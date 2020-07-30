@@ -23,7 +23,9 @@ import org.apache.flink.api.dag.Transformation;
 
 import org.apache.flink.shaded.guava18.com.google.common.collect.Lists;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -38,6 +40,13 @@ import java.util.List;
 @Internal
 public class UnionTransformation<T> extends Transformation<T> {
 	private final List<Transformation<T>> inputs;
+
+	@SafeVarargs
+	public static <T> UnionTransformation<T> of(Transformation<T>... transforms) {
+		List<Transformation<T>> inputList = new ArrayList<>();
+		Collections.addAll(inputList, transforms);
+		return new UnionTransformation<>(inputList);
+	}
 
 	/**
 	 * Creates a new {@code UnionTransformation} from the given input {@code Transformations}.

@@ -9,8 +9,8 @@ import org.apache.flink.api.dag.TransformationApply;
 /**
  * Applies a {@link CommitFunction} on the input {@link Transformation}.
  *
- * <p>TODO: This shouldn't be in flink-streaming-java but we currently need access to the physical
- * map operator here because we don't have a logical MapTransformation.
+ * <p>TODO: This shouldn't be in flink-streaming-java but I'm keeping them all here together for
+ * the POC.
  */
 public class Commit<CommitT> extends TransformationApply<Transformation<CommitT>, Transformation<Void>> {
 

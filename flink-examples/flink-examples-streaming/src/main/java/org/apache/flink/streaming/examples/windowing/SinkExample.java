@@ -18,13 +18,16 @@
 package org.apache.flink.streaming.examples.windowing;
 
 import org.apache.flink.api.common.functions.CommitFunction;
+import org.apache.flink.api.common.functions.FinalizeFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.dag.Sink;
 import org.apache.flink.api.dag.Transformation;
 import org.apache.flink.streaming.api.dag.Commit;
+import org.apache.flink.streaming.api.dag.Finalize;
 import org.apache.flink.streaming.api.dag.Map;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.transformations.UnionTransformation;
 
 /**
  * Example for the new topology-based Sink API.
@@ -54,28 +57,68 @@ public class SinkExample {
 		@Override
 		public Transformation<?> apply(Context context, Transformation<String> input) {
 
-			// instead of just forwarding we would have a transform/function that writes data and
-			// forwards commits
-			Transformation<String> mapped = input.apply(context, Map.of(new MySinkMapper()));
+			Transformation<String> mapped = input.apply(context, Map.of(new MySinkMapper("1")));
 
-			// this is just an example, maybe we need more new primitive operations as building
-			// blocks to allow building the StreamingFileSink and Kafka
-			Transformation<Void> committed = mapped.apply(context, Commit.of(new MyCommitter()));
+			Transformation<Void> committed1 = mapped.apply(
+					context,
+					Commit.of(new MyCommitter("1")));
+			Transformation<Void> committed2 = mapped.apply(
+					context,
+					Commit.of(new MyCommitter("2")));
 
-			return committed;
+			Transformation<String> mapped2 = mapped.apply(context, Map.of(new MySinkMapper("2")));
+			Transformation<String> mapped3 = mapped.apply(context, Map.of(new MySinkMapper("3")));
+
+			Transformation<String> union = UnionTransformation.of(mapped2, mapped3);
+			Transformation<Void> committedUnion = union.apply(
+					context,
+					Commit.of(new MyCommitter("union")));
+
+			Transformation<Void> unionAll = UnionTransformation.of(
+					committed1,
+					committed2,
+					committedUnion);
+
+			return unionAll.apply(context, Finalize.of(new MyFinalizer("all")));
 		}
 
 		public static class MySinkMapper implements MapFunction<String, String> {
+
+			private final String id;
+
+			public MySinkMapper(String id) {
+				this.id = id;
+			}
+
 			@Override
 			public String map(String value) {
-				return "Hello " + value;
+				return id + ": Hello " + value;
 			}
 		}
 
 		public static class MyCommitter implements CommitFunction<String> {
+			private final String id;
+
+			public MyCommitter(String id) {
+				this.id = id;
+			}
+
 			@Override
 			public void commit(String commit) {
-				System.out.println("Committing " + commit);
+				System.out.println(id + ": Committing " + commit);
+			}
+		}
+
+		public static class MyFinalizer implements FinalizeFunction {
+			private final String id;
+
+			public MyFinalizer(String id) {
+				this.id = id;
+			}
+
+			@Override
+			public void finalizeOutput() {
+				System.out.println(id + ": Finalizing");
 			}
 		}
 	}

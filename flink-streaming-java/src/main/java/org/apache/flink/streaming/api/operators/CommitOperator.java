@@ -29,20 +29,20 @@ import org.apache.flink.streaming.runtime.streamrecord.StreamRecord;
  * A {@link StreamOperator} for executing a {@link org.apache.flink.api.dag.CommitTransformation}.
  */
 @Internal
-public class CommitOperator<CommitT>
+public class CommitOperator<CommittableT>
 		extends AbstractStreamOperator<Void>
-		implements OneInputStreamOperator<CommitT, Void>, BoundedOneInput {
+		implements OneInputStreamOperator<CommittableT, Void>, BoundedOneInput {
 
 	private static final long serialVersionUID = 1L;
 
-	private final CommitFunction<CommitT> commitFunction;
-	private final TypeSerializer<CommitT> commitSerializer;
+	private final CommitFunction<CommittableT> commitFunction;
+	private final TypeSerializer<CommittableT> commitSerializer;
 
-	private transient ListState<CommitT> commits;
+	private transient ListState<CommittableT> commits;
 
 	public CommitOperator(
-			CommitFunction<CommitT> commitFunction,
-			TypeSerializer<CommitT> commitSerializer) {
+			CommitFunction<CommittableT> commitFunction,
+			TypeSerializer<CommittableT> commitSerializer) {
 		this.commitFunction = commitFunction;
 		this.commitSerializer = commitSerializer;
 	}
@@ -50,7 +50,7 @@ public class CommitOperator<CommitT>
 	@Override
 	public void initializeState(StateInitializationContext context) throws Exception {
 		super.initializeState(context);
-		ListStateDescriptor<CommitT> commitStateDescriptor = new ListStateDescriptor<>(
+		ListStateDescriptor<CommittableT> commitStateDescriptor = new ListStateDescriptor<>(
 				"commits",
 				commitSerializer);
 
@@ -63,13 +63,13 @@ public class CommitOperator<CommitT>
 	public void endInput() throws Exception {
 		// potentially we should not commit right away here but set a flag and then commit
 		// once we get the next or final checkpoint complete notification
-		for (CommitT commit : commits.get()) {
+		for (CommittableT commit : commits.get()) {
 			commitFunction.commit(commit);
 		}
 	}
 
 	@Override
-	public void processElement(StreamRecord<CommitT> element) throws Exception {
+	public void processElement(StreamRecord<CommittableT> element) throws Exception {
 		commits.add(element.getValue());
 	}
 }

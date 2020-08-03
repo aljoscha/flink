@@ -446,7 +446,7 @@ public class StreamGraphGenerator {
 	 * Transforms a {@code CommitTransformation}.
 	 *
 	 */
-	private <CommitT> Collection<Integer> transformCommit(CommitTransformation<CommitT> transform) {
+	private <CommittableT> Collection<Integer> transformCommit(CommitTransformation<CommittableT> transform) {
 
 		Collection<Integer> inputIds = transform(transform.getInput());
 
@@ -462,7 +462,7 @@ public class StreamGraphGenerator {
 		// create an operator for executing this. Once we have bounded/unbounded execution
 		// we can decide on different physical execution strategies for this. Could be an operator,
 		// could be an operator with an operator coordinator that does some magic.
-		CommitOperator<CommitT> commitOperator = new CommitOperator<>(
+		CommitOperator<CommittableT> commitOperator = new CommitOperator<>(
 				transform.getCommitFunction(),
 				transform.getInput().getOutputType().createSerializer(executionConfig));
 

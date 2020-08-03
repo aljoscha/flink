@@ -26,11 +26,11 @@ import java.io.Serializable;
  * A "function" that can manage a set of commits that should be committed at the end of the job.
  */
 @Public
-public interface CommitFunction<CommitT> extends Function, Serializable {
+public interface CommitFunction<CommittableT> extends Function, Serializable {
 
 	/**
-	 * Commits the given commit. This method should be idemponent because we might have to retry
+	 * Commits the given commit. This method should be idempotent because we might have to retry
 	 * committing in the case of failures.
 	 */
-	void commit(CommitT commit);
+	void commit(CommittableT commit);
 }

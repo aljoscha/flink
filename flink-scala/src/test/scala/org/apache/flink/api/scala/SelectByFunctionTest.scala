@@ -22,8 +22,6 @@ import org.apache.flink.api.java.typeutils.TupleTypeInfoBase
 
 import org.junit.{Assert, Test}
 
-/**
- */
 class SelectByFunctionTest {
 
   val tupleTypeInfo = implicitly[TypeInformation[(Int, Long, String, Long, Int)]]

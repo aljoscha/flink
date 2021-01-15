@@ -42,7 +42,8 @@ import scala.collection.JavaConversions._
 /**
  * Batch physical RelNode for local sort-based aggregate operator.
  *
- * @see [[BatchPhysicalGroupAggregateBase]] for more info.
+ * @see
+ *   [[BatchPhysicalGroupAggregateBase]] for more info.
  */
 class BatchPhysicalLocalSortAggregate(
     cluster: RelOptCluster,

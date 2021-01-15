@@ -28,29 +28,38 @@ import org.apache.flink.streaming.api.scala.DataStream
 object CEP {
 
   /**
-   * Transforms a [[DataStream]] into a [[PatternStream]] in the Scala API.
-   * See [[org.apache.flink.cep.CEP}]]for a more detailed description how the underlying
-   * Java API works.
+   * Transforms a [[DataStream]] into a [[PatternStream]] in the Scala API. See
+   * [[org.apache.flink.cep.CEP}]] for a more detailed description how the underlying Java API
+   * works.
    *
-   * @param input   DataStream containing the input events
-   * @param pattern Pattern specification which shall be detected
-   * @tparam T Type of the input events
-   * @return Resulting pattern stream
+   * @param input
+   *   DataStream containing the input events
+   * @param pattern
+   *   Pattern specification which shall be detected
+   * @tparam T
+   *   Type of the input events
+   * @return
+   *   Resulting pattern stream
    */
   def pattern[T](input: DataStream[T], pattern: Pattern[T, _ <: T]): PatternStream[T] = {
     wrapPatternStream(JCEP.pattern(input.javaStream, pattern.wrappedPattern))
   }
 
   /**
-   * Transforms a [[DataStream]] into a [[PatternStream]] in the Scala API.
-   * See [[org.apache.flink.cep.CEP}]]for a more detailed description how the underlying
-   * Java API works.
+   * Transforms a [[DataStream]] into a [[PatternStream]] in the Scala API. See
+   * [[org.apache.flink.cep.CEP}]] for a more detailed description how the underlying Java API
+   * works.
    *
-   * @param input      DataStream containing the input events
-   * @param pattern    Pattern specification which shall be detected
-   * @param comparator Comparator to sort events with equal timestamps
-   * @tparam T Type of the input events
-   * @return Resulting pattern stream
+   * @param input
+   *   DataStream containing the input events
+   * @param pattern
+   *   Pattern specification which shall be detected
+   * @param comparator
+   *   Comparator to sort events with equal timestamps
+   * @tparam T
+   *   Type of the input events
+   * @return
+   *   Resulting pattern stream
    */
   def pattern[T](
       input: DataStream[T],

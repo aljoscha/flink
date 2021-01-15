@@ -35,17 +35,16 @@ import org.apache.calcite.rex.{RexLiteral, RexUtil}
  * Converts [[FlinkLogicalTableFunctionScan]] with constant RexCall to
  * {{{
  *                         [[BatchPhysicalCorrelate]]
- *                            /             \
+ *                           /             \
  * empty [[BatchPhysicalValuesRule]]  [[FlinkLogicalTableFunctionScan]]
  * }}}
  *
- * Add the rule to support select from a UDF directly, such as the following SQL:
- * SELECT * FROM LATERAL TABLE(func()) as T(c)
+ * Add the rule to support select from a UDF directly, such as the following SQL: SELECT * FROM
+ * LATERAL TABLE(func()) as T(c)
  *
- * Note: [[BatchPhysicalCorrelateRule]] is responsible for converting a reasonable physical plan
- * for the normal correlate query, such as the following SQL:
- * example1: SELECT * FROM T, LATERAL TABLE(func()) as T(c)
- * example2: SELECT a, c FROM T, LATERAL TABLE(func(a)) as T(c)
+ * Note: [[BatchPhysicalCorrelateRule]] is responsible for converting a reasonable physical plan for
+ * the normal correlate query, such as the following SQL: example1: SELECT * FROM T, LATERAL
+ * TABLE(func()) as T(c) example2: SELECT a, c FROM T, LATERAL TABLE(func(a)) as T(c)
  */
 class BatchPhysicalConstantTableFunctionScanRule
     extends RelOptRule(

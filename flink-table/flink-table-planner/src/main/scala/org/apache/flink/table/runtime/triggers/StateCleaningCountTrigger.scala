@@ -28,8 +28,8 @@ import org.apache.flink.table.api.{TableConfig, Types}
 import org.apache.flink.table.runtime.triggers.StateCleaningCountTrigger.Sum
 
 /**
- * A [[Trigger]] that fires once the count of elements in a pane reaches the given count
- * or the cleanup timer is triggered.
+ * A [[Trigger]] that fires once the count of elements in a pane reaches the given count or the
+ * cleanup timer is triggered.
  */
 class StateCleaningCountTrigger(minRetentionTime: Long, maxRetentionTime: Long, maxCount: Long)
     extends Trigger[Any, GlobalWindow] {
@@ -118,8 +118,10 @@ object StateCleaningCountTrigger {
   /**
    * Create a [[StateCleaningCountTrigger]] instance.
    *
-   * @param config table configuration.
-   * @param maxCount The count of elements at which to fire.
+   * @param config
+   *   table configuration.
+   * @param maxCount
+   *   The count of elements at which to fire.
    */
   def of(config: TableConfig, maxCount: Long): StateCleaningCountTrigger =
     new StateCleaningCountTrigger(

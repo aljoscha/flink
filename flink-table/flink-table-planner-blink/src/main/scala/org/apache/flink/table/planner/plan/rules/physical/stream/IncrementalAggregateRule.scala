@@ -38,11 +38,10 @@ import java.lang.{Boolean => JBoolean}
 import java.util.Collections
 
 /**
- * Rule that matches final [[StreamPhysicalGlobalGroupAggregate]] on [[StreamPhysicalExchange]]
- * on final [[StreamPhysicalLocalGroupAggregate]] on partial [[StreamPhysicalGlobalGroupAggregate]],
- * and combines the final [[StreamPhysicalLocalGroupAggregate]] and
- * the partial [[StreamPhysicalGlobalGroupAggregate]] into a
- * [[StreamPhysicalIncrementalGroupAggregate]].
+ * Rule that matches final [[StreamPhysicalGlobalGroupAggregate]] on [[StreamPhysicalExchange]] on
+ * final [[StreamPhysicalLocalGroupAggregate]] on partial [[StreamPhysicalGlobalGroupAggregate]],
+ * and combines the final [[StreamPhysicalLocalGroupAggregate]] and the partial
+ * [[StreamPhysicalGlobalGroupAggregate]] into a [[StreamPhysicalIncrementalGroupAggregate]].
  */
 class IncrementalAggregateRule
     extends RelOptRule(

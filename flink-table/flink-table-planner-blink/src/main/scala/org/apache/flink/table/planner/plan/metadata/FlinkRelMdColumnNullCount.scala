@@ -46,10 +46,14 @@ class FlinkRelMdColumnNullCount private extends MetadataHandler[ColumnNullCount]
   /**
    * Gets the null count of the given column in TableScan.
    *
-   * @param ts    TableScan RelNode
-   * @param mq    RelMetadataQuery instance
-   * @param index the index of the given column
-   * @return the null count of the given column in TableScan
+   * @param ts
+   *   TableScan RelNode
+   * @param mq
+   *   RelMetadataQuery instance
+   * @param index
+   *   the index of the given column
+   * @return
+   *   the null count of the given column in TableScan
    */
   def getColumnNullCount(ts: TableScan, mq: RelMetadataQuery, index: Int): JDouble = {
     Preconditions.checkArgument(mq.isInstanceOf[FlinkRelMetadataQuery])
@@ -69,20 +73,28 @@ class FlinkRelMdColumnNullCount private extends MetadataHandler[ColumnNullCount]
   /**
    * Gets the null count of the given column on Snapshot.
    *
-   * @param snapshot    Snapshot RelNode
-   * @param mq    RelMetadataQuery instance
-   * @param index the index of the given column
-   * @return the null count of the given column on Snapshot.
+   * @param snapshot
+   *   Snapshot RelNode
+   * @param mq
+   *   RelMetadataQuery instance
+   * @param index
+   *   the index of the given column
+   * @return
+   *   the null count of the given column on Snapshot.
    */
   def getColumnNullCount(snapshot: Snapshot, mq: RelMetadataQuery, index: Int): JDouble = null
 
   /**
    * Gets the null count of the given column in Project.
    *
-   * @param project Project RelNode
-   * @param mq      RelMetadataQuery instance
-   * @param index   the index of the given column
-   * @return the null count of the given column in Project
+   * @param project
+   *   Project RelNode
+   * @param mq
+   *   RelMetadataQuery instance
+   * @param index
+   *   the index of the given column
+   * @return
+   *   the null count of the given column in Project
    */
   def getColumnNullCount(project: Project, mq: RelMetadataQuery, index: Int): JDouble = {
     val (nullCountOfInput, _) =
@@ -93,10 +105,14 @@ class FlinkRelMdColumnNullCount private extends MetadataHandler[ColumnNullCount]
   /**
    * Gets the null count of the given column in Filter.
    *
-   * @param filter  Filter RelNode
-   * @param mq    RelMetadataQuery instance
-   * @param index the index of the given column
-   * @return the null count of the given column in Filter
+   * @param filter
+   *   Filter RelNode
+   * @param mq
+   *   RelMetadataQuery instance
+   * @param index
+   *   the index of the given column
+   * @return
+   *   the null count of the given column in Filter
    */
   def getColumnNullCount(filter: Filter, mq: RelMetadataQuery, index: Int): JDouble = {
     val fmq = FlinkRelMetadataQuery.reuseOrCreate(mq)
@@ -108,10 +124,14 @@ class FlinkRelMdColumnNullCount private extends MetadataHandler[ColumnNullCount]
   /**
    * Gets the null count of the given column in Calc.
    *
-   * @param calc  Calc RelNode
-   * @param mq    RelMetadataQuery instance
-   * @param index the index of the given column
-   * @return the null count of the given column in Calc
+   * @param calc
+   *   Calc RelNode
+   * @param mq
+   *   RelMetadataQuery instance
+   * @param index
+   *   the index of the given column
+   * @return
+   *   the null count of the given column in Calc
    */
   def getColumnNullCount(calc: Calc, mq: RelMetadataQuery, index: Int): JDouble = {
     val program = calc.getProgram
@@ -187,10 +207,14 @@ class FlinkRelMdColumnNullCount private extends MetadataHandler[ColumnNullCount]
   /**
    * Gets the null count of the given column in Join.
    *
-   * @param rel   Join RelNode
-   * @param mq    RelMetadataQuery instance
-   * @param index the index of the given column
-   * @return the null count of the given column in Join.
+   * @param rel
+   *   Join RelNode
+   * @param mq
+   *   RelMetadataQuery instance
+   * @param index
+   *   the index of the given column
+   * @return
+   *   the null count of the given column in Join.
    */
   def getColumnNullCount(rel: Join, mq: RelMetadataQuery, index: Int): JDouble = {
 
@@ -279,10 +303,14 @@ class FlinkRelMdColumnNullCount private extends MetadataHandler[ColumnNullCount]
   /**
    * Catches-all rule when none of the others apply.
    *
-   * @param rel   RelNode to analyze
-   * @param mq    RelMetadataQuery instance
-   * @param index the index of the given column
-   * @return Always returns null
+   * @param rel
+   *   RelNode to analyze
+   * @param mq
+   *   RelMetadataQuery instance
+   * @param index
+   *   the index of the given column
+   * @return
+   *   Always returns null
    */
   def getColumnNullCount(rel: RelNode, mq: RelMetadataQuery, index: Int): JDouble = null
 

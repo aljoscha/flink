@@ -33,7 +33,8 @@ import java.util
 /**
  * Stream physical RelNode for Python unbounded group aggregate.
  *
- * @see [[StreamPhysicalGroupAggregateBase]] for more info.
+ * @see
+ *   [[StreamPhysicalGroupAggregateBase]] for more info.
  */
 class StreamPhysicalPythonGroupAggregate(
     cluster: RelOptCluster,

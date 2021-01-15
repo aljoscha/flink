@@ -28,7 +28,7 @@ import org.apache.calcite.rel.rules.CoreRules
 import org.apache.calcite.tools.RuleSets
 
 /**
- * Test for [[PruneAggregateCallRule]]#CALC_ON_AGGREGATE.
+ * Test for [[PruneAggregateCallRule]] #CALC_ON_AGGREGATE.
  */
 class CalcPruneAggregateCallRuleTest extends PruneAggregateCallRuleTestBase {
 

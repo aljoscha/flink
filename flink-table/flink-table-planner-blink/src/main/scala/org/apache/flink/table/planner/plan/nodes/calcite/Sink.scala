@@ -32,12 +32,18 @@ import scala.collection.JavaConversions._
 /**
  * Relational expression that writes out data of input node into a [[DynamicTableSink]].
  *
- * @param cluster  cluster that this relational expression belongs to
- * @param traitSet the traits of this rel
- * @param input    input relational expression
- *  @param tableIdentifier the full path of the table to retrieve.
- *  @param catalogTable Catalog table where this table source table comes from
- *  @param tableSink the [[DynamicTableSink]] for which to write into
+ * @param cluster
+ *   cluster that this relational expression belongs to
+ * @param traitSet
+ *   the traits of this rel
+ * @param input
+ *   input relational expression
+ * @param tableIdentifier
+ *   the full path of the table to retrieve.
+ * @param catalogTable
+ *   Catalog table where this table source table comes from
+ * @param tableSink
+ *   the [[DynamicTableSink]] for which to write into
  */
 abstract class Sink(
     cluster: RelOptCluster,

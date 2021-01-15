@@ -36,9 +36,12 @@ import org.apache.flink.util.Collector
 /**
  * A ProcessFunction to support unbounded event-time over-window
  *
- * @param genAggregations Generated aggregate helper function
- * @param intermediateType         the intermediate row tye which the state saved
- * @param inputType                the input row tye which the state saved
+ * @param genAggregations
+ *   Generated aggregate helper function
+ * @param intermediateType
+ *   the intermediate row tye which the state saved
+ * @param inputType
+ *   the input row tye which the state saved
  */
 abstract class RowTimeUnboundedOver[K](
     genAggregations: GeneratedAggregationsFunction,
@@ -93,12 +96,15 @@ abstract class RowTimeUnboundedOver[K](
   }
 
   /**
-   * Puts an element from the input stream into state if it is not late.
-   * Registers a timer for the next watermark.
+   * Puts an element from the input stream into state if it is not late. Registers a timer for the
+   * next watermark.
    *
-   * @param inputC The input value.
-   * @param ctx   The ctx to register timer or get current time
-   * @param out   The collector for returning result values.
+   * @param inputC
+   *   The input value.
+   * @param ctx
+   *   The ctx to register timer or get current time
+   * @param out
+   *   The collector for returning result values.
    */
   override def processElement(
       inputC: CRow,
@@ -129,13 +135,15 @@ abstract class RowTimeUnboundedOver[K](
   }
 
   /**
-   * Called when a watermark arrived.
-   * Sorts records according the timestamp, computes aggregates, and emits all records with
-   * timestamp smaller than the watermark in timestamp order.
+   * Called when a watermark arrived. Sorts records according the timestamp, computes aggregates,
+   * and emits all records with timestamp smaller than the watermark in timestamp order.
    *
-   * @param timestamp The timestamp of the firing timer.
-   * @param ctx       The ctx to register timer or get current time
-   * @param out       The collector for returning result values.
+   * @param timestamp
+   *   The timestamp of the firing timer.
+   * @param ctx
+   *   The ctx to register timer or get current time
+   * @param out
+   *   The collector for returning result values.
    */
   override def onTimer(
       timestamp: Long,
@@ -213,8 +221,8 @@ abstract class RowTimeUnboundedOver[K](
   /**
    * Inserts timestamps in order into a linked list.
    *
-   * If timestamps arrive in order (as in case of using the RocksDB state backend) this is just
-   * an append with O(1).
+   * If timestamps arrive in order (as in case of using the RocksDB state backend) this is just an
+   * append with O(1).
    */
   private def insertToSortedList(recordTimestamp: Long) = {
     val listIterator = sortedTimestamps.listIterator(sortedTimestamps.size)
@@ -234,8 +242,7 @@ abstract class RowTimeUnboundedOver[K](
   }
 
   /**
-   * Process the same timestamp data, the mechanism is different between
-   * rows and range window.
+   * Process the same timestamp data, the mechanism is different between rows and range window.
    */
   def processElementsWithSameTimestamp(
       curRowList: JList[Row],
@@ -250,8 +257,8 @@ abstract class RowTimeUnboundedOver[K](
 }
 
 /**
- * A ProcessFunction to support unbounded ROWS window.
- * The ROWS clause defines on a physical level how many rows are included in a window frame.
+ * A ProcessFunction to support unbounded ROWS window. The ROWS clause defines on a physical level
+ * how many rows are included in a window frame.
  */
 class RowTimeUnboundedRowsOver[K](
     genAggregations: GeneratedAggregationsFunction,
@@ -291,9 +298,8 @@ class RowTimeUnboundedRowsOver[K](
 }
 
 /**
- * A ProcessFunction to support unbounded RANGE window.
- * The RANGE option includes all the rows within the window frame
- * that have the same ORDER BY values as the current row.
+ * A ProcessFunction to support unbounded RANGE window. The RANGE option includes all the rows
+ * within the window frame that have the same ORDER BY values as the current row.
  */
 class RowTimeUnboundedRangeOver[K](
     genAggregations: GeneratedAggregationsFunction,

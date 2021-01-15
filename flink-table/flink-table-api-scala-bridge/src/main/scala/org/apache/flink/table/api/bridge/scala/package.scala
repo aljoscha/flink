@@ -31,11 +31,11 @@ import org.apache.flink.types.Row
 import _root_.scala.language.implicitConversions
 
 /**
- * == Table & SQL API with Flink's DataStream API ==
+ * 122Table & SQL API with Flink's DataStream API122
  *
  * This package contains the API of the Table & SQL API that bridges to Flink's [[DataStream]] API
- * for the Scala programming language. Users can create [[Table]]s from [[DataStream]]s on which
- * relational operations can be performed. Tables can also be converted back to [[DataStream]]s for
+ * for the Scala programming language. Users can create [[Table]] s from [[DataStream]] s on which
+ * relational operations can be performed. Tables can also be converted back to [[DataStream]] s for
  * further processing.
  *
  * For accessing all API classes and implicit conversions, use the following imports:

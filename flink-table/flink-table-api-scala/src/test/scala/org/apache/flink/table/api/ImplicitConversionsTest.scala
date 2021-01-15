@@ -27,7 +27,7 @@ import org.junit.Assert.assertThat
 import org.junit.Test
 
 /**
- * Tests for conversion between objects and [[Expression]]s used in Expression DSL.
+ * Tests for conversion between objects and [[Expression]] s used in Expression DSL.
  */
 class ImplicitConversionsTest extends ImplicitExpressionConversions {
   @Test

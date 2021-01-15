@@ -34,15 +34,20 @@ import org.apache.flink.util.Collector
  * aligned rowtime for pre-tumbling), pre-aggregates (pre-tumbles) rows, aligns the window start,
  * and replicates or omits records for different panes of a sliding window.
  *
- * This function is similar to [[DataSetTumbleCountWindowAggReduceGroupFunction]], however,
- * it does no final aggregate evaluation. It also includes the logic of
+ * This function is similar to [[DataSetTumbleCountWindowAggReduceGroupFunction]], however, it does
+ * no final aggregate evaluation. It also includes the logic of
  * [[DataSetSlideTimeWindowAggFlatMapFunction]].
  *
- * @param genAggregations Code-generated [[GeneratedAggregations]]
- * @param keysAndAggregatesArity The total arity of keys and aggregates
- * @param windowSize window size of the sliding window
- * @param windowSlide window slide of the sliding window
- * @param returnType return type of this function
+ * @param genAggregations
+ *   Code-generated [[GeneratedAggregations]]
+ * @param keysAndAggregatesArity
+ *   The total arity of keys and aggregates
+ * @param windowSize
+ *   window size of the sliding window
+ * @param windowSlide
+ *   window slide of the sliding window
+ * @param returnType
+ *   return type of this function
  */
 class DataSetSlideTimeWindowAggReduceGroupFunction(
     private val genAggregations: GeneratedAggregationsFunction,

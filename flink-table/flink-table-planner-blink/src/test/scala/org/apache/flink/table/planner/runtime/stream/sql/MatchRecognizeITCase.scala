@@ -574,10 +574,9 @@ class MatchRecognizeITCase(backend: StateBackendMode) extends StreamingWithState
   /**
    * This query checks:
    *
-   * 1. count(D.price) produces 0, because no rows matched to D
-   * 2. sum(D.price) produces null, because no rows matched to D
-   * 3. aggregates that take multiple parameters work
-   * 4. aggregates with expressions work
+   *   1. count(D.price) produces 0, because no rows matched to D 2. sum(D.price) produces null,
+   *      because no rows matched to D 3. aggregates that take multiple parameters work 4.
+   *      aggregates with expressions work
    */
   @Test
   def testAggregates(): Unit = {

@@ -25,8 +25,7 @@ sealed trait ValidationResult {
   def isSuccess: Boolean
 
   /**
-   * Allows constructing a cascade of validation results.
-   * The first failure result will be returned.
+   * Allows constructing a cascade of validation results. The first failure result will be returned.
    */
   def orElse(other: ValidationResult): ValidationResult = {
     if (isSuccess) {
@@ -45,8 +44,8 @@ object ValidationSuccess extends ValidationResult {
 }
 
 /**
- * Represents the failing result of a validation,
- * with a error message to show the reason of failure.
+ * Represents the failing result of a validation, with a error message to show the reason of
+ * failure.
  */
 case class ValidationFailure(message: String) extends ValidationResult {
   val isSuccess: Boolean = false

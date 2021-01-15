@@ -21,14 +21,14 @@ import org.apache.flink.annotation.PublicEvolving
 import org.apache.flink.api.scala.extensions.impl.acceptPartialFunctions._
 
 /**
- * acceptPartialFunctions extends the original DataSet with methods with unique names
- * that delegate to core higher-order functions (e.g. `map`) so that we can work around
- * the fact that overloaded methods taking functions as parameters can't accept partial
- * functions as well. This enables the possibility to directly apply pattern matching
- * to decompose inputs such as tuples, case classes and collections.
+ * acceptPartialFunctions extends the original DataSet with methods with unique names that delegate
+ * to core higher-order functions (e.g. `map`) so that we can work around the fact that overloaded
+ * methods taking functions as parameters can't accept partial functions as well. This enables the
+ * possibility to directly apply pattern matching to decompose inputs such as tuples, case classes
+ * and collections.
  *
- * The following is a small example that showcases how this extensions would work on
- * a Flink data set:
+ * The following is a small example that showcases how this extensions would work on a Flink data
+ * set:
  *
  * {{{
  *   object Main {
@@ -52,9 +52,9 @@ import org.apache.flink.api.scala.extensions.impl.acceptPartialFunctions._
  *   }
  * }}}
  *
- * The extension consists of several implicit conversions over all the data set representations
- * that could gain from this feature. To use this set of extensions methods the user has to
- * explicitly opt-in by importing `org.apache.flink.api.scala.extensions.acceptPartialFunctions`.
+ * The extension consists of several implicit conversions over all the data set representations that
+ * could gain from this feature. To use this set of extensions methods the user has to explicitly
+ * opt-in by importing `org.apache.flink.api.scala.extensions.acceptPartialFunctions`.
  *
  * For more information and usage examples please consult the Apache Flink official documentation.
  */

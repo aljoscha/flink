@@ -26,8 +26,10 @@ import org.apache.flink.table.api.dataview.ListView
 /**
  * [[ListView]] use state backend.
  *
- * @param state list state
- * @tparam T element type
+ * @param state
+ *   list state
+ * @tparam T
+ *   element type
  */
 class StateListView[T](state: ListState[T]) extends ListView[T] {
 

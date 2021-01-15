@@ -29,9 +29,9 @@ import org.apache.flink.types.Row
 object Conversions {
 
   /**
-   * Utility method for generating converter [[MapFunction]] that converts from
-   * given input [[TypeInformation]] of type [[Row]] to requested type, based on a
-   * logical [[TableSchema]] of the input type.
+   * Utility method for generating converter [[MapFunction]] that converts from given input
+   * [[TypeInformation]] of type [[Row]] to requested type, based on a logical [[TableSchema]] of
+   * the input type.
    */
   def generateRowConverterFunction[OUT](
       physicalInputType: TypeInformation[Row],

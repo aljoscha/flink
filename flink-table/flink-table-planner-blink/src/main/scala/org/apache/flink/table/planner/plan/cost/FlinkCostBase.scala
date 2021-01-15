@@ -26,12 +26,14 @@ import org.apache.calcite.plan.RelOptCost
 trait FlinkCostBase extends RelOptCost {
 
   /**
-   * @return usage of network resources
+   * @return
+   *   usage of network resources
    */
   def getNetwork: Double
 
   /**
-   * @return usage of memory resources
+   * @return
+   *   usage of memory resources
    */
   def getMemory: Double
 }

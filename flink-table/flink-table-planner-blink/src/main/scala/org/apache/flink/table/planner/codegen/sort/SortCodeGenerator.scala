@@ -40,9 +40,12 @@ import scala.collection.mutable
 /**
  * A code generator for generating [[NormalizedKeyComputer]] and [[RecordComparator]].
  *
- * @param conf         config of the planner.
- * @param input        input type.
- * @param sortSpec     sort specification.
+ * @param conf
+ *   config of the planner.
+ * @param input
+ *   input type.
+ * @param sortSpec
+ *   sort specification.
  */
 class SortCodeGenerator(conf: TableConfig, val input: RowType, val sortSpec: SortSpec) {
 
@@ -121,9 +124,11 @@ class SortCodeGenerator(conf: TableConfig, val input: RowType, val sortSpec: Sor
   /**
    * Generates a [[NormalizedKeyComputer]] that can be passed to a Java compiler.
    *
-   * @param name Class name of the function.
-   *             Does not need to be unique but has to be a valid Java class identifier.
-   * @return A GeneratedNormalizedKeyComputer
+   * @param name
+   *   Class name of the function. Does not need to be unique but has to be a valid Java class
+   *   identifier.
+   * @return
+   *   A GeneratedNormalizedKeyComputer
    */
   def generateNormalizedKeyComputer(name: String): GeneratedNormalizedKeyComputer = {
 
@@ -251,8 +256,8 @@ class SortCodeGenerator(conf: TableConfig, val input: RowType, val sortSpec: Sor
   }
 
   /**
-   * In order to better performance and not use MemorySegment's compare() and swap(),
-   * we CodeGen more efficient chunk method.
+   * In order to better performance and not use MemorySegment's compare() and swap(), we CodeGen
+   * more efficient chunk method.
    */
   def calculateChunks(numKeyBytes: Int): Array[Int] = {
     /* Example chunks, for int:
@@ -274,8 +279,8 @@ class SortCodeGenerator(conf: TableConfig, val input: RowType, val sortSpec: Sor
   }
 
   /**
-   * Because we put normalizedKeys in big endian way, if we are the little endian,
-   * we need to reverse these data with chunks for comparation.
+   * Because we put normalizedKeys in big endian way, if we are the little endian, we need to
+   * reverse these data with chunks for comparation.
    */
   def generateReverseNormalizedKeys(chunks: Array[Int]): mutable.ArrayBuffer[String] = {
     /* Example generated code, for int:
@@ -379,9 +384,11 @@ class SortCodeGenerator(conf: TableConfig, val input: RowType, val sortSpec: Sor
   /**
    * Generates a [[RecordComparator]] that can be passed to a Java compiler.
    *
-   * @param name Class name of the function.
-   *             Does not need to be unique but has to be a valid Java class identifier.
-   * @return A GeneratedRecordComparator
+   * @param name
+   *   Class name of the function. Does not need to be unique but has to be a valid Java class
+   *   identifier.
+   * @return
+   *   A GeneratedRecordComparator
    */
   def generateRecordComparator(name: String): GeneratedRecordComparator = {
     ComparatorCodeGenerator.gen(conf, name, input, sortSpec)

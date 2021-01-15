@@ -35,9 +35,12 @@ import scala.collection.JavaConverters._
 /**
  * Composite type for encapsulating Flink's [[CompositeType]].
  *
- * @param compositeType CompositeType to encapsulate
- * @param nullable flag if type can be nullable
- * @param typeFactory Flink's type factory
+ * @param compositeType
+ *   CompositeType to encapsulate
+ * @param nullable
+ *   flag if type can be nullable
+ * @param typeFactory
+ *   Flink's type factory
  */
 class CompositeRelDataType(
     val compositeType: CompositeType[_],

@@ -45,15 +45,20 @@ object BatchTableEnvUtil {
   }
 
   /**
-   * Registers the given [[Iterable]] as table in the
-   * [[TableEnvironment]]'s catalog.
+   * Registers the given [[Iterable]] as table in the [[TableEnvironment]] 's catalog.
    *
-   * @param tableName name of table.
-   * @param data The [[Iterable]] to be converted.
-   * @param typeInfo information of [[Iterable]].
-   * @param fieldNames field names expressions, eg: 'a, 'b, 'c
-   * @tparam T The type of the [[Iterable]].
-   * @return The converted [[Table]].
+   * @param tableName
+   *   name of table.
+   * @param data
+   *   The [[Iterable]] to be converted.
+   * @param typeInfo
+   *   information of [[Iterable]].
+   * @param fieldNames
+   *   field names expressions, eg: 'a, 'b, 'c
+   * @tparam T
+   *   The type of the [[Iterable]].
+   * @return
+   *   The converted [[Table]].
    */
   def registerCollection[T](
       tEnv: TableEnvironment,
@@ -72,17 +77,24 @@ object BatchTableEnvUtil {
   }
 
   /**
-   * Registers the given [[Iterable]] as table in the
-   * [[TableEnvironment]]'s catalog.
+   * Registers the given [[Iterable]] as table in the [[TableEnvironment]] 's catalog.
    *
-   * @param tableName name of table.
-   * @param data The [[Iterable]] to be converted.
-   * @param typeInfo information of [[Iterable]].
-   * @param fieldNames field names, eg: "a, b, c"
-   * @param fieldNullables The field isNullables attributes of data.
-   * @param statistic statistics of current Table
-   * @tparam T The type of the [[Iterable]].
-   * @return The converted [[Table]].
+   * @param tableName
+   *   name of table.
+   * @param data
+   *   The [[Iterable]] to be converted.
+   * @param typeInfo
+   *   information of [[Iterable]].
+   * @param fieldNames
+   *   field names, eg: "a, b, c"
+   * @param fieldNullables
+   *   The field isNullables attributes of data.
+   * @param statistic
+   *   statistics of current Table
+   * @tparam T
+   *   The type of the [[Iterable]].
+   * @return
+   *   The converted [[Table]].
    */
   def registerCollection[T](
       tEnv: TableEnvironment,
@@ -103,14 +115,18 @@ object BatchTableEnvUtil {
   }
 
   /**
-   * Registers the given [[Iterable]] as table in the
-   * [[TableEnvironment]]'s catalog.
+   * Registers the given [[Iterable]] as table in the [[TableEnvironment]] 's catalog.
    *
-   * @param tableName name of table.
-   * @param data The [[Iterable]] to be converted.
-   * @param fieldNames field names expressions, eg: 'a, 'b, 'c
-   * @tparam T The type of the [[Iterable]].
-   * @return The converted [[Table]].
+   * @param tableName
+   *   name of table.
+   * @param data
+   *   The [[Iterable]] to be converted.
+   * @param fieldNames
+   *   field names expressions, eg: 'a, 'b, 'c
+   * @tparam T
+   *   The type of the [[Iterable]].
+   * @return
+   *   The converted [[Table]].
    */
   def registerCollection[T: ClassTag: TypeInformation](
       tEnv: TableEnvironment,
@@ -129,16 +145,22 @@ object BatchTableEnvUtil {
   }
 
   /**
-   * Registers the given [[Iterable]] as table in the
-   * [[TableEnvironment]]'s catalog.
+   * Registers the given [[Iterable]] as table in the [[TableEnvironment]] 's catalog.
    *
-   * @param tableName name of table.
-   * @param data The [[Iterable]] to be converted.
-   * @param fieldNames field names, eg: "a, b, c"
-   * @param fieldNullables The field isNullables attributes of data.
-   * @param statistic statistics of current Table
-   * @tparam T The type of the [[Iterable]].
-   * @return The converted [[Table]].
+   * @param tableName
+   *   name of table.
+   * @param data
+   *   The [[Iterable]] to be converted.
+   * @param fieldNames
+   *   field names, eg: "a, b, c"
+   * @param fieldNullables
+   *   The field isNullables attributes of data.
+   * @param statistic
+   *   statistics of current Table
+   * @tparam T
+   *   The type of the [[Iterable]].
+   * @return
+   *   The converted [[Table]].
    */
   def registerCollection[T: ClassTag: TypeInformation](
       tEnv: TableEnvironment,
@@ -166,12 +188,15 @@ object BatchTableEnvUtil {
    * }}}
    * Then the schema type would be (_1:int, _2:int, _3:varchar)
    *
-   * Caution that use must pass a ''Scala'' type data elements, or the inferred type
-   * would be unexpected.
+   * Caution that use must pass a ''Scala'' type data elements, or the inferred type would be
+   * unexpected.
    *
-   * @param data row data sequence
-   * @tparam T row data class type
-   * @return table from the data with default fields names
+   * @param data
+   *   row data sequence
+   * @tparam T
+   *   row data class type
+   * @return
+   *   table from the data with default fields names
    */
   def fromElements[T: ClassTag: TypeInformation](tEnv: TableEnvironment, data: T*): Table = {
     require(data != null, "Data must not be null.")
@@ -180,9 +205,8 @@ object BatchTableEnvUtil {
   }
 
   /**
-   * Create a [[Table]] from a scala [[Iterable]]. The default fields names
-   * would be like _1, _2, _3 and so on. The table schema type would be inferred from the
-   * [[Iterable]] element type.
+   * Create a [[Table]] from a scala [[Iterable]]. The default fields names would be like _1, _2, _3
+   * and so on. The table schema type would be inferred from the [[Iterable]] element type.
    */
   def fromCollection[T: ClassTag: TypeInformation](
       tEnv: TableEnvironment,
@@ -192,8 +216,8 @@ object BatchTableEnvUtil {
   }
 
   /**
-   * Create a [[Table]] from a scala [[Iterable]]. The table schema type would be inferred
-   * from the [[Iterable]] element type.
+   * Create a [[Table]] from a scala [[Iterable]]. The table schema type would be inferred from the
+   * [[Iterable]] element type.
    */
   def fromCollection[T: ClassTag: TypeInformation](
       tEnv: TableEnvironment,
@@ -205,17 +229,24 @@ object BatchTableEnvUtil {
   }
 
   /**
-   * Registers the given [[Iterable]] as table in the
-   * [[TableEnvironment]]'s catalog.
+   * Registers the given [[Iterable]] as table in the [[TableEnvironment]] 's catalog.
    *
-   * @param tableName name of table.
-   * @param data The [[Iterable]] to be converted.
-   * @param typeInfo information of [[Iterable]].
-   * @param fieldNames field names.
-   * @param fieldNullables The field isNullables attributes of data.
-   * @param statistic statistics of current Table
-   * @tparam T The type of the [[Iterable]].
-   * @return The converted [[Table]].
+   * @param tableName
+   *   name of table.
+   * @param data
+   *   The [[Iterable]] to be converted.
+   * @param typeInfo
+   *   information of [[Iterable]].
+   * @param fieldNames
+   *   field names.
+   * @param fieldNullables
+   *   The field isNullables attributes of data.
+   * @param statistic
+   *   statistics of current Table
+   * @tparam T
+   *   The type of the [[Iterable]].
+   * @return
+   *   The converted [[Table]].
    */
   @VisibleForTesting
   private[table] def registerCollection[T](
@@ -243,12 +274,15 @@ object BatchTableEnvUtil {
   }
 
   /**
-   * Registers a [[DataStream]] as a table under a given name in the [[TableEnvironment]]'s
+   * Registers a [[DataStream]] as a table under a given name in the [[TableEnvironment]] 's
    * catalog.
    *
-   * @param name     The name under which the table is registered in the catalog.
-   * @param boundedStream The [[DataStream]] to register as table in the catalog.
-   * @tparam T the type of the [[DataStream]].
+   * @param name
+   *   The name under which the table is registered in the catalog.
+   * @param boundedStream
+   *   The [[DataStream]] to register as table in the catalog.
+   * @tparam T
+   *   the type of the [[DataStream]].
    */
   private[flink] def registerBoundedStreamInternal[T](
       tEnv: TableEnvironment,

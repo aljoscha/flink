@@ -35,8 +35,8 @@ import java.util.Collections
 import java.util.function.Supplier
 
 /**
- * Sub-class of [[TableScan]] that is a relational operator
- * which returns the contents of a [[DataStreamTable]] in Flink.
+ * Sub-class of [[TableScan]] that is a relational operator which returns the contents of a
+ * [[DataStreamTable]] in Flink.
  */
 class FlinkLogicalDataStreamTableScan(
     cluster: RelOptCluster,

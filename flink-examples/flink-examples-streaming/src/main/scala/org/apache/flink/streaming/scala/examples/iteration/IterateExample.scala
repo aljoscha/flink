@@ -29,14 +29,14 @@ import org.apache.flink.streaming.api.scala.{DataStream, StreamExecutionEnvironm
 /**
  * Example illustrating iterations in Flink streaming.
  *
- * The program sums up random numbers and counts additions
- * it performs to reach a specific threshold in an iterative streaming fashion.
+ * The program sums up random numbers and counts additions it performs to reach a specific threshold
+ * in an iterative streaming fashion.
  *
  * This example shows how to use:
  *
- *  - streaming iterations,
- *  - buffer timeout to enhance latency,
- *  - directed outputs.
+ *   - streaming iterations,
+ *   - buffer timeout to enhance latency,
+ *   - directed outputs.
  */
 object IterateExample {
 

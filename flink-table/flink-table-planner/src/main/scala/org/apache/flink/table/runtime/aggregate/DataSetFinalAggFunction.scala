@@ -28,10 +28,11 @@ import org.apache.flink.types.Row
 import org.apache.flink.util.Collector
 
 /**
- * [[RichGroupReduceFunction]] to compute the final result of a pre-aggregated aggregation
- * for batch (DataSet) queries.
+ * [[RichGroupReduceFunction]] to compute the final result of a pre-aggregated aggregation for batch
+ * (DataSet) queries.
  *
- * @param genAggregations Code-generated [[GeneratedAggregations]]
+ * @param genAggregations
+ *   Code-generated [[GeneratedAggregations]]
  */
 class DataSetFinalAggFunction(private val genAggregations: GeneratedAggregationsFunction)
     extends RichGroupReduceFunction[Row, Row]

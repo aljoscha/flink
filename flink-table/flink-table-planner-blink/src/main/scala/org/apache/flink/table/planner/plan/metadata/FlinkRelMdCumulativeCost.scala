@@ -27,8 +27,8 @@ import org.apache.calcite.util.BuiltInMethod
 import scala.collection.JavaConversions._
 
 /**
- * FlinkRelMdCumulativeCost supplies a implementation of
- * [[RelMetadataQuery#getCumulativeCost]] for the standard logical algebra.
+ * FlinkRelMdCumulativeCost supplies a implementation of [[RelMetadataQuery#getCumulativeCost]] for
+ * the standard logical algebra.
  */
 class FlinkRelMdCumulativeCost private extends MetadataHandler[BuiltInMetadata.CumulativeCost] {
 

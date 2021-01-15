@@ -30,17 +30,17 @@ import scala.collection.JavaConverters._
  * Collection of rules to annotate [[DataStreamRel]] nodes with retraction information.
  *
  * The rules have to be applied in the following order:
- * - [[DataStreamRetractionRules.DEFAULT_RETRACTION_INSTANCE]]
- * - [[DataStreamRetractionRules.UPDATES_AS_RETRACTION_INSTANCE]]
- * - [[DataStreamRetractionRules.ACCMODE_INSTANCE]]
+ *   - [[DataStreamRetractionRules.DEFAULT_RETRACTION_INSTANCE]]
+ *   - [[DataStreamRetractionRules.UPDATES_AS_RETRACTION_INSTANCE]]
+ *   - [[DataStreamRetractionRules.ACCMODE_INSTANCE]]
  *
- * The rules will assign a [[AccModeTrait]] to each [[DataStreamRel]] node of the plan. The
- * trait defines the [[AccMode]] a node.
- * - [[AccMode.Acc]] defines that the node produces only accumulate messages, i.e., all types of
- * modifications (insert, update, delete) are encoded as accumulate messages.
- * - [[AccMode.AccRetract]] defines that the node produces accumulate and retraction messages.
- * Insert modifications are encoded as accumulate message, delete modifications as retraction
- * message, and update modifications as a pair of accumulate and retraction messages.
+ * The rules will assign a [[AccModeTrait]] to each [[DataStreamRel]] node of the plan. The trait
+ * defines the [[AccMode]] a node.
+ *   - [[AccMode.Acc]] defines that the node produces only accumulate messages, i.e., all types of
+ *     modifications (insert, update, delete) are encoded as accumulate messages.
+ *   - [[AccMode.AccRetract]] defines that the node produces accumulate and retraction messages.
+ *     Insert modifications are encoded as accumulate message, delete modifications as retraction
+ *     message, and update modifications as a pair of accumulate and retraction messages.
  */
 object DataStreamRetractionRules {
 
@@ -62,8 +62,10 @@ object DataStreamRetractionRules {
   /**
    * Get all children RelNodes of a RelNode.
    *
-   * @param parent The parent RelNode
-   * @return All child nodes
+   * @param parent
+   *   The parent RelNode
+   * @return
+   *   All child nodes
    */
   def getChildRelNodes(parent: RelNode): Seq[RelNode] = {
     parent.getInputs.asScala.map(_.asInstanceOf[HepRelVertex].getCurrentRel)
@@ -72,8 +74,10 @@ object DataStreamRetractionRules {
   /**
    * Checks if a [[RelNode]] ships updates as retractions.
    *
-   * @param node The node to check.
-   * @return True if the node ships updates as retractions, false otherwise.
+   * @param node
+   *   The node to check.
+   * @return
+   *   True if the node ships updates as retractions, false otherwise.
    */
   def sendsUpdatesAsRetraction(node: RelNode): Boolean = {
     val retractionTrait = node.getTraitSet.getTrait(UpdateAsRetractionTraitDef.INSTANCE)
@@ -89,8 +93,8 @@ object DataStreamRetractionRules {
   }
 
   /**
-   * Rule that assigns the default retraction information to [[DataStreamRel]] nodes.
-   * The default is to not publish updates as retraction messages and [[AccMode.Acc]].
+   * Rule that assigns the default retraction information to [[DataStreamRel]] nodes. The default is
+   * to not publish updates as retraction messages and [[AccMode.Acc]].
    */
   class AssignDefaultRetractionRule
       extends RelOptRule(operand(classOf[DataStreamRel], none()), "AssignDefaultRetractionRule") {
@@ -126,8 +130,7 @@ object DataStreamRetractionRules {
       extends RelOptRule(operand(classOf[DataStreamRel], none()), "SetUpdatesAsRetractionRule") {
 
     /**
-     * Checks if a [[RelNode]] requires that update changes are sent with retraction
-     * messages.
+     * Checks if a [[RelNode]] requires that update changes are sent with retraction messages.
      */
     def needsUpdatesAsRetraction(node: RelNode): Boolean = {
       node match {
@@ -145,15 +148,15 @@ object DataStreamRetractionRules {
     }
 
     /**
-     * Annotates the children of a parent node with the information that they need to forward
-     * update and delete modifications as retraction messages.
+     * Annotates the children of a parent node with the information that they need to forward update
+     * and delete modifications as retraction messages.
      *
      * A child needs to produce retraction messages, if
      *
-     * 1. its parent requires retraction messages by itself because it is a certain type
-     *    of operator, such as a [[DataStreamGroupAggregate]] or [[DataStreamOverAggregate]], or
-     * 2. its parent requires retraction because its own parent requires retraction
-     *    (transitive requirement).
+     *   1. its parent requires retraction messages by itself because it is a certain type of
+     *      operator, such as a [[DataStreamGroupAggregate]] or [[DataStreamOverAggregate]], or 2.
+     *      its parent requires retraction because its own parent requires retraction (transitive
+     *      requirement).
      */
     override def onMatch(call: RelOptRuleCall): Unit = {
       val parent = call.rel(0).asInstanceOf[DataStreamRel]

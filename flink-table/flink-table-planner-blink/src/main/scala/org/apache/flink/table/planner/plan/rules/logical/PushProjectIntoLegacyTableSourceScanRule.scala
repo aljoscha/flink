@@ -30,8 +30,8 @@ import org.apache.calcite.rel.rules.ProjectRemoveRule
 import org.apache.flink.table.api.TableException
 
 /**
- * Planner rule that pushes a [[LogicalProject]] into a [[LogicalTableScan]]
- * which wraps a [[ProjectableTableSource]] or a [[NestedFieldsProjectableTableSource]].
+ * Planner rule that pushes a [[LogicalProject]] into a [[LogicalTableScan]] which wraps a
+ * [[ProjectableTableSource]] or a [[NestedFieldsProjectableTableSource]].
  */
 class PushProjectIntoLegacyTableSourceScanRule
     extends RelOptRule(

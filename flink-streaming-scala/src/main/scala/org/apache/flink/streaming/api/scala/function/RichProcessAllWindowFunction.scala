@@ -22,12 +22,15 @@ import org.apache.flink.annotation.Public
 import org.apache.flink.streaming.api.windowing.windows.Window
 
 /**
- * Base abstract class for functions that are evaluated over
- * keyed (grouped) windows using a context for retrieving extra information.
+ * Base abstract class for functions that are evaluated over keyed (grouped) windows using a context
+ * for retrieving extra information.
  *
- * @tparam IN The type of the input value.
- * @tparam OUT The type of the output value.
- * @tparam W The type of the window.
+ * @tparam IN
+ *   The type of the input value.
+ * @tparam OUT
+ *   The type of the output value.
+ * @tparam W
+ *   The type of the window.
  */
 @Public
 @deprecated("use [[ProcessAllWindowFunction]] instead")

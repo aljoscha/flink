@@ -41,7 +41,7 @@ import java.util.Optional
 import scala.collection.JavaConversions._
 
 /**
- * Util for [[Join]]s.
+ * Util for [[Join]] s.
  */
 object JoinUtil {
 
@@ -96,8 +96,8 @@ object JoinUtil {
   /**
    * Creates a [[JoinInfo]] by analyzing a condition.
    *
-   * <p>NOTES: the functionality of the method is same with [[JoinInfo#of]],
-   * the only difference is that the methods could return `filterNulls`.
+   * <p>NOTES: the functionality of the method is same with [[JoinInfo#of]], the only difference is
+   * that the methods could return `filterNulls`.
    */
   def createJoinInfo(
       left: RelNode,

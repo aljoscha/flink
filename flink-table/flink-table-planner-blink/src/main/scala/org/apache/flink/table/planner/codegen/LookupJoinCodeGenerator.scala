@@ -404,13 +404,19 @@ object LookupJoinCodeGenerator {
   /**
    * Generates a [[TableFunctionResultFuture]] that can be passed to Java compiler.
    *
-   * @param config The TableConfig
-   * @param name Class name of the table function collector. Must not be unique but has to be a
-   *             valid Java class identifier.
-   * @param leftInputType The type information of the element being collected
-   * @param collectedType The type information of the element collected by the collector
-   * @param condition The filter condition before collect elements
-   * @return instance of GeneratedCollector
+   * @param config
+   *   The TableConfig
+   * @param name
+   *   Class name of the table function collector. Must not be unique but has to be a valid Java
+   *   class identifier.
+   * @param leftInputType
+   *   The type information of the element being collected
+   * @param collectedType
+   *   The type information of the element collected by the collector
+   * @param condition
+   *   The filter condition before collect elements
+   * @return
+   *   instance of GeneratedCollector
    */
   def generateTableAsyncCollector(
       config: TableConfig,
@@ -491,8 +497,8 @@ object LookupJoinCodeGenerator {
   }
 
   /**
-   * Generates calculate flatmap function for temporal join which is used
-   * to projection/filter the dimension table results
+   * Generates calculate flatmap function for temporal join which is used to projection/filter the
+   * dimension table results
    */
   def generateCalcMapFunction(
       config: TableConfig,

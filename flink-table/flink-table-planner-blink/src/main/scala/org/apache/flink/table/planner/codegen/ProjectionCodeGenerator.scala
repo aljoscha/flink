@@ -27,8 +27,7 @@ import org.apache.flink.table.runtime.generated.{GeneratedProjection, Projection
 import org.apache.flink.table.types.logical.RowType
 
 /**
- * CodeGenerator for projection, Take out some fields of [[RowData]] to generate
- * a new [[RowData]].
+ * CodeGenerator for projection, Take out some fields of [[RowData]] to generate a new [[RowData]].
  */
 object ProjectionCodeGenerator {
 
@@ -74,9 +73,9 @@ object ProjectionCodeGenerator {
 
   /**
    * CodeGenerator for projection.
-   * @param reusedOutRecord If objects or variables can be reused, they will be added a reusable
-   * output record to the member area of the generated class. If not they will be as temp
-   * variables.
+   * @param reusedOutRecord
+   *   If objects or variables can be reused, they will be added a reusable output record to the
+   *   member area of the generated class. If not they will be as temp variables.
    * @return
    */
   def generateProjection(

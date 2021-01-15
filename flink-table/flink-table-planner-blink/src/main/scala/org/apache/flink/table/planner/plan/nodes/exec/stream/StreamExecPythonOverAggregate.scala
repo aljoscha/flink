@@ -50,9 +50,8 @@ import scala.collection.JavaConversions._
 /**
  * Stream [[ExecNode]] for python time-based over operator.
  *
- * <p>Note: This class can't be ported to Java,
- * because java class can't extend scala interface with default implementation.
- * FLINK-20924 will port this class to Java.
+ * <p>Note: This class can't be ported to Java, because java class can't extend scala interface with
+ * default implementation. FLINK-20924 will port this class to Java.
  */
 class StreamExecPythonOverAggregate(
     overSpec: OverSpec,

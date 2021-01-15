@@ -40,10 +40,14 @@ import org.apache.flink.util.{Collector, Preconditions}
 /**
  * Process Function for ROW clause processing-time bounded OVER window
  *
- * @param genAggregations      Generated aggregate helper function
- * @param precedingOffset      preceding offset
- * @param aggregatesTypeInfo   row type info of aggregation
- * @param inputType            row type info of input row
+ * @param genAggregations
+ *   Generated aggregate helper function
+ * @param precedingOffset
+ *   preceding offset
+ * @param aggregatesTypeInfo
+ *   row type info of aggregation
+ * @param inputType
+ *   row type info of input row
  */
 class ProcTimeBoundedRowsOver[K](
     genAggregations: GeneratedAggregationsFunction,

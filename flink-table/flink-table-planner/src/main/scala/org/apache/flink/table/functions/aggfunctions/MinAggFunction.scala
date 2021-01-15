@@ -34,7 +34,8 @@ class MinAccumulator[T] extends JTuple2[T, Boolean]
 /**
  * Base class for built-in Min aggregate function
  *
- * @tparam T the type for the aggregation result
+ * @tparam T
+ *   the type for the aggregation result
  */
 abstract class MinAggFunction[T](implicit ord: Ordering[T])
     extends AggregateFunction[T, MinAccumulator[T]] {

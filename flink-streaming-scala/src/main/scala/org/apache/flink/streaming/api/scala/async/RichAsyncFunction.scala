@@ -31,8 +31,10 @@ import org.apache.flink.api.common.functions.AbstractRichFunction
  * [[org.apache.flink.api.common.functions.IterationRuntimeContext#getIterationAggregator(String)]]
  * is not supported since the aggregator may be modified by multiple threads.
  *
- * @tparam IN The type of the input value.
- * @tparam OUT The type of the output value.
+ * @tparam IN
+ *   The type of the input value.
+ * @tparam OUT
+ *   The type of the output value.
  */
 abstract class RichAsyncFunction[IN, OUT]
     extends AbstractRichFunction

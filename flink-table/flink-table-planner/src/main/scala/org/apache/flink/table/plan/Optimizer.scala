@@ -35,12 +35,14 @@ import scala.collection.JavaConverters._
 
 /**
  * Common functionalities for both [[StreamOptimizer]] and [[BatchOptimizer]]. An [[Optimizer]]
- * should be used to create an optimized tree from a logical input tree.
- * See [[StreamOptimizer.optimize]] and [[BatchOptimizer.optimize]]
+ * should be used to create an optimized tree from a logical input tree. See
+ * [[StreamOptimizer.optimize]] and [[BatchOptimizer.optimize]]
  *
- * @param calciteConfig                provider for [[CalciteConfig]]. It is a provider because the
- *                                     [[TableConfig]] in a [[TableEnvImpl]] is mutable.
- * @param planningConfigurationBuilder provider for [[RelOptPlanner]] and [[Context]]
+ * @param calciteConfig
+ *   provider for [[CalciteConfig]]. It is a provider because the [[TableConfig]] in a
+ *   [[TableEnvImpl]] is mutable.
+ * @param planningConfigurationBuilder
+ *   provider for [[RelOptPlanner]] and [[Context]]
  */
 abstract class Optimizer(
     calciteConfig: () => CalciteConfig,
@@ -49,8 +51,7 @@ abstract class Optimizer(
   protected def materializedConfig: CalciteConfig = calciteConfig.apply()
 
   /**
-   * Returns the normalization rule set for this optimizer
-   * including a custom RuleSet configuration.
+   * Returns the normalization rule set for this optimizer including a custom RuleSet configuration.
    */
   protected def getNormRuleSet: RuleSet = {
     materializedConfig.normRuleSet match {
@@ -68,8 +69,8 @@ abstract class Optimizer(
   }
 
   /**
-   * Returns the logical optimization rule set for this optimizer
-   * including a custom RuleSet configuration.
+   * Returns the logical optimization rule set for this optimizer including a custom RuleSet
+   * configuration.
    */
   protected def getLogicalOptRuleSet: RuleSet = {
     materializedConfig.logicalOptRuleSet match {
@@ -87,8 +88,8 @@ abstract class Optimizer(
   }
 
   /**
-   * Returns the logical rewrite rule set for this optimizer
-   * including a custom RuleSet configuration.
+   * Returns the logical rewrite rule set for this optimizer including a custom RuleSet
+   * configuration.
    */
   protected def getLogicalRewriteRuleSet: RuleSet = {
     materializedConfig.logicalRewriteRuleSet match {
@@ -106,8 +107,8 @@ abstract class Optimizer(
   }
 
   /**
-   * Returns the physical optimization rule set for this optimizer
-   * including a custom RuleSet configuration.
+   * Returns the physical optimization rule set for this optimizer including a custom RuleSet
+   * configuration.
    */
   protected def getPhysicalOptRuleSet: RuleSet = {
     materializedConfig.physicalOptRuleSet match {
@@ -213,9 +214,9 @@ abstract class Optimizer(
   }
 
   /**
-   * run HEP planner with rules applied one by one. First apply one rule to all of the nodes
-   * and only then apply the next rule. If a rule creates a new node preceding rules will not
-   * be applied to the newly created node.
+   * run HEP planner with rules applied one by one. First apply one rule to all of the nodes and
+   * only then apply the next rule. If a rule creates a new node preceding rules will not be applied
+   * to the newly created node.
    */
   protected def runHepPlannerSequentially(
       hepMatchOrder: HepMatchOrder,
@@ -234,9 +235,9 @@ abstract class Optimizer(
   }
 
   /**
-   * run HEP planner with rules applied simultaneously. Apply all of the rules to the given
-   * node before going to the next one. If a rule creates a new node all of the rules will
-   * be applied to this new node.
+   * run HEP planner with rules applied simultaneously. Apply all of the rules to the given node
+   * before going to the next one. If a rule creates a new node all of the rules will be applied to
+   * this new node.
    */
   protected def runHepPlannerSimultaneously(
       hepMatchOrder: HepMatchOrder,

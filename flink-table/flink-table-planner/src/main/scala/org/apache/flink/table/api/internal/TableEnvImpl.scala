@@ -74,7 +74,8 @@ import _root_.scala.util.Try
 /**
  * The abstract base class for the implementation of batch TableEnvironment.
  *
- * @param config The configuration of the TableEnvironment
+ * @param config
+ *   The configuration of the TableEnvironment
  */
 abstract class TableEnvImpl(
     val config: TableConfig,
@@ -223,8 +224,8 @@ abstract class TableEnvImpl(
   }
 
   /**
-   * Registers a [[TableFunction]] under a unique name. Replaces already existing
-   * user-defined functions under this name.
+   * Registers a [[TableFunction]] under a unique name. Replaces already existing user-defined
+   * functions under this name.
    */
   private[flink] def registerTableFunctionInternal[T: TypeInformation](
       name: String,
@@ -236,8 +237,8 @@ abstract class TableEnvImpl(
   }
 
   /**
-   * Registers an [[AggregateFunction]] under a unique name. Replaces already existing
-   * user-defined functions under this name.
+   * Registers an [[AggregateFunction]] under a unique name. Replaces already existing user-defined
+   * functions under this name.
    */
   private[flink] def registerAggregateFunctionInternal[T: TypeInformation, ACC: TypeInformation](
       name: String,
@@ -317,20 +318,21 @@ abstract class TableEnvImpl(
   }
 
   /**
-   * Perform batch or streaming specific validations of the [[TableSource]].
-   * This method should throw [[ValidationException]] if the [[TableSource]] cannot be used
-   * in this [[TableEnvironment]].
+   * Perform batch or streaming specific validations of the [[TableSource]]. This method should
+   * throw [[ValidationException]] if the [[TableSource]] cannot be used in this
+   * [[TableEnvironment]].
    *
-   * @param tableSource table source to validate
+   * @param tableSource
+   *   table source to validate
    */
   protected def validateTableSource(tableSource: TableSource[_]): Unit
 
   /**
-   * Perform batch or streaming specific validations of the [[TableSink]].
-   * This method should throw [[ValidationException]] if the [[TableSink]] cannot be used
-   * in this [[TableEnvironment]].
+   * Perform batch or streaming specific validations of the [[TableSink]]. This method should throw
+   * [[ValidationException]] if the [[TableSink]] cannot be used in this [[TableEnvironment]].
    *
-   * @param tableSink table source to validate
+   * @param tableSink
+   *   table source to validate
    */
   protected def validateTableSink(tableSink: TableSink[_]): Unit
 
@@ -849,10 +851,10 @@ abstract class TableEnvImpl(
   }
 
   /**
-   * extract sink identifier names from [[ModifyOperation]]s.
+   * extract sink identifier names from [[ModifyOperation]] s.
    *
-   * <p>If there are multiple ModifyOperations have same name,
-   * an index suffix will be added at the end of the name to ensure each name is unique.
+   * <p>If there are multiple ModifyOperations have same name, an index suffix will be added at the
+   * end of the name to ensure each name is unique.
    */
   private def extractSinkIdentifierNames(operations: JList[ModifyOperation]): JList[String] = {
     val tableNameToCount = new JHashMap[String, Int]()
@@ -882,16 +884,20 @@ abstract class TableEnvImpl(
   protected def execute(dataSinks: JList[DataSink[_]], jobName: String): JobClient
 
   /**
-   * Writes a [[QueryOperation]] to the registered TableSink with insert options,
-   * and translates them into a [[DataSink]].
+   * Writes a [[QueryOperation]] to the registered TableSink with insert options, and translates
+   * them into a [[DataSink]].
    *
-   * Internally, the [[QueryOperation]] is translated into a [[DataSet]]
-   * and handed over to the [[TableSink]] to write it.
+   * Internally, the [[QueryOperation]] is translated into a [[DataSet]] and handed over to the
+   * [[TableSink]] to write it.
    *
-   * @param queryOperation The [[QueryOperation]] to translate.
-   * @param insertOptions The insert options for executing sql insert.
-   * @param sinkIdentifier The name of the registered TableSink.
-   * @return [[DataSink]] which represents the plan.
+   * @param queryOperation
+   *   The [[QueryOperation]] to translate.
+   * @param insertOptions
+   *   The insert options for executing sql insert.
+   * @param sinkIdentifier
+   *   The name of the registered TableSink.
+   * @return
+   *   [[DataSink]] which represents the plan.
    */
   private def writeToSinkAndTranslate(
       queryOperation: QueryOperation,
@@ -932,15 +938,17 @@ abstract class TableEnvImpl(
   }
 
   /**
-   * Writes a [[QueryOperation]] to a [[TableSink]],
-   * and translates them into a [[DataSink]].
+   * Writes a [[QueryOperation]] to a [[TableSink]], and translates them into a [[DataSink]].
    *
-   * Internally, the [[QueryOperation]] is translated into a [[DataSet]]
-   * and handed over to the [[TableSink]] to write it.
+   * Internally, the [[QueryOperation]] is translated into a [[DataSet]] and handed over to the
+   * [[TableSink]] to write it.
    *
-   * @param queryOperation The [[QueryOperation]] to write.
-   * @param tableSink The [[TableSink]] to write the [[Table]] to.
-   * @return [[DataSink]] which represents the plan.
+   * @param queryOperation
+   *   The [[QueryOperation]] to write.
+   * @param tableSink
+   *   The [[TableSink]] to write the [[Table]] to.
+   * @return
+   *   [[DataSink]] which represents the plan.
    */
   protected def writeToSinkAndTranslate[T](
       queryOperation: QueryOperation,
@@ -949,7 +957,8 @@ abstract class TableEnvImpl(
   /**
    * Add the given [[ModifyOperation]] into the buffer.
    *
-   * @param modifyOperation The [[ModifyOperation]] to add the buffer to.
+   * @param modifyOperation
+   *   The [[ModifyOperation]] to add the buffer to.
    */
   protected def addToBuffer[T](modifyOperation: ModifyOperation): Unit
 
@@ -978,8 +987,10 @@ abstract class TableEnvImpl(
   /**
    * Writes the [[Table]] to a [[TableSink]] that was registered under the specified name.
    *
-   * @param table The table to write to the TableSink.
-   * @param sinkIdentifier The name of the registered TableSink.
+   * @param table
+   *   The table to write to the TableSink.
+   * @param sinkIdentifier
+   *   The name of the registered TableSink.
    */
   private def insertInto(
       table: Table,

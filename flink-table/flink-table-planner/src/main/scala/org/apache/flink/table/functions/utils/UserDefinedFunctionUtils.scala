@@ -61,8 +61,8 @@ object UserDefinedFunctionUtils {
   }
 
   /**
-   * Returns the signature of the accumulate method matching the given signature
-   * of [[TypeInformation]]. Elements of the signature can be null (act as a wildcard).
+   * Returns the signature of the accumulate method matching the given signature of
+   * [[TypeInformation]]. Elements of the signature can be null (act as a wildcard).
    */
   def getAccumulateMethodSignature(
       function: ImperativeAggregateFunction[_, _],
@@ -94,11 +94,13 @@ object UserDefinedFunctionUtils {
   /**
    * Returns user defined method matching the given name and signature.
    *
-   * @param function        function instance
-   * @param methodName      method name
-   * @param methodSignature an array of raw Java classes. We compare the raw Java classes not the
-   *                        TypeInformation. TypeInformation does not matter during runtime (e.g.
-   *                        within a MapFunction)
+   * @param function
+   *   function instance
+   * @param methodName
+   *   method name
+   * @param methodSignature
+   *   an array of raw Java classes. We compare the raw Java classes not the TypeInformation.
+   *   TypeInformation does not matter during runtime (e.g. within a MapFunction)
    */
   def getUserDefinedMethod(
       function: UserDefinedFunction,
@@ -200,8 +202,8 @@ object UserDefinedFunctionUtils {
   }
 
   /**
-   * Extracts methods and throws a [[ValidationException]] if no implementation
-   * can be found, or implementation does not match the requirements.
+   * Extracts methods and throws a [[ValidationException]] if no implementation can be found, or
+   * implementation does not match the requirements.
    */
   def checkAndExtractMethods(function: UserDefinedFunction, methodName: String): Array[Method] = {
     val methods = function.getClass.getMethods
@@ -236,10 +238,14 @@ object UserDefinedFunctionUtils {
   /**
    * Creates [[SqlFunction]] for a [[ScalarFunction]]
    *
-   * @param name function name
-   * @param function scalar function
-   * @param typeFactory type factory
-   * @return the ScalarSqlFunction
+   * @param name
+   *   function name
+   * @param function
+   *   scalar function
+   * @param typeFactory
+   *   type factory
+   * @return
+   *   the ScalarSqlFunction
    */
   def createScalarSqlFunction(
       name: String,
@@ -252,11 +258,16 @@ object UserDefinedFunctionUtils {
   /**
    * Creates [[SqlFunction]] for a [[TableFunction]]
    *
-   * @param name function name
-   * @param tableFunction table function
-   * @param resultType the type information of returned table
-   * @param typeFactory type factory
-   * @return the TableSqlFunction
+   * @param name
+   *   function name
+   * @param tableFunction
+   *   table function
+   * @param resultType
+   *   the type information of returned table
+   * @param typeFactory
+   *   type factory
+   * @return
+   *   the TableSqlFunction
    */
   def createTableSqlFunction(
       name: String,
@@ -272,10 +283,14 @@ object UserDefinedFunctionUtils {
   /**
    * Creates [[SqlFunction]] for an [[AggregateFunction]]
    *
-   * @param name function name
-   * @param aggFunction aggregate function
-   * @param typeFactory type factory
-   * @return the TableSqlFunction
+   * @param name
+   *   function name
+   * @param aggFunction
+   *   aggregate function
+   * @param typeFactory
+   *   type factory
+   * @return
+   *   the TableSqlFunction
    */
   def createAggregateSqlFunction(
       name: String,
@@ -291,8 +306,8 @@ object UserDefinedFunctionUtils {
   }
 
   /**
-   * Creates a [[SqlOperandTypeChecker]] for SQL validation of
-   * eval functions (scalar and table functions).
+   * Creates a [[SqlOperandTypeChecker]] for SQL validation of eval functions (scalar and table
+   * functions).
    */
   def createEvalOperandMetadata(name: String, function: UserDefinedFunction): SqlOperandMetadata = {
 
@@ -362,8 +377,8 @@ object UserDefinedFunctionUtils {
   }
 
   /**
-   * Creates a [[SqlOperandTypeInference]] for the SQL validation of eval functions
-   * (scalar and table functions).
+   * Creates a [[SqlOperandTypeInference]] for the SQL validation of eval functions (scalar and
+   * table functions).
    */
   def createEvalOperandTypeInference(
       name: String,
@@ -416,12 +431,17 @@ object UserDefinedFunctionUtils {
   /**
    * Remove StateView fields from accumulator type information.
    *
-   * @param index index of aggregate function
-   * @param acc accumulator
-   * @param accType accumulator type information, only support pojo type
-   * @param isStateBackedDataViews is data views use state backend
-   * @return mapping of accumulator type information and data view config which contains id,
-   *         field name and state descriptor
+   * @param index
+   *   index of aggregate function
+   * @param acc
+   *   accumulator
+   * @param accType
+   *   accumulator type information, only support pojo type
+   * @param isStateBackedDataViews
+   *   is data views use state backend
+   * @return
+   *   mapping of accumulator type information and data view config which contains id, field name
+   *   and state descriptor
    */
   def removeStateViewFieldsFromAccTypeInfo[ACC](
       index: Int,
@@ -555,8 +575,10 @@ object UserDefinedFunctionUtils {
    * Field names are automatically extracted for
    * [[org.apache.flink.api.common.typeutils.CompositeType]].
    *
-   * @param inputType The TypeInformation to extract the field names and positions from.
-   * @return A tuple of two arrays holding the field names and corresponding field positions.
+   * @param inputType
+   *   The TypeInformation to extract the field names and positions from.
+   * @return
+   *   A tuple of two arrays holding the field names and corresponding field positions.
    */
   def getFieldInfo(
       inputType: TypeInformation[_]): (Array[String], Array[Int], Array[TypeInformation[_]]) = {

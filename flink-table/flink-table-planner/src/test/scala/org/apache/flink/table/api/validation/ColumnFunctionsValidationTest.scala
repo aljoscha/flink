@@ -25,8 +25,7 @@ import org.apache.flink.table.utils.{StreamTableTestUtil, TableTestBase}
 import org.junit.Test
 
 /**
- * Tests to validate exceptions for column functions. This test can also cover the batch
- * scenarios.
+ * Tests to validate exceptions for column functions. This test can also cover the batch scenarios.
  */
 class ColumnFunctionsValidationTest extends TableTestBase {
 

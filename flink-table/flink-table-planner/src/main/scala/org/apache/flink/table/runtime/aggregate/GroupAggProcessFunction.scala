@@ -33,8 +33,10 @@ import org.apache.flink.util.Collector
 /**
  * Aggregate Function used for the groupby (without window) aggregate
  *
- * @param genAggregations      Generated aggregate helper function
- * @param aggregationStateType The row type info of aggregation
+ * @param genAggregations
+ *   Generated aggregate helper function
+ * @param aggregationStateType
+ *   The row type info of aggregation
  */
 class GroupAggProcessFunction[K](
     genAggregations: GeneratedAggregationsFunction,

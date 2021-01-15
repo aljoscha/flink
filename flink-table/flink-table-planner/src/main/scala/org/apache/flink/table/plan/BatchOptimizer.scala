@@ -33,9 +33,11 @@ import org.apache.flink.table.planner.PlanningConfigurationBuilder
  * An [[Optimizer]] that can be used for optimizing a batch plan. Should be used to create an
  * optimized tree from a logical input tree.
  *
- * @param calciteConfig                provider for [[CalciteConfig]]. It is a provider because the
- *                                     [[TableConfig]] in a [[TableEnvImpl]] is mutable.
- * @param planningConfigurationBuilder provider for [[RelOptPlanner]] and [[Context]]
+ * @param calciteConfig
+ *   provider for [[CalciteConfig]]. It is a provider because the [[TableConfig]] in a
+ *   [[TableEnvImpl]] is mutable.
+ * @param planningConfigurationBuilder
+ *   provider for [[RelOptPlanner]] and [[Context]]
  */
 class BatchOptimizer(
     calciteConfig: () => CalciteConfig,
@@ -45,8 +47,10 @@ class BatchOptimizer(
   /**
    * Generates the optimized [[RelNode]] tree from the original relational node tree.
    *
-   * @param relNode The original [[RelNode]] tree
-   * @return The optimized [[RelNode]] tree
+   * @param relNode
+   *   The original [[RelNode]] tree
+   * @return
+   *   The optimized [[RelNode]] tree
    */
   def optimize(relNode: RelNode): RelNode = {
     val convSubQueryPlan = optimizeConvertSubQueries(relNode)

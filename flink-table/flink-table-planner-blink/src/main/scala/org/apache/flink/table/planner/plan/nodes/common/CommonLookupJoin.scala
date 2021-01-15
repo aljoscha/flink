@@ -86,41 +86,30 @@ import scala.collection.mutable
  *
  * For a lookup join query:
  *
- * <pre>
- * SELECT T.id, T.content, D.age
- * FROM T JOIN userTable FOR SYSTEM_TIME AS OF T.proctime AS D
- * ON T.content = concat(D.name, '!') AND D.age = 11 AND T.id = D.id
- * WHERE D.name LIKE 'Jack%'
+ * <pre> SELECT T.id, T.content, D.age FROM T JOIN userTable FOR SYSTEM_TIME AS OF T.proctime AS D
+ * ON T.content = concat(D.name, '!') AND D.age = 11 AND T.id = D.id WHERE D.name LIKE 'Jack%'
  * </pre>
  *
  * The LookupJoin physical node encapsulates the following RelNode tree:
  *
- * <pre>
- *      Join (l.name = r.name)
- *    /     \
- * RelNode  Calc (concat(name, "!") as name, name LIKE 'Jack%')
- *           |
- *        DimTable (lookup-keys: age=11, id=l.id)
- *     (age, id, name)
- * </pre>
+ * <pre> Join (l.name = r.name) / \ RelNode Calc (concat(name, "!") as name, name LIKE 'Jack%')
+ * | DimTable (lookup-keys: age=11, id=l.id) (age, id, name) </pre>
  *
- * The important member fields in LookupJoin:
- * <ul>
- *  <li>joinPairs: "0=0" (equal condition of Join)</li>
- *  <li>joinKeyPairs: empty (left input field index to dim table field index)</li>
- *  <li>allLookupKeys: [$0=11, $1=l.id] ($0 and $1 is the indexes of age and id in dim table)</li>
- *  <li>remainingCondition: l.name=r.name</li>
- * <ul>
+ * The important member fields in LookupJoin: <ul> <li>joinPairs: "0=0" (equal condition of
+ * Join)</li> <li>joinKeyPairs: empty (left input field index to dim table field index)</li>
+ * <li>allLookupKeys: [$0=11, $1=l.id] ($0 and $1 is the indexes of age and id in dim table)</li>
+ * <li>remainingCondition: l.name=r.name</li> <ul>
  *
  * The workflow of lookup join:
  *
- * 1) lookup records dimension table using the lookup-keys <br>
- * 2) project & filter on the lookup-ed records <br>
- * 3) join left input record and lookup-ed records <br>
- * 4) only outputs the rows which match to the remainingCondition <br>
+ * 1) lookup records dimension table using the lookup-keys <br> 2) project & filter on the lookup-ed
+ * records <br> 3) join left input record and lookup-ed records <br> 4) only outputs the rows which
+ * match to the remainingCondition <br>
  *
- * @param input  input rel node
- * @param calcOnTemporalTable  the calc (projection&filter) after table scan before joining
+ * @param input
+ *   input rel node
+ * @param calcOnTemporalTable
+ *   the calc (projection&filter) after table scan before joining
  */
 abstract class CommonLookupJoin(
     cluster: RelOptCluster,
@@ -479,8 +468,10 @@ abstract class CommonLookupJoin(
 
   /**
    * Gets the join key pairs from left input field index to temporal table field index
-   * @param joinInfo the join information of temporal table join
-   * @param calcOnTemporalTable the calc programs on temporal table
+   * @param joinInfo
+   *   the join information of temporal table join
+   * @param calcOnTemporalTable
+   *   the calc programs on temporal table
    */
   private def getTemporalTableJoinKeyPairs(
       joinInfo: JoinInfo,
@@ -502,13 +493,17 @@ abstract class CommonLookupJoin(
   }
 
   /**
-   * Analyze potential lookup keys (including [[ConstantLookupKey]] and [[FieldRefLookupKey]])
-   * of the temporal table from the join condition and calc program on the temporal table.
+   * Analyze potential lookup keys (including [[ConstantLookupKey]] and [[FieldRefLookupKey]] ) of
+   * the temporal table from the join condition and calc program on the temporal table.
    *
-   * @param rexBuilder the RexBuilder
-   * @param joinKeyPairs join key pairs from left input field index to temporal table field index
-   * @param calcOnTemporalTable  the calc program on temporal table
-   * @return all the potential lookup keys
+   * @param rexBuilder
+   *   the RexBuilder
+   * @param joinKeyPairs
+   *   join key pairs from left input field index to temporal table field index
+   * @param calcOnTemporalTable
+   *   the calc program on temporal table
+   * @return
+   *   all the potential lookup keys
    */
   private def analyzeLookupKeys(
       rexBuilder: RexBuilder,

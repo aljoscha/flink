@@ -29,8 +29,8 @@ import org.apache.flink.table.planner.plan.logical.LogicalWindow
 
 /**
  * Sub-class of [[WindowTableAggregate]] that is a relational expression which performs window
- * aggregations but outputs 0 or more records for a group. This class corresponds to Calcite
- * logical rel.
+ * aggregations but outputs 0 or more records for a group. This class corresponds to Calcite logical
+ * rel.
  */
 class LogicalWindowTableAggregate(
     cluster: RelOptCluster,

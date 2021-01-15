@@ -34,15 +34,15 @@ import scala.collection.JavaConversions._
 /**
  * Stream physical RelNode for [[Sort]].
  *
- * <b>NOTES:</b> This class is used for testing with bounded source now.
- * If a query is converted to this node in product environment, an exception will be thrown.
+ * <b>NOTES:</b> This class is used for testing with bounded source now. If a query is converted to
+ * this node in product environment, an exception will be thrown.
  *
- * @see [[StreamPhysicalTemporalSort]] which must be time-ascending-order sort without `limit`.
+ * @see
+ *   [[StreamPhysicalTemporalSort]] which must be time-ascending-order sort without `limit`.
  *
- * e.g.
- *      ''SELECT * FROM TABLE ORDER BY ROWTIME, a'' will be converted to
- *         [[StreamPhysicalTemporalSort]]
- *      ''SELECT * FROM TABLE ORDER BY a, ROWTIME'' will be converted to [[StreamPhysicalSort]]
+ * e.g. ''SELECT * FROM TABLE ORDER BY ROWTIME, a'' will be converted to
+ * [[StreamPhysicalTemporalSort]] ''SELECT * FROM TABLE ORDER BY a, ROWTIME'' will be converted to
+ * [[StreamPhysicalSort]]
  */
 @Experimental
 class StreamPhysicalSort(

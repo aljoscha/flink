@@ -90,8 +90,10 @@ class BatchTestBase extends BatchAbstractTestBase {
   /**
    * Explain ast tree nodes of table and the logical plan after optimization.
    *
-   * @param table table to explain for
-   * @return string presentation of of explaining
+   * @param table
+   *   table to explain for
+   * @return
+   *   string presentation of of explaining
    */
   def explainLogical(table: Table): String = {
     val ast = TableTestUtil.toRelNode(table)
@@ -406,7 +408,8 @@ class BatchTestBase extends BatchAbstractTestBase {
   }
 
   /**
-   * @deprecated Use [[registerTemporarySystemFunction()]] for the new type inference.
+   * @deprecated
+   *   Use [[registerTemporarySystemFunction()]] for the new type inference.
    */
   @deprecated
   def registerFunction(name: String, function: ScalarFunction): Unit = {
@@ -414,7 +417,8 @@ class BatchTestBase extends BatchAbstractTestBase {
   }
 
   /**
-   * @deprecated Use [[registerTemporarySystemFunction()]] for the new type inference.
+   * @deprecated
+   *   Use [[registerTemporarySystemFunction()]] for the new type inference.
    */
   @deprecated
   def registerFunction[T: TypeInformation, ACC: TypeInformation](
@@ -424,7 +428,8 @@ class BatchTestBase extends BatchAbstractTestBase {
   }
 
   /**
-   * @deprecated Use [[registerTemporarySystemFunction()]] for the new type inference.
+   * @deprecated
+   *   Use [[registerTemporarySystemFunction()]] for the new type inference.
    */
   @deprecated
   def registerFunction[T: TypeInformation](name: String, tf: TableFunction[T]): Unit = {
@@ -453,8 +458,8 @@ class BatchTestBase extends BatchAbstractTestBase {
   }
 
   /**
-   * Creates a new Row and assigns the given values to the Row's fields.
-   * We use [[rowOf()]] here to avoid conflicts with [[ImplicitExpressionConversions.row]].
+   * Creates a new Row and assigns the given values to the Row's fields. We use [[rowOf()]] here to
+   * avoid conflicts with [[ImplicitExpressionConversions.row]].
    */
   protected def rowOf(args: Any*): Row = {
     val row = new Row(args.length)

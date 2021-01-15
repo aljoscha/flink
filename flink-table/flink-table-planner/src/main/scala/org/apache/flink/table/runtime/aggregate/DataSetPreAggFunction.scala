@@ -30,7 +30,8 @@ import org.apache.flink.util.Collector
  * [[GroupCombineFunction]] and [[MapPartitionFunction]] to compute pre-aggregates for batch
  * (DataSet) queries.
  *
- * @param genAggregations Code-generated [[GeneratedAggregations]]
+ * @param genAggregations
+ *   Code-generated [[GeneratedAggregations]]
  */
 class DataSetPreAggFunction(genAggregations: GeneratedAggregationsFunction)
     extends AbstractRichFunction

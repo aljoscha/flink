@@ -30,28 +30,27 @@ import java.util.concurrent.atomic.AtomicInteger
 import scala.collection.JavaConversions._
 
 /**
- * A [[Optimizer]] that optimizes [[RelNode]] DAG into semantically [[RelNode]] DAG
- * based common sub-graph. Common sub-graph represents the common sub RelNode plan
- * in multiple RelNode trees. Calcite planner does not support DAG (multiple roots) optimization,
- * so a [[RelNode]] DAG should be decomposed into multiple common sub-graphs,
- * and each sub-graph is a tree (which has only one root), and can be optimized independently
- * by Calcite [[org.apache.calcite.plan.RelOptPlanner]].
+ * A [[Optimizer]] that optimizes [[RelNode]] DAG into semantically [[RelNode]] DAG based common
+ * sub-graph. Common sub-graph represents the common sub RelNode plan in multiple RelNode trees.
+ * Calcite planner does not support DAG (multiple roots) optimization, so a [[RelNode]] DAG should
+ * be decomposed into multiple common sub-graphs, and each sub-graph is a tree (which has only one
+ * root), and can be optimized independently by Calcite [[org.apache.calcite.plan.RelOptPlanner]].
  * The algorithm works as follows:
- * 1. Decompose [[RelNode]] DAG into multiple [[RelNodeBlock]]s, and build [[RelNodeBlock]] DAG.
- * Each [[RelNodeBlock]] has only one sink output, and represents a common sub-graph.
- * 2. optimize recursively each [[RelNodeBlock]] from leaf block to root(sink) block,
- * and wrap the optimized result of non-root block as an [[IntermediateRelTable]].
- * 3. expand [[IntermediateRelTable]] into RelNode tree in each [[RelNodeBlock]].
+ *   1. Decompose [[RelNode]] DAG into multiple [[RelNodeBlock]] s, and build [[RelNodeBlock]] DAG.
+ *      Each [[RelNodeBlock]] has only one sink output, and represents a common sub-graph. 2.
+ *      optimize recursively each [[RelNodeBlock]] from leaf block to root(sink) block, and wrap the
+ *      optimized result of non-root block as an [[IntermediateRelTable]]. 3. expand
+ *      [[IntermediateRelTable]] into RelNode tree in each [[RelNodeBlock]].
  *
  * Currently, we choose this strategy based on the following considerations:
- * 1. In general, for multi-sinks users tend to use VIEW which is a natural common sub-graph.
- * 2. after some optimization, like project push-down, filter push-down, there may be no common
- * sub-graph (even table source) could be found in the final plan.
- * however, current strategy has some deficiencies that need to be improved:
- * 1. how to find a valid break-point for common sub-graph, e.g. some physical RelNodes are
- * converted from several logical RelNodes, so the valid break-point could not be
- * between those logical nodes.
- * 2. the optimization result is local optimal (in sub-graph), not global optimal.
+ *   1. In general, for multi-sinks users tend to use VIEW which is a natural common sub-graph. 2.
+ *      after some optimization, like project push-down, filter push-down, there may be no common
+ *      sub-graph (even table source) could be found in the final plan. however, current strategy
+ *      has some deficiencies that need to be improved:
+ *   1. how to find a valid break-point for common sub-graph, e.g. some physical RelNodes are
+ *      converted from several logical RelNodes, so the valid break-point could not be between those
+ *      logical nodes. 2. the optimization result is local optimal (in sub-graph), not global
+ *      optimal.
  */
 abstract class CommonSubGraphBasedOptimizer extends Optimizer {
 
@@ -66,12 +65,14 @@ abstract class CommonSubGraphBasedOptimizer extends Optimizer {
   }
 
   /**
-   * Generates the optimized [[RelNode]] DAG from the original relational nodes.
-   * NOTES: the reused node in result DAG will be converted to the same RelNode,
-   * and the result doesn't contain [[IntermediateRelTable]].
+   * Generates the optimized [[RelNode]] DAG from the original relational nodes. NOTES: the reused
+   * node in result DAG will be converted to the same RelNode, and the result doesn't contain
+   * [[IntermediateRelTable]].
    *
-   * @param roots the original relational nodes.
-   * @return a list of RelNode represents an optimized RelNode DAG.
+   * @param roots
+   *   the original relational nodes.
+   * @return
+   *   a list of RelNode represents an optimized RelNode DAG.
    */
   override def optimize(roots: Seq[RelNode]): Seq[RelNode] = {
     val sinkBlocks = doOptimize(roots)
@@ -84,10 +85,11 @@ abstract class CommonSubGraphBasedOptimizer extends Optimizer {
   }
 
   /**
-   * Decompose RelNode trees into multiple [[RelNodeBlock]]s, optimize recursively each
-   * [[RelNodeBlock]], return optimized [[RelNodeBlock]]s.
+   * Decompose RelNode trees into multiple [[RelNodeBlock]] s, optimize recursively each
+   * [[RelNodeBlock]], return optimized [[RelNodeBlock]] s.
    *
-   * @return optimized [[RelNodeBlock]]s.
+   * @return
+   *   optimized [[RelNodeBlock]] s.
    */
   protected def doOptimize(roots: Seq[RelNode]): Seq[RelNodeBlock]
 

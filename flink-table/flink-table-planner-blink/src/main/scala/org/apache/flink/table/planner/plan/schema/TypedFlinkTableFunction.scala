@@ -29,11 +29,13 @@ import org.apache.flink.table.typeutils.FieldInfoUtils
 import org.apache.calcite.rel.`type`.{RelDataType, RelDataTypeFactory}
 
 /**
- * A Typed Function is a Table Function which the result type has already been determined.
- * The result type will be determined before constructing the class.
+ * A Typed Function is a Table Function which the result type has already been determined. The
+ * result type will be determined before constructing the class.
  *
- * @param tableFunction The Table Function instance
- * @param externalResultType The result type which has been determined
+ * @param tableFunction
+ *   The Table Function instance
+ * @param externalResultType
+ *   The result type which has been determined
  */
 class TypedFlinkTableFunction(
     val tableFunction: TableFunction[_],

@@ -65,13 +65,12 @@ import scala.collection.JavaConversions._
  * Sliding window:
  * 1.enableAssignPane + 2 phase:
  * -- assign pane + hash agg
- *     -- distribute by (key)
- *       -- global hash agg(key + pane)
- *         -- sort by (key + pane)
- *           -- assign window + sort agg
- * 2.disableAssignPane + 1 phase:
  * -- distribute by (key)
- *   -- assign window + hash agg[(key + window) -> agg buffer].
+ * -- global hash agg(key + pane)
+ * -- sort by (key + pane)
+ * -- assign window + sort agg 2.disableAssignPane + 1 phase:
+ * -- distribute by (key)
+ * -- assign window + hash agg[(key + window) -> agg buffer].
  */
 class HashWindowCodeGenerator(
     ctx: CodeGeneratorContext,

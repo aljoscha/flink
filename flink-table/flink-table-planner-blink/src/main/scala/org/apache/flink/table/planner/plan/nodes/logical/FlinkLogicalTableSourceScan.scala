@@ -40,8 +40,8 @@ import java.util.function.Supplier
 import scala.collection.JavaConversions._
 
 /**
- * Sub-class of [[TableScan]] that is a relational operator
- * which returns the contents of a [[DynamicTableSource]] in Flink.
+ * Sub-class of [[TableScan]] that is a relational operator which returns the contents of a
+ * [[DynamicTableSource]] in Flink.
  */
 class FlinkLogicalTableSourceScan(
     cluster: RelOptCluster,

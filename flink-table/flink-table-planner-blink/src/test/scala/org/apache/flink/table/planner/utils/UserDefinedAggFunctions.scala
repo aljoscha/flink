@@ -29,9 +29,8 @@ import java.lang.{Float => JFloat, Integer => JInt, Long => JLong}
 import java.util
 
 /**
- * User-defined aggregation function to compute the top 10 most visited Int IDs
- * with the highest Float values. We use an Array[Tuple2[Int, Float]] as accumulator to
- * store the top 10 entries.
+ * User-defined aggregation function to compute the top 10 most visited Int IDs with the highest
+ * Float values. We use an Array[Tuple2[Int, Float]] as accumulator to store the top 10 entries.
  *
  * The result is emitted as Array as well.
  */
@@ -45,9 +44,12 @@ class Top10 extends AggregateFunction[Array[JTuple2[JInt, JFloat]], Array[JTuple
   /**
    * Adds a new entry and count to the top 10 entries if necessary.
    *
-   * @param acc   The current top 10
-   * @param id    The ID
-   * @param value The value for the ID
+   * @param acc
+   *   The current top 10
+   * @param id
+   *   The ID
+   * @param value
+   *   The value for the ID
    */
   def accumulate(acc: Array[JTuple2[JInt, JFloat]], id: Int, value: Float) {
 

@@ -28,9 +28,8 @@ import org.apache.flink.table.codegen.{CodeGenerator, GeneratedExpression}
 /**
  * Generates a TRIM function call.
  *
- * First operand: trim mode (see [[org.apache.calcite.sql.fun.SqlTrimFunction.Flag]])
- * Second operand: String to be removed
- * Third operand: String to be trimmed
+ * First operand: trim mode (see [[org.apache.calcite.sql.fun.SqlTrimFunction.Flag]] ) Second
+ * operand: String to be removed Third operand: String to be trimmed
  */
 class TrimCallGen extends CallGenerator {
 

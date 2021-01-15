@@ -41,11 +41,11 @@ import java.util.Optional
 import scala.collection.JavaConverters._
 
 /**
- * Stream physical node for temporal table join (FOR SYSTEM_TIME AS OF) and
- * temporal TableFunction join (LATERAL TemporalTableFunction(proctime)).
+ * Stream physical node for temporal table join (FOR SYSTEM_TIME AS OF) and temporal TableFunction
+ * join (LATERAL TemporalTableFunction(proctime)).
  *
- * <p>The legacy temporal table function join is the subset of temporal table join,
- * the only difference is the validation, we reuse most same logic here.
+ * <p>The legacy temporal table function join is the subset of temporal table join, the only
+ * difference is the validation, we reuse most same logic here.
  */
 class StreamPhysicalTemporalJoin(
     cluster: RelOptCluster,
@@ -129,11 +129,11 @@ class StreamPhysicalTemporalJoin(
   }
 
   /**
-   * TemporalJoinConditionExtractor extracts [[TEMPORAL_JOIN_CONDITION]] from
-   * non-equi join conditions.
+   * TemporalJoinConditionExtractor extracts [[TEMPORAL_JOIN_CONDITION]] from non-equi join
+   * conditions.
    *
-   * <p>TimeAttributes of both sides and primary keys of right side will be extracted and
-   * the TEMPORAL_JOIN_CONDITION RexCall will be pruned after extraction. </p>
+   * <p>TimeAttributes of both sides and primary keys of right side will be extracted and the
+   * TEMPORAL_JOIN_CONDITION RexCall will be pruned after extraction. </p>
    */
   private class TemporalJoinConditionExtractor(
       textualRepresentation: String,

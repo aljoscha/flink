@@ -28,11 +28,13 @@ import org.apache.flink.util.Collector
 
 /**
  * It wraps the aggregate logic inside of
- * [[org.apache.flink.api.java.operators.GroupReduceOperator]].
- * It is only used for tumbling count-window on batch.
+ * [[org.apache.flink.api.java.operators.GroupReduceOperator]]. It is only used for tumbling
+ * count-window on batch.
  *
- * @param genAggregations  Code-generated [[GeneratedAggregations]]
- * @param windowSize       Tumble count window size
+ * @param genAggregations
+ *   Code-generated [[GeneratedAggregations]]
+ * @param windowSize
+ *   Tumble count window size
  */
 class DataSetTumbleCountWindowAggReduceGroupFunction(
     private val genAggregations: GeneratedAggregationsFunction,

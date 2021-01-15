@@ -32,8 +32,8 @@ import java.util
 import java.util.function.Supplier
 
 /**
- * Sub-class of [[Snapshot]] that is a relational expression which returns
- * the contents of a relation expression as it was at a given time in the past.
+ * Sub-class of [[Snapshot]] that is a relational expression which returns the contents of a
+ * relation expression as it was at a given time in the past.
  */
 class FlinkLogicalSnapshot(
     cluster: RelOptCluster,

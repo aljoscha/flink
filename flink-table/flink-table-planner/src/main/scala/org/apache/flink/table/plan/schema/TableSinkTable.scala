@@ -41,7 +41,8 @@ class TableSinkTable[T](
   /**
    * Returns statistics of current table
    *
-   * @return statistics of current table
+   * @return
+   *   statistics of current table
    */
   override def getStatistic: FlinkStatistic = statistic
 }

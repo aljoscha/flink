@@ -35,24 +35,23 @@ import org.apache.flink.table.api.{TableConfig, Types}
 import org.apache.flink.table.runtime.types.CRow
 
 /**
- * An abstract [[TwoInputStreamOperator]] that allows its subclasses to clean
- * up their state based on a TTL. This TTL should be specified in the provided
- * [[TableConfig]].
+ * An abstract [[TwoInputStreamOperator]] that allows its subclasses to clean up their state based
+ * on a TTL. This TTL should be specified in the provided [[TableConfig]].
  *
- * For each known key, this operator registers a timer (in processing time) to
- * fire after the TTL expires. When the timer fires, the subclass can decide which
- * state to cleanup and what further action to take.
+ * For each known key, this operator registers a timer (in processing time) to fire after the TTL
+ * expires. When the timer fires, the subclass can decide which state to cleanup and what further
+ * action to take.
  *
  * This class takes care of maintaining at most one timer per key.
  *
- * <p><b>IMPORTANT NOTE TO USERS:</b> When extending this class, do not use processing time
- * timers in your business logic. The reason is that:
+ * <p><b>IMPORTANT NOTE TO USERS:</b> When extending this class, do not use processing time timers
+ * in your business logic. The reason is that:
  *
- * 1) if your timers collide with clean up timers and you delete them, then state
- * clean-up will not be performed, and
+ * 1) if your timers collide with clean up timers and you delete them, then state clean-up will not
+ * be performed, and
  *
- * 2) (this one is the reason why this class does not allow to override the onProcessingTime())
- * the onProcessingTime with your logic would be also executed on each clean up timer.
+ * 2) (this one is the reason why this class does not allow to override the onProcessingTime()) the
+ * onProcessingTime with your logic would be also executed on each clean up timer.
  */
 @Internal
 abstract class BaseTwoInputStreamOperatorWithStateRetention(
@@ -90,8 +89,8 @@ abstract class BaseTwoInputStreamOperatorWithStateRetention(
   }
 
   /**
-   * If the user has specified a `minRetentionTime` and `maxRetentionTime`, this
-   * method registers a cleanup timer for `currentProcessingTime + minRetentionTime`.
+   * If the user has specified a `minRetentionTime` and `maxRetentionTime`, this method registers a
+   * cleanup timer for `currentProcessingTime + minRetentionTime`.
    *
    * <p>When this timer fires, the [[BaseTwoInputStreamOperatorWithStateRetention.cleanUpState()]]
    * method is called.
@@ -133,8 +132,7 @@ abstract class BaseTwoInputStreamOperatorWithStateRetention(
   }
 
   /**
-   * The users of this class are not allowed to use processing time timers.
-   * See class javadoc.
+   * The users of this class are not allowed to use processing time timers. See class javadoc.
    */
   override final def onProcessingTime(timer: InternalTimer[Any, VoidNamespace]): Unit = {
     if (stateCleaningEnabled) {
@@ -152,7 +150,8 @@ abstract class BaseTwoInputStreamOperatorWithStateRetention(
 
   /**
    * The method to be called when a cleanup timer fires.
-   * @param time The timestamp of the fired timer.
+   * @param time
+   *   The timestamp of the fired timer.
    */
   def cleanUpState(time: Long): Unit
 }

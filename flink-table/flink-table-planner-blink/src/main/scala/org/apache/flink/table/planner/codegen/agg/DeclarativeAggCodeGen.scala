@@ -44,19 +44,27 @@ import org.apache.calcite.rex.RexLiteral
 import org.apache.calcite.tools.RelBuilder
 
 /**
- * It is for code generate aggregation functions that are specified using expressions.
- * The aggregate buffer is embedded inside of a larger shared aggregation buffer.
+ * It is for code generate aggregation functions that are specified using expressions. The aggregate
+ * buffer is embedded inside of a larger shared aggregation buffer.
  *
- * @param ctx the code gen context
- * @param aggInfo  the aggregate information
- * @param filterExpression filter argument access expression, none if no filter
- * @param mergedAccOffset the mergedAcc may come from local aggregate,
- *                        this is the first buffer offset in the row
- * @param aggBufferOffset  the offset in the buffers of this aggregate
- * @param aggBufferSize  the total size of aggregate buffers
- * @param inputTypes   the input field type infos
- * @param constants  the constant literals
- * @param relBuilder  the rel builder to translate expressions to calcite rex nodes
+ * @param ctx
+ *   the code gen context
+ * @param aggInfo
+ *   the aggregate information
+ * @param filterExpression
+ *   filter argument access expression, none if no filter
+ * @param mergedAccOffset
+ *   the mergedAcc may come from local aggregate, this is the first buffer offset in the row
+ * @param aggBufferOffset
+ *   the offset in the buffers of this aggregate
+ * @param aggBufferSize
+ *   the total size of aggregate buffers
+ * @param inputTypes
+ *   the input field type infos
+ * @param constants
+ *   the constant literals
+ * @param relBuilder
+ *   the rel builder to translate expressions to calcite rex nodes
  */
 class DeclarativeAggCodeGen(
     ctx: CodeGeneratorContext,
@@ -226,7 +234,8 @@ class DeclarativeAggCodeGen(
   /**
    * Resolves the given expression to a resolved Expression.
    *
-   * @param isMerge this is called from merge() method
+   * @param isMerge
+   *   this is called from merge() method
    */
   private case class ResolveReference(isMerge: Boolean = false, isDistinctMerge: Boolean = false)
       extends DeclarativeExpressionResolver(relBuilder, function, isMerge) {

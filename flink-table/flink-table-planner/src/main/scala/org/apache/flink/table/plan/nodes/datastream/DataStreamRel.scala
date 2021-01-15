@@ -28,8 +28,10 @@ trait DataStreamRel extends FlinkRelNode {
   /**
    * Translates the FlinkRelNode into a Flink operator.
    *
-   * @param tableEnv    The [[StreamPlanner]] of the translated Table.
-   * @return DataStream of type [[CRow]]
+   * @param tableEnv
+   *   The [[StreamPlanner]] of the translated Table.
+   * @return
+   *   DataStream of type [[CRow]]
    */
   def translateToPlan(tableEnv: StreamPlanner): DataStream[CRow]
 
@@ -45,14 +47,14 @@ trait DataStreamRel extends FlinkRelNode {
   def producesUpdates: Boolean = false
 
   /**
-   * Whether the [[DataStreamRel]] consumes retraction messages instead of forwarding them.
-   * The node might or might not produce new retraction messages.
+   * Whether the [[DataStreamRel]] consumes retraction messages instead of forwarding them. The node
+   * might or might not produce new retraction messages.
    */
   def consumesRetractions: Boolean = false
 
   /**
-   * Whether the [[DataStreamRel]] produces retraction messages.
-   * It might forward retraction messages nevertheless.
+   * Whether the [[DataStreamRel]] produces retraction messages. It might forward retraction
+   * messages nevertheless.
    */
   def producesRetractions: Boolean = false
 }

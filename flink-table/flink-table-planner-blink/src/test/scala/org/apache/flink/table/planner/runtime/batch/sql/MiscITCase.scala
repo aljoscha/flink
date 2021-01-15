@@ -504,9 +504,8 @@ class MiscITCase extends BatchTestBase {
   }
 
   /**
-   * Due to the improper translation of TableFunction left outer join (see CALCITE-2004), the
-   * join predicate can only be empty or literal true (the restriction should be removed in
-   * FLINK-7865).
+   * Due to the improper translation of TableFunction left outer join (see CALCITE-2004), the join
+   * predicate can only be empty or literal true (the restriction should be removed in FLINK-7865).
    */
   @Test(expected = classOf[org.apache.flink.table.api.ValidationException])
   def testTableGenerateFunctionLeftJoin(): Unit = {

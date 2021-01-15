@@ -124,30 +124,27 @@ object OverAggregateUtil {
   }
 
   /**
-   * Calculate the bound value.
-   * The return type only is Long for the ROWS OVER WINDOW.
-   * The return type can be Long or BigDecimal for the RANGE OVER WINDOW.
-   * NOTE: returns a signed value, considering whether it is preceding.
+   * Calculate the bound value. The return type only is Long for the ROWS OVER WINDOW. The return
+   * type can be Long or BigDecimal for the RANGE OVER WINDOW. NOTE: returns a signed value,
+   * considering whether it is preceding.
    */
   def getBoundary(logicWindow: Window, windowBound: RexWindowBound): Any = {
     getBoundary(windowBound, logicWindow.getConstants, calcOriginalInputFields(logicWindow))
   }
 
   /**
-   * Calculate the bound value.
-   * The return type only is Long for the ROWS OVER WINDOW.
-   * The return type can be Long or BigDecimal for the RANGE OVER WINDOW.
-   * NOTE: returns a signed value, considering whether it is preceding.
+   * Calculate the bound value. The return type only is Long for the ROWS OVER WINDOW. The return
+   * type can be Long or BigDecimal for the RANGE OVER WINDOW. NOTE: returns a signed value,
+   * considering whether it is preceding.
    */
   def getBoundary(overSpec: OverSpec, windowBound: RexWindowBound): Any = {
     getBoundary(windowBound, overSpec.getConstants, overSpec.getOriginalInputFields)
   }
 
   /**
-   * Calculate the bound value.
-   * The return type only is Long for the ROWS OVER WINDOW.
-   * The return type can be Long or BigDecimal for the RANGE OVER WINDOW.
-   * NOTE: returns a signed value, considering whether it is preceding.
+   * Calculate the bound value. The return type only is Long for the ROWS OVER WINDOW. The return
+   * type can be Long or BigDecimal for the RANGE OVER WINDOW. NOTE: returns a signed value,
+   * considering whether it is preceding.
    */
   private def getBoundary(
       windowBound: RexWindowBound,

@@ -38,8 +38,8 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable.ArrayBuffer
 
 /**
- * TypeInformation for Case Classes. Creation and access is different from
- * our Java Tuples so we have to treat them differently.
+ * TypeInformation for Case Classes. Creation and access is different from our Java Tuples so we
+ * have to treat them differently.
  */
 @Public
 abstract class CaseClassTypeInfo[T <: Product](

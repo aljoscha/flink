@@ -32,18 +32,17 @@ import org.apache.flink.util.Preconditions.checkArgument
  * Represents a join between a table and [[org.apache.flink.table.functions.TemporalTableFunction]]
  *
  * @param cluster
- * @param traitSet
+ *   @param traitSet
  * @param left
- * @param right     table scan (or other more complex table expression) of underlying
- *                  [[org.apache.flink.table.functions.TemporalTableFunction]]
- * @param condition must contain [[LogicalTemporalTableJoin#TEMPORAL_JOIN_CONDITION]] with
- *                  correctly defined references to rightTimeAttribute,
- *                  rightPrimaryKeyExpression and leftTimeAttribute. We can not implement
- *                  those references as separate fields, because of problems with Calcite's
- *                  optimization rules like projections push downs, column
- *                  pruning/renaming/reordering, etc. Later rightTimeAttribute,
- *                  rightPrimaryKeyExpression and leftTimeAttribute will be extracted from
- *                  the condition.
+ *   @param right table scan (or other more complex table expression) of underlying
+ *   [[org.apache.flink.table.functions.TemporalTableFunction]]
+ * @param condition
+ *   must contain [[LogicalTemporalTableJoin#TEMPORAL_JOIN_CONDITION]] with correctly defined
+ *   references to rightTimeAttribute, rightPrimaryKeyExpression and leftTimeAttribute. We can not
+ *   implement those references as separate fields, because of problems with Calcite's optimization
+ *   rules like projections push downs, column pruning/renaming/reordering, etc. Later
+ *   rightTimeAttribute, rightPrimaryKeyExpression and leftTimeAttribute will be extracted from the
+ *   condition.
  */
 class LogicalTemporalTableJoin private (
     cluster: RelOptCluster,
@@ -153,10 +152,10 @@ object LogicalTemporalTableJoin {
   /**
    * See [[LogicalTemporalTableJoin]]
    *
-   * @param leftTimeAttribute is needed because otherwise,
-   *                          [[LogicalTemporalTableJoin#TEMPORAL_JOIN_CONDITION]] could be pushed
-   *                          down below [[LogicalTemporalTableJoin]], since it wouldn't have any
-   *                          references to the left node.
+   * @param leftTimeAttribute
+   *   is needed because otherwise, [[LogicalTemporalTableJoin#TEMPORAL_JOIN_CONDITION]] could be
+   *   pushed down below [[LogicalTemporalTableJoin]], since it wouldn't have any references to the
+   *   left node.
    */
   def createProctime(
       rexBuilder: RexBuilder,

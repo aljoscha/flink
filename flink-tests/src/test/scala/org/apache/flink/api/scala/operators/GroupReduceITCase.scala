@@ -258,8 +258,8 @@ class GroupReduceITCase(mode: TestExecutionMode) extends MultipleProgramsTestBas
   }
 
   /**
-   * check correctness of groupReduce if UDF returns input objects multiple times and
-   * changes it in between
+   * check correctness of groupReduce if UDF returns input objects multiple times and changes it in
+   * between
    */
   @Test
   def testCorrectnessOfGroupReduceIfUDFReturnsInputObjectMultipleTimesWhileChangingIt(): Unit = {
@@ -422,8 +422,7 @@ class GroupReduceITCase(mode: TestExecutionMode) extends MultipleProgramsTestBas
   }
 
   /**
-   * check that input of combiner is also sorted for combinable groupReduce with group
-   * sorting
+   * check that input of combiner is also sorted for combinable groupReduce with group sorting
    */
   @Test
   def testInputOfCombinerIsSortedForCombinableGroupReduceWithGroupSorting(): Unit = {
@@ -450,8 +449,7 @@ class GroupReduceITCase(mode: TestExecutionMode) extends MultipleProgramsTestBas
   }
 
   /**
-   * Deep nesting test
-   * + null value in pojo
+   * Deep nesting test + null value in pojo
    */
   @Test
   def testDeepNestingAndNullValueInPojo(): Unit = {
@@ -522,8 +520,8 @@ class GroupReduceITCase(mode: TestExecutionMode) extends MultipleProgramsTestBas
   }
 
   /**
-   * Test string-based definition on group sort, based on test:
-   * check correctness of groupReduce with descending group sort
+   * Test string-based definition on group sort, based on test: check correctness of groupReduce
+   * with descending group sort
    */
   @Test
   def testStringBasedDefinitionOnGroupSort(): Unit = {

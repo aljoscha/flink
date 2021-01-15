@@ -26,9 +26,12 @@ import org.apache.flink.table.expressions.Expression
 /**
  * Holds methods to convert a [[DataStream]] into a [[Table]].
  *
- * @param dataStream The [[DataStream]] to convert.
- * @param inputType The [[TypeInformation]] for the type of the [[DataStream]].
- * @tparam T The type of the [[DataStream]].
+ * @param dataStream
+ *   The [[DataStream]] to convert.
+ * @param inputType
+ *   The [[TypeInformation]] for the type of the [[DataStream]].
+ * @tparam T
+ *   The type of the [[DataStream]].
  */
 @PublicEvolving
 class DataStreamConversions[T](dataStream: DataStream[T], inputType: TypeInformation[T]) {
@@ -46,12 +49,15 @@ class DataStreamConversions[T](dataStream: DataStream[T], inputType: TypeInforma
    *   val table = stream.toTable(tEnv, 'name, 'amount)
    * }}}
    *
-   * If not explicitly specified, field names are automatically extracted from the type of
-   * the [[DataStream]].
+   * If not explicitly specified, field names are automatically extracted from the type of the
+   * [[DataStream]].
    *
-   * @param tableEnv The [[StreamTableEnvironment]] in which the new [[Table]] is created.
-   * @param fields The field names of the new [[Table]] (optional).
-   * @return The resulting [[Table]].
+   * @param tableEnv
+   *   The [[StreamTableEnvironment]] in which the new [[Table]] is created.
+   * @param fields
+   *   The field names of the new [[Table]] (optional).
+   * @return
+   *   The resulting [[Table]].
    */
   def toTable(tableEnv: StreamTableEnvironment, fields: Expression*): Table = {
     if (fields.isEmpty) {

@@ -35,12 +35,14 @@ import scala.collection.Map
 
 /**
  * Stream abstraction for CEP pattern detection. A pattern stream is a stream which emits detected
- * pattern sequences as a map of events associated with their names. The pattern is detected using
- * a [[org.apache.flink.cep.nfa.NFA]]. In order to process the detected sequences, the user has to
+ * pattern sequences as a map of events associated with their names. The pattern is detected using a
+ * [[org.apache.flink.cep.nfa.NFA]]. In order to process the detected sequences, the user has to
  * specify a [[PatternSelectFunction]] or a [[PatternFlatSelectFunction]].
  *
- * @param jPatternStream Underlying pattern stream from Java API
- * @tparam T Type of the events
+ * @param jPatternStream
+ *   Underlying pattern stream from Java API
+ * @tparam T
+ *   Type of the events
  */
 class PatternStream[T](jPatternStream: JPatternStream[T]) {
 
@@ -50,10 +52,12 @@ class PatternStream[T](jPatternStream: JPatternStream[T]) {
    * Applies a process function to the detected pattern sequence. For each pattern sequence the
    * provided [[PatternProcessFunction]] is called.
    *
-   * @param patternProcessFunction The pattern process function which is called for each detected
-   *                              pattern sequence.
-   * @tparam R Type of the resulting elements
-   * @return [[DataStream]] which contains the resulting elements from the pattern select function.
+   * @param patternProcessFunction
+   *   The pattern process function which is called for each detected pattern sequence.
+   * @tparam R
+   *   Type of the resulting elements
+   * @return
+   *   [[DataStream]] which contains the resulting elements from the pattern select function.
    */
   def process[R: TypeInformation](
       patternProcessFunction: PatternProcessFunction[T, R]): DataStream[R] = {
@@ -62,13 +66,15 @@ class PatternStream[T](jPatternStream: JPatternStream[T]) {
 
   /**
    * Applies a select function to the detected pattern sequence. For each pattern sequence the
-   * provided [[PatternSelectFunction]] is called. The pattern select function can produce
-   * exactly one resulting element.
+   * provided [[PatternSelectFunction]] is called. The pattern select function can produce exactly
+   * one resulting element.
    *
-   * @param patternSelectFunction The pattern select function which is called for each detected
-   *                              pattern sequence.
-   * @tparam R Type of the resulting elements
-   * @return [[DataStream]] which contains the resulting elements from the pattern select function.
+   * @param patternSelectFunction
+   *   The pattern select function which is called for each detected pattern sequence.
+   * @tparam R
+   *   Type of the resulting elements
+   * @return
+   *   [[DataStream]] which contains the resulting elements from the pattern select function.
    */
   def select[R: TypeInformation](
       patternSelectFunction: PatternSelectFunction[T, R]): DataStream[R] = {
@@ -77,8 +83,8 @@ class PatternStream[T](jPatternStream: JPatternStream[T]) {
 
   /**
    * Applies a select function to the detected pattern sequence. For each pattern sequence the
-   * provided [[PatternSelectFunction]] is called. The pattern select function can produce
-   * exactly one resulting element.
+   * provided [[PatternSelectFunction]] is called. The pattern select function can produce exactly
+   * one resulting element.
    *
    * Additionally a timeout function is applied to partial event patterns which have timed out. For
    * each partial pattern sequence the provided [[PatternTimeoutFunction]] is called. The pattern
@@ -86,15 +92,19 @@ class PatternStream[T](jPatternStream: JPatternStream[T]) {
    *
    * The resulting event and the resulting timeout event are wrapped in an [[Either]] instance.
    *
-   * @param patternTimeoutFunction The pattern timeout function which is called for each partial
-   *                               pattern sequence which has timed out.
-   * @param patternSelectFunction  The pattern select function which is called for each detected
-   *                               pattern sequence.
-   * @tparam L Type of the resulting timeout event
-   * @tparam R Type of the resulting event
-   * @deprecated Use the version that returns timeouted events as a side-output
-   * @return Data stream of either type which contains the resulting events and resulting timeout
-   *         events.
+   * @param patternTimeoutFunction
+   *   The pattern timeout function which is called for each partial pattern sequence which has
+   *   timed out.
+   * @param patternSelectFunction
+   *   The pattern select function which is called for each detected pattern sequence.
+   * @tparam L
+   *   Type of the resulting timeout event
+   * @tparam R
+   *   Type of the resulting event
+   * @deprecated
+   *   Use the version that returns timeouted events as a side-output
+   * @return
+   *   Data stream of either type which contains the resulting events and resulting timeout events.
    */
   @deprecated
   def select[L: TypeInformation, R: TypeInformation](
@@ -107,8 +117,8 @@ class PatternStream[T](jPatternStream: JPatternStream[T]) {
 
   /**
    * Applies a select function to the detected pattern sequence. For each pattern sequence the
-   * provided [[PatternSelectFunction]] is called. The pattern select function can produce
-   * exactly one resulting element.
+   * provided [[PatternSelectFunction]] is called. The pattern select function can produce exactly
+   * one resulting element.
    *
    * Additionally a timeout function is applied to partial event patterns which have timed out. For
    * each partial pattern sequence the provided [[PatternTimeoutFunction]] is called. The pattern
@@ -117,15 +127,20 @@ class PatternStream[T](jPatternStream: JPatternStream[T]) {
    * You can get the stream of timeouted matches using [[DataStream.getSideOutput()]] on the
    * [[DataStream]] resulting from the windowed operation with the same [[OutputTag]].
    *
-   * @param outputTag [[OutputTag]] that identifies side output with timeouted patterns
-   * @param patternTimeoutFunction The pattern timeout function which is called for each partial
-   *                               pattern sequence which has timed out.
-   * @param patternSelectFunction  The pattern select function which is called for each detected
-   *                               pattern sequence.
-   * @tparam L Type of the resulting timeout event
-   * @tparam R Type of the resulting event
-   * @return Data stream which contains the resulting elements with the resulting timeout elements
-   *         in a side output.
+   * @param outputTag
+   *   [[OutputTag]] that identifies side output with timeouted patterns
+   * @param patternTimeoutFunction
+   *   The pattern timeout function which is called for each partial pattern sequence which has
+   *   timed out.
+   * @param patternSelectFunction
+   *   The pattern select function which is called for each detected pattern sequence.
+   * @tparam L
+   *   Type of the resulting timeout event
+   * @tparam R
+   *   Type of the resulting event
+   * @return
+   *   Data stream which contains the resulting elements with the resulting timeout elements in a
+   *   side output.
    */
   def select[L: TypeInformation, R: TypeInformation](
       outputTag: OutputTag[L],
@@ -140,15 +155,16 @@ class PatternStream[T](jPatternStream: JPatternStream[T]) {
   }
 
   /**
-   * Applies a flat select function to the detected pattern sequence. For each pattern sequence
-   * the provided [[PatternFlatSelectFunction]] is called. The pattern flat select function can
-   * produce an arbitrary number of resulting elements.
+   * Applies a flat select function to the detected pattern sequence. For each pattern sequence the
+   * provided [[PatternFlatSelectFunction]] is called. The pattern flat select function can produce
+   * an arbitrary number of resulting elements.
    *
-   * @param patternFlatSelectFunction The pattern flat select function which is called for each
-   *                                  detected pattern sequence.
-   * @tparam R Type of the resulting elements
-   * @return [[DataStream]] which contains the resulting elements from the pattern flat select
-   *         function.
+   * @param patternFlatSelectFunction
+   *   The pattern flat select function which is called for each detected pattern sequence.
+   * @tparam R
+   *   Type of the resulting elements
+   * @return
+   *   [[DataStream]] which contains the resulting elements from the pattern flat select function.
    */
   def flatSelect[R: TypeInformation](
       patternFlatSelectFunction: PatternFlatSelectFunction[T, R]): DataStream[R] = {
@@ -158,9 +174,9 @@ class PatternStream[T](jPatternStream: JPatternStream[T]) {
   }
 
   /**
-   * Applies a flat select function to the detected pattern sequence. For each pattern sequence
-   * the provided [[PatternFlatSelectFunction]] is called. The pattern flat select function can
-   * produce an arbitrary number of resulting elements.
+   * Applies a flat select function to the detected pattern sequence. For each pattern sequence the
+   * provided [[PatternFlatSelectFunction]] is called. The pattern flat select function can produce
+   * an arbitrary number of resulting elements.
    *
    * Additionally a timeout function is applied to partial event patterns which have timed out. For
    * each partial pattern sequence the provided [[PatternFlatTimeoutFunction]] is called. The
@@ -168,15 +184,20 @@ class PatternStream[T](jPatternStream: JPatternStream[T]) {
    *
    * The resulting event and the resulting timeout event are wrapped in an [[Either]] instance.
    *
-   * @param patternFlatTimeoutFunction The pattern flat timeout function which is called for each
-   *                                   partially matched pattern sequence which has timed out.
-   * @param patternFlatSelectFunction  The pattern flat select function which is called for each
-   *                                   detected pattern sequence.
-   * @tparam L Type of the resulting timeout event
-   * @tparam R Type of the resulting event
-   * @deprecated Use the version that returns timeouted events as a side-output
-   * @return Data stream of either type which contains the resulting events and the resulting
-   *         timeout events wrapped in a [[Either]] type.
+   * @param patternFlatTimeoutFunction
+   *   The pattern flat timeout function which is called for each partially matched pattern sequence
+   *   which has timed out.
+   * @param patternFlatSelectFunction
+   *   The pattern flat select function which is called for each detected pattern sequence.
+   * @tparam L
+   *   Type of the resulting timeout event
+   * @tparam R
+   *   Type of the resulting event
+   * @deprecated
+   *   Use the version that returns timeouted events as a side-output
+   * @return
+   *   Data stream of either type which contains the resulting events and the resulting timeout
+   *   events wrapped in a [[Either]] type.
    */
   @deprecated
   def flatSelect[L: TypeInformation, R: TypeInformation](
@@ -189,9 +210,9 @@ class PatternStream[T](jPatternStream: JPatternStream[T]) {
   }
 
   /**
-   * Applies a flat select function to the detected pattern sequence. For each pattern sequence
-   * the provided [[PatternFlatSelectFunction]] is called. The pattern flat select function can
-   * produce an arbitrary number of resulting elements.
+   * Applies a flat select function to the detected pattern sequence. For each pattern sequence the
+   * provided [[PatternFlatSelectFunction]] is called. The pattern flat select function can produce
+   * an arbitrary number of resulting elements.
    *
    * Additionally a timeout function is applied to partial event patterns which have timed out. For
    * each partial pattern sequence the provided [[PatternFlatTimeoutFunction]] is called. The
@@ -200,15 +221,20 @@ class PatternStream[T](jPatternStream: JPatternStream[T]) {
    * You can get the stream of timeouted matches using [[DataStream.getSideOutput()]] on the
    * [[DataStream]] resulting from the windowed operation with the same [[OutputTag]].
    *
-   * @param outputTag [[OutputTag]] that identifies side output with timeouted patterns
-   * @param patternFlatTimeoutFunction The pattern flat timeout function which is called for each
-   *                                   partially matched pattern sequence which has timed out.
-   * @param patternFlatSelectFunction  The pattern flat select function which is called for each
-   *                                   detected pattern sequence.
-   * @tparam L Type of the resulting timeout event
-   * @tparam R Type of the resulting event
-   * @return Data stream which contains the resulting elements with the resulting timeout elements
-   *         in a side output.
+   * @param outputTag
+   *   [[OutputTag]] that identifies side output with timeouted patterns
+   * @param patternFlatTimeoutFunction
+   *   The pattern flat timeout function which is called for each partially matched pattern sequence
+   *   which has timed out.
+   * @param patternFlatSelectFunction
+   *   The pattern flat select function which is called for each detected pattern sequence.
+   * @tparam L
+   *   Type of the resulting timeout event
+   * @tparam R
+   *   Type of the resulting event
+   * @return
+   *   Data stream which contains the resulting elements with the resulting timeout elements in a
+   *   side output.
    */
   def flatSelect[L: TypeInformation, R: TypeInformation](
       outputTag: OutputTag[L],
@@ -228,10 +254,12 @@ class PatternStream[T](jPatternStream: JPatternStream[T]) {
    * provided [[PatternSelectFunction]] is called. The pattern select function can produce exactly
    * one resulting element.
    *
-   * @param patternSelectFun The pattern select function which is called for each detected
-   *                         pattern sequence.
-   * @tparam R Type of the resulting elements
-   * @return [[DataStream]] which contains the resulting elements from the pattern select function.
+   * @param patternSelectFun
+   *   The pattern select function which is called for each detected pattern sequence.
+   * @tparam R
+   *   Type of the resulting elements
+   * @return
+   *   [[DataStream]] which contains the resulting elements from the pattern select function.
    */
   def select[R: TypeInformation](patternSelectFun: Map[String, Iterable[T]] => R): DataStream[R] = {
     val cleanFun = cleanClosure(patternSelectFun)
@@ -245,8 +273,8 @@ class PatternStream[T](jPatternStream: JPatternStream[T]) {
 
   /**
    * Applies a select function to the detected pattern sequence. For each pattern sequence the
-   * provided [[PatternSelectFunction]] is called. The pattern select function can produce
-   * exactly one resulting element.
+   * provided [[PatternSelectFunction]] is called. The pattern select function can produce exactly
+   * one resulting element.
    *
    * Additionally a timeout function is applied to partial event patterns which have timed out. For
    * each partial pattern sequence the provided [[PatternTimeoutFunction]] is called. The pattern
@@ -254,15 +282,19 @@ class PatternStream[T](jPatternStream: JPatternStream[T]) {
    *
    * The resulting event and the resulting timeout event are wrapped in an [[Either]] instance.
    *
-   * @param patternTimeoutFunction The pattern timeout function which is called for each partial
-   *                               pattern sequence which has timed out.
-   * @param patternSelectFunction  The pattern select function which is called for each detected
-   *                               pattern sequence.
-   * @tparam L Type of the resulting timeout event
-   * @tparam R Type of the resulting event
-   * @deprecated Use the version that returns timeouted events as a side-output
-   * @return Data stream of either type which contain the resulting events and resulting timeout
-   *         events.
+   * @param patternTimeoutFunction
+   *   The pattern timeout function which is called for each partial pattern sequence which has
+   *   timed out.
+   * @param patternSelectFunction
+   *   The pattern select function which is called for each detected pattern sequence.
+   * @tparam L
+   *   Type of the resulting timeout event
+   * @tparam R
+   *   Type of the resulting event
+   * @deprecated
+   *   Use the version that returns timeouted events as a side-output
+   * @return
+   *   Data stream of either type which contain the resulting events and resulting timeout events.
    */
   @deprecated
   def select[L: TypeInformation, R: TypeInformation](
@@ -286,8 +318,8 @@ class PatternStream[T](jPatternStream: JPatternStream[T]) {
 
   /**
    * Applies a select function to the detected pattern sequence. For each pattern sequence the
-   * provided [[PatternSelectFunction]] is called. The pattern select function can produce
-   * exactly one resulting element.
+   * provided [[PatternSelectFunction]] is called. The pattern select function can produce exactly
+   * one resulting element.
    *
    * Additionally a timeout function is applied to partial event patterns which have timed out. For
    * each partial pattern sequence the provided [[PatternTimeoutFunction]] is called. The pattern
@@ -296,15 +328,19 @@ class PatternStream[T](jPatternStream: JPatternStream[T]) {
    * You can get the stream of timeouted matches using [[DataStream.getSideOutput()]] on the
    * [[DataStream]] resulting from the windowed operation with the same [[OutputTag]].
    *
-   * @param outputTag [[OutputTag]] that identifies side output with timeouted patterns
-   * @param patternTimeoutFunction The pattern timeout function which is called for each partial
-   *                               pattern sequence which has timed out.
-   * @param patternSelectFunction  The pattern select function which is called for each detected
-   *                               pattern sequence.
-   * @tparam L Type of the resulting timeout event
-   * @tparam R Type of the resulting event
-   * @return Data stream of either type which contain the resulting events and resulting timeout
-   *         events.
+   * @param outputTag
+   *   [[OutputTag]] that identifies side output with timeouted patterns
+   * @param patternTimeoutFunction
+   *   The pattern timeout function which is called for each partial pattern sequence which has
+   *   timed out.
+   * @param patternSelectFunction
+   *   The pattern select function which is called for each detected pattern sequence.
+   * @tparam L
+   *   Type of the resulting timeout event
+   * @tparam R
+   *   Type of the resulting event
+   * @return
+   *   Data stream of either type which contain the resulting events and resulting timeout events.
    */
   def select[L: TypeInformation, R: TypeInformation](outputTag: OutputTag[L])(
       patternTimeoutFunction: (Map[String, Iterable[T]], Long) => L)(
@@ -326,15 +362,16 @@ class PatternStream[T](jPatternStream: JPatternStream[T]) {
   }
 
   /**
-   * Applies a flat select function to the detected pattern sequence. For each pattern sequence
-   * the provided [[PatternFlatSelectFunction]] is called. The pattern flat select function
-   * can produce an arbitrary number of resulting elements.
+   * Applies a flat select function to the detected pattern sequence. For each pattern sequence the
+   * provided [[PatternFlatSelectFunction]] is called. The pattern flat select function can produce
+   * an arbitrary number of resulting elements.
    *
-   * @param patternFlatSelectFun The pattern flat select function which is called for each
-   *                             detected pattern sequence.
-   * @tparam R Type of the resulting elements
-   * @return [[DataStream]] which contains the resulting elements from the pattern flat select
-   *         function.
+   * @param patternFlatSelectFun
+   *   The pattern flat select function which is called for each detected pattern sequence.
+   * @tparam R
+   *   Type of the resulting elements
+   * @return
+   *   [[DataStream]] which contains the resulting elements from the pattern flat select function.
    */
   def flatSelect[R: TypeInformation](
       patternFlatSelectFun: (Map[String, Iterable[T]], Collector[R]) => Unit): DataStream[R] = {
@@ -350,9 +387,9 @@ class PatternStream[T](jPatternStream: JPatternStream[T]) {
   }
 
   /**
-   * Applies a flat select function to the detected pattern sequence. For each pattern sequence
-   * the provided [[PatternFlatSelectFunction]] is called. The pattern flat select function can
-   * produce an arbitrary number of resulting elements.
+   * Applies a flat select function to the detected pattern sequence. For each pattern sequence the
+   * provided [[PatternFlatSelectFunction]] is called. The pattern flat select function can produce
+   * an arbitrary number of resulting elements.
    *
    * Additionally a timeout function is applied to partial event patterns which have timed out. For
    * each partial pattern sequence the provided [[PatternFlatTimeoutFunction]] is called. The
@@ -360,15 +397,20 @@ class PatternStream[T](jPatternStream: JPatternStream[T]) {
    *
    * The resulting event and the resulting timeout event are wrapped in an [[Either]] instance.
    *
-   * @param patternFlatTimeoutFunction The pattern flat timeout function which is called for each
-   *                                   partially matched pattern sequence which has timed out.
-   * @param patternFlatSelectFunction  The pattern flat select function which is called for each
-   *                                   detected pattern sequence.
-   * @tparam L Type of the resulting timeout event
-   * @tparam R Type of the resulting event
-   * @deprecated Use the version that returns timeouted events as a side-output
-   * @return Data stream of either type which contains the resulting events and the resulting
-   *         timeout events wrapped in a [[Either]] type.
+   * @param patternFlatTimeoutFunction
+   *   The pattern flat timeout function which is called for each partially matched pattern sequence
+   *   which has timed out.
+   * @param patternFlatSelectFunction
+   *   The pattern flat select function which is called for each detected pattern sequence.
+   * @tparam L
+   *   Type of the resulting timeout event
+   * @tparam R
+   *   Type of the resulting event
+   * @deprecated
+   *   Use the version that returns timeouted events as a side-output
+   * @return
+   *   Data stream of either type which contains the resulting events and the resulting timeout
+   *   events wrapped in a [[Either]] type.
    */
   @deprecated
   def flatSelect[L: TypeInformation, R: TypeInformation](
@@ -397,9 +439,9 @@ class PatternStream[T](jPatternStream: JPatternStream[T]) {
   }
 
   /**
-   * Applies a flat select function to the detected pattern sequence. For each pattern sequence
-   * the provided [[PatternFlatSelectFunction]] is called. The pattern flat select function can
-   * produce an arbitrary number of resulting elements.
+   * Applies a flat select function to the detected pattern sequence. For each pattern sequence the
+   * provided [[PatternFlatSelectFunction]] is called. The pattern flat select function can produce
+   * an arbitrary number of resulting elements.
    *
    * Additionally a timeout function is applied to partial event patterns which have timed out. For
    * each partial pattern sequence the provided [[PatternFlatTimeoutFunction]] is called. The
@@ -408,15 +450,20 @@ class PatternStream[T](jPatternStream: JPatternStream[T]) {
    * You can get the stream of timeouted matches using [[DataStream.getSideOutput()]] on the
    * [[DataStream]] resulting from the windowed operation with the same [[OutputTag]].
    *
-   * @param outputTag [[OutputTag]] that identifies side output with timeouted patterns
-   * @param patternFlatTimeoutFunction The pattern flat timeout function which is called for each
-   *                                   partially matched pattern sequence which has timed out.
-   * @param patternFlatSelectFunction  The pattern flat select function which is called for each
-   *                                   detected pattern sequence.
-   * @tparam L Type of the resulting timeout event
-   * @tparam R Type of the resulting event
-   * @return Data stream of either type which contains the resulting events and the resulting
-   *         timeout events wrapped in a [[Either]] type.
+   * @param outputTag
+   *   [[OutputTag]] that identifies side output with timeouted patterns
+   * @param patternFlatTimeoutFunction
+   *   The pattern flat timeout function which is called for each partially matched pattern sequence
+   *   which has timed out.
+   * @param patternFlatSelectFunction
+   *   The pattern flat select function which is called for each detected pattern sequence.
+   * @tparam L
+   *   Type of the resulting timeout event
+   * @tparam R
+   *   Type of the resulting event
+   * @return
+   *   Data stream of either type which contains the resulting events and the resulting timeout
+   *   events wrapped in a [[Either]] type.
    */
   def flatSelect[L: TypeInformation, R: TypeInformation](outputTag: OutputTag[L])(
       patternFlatTimeoutFunction: (Map[String, Iterable[T]], Long, Collector[L]) => Unit)(
@@ -462,9 +509,12 @@ class PatternStream[T](jPatternStream: JPatternStream[T]) {
 object PatternStream {
 
   /**
-   * @param jPatternStream Underlying pattern stream from Java API
-   * @tparam T Type of the events
-   * @return A new pattern stream wrapping the pattern stream from Java APU
+   * @param jPatternStream
+   *   Underlying pattern stream from Java API
+   * @tparam T
+   *   Type of the events
+   * @return
+   *   A new pattern stream wrapping the pattern stream from Java APU
    */
   def apply[T](jPatternStream: JPatternStream[T]): PatternStream[T] = {
     new PatternStream[T](jPatternStream)

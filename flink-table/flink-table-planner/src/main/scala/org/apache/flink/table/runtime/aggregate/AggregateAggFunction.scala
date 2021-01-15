@@ -28,8 +28,10 @@ import org.apache.flink.types.Row
  * Aggregate Function used for the aggregate or table aggregate operator in
  * [[org.apache.flink.streaming.api.datastream.WindowedStream]].
  *
- * @param genAggregations Generated aggregate or table aggregate helper function
- * @param isTableAggregate Whether it is table aggregate.
+ * @param genAggregations
+ *   Generated aggregate or table aggregate helper function
+ * @param isTableAggregate
+ *   Whether it is table aggregate.
  */
 class AggregateAggFunction[F <: AggregationsFunction](
     genAggregations: GeneratedAggregationsFunction,

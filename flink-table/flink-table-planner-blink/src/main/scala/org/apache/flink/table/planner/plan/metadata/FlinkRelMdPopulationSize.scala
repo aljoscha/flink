@@ -35,8 +35,8 @@ import org.apache.calcite.util.{BuiltInMethod, ImmutableBitSet, NumberUtil, Util
 import scala.collection.JavaConversions._
 
 /**
- * [[FlinkRelMdPopulationSize]] supplies a implementation of
- * [[RelMetadataQuery#getPopulationSize]] for the standard logical algebra.
+ * [[FlinkRelMdPopulationSize]] supplies a implementation of [[RelMetadataQuery#getPopulationSize]]
+ * for the standard logical algebra.
  */
 class FlinkRelMdPopulationSize private extends MetadataHandler[BuiltInMetadata.PopulationSize] {
 
@@ -346,11 +346,11 @@ class FlinkRelMdPopulationSize private extends MetadataHandler[BuiltInMetadata.P
 
   /**
    * Catch-all implementation for
-   * [[BuiltInMetadata.PopulationSize#getPopulationSize(ImmutableBitSet)]],
-   * invoked using reflection.
+   * [[BuiltInMetadata.PopulationSize#getPopulationSize(ImmutableBitSet)]], invoked using
+   * reflection.
    *
-   * @see org.apache.calcite.rel.metadata.RelMetadataQuery#getPopulationSize(RelNode,
-   *      ImmutableBitSet)
+   * @see
+   *   org.apache.calcite.rel.metadata.RelMetadataQuery#getPopulationSize(RelNode, ImmutableBitSet)
    */
   def getPopulationSize(rel: RelNode, mq: RelMetadataQuery, groupKey: ImmutableBitSet): JDouble = {
     // if the keys are unique, return the row count; otherwise, we have

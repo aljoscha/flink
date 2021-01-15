@@ -159,11 +159,16 @@ class StreamCommonSubGraphBasedOptimizer(planner: StreamPlanner)
   /**
    * Generates the optimized [[RelNode]] tree from the original relational node tree.
    *
-   * @param relNode The root node of the relational expression tree.
-   * @param updateBeforeRequired True if UPDATE_BEFORE message is required for updates
-   * @param miniBatchInterval mini-batch interval of the block.
-   * @param isSinkBlock True if the given block is sink block.
-   * @return The optimized [[RelNode]] tree
+   * @param relNode
+   *   The root node of the relational expression tree.
+   * @param updateBeforeRequired
+   *   True if UPDATE_BEFORE message is required for updates
+   * @param miniBatchInterval
+   *   mini-batch interval of the block.
+   * @param isSinkBlock
+   *   True if the given block is sink block.
+   * @return
+   *   The optimized [[RelNode]] tree
    */
   private def optimizeTree(
       relNode: RelNode,
@@ -203,13 +208,17 @@ class StreamCommonSubGraphBasedOptimizer(planner: StreamPlanner)
   }
 
   /**
-   * Infer UpdateAsRetraction property and MiniBatchInterval property for each block.
-   * NOTES: this method should not change the original RelNode tree.
+   * Infer UpdateAsRetraction property and MiniBatchInterval property for each block. NOTES: this
+   * method should not change the original RelNode tree.
    *
-   * @param block              The [[RelNodeBlock]] instance.
-   * @param updateBeforeRequired True if UPDATE_BEFORE message is required for updates
-   * @param miniBatchInterval  mini-batch interval of the block.
-   * @param isSinkBlock        True if the given block is sink block.
+   * @param block
+   *   The [[RelNodeBlock]] instance.
+   * @param updateBeforeRequired
+   *   True if UPDATE_BEFORE message is required for updates
+   * @param miniBatchInterval
+   *   mini-batch interval of the block.
+   * @param isSinkBlock
+   *   True if the given block is sink block.
    */
   private def inferTraits(
       block: RelNodeBlock,
@@ -259,8 +268,10 @@ class StreamCommonSubGraphBasedOptimizer(planner: StreamPlanner)
   /**
    * Propagate updateBeforeRequired property and miniBatchInterval property to all input blocks.
    *
-   * @param block The [[RelNodeBlock]] instance.
-   * @param isSinkBlock True if the given block is sink block.
+   * @param block
+   *   The [[RelNodeBlock]] instance.
+   * @param isSinkBlock
+   *   True if the given block is sink block.
    */
   private def propagateTraits(block: RelNodeBlock, isSinkBlock: Boolean): Unit = {
 
@@ -307,7 +318,8 @@ class StreamCommonSubGraphBasedOptimizer(planner: StreamPlanner)
   /**
    * Reset the intermediate result including newOutputNode and outputTableName
    *
-   * @param block the [[RelNodeBlock]] instance.
+   * @param block
+   *   the [[RelNodeBlock]] instance.
    */
   private def resetIntermediateResult(block: RelNodeBlock): Unit = {
     block.setNewOutputNode(null)

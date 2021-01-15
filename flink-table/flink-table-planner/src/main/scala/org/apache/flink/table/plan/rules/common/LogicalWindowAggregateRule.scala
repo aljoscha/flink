@@ -65,11 +65,11 @@ abstract class LogicalWindowAggregateRule(ruleName: String)
   }
 
   /**
-   * Transform LogicalAggregate with windowing expression to LogicalProject
-   * + LogicalWindowAggregate + LogicalProject.
+   * Transform LogicalAggregate with windowing expression to LogicalProject + LogicalWindowAggregate
+   * + LogicalProject.
    *
-   * The transformation adds an additional LogicalProject at the top to ensure
-   * that the types are equivalent.
+   * The transformation adds an additional LogicalProject at the top to ensure that the types are
+   * equivalent.
    */
   override def onMatch(call: RelOptRuleCall): Unit = {
     val agg0 = call.rel[LogicalAggregate](0)
@@ -146,23 +146,17 @@ abstract class LogicalWindowAggregateRule(ruleName: String)
   }
 
   /**
-   * Rewrite plan with function call as window call operand: rewrite the window call to
-   * reference the input instead of invoking the function directly, in order to simplify the
-   * subsequent rewrite logic.
+   * Rewrite plan with function call as window call operand: rewrite the window call to reference
+   * the input instead of invoking the function directly, in order to simplify the subsequent
+   * rewrite logic.
    *
-   * For example, plan
-   * <pre>
-   * LogicalAggregate(group=[{0}], a=[COUNT()])
-   *   LogicalProject($f0=[$TUMBLE(TUMBLE_ROWTIME($0), 4:INTERVAL SECOND)], a=[$1])
-   *     LogicalProject($f0=[1970-01-01 00:00:00:TIMESTAMP(3)], a=[$0])
-   * </pre>
+   * For example, plan <pre> LogicalAggregate(group=[{0}], a=[COUNT()])
+   * LogicalProject($f0=[$TUMBLE(TUMBLE_ROWTIME($0), 4:INTERVAL SECOND)], a=[$1])
+   * LogicalProject($f0=[1970-01-01 00:00:00:TIMESTAMP(3)], a=[$0]) </pre>
    *
-   * would be rewritten to
-   * <pre>
-   * LogicalAggregate(group=[{0}], a=[COUNT()])
-   *   LogicalProject($f0=[TUMBLE($1, 4:INTERVAL SECOND)], a=[$0])
-   *     LogicalProject(a=[$1], zzzzz=[TUMBLE_ROWTIME($0)])
-   *       LogicalProject($f0=[1970-01-01 00:00:00:TIMESTAMP(3)], a=[$0])
+   * would be rewritten to <pre> LogicalAggregate(group=[{0}], a=[COUNT()])
+   * LogicalProject($f0=[TUMBLE($1, 4:INTERVAL SECOND)], a=[$0]) LogicalProject(a=[$1],
+   * zzzzz=[TUMBLE_ROWTIME($0)]) LogicalProject($f0=[1970-01-01 00:00:00:TIMESTAMP(3)], a=[$0])
    * </pre>
    */
   private def rewriteWindowCallWithFuncOperands(
@@ -217,8 +211,7 @@ abstract class LogicalWindowAggregateRule(ruleName: String)
   }
 
   /**
-   * Decides if the [[RexNode]] is a call whose return type is
-   * a time indicator type.
+   * Decides if the [[RexNode]] is a call whose return type is a time indicator type.
    */
   def isTimeAttributeCall(rexNode: RexNode, projects: JList[RexNode]): Boolean = rexNode match {
     case call: RexCall if FlinkTypeFactory.isTimeIndicatorType(call.getType) =>

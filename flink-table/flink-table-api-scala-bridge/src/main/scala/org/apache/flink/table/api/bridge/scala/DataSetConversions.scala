@@ -26,9 +26,12 @@ import org.apache.flink.table.expressions.Expression
 /**
  * Holds methods to convert a [[DataSet]] into a [[Table]].
  *
- * @param dataSet The [[DataSet]] to convert.
- * @param inputType The [[TypeInformation]] for the type of the [[DataSet]].
- * @tparam T The type of the [[DataSet]].
+ * @param dataSet
+ *   The [[DataSet]] to convert.
+ * @param inputType
+ *   The [[TypeInformation]] for the type of the [[DataSet]].
+ * @tparam T
+ *   The type of the [[DataSet]].
  */
 @PublicEvolving
 class DataSetConversions[T](dataSet: DataSet[T], inputType: TypeInformation[T]) {
@@ -46,12 +49,15 @@ class DataSetConversions[T](dataSet: DataSet[T], inputType: TypeInformation[T]) 
    *   val table = set.toTable(tEnv, 'name, 'amount)
    * }}}
    *
-   * If not explicitly specified, field names are automatically extracted from the type of
-   * the [[DataSet]].
+   * If not explicitly specified, field names are automatically extracted from the type of the
+   * [[DataSet]].
    *
-   * @param tableEnv The [[BatchTableEnvironment]] in which the new [[Table]] is created.
-   * @param fields The field names of the new [[Table]] (optional).
-   * @return The resulting [[Table]].
+   * @param tableEnv
+   *   The [[BatchTableEnvironment]] in which the new [[Table]] is created.
+   * @param fields
+   *   The field names of the new [[Table]] (optional).
+   * @return
+   *   The resulting [[Table]].
    */
   def toTable(tableEnv: BatchTableEnvironment, fields: Expression*): Table = {
     if (fields.isEmpty) {

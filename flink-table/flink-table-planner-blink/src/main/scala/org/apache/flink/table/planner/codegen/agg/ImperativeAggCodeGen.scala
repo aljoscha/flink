@@ -47,22 +47,32 @@ import java.lang.{Iterable => JIterable}
 import scala.collection.mutable.ArrayBuffer
 
 /**
- * It is for code generate aggregation functions that are specified in terms of
- * accumulate(), retract() and merge() functions. The aggregate accumulator is
- * embedded inside of a larger shared aggregation buffer.
+ * It is for code generate aggregation functions that are specified in terms of accumulate(),
+ * retract() and merge() functions. The aggregate accumulator is embedded inside of a larger shared
+ * aggregation buffer.
  *
- * @param ctx the code gen context
- * @param aggInfo  the aggregate information
- * @param filterExpression filter argument access expression, none if no filter
- * @param mergedAccOffset the mergedAcc may come from local aggregate,
- *                        this is the first buffer offset in the row
- * @param aggBufferOffset  the offset in the buffers of this aggregate
- * @param aggBufferSize  the total size of aggregate buffers
- * @param inputTypes   the input field type infos
- * @param constantExprs  the constant expressions
- * @param relBuilder  the rel builder to translate expressions to calcite rex nodes
- * @param hasNamespace  whether the accumulators state has namespace
- * @param inputFieldCopy    copy input field element if true (only mutable type will be copied)
+ * @param ctx
+ *   the code gen context
+ * @param aggInfo
+ *   the aggregate information
+ * @param filterExpression
+ *   filter argument access expression, none if no filter
+ * @param mergedAccOffset
+ *   the mergedAcc may come from local aggregate, this is the first buffer offset in the row
+ * @param aggBufferOffset
+ *   the offset in the buffers of this aggregate
+ * @param aggBufferSize
+ *   the total size of aggregate buffers
+ * @param inputTypes
+ *   the input field type infos
+ * @param constantExprs
+ *   the constant expressions
+ * @param relBuilder
+ *   the rel builder to translate expressions to calcite rex nodes
+ * @param hasNamespace
+ *   whether the accumulators state has namespace
+ * @param inputFieldCopy
+ *   copy input field element if true (only mutable type will be copied)
  */
 class ImperativeAggCodeGen(
     ctx: CodeGeneratorContext,
@@ -92,8 +102,8 @@ class ImperativeAggCodeGen(
   private val internalAccType = fromDataTypeToLogicalType(externalAccType)
 
   /**
-   * whether the acc type is an internal type.
-   * Currently we only support GenericRowData as internal acc type
+   * whether the acc type is an internal type. Currently we only support GenericRowData as internal
+   * acc type
    */
   val isAccTypeInternal: Boolean =
     classOf[RowData].isAssignableFrom(externalAccType.getConversionClass)
@@ -396,8 +406,10 @@ class ImperativeAggCodeGen(
   /**
    * Generate statements to set data view field when use state backend.
    *
-   * @param accTerm aggregation term
-   * @return data view field set statements
+   * @param accTerm
+   *   aggregation term
+   * @return
+   *   data view field set statements
    */
   private def generateDataViewFieldSetter(
       accTerm: String,

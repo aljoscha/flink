@@ -27,17 +27,23 @@ import org.apache.flink.table.codegen.Indenter.toISC
 import org.apache.flink.util.Collector
 
 /**
- * A code generator for generating Flink [[org.apache.flink.api.common.functions.Function]]s.
+ * A code generator for generating Flink [[org.apache.flink.api.common.functions.Function]] s.
  * Including [[MapFunction]], [[FlatMapFunction]], [[FlatJoinFunction]], [[ProcessFunction]].
  *
- * @param config configuration that determines runtime behavior
- * @param nullableInput input(s) can be null.
- * @param input1 type information about the first input of the Function
- * @param input2 type information about the second input if the Function is binary
- * @param input1FieldMapping additional mapping information for input1
- *   (e.g. POJO types have no deterministic field order and some input fields might not be read)
- * @param input2FieldMapping additional mapping information for input2
- *   (e.g. POJO types have no deterministic field order and some input fields might not be read)
+ * @param config
+ *   configuration that determines runtime behavior
+ * @param nullableInput
+ *   input(s) can be null.
+ * @param input1
+ *   type information about the first input of the Function
+ * @param input2
+ *   type information about the second input if the Function is binary
+ * @param input1FieldMapping
+ *   additional mapping information for input1 (e.g. POJO types have no deterministic field order
+ *   and some input fields might not be read)
+ * @param input2FieldMapping
+ *   additional mapping information for input2 (e.g. POJO types have no deterministic field order
+ *   and some input fields might not be read)
  */
 class FunctionCodeGenerator(
     config: TableConfig,
@@ -55,14 +61,18 @@ class FunctionCodeGenerator(
       input2FieldMapping) {
 
   /**
-   * A code generator for generating unary Flink
-   * [[org.apache.flink.api.common.functions.Function]]s with one input.
+   * A code generator for generating unary Flink [[org.apache.flink.api.common.functions.Function]]
+   * s with one input.
    *
-   * @param config configuration that determines runtime behavior
-   * @param nullableInput input(s) can be null.
-   * @param input type information about the input of the Function
-   * @param inputFieldMapping additional mapping information necessary for input
-   *   (e.g. POJO types have no deterministic field order and some input fields might not be read)
+   * @param config
+   *   configuration that determines runtime behavior
+   * @param nullableInput
+   *   input(s) can be null.
+   * @param input
+   *   type information about the input of the Function
+   * @param inputFieldMapping
+   *   additional mapping information necessary for input (e.g. POJO types have no deterministic
+   *   field order and some input fields might not be read)
    */
   def this(
       config: TableConfig,
@@ -75,15 +85,21 @@ class FunctionCodeGenerator(
    * Generates a [[org.apache.flink.api.common.functions.Function]] that can be passed to Java
    * compiler.
    *
-   * @param name Class name of the Function. Must not be unique but has to be a valid Java class
-   *             identifier.
-   * @param clazz Flink Function to be generated.
-   * @param bodyCode code contents of the SAM (Single Abstract Method). Inputs, collector, or
-   *                 output record can be accessed via the given term methods.
-   * @param returnType expected return type
-   * @tparam F Flink Function to be generated.
-   * @tparam T Return type of the Flink Function.
-   * @return instance of GeneratedFunction
+   * @param name
+   *   Class name of the Function. Must not be unique but has to be a valid Java class identifier.
+   * @param clazz
+   *   Flink Function to be generated.
+   * @param bodyCode
+   *   code contents of the SAM (Single Abstract Method). Inputs, collector, or output record can be
+   *   accessed via the given term methods.
+   * @param returnType
+   *   expected return type
+   * @tparam F
+   *   Flink Function to be generated.
+   * @tparam T
+   *   Return type of the Flink Function.
+   * @return
+   *   instance of GeneratedFunction
    */
   def generateFunction[F <: Function, T <: Any](
       name: String,

@@ -28,19 +28,22 @@ import org.apache.flink.api.common.typeinfo.TypeInformation
 
 /**
  * This is for dealing with operations that require keys and use a fluent interface (join, and
- * coGroup for now). For each operation we need a subclass that implements `finish` to
- * create the actual operation using the provided keys.
+ * coGroup for now). For each operation we need a subclass that implements `finish` to create the
+ * actual operation using the provided keys.
  *
  * This way, we have a central point where all the key-providing happens and don't need to change
  * the specific operations if the supported key types change.
  *
- * We use the type parameter `O` to specify the type of the resulting operation. For join
- * this would be `JoinDataSet[L, R]` and for coGroup it would be `CoGroupDataSet[L, R]`. This
- * way the user gets the correct type for the finished operation.
+ * We use the type parameter `O` to specify the type of the resulting operation. For join this would
+ * be `JoinDataSet[L, R]` and for coGroup it would be `CoGroupDataSet[L, R]`. This way the user gets
+ * the correct type for the finished operation.
  *
- * @tparam L Type of the left input [[DataSet]].
- * @tparam R Type of the right input [[DataSet]].
- * @tparam O The type of the resulting Operation.
+ * @tparam L
+ *   Type of the left input [[DataSet]].
+ * @tparam R
+ *   Type of the right input [[DataSet]].
+ * @tparam O
+ *   The type of the resulting Operation.
  */
 @Internal
 private[flink] abstract class UnfinishedKeyPairOperation[L, R, O](
@@ -50,10 +53,9 @@ private[flink] abstract class UnfinishedKeyPairOperation[L, R, O](
   private[flink] def finish(leftKey: Keys[L], rightKey: Keys[R]): O
 
   /**
-   * Specify the key fields for the left side of the key based operation. This returns
-   * a [[HalfUnfinishedKeyPairOperation]] on which `equalTo` must be called to specify the
-   * key for the right side. The result after specifying the right side key is the finished
-   * operation.
+   * Specify the key fields for the left side of the key based operation. This returns a
+   * [[HalfUnfinishedKeyPairOperation]] on which `equalTo` must be called to specify the key for the
+   * right side. The result after specifying the right side key is the finished operation.
    *
    * This only works on Tuple [[DataSet]].
    */
@@ -63,10 +65,9 @@ private[flink] abstract class UnfinishedKeyPairOperation[L, R, O](
   }
 
   /**
-   * Specify the key fields for the left side of the key based operation. This returns
-   * a [[HalfUnfinishedKeyPairOperation]] on which `equalTo` must be called to specify the
-   * key for the right side. The result after specifying the right side key is the finished
-   * operation.
+   * Specify the key fields for the left side of the key based operation. This returns a
+   * [[HalfUnfinishedKeyPairOperation]] on which `equalTo` must be called to specify the key for the
+   * right side. The result after specifying the right side key is the finished operation.
    */
   def where(firstLeftField: String, otherLeftFields: String*) = {
     val leftKey =
@@ -75,10 +76,9 @@ private[flink] abstract class UnfinishedKeyPairOperation[L, R, O](
   }
 
   /**
-   * Specify the key selector function for the left side of the key based operation. This returns
-   * a [[HalfUnfinishedKeyPairOperation]] on which `equalTo` must be called to specify the
-   * key for the right side. The result after specifying the right side key is the finished
-   * operation.
+   * Specify the key selector function for the left side of the key based operation. This returns a
+   * [[HalfUnfinishedKeyPairOperation]] on which `equalTo` must be called to specify the key for the
+   * right side. The result after specifying the right side key is the finished operation.
    */
   def where[K: TypeInformation](fun: (L) => K) = {
     val keyType = implicitly[TypeInformation[K]]
@@ -91,10 +91,9 @@ private[flink] abstract class UnfinishedKeyPairOperation[L, R, O](
   }
 
   /**
-   * Specify the key selector function for the left side of the key based operation. This returns
-   * a [[HalfUnfinishedKeyPairOperation]] on which `equalTo` must be called to specify the
-   * key for the right side. The result after specifying the right side key is the finished
-   * operation.
+   * Specify the key selector function for the left side of the key based operation. This returns a
+   * [[HalfUnfinishedKeyPairOperation]] on which `equalTo` must be called to specify the key for the
+   * right side. The result after specifying the right side key is the finished operation.
    */
   def where[K: TypeInformation](fun: KeySelector[L, K]) = {
     val keyType = implicitly[TypeInformation[K]]
@@ -110,8 +109,8 @@ private[flink] class HalfUnfinishedKeyPairOperation[L, R, O](
     leftKey: Keys[L]) {
 
   /**
-   * Specify the key fields for the right side of the key based operation. This returns
-   * the finished operation.
+   * Specify the key fields for the right side of the key based operation. This returns the finished
+   * operation.
    *
    * This only works on a Tuple [[DataSet]].
    */
@@ -126,8 +125,8 @@ private[flink] class HalfUnfinishedKeyPairOperation[L, R, O](
   }
 
   /**
-   * Specify the key fields for the right side of the key based operation. This returns
-   * the finished operation.
+   * Specify the key fields for the right side of the key based operation. This returns the finished
+   * operation.
    */
   def equalTo(firstRightField: String, otherRightFields: String*): O = {
     val rightKey = new ExpressionKeys[R](

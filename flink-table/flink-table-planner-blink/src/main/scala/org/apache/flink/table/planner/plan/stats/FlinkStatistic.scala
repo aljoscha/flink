@@ -47,15 +47,18 @@ class FlinkStatistic(
   /**
    * Returns the table statistics.
    *
-   * @return The table statistics
+   * @return
+   *   The table statistics
    */
   def getTableStats: TableStats = tableStats
 
   /**
    * Returns the stats of the specified the column.
    *
-   * @param columnName The name of the column for which the stats are requested.
-   * @return The stats of the specified column.
+   * @param columnName
+   *   The name of the column for which the stats are requested.
+   * @return
+   *   The stats of the specified column.
    */
   def getColumnStats(columnName: String): ColumnStats = {
     if (tableStats != TableStats.UNKNOWN && tableStats.getColumnStats != null) {
@@ -79,7 +82,8 @@ class FlinkStatistic(
   /**
    * Returns the number of rows of the table.
    *
-   * @return The number of rows of the table.
+   * @return
+   *   The number of rows of the table.
    */
   override def getRowCount: java.lang.Double = {
     if (tableStats != TableStats.UNKNOWN) {
@@ -98,17 +102,16 @@ class FlinkStatistic(
   override def getCollations: util.List[RelCollation] = util.Collections.emptyList()
 
   /**
-   * Returns whether the given columns are a key or a superset of a unique key
-   * of this table.
+   * Returns whether the given columns are a key or a superset of a unique key of this table.
    *
-   * Note: Do not call this method!
-   * Use [[org.apache.calcite.rel.metadata.RelMetadataQuery]].areRowsUnique if need.
-   * Because columns in original uniqueKey may not exist in RowType after project pushDown, however
-   * the RowType cannot be available here.
+   * Note: Do not call this method! Use [[org.apache.calcite.rel.metadata.RelMetadataQuery]].
+   * areRowsUnique if need. Because columns in original uniqueKey may not exist in RowType after
+   * project pushDown, however the RowType cannot be available here.
    *
-   * @param columns Ordinals of key columns
-   * @return if bit mask represents a unique column set; false if not (or
-   *         if no metadata is available).
+   * @param columns
+   *   Ordinals of key columns
+   * @return
+   *   if bit mask represents a unique column set; false if not (or if no metadata is available).
    */
   override def isKey(columns: ImmutableBitSet): Boolean = false
 
@@ -197,7 +200,8 @@ object FlinkStatistic {
   /**
    * Return a new builder that builds a [[FlinkStatistic]].
    *
-   * @return a new builder to build a [[FlinkStatistic]]
+   * @return
+   *   a new builder to build a [[FlinkStatistic]]
    */
   def builder(): Builder = new Builder
 }

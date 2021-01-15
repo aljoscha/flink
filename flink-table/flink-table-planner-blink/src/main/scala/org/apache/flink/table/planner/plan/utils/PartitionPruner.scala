@@ -44,7 +44,7 @@ import scala.collection.JavaConversions._
 /**
  * Utility class for partition pruning.
  *
- * Creates partition filter instance (a [[RichMapFunction]]) with partition predicates by code-gen,
+ * Creates partition filter instance (a [[RichMapFunction]] ) with partition predicates by code-gen,
  * and then evaluates all partition values against the partition filter to get final partitions.
  */
 object PartitionPruner {
@@ -69,11 +69,16 @@ object PartitionPruner {
   /**
    * get pruned partitions from all partitions by partition filters
    *
-   * @param partitionFieldNames Partition field names.
-   * @param partitionFieldTypes Partition field types.
-   * @param allPartitions       All partition values.
-   * @param partitionPredicate  A predicate that will be applied against partition values.
-   * @return Pruned partitions.
+   * @param partitionFieldNames
+   *   Partition field names.
+   * @param partitionFieldTypes
+   *   Partition field types.
+   * @param allPartitions
+   *   All partition values.
+   * @param partitionPredicate
+   *   A predicate that will be applied against partition values.
+   * @return
+   *   Pruned partitions.
    */
   def prunePartitions(
       config: TableConfig,

@@ -48,18 +48,16 @@ import org.apache.calcite.tools.RelBuilder
  * Sliding window:
  * 1.enableAssignPane + 1 phase:
  * -- distribute by (key)
- *   -- sort by (key + ts)
- *     -- assign pane + sort agg + assign window + sort agg
- * 2.enableAssignPane + 2 phase:
  * -- sort by (key + ts)
- *   -- assign pane + sort agg
- *     -- distribute by (key)
- *       -- sort by (key + pane)
- *         -- assign window + sort agg
- * 3.disableAssignPane + 1 phase:
+ * -- assign pane + sort agg + assign window + sort agg 2.enableAssignPane + 2 phase:
+ * -- sort by (key + ts)
+ * -- assign pane + sort agg
  * -- distribute by (key)
- *   -- sort by (key +ts)
- *     -- assign window + sort agg.
+ * -- sort by (key + pane)
+ * -- assign window + sort agg 3.disableAssignPane + 1 phase:
+ * -- distribute by (key)
+ * -- sort by (key +ts)
+ * -- assign window + sort agg.
  */
 class SortWindowCodeGenerator(
     ctx: CodeGeneratorContext,

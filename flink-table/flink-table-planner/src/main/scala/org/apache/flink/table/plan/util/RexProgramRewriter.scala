@@ -27,15 +27,19 @@ import scala.collection.JavaConverters._
 object RexProgramRewriter {
 
   /**
-   * Generates a new RexProgram with used input fields. The used fields maybe
-   * a subset of total input fields, so we need to convert the field index in
-   * new RexProgram based on given fields.
+   * Generates a new RexProgram with used input fields. The used fields maybe a subset of total
+   * input fields, so we need to convert the field index in new RexProgram based on given fields.
    *
-   * @param rexProgram   original RexProgram
-   * @param inputRowType input row type
-   * @param rexBuilder   builder for Rex expressions
-   * @param usedFields   indices of used input fields
-   * @return A new RexProgram with only used input fields
+   * @param rexProgram
+   *   original RexProgram
+   * @param inputRowType
+   *   input row type
+   * @param rexBuilder
+   *   builder for Rex expressions
+   * @param usedFields
+   *   indices of used input fields
+   * @return
+   *   A new RexProgram with only used input fields
    */
   def rewriteWithFieldProjection(
       rexProgram: RexProgram,
@@ -71,7 +75,8 @@ object RexProgramRewriter {
 /**
  * A RexShuttle to rewrite field accesses of a RexProgram.
  *
- * @param fields used input fields
+ * @param fields
+ *   used input fields
  */
 class InputRewriter(fields: Array[Int]) extends RexShuttle {
 

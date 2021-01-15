@@ -103,9 +103,8 @@ class TemporalTableJoinTest extends TableTestBase {
   }
 
   /**
-   * Test versioned joins with more complicated query.
-   * Important thing here is that we have complex OR join condition
-   * and there are some columns that are not being used (are being pruned).
+   * Test versioned joins with more complicated query. Important thing here is that we have complex
+   * OR join condition and there are some columns that are not being used (are being pruned).
    */
   @Test
   def testComplexJoin(): Unit = {

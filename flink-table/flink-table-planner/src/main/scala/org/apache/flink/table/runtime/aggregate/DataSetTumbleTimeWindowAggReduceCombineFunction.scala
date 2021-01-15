@@ -27,19 +27,23 @@ import org.apache.flink.types.Row
 /**
  * It wraps the aggregate logic inside of
  * [[org.apache.flink.api.java.operators.GroupReduceOperator]] and
- * [[org.apache.flink.api.java.operators.GroupCombineOperator]].
- * It is used for tumbling time-window on batch.
+ * [[org.apache.flink.api.java.operators.GroupCombineOperator]]. It is used for tumbling time-window
+ * on batch.
  *
- * @param genPreAggregations        Code-generated [[GeneratedAggregations]] for partial aggs.
- * @param genFinalAggregations        Code-generated [[GeneratedAggregations]] for final aggs.
- * @param windowSize             Tumbling time window size
- * @param windowStartPos         The relative window-start field position to the last field of
- *                               output row
- * @param windowEndPos           The relative window-end field position to the last field of
- *                               output row
- * @param windowRowtimePos       The relative window-rowtime field position to the last field of
- *                               output row
- * @param keysAndAggregatesArity The total arity of keys and aggregates
+ * @param genPreAggregations
+ *   Code-generated [[GeneratedAggregations]] for partial aggs.
+ * @param genFinalAggregations
+ *   Code-generated [[GeneratedAggregations]] for final aggs.
+ * @param windowSize
+ *   Tumbling time window size
+ * @param windowStartPos
+ *   The relative window-start field position to the last field of output row
+ * @param windowEndPos
+ *   The relative window-end field position to the last field of output row
+ * @param windowRowtimePos
+ *   The relative window-rowtime field position to the last field of output row
+ * @param keysAndAggregatesArity
+ *   The total arity of keys and aggregates
  */
 class DataSetTumbleTimeWindowAggReduceCombineFunction(
     genPreAggregations: GeneratedAggregationsFunction,
@@ -77,8 +81,10 @@ class DataSetTumbleTimeWindowAggReduceCombineFunction(
   /**
    * For sub-grouped intermediate aggregate Rows, merge all of them into aggregate buffer,
    *
-   * @param records Sub-grouped intermediate aggregate Rows iterator.
-   * @return Combined intermediate aggregate Row.
+   * @param records
+   *   Sub-grouped intermediate aggregate Rows iterator.
+   * @return
+   *   Combined intermediate aggregate Row.
    */
   override def combine(records: Iterable[Row]): Row = {
 

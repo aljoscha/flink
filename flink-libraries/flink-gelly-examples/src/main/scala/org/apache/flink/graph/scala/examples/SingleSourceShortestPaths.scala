@@ -33,11 +33,10 @@ import scala.collection.JavaConversions._
  *
  * It is an implementation of the Single-Source-Shortest-Paths algorithm.
  *
- * The input file is a plain text file and must be formatted as follows:
- * Edges are represented by tuples of srcVertexId, trgVertexId, distance which are
- * separated by tabs. Edges themselves are separated by newlines.
- * For example: <code>1\t2\t0.1\n1\t3\t1.4\n</code> defines two edges,
- * edge 1-2 with distance 0.1, and edge 1-3 with distance 1.4.
+ * The input file is a plain text file and must be formatted as follows: Edges are represented by
+ * tuples of srcVertexId, trgVertexId, distance which are separated by tabs. Edges themselves are
+ * separated by newlines. For example: <code>1\t2\t0.1\n1\t3\t1.4\n</code> defines two edges, edge
+ * 1-2 with distance 0.1, and edge 1-3 with distance 1.4.
  *
  * If no parameters are provided, the program is run with default data from
  * [[SingleSourceShortestPathsData]]
@@ -86,8 +85,8 @@ object SingleSourceShortestPaths {
   }
 
   /**
-   * Distributes the minimum distance associated with a given vertex among all
-   * the target vertices summed up with the edge's value.
+   * Distributes the minimum distance associated with a given vertex among all the target vertices
+   * summed up with the edge's value.
    */
   private final class MinDistanceMessenger extends ScatterFunction[Long, Double, Double, Double] {
 
@@ -101,8 +100,8 @@ object SingleSourceShortestPaths {
   }
 
   /**
-   * Function that updates the value of a vertex by picking the minimum
-   * distance from all incoming messages.
+   * Function that updates the value of a vertex by picking the minimum distance from all incoming
+   * messages.
    */
   private final class VertexDistanceUpdater extends GatherFunction[Long, Double, Double] {
 

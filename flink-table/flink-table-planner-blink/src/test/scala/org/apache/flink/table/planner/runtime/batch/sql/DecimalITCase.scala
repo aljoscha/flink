@@ -36,8 +36,7 @@ import java.math.{BigDecimal => JBigDecimal}
 import scala.collection.Seq
 
 /**
- * Conformance test of SQL type Decimal(p,s).
- * Served also as documentation of our Decimal behaviors.
+ * Conformance test of SQL type Decimal(p,s). Served also as documentation of our Decimal behaviors.
  */
 class DecimalITCase extends BatchTestBase {
 

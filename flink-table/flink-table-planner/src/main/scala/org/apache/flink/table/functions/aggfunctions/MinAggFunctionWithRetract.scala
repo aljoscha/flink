@@ -36,7 +36,8 @@ class MinWithRetractAccumulator[T] {
 /**
  * Base class for built-in Min with retraction aggregate function
  *
- * @tparam T the type for the aggregation result
+ * @tparam T
+ *   the type for the aggregation result
  */
 abstract class MinWithRetractAggFunction[T](implicit ord: Ordering[T])
     extends AggregateFunction[T, MinWithRetractAccumulator[T]] {

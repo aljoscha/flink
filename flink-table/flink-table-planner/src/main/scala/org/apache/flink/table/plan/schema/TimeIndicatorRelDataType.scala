@@ -22,8 +22,8 @@ import org.apache.calcite.rel.`type`.RelDataTypeSystem
 import org.apache.calcite.sql.`type`.BasicSqlType
 
 /**
- * Creates a time indicator type for event-time or processing-time, but with similar properties
- * as a basic SQL type.
+ * Creates a time indicator type for event-time or processing-time, but with similar properties as a
+ * basic SQL type.
  */
 class TimeIndicatorRelDataType(
     typeSystem: RelDataTypeSystem,

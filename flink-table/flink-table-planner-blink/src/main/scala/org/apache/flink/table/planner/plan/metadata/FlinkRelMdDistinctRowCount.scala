@@ -44,8 +44,8 @@ import org.apache.calcite.util._
 import scala.collection.JavaConversions._
 
 /**
- * FlinkRelMdDistinctRowCount supplies a implementation of
- * [[RelMetadataQuery#getDistinctRowCount]] for the standard logical algebra.
+ * FlinkRelMdDistinctRowCount supplies a implementation of [[RelMetadataQuery#getDistinctRowCount]]
+ * for the standard logical algebra.
  */
 class FlinkRelMdDistinctRowCount private extends MetadataHandler[BuiltInMetadata.DistinctRowCount] {
 
@@ -596,11 +596,12 @@ class FlinkRelMdDistinctRowCount private extends MetadataHandler[BuiltInMetadata
 
   /**
    * Catch-all implementation for
-   * [[BuiltInMetadata.DistinctRowCount#getDistinctRowCount(ImmutableBitSet, RexNode)]],
-   * invoked using reflection.
+   * [[BuiltInMetadata.DistinctRowCount#getDistinctRowCount(ImmutableBitSet,RexNode)]], invoked
+   * using reflection.
    *
-   * @see org.apache.calcite.rel.metadata.RelMetadataQuery#getDistinctRowCount(
-   *      RelNode, ImmutableBitSet, RexNode)
+   * @see
+   *   org.apache.calcite.rel.metadata.RelMetadataQuery#getDistinctRowCount( RelNode,
+   *   ImmutableBitSet, RexNode)
    */
   def getDistinctRowCount(
       rel: RelNode,

@@ -83,7 +83,8 @@ object AggregateUtil extends Enumeration {
   /**
    * Returns whether any of the aggregates are accurate DISTINCT.
    *
-   * @return Whether any of the aggregates are accurate DISTINCT
+   * @return
+   *   Whether any of the aggregates are accurate DISTINCT
    */
   def containsAccurateDistinctCall(aggCalls: util.List[AggregateCall]): Boolean = {
     aggCalls.exists(call => call.isDistinct && !call.isApproximate)
@@ -92,7 +93,8 @@ object AggregateUtil extends Enumeration {
   /**
    * Returns whether any of the aggregates are approximate DISTINCT.
    *
-   * @return Whether any of the aggregates are approximate DISTINCT
+   * @return
+   *   Whether any of the aggregates are approximate DISTINCT
    */
   def containsApproximateDistinctCall(aggCalls: util.List[AggregateCall]): Boolean = {
     aggCalls.exists(call => call.isDistinct && call.isApproximate)
@@ -113,13 +115,14 @@ object AggregateUtil extends Enumeration {
   }
 
   /**
-   * Check whether AUXILIARY_GROUP aggCalls is in the front of the given agg's aggCallList,
-   * and whether aggCallList contain AUXILIARY_GROUP when the given agg's groupSet is empty
-   * or the indicator is true.
-   * Returns AUXILIARY_GROUP aggCalls' args and other aggCalls.
+   * Check whether AUXILIARY_GROUP aggCalls is in the front of the given agg's aggCallList, and
+   * whether aggCallList contain AUXILIARY_GROUP when the given agg's groupSet is empty or the
+   * indicator is true. Returns AUXILIARY_GROUP aggCalls' args and other aggCalls.
    *
-   * @param agg aggregate
-   * @return returns AUXILIARY_GROUP aggCalls' args and other aggCalls
+   * @param agg
+   *   aggregate
+   * @return
+   *   returns AUXILIARY_GROUP aggCalls' args and other aggCalls
    */
   def checkAndSplitAggCalls(agg: Aggregate): (Array[Int], Seq[AggregateCall]) = {
     var nonAuxGroupCallsStartIdx = -1
@@ -322,15 +325,21 @@ object AggregateUtil extends Enumeration {
   /**
    * Transforms calcite aggregate calls to AggregateInfos.
    *
-   * @param inputRowType     the input's output RowType
-   * @param aggregateCalls   the calcite aggregate calls
-   * @param aggCallNeedRetractions   whether the aggregate function need retract method
-   * @param orderKeyIndexes      the index of order by field in the input, null if not over agg
-   * @param needInputCount   whether need to calculate the input counts, which is used in
-   *                         aggregation with retraction input.If needed,
-   *                         insert a count(1) aggregate into the agg list.
-   * @param isStateBackedDataViews   whether the dataview in accumulator use state or heap
-   * @param needDistinctInfo  whether need to extract distinct information
+   * @param inputRowType
+   *   the input's output RowType
+   * @param aggregateCalls
+   *   the calcite aggregate calls
+   * @param aggCallNeedRetractions
+   *   whether the aggregate function need retract method
+   * @param orderKeyIndexes
+   *   the index of order by field in the input, null if not over agg
+   * @param needInputCount
+   *   whether need to calculate the input counts, which is used in aggregation with retraction
+   *   input.If needed, insert a count(1) aggregate into the agg list.
+   * @param isStateBackedDataViews
+   *   whether the dataview in accumulator use state or heap
+   * @param needDistinctInfo
+   *   whether need to extract distinct information
    */
   private def transformToAggregateInfoList(
       inputRowType: RowType,
@@ -592,12 +601,15 @@ object AggregateUtil extends Enumeration {
   }
 
   /**
-   * Inserts an COUNT(*) aggregate call if needed. The COUNT(*) aggregate call is used
-   * to count the number of added and retracted input records.
+   * Inserts an COUNT(*) aggregate call if needed. The COUNT(*) aggregate call is used to count the
+   * number of added and retracted input records.
    *
-   * @param needInputCount whether to insert an InputCount aggregate
-   * @param aggregateCalls original aggregate calls
-   * @return (indexOfCountStar, countStarInserted, newAggCalls)
+   * @param needInputCount
+   *   whether to insert an InputCount aggregate
+   * @param aggregateCalls
+   *   original aggregate calls
+   * @return
+   *   (indexOfCountStar, countStarInserted, newAggCalls)
    */
   private def insertCountStarAggCall(
       needInputCount: Boolean,
@@ -644,15 +656,21 @@ object AggregateUtil extends Enumeration {
   }
 
   /**
-   * Extracts DistinctInfo array from the aggregate calls,
-   * and change the distinct aggregate to non-distinct aggregate.
+   * Extracts DistinctInfo array from the aggregate calls, and change the distinct aggregate to
+   * non-distinct aggregate.
    *
-   * @param needDistinctInfo whether to extract distinct information
-   * @param aggCalls   the original aggregate calls
-   * @param inputType  the input rel data type
-   * @param hasStateBackedDataViews whether the dataview in accumulator use state or heap
-   * @param consumeRetraction  whether the distinct aggregate consumes retraction messages
-   * @return (distinctInfoArray, newAggCalls)
+   * @param needDistinctInfo
+   *   whether to extract distinct information
+   * @param aggCalls
+   *   the original aggregate calls
+   * @param inputType
+   *   the input rel data type
+   * @param hasStateBackedDataViews
+   *   whether the dataview in accumulator use state or heap
+   * @param consumeRetraction
+   *   whether the distinct aggregate consumes retraction messages
+   * @return
+   *   (distinctInfoArray, newAggCalls)
    */
   private def extractDistinctInformation(
       needDistinctInfo: Boolean,
@@ -846,8 +864,8 @@ object AggregateUtil extends Enumeration {
 
   /**
    * Return the retraction flags for each given agg calls, currently MAX and MIN are supported.
-   * MaxWithRetract can be optimized to Max if input is update increasing,
-   * MinWithRetract can be optimized to Min if input is update decreasing.
+   * MaxWithRetract can be optimized to Max if input is update increasing, MinWithRetract can be
+   * optimized to Min if input is update decreasing.
    */
   def deriveAggCallNeedRetractions(
       agg: StreamPhysicalRel,
@@ -861,8 +879,8 @@ object AggregateUtil extends Enumeration {
 
   /**
    * Return the retraction flags for each given agg calls, currently max and min are supported.
-   * MaxWithRetract can be optimized to Max if input is update increasing,
-   * MinWithRetract can be optimized to Min if input is update decreasing.
+   * MaxWithRetract can be optimized to Max if input is update increasing, MinWithRetract can be
+   * optimized to Min if input is update decreasing.
    */
   def deriveAggCallNeedRetractions(
       groupCount: Int,

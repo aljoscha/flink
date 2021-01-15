@@ -202,8 +202,8 @@ class JoinValidationTest extends TableTestBase {
   }
 
   /**
-   * Currently only the inner join condition can support the Python UDF taking the inputs from
-   * the left table and the right table at the same time.
+   * Currently only the inner join condition can support the Python UDF taking the inputs from the
+   * left table and the right table at the same time.
    */
   @Test
   def testOuterJoinWithPythonFunctionInCondition(): Unit = {

@@ -75,8 +75,7 @@ object TypeCoercion {
   }
 
   /**
-   * All the supported cast types in flink-table.
-   * Note: This may lose information during the cast.
+   * All the supported cast types in flink-table. Note: This may lose information during the cast.
    */
   def canCast(from: TypeInformation[_], to: TypeInformation[_]): Boolean = (from, to) match {
     case (fromTp, toTp) if fromTp == toTp => true

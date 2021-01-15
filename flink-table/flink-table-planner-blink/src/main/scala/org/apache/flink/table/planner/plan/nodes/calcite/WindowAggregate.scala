@@ -66,11 +66,10 @@ abstract class WindowAggregate(
   }
 
   /**
-   * The [[getDigest]] should be uniquely identifies the node; another node
-   * is equivalent if and only if it has the same value. The [[getDigest]] is
-   * computed by [[explainTerms(pw)]], so it should contains window information
-   * to identify different WindowAggregate nodes, otherwise WindowAggregate node
-   * can be replaced by any other WindowAggregate node.
+   * The [[getDigest]] should be uniquely identifies the node; another node is equivalent if and
+   * only if it has the same value. The [[getDigest]] is computed by [[explainTerms(pw)]], so it
+   * should contains window information to identify different WindowAggregate nodes, otherwise
+   * WindowAggregate node can be replaced by any other WindowAggregate node.
    */
   override def explainTerms(pw: RelWriter): RelWriter = {
     super

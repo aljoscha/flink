@@ -42,8 +42,8 @@ import org.junit.runners.Parameterized
 import java.math.BigDecimal
 
 /**
- * We only test some aggregations until better testing of constructed DataStream
- * programs is possible.
+ * We only test some aggregations until better testing of constructed DataStream programs is
+ * possible.
  */
 @RunWith(classOf[Parameterized])
 class GroupWindowITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode) {

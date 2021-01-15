@@ -59,8 +59,8 @@ import java.util.Arrays.asList
 import scala.collection.JavaConversions._
 
 /**
- * Utilities to generate SQL scalar operators, e.g. arithmetic operator,
- * compare operator, equal operator, etc.
+ * Utilities to generate SQL scalar operators, e.g. arithmetic operator, compare operator, equal
+ * operator, etc.
  */
 object ScalarOperatorGens {
 
@@ -1573,7 +1573,8 @@ object ScalarOperatorGens {
 
   /**
    * Return null when array index out of bounds which follows Calcite's behaviour.
-   * @see [[org.apache.calcite.sql.fun.SqlStdOperatorTable.ITEM]]
+   * @see
+   *   [[org.apache.calcite.sql.fun.SqlStdOperatorTable.ITEM]]
    */
   def generateArrayElementAt(
       ctx: CodeGeneratorContext,

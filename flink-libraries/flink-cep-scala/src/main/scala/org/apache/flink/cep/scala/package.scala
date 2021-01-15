@@ -30,9 +30,12 @@ package object scala {
   /**
    * Utility method to wrap [[org.apache.flink.cep.PatternStream]] for usage with the Scala API.
    *
-   * @param javaPatternStream The underlying pattern stream from the Java API
-   * @tparam T Type of the events
-   * @return A pattern stream from the Scala API which wraps a pattern stream from the Java API
+   * @param javaPatternStream
+   *   The underlying pattern stream from the Java API
+   * @tparam T
+   *   Type of the events
+   * @return
+   *   A pattern stream from the Scala API which wraps a pattern stream from the Java API
    */
   private[flink] def wrapPatternStream[T](
       javaPatternStream: JPatternStream[T]): scala.PatternStream[T] = {

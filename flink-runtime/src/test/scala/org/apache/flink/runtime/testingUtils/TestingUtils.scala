@@ -98,7 +98,8 @@ object TestingUtils {
   /**
    * Returns an [[ExecutionContext]] which uses the current thread to execute the runnable.
    *
-   * @return Direct [[ExecutionContext]] which executes runnables directly
+   * @return
+   *   Direct [[ExecutionContext]] which executes runnables directly
    */
   def directExecutionContext = ExecutionContext
     .fromExecutor(org.apache.flink.runtime.concurrent.Executors.directExecutor())
@@ -109,9 +110,8 @@ object TestingUtils {
   }
 
   /**
-   * [[ExecutionContext]] which queues [[Runnable]] up in an [[ActionQueue]] instead of
-   * execution them. If the automatic execution mode is activated, then the [[Runnable]] are
-   * executed.
+   * [[ExecutionContext]] which queues [[Runnable]] up in an [[ActionQueue]] instead of execution
+   * them. If the automatic execution mode is activated, then the [[Runnable]] are executed.
    */
   class QueuedActionExecutionContext private[testingUtils] (val actionQueue: ActionQueue)
       extends AbstractExecutorService

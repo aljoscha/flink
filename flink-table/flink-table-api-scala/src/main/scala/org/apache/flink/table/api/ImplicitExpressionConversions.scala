@@ -59,8 +59,8 @@ import java.util.{List => JList, Map => JMap}
 import scala.language.implicitConversions
 
 /**
- * Implicit conversions from Scala literals to [[Expression]] and from [[Expression]]
- * to [[ImplicitExpressionOperations]].
+ * Implicit conversions from Scala literals to [[Expression]] and from [[Expression]] to
+ * [[ImplicitExpressionOperations]].
  */
 @PublicEvolving
 trait ImplicitExpressionConversions {
@@ -234,8 +234,8 @@ trait ImplicitExpressionConversions {
   }
 
   /**
-   * Extends Scala's StringContext with a method for creating an unresolved reference via
-   * string interpolation.
+   * Extends Scala's StringContext with a method for creating an unresolved reference via string
+   * interpolation.
    */
   implicit class FieldExpression(val sc: StringContext) {
 
@@ -342,38 +342,42 @@ trait ImplicitExpressionConversions {
   /**
    * A call to a function that will be looked up in a catalog. There are two kinds of functions:
    *
-   *  - System functions - which are identified with one part names
-   *  - Catalog functions - which are identified always with three parts names
-   *    (catalog, database, function)
+   *   - System functions - which are identified with one part names
+   *   - Catalog functions - which are identified always with three parts names (catalog, database,
+   *     function)
    *
-   * Moreover each function can either be a temporary function or permanent one
-   * (which is stored in a catalog).
+   * Moreover each function can either be a temporary function or permanent one (which is stored in
+   * a catalog).
    *
-   * Based on those two properties, the resolution order for looking up a function based on
-   * the provided path is as follows:
+   * Based on those two properties, the resolution order for looking up a function based on the
+   * provided path is as follows:
    *
-   *  - Temporary system function
-   *  - System function
-   *  - Temporary catalog function
-   *  - Catalog function
+   *   - Temporary system function
+   *   - System function
+   *   - Temporary catalog function
+   *   - Catalog function
    *
-   * @see TableEnvironment#useCatalog(String)
-   * @see TableEnvironment#useDatabase(String)
-   * @see TableEnvironment#createTemporaryFunction
-   * @see TableEnvironment#createTemporarySystemFunction
+   * @see
+   *   TableEnvironment#useCatalog(String)
+   * @see
+   *   TableEnvironment#useDatabase(String)
+   * @see
+   *   TableEnvironment#createTemporaryFunction
+   * @see
+   *   TableEnvironment#createTemporarySystemFunction
    */
   def call(path: String, params: Expression*): Expression = Expressions.call(path, params: _*)
 
   /**
    * A call to an unregistered, inline function. For functions that have been registered before and
-   * are identified by a name, use [[call(String, Object...)]].
+   * are identified by a name, use [[call(String,Object...)]].
    */
   def call(function: UserDefinedFunction, params: Expression*): Expression =
     Expressions.call(function, params: _*)
 
   /**
    * A call to an unregistered, inline function. For functions that have been registered before and
-   * are identified by a name, use [[call(String, Object...)]].
+   * are identified by a name, use [[call(String,Object...)]].
    */
   def call(function: Class[_ <: UserDefinedFunction], params: Expression*): Expression =
     Expressions.call(function, params: _*)
@@ -387,9 +391,7 @@ trait ImplicitExpressionConversions {
    *
    * For example:
    *
-   * ```
-   * tab.select($("key"), $("value"))
-   * ```
+   * ``` tab.select($("key"), $("value")) ```
    *
    * This method is useful in cases where the field name is calculated and the recommended way of
    * using string interpolation like `$"key"` would be inconvenient.
@@ -403,9 +405,9 @@ trait ImplicitExpressionConversions {
    *
    * For example:
    *
-   *  - `lit(12)`` leads to `INT`
-   *  - `lit("abc")`` leads to `CHAR(3)`
-   *  - `lit(new java.math.BigDecimal("123.45"))` leads to `DECIMAL(5, 2)`
+   *   - `lit(12)`` leads to `INT`
+   *   - `lit("abc")`` leads to `CHAR(3)`
+   *   - `lit(new java.math.BigDecimal("123.45"))` leads to `DECIMAL(5, 2)`
    *
    * See [[org.apache.flink.table.types.utils.ValueDataTypeConverter]] for a list of supported
    * literal values.
@@ -415,8 +417,8 @@ trait ImplicitExpressionConversions {
   /**
    * Creates a SQL literal of a given [[DataType]].
    *
-   * The method [[lit(Object)]] is preferred as it extracts the [[DataType]]
-   * automatically. The class of `v` must be supported according to the
+   * The method [[lit(Object)]] is preferred as it extracts the [[DataType]] automatically. The
+   * class of `v` must be supported according to the
    * [[org.apache.flink.table.types.logical.LogicalType#supportsInputConversion(Class)]].
    */
   def lit(v: Any, dataType: DataType): Expression = Expressions.lit(v, dataType)
@@ -464,9 +466,9 @@ trait ImplicitExpressionConversions {
   }
 
   /**
-   * Determines whether two anchored time intervals overlap. Time point and temporal are
-   * transformed into a range defined by two time points (start, end). The function
-   * evaluates <code>leftEnd >= rightStart && rightEnd >= leftStart</code>.
+   * Determines whether two anchored time intervals overlap. Time point and temporal are transformed
+   * into a range defined by two time points (start, end). The function evaluates <code>leftEnd >=
+   * rightStart && rightEnd >= leftStart</code>.
    *
    * It evaluates: leftEnd >= rightStart && rightEnd >= leftStart
    *
@@ -481,15 +483,17 @@ trait ImplicitExpressionConversions {
   }
 
   /**
-   * Formats a timestamp as a string using a specified format.
-   * The format must be compatible with MySQL's date formatting syntax as used by the
-   * date_parse function.
+   * Formats a timestamp as a string using a specified format. The format must be compatible with
+   * MySQL's date formatting syntax as used by the date_parse function.
    *
    * For example dataFormat('time, "%Y, %d %M") results in strings formatted as "2017, 05 May".
    *
-   * @param timestamp The timestamp to format as string.
-   * @param format The format of the string.
-   * @return The formatted timestamp as string.
+   * @param timestamp
+   *   The timestamp to format as string.
+   * @param format
+   *   The format of the string.
+   * @return
+   *   The formatted timestamp as string.
    */
   def dateFormat(timestamp: Expression, format: Expression): Expression = {
     Expressions.dateFormat(timestamp, format)
@@ -498,13 +502,17 @@ trait ImplicitExpressionConversions {
   /**
    * Returns the (signed) number of [[TimePointUnit]] between timePoint1 and timePoint2.
    *
-   * For example, timestampDiff(TimePointUnit.DAY, '2016-06-15'.toDate, '2016-06-18'.toDate leads
-   * to 3.
+   * For example, timestampDiff(TimePointUnit.DAY, '2016-06-15'.toDate, '2016-06-18'.toDate leads to
+   * 3.
    *
-   * @param timePointUnit The unit to compute diff.
-   * @param timePoint1 The first point in time.
-   * @param timePoint2 The second point in time.
-   * @return The number of intervals as integer value.
+   * @param timePointUnit
+   *   The unit to compute diff.
+   * @param timePoint1
+   *   The first point in time.
+   * @param timePoint2
+   *   The second point in time.
+   * @return
+   *   The number of intervals as integer value.
    */
   def timestampDiff(
       timePointUnit: TimePointUnit,
@@ -556,17 +564,17 @@ trait ImplicitExpressionConversions {
   }
 
   /**
-   * Returns a pseudorandom double value between 0.0 (inclusive) and 1.0 (exclusive) with a
-   * initial seed. Two rand() functions will return identical sequences of numbers if they
-   * have same initial seed.
+   * Returns a pseudorandom double value between 0.0 (inclusive) and 1.0 (exclusive) with a initial
+   * seed. Two rand() functions will return identical sequences of numbers if they have same initial
+   * seed.
    */
   def rand(seed: Expression): Expression = {
     Expressions.rand(seed)
   }
 
   /**
-   * Returns a pseudorandom integer value between 0.0 (inclusive) and the specified
-   * value (exclusive).
+   * Returns a pseudorandom integer value between 0.0 (inclusive) and the specified value
+   * (exclusive).
    */
   def randInteger(bound: Expression): Expression = {
     Expressions.randInteger(bound)
@@ -574,16 +582,16 @@ trait ImplicitExpressionConversions {
 
   /**
    * Returns a pseudorandom integer value between 0.0 (inclusive) and the specified value
-   * (exclusive) with a initial seed. Two randInteger() functions will return identical sequences
-   * of numbers if they have same initial seed and same bound.
+   * (exclusive) with a initial seed. Two randInteger() functions will return identical sequences of
+   * numbers if they have same initial seed and same bound.
    */
   def randInteger(seed: Expression, bound: Expression): Expression = {
     Expressions.randInteger(seed, bound)
   }
 
   /**
-   * Returns the string that results from concatenating the arguments.
-   * Returns NULL if any argument is NULL.
+   * Returns the string that results from concatenating the arguments. Returns NULL if any argument
+   * is NULL.
    */
   def concat(string: Expression, strings: Expression*): Expression = {
     Expressions.concat(string, strings: _*)
@@ -597,12 +605,13 @@ trait ImplicitExpressionConversions {
   }
 
   /**
-   * Returns the string that results from concatenating the arguments and separator.
-   * Returns NULL If the separator is NULL.
+   * Returns the string that results from concatenating the arguments and separator. Returns NULL If
+   * the separator is NULL.
    *
-   * Note: This function does not skip empty strings. However, it does skip any NULL
-   * values after the separator argument.
-   * @deprecated use [[ImplicitExpressionConversions.concatWs()]]
+   * Note: This function does not skip empty strings. However, it does skip any NULL values after
+   * the separator argument.
+   * @deprecated
+   *   use [[ImplicitExpressionConversions.concatWs()]]
    */
   @deprecated
   def concat_ws(separator: Expression, string: Expression, strings: Expression*): Expression = {
@@ -610,8 +619,8 @@ trait ImplicitExpressionConversions {
   }
 
   /**
-   * Returns the string that results from concatenating the arguments and separator.
-   * Returns NULL If the separator is NULL.
+   * Returns the string that results from concatenating the arguments and separator. Returns NULL If
+   * the separator is NULL.
    *
    * Note: this user-defined function does not skip empty strings. However, it does skip any NULL
    * values after the separator argument.
@@ -640,11 +649,11 @@ trait ImplicitExpressionConversions {
   }
 
   /**
-   * @deprecated This method will be removed in future versions as it uses the old type system.
-   *             It is recommended to use [[nullOf(DataType)]] instead which uses the new type
-   *             system based on [[DataTypes]]. Please make sure to use either the old or the new
-   *             type system consistently to avoid unintended behavior. See the website
-   *             documentation for more information.
+   * @deprecated
+   *   This method will be removed in future versions as it uses the old type system. It is
+   *   recommended to use [[nullOf(DataType)]] instead which uses the new type system based on
+   *   [[DataTypes]]. Please make sure to use either the old or the new type system consistently to
+   *   avoid unintended behavior. See the website documentation for more information.
    */
   def nullOf(typeInfo: TypeInformation[_]): Expression = {
     Expressions.nullOf(typeInfo)
@@ -670,9 +679,12 @@ trait ImplicitExpressionConversions {
    *
    * e.g. ifThenElse(42 > 5, "A", "B") leads to "A"
    *
-   * @param condition boolean condition
-   * @param ifTrue expression to be evaluated if condition holds
-   * @param ifFalse expression to be evaluated if condition does not hold
+   * @param condition
+   *   boolean condition
+   * @param ifTrue
+   *   expression to be evaluated if condition holds
+   * @param ifFalse
+   *   expression to be evaluated if condition does not hold
    */
   def ifThenElse(condition: Expression, ifTrue: Expression, ifFalse: Expression): Expression = {
     Expressions.ifThenElse(condition, ifTrue, ifFalse)
@@ -692,8 +704,8 @@ trait ImplicitExpressionConversions {
   }
 
   /**
-   * Creates an expression that selects all columns except for the given range of columns. It can
-   * be used wherever an array of expression is accepted such as function calls, projections, or
+   * Creates an expression that selects all columns except for the given range of columns. It can be
+   * used wherever an array of expression is accepted such as function calls, projections, or
    * groupings.
    *
    * A range can either be index-based or name-based. Indices start at 1 and boundaries are

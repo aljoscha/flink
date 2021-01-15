@@ -38,8 +38,7 @@ class MinByOperatorTest {
   }
 
   /**
-   * This test validates that an index which is out of bounds throws an
-   * IndexOutOfBoundsException.
+   * This test validates that an index which is out of bounds throws an IndexOutOfBoundsException.
    */
   @Test(expected = classOf[IndexOutOfBoundsException])
   def testOutOfTupleBoundsDataset1() {
@@ -52,8 +51,7 @@ class MinByOperatorTest {
   }
 
   /**
-   * This test validates that an index which is out of bounds throws an
-   * IndexOutOfBoundsException.
+   * This test validates that an index which is out of bounds throws an IndexOutOfBoundsException.
    */
   @Test(expected = classOf[IndexOutOfBoundsException])
   def testOutOfTupleBoundsDataset2() {
@@ -65,8 +63,7 @@ class MinByOperatorTest {
   }
 
   /**
-   * This test validates that an index which is out of bounds throws an
-   * IndexOutOfBoundsException.
+   * This test validates that an index which is out of bounds throws an IndexOutOfBoundsException.
    */
   @Test(expected = classOf[IndexOutOfBoundsException])
   def testOutOfTupleBoundsDataset3() {
@@ -78,8 +75,8 @@ class MinByOperatorTest {
   }
 
   /**
-   * This test validates that an InvalidProgramException is thrown when minBy
-   * is used on a custom data type.
+   * This test validates that an InvalidProgramException is thrown when minBy is used on a custom
+   * data type.
    */
   @Test(expected = classOf[InvalidProgramException])
   def testCustomKeyFieldsDataset() {
@@ -92,8 +89,7 @@ class MinByOperatorTest {
   }
 
   /**
-   * This test validates that no exceptions is thrown when an empty grouping
-   * calls minBy().
+   * This test validates that no exceptions is thrown when an empty grouping calls minBy().
    */
   @Test
   def testMinByKeyFieldsGrouping() {
@@ -109,8 +105,8 @@ class MinByOperatorTest {
   }
 
   /**
-   * This test validates that an InvalidProgramException is thrown when minBy
-   * is used on a custom data type.
+   * This test validates that an InvalidProgramException is thrown when minBy is used on a custom
+   * data type.
    */
   @Test(expected = classOf[InvalidProgramException])
   def testCustomKeyFieldsGrouping() {
@@ -122,8 +118,7 @@ class MinByOperatorTest {
   }
 
   /**
-   * This test validates that an index which is out of bounds throws an
-   * IndexOutOfBoundsException.
+   * This test validates that an index which is out of bounds throws an IndexOutOfBoundsException.
    */
   @Test(expected = classOf[IndexOutOfBoundsException])
   def testOutOfTupleBoundsGrouping1() {
@@ -135,8 +130,7 @@ class MinByOperatorTest {
   }
 
   /**
-   * This test validates that an index which is out of bounds throws an
-   * IndexOutOfBoundsException.
+   * This test validates that an index which is out of bounds throws an IndexOutOfBoundsException.
    */
   @Test(expected = classOf[IndexOutOfBoundsException])
   def testOutOfTupleBoundsGrouping2() {
@@ -148,9 +142,7 @@ class MinByOperatorTest {
   }
 
   /**
-   * s
-   * This test validates that an index which is out of bounds throws an
-   * IndexOutOfBoundsException.
+   * s This test validates that an index which is out of bounds throws an IndexOutOfBoundsException.
    */
   @Test(expected = classOf[IndexOutOfBoundsException])
   def testOutOfTupleBoundsGrouping3() {

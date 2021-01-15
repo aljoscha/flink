@@ -30,9 +30,12 @@ import scala.collection.mutable
 /**
  * Generates a call to user-defined [[ScalarFunction]].
  *
- * @param scalarFunction user-defined [[ScalarFunction]] that might be overloaded
- * @param signature actual signature with which the function is called
- * @param returnType actual return type required by the surrounding
+ * @param scalarFunction
+ *   user-defined [[ScalarFunction]] that might be overloaded
+ * @param signature
+ *   actual signature with which the function is called
+ * @param returnType
+ *   actual return type required by the surrounding
  */
 class ScalarFunctionCallGen(
     scalarFunction: ScalarFunction,

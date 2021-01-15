@@ -27,9 +27,12 @@ import org.apache.flink.util.Collector
 /**
  * Base interface for functions that are evaluated over keyed (grouped) windows.
  *
- * @tparam IN The type of the input value.
- * @tparam OUT The type of the output value.
- * @tparam KEY The type of the key.
+ * @tparam IN
+ *   The type of the input value.
+ * @tparam OUT
+ *   The type of the output value.
+ * @tparam KEY
+ *   The type of the key.
  */
 @Public
 trait WindowFunction[IN, OUT, KEY, W <: Window] extends Function with Serializable {
@@ -37,11 +40,16 @@ trait WindowFunction[IN, OUT, KEY, W <: Window] extends Function with Serializab
   /**
    * Evaluates the window and outputs none or several elements.
    *
-   * @param key    The key for which this window is evaluated.
-   * @param window The window that is being evaluated.
-   * @param input  The elements in the window being evaluated.
-   * @param out    A collector for emitting elements.
-   * @throws Exception The function may throw exceptions to fail the program and trigger recovery.
+   * @param key
+   *   The key for which this window is evaluated.
+   * @param window
+   *   The window that is being evaluated.
+   * @param input
+   *   The elements in the window being evaluated.
+   * @param out
+   *   A collector for emitting elements.
+   * @throws
+   *   Exception The function may throw exceptions to fail the program and trigger recovery.
    */
   def apply(key: KEY, window: W, input: Iterable[IN], out: Collector[OUT])
 }

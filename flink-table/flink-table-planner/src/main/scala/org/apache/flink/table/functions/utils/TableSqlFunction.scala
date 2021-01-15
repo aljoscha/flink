@@ -58,8 +58,8 @@ class TableSqlFunction(
   def getRowTypeInfo: TypeInformation[_] = rowTypeInfo
 
   /**
-   * Get additional mapping information if the returned table type is a POJO
-   * (POJO types have no deterministic field order).
+   * Get additional mapping information if the returned table type is a POJO (POJO types have no
+   * deterministic field order).
    */
   def getPojoFieldMapping: Array[Int] = functionImpl.fieldIndexes
 

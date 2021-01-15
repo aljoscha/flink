@@ -27,15 +27,19 @@ import java.util.{Map => JMap}
 object TableSinkUtils {
 
   /**
-   * Checks if the given [[QueryOperation]] can be written to the given [[TableSink]].
-   * It checks if the names & the field types match. If this sink is a [[PartitionableTableSink]],
-   * it will also validate the partitions.
+   * Checks if the given [[QueryOperation]] can be written to the given [[TableSink]]. It checks if
+   * the names & the field types match. If this sink is a [[PartitionableTableSink]], it will also
+   * validate the partitions.
    *
-   * @param staticPartitions Static partitions of the sink if there exists any.
-   * @param query            The query that is supposed to be written.
-   * @param objectIdentifier The path of the sink. It is needed just for logging. It does not
-   *                         participate in the validation.
-   * @param sink             The sink that we want to write to.
+   * @param staticPartitions
+   *   Static partitions of the sink if there exists any.
+   * @param query
+   *   The query that is supposed to be written.
+   * @param objectIdentifier
+   *   The path of the sink. It is needed just for logging. It does not participate in the
+   *   validation.
+   * @param sink
+   *   The sink that we want to write to.
    */
   def validateSink(
       staticPartitions: JMap[String, String],

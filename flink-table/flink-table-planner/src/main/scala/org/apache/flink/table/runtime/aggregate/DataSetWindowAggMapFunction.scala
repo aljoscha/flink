@@ -30,12 +30,15 @@ import org.apache.flink.table.util.Logging
 import org.apache.flink.types.Row
 
 /**
- * This map function only works for windows on batch tables.
- * It appends an (aligned) rowtime field to the end of the output row.
+ * This map function only works for windows on batch tables. It appends an (aligned) rowtime field
+ * to the end of the output row.
  *
- * @param genAggregations      Code-generated [[GeneratedAggregations]]
- * @param timeFieldPos         Time field position in input row
- * @param tumbleTimeWindowSize The size of tumble time window
+ * @param genAggregations
+ *   Code-generated [[GeneratedAggregations]]
+ * @param timeFieldPos
+ *   Time field position in input row
+ * @param tumbleTimeWindowSize
+ *   The size of tumble time window
  */
 class DataSetWindowAggMapFunction(
     private val genAggregations: GeneratedAggregationsFunction,

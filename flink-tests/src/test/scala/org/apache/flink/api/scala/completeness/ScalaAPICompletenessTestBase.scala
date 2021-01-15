@@ -26,8 +26,8 @@ import org.junit.Test
 import scala.language.existentials
 
 /**
- * Test base for checking whether the Scala API is up to feature parity with the Java API.
- * Right now is very simple, it is only checked whether a method with the same name exists.
+ * Test base for checking whether the Scala API is up to feature parity with the Java API. Right now
+ * is very simple, it is only checked whether a method with the same name exists.
  *
  * When adding excluded methods to the lists you should give a good reason in a comment.
  *

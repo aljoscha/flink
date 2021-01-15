@@ -72,8 +72,10 @@ class DataStream[T](stream: JavaStream[T]) {
   /**
    * Returns the [[StreamExecutionEnvironment]] associated with the current [[DataStream]].
    *
-   * @return associated execution environment
-   * @deprecated Use [[executionEnvironment]] instead
+   * @return
+   *   associated execution environment
+   * @deprecated
+   *   Use [[executionEnvironment]] instead
    */
   @deprecated
   @PublicEvolving
@@ -83,7 +85,8 @@ class DataStream[T](stream: JavaStream[T]) {
   /**
    * Returns the TypeInformation for the elements of this DataStream.
    *
-   * @deprecated Use [[dataType]] instead.
+   * @deprecated
+   *   Use [[dataType]] instead.
    */
   @deprecated
   @PublicEvolving
@@ -92,7 +95,8 @@ class DataStream[T](stream: JavaStream[T]) {
   /**
    * Returns the parallelism of this operation.
    *
-   * @deprecated Use [[parallelism]] instead.
+   * @deprecated
+   *   Use [[parallelism]] instead.
    */
   @deprecated
   @PublicEvolving
@@ -101,7 +105,8 @@ class DataStream[T](stream: JavaStream[T]) {
   /**
    * Returns the execution config.
    *
-   * @deprecated Use [[executionConfig]] instead.
+   * @deprecated
+   *   Use [[executionConfig]] instead.
    */
   @deprecated
   @PublicEvolving
@@ -207,10 +212,11 @@ class DataStream[T](stream: JavaStream[T]) {
 //  }
 
   /**
-   * Gets the name of the current data stream. This name is
-   * used by the visualization and logging during runtime.
+   * Gets the name of the current data stream. This name is used by the visualization and logging
+   * during runtime.
    *
-   * @return Name of the stream.
+   * @return
+   *   Name of the stream.
    */
   def name: String = stream match {
     case stream: SingleOutputStreamOperator[T] => stream.getName
@@ -220,21 +226,24 @@ class DataStream[T](stream: JavaStream[T]) {
   // --------------------------------------------------------------------------
 
   /**
-   * Gets the name of the current data stream. This name is
-   * used by the visualization and logging during runtime.
+   * Gets the name of the current data stream. This name is used by the visualization and logging
+   * during runtime.
    *
-   * @return Name of the stream.
-   * @deprecated Use [[name]] instead
+   * @return
+   *   Name of the stream.
+   * @deprecated
+   *   Use [[name]] instead
    */
   @deprecated
   @PublicEvolving
   def getName: String = name
 
   /**
-   * Sets the name of the current data stream. This name is
-   * used by the visualization and logging during runtime.
+   * Sets the name of the current data stream. This name is used by the visualization and logging
+   * during runtime.
    *
-   * @return The named operator
+   * @return
+   *   The named operator
    */
   def name(name: String): DataStream[T] = stream match {
     case stream: SingleOutputStreamOperator[T] => asScalaStream(stream.name(name))
@@ -246,14 +255,16 @@ class DataStream[T](stream: JavaStream[T]) {
   /**
    * Sets an ID for this operator.
    *
-   * The specified ID is used to assign the same operator ID across job
-   * submissions (for example when starting a job from a savepoint).
+   * The specified ID is used to assign the same operator ID across job submissions (for example
+   * when starting a job from a savepoint).
    *
-   * <strong>Important</strong>: this ID needs to be unique per
-   * transformation and job. Otherwise, job submission will fail.
+   * <strong>Important</strong>: this ID needs to be unique per transformation and job. Otherwise,
+   * job submission will fail.
    *
-   * @param uid The unique user-specified ID of this transformation.
-   * @return The operator with the specified ID.
+   * @param uid
+   *   The unique user-specified ID of this transformation.
+   * @return
+   *   The operator with the specified ID.
    */
   @PublicEvolving
   def uid(uid: String): DataStream[T] = javaStream match {
@@ -270,20 +281,18 @@ class DataStream[T](stream: JavaStream[T]) {
   }
 
   /**
-   * Sets an user provided hash for this operator. This will be used AS IS the create
-   * the JobVertexID.
-   * <p/>
-   * <p>The user provided hash is an alternative to the generated hashes, that is
-   * considered when identifying an operator through the default hash mechanics fails
-   * (e.g. because of changes between Flink versions).
-   * <p/>
-   * <p><strong>Important</strong>: this should be used as a workaround or for trouble
-   * shooting. The provided hash needs to be unique per transformation and job. Otherwise,
-   * job submission will fail. Furthermore, you cannot assign user-specified hash to
-   * intermediate nodes in an operator chain and trying so will let your job fail.
+   * Sets an user provided hash for this operator. This will be used AS IS the create the
+   * JobVertexID. <p/> <p>The user provided hash is an alternative to the generated hashes, that is
+   * considered when identifying an operator through the default hash mechanics fails (e.g. because
+   * of changes between Flink versions). <p/> <p><strong>Important</strong>: this should be used as
+   * a workaround or for trouble shooting. The provided hash needs to be unique per transformation
+   * and job. Otherwise, job submission will fail. Furthermore, you cannot assign user-specified
+   * hash to intermediate nodes in an operator chain and trying so will let your job fail.
    *
-   * @param hash the user provided hash for this operator.
-   * @return The operator with the user provided hash.
+   * @param hash
+   *   the user provided hash for this operator.
+   * @return
+   *   The operator with the user provided hash.
    */
   @PublicEvolving
   def setUidHash(hash: String): DataStream[T] = javaStream match {
@@ -295,10 +304,10 @@ class DataStream[T](stream: JavaStream[T]) {
   }
 
   /**
-   * Turns off chaining for this operator so thread co-location will not be
-   * used as an optimization. </p> Chaining can be turned off for the whole
-   * job by [[StreamExecutionEnvironment.disableOperatorChaining()]]
-   * however it is not advised for performance considerations.
+   * Turns off chaining for this operator so thread co-location will not be used as an optimization.
+   * </p> Chaining can be turned off for the whole job by
+   * [[StreamExecutionEnvironment.disableOperatorChaining()]] however it is not advised for
+   * performance considerations.
    */
   @PublicEvolving
   def disableChaining(): DataStream[T] = {
@@ -311,9 +320,8 @@ class DataStream[T](stream: JavaStream[T]) {
   }
 
   /**
-   * Starts a new task chain beginning at this operator. This operator will
-   * not be chained (thread co-located for increased performance) to any
-   * previous tasks even if possible.
+   * Starts a new task chain beginning at this operator. This operator will not be chained (thread
+   * co-located for increased performance) to any previous tasks even if possible.
    */
   @PublicEvolving
   def startNewChain(): DataStream[T] = {
@@ -326,17 +334,17 @@ class DataStream[T](stream: JavaStream[T]) {
   }
 
   /**
-   * Sets the slot sharing group of this operation. Parallel instances of
-   * operations that are in the same slot sharing group will be co-located in the same
-   * TaskManager slot, if possible.
+   * Sets the slot sharing group of this operation. Parallel instances of operations that are in the
+   * same slot sharing group will be co-located in the same TaskManager slot, if possible.
    *
-   * Operations inherit the slot sharing group of input operations if all input operations
-   * are in the same slot sharing group and no slot sharing group was explicitly specified.
+   * Operations inherit the slot sharing group of input operations if all input operations are in
+   * the same slot sharing group and no slot sharing group was explicitly specified.
    *
-   * Initially an operation is in the default slot sharing group. An operation can be put into
-   * the default group explicitly by setting the slot sharing group to `"default"`.
+   * Initially an operation is in the default slot sharing group. An operation can be put into the
+   * default group explicitly by setting the slot sharing group to `"default"`.
    *
-   * @param slotSharingGroup The slot sharing group name.
+   * @param slotSharingGroup
+   *   The slot sharing group name.
    */
   @PublicEvolving
   def slotSharingGroup(slotSharingGroup: String): DataStream[T] = {
@@ -349,12 +357,13 @@ class DataStream[T](stream: JavaStream[T]) {
   }
 
   /**
-   * Sets the maximum time frequency (ms) for the flushing of the output
-   * buffer. By default the output buffers flush only when they are full.
+   * Sets the maximum time frequency (ms) for the flushing of the output buffer. By default the
+   * output buffers flush only when they are full.
    *
    * @param timeoutMillis
-   * The maximum time between two output flushes.
-   * @return The operator with buffer timeout set.
+   *   The maximum time between two output flushes.
+   * @return
+   *   The operator with buffer timeout set.
    */
   def setBufferTimeout(timeoutMillis: Long): DataStream[T] = {
     stream match {
@@ -370,60 +379,58 @@ class DataStream[T](stream: JavaStream[T]) {
   // --------------------------------------------------------------------------
 
   /**
-   * Creates a new DataStream by merging DataStream outputs of
-   * the same type with each other. The DataStreams merged using this operator
-   * will be transformed simultaneously.
+   * Creates a new DataStream by merging DataStream outputs of the same type with each other. The
+   * DataStreams merged using this operator will be transformed simultaneously.
    */
   def union(dataStreams: DataStream[T]*): DataStream[T] =
     asScalaStream(stream.union(dataStreams.map(_.javaStream): _*))
 
   /**
-   * Creates a new ConnectedStreams by connecting
-   * DataStream outputs of different type with each other. The
-   * DataStreams connected using this operators can be used with CoFunctions.
+   * Creates a new ConnectedStreams by connecting DataStream outputs of different type with each
+   * other. The DataStreams connected using this operators can be used with CoFunctions.
    */
   def connect[T2](dataStream: DataStream[T2]): ConnectedStreams[T, T2] =
     asScalaStream(stream.connect(dataStream.javaStream))
 
   /**
-   * Creates a new [[BroadcastConnectedStream]] by connecting the current
-   * [[DataStream]] or [[KeyedStream]] with a [[BroadcastStream]].
+   * Creates a new [[BroadcastConnectedStream]] by connecting the current [[DataStream]] or
+   * [[KeyedStream]] with a [[BroadcastStream]].
    *
    * The latter can be created using the [[broadcast(MapStateDescriptor[])]] method.
    *
    * The resulting stream can be further processed using the
-   * ``broadcastConnectedStream.process(myFunction)``
-   * method, where ``myFunction`` can be either a
-   * [[org.apache.flink.streaming.api.functions.co.KeyedBroadcastProcessFunction]]
-   * or a [[org.apache.flink.streaming.api.functions.co.BroadcastProcessFunction]]
-   * depending on the current stream being a [[KeyedStream]] or not.
+   * ``broadcastConnectedStream.process(myFunction)`` method, where ``myFunction`` can be either a
+   * [[org.apache.flink.streaming.api.functions.co.KeyedBroadcastProcessFunction]] or a
+   * [[org.apache.flink.streaming.api.functions.co.BroadcastProcessFunction]] depending on the
+   * current stream being a [[KeyedStream]] or not.
    *
-   * @param broadcastStream The broadcast stream with the broadcast state to be
-   *                        connected with this stream.
-   * @return The [[BroadcastConnectedStream]].
+   * @param broadcastStream
+   *   The broadcast stream with the broadcast state to be connected with this stream.
+   * @return
+   *   The [[BroadcastConnectedStream]].
    */
   @PublicEvolving
   def connect[R](broadcastStream: BroadcastStream[R]): BroadcastConnectedStream[T, R] =
     asScalaStream(stream.connect(broadcastStream))
 
   /**
-   * Groups the elements of a DataStream by the given key positions (for tuple/array types) to
-   * be used with grouped operators like grouped reduce or grouped aggregations.
+   * Groups the elements of a DataStream by the given key positions (for tuple/array types) to be
+   * used with grouped operators like grouped reduce or grouped aggregations.
    */
   @deprecated("use [[DataStream.keyBy(KeySelector)]] instead")
   def keyBy(fields: Int*): KeyedStream[T, JavaTuple] = asScalaStream(stream.keyBy(fields: _*))
 
   /**
-   * Groups the elements of a DataStream by the given field expressions to
-   * be used with grouped operators like grouped reduce or grouped aggregations.
+   * Groups the elements of a DataStream by the given field expressions to be used with grouped
+   * operators like grouped reduce or grouped aggregations.
    */
   @deprecated("use [[DataStream.keyBy(KeySelector)]] instead")
   def keyBy(firstField: String, otherFields: String*): KeyedStream[T, JavaTuple] =
     asScalaStream(stream.keyBy(firstField +: otherFields.toArray: _*))
 
   /**
-   * Groups the elements of a DataStream by the given K key to
-   * be used with grouped operators like grouped reduce or grouped aggregations.
+   * Groups the elements of a DataStream by the given K key to be used with grouped operators like
+   * grouped reduce or grouped aggregations.
    */
   def keyBy[K: TypeInformation](fun: T => K): KeyedStream[T, K] = {
 
@@ -438,8 +445,8 @@ class DataStream[T](stream: JavaStream[T]) {
   }
 
   /**
-   * Groups the elements of a DataStream by the given K key to
-   * be used with grouped operators like grouped reduce or grouped aggregations.
+   * Groups the elements of a DataStream by the given K key to be used with grouped operators like
+   * grouped reduce or grouped aggregations.
    */
   def keyBy[K: TypeInformation](fun: KeySelector[T, K]): KeyedStream[T, K] = {
 
@@ -450,9 +457,8 @@ class DataStream[T](stream: JavaStream[T]) {
   }
 
   /**
-   * Partitions a tuple DataStream on the specified key fields using a custom partitioner.
-   * This method takes the key position to partition on, and a partitioner that accepts the key
-   * type.
+   * Partitions a tuple DataStream on the specified key fields using a custom partitioner. This
+   * method takes the key position to partition on, and a partitioner that accepts the key type.
    *
    * Note: This method works only on single field keys.
    */
@@ -461,9 +467,8 @@ class DataStream[T](stream: JavaStream[T]) {
     asScalaStream(stream.partitionCustom(partitioner, field))
 
   /**
-   * Partitions a POJO DataStream on the specified key fields using a custom partitioner.
-   * This method takes the key expression to partition on, and a partitioner that accepts the key
-   * type.
+   * Partitions a POJO DataStream on the specified key fields using a custom partitioner. This
+   * method takes the key expression to partition on, and a partitioner that accepts the key type.
    *
    * Note: This method works only on single field keys.
    */
@@ -474,12 +479,12 @@ class DataStream[T](stream: JavaStream[T]) {
     asScalaStream(stream.partitionCustom(partitioner, field))
 
   /**
-   * Partitions a DataStream on the key returned by the selector, using a custom partitioner.
-   * This method takes the key selector to get the key to partition on, and a partitioner that
-   * accepts the key type.
+   * Partitions a DataStream on the key returned by the selector, using a custom partitioner. This
+   * method takes the key selector to get the key to partition on, and a partitioner that accepts
+   * the key type.
    *
-   * Note: This method works only on single field keys, i.e. the selector cannot return tuples
-   * of fields.
+   * Note: This method works only on single field keys, i.e. the selector cannot return tuples of
+   * fields.
    */
   def partitionCustom[K: TypeInformation](
       partitioner: Partitioner[K],
@@ -497,22 +502,22 @@ class DataStream[T](stream: JavaStream[T]) {
   }
 
   /**
-   * Sets the partitioning of the DataStream so that the output tuples
-   * are broad casted to every parallel instance of the next component.
+   * Sets the partitioning of the DataStream so that the output tuples are broad casted to every
+   * parallel instance of the next component.
    */
   def broadcast: DataStream[T] = asScalaStream(stream.broadcast())
 
   /**
-   * Sets the partitioning of the [[DataStream]] so that the output elements
-   * are broadcasted to every parallel instance of the next operation. In addition,
-   * it implicitly creates as many
-   * [[org.apache.flink.api.common.state.BroadcastState broadcast states]]
-   * as the specified descriptors which can be used to store the element of the stream.
+   * Sets the partitioning of the [[DataStream]] so that the output elements are broadcasted to
+   * every parallel instance of the next operation. In addition, it implicitly creates as many
+   * [[org.apache.flink.api.common.state.BroadcastStatebroadcaststates]] as the specified
+   * descriptors which can be used to store the element of the stream.
    *
-   * @param broadcastStateDescriptors the descriptors of the broadcast states to create.
-   * @return A [[BroadcastStream]] which can be used in the
-   *         [[DataStream.connect(BroadcastStream)]] to create a
-   *         [[BroadcastConnectedStream]] for further processing of the elements.
+   * @param broadcastStateDescriptors
+   *   the descriptors of the broadcast states to create.
+   * @return
+   *   A [[BroadcastStream]] which can be used in the [[DataStream.connect(BroadcastStream)]] to
+   *   create a [[BroadcastConnectedStream]] for further processing of the elements.
    */
   @PublicEvolving
   def broadcast(broadcastStateDescriptors: MapStateDescriptor[_, _]*): BroadcastStream[T] = {
@@ -523,46 +528,44 @@ class DataStream[T](stream: JavaStream[T]) {
   }
 
   /**
-   * Sets the partitioning of the DataStream so that the output values all go to
-   * the first instance of the next processing operator. Use this setting with care
-   * since it might cause a serious performance bottleneck in the application.
+   * Sets the partitioning of the DataStream so that the output values all go to the first instance
+   * of the next processing operator. Use this setting with care since it might cause a serious
+   * performance bottleneck in the application.
    */
   @PublicEvolving
   def global: DataStream[T] = asScalaStream(stream.global())
 
   /**
-   * Sets the partitioning of the DataStream so that the output tuples
-   * are shuffled to the next component.
+   * Sets the partitioning of the DataStream so that the output tuples are shuffled to the next
+   * component.
    */
   @PublicEvolving
   def shuffle: DataStream[T] = asScalaStream(stream.shuffle())
 
   /**
-   * Sets the partitioning of the DataStream so that the output tuples
-   * are forwarded to the local subtask of the next component (whenever
-   * possible).
+   * Sets the partitioning of the DataStream so that the output tuples are forwarded to the local
+   * subtask of the next component (whenever possible).
    */
   def forward: DataStream[T] = asScalaStream(stream.forward())
 
   /**
-   * Sets the partitioning of the DataStream so that the output tuples
-   * are distributed evenly to the next component.
+   * Sets the partitioning of the DataStream so that the output tuples are distributed evenly to the
+   * next component.
    */
   def rebalance: DataStream[T] = asScalaStream(stream.rebalance())
 
   /**
-   * Sets the partitioning of the [[DataStream]] so that the output tuples
-   * are distributed evenly to a subset of instances of the downstream operation.
+   * Sets the partitioning of the [[DataStream]] so that the output tuples are distributed evenly to
+   * a subset of instances of the downstream operation.
    *
-   * The subset of downstream operations to which the upstream operation sends
-   * elements depends on the degree of parallelism of both the upstream and downstream operation.
-   * For example, if the upstream operation has parallelism 2 and the downstream operation
-   * has parallelism 4, then one upstream operation would distribute elements to two
-   * downstream operations while the other upstream operation would distribute to the other
-   * two downstream operations. If, on the other hand, the downstream operation has parallelism
-   * 2 while the upstream operation has parallelism 4 then two upstream operations will
-   * distribute to one downstream operation while the other two upstream operations will
-   * distribute to the other downstream operations.
+   * The subset of downstream operations to which the upstream operation sends elements depends on
+   * the degree of parallelism of both the upstream and downstream operation. For example, if the
+   * upstream operation has parallelism 2 and the downstream operation has parallelism 4, then one
+   * upstream operation would distribute elements to two downstream operations while the other
+   * upstream operation would distribute to the other two downstream operations. If, on the other
+   * hand, the downstream operation has parallelism 2 while the upstream operation has parallelism 4
+   * then two upstream operations will distribute to one downstream operation while the other two
+   * upstream operations will distribute to the other downstream operations.
    *
    * In cases where the different parallelisms are not multiples of each other one or several
    * downstream operations will have a differing number of inputs from upstream operations.
@@ -571,23 +574,22 @@ class DataStream[T](stream: JavaStream[T]) {
   def rescale: DataStream[T] = asScalaStream(stream.rescale())
 
   /**
-   * Initiates an iterative part of the program that creates a loop by feeding
-   * back data streams. To create a streaming iteration the user needs to define
-   * a transformation that creates two DataStreams. The first one is the output
-   * that will be fed back to the start of the iteration and the second is the output
-   * stream of the iterative part.
+   * Initiates an iterative part of the program that creates a loop by feeding back data streams. To
+   * create a streaming iteration the user needs to define a transformation that creates two
+   * DataStreams. The first one is the output that will be fed back to the start of the iteration
+   * and the second is the output stream of the iterative part.
    *
    * stepfunction: initialStream => (feedback, output)
    *
-   * A common pattern is to use output splitting to create feedback and output DataStream.
-   * Please see the side outputs of [[ProcessFunction]] method of the DataStream
+   * A common pattern is to use output splitting to create feedback and output DataStream. Please
+   * see the side outputs of [[ProcessFunction]] method of the DataStream
    *
-   * By default a DataStream with iteration will never terminate, but the user
-   * can use the maxWaitTime parameter to set a max waiting time for the iteration head.
-   * If no data received in the set time the stream terminates.
+   * By default a DataStream with iteration will never terminate, but the user can use the
+   * maxWaitTime parameter to set a max waiting time for the iteration head. If no data received in
+   * the set time the stream terminates.
    *
-   * Parallelism of the feedback stream must match the parallelism of the original stream.
-   * Please refer to the [[setParallelism]] method for parallelism modification
+   * Parallelism of the feedback stream must match the parallelism of the original stream. Please
+   * refer to the [[setParallelism]] method for parallelism modification
    */
   @PublicEvolving
   def iterate[R](
@@ -602,22 +604,21 @@ class DataStream[T](stream: JavaStream[T]) {
   }
 
   /**
-   * Initiates an iterative part of the program that creates a loop by feeding
-   * back data streams. To create a streaming iteration the user needs to define
-   * a transformation that creates two DataStreams. The first one is the output
-   * that will be fed back to the start of the iteration and the second is the output
-   * stream of the iterative part.
+   * Initiates an iterative part of the program that creates a loop by feeding back data streams. To
+   * create a streaming iteration the user needs to define a transformation that creates two
+   * DataStreams. The first one is the output that will be fed back to the start of the iteration
+   * and the second is the output stream of the iterative part.
    *
-   * The input stream of the iterate operator and the feedback stream will be treated
-   * as a ConnectedStreams where the input is connected with the feedback stream.
+   * The input stream of the iterate operator and the feedback stream will be treated as a
+   * ConnectedStreams where the input is connected with the feedback stream.
    *
    * This allows the user to distinguish standard input from feedback inputs.
    *
    * stepfunction: initialStream => (feedback, output)
    *
-   * The user must set the max waiting time for the iteration head.
-   * If no data received in the set time the stream terminates. If this parameter is set
-   * to 0 then the iteration sources will indefinitely, so the job must be killed to stop.
+   * The user must set the max waiting time for the iteration head. If no data received in the set
+   * time the stream terminates. If this parameter is set to 0 then the iteration sources will
+   * indefinitely, so the job must be killed to stop.
    */
   @PublicEvolving
   def iterate[R, F: TypeInformation](
@@ -661,8 +662,8 @@ class DataStream[T](stream: JavaStream[T]) {
   }
 
   /**
-   * Creates a new DataStream by applying the given function to every element and flattening
-   * the results.
+   * Creates a new DataStream by applying the given function to every element and flattening the
+   * results.
    */
   def flatMap[R: TypeInformation](flatMapper: FlatMapFunction[T, R]): DataStream[R] = {
     if (flatMapper == null) {
@@ -674,8 +675,8 @@ class DataStream[T](stream: JavaStream[T]) {
   }
 
   /**
-   * Creates a new DataStream by applying the given function to every element and flattening
-   * the results.
+   * Creates a new DataStream by applying the given function to every element and flattening the
+   * results.
    */
   def flatMap[R: TypeInformation](fun: (T, Collector[R]) => Unit): DataStream[R] = {
     if (fun == null) {
@@ -689,8 +690,8 @@ class DataStream[T](stream: JavaStream[T]) {
   }
 
   /**
-   * Creates a new DataStream by applying the given function to every element and flattening
-   * the results.
+   * Creates a new DataStream by applying the given function to every element and flattening the
+   * results.
    */
   def flatMap[R: TypeInformation](fun: T => TraversableOnce[R]): DataStream[R] = {
     if (fun == null) {
@@ -704,14 +705,14 @@ class DataStream[T](stream: JavaStream[T]) {
   }
 
   /**
-   * Applies the given [[ProcessFunction]] on the input stream, thereby
-   * creating a transformed output stream.
+   * Applies the given [[ProcessFunction]] on the input stream, thereby creating a transformed
+   * output stream.
    *
-   * The function will be called for every element in the stream and can produce
-   * zero or more output.
+   * The function will be called for every element in the stream and can produce zero or more
+   * output.
    *
-   * @param processFunction The [[ProcessFunction]] that is called for each element
-   *                   in the stream.
+   * @param processFunction
+   *   The [[ProcessFunction]] that is called for each element in the stream.
    */
   @PublicEvolving
   def process[R: TypeInformation](processFunction: ProcessFunction[T, R]): DataStream[R] = {
@@ -751,19 +752,20 @@ class DataStream[T](stream: JavaStream[T]) {
    * Windows this DataStream into tumbling time windows.
    *
    * This is a shortcut for either `.window(TumblingEventTimeWindows.of(size))` or
-   * `.window(TumblingProcessingTimeWindows.of(size))` depending on the time characteristic
-   * set using
-   * [[StreamExecutionEnvironment.setStreamTimeCharacteristic]].
+   * `.window(TumblingProcessingTimeWindows.of(size))` depending on the time characteristic set
+   * using [[StreamExecutionEnvironment.setStreamTimeCharacteristic]].
    *
-   * Note: This operation can be inherently non-parallel since all elements have to pass through
-   * the same operator instance. (Only for special cases, such as aligned time windows is
-   * it possible to perform this operation in parallel).
+   * Note: This operation can be inherently non-parallel since all elements have to pass through the
+   * same operator instance. (Only for special cases, such as aligned time windows is it possible to
+   * perform this operation in parallel).
    *
-   * @param size The size of the window.
+   * @param size
+   *   The size of the window.
    *
-   * @deprecated Please use [[windowAll()]] with either [[TumblingEventTimeWindows]] or
-   *             [[TumblingProcessingTimeWindows]]. For more information, see the deprecation
-   *             notice on [[org.apache.flink.streaming.api.TimeCharacteristic]].
+   * @deprecated
+   *   Please use [[windowAll()]] with either [[TumblingEventTimeWindows]] or
+   *   [[TumblingProcessingTimeWindows]]. For more information, see the deprecation notice on
+   *   [[org.apache.flink.streaming.api.TimeCharacteristic]].
    */
   @deprecated
   def timeWindowAll(size: Time): AllWindowedStream[T, TimeWindow] = {
@@ -775,18 +777,19 @@ class DataStream[T](stream: JavaStream[T]) {
    *
    * This is a shortcut for either `.window(SlidingEventTimeWindows.of(size, slide))` or
    * `.window(SlidingProcessingTimeWindows.of(size, slide))` depending on the time characteristic
-   * set using
-   * [[StreamExecutionEnvironment.setStreamTimeCharacteristic]].
+   * set using [[StreamExecutionEnvironment.setStreamTimeCharacteristic]].
    *
-   * Note: This operation can be inherently non-parallel since all elements have to pass through
-   * the same operator instance. (Only for special cases, such as aligned time windows is
-   * it possible to perform this operation in parallel).
+   * Note: This operation can be inherently non-parallel since all elements have to pass through the
+   * same operator instance. (Only for special cases, such as aligned time windows is it possible to
+   * perform this operation in parallel).
    *
-   * @param size The size of the window.
+   * @param size
+   *   The size of the window.
    *
-   * @deprecated Please use [[windowAll()]] with either [[SlidingEventTimeWindows]] or
-   *             [[SlidingProcessingTimeWindows]]. For more information, see the deprecation
-   *             notice on [[org.apache.flink.streaming.api.TimeCharacteristic]].
+   * @deprecated
+   *   Please use [[windowAll()]] with either [[SlidingEventTimeWindows]] or
+   *   [[SlidingProcessingTimeWindows]]. For more information, see the deprecation notice on
+   *   [[org.apache.flink.streaming.api.TimeCharacteristic]].
    */
   @deprecated
   def timeWindowAll(size: Time, slide: Time): AllWindowedStream[T, TimeWindow] = {
@@ -797,12 +800,14 @@ class DataStream[T](stream: JavaStream[T]) {
   /**
    * Windows this [[DataStream]] into sliding count windows.
    *
-   * Note: This operation can be inherently non-parallel since all elements have to pass through
-   * the same operator instance. (Only for special cases, such as aligned time windows is
-   * it possible to perform this operation in parallel).
+   * Note: This operation can be inherently non-parallel since all elements have to pass through the
+   * same operator instance. (Only for special cases, such as aligned time windows is it possible to
+   * perform this operation in parallel).
    *
-   * @param size The size of the windows in number of elements.
-   * @param slide The slide interval in number of elements.
+   * @param size
+   *   The size of the windows in number of elements.
+   * @param slide
+   *   The slide interval in number of elements.
    */
   def countWindowAll(size: Long, slide: Long): AllWindowedStream[T, GlobalWindow] = {
     new AllWindowedStream(stream.countWindowAll(size, slide))
@@ -811,31 +816,34 @@ class DataStream[T](stream: JavaStream[T]) {
   /**
    * Windows this [[DataStream]] into tumbling count windows.
    *
-   * Note: This operation can be inherently non-parallel since all elements have to pass through
-   * the same operator instance. (Only for special cases, such as aligned time windows is
-   * it possible to perform this operation in parallel).
+   * Note: This operation can be inherently non-parallel since all elements have to pass through the
+   * same operator instance. (Only for special cases, such as aligned time windows is it possible to
+   * perform this operation in parallel).
    *
-   * @param size The size of the windows in number of elements.
+   * @param size
+   *   The size of the windows in number of elements.
    */
   def countWindowAll(size: Long): AllWindowedStream[T, GlobalWindow] = {
     new AllWindowedStream(stream.countWindowAll(size))
   }
 
   /**
-   * Windows this data stream to a [[AllWindowedStream]], which evaluates windows
-   * over a key grouped stream. Elements are put into windows by a [[WindowAssigner]]. The grouping
-   * of elements is done both by key and by window.
+   * Windows this data stream to a [[AllWindowedStream]], which evaluates windows over a key grouped
+   * stream. Elements are put into windows by a [[WindowAssigner]]. The grouping of elements is done
+   * both by key and by window.
    *
-   * A [[org.apache.flink.streaming.api.windowing.triggers.Trigger]] can be defined to specify
-   * when windows are evaluated. However, `WindowAssigner` have a default `Trigger`
-   * that is used if a `Trigger` is not specified.
+   * A [[org.apache.flink.streaming.api.windowing.triggers.Trigger]] can be defined to specify when
+   * windows are evaluated. However, `WindowAssigner` have a default `Trigger` that is used if a
+   * `Trigger` is not specified.
    *
-   * Note: This operation can be inherently non-parallel since all elements have to pass through
-   * the same operator instance. (Only for special cases, such as aligned time windows is
-   * it possible to perform this operation in parallel).
+   * Note: This operation can be inherently non-parallel since all elements have to pass through the
+   * same operator instance. (Only for special cases, such as aligned time windows is it possible to
+   * perform this operation in parallel).
    *
-   * @param assigner The `WindowAssigner` that assigns elements to windows.
-   * @return The trigger windows data stream.
+   * @param assigner
+   *   The `WindowAssigner` that assigns elements to windows.
+   * @return
+   *   The trigger windows data stream.
    */
   @PublicEvolving
   def windowAll[W <: Window](assigner: WindowAssigner[_ >: T, W]): AllWindowedStream[T, W] = {
@@ -843,17 +851,17 @@ class DataStream[T](stream: JavaStream[T]) {
   }
 
   /**
-   * Assigns timestamps to the elements in the data stream and generates watermarks to signal
-   * event time progress. The given [[WatermarkStrategy is used to create a [[TimestampAssigner]]
-   * and [[org.apache.flink.api.common.eventtime.WatermarkGenerator]].
+   * Assigns timestamps to the elements in the data stream and generates watermarks to signal event
+   * time progress. The given [[WatermarkStrategyisusedtocreatea[[TimestampAssigner]] and
+   * [[org.apache.flink.api.common.eventtime.WatermarkGenerator]].
    *
-   * For each event in the data stream, the [[TimestampAssigner#extractTimestamp(Object, long)]]
+   * For each event in the data stream, the [[TimestampAssigner#extractTimestamp(Object,long)]]
    * method is called to assign an event timestamp.
    *
    * For each event in the data stream, the
-   * [[WatermarkGenerator#onEvent(Object, long, WatermarkOutput)]] will be called.
+   * [[WatermarkGenerator#onEvent(Object,long,WatermarkOutput)]] will be called.
    *
-   * Periodically (defined by the [[ExecutionConfig#getAutoWatermarkInterval()]]), the
+   * Periodically (defined by the [[ExecutionConfig#getAutoWatermarkInterval()]] ), the
    * [[WatermarkGenerator#onPeriodicEmit(WatermarkOutput)]] method will be called.
    *
    * Common watermark generation patterns can be found as static methods in the
@@ -866,15 +874,16 @@ class DataStream[T](stream: JavaStream[T]) {
   }
 
   /**
-   * Assigns timestamps to the elements in the data stream and periodically creates
-   * watermarks to signal event time progress.
+   * Assigns timestamps to the elements in the data stream and periodically creates watermarks to
+   * signal event time progress.
    *
    * This method uses the deprecated watermark generator interfaces. Please switch to
-   * [[assignTimestampsAndWatermarks(WatermarkStrategy]] to use the
-   * new interfaces instead. The new interfaces support watermark idleness and no longer need
-   * to differentiate between "periodic" and "punctuated" watermarks.
+   * [[assignTimestampsAndWatermarks(WatermarkStrategy]] to use the new interfaces instead. The new
+   * interfaces support watermark idleness and no longer need to differentiate between "periodic"
+   * and "punctuated" watermarks.
    *
-   * @deprecated please use [[assignTimestampsAndWatermarks()]]
+   * @deprecated
+   *   please use [[assignTimestampsAndWatermarks()]]
    */
   @deprecated
   @PublicEvolving
@@ -883,15 +892,16 @@ class DataStream[T](stream: JavaStream[T]) {
   }
 
   /**
-   * Assigns timestamps to the elements in the data stream and periodically creates
-   * watermarks to signal event time progress.
+   * Assigns timestamps to the elements in the data stream and periodically creates watermarks to
+   * signal event time progress.
    *
    * This method uses the deprecated watermark generator interfaces. Please switch to
-   * [[assignTimestampsAndWatermarks(WatermarkStrategy]] to use the
-   * new interfaces instead. The new interfaces support watermark idleness and no longer need
-   * to differentiate between "periodic" and "punctuated" watermarks.
+   * [[assignTimestampsAndWatermarks(WatermarkStrategy]] to use the new interfaces instead. The new
+   * interfaces support watermark idleness and no longer need to differentiate between "periodic"
+   * and "punctuated" watermarks.
    *
-   * @deprecated please use [[assignTimestampsAndWatermarks()]]
+   * @deprecated
+   *   please use [[assignTimestampsAndWatermarks()]]
    */
   @deprecated
   @PublicEvolving
@@ -902,17 +912,16 @@ class DataStream[T](stream: JavaStream[T]) {
   }
 
   /**
-   * Assigns timestamps to the elements in the data stream and periodically creates
-   * watermarks to signal event time progress.
+   * Assigns timestamps to the elements in the data stream and periodically creates watermarks to
+   * signal event time progress.
    *
-   * This method is a shortcut for data streams where the element timestamp are known
-   * to be monotonously ascending within each parallel stream.
-   * In that case, the system can generate watermarks automatically and perfectly
-   * by tracking the ascending timestamps.
+   * This method is a shortcut for data streams where the element timestamp are known to be
+   * monotonously ascending within each parallel stream. In that case, the system can generate
+   * watermarks automatically and perfectly by tracking the ascending timestamps.
    *
-   * For cases where the timestamps are not monotonously increasing, use the more
-   * general methods [[assignTimestampsAndWatermarks(AssignerWithPeriodicWatermarks)]]
-   * and [[assignTimestampsAndWatermarks(AssignerWithPunctuatedWatermarks)]].
+   * For cases where the timestamps are not monotonously increasing, use the more general methods
+   * [[assignTimestampsAndWatermarks(AssignerWithPeriodicWatermarks)]] and
+   * [[assignTimestampsAndWatermarks(AssignerWithPunctuatedWatermarks)]].
    */
   @PublicEvolving
   def assignAscendingTimestamps(extractor: T => Long): DataStream[T] = {
@@ -926,25 +935,24 @@ class DataStream[T](stream: JavaStream[T]) {
   }
 
   /**
-   * Creates a co-group operation. See [[CoGroupedStreams]] for an example of how the keys
-   * and window can be specified.
+   * Creates a co-group operation. See [[CoGroupedStreams]] for an example of how the keys and
+   * window can be specified.
    */
   def coGroup[T2](otherStream: DataStream[T2]): CoGroupedStreams[T, T2] = {
     new CoGroupedStreams(this, otherStream)
   }
 
   /**
-   * Creates a join operation. See [[JoinedStreams]] for an example of how the keys
-   * and window can be specified.
+   * Creates a join operation. See [[JoinedStreams]] for an example of how the keys and window can
+   * be specified.
    */
   def join[T2](otherStream: DataStream[T2]): JoinedStreams[T, T2] = {
     new JoinedStreams(this, otherStream)
   }
 
   /**
-   * Writes a DataStream to the standard output stream (stdout). For each
-   * element of the DataStream the result of .toString is
-   * written.
+   * Writes a DataStream to the standard output stream (stdout). For each element of the DataStream
+   * the result of .toString is written.
    */
   @PublicEvolving
   def print(): DataStreamSink[T] = stream.print()
@@ -952,21 +960,22 @@ class DataStream[T](stream: JavaStream[T]) {
   /**
    * Writes a DataStream to the standard output stream (stderr).
    *
-   * For each element of the DataStream the result of
-   * [[AnyRef.toString()]] is written.
+   * For each element of the DataStream the result of [[AnyRef.toString()]] is written.
    *
-   * @return The closed DataStream.
+   * @return
+   *   The closed DataStream.
    */
   @PublicEvolving
   def printToErr() = stream.printToErr()
 
   /**
-   * Writes a DataStream to the standard output stream (stdout). For each
-   * element of the DataStream the result of [[AnyRef.toString()]] is
-   * written.
+   * Writes a DataStream to the standard output stream (stdout). For each element of the DataStream
+   * the result of [[AnyRef.toString()]] is written.
    *
-   * @param sinkIdentifier The string to prefix the output with.
-   * @return The closed DataStream.
+   * @param sinkIdentifier
+   *   The string to prefix the output with.
+   * @return
+   *   The closed DataStream.
    */
   @PublicEvolving
   def print(sinkIdentifier: String): DataStreamSink[T] = stream.print(sinkIdentifier)
@@ -974,25 +983,28 @@ class DataStream[T](stream: JavaStream[T]) {
   /**
    * Writes a DataStream to the standard output stream (stderr).
    *
-   * For each element of the DataStream the result of
-   * [[AnyRef.toString()]] is written.
+   * For each element of the DataStream the result of [[AnyRef.toString()]] is written.
    *
-   * @param sinkIdentifier The string to prefix the output with.
-   * @return The closed DataStream.
+   * @param sinkIdentifier
+   *   The string to prefix the output with.
+   * @return
+   *   The closed DataStream.
    */
   @PublicEvolving
   def printToErr(sinkIdentifier: String) = stream.printToErr(sinkIdentifier)
 
   /**
-   * Writes a DataStream to the file specified by path in text format. For
-   * every element of the DataStream the result of .toString is written.
+   * Writes a DataStream to the file specified by path in text format. For every element of the
+   * DataStream the result of .toString is written.
    *
-   * @param path The path pointing to the location the text file is written to
-   * @return The closed DataStream
+   * @param path
+   *   The path pointing to the location the text file is written to
+   * @return
+   *   The closed DataStream
    *
-   * @deprecated Please use the
-   *             [[org.apache.flink.streaming.api.functions.sink.filesystem.StreamingFileSink]]
-   *             explicitly using the [[addSink()]] method.
+   * @deprecated
+   *   Please use the [[org.apache.flink.streaming.api.functions.sink.filesystem.StreamingFileSink]]
+   *   explicitly using the [[addSink()]] method.
    */
   @Deprecated
   @PublicEvolving
@@ -1000,17 +1012,19 @@ class DataStream[T](stream: JavaStream[T]) {
     stream.writeAsText(path)
 
   /**
-   * Writes a DataStream to the file specified by path in text format. For
-   * every element of the DataStream the result of .toString is written.
+   * Writes a DataStream to the file specified by path in text format. For every element of the
+   * DataStream the result of .toString is written.
    *
-   * @param path The path pointing to the location the text file is written to
-   * @param writeMode Controls the behavior for existing files. Options are NO_OVERWRITE and
-   *                  OVERWRITE.
-   * @return The closed DataStream
+   * @param path
+   *   The path pointing to the location the text file is written to
+   * @param writeMode
+   *   Controls the behavior for existing files. Options are NO_OVERWRITE and OVERWRITE.
+   * @return
+   *   The closed DataStream
    *
-   * @deprecated Please use the
-   *             [[org.apache.flink.streaming.api.functions.sink.filesystem.StreamingFileSink]]
-   *             explicitly using the [[addSink()]] method.
+   * @deprecated
+   *   Please use the [[org.apache.flink.streaming.api.functions.sink.filesystem.StreamingFileSink]]
+   *   explicitly using the [[addSink()]] method.
    */
   @Deprecated
   @PublicEvolving
@@ -1023,15 +1037,17 @@ class DataStream[T](stream: JavaStream[T]) {
   }
 
   /**
-   * Writes the DataStream in CSV format to the file specified by the path parameter. The writing
-   * is performed periodically every millis milliseconds.
+   * Writes the DataStream in CSV format to the file specified by the path parameter. The writing is
+   * performed periodically every millis milliseconds.
    *
-   * @param path Path to the location of the CSV file
-   * @return The closed DataStream
+   * @param path
+   *   Path to the location of the CSV file
+   * @return
+   *   The closed DataStream
    *
-   * @deprecated Please use the
-   *             [[org.apache.flink.streaming.api.functions.sink.filesystem.StreamingFileSink]]
-   *             explicitly using the [[addSink()]] method.
+   * @deprecated
+   *   Please use the [[org.apache.flink.streaming.api.functions.sink.filesystem.StreamingFileSink]]
+   *   explicitly using the [[addSink()]] method.
    */
   @Deprecated
   @PublicEvolving
@@ -1044,16 +1060,19 @@ class DataStream[T](stream: JavaStream[T]) {
   }
 
   /**
-   * Writes the DataStream in CSV format to the file specified by the path parameter. The writing
-   * is performed periodically every millis milliseconds.
+   * Writes the DataStream in CSV format to the file specified by the path parameter. The writing is
+   * performed periodically every millis milliseconds.
    *
-   * @param path Path to the location of the CSV file
-   * @param writeMode Controls whether an existing file is overwritten or not
-   * @return The closed DataStream
+   * @param path
+   *   Path to the location of the CSV file
+   * @param writeMode
+   *   Controls whether an existing file is overwritten or not
+   * @return
+   *   The closed DataStream
    *
-   * @deprecated Please use the
-   *             [[org.apache.flink.streaming.api.functions.sink.filesystem.StreamingFileSink]]
-   *             explicitly using the [[addSink()]] method.
+   * @deprecated
+   *   Please use the [[org.apache.flink.streaming.api.functions.sink.filesystem.StreamingFileSink]]
+   *   explicitly using the [[addSink()]] method.
    */
   @Deprecated
   @PublicEvolving
@@ -1066,18 +1085,23 @@ class DataStream[T](stream: JavaStream[T]) {
   }
 
   /**
-   * Writes the DataStream in CSV format to the file specified by the path parameter. The writing
-   * is performed periodically every millis milliseconds.
+   * Writes the DataStream in CSV format to the file specified by the path parameter. The writing is
+   * performed periodically every millis milliseconds.
    *
-   * @param path Path to the location of the CSV file
-   * @param writeMode Controls whether an existing file is overwritten or not
-   * @param rowDelimiter Delimiter for consecutive rows
-   * @param fieldDelimiter Delimiter for consecutive fields
-   * @return The closed DataStream
+   * @param path
+   *   Path to the location of the CSV file
+   * @param writeMode
+   *   Controls whether an existing file is overwritten or not
+   * @param rowDelimiter
+   *   Delimiter for consecutive rows
+   * @param fieldDelimiter
+   *   Delimiter for consecutive fields
+   * @return
+   *   The closed DataStream
    *
-   * @deprecated Please use the
-   *             [[org.apache.flink.streaming.api.functions.sink.filesystem.StreamingFileSink]]
-   *             explicitly using the [[addSink()]] method.
+   * @deprecated
+   *   Please use the [[org.apache.flink.streaming.api.functions.sink.filesystem.StreamingFileSink]]
+   *   explicitly using the [[addSink()]] method.
    */
   @Deprecated
   @PublicEvolving
@@ -1103,8 +1127,8 @@ class DataStream[T](stream: JavaStream[T]) {
   }
 
   /**
-   * Writes the DataStream to a socket as a byte array. The format of the output is
-   * specified by a [[SerializationSchema]].
+   * Writes the DataStream to a socket as a byte array. The format of the output is specified by a
+   * [[SerializationSchema]].
    */
   @PublicEvolving
   def writeToSocket(
@@ -1115,17 +1139,15 @@ class DataStream[T](stream: JavaStream[T]) {
   }
 
   /**
-   * Adds the given sink to this DataStream. Only streams with sinks added
-   * will be executed once the StreamExecutionEnvironment.execute(...)
-   * method is called.
+   * Adds the given sink to this DataStream. Only streams with sinks added will be executed once the
+   * StreamExecutionEnvironment.execute(...) method is called.
    */
   def addSink(sinkFunction: SinkFunction[T]): DataStreamSink[T] =
     stream.addSink(sinkFunction)
 
   /**
-   * Adds the given sink to this DataStream. Only streams with sinks added
-   * will be executed once the StreamExecutionEnvironment.execute(...)
-   * method is called.
+   * Adds the given sink to this DataStream. Only streams with sinks added will be executed once the
+   * StreamExecutionEnvironment.execute(...) method is called.
    */
   def addSink(fun: T => Unit): DataStreamSink[T] = {
     if (fun == null) {
@@ -1139,9 +1161,8 @@ class DataStream[T](stream: JavaStream[T]) {
   }
 
   /**
-   * Adds the given sink to this DataStream. Only streams with sinks added
-   * will be executed once the StreamExecutionEnvironment.execute(...)
-   * method is called.
+   * Adds the given sink to this DataStream. Only streams with sinks added will be executed once the
+   * StreamExecutionEnvironment.execute(...) method is called.
    */
   def sinkTo(sink: Sink[T, _, _, _]): DataStreamSink[T] = stream.sinkTo(sink)
 
@@ -1194,8 +1215,8 @@ class DataStream[T](stream: JavaStream[T]) {
     stream.executeAndCollect(jobExecutionName, limit).asScala.toList
 
   /**
-   * Returns a "closure-cleaned" version of the given function. Cleans only if closure cleaning
-   * is not disabled in the [[org.apache.flink.api.common.ExecutionConfig]].
+   * Returns a "closure-cleaned" version of the given function. Cleans only if closure cleaning is
+   * not disabled in the [[org.apache.flink.api.common.ExecutionConfig]].
    */
   private[flink] def clean[F <: AnyRef](f: F): F = {
     new StreamExecutionEnvironment(stream.getExecutionEnvironment).scalaClean(f)
@@ -1204,9 +1225,12 @@ class DataStream[T](stream: JavaStream[T]) {
   /**
    * Transforms the [[DataStream]] by using a custom [[OneInputStreamOperator]].
    *
-   * @param operatorName name of the operator, for logging purposes
-   * @param operator the object containing the transformation logic
-   * @tparam R the type of elements emitted by the operator
+   * @param operatorName
+   *   name of the operator, for logging purposes
+   * @param operator
+   *   the object containing the transformation logic
+   * @tparam R
+   *   the type of elements emitted by the operator
    */
   @PublicEvolving
   def transform[R: TypeInformation](

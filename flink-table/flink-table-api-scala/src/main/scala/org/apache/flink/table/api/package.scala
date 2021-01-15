@@ -19,9 +19,9 @@
 package org.apache.flink.table
 
 /**
- * == Table & SQL API ==
+ * 122Table & SQL API122
  *
- * This package contains the API of the Table & SQL API. Users create [[Table]]s on which
+ * This package contains the API of the Table & SQL API. Users create [[Table]] s on which
  * relational operations can be performed.
  *
  * For accessing all API classes and implicit conversions, use the following imports:

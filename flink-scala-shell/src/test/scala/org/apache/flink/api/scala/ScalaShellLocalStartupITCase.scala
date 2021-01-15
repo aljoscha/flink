@@ -34,8 +34,8 @@ class ScalaShellLocalStartupITCase extends TestLogger {
   def temporaryFolder = _temporaryFolder
 
   /**
-   * tests flink shell with local setup through startup script in bin folder
-   * for both streaming and batch
+   * tests flink shell with local setup through startup script in bin folder for both streaming and
+   * batch
    */
   @Test
   def testLocalCluster: Unit = {

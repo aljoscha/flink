@@ -27,8 +27,8 @@ import org.apache.flink.streaming.api.windowing.assigners.SlidingProcessingTimeW
 import org.apache.flink.streaming.api.windowing.time.Time
 
 /**
- * An example of grouped stream windowing into sliding time windows.
- * This example uses [[RichParallelSourceFunction]] to generate a list of key-value pair.
+ * An example of grouped stream windowing into sliding time windows. This example uses
+ * [[RichParallelSourceFunction]] to generate a list of key-value pair.
  */
 object GroupedProcessingTimeWindowExample {
 

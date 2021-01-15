@@ -51,15 +51,22 @@ object AsyncDataStream {
    * with respect to watermarks. Stream records which lie between the same two watermarks, can be
    * re-ordered.
    *
-   * @param input to apply the async function on
-   * @param asyncFunction to use
-   * @param timeout for the asynchronous operation to complete
-   * @param timeUnit of the timeout
-   * @param capacity of the operator which is equivalent to the number of concurrent asynchronous
-   *                 operations
-   * @tparam IN Type of the input record
-   * @tparam OUT Type of the output record
-   * @return the resulting stream containing the asynchronous results
+   * @param input
+   *   to apply the async function on
+   * @param asyncFunction
+   *   to use
+   * @param timeout
+   *   for the asynchronous operation to complete
+   * @param timeUnit
+   *   of the timeout
+   * @param capacity
+   *   of the operator which is equivalent to the number of concurrent asynchronous operations
+   * @tparam IN
+   *   Type of the input record
+   * @tparam OUT
+   *   Type of the output record
+   * @return
+   *   the resulting stream containing the asynchronous results
    */
   def unorderedWait[IN, OUT: TypeInformation](
       input: DataStream[IN],
@@ -83,13 +90,20 @@ object AsyncDataStream {
    * with respect to watermarks. Stream records which lie between the same two watermarks, can be
    * re-ordered.
    *
-   * @param input to apply the async function on
-   * @param asyncFunction to use
-   * @param timeout for the asynchronous operation to complete
-   * @param timeUnit of the timeout
-   * @tparam IN Type of the input record
-   * @tparam OUT Type of the output record
-   * @return the resulting stream containing the asynchronous results
+   * @param input
+   *   to apply the async function on
+   * @param asyncFunction
+   *   to use
+   * @param timeout
+   *   for the asynchronous operation to complete
+   * @param timeUnit
+   *   of the timeout
+   * @tparam IN
+   *   Type of the input record
+   * @tparam OUT
+   *   Type of the output record
+   * @return
+   *   the resulting stream containing the asynchronous results
    */
   def unorderedWait[IN, OUT: TypeInformation](
       input: DataStream[IN],
@@ -105,15 +119,22 @@ object AsyncDataStream {
    * with respect to watermarks. Stream records which lie between the same two watermarks, can be
    * re-ordered.
    *
-   * @param input to apply the async function on
-   * @param timeout for the asynchronous operation to complete
-   * @param timeUnit of the timeout
-   * @param capacity of the operator which is equivalent to the number of concurrent asynchronous
-   *                 operations
-   * @param asyncFunction to use
-   * @tparam IN Type of the input record
-   * @tparam OUT Type of the output record
-   * @return the resulting stream containing the asynchronous results
+   * @param input
+   *   to apply the async function on
+   * @param timeout
+   *   for the asynchronous operation to complete
+   * @param timeUnit
+   *   of the timeout
+   * @param capacity
+   *   of the operator which is equivalent to the number of concurrent asynchronous operations
+   * @param asyncFunction
+   *   to use
+   * @tparam IN
+   *   Type of the input record
+   * @tparam OUT
+   *   Type of the output record
+   * @return
+   *   the resulting stream containing the asynchronous results
    */
   def unorderedWait[IN, OUT: TypeInformation](
       input: DataStream[IN],
@@ -145,13 +166,20 @@ object AsyncDataStream {
    * with respect to watermarks. Stream records which lie between the same two watermarks, can be
    * re-ordered.
    *
-   * @param input to apply the async function on
-   * @param timeout for the asynchronous operation to complete
-   * @param timeUnit of the timeout
-   * @param asyncFunction to use
-   * @tparam IN Type of the input record
-   * @tparam OUT Type of the output record
-   * @return the resulting stream containing the asynchronous results
+   * @param input
+   *   to apply the async function on
+   * @param timeout
+   *   for the asynchronous operation to complete
+   * @param timeUnit
+   *   of the timeout
+   * @param asyncFunction
+   *   to use
+   * @tparam IN
+   *   Type of the input record
+   * @tparam OUT
+   *   Type of the output record
+   * @return
+   *   the resulting stream containing the asynchronous results
    */
   def unorderedWait[IN, OUT: TypeInformation](
       input: DataStream[IN],
@@ -164,15 +192,22 @@ object AsyncDataStream {
    * Apply an asynchronous function on the input data stream. The output order is the same as the
    * input order of the elements.
    *
-   * @param input to apply the async function on
-   * @param asyncFunction to use
-   * @param timeout for the asynchronous operation to complete
-   * @param timeUnit of the timeout
-   * @param capacity of the operator which is equivalent to the number of concurrent asynchronous
-   *                 operations
-   * @tparam IN Type of the input record
-   * @tparam OUT Type of the output record
-   * @return the resulting stream containing the asynchronous results
+   * @param input
+   *   to apply the async function on
+   * @param asyncFunction
+   *   to use
+   * @param timeout
+   *   for the asynchronous operation to complete
+   * @param timeUnit
+   *   of the timeout
+   * @param capacity
+   *   of the operator which is equivalent to the number of concurrent asynchronous operations
+   * @tparam IN
+   *   Type of the input record
+   * @tparam OUT
+   *   Type of the output record
+   * @return
+   *   the resulting stream containing the asynchronous results
    */
   def orderedWait[IN, OUT: TypeInformation](
       input: DataStream[IN],
@@ -195,13 +230,20 @@ object AsyncDataStream {
    * Apply an asynchronous function on the input data stream. The output order is the same as the
    * input order of the elements.
    *
-   * @param input to apply the async function on
-   * @param asyncFunction to use
-   * @param timeout for the asynchronous operation to complete
-   * @param timeUnit of the timeout
-   * @tparam IN Type of the input record
-   * @tparam OUT Type of the output record
-   * @return the resulting stream containing the asynchronous results
+   * @param input
+   *   to apply the async function on
+   * @param asyncFunction
+   *   to use
+   * @param timeout
+   *   for the asynchronous operation to complete
+   * @param timeUnit
+   *   of the timeout
+   * @tparam IN
+   *   Type of the input record
+   * @tparam OUT
+   *   Type of the output record
+   * @return
+   *   the resulting stream containing the asynchronous results
    */
   def orderedWait[IN, OUT: TypeInformation](
       input: DataStream[IN],
@@ -215,15 +257,22 @@ object AsyncDataStream {
    * Apply an asynchronous function on the input data stream. The output order is the same as the
    * input order of the elements.
    *
-   * @param input to apply the async function on
-   * @param timeout for the asynchronous operation to complete
-   * @param timeUnit of the timeout
-   * @param capacity of the operator which is equivalent to the number of concurrent asynchronous
-   *                 operations
-   * @param asyncFunction to use
-   * @tparam IN Type of the input record
-   * @tparam OUT Type of the output record
-   * @return the resulting stream containing the asynchronous results
+   * @param input
+   *   to apply the async function on
+   * @param timeout
+   *   for the asynchronous operation to complete
+   * @param timeUnit
+   *   of the timeout
+   * @param capacity
+   *   of the operator which is equivalent to the number of concurrent asynchronous operations
+   * @param asyncFunction
+   *   to use
+   * @tparam IN
+   *   Type of the input record
+   * @tparam OUT
+   *   Type of the output record
+   * @return
+   *   the resulting stream containing the asynchronous results
    */
   def orderedWait[IN, OUT: TypeInformation](
       input: DataStream[IN],
@@ -253,13 +302,20 @@ object AsyncDataStream {
    * Apply an asynchronous function on the input data stream. The output order is the same as the
    * input order of the elements.
    *
-   * @param input to apply the async function on
-   * @param timeout for the asynchronous operation to complete
-   * @param timeUnit of the timeout
-   * @param asyncFunction to use
-   * @tparam IN Type of the input record
-   * @tparam OUT Type of the output record
-   * @return the resulting stream containing the asynchronous results
+   * @param input
+   *   to apply the async function on
+   * @param timeout
+   *   for the asynchronous operation to complete
+   * @param timeUnit
+   *   of the timeout
+   * @param asyncFunction
+   *   to use
+   * @tparam IN
+   *   Type of the input record
+   * @tparam OUT
+   *   Type of the output record
+   * @return
+   *   the resulting stream containing the asynchronous results
    */
   def orderedWait[IN, OUT: TypeInformation](
       input: DataStream[IN],

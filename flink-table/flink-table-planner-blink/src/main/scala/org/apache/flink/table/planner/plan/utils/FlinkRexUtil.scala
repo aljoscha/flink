@@ -57,23 +57,21 @@ object FlinkRexUtil {
           "Negative number to use the default threshold: double of number of nodes.")
 
   /**
-   * Similar to [[RexUtil#toCnf(RexBuilder, Int, RexNode)]]; it lets you
-   * specify a threshold in the number of nodes that can be created out of
-   * the conversion. however, if the threshold is a negative number,
-   * this method will give a default threshold value that is double of
-   * the number of RexCall in the given node.
+   * Similar to [[RexUtil#toCnf(RexBuilder,Int,RexNode)]]; it lets you specify a threshold in the
+   * number of nodes that can be created out of the conversion. however, if the threshold is a
+   * negative number, this method will give a default threshold value that is double of the number
+   * of RexCall in the given node.
    *
-   * <p>If the number of resulting RexCalls exceeds that threshold,
-   * stops conversion and returns the original expression.
+   * <p>If the number of resulting RexCalls exceeds that threshold, stops conversion and returns the
+   * original expression.
    *
    * <p>Leaf nodes(e.g. RexInputRef) in the expression do not count towards the threshold.
    *
-   * <p>We strongly discourage use the [[RexUtil#toCnf(RexBuilder, RexNode)]] and
-   * [[RexUtil#toCnf(RexBuilder, Int, RexNode)]], because there are many bad case when using
-   * [[RexUtil#toCnf(RexBuilder, RexNode)]], such as predicate in TPC-DS q41.sql will be
-   * converted to extremely complex expression (including 736450 RexCalls); and we can not give
-   * an appropriate value for `maxCnfNodeCount` when using
-   * [[RexUtil#toCnf(RexBuilder, Int, RexNode)]].
+   * <p>We strongly discourage use the [[RexUtil#toCnf(RexBuilder,RexNode)]] and
+   * [[RexUtil#toCnf(RexBuilder,Int,RexNode)]], because there are many bad case when using
+   * [[RexUtil#toCnf(RexBuilder,RexNode)]], such as predicate in TPC-DS q41.sql will be converted to
+   * extremely complex expression (including 736450 RexCalls); and we can not give an appropriate
+   * value for `maxCnfNodeCount` when using [[RexUtil#toCnf(RexBuilder,Int,RexNode)]].
    */
   def toCnf(rexBuilder: RexBuilder, maxCnfNodeCount: Int, rex: RexNode): RexNode = {
     val maxCnfNodeCnt = if (maxCnfNodeCount < 0) {
@@ -190,12 +188,9 @@ object FlinkRexUtil {
    * Merges same expressions and then simplifies the result expression by [[RexSimplify]].
    *
    * Examples for merging same expressions:
-   * 1. a = b AND b = a -> a = b
-   * 2. a = b OR b = a -> a = b
-   * 3. (a > b AND c < 10) AND b < a -> a > b AND c < 10
-   * 4. (a > b OR c < 10) OR b < a -> a > b OR c < 10
-   * 5. a = a, a >= a, a <= a -> true
-   * 6. a <> a, a > a, a < a -> false
+   *   1. a = b AND b = a -> a = b 2. a = b OR b = a -> a = b 3. (a > b AND c < 10) AND b < a -> a >
+   *      b AND c < 10 4. (a > b OR c < 10) OR b < a -> a > b OR c < 10 5. a = a, a >= a, a <= a ->
+   *      true 6. a <> a, a > a, a < a -> false
    */
   def simplify(rexBuilder: RexBuilder, expr: RexNode): RexNode = {
     if (expr.isAlwaysTrue || expr.isAlwaysFalse) {
@@ -305,7 +300,8 @@ object FlinkRexUtil {
 
   /**
    * Find all inputRefs.
-   * @return InputRef HashSet.
+   * @return
+   *   InputRef HashSet.
    */
   private[flink] def findAllInputRefs(node: RexNode): util.HashSet[RexInputRef] = {
     val set = new util.HashSet[RexInputRef]
@@ -321,11 +317,14 @@ object FlinkRexUtil {
   /**
    * Adjust the expression's field indices according to fieldsOldToNewIndexMapping.
    *
-   * @param expr The expression to be adjusted.
-   * @param fieldsOldToNewIndexMapping A map containing the mapping the old field indices to new
-   *                                   field indices.
-   * @param rowType The row type of the new output.
-   * @return Return new expression with new field indices.
+   * @param expr
+   *   The expression to be adjusted.
+   * @param fieldsOldToNewIndexMapping
+   *   A map containing the mapping the old field indices to new field indices.
+   * @param rowType
+   *   The row type of the new output.
+   * @return
+   *   Return new expression with new field indices.
    */
   private[flink] def adjustInputRef(
       expr: RexNode,
@@ -379,10 +378,12 @@ object FlinkRexUtil {
   /**
    * Adjust the expression's field indices according to fieldsOldToNewIndexMapping.
    *
-   * @param expr The expression to be adjusted.
-   * @param fieldsOldToNewIndexMapping A map containing the mapping the old field indices to new
-   *                                   field indices.
-   * @return Return new expression with new field indices.
+   * @param expr
+   *   The expression to be adjusted.
+   * @param fieldsOldToNewIndexMapping
+   *   A map containing the mapping the old field indices to new field indices.
+   * @return
+   *   Return new expression with new field indices.
    */
   private[flink] def adjustInputRef(
       expr: RexNode,

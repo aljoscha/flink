@@ -38,10 +38,14 @@ import org.apache.flink.table.util.Logging
  * Process Function used for the aggregate in bounded proc-time OVER window
  * [[org.apache.flink.streaming.api.datastream.DataStream]]
  *
- * @param genAggregations          Generated aggregate helper function
- * @param precedingTimeBoundary    Is used to indicate the processing time boundaries
- * @param aggregatesTypeInfo       row type info of aggregation
- * @param inputType                row type info of input row
+ * @param genAggregations
+ *   Generated aggregate helper function
+ * @param precedingTimeBoundary
+ *   Is used to indicate the processing time boundaries
+ * @param aggregatesTypeInfo
+ *   row type info of aggregation
+ * @param inputType
+ *   row type info of input row
  */
 class ProcTimeBoundedRangeOver[K](
     genAggregations: GeneratedAggregationsFunction,

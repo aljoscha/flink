@@ -37,9 +37,12 @@ import org.apache.flink.util.{Collector, Preconditions}
 /**
  * ProcessFunction to sort on event-time and possibly additional secondary sort attributes.
  *
- * @param inputRowType The data type of the input data.
- * @param rowtimeIdx The index of the rowtime field.
- * @param rowComparator A comparator to sort rows.
+ * @param inputRowType
+ *   The data type of the input data.
+ * @param rowtimeIdx
+ *   The index of the rowtime field.
+ * @param rowComparator
+ *   A comparator to sort rows.
  */
 class RowTimeSortProcessFunction[K](
     private val inputRowType: CRowTypeInfo,

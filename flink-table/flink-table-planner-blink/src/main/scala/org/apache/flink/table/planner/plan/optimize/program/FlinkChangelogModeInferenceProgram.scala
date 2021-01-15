@@ -99,8 +99,8 @@ class FlinkChangelogModeInferenceProgram extends FlinkOptimizeProgram[StreamOpti
   /**
    * A visitor which will try to satisfy the required [[ModifyKindSetTrait]] from root.
    *
-   * <p>After traversed by this visitor, every node should have a correct [[ModifyKindSetTrait]]
-   * or an exception should be thrown if the planner doesn't support to satisfy the required
+   * <p>After traversed by this visitor, every node should have a correct [[ModifyKindSetTrait]] or
+   * an exception should be thrown if the planner doesn't support to satisfy the required
    * [[ModifyKindSetTrait]].
    */
   private class SatisfyModifyKindSetTraitVisitor {
@@ -108,21 +108,24 @@ class FlinkChangelogModeInferenceProgram extends FlinkOptimizeProgram[StreamOpti
     /**
      * Try to satisfy the required [[ModifyKindSetTrait]] from root.
      *
-     * <p>Each node should first require a [[ModifyKindSetTrait]] to its children.
-     * If the trait provided by children does not satisfy the required one,
-     * it should throw an exception and prompt the user that plan is not supported.
-     * The required [[ModifyKindSetTrait]] may come from the node's parent,
-     * or come from the node itself, depending on whether the node will destroy
+     * <p>Each node should first require a [[ModifyKindSetTrait]] to its children. If the trait
+     * provided by children does not satisfy the required one, it should throw an exception and
+     * prompt the user that plan is not supported. The required [[ModifyKindSetTrait]] may come from
+     * the node's parent, or come from the node itself, depending on whether the node will destroy
      * the trait provided by children or pass the trait from children.
      *
-     * <p>Each node should provide [[ModifyKindSetTrait]] according to current node's behavior
-     * and the ModifyKindSetTrait provided by children.
+     * <p>Each node should provide [[ModifyKindSetTrait]] according to current node's behavior and
+     * the ModifyKindSetTrait provided by children.
      *
-     * @param rel the node who should satisfy the requiredTrait
-     * @param requiredTrait the required ModifyKindSetTrait
-     * @param requester the requester who starts the requirement, used for better exception message
-     * @return A converted node which satisfy required traits by inputs node of current node.
-     *         Or throws exception if required trait can’t be satisfied.
+     * @param rel
+     *   the node who should satisfy the requiredTrait
+     * @param requiredTrait
+     *   the required ModifyKindSetTrait
+     * @param requester
+     *   the requester who starts the requirement, used for better exception message
+     * @return
+     *   A converted node which satisfy required traits by inputs node of current node. Or throws
+     *   exception if required trait can’t be satisfied.
      */
     def visit(
         rel: StreamPhysicalRel,
@@ -398,31 +401,32 @@ class FlinkChangelogModeInferenceProgram extends FlinkOptimizeProgram[StreamOpti
   /**
    * A visitor which will try to satisfy the required [[UpdateKindTrait]] from root.
    *
-   * <p>After traversed by this visitor, every node should have a correct [[UpdateKindTrait]]
-   * or returns None if the planner doesn't support to satisfy the required [[UpdateKindTrait]].
+   * <p>After traversed by this visitor, every node should have a correct [[UpdateKindTrait]] or
+   * returns None if the planner doesn't support to satisfy the required [[UpdateKindTrait]].
    */
   private class SatisfyUpdateKindTraitVisitor {
 
     /**
      * Try to satisfy the required [[UpdateKindTrait]] from root.
      *
-     * <p>Each node will first require a UpdateKindTrait to its children.
-     * The required UpdateKindTrait may come from the node's parent,
-     * or come from the node itself, depending on whether the node will destroy
-     * the trait provided by children or pass the trait from children.
+     * <p>Each node will first require a UpdateKindTrait to its children. The required
+     * UpdateKindTrait may come from the node's parent, or come from the node itself, depending on
+     * whether the node will destroy the trait provided by children or pass the trait from children.
      *
-     * <p>If the node will pass the children's UpdateKindTrait without destroying it,
-     * then return a new node with new inputs and forwarded UpdateKindTrait.
+     * <p>If the node will pass the children's UpdateKindTrait without destroying it, then return a
+     * new node with new inputs and forwarded UpdateKindTrait.
      *
-     * <p>If the node will destroy the children's UpdateKindTrait, then the node itself
-     * needs to be converted, or a new node should be generated to satisfy the required trait,
-     * such as marking itself not to generate UPDATE_BEFORE,
-     * or generating a new node to filter UPDATE_BEFORE.
+     * <p>If the node will destroy the children's UpdateKindTrait, then the node itself needs to be
+     * converted, or a new node should be generated to satisfy the required trait, such as marking
+     * itself not to generate UPDATE_BEFORE, or generating a new node to filter UPDATE_BEFORE.
      *
-     * @param rel the node who should satisfy the requiredTrait
-     * @param requiredTrait the required UpdateKindTrait
-     * @return A converted node which satisfies required traits by input nodes of current node.
-     *         Or None if required traits cannot be satisfied.
+     * @param rel
+     *   the node who should satisfy the requiredTrait
+     * @param requiredTrait
+     *   the required UpdateKindTrait
+     * @return
+     *   A converted node which satisfies required traits by input nodes of current node. Or None if
+     *   required traits cannot be satisfied.
      */
     def visit(rel: StreamPhysicalRel, requiredTrait: UpdateKindTrait): Option[StreamPhysicalRel] =
       rel match {
@@ -722,9 +726,12 @@ class FlinkChangelogModeInferenceProgram extends FlinkOptimizeProgram[StreamOpti
 
     /**
      * Try all possible rank strategies and return the first viable new node.
-     * @param rankStrategies all possible supported rank strategy by current node
-     * @param requiredUpdateKindTrait the required UpdateKindTrait by parent of rank node
-     * @param applyRankStrategy a function to apply rank strategy to get a new copied rank node
+     * @param rankStrategies
+     *   all possible supported rank strategy by current node
+     * @param requiredUpdateKindTrait
+     *   the required UpdateKindTrait by parent of rank node
+     * @param applyRankStrategy
+     *   a function to apply rank strategy to get a new copied rank node
      */
     private def visitRankStrategies(
         rankStrategies: Seq[RankProcessStrategy],

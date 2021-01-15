@@ -32,10 +32,9 @@ import org.apache.calcite.sql.`type`.{SqlTypeFamily, SqlTypeName}
 import _root_.java.math.{BigDecimal => JBigDecimal}
 
 /**
- * Planner rule that transforms simple [[LogicalAggregate]] on a [[LogicalProject]]
- * with windowing expression to
- * [[org.apache.flink.table.planner.plan.nodes.calcite.LogicalWindowAggregate]]
- * for stream.
+ * Planner rule that transforms simple [[LogicalAggregate]] on a [[LogicalProject]] with windowing
+ * expression to [[org.apache.flink.table.planner.plan.nodes.calcite.LogicalWindowAggregate]] for
+ * stream.
  */
 class StreamLogicalWindowAggregateRule
     extends LogicalWindowAggregateRuleBase("StreamLogicalWindowAggregateRule") {

@@ -25,11 +25,11 @@ import org.apache.hive.hcatalog.data.HCatRecord
 import org.apache.hive.hcatalog.data.schema.HCatFieldSchema
 
 /**
- * A InputFormat to read from HCatalog tables.
- * The InputFormat supports projection (selection and order of fields) and partition filters.
+ * A InputFormat to read from HCatalog tables. The InputFormat supports projection (selection and
+ * order of fields) and partition filters.
  *
- * Data can be returned as [[HCatRecord]] or Scala tuples.
- * Scala tuples support only up to 22 fields.
+ * Data can be returned as [[HCatRecord]] or Scala tuples. Scala tuples support only up to 22
+ * fields.
  */
 class HCatInputFormat[T](database: String, table: String, config: Configuration)
     extends HCatInputFormatBase[T](database, table, config) {

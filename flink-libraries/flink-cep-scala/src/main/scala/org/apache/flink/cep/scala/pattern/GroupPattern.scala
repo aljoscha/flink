@@ -23,9 +23,12 @@ import org.apache.flink.cep.pattern.{GroupPattern => JGroupPattern}
 /**
  * Base class for a group pattern definition.
  *
- * @param jGroupPattern Underlying Java API GroupPattern
- * @tparam T Base type of the elements appearing in the pattern
- * @tparam F Subtype of T to which the current pattern operator is constrained
+ * @param jGroupPattern
+ *   Underlying Java API GroupPattern
+ * @tparam T
+ *   Base type of the elements appearing in the pattern
+ * @tparam F
+ *   Subtype of T to which the current pattern operator is constrained
  */
 class GroupPattern[T, F <: T](jGroupPattern: JGroupPattern[T, F])
     extends Pattern[T, F](jGroupPattern) {
@@ -46,10 +49,14 @@ object GroupPattern {
   /**
    * Constructs a new GroupPattern by wrapping a given Java API GroupPattern
    *
-   * @param jGroupPattern Underlying Java API GroupPattern.
-   * @tparam T Base type of the elements appearing in the pattern
-   * @tparam F Subtype of T to which the current pattern operator is constrained
-   * @return New wrapping GroupPattern object
+   * @param jGroupPattern
+   *   Underlying Java API GroupPattern.
+   * @tparam T
+   *   Base type of the elements appearing in the pattern
+   * @tparam F
+   *   Subtype of T to which the current pattern operator is constrained
+   * @return
+   *   New wrapping GroupPattern object
    */
   def apply[T, F <: T](jGroupPattern: JGroupPattern[T, F]) = new GroupPattern[T, F](jGroupPattern)
 

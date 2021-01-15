@@ -35,16 +35,11 @@ import scala.collection.JavaConversions._
 /**
  * Collection of planner rules that transform `Coalesce` to `Case When` RexNode trees.
  *
- * <p>Currently this is only used for natural join, for explicit Coalesce
- * Calcite already replace it with Case When.
+ * <p>Currently this is only used for natural join, for explicit Coalesce Calcite already replace it
+ * with Case When.
  *
- * <p>There are four transformation contexts:
- * <ul>
- * <li>Project project list
- * <li>Join condition
- * <li>Filter condition
- * <li>Calc expression list
- * </ul>
+ * <p>There are four transformation contexts: <ul> <li>Project project list <li>Join condition
+ * <li>Filter condition <li>Calc expression list </ul>
  */
 abstract class RewriteCoalesceRule[T <: RelNode](clazz: Class[T], description: String)
     extends RelOptRule(operand(clazz, any), description) {

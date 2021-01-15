@@ -27,14 +27,21 @@ import org.apache.flink.table.util.Logging
 /**
  * Flink RelNode for data stream unbounded group aggregate
  *
- * @param cluster         Cluster of the RelNode, represent for an environment of related
- *                        relational expressions during the optimization of a query.
- * @param traitSet        Trait set of the RelNode
- * @param inputNode       The input RelNode of aggregation
- * @param namedAggregates List of calls to aggregate functions and their output field names
- * @param inputSchema     The type of the rows consumed by this RelNode
- * @param schema          The type of the rows emitted by this RelNode
- * @param groupings       The position (in the input Row) of the grouping keys
+ * @param cluster
+ *   Cluster of the RelNode, represent for an environment of related relational expressions during
+ *   the optimization of a query.
+ * @param traitSet
+ *   Trait set of the RelNode
+ * @param inputNode
+ *   The input RelNode of aggregation
+ * @param namedAggregates
+ *   List of calls to aggregate functions and their output field names
+ * @param inputSchema
+ *   The type of the rows consumed by this RelNode
+ * @param schema
+ *   The type of the rows emitted by this RelNode
+ * @param groupings
+ *   The position (in the input Row) of the grouping keys
  */
 class DataStreamGroupAggregate(
     cluster: RelOptCluster,

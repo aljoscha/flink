@@ -47,16 +47,23 @@ import org.apache.calcite.sql.validate.SqlUserDefinedAggFunction
 import org.apache.calcite.util.Optionality
 
 /**
- * Calcite wrapper for user-defined aggregate functions. Currently, the aggregate function can be
- * an [[AggregateFunction]] or a [[TableAggregateFunction]]
+ * Calcite wrapper for user-defined aggregate functions. Currently, the aggregate function can be an
+ * [[AggregateFunction]] or a [[TableAggregateFunction]]
  *
- * @param identifier function identifier to uniquely identify this function
- * @param displayName name to be displayed in operator name
- * @param aggregateFunction aggregate function to be called
- * @param externalResultType the type information of returned value
- * @param externalAccType the type information of the accumulator
- * @param typeFactory type factory for converting Flink's between Calcite's types
- * @deprecated This uses the old type inference stack. Use [[BridgingSqlAggFunction]] instead.
+ * @param identifier
+ *   function identifier to uniquely identify this function
+ * @param displayName
+ *   name to be displayed in operator name
+ * @param aggregateFunction
+ *   aggregate function to be called
+ * @param externalResultType
+ *   the type information of returned value
+ * @param externalAccType
+ *   the type information of the accumulator
+ * @param typeFactory
+ *   type factory for converting Flink's between Calcite's types
+ * @deprecated
+ *   This uses the old type inference stack. Use [[BridgingSqlAggFunction]] instead.
  */
 @deprecated
 class AggSqlFunction(
@@ -83,8 +90,8 @@ class AggSqlFunction(
       Optionality.FORBIDDEN) {
 
   /**
-   * This is temporary solution for hive udf and should be removed once FLIP-65 is finished,
-   * please pass the non-null input arguments.
+   * This is temporary solution for hive udf and should be removed once FLIP-65 is finished, please
+   * pass the non-null input arguments.
    */
   def makeFunction(
       constants: Array[AnyRef],

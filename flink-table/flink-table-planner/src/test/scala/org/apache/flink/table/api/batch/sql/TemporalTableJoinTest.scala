@@ -54,9 +54,9 @@ class TemporalTableJoinTest extends TableTestBase {
   }
 
   /**
-   * Test temporal table joins with more complicated query.
-   * Important thing here is that we have complex OR join condition
-   * and there are some columns that are not being used (are being pruned).
+   * Test temporal table joins with more complicated query. Important thing here is that we have
+   * complex OR join condition and there are some columns that are not being used (are being
+   * pruned).
    */
   @Test(expected = classOf[TableException])
   def testComplexJoin(): Unit = {

@@ -34,8 +34,8 @@ import java.util
 import java.util.function.Supplier
 
 /**
- * Sub-class of [[Values]] that is a relational expression
- * whose value is a sequence of zero or more literal row values in Flink.
+ * Sub-class of [[Values]] that is a relational expression whose value is a sequence of zero or more
+ * literal row values in Flink.
  */
 class FlinkLogicalValues(
     cluster: RelOptCluster,

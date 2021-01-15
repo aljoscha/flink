@@ -29,8 +29,8 @@ import org.apache.calcite.rel.RelNode
 import org.apache.calcite.rel.convert.ConverterRule
 
 /**
- * Rule that matches [[FlinkLogicalSort]] which is sorted by time attribute in ascending order
- * and its `fetch` and `offset` are null, and converts it to [[StreamPhysicalTemporalSort]].
+ * Rule that matches [[FlinkLogicalSort]] which is sorted by time attribute in ascending order and
+ * its `fetch` and `offset` are null, and converts it to [[StreamPhysicalTemporalSort]].
  */
 class StreamPhysicalTemporalSortRule
     extends ConverterRule(
@@ -67,11 +67,13 @@ object StreamPhysicalTemporalSortRule {
   /**
    * Whether the given sort could be converted to [[StreamPhysicalTemporalSort]].
    *
-   * Return true if the given sort is sorted by time attribute in ascending order
-   * and its `fetch` and `offset` are null, else false.
+   * Return true if the given sort is sorted by time attribute in ascending order and its `fetch`
+   * and `offset` are null, else false.
    *
-   * @param sort the [[FlinkLogicalSort]] node
-   * @return True if the input sort could be converted to [[StreamPhysicalTemporalSort]]
+   * @param sort
+   *   the [[FlinkLogicalSort]] node
+   * @return
+   *   True if the input sort could be converted to [[StreamPhysicalTemporalSort]]
    */
   def canConvertToTemporalSort(sort: FlinkLogicalSort): Boolean = {
     val fieldCollations = sort.collation.getFieldCollations

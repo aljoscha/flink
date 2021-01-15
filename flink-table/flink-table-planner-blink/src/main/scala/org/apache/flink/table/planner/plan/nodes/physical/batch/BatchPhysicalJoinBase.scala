@@ -84,13 +84,13 @@ abstract class BatchPhysicalJoinBase(
    * Try to satisfy hash distribution on Non-BroadcastJoin (including SortMergeJoin and
    * Non-Broadcast HashJoin).
    *
-   * @param requiredDistribution distribution requirement
-   * @return a Tuple including 3 element.
-   *         The first element is a flag which indicates whether the requirement can be satisfied.
-   *         The second element is the distribution requirement of left child if the requirement
-   *         can be push down into join.
-   *         The third element is the distribution requirement of right child if the requirement
-   *         can be push down into join.
+   * @param requiredDistribution
+   *   distribution requirement
+   * @return
+   *   a Tuple including 3 element. The first element is a flag which indicates whether the
+   *   requirement can be satisfied. The second element is the distribution requirement of left
+   *   child if the requirement can be push down into join. The third element is the distribution
+   *   requirement of right child if the requirement can be push down into join.
    */
   def satisfyHashDistributionOnNonBroadcastJoin(requiredDistribution: FlinkRelDistribution)
       : (Boolean, FlinkRelDistribution, FlinkRelDistribution) = {
@@ -166,9 +166,11 @@ abstract class BatchPhysicalJoinBase(
    * Try to satisfy the given required traits on BroadcastJoin (including Broadcast-HashJoin and
    * NestedLoopJoin).
    *
-   * @param requiredTraitSet requirement traitSets
-   * @return Equivalent Join which satisfies required traitSet, return null if
-   *         requirement cannot be satisfied.
+   * @param requiredTraitSet
+   *   requirement traitSets
+   * @return
+   *   Equivalent Join which satisfies required traitSet, return null if requirement cannot be
+   *   satisfied.
    */
   protected def satisfyTraitsOnBroadcastJoin(
       requiredTraitSet: RelTraitSet,

@@ -35,7 +35,8 @@ import java.util
  *
  * This node does support un-splittable aggregate function (e.g. STDDEV_POP).
  *
- * @see [[StreamPhysicalGroupAggregateBase]] for more info.
+ * @see
+ *   [[StreamPhysicalGroupAggregateBase]] for more info.
  */
 class StreamPhysicalGroupAggregate(
     cluster: RelOptCluster,

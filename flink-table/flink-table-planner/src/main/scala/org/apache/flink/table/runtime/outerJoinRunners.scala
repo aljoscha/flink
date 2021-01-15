@@ -58,9 +58,8 @@ abstract class OuterJoinRunner(
 }
 
 /**
- * Emits left outer join pairs of left and right rows.
- * Left rows are always preserved if no matching right row is found (predicate evaluates to false
- * or right input row is null).
+ * Emits left outer join pairs of left and right rows. Left rows are always preserved if no matching
+ * right row is found (predicate evaluates to false or right input row is null).
  */
 class LeftOuterJoinRunner(name: String, code: String, returnType: TypeInformation[Row])
     extends OuterJoinRunner(name, code, returnType) {
@@ -94,9 +93,8 @@ class LeftOuterJoinRunner(name: String, code: String, returnType: TypeInformatio
 }
 
 /**
- * Emits right outer join pairs of left and right rows.
- * Right rows are always preserved if no matching left row is found (predicate evaluates to false
- * or left input row is null).
+ * Emits right outer join pairs of left and right rows. Right rows are always preserved if no
+ * matching left row is found (predicate evaluates to false or left input row is null).
  */
 class RightOuterJoinRunner(name: String, code: String, returnType: TypeInformation[Row])
     extends OuterJoinRunner(name, code, returnType) {
@@ -127,9 +125,8 @@ class RightOuterJoinRunner(name: String, code: String, returnType: TypeInformati
 }
 
 /**
- * Emits full outer join pairs of left and right rows.
- * Left and right rows are always preserved if no matching right row is found (predicate evaluates
- * to false or left or right input row is null).
+ * Emits full outer join pairs of left and right rows. Left and right rows are always preserved if
+ * no matching right row is found (predicate evaluates to false or left or right input row is null).
  */
 class FullOuterJoinRunner(name: String, code: String, returnType: TypeInformation[Row])
     extends OuterJoinRunner(name, code, returnType) {

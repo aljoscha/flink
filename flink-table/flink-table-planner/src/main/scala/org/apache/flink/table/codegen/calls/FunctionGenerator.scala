@@ -578,10 +578,14 @@ object FunctionGenerator {
    * Returns a [[CallGenerator]] that generates all required code for calling the given
    * [[SqlOperator]].
    *
-   * @param sqlOperator SQL operator (might be overloaded)
-   * @param operandTypes actual operand types
-   * @param resultType expected return type
-   * @return [[CallGenerator]]
+   * @param sqlOperator
+   *   SQL operator (might be overloaded)
+   * @param operandTypes
+   *   actual operand types
+   * @param resultType
+   *   expected return type
+   * @return
+   *   [[CallGenerator]]
    */
   def getCallGenerator(
       sqlOperator: SqlOperator,

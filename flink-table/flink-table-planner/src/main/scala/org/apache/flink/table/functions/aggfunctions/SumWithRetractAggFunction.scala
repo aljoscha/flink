@@ -31,7 +31,8 @@ class SumWithRetractAccumulator[T] extends JTuple2[T, Long]
 /**
  * Base class for built-in Sum with retract aggregate function
  *
- * @tparam T the type for the aggregation result
+ * @tparam T
+ *   the type for the aggregation result
  */
 abstract class SumWithRetractAggFunction[T: Numeric]
     extends AggregateFunction[T, SumWithRetractAccumulator[T]] {

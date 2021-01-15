@@ -30,15 +30,13 @@ object FlinkPruneEmptyRules {
    * [[org.apache.calcite.rel.rules.PruneEmptyRules#JOIN_RIGHT_INSTANCE]].
    *
    * Modification:
-   * - Handles ANTI join specially.
+   *   - Handles ANTI join specially.
    *
    * Rule that converts a [[Join]] to empty if its right child is empty.
    *
    * <p>Examples:
    *
-   * <ul>
-   * <li>Join(Scan(Emp), Empty, INNER) becomes Empty
-   * </ul>
+   * <ul> <li>Join(Scan(Emp), Empty, INNER) becomes Empty </ul>
    */
   val JOIN_RIGHT_INSTANCE: RelOptRule = new RelOptRule(
     operand(classOf[Join], some(operand(classOf[RelNode], any), operand(classOf[Values], none))),

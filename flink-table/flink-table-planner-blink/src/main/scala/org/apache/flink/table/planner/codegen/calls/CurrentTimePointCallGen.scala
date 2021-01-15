@@ -28,8 +28,8 @@ import org.apache.flink.table.types.logical.LogicalTypeRoot.{
 }
 
 /**
- * Generates function call to determine current time point (as date/time/timestamp) in
- * local timezone or not.
+ * Generates function call to determine current time point (as date/time/timestamp) in local
+ * timezone or not.
  */
 class CurrentTimePointCallGen(local: Boolean) extends CallGenerator {
 

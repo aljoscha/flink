@@ -154,9 +154,9 @@ abstract class WindowCodeGenerator(
   }
 
   /**
-   * Using [[WindowsGrouping#buildTriggerWindowElementsIterator]]
-   * to iterate the windows assigned with the current keyed or all grouped input.
-   * Apply aggregate functions within the each window scope in turns.
+   * Using [[WindowsGrouping#buildTriggerWindowElementsIterator]] to iterate the windows assigned
+   * with the current keyed or all grouped input. Apply aggregate functions within the each window
+   * scope in turns.
    */
   private[flink] def genTriggerWindowAggByWindowsGroupingCode(
       ctx: CodeGeneratorContext,
@@ -616,10 +616,10 @@ abstract class WindowCodeGenerator(
   }
 
   /**
-   * Generate code to set the group window aggregate result.
-   * If the group window aggregate has window auxiliary functions' projection with it,
-   * two Timestamp typed fields will be added at the last of the output row indicating
-   * the window's start and end timestamp property, to which the windowed aggregate result belongs.
+   * Generate code to set the group window aggregate result. If the group window aggregate has
+   * window auxiliary functions' projection with it, two Timestamp typed fields will be added at the
+   * last of the output row indicating the window's start and end timestamp property, to which the
+   * windowed aggregate result belongs.
    */
   private[flink] def genWindowAggOutputWithWindowPorps(
       ctx: CodeGeneratorContext,

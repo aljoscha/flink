@@ -37,14 +37,21 @@ object DataStreamConversions {
   /**
    * Translates a [[DataStream]] of internal [[CRow]] type into a [[DataStream]] of requested type.
    *
-   * @param inputDataStream     The input [[DataStream]] for the conversion.
-   * @param logicalType         The logical row type of the [[DataStream]]. This is needed because
-   *                            field naming might be lost during optimization.
-   * @param withChangeFlag      Set to true to emit records with change flags.
-   * @param requestedOutputType The [[TypeInformation]] of the resulting [[DataStream]].
-   * @param config              The [[TableConfig]] of the current [[TableEnvironment]].
-   * @tparam A                  The type of the resulting [[DataStream]].
-   * @return The [[DataStream]] of requested type.
+   * @param inputDataStream
+   *   The input [[DataStream]] for the conversion.
+   * @param logicalType
+   *   The logical row type of the [[DataStream]]. This is needed because field naming might be lost
+   *   during optimization.
+   * @param withChangeFlag
+   *   Set to true to emit records with change flags.
+   * @param requestedOutputType
+   *   The [[TypeInformation]] of the resulting [[DataStream]].
+   * @param config
+   *   The [[TableConfig]] of the current [[TableEnvironment]].
+   * @tparam A
+   *   The type of the resulting [[DataStream]].
+   * @return
+   *   The [[DataStream]] of requested type.
    */
   def convert[A](
       inputDataStream: DataStream[CRow],
@@ -118,12 +125,14 @@ object DataStreamConversions {
   /**
    * Creates a final converter that maps the internal row type to external type.
    *
-   * @param physicalInputType   the input of the sink
-   * @param logicalInputSchema  the input schema with correct field names (esp. for POJO field
-   *                            mapping)
-   * @param requestedOutputType the output type of the sink
-   * @param functionName        name of the map function. Must not be unique but has to be a
-   *                            valid Java class identifier.
+   * @param physicalInputType
+   *   the input of the sink
+   * @param logicalInputSchema
+   *   the input schema with correct field names (esp. for POJO field mapping)
+   * @param requestedOutputType
+   *   the output type of the sink
+   * @param functionName
+   *   name of the map function. Must not be unique but has to be a valid Java class identifier.
    */
   private def getConversionMapper[OUT](
       physicalInputType: TypeInformation[CRow],
@@ -152,12 +161,14 @@ object DataStreamConversions {
   /**
    * Creates a converter that maps the internal CRow type to Scala or Java Tuple2 with change flag.
    *
-   * @param physicalInputType   the input of the sink
-   * @param logicalInputSchema  the input schema with correct field names (esp. for POJO field
-   *                            mapping)
-   * @param requestedOutputType the output type of the sink.
-   * @param functionName        name of the map function. Must not be unique but has to be a
-   *                            valid Java class identifier.
+   * @param physicalInputType
+   *   the input of the sink
+   * @param logicalInputSchema
+   *   the input schema with correct field names (esp. for POJO field mapping)
+   * @param requestedOutputType
+   *   the output type of the sink.
+   * @param functionName
+   *   name of the map function. Must not be unique but has to be a valid Java class identifier.
    */
   private def getConversionMapperWithChanges[OUT](
       physicalInputType: TypeInformation[CRow],

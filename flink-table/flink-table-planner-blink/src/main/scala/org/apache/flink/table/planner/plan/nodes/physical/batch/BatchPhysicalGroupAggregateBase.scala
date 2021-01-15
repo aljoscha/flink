@@ -33,16 +33,14 @@ import org.apache.calcite.rel.{RelNode, SingleRel}
  * Batch physical RelNode for aggregate.
  *
  * <P>There are two differences between this node and [[Aggregate]]:
- * 1. This node supports two-stage aggregation to reduce data-shuffling:
- * local-aggregation and global-aggregation.
- * local-aggregation produces a partial result for each group before shuffle in stage 1,
- * and then the partially aggregated results are shuffled to global-aggregation
- * which produces the final result in stage 2.
- * Two-stage aggregation is enabled only if all aggregate functions are mergeable.
- * (e.g. SUM, AVG, MAX)
- * 2. This node supports auxiliary group keys which will not be computed as key and
- * does not also affect the correctness of the final result. [[Aggregate]] does not distinguish
- * group keys and auxiliary group keys, and combines them as a complete `groupSet`.
+ *   1. This node supports two-stage aggregation to reduce data-shuffling: local-aggregation and
+ *      global-aggregation. local-aggregation produces a partial result for each group before
+ *      shuffle in stage 1, and then the partially aggregated results are shuffled to
+ *      global-aggregation which produces the final result in stage 2. Two-stage aggregation is
+ *      enabled only if all aggregate functions are mergeable. (e.g. SUM, AVG, MAX) 2. This node
+ *      supports auxiliary group keys which will not be computed as key and does not also affect the
+ *      correctness of the final result. [[Aggregate]] does not distinguish group keys and auxiliary
+ *      group keys, and combines them as a complete `groupSet`.
  */
 abstract class BatchPhysicalGroupAggregateBase(
     cluster: RelOptCluster,

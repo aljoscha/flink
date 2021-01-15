@@ -25,9 +25,9 @@ import org.apache.flink.table.api.bridge.scala._
  * Simple example that shows how the Batch SQL API is used in Scala.
  *
  * This example shows how to:
- *  - Convert DataSets to Tables
- *  - Register a Table under a name
- *  - Run a SQL query on the registered Table
+ *   - Convert DataSets to Tables
+ *   - Register a Table under a name
+ *   - Run a SQL query on the registered Table
  */
 object WordCountSQL {
 

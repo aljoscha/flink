@@ -37,9 +37,11 @@ import scala.collection.JavaConverters._
  * An [[Optimizer]] that can be used for optimizing a streaming plan. Should be used to create an
  * optimized tree from a logical input tree.
  *
- * @param calciteConfig                provider for [[CalciteConfig]]. It is a provider because the
- *                                     [[TableConfig]] in a [[TableEnvImpl]] is mutable.
- * @param planningConfigurationBuilder provider for [[RelOptPlanner]] and [[Context]]
+ * @param calciteConfig
+ *   provider for [[CalciteConfig]]. It is a provider because the [[TableConfig]] in a
+ *   [[TableEnvImpl]] is mutable.
+ * @param planningConfigurationBuilder
+ *   provider for [[RelOptPlanner]] and [[Context]]
  */
 class StreamOptimizer(
     calciteConfig: () => CalciteConfig,
@@ -49,9 +51,12 @@ class StreamOptimizer(
   /**
    * Generates the optimized [[RelNode]] tree from the original relational node tree.
    *
-   * @param relNode The root node of the relational expression tree.
-   * @param updatesAsRetraction True if the sink requests updates as retraction messages.
-   * @return The optimized [[RelNode]] tree
+   * @param relNode
+   *   The root node of the relational expression tree.
+   * @param updatesAsRetraction
+   *   True if the sink requests updates as retraction messages.
+   * @return
+   *   The optimized [[RelNode]] tree
    */
   def optimize(relNode: RelNode, updatesAsRetraction: Boolean, relBuilder: RelBuilder): RelNode = {
     val convSubQueryPlan = optimizeConvertSubQueries(relNode)
@@ -67,8 +72,7 @@ class StreamOptimizer(
   }
 
   /**
-   * Returns the decoration rule set for this optimizer
-   * including a custom RuleSet configuration.
+   * Returns the decoration rule set for this optimizer including a custom RuleSet configuration.
    */
   protected def getDecoRuleSet: RuleSet = {
     materializedConfig.decoRuleSet match {

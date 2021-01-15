@@ -78,8 +78,8 @@ object UserDefinedFunctionUtils {
   }
 
   /**
-   * Check whether this is a Scala object. It is forbidden to use [[TableFunction]] implemented
-   * by a Scala object, since concurrent risks.
+   * Check whether this is a Scala object. It is forbidden to use [[TableFunction]] implemented by a
+   * Scala object, since concurrent risks.
    */
   def checkNotSingleton(clazz: Class[_]): Unit = {
     // TODO it is not a good way to check singleton. Maybe improve it further.
@@ -277,22 +277,26 @@ object UserDefinedFunctionUtils {
   /**
    * Returns user defined method matching the given name and signature.
    *
-   * @param function                function instance
-   * @param methodName              method name
-   * @param methodSignature         an array of raw Java classes. We compare the raw Java classes
-   *                                not the DateType. DateType does not matter during runtime (e.g.
-   *                                within a MapFunction)
-   * @param internalTypes           internal data types of methodSignature
-   * @param parameterTypes          user provided parameter data types, usually comes from invoking
-   *                                CustomTypeDefinedFunction#getParameterTypes
-   * @param parameterClassEquals    function ((expect, reflected) -> Boolean) to decide if the
-   *                                provided expect parameter class is equals to reflection method
-   *                                signature class. The expect class comes from param
-   *                                [methodSignature].
+   * @param function
+   *   function instance
+   * @param methodName
+   *   method name
+   * @param methodSignature
+   *   an array of raw Java classes. We compare the raw Java classes not the DateType. DateType does
+   *   not matter during runtime (e.g. within a MapFunction)
+   * @param internalTypes
+   *   internal data types of methodSignature
+   * @param parameterTypes
+   *   user provided parameter data types, usually comes from invoking
+   *   CustomTypeDefinedFunction#getParameterTypes
+   * @param parameterClassEquals
+   *   function ((expect, reflected) -> Boolean) to decide if the provided expect parameter class is
+   *   equals to reflection method signature class. The expect class comes from param
+   *   [methodSignature].
    *
-   * @param parameterDataTypeEquals function ((expect, dataType) -> Boolean) to decide if the
-   *                                provided expect parameter data type is equals to type in
-   *                                [parameterTypes].
+   * @param parameterDataTypeEquals
+   *   function ((expect, dataType) -> Boolean) to decide if the provided expect parameter data type
+   *   is equals to type in [parameterTypes].
    */
   def getUserDefinedMethod(
       function: UserDefinedFunction,
@@ -408,8 +412,8 @@ object UserDefinedFunctionUtils {
   }
 
   /**
-   * Extracts methods and throws a [[ValidationException]] if no implementation
-   * can be found, or implementation does not match the requirements.
+   * Extracts methods and throws a [[ValidationException]] if no implementation can be found, or
+   * implementation does not match the requirements.
    */
   def checkAndExtractMethods(function: UserDefinedFunction, methodName: String): Array[Method] = {
     val methods = function.getClass.getMethods
@@ -444,10 +448,14 @@ object UserDefinedFunctionUtils {
   /**
    * Create [[SqlFunction]] for a [[ScalarFunction]]
    *
-   * @param identifier function identifier
-   * @param function scalar function
-   * @param typeFactory type factory
-   * @return the ScalarSqlFunction
+   * @param identifier
+   *   function identifier
+   * @param function
+   *   scalar function
+   * @param typeFactory
+   *   type factory
+   * @return
+   *   the ScalarSqlFunction
    */
   def createScalarSqlFunction(
       identifier: FunctionIdentifier,
@@ -470,14 +478,19 @@ object UserDefinedFunctionUtils {
    *
    * The implicitResultType would be inferred from type `T`.
    *
-   * For all the other cases, please use
-   * createTableSqlFunction (String, String, TableFunction, FlinkTypeFactory) instead.
+   * For all the other cases, please use createTableSqlFunction (String, String, TableFunction,
+   * FlinkTypeFactory) instead.
    *
-   * @param identifier function identifier
-   * @param tableFunction table function
-   * @param implicitResultType the implicit type information of returned table
-   * @param typeFactory type factory
-   * @return the TableSqlFunction
+   * @param identifier
+   *   function identifier
+   * @param tableFunction
+   *   table function
+   * @param implicitResultType
+   *   the implicit type information of returned table
+   * @param typeFactory
+   *   type factory
+   * @return
+   *   the TableSqlFunction
    */
   def createTableSqlFunction(
       identifier: FunctionIdentifier,
@@ -499,10 +512,14 @@ object UserDefinedFunctionUtils {
   /**
    * Create [[SqlFunction]] for an [[AggregateFunction]]
    *
-   * @param identifier function identifier
-   * @param aggFunction aggregate function
-   * @param typeFactory type factory
-   * @return the TableSqlFunction
+   * @param identifier
+   *   function identifier
+   * @param aggFunction
+   *   aggregate function
+   * @param typeFactory
+   *   type factory
+   * @return
+   *   the TableSqlFunction
    */
   def createAggregateSqlFunction(
       identifier: FunctionIdentifier,
@@ -529,12 +546,14 @@ object UserDefinedFunctionUtils {
   // ----------------------------------------------------------------------------------------------
 
   /**
-   * Tries to infer the DataType of a [[ImperativeAggregateFunction]]'s return type.
+   * Tries to infer the DataType of a [[ImperativeAggregateFunction]] 's return type.
    *
-   * @param userDefinedAggregateFunction The [[ImperativeAggregateFunction]] for which the return
-   *                                     type is inferred.
-   * @param extractedType                The implicitly inferred type of the result type.
-   * @return The inferred result type of the [[ImperativeAggregateFunction]].
+   * @param userDefinedAggregateFunction
+   *   The [[ImperativeAggregateFunction]] for which the return type is inferred.
+   * @param extractedType
+   *   The implicitly inferred type of the result type.
+   * @return
+   *   The inferred result type of the [[ImperativeAggregateFunction]].
    */
   def getResultTypeOfAggregateFunction(
       userDefinedAggregateFunction: ImperativeAggregateFunction[_, _],
@@ -560,12 +579,14 @@ object UserDefinedFunctionUtils {
   }
 
   /**
-   * Tries to infer the Type of a [[ImperativeAggregateFunction]]'s accumulator type.
+   * Tries to infer the Type of a [[ImperativeAggregateFunction]] 's accumulator type.
    *
-   * @param userDefinedAggregateFunction The [[ImperativeAggregateFunction]] for which the
-   *                                     accumulator type is inferred.
-   * @param extractedType                The implicitly inferred type of the accumulator type.
-   * @return The inferred accumulator type of the [[ImperativeAggregateFunction]].
+   * @param userDefinedAggregateFunction
+   *   The [[ImperativeAggregateFunction]] for which the accumulator type is inferred.
+   * @param extractedType
+   *   The implicitly inferred type of the accumulator type.
+   * @return
+   *   The inferred accumulator type of the [[ImperativeAggregateFunction]].
    */
   def getAccumulatorTypeOfAggregateFunction(
       userDefinedAggregateFunction: ImperativeAggregateFunction[_, _],
@@ -591,11 +612,14 @@ object UserDefinedFunctionUtils {
   }
 
   /**
-   * Internal method to extract a type from a [[ImperativeAggregateFunction]]'s type parameters.
+   * Internal method to extract a type from a [[ImperativeAggregateFunction]] 's type parameters.
    *
-   * @param aggregateFunction The [[ImperativeAggregateFunction]] for which the type is extracted.
-   * @param parameterTypePos  The position of the type parameter for which the type is extracted.
-   * @return The extracted type.
+   * @param aggregateFunction
+   *   The [[ImperativeAggregateFunction]] for which the type is extracted.
+   * @param parameterTypePos
+   *   The position of the type parameter for which the type is extracted.
+   * @return
+   *   The extracted type.
    */
   @throws(classOf[InvalidTypesException])
   private def extractTypeFromAggregateFunction(
@@ -655,8 +679,10 @@ object UserDefinedFunctionUtils {
    *
    * Field names are automatically extracted for [[RowType]].
    *
-   * @param inputType The DataType to extract the field names and positions from.
-   * @return A tuple of two arrays holding the field names and corresponding field positions.
+   * @param inputType
+   *   The DataType to extract the field names and positions from.
+   * @return
+   *   A tuple of two arrays holding the field names and corresponding field positions.
    */
   def getFieldInfo(inputType: DataType): (Array[String], Array[Int], Array[LogicalType]) = {
     val inputTypeInfo = fromDataTypeToTypeInfo(inputType)
@@ -784,12 +810,13 @@ object UserDefinedFunctionUtils {
   }
 
   /**
-   * Transform the rex nodes to Objects
-   * Only literal rex nodes will be transformed, non-literal rex nodes will be
-   * translated to nulls.
+   * Transform the rex nodes to Objects Only literal rex nodes will be transformed, non-literal rex
+   * nodes will be translated to nulls.
    *
-   * @param rexNodes actual parameters of the function
-   * @return A Array of the Objects
+   * @param rexNodes
+   *   actual parameters of the function
+   * @return
+   *   A Array of the Objects
    */
   private[table] def transformRexNodes(rexNodes: java.util.List[RexNode]): Array[AnyRef] = {
     rexNodes.map {
@@ -859,11 +886,12 @@ object UserDefinedFunctionUtils {
   /**
    * Extract implicit type from table function through reflection,
    *
-   * Broadly, We would consider CustomTypeDefinedFunction#getResultType first, this function
-   * should always be considered as a fallback.
+   * Broadly, We would consider CustomTypeDefinedFunction#getResultType first, this function should
+   * always be considered as a fallback.
    *
-   * @return Inferred implicit [[TypeInformation]], if [[InvalidTypesException]] throws, return
-   *         GenericTypeInfo(classOf[AnyRef]) as fallback
+   * @return
+   *   Inferred implicit [[TypeInformation]], if [[InvalidTypesException]] throws, return
+   *   GenericTypeInfo(classOf[AnyRef]) as fallback
    */
   def extractResultTypeFromTableFunction[T](tf: TableFunction[T]): TypeInformation[T] = {
     val implicitResultType =

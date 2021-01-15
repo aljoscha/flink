@@ -35,8 +35,8 @@ import org.mockito.Mockito
 case class CaseTestClass(a: Int, b: Int, c: Int, d: String)
 
 /**
- * Test that verifies that the case class comparators properly
- * generate normalized keys used during sorting.
+ * Test that verifies that the case class comparators properly generate normalized keys used during
+ * sorting.
  */
 class CaseClassNormalizedKeySortingTest {
 

@@ -30,22 +30,26 @@ import org.apache.flink.table.plan.schema.TableSourceTable
 /**
  * The class provides statistics for a [[TableSourceTable]].
  *
- * @param tableStats The table statistics.
+ * @param tableStats
+ *   The table statistics.
  */
 class FlinkStatistic(tableStats: Option[TableStats]) extends Statistic {
 
   /**
    * Returns the table statistics.
    *
-   * @return The table statistics
+   * @return
+   *   The table statistics
    */
   def getTableStats: TableStats = tableStats.orNull
 
   /**
    * Returns the stats of the specified the column.
    *
-   * @param columnName The name of the column for which the stats are requested.
-   * @return The stats of the specified column.
+   * @param columnName
+   *   The name of the column for which the stats are requested.
+   * @return
+   *   The stats of the specified column.
    */
   def getColumnStats(columnName: String): ColumnStats = tableStats match {
     case Some(tStats) => tStats.getColumnStats.get(columnName)
@@ -55,7 +59,8 @@ class FlinkStatistic(tableStats: Option[TableStats]) extends Statistic {
   /**
    * Returns the number of rows of the table.
    *
-   * @return The number of rows of the table.
+   * @return
+   *   The number of rows of the table.
    */
   override def getRowCount: Double = tableStats match {
     case Some(tStats) => tStats.getRowCount.toDouble
@@ -85,8 +90,10 @@ object FlinkStatistic {
   /**
    * Returns a FlinkStatistic with given table statistics.
    *
-   * @param tableStats The table statistics.
-   * @return The generated FlinkStatistic
+   * @param tableStats
+   *   The table statistics.
+   * @return
+   *   The generated FlinkStatistic
    */
   def of(tableStats: TableStats): FlinkStatistic = new FlinkStatistic(Option(tableStats))
 

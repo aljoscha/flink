@@ -45,8 +45,10 @@ abstract class RexProgramTestBase {
   /**
    * extract all expression string list from input RexProgram expression lists
    *
-   * @param rexProgram input RexProgram instance to analyze
-   * @return all expression string list of input RexProgram expression lists
+   * @param rexProgram
+   *   input RexProgram instance to analyze
+   * @return
+   *   all expression string list of input RexProgram expression lists
    */
   protected def extractExprStrList(rexProgram: RexProgram): mutable.Buffer[String] = {
     rexProgram.getExprList.asScala.map(_.toString)

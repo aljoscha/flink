@@ -34,10 +34,12 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
- * Base class of [[ExecNode]]s.
+ * Base class of [[ExecNode]] s.
  *
- * @tparam P The Planner
- * @tparam T The type of the elements that result from this [[Transformation]]
+ * @tparam P
+ *   The Planner
+ * @tparam T
+ *   The type of the elements that result from this [[Transformation]]
  *
  * <p>NOTE: This class will be removed once all sub-classes do not extend from RelNode.
  */
@@ -85,7 +87,8 @@ trait LegacyExecNodeBase[P <: Planner, T] extends ExecNode[T] {
    *
    * <p>NOTE: returns same translate result if called multiple times.
    *
-   * @param planner The [[Planner]] of the translated Table.
+   * @param planner
+   *   The [[Planner]] of the translated Table.
    */
   def translateToPlan(planner: Planner): Transformation[T] = {
     if (transformation == null) {
@@ -97,21 +100,23 @@ trait LegacyExecNodeBase[P <: Planner, T] extends ExecNode[T] {
   /**
    * Internal method, translates this node into a Flink operator.
    *
-   * @param planner The [[Planner]] of the translated Table.
+   * @param planner
+   *   The [[Planner]] of the translated Table.
    */
   protected def translateToPlanInternal(planner: P): Transformation[T]
 
   /**
    * Accepts a visit from a [[ExecNodeVisitor]].
    *
-   * @param visitor ExecNodeVisitor
+   * @param visitor
+   *   ExecNodeVisitor
    */
   def accept(visitor: ExecNodeVisitor): Unit = {
     visitor.visit(this)
   }
 
   /**
-   *  Whether there is singleton exchange node as input.
+   * Whether there is singleton exchange node as input.
    */
   protected def inputsContainSingleton(): Boolean = {
     getInputNodes.exists { node =>

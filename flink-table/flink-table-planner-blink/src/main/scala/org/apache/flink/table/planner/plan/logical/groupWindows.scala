@@ -24,8 +24,10 @@ import org.apache.flink.table.planner.expressions.PlannerWindowReference
 /**
  * Logical super class for group windows.
  *
- * @param aliasAttribute window alias
- * @param timeAttribute time field indicating event-time or processing-time
+ * @param aliasAttribute
+ *   window alias
+ * @param timeAttribute
+ *   time field indicating event-time or processing-time
  */
 abstract class LogicalWindow(
     val aliasAttribute: PlannerWindowReference,

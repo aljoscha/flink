@@ -28,11 +28,13 @@ import org.apache.flink.table.types.utils.TypeConversions
 import org.apache.calcite.rel.`type`.{RelDataType, RelDataTypeFactory}
 
 /**
- * A Deferred Type is a Table Function which the result type hasn't been determined yet.
- * It will determine the result type after the arguments are passed.
+ * A Deferred Type is a Table Function which the result type hasn't been determined yet. It will
+ * determine the result type after the arguments are passed.
  *
- * @param tableFunction The Table Function instance
- * @param implicitResultType Implicit result type.
+ * @param tableFunction
+ *   The Table Function instance
+ * @param implicitResultType
+ *   Implicit result type.
  */
 class DeferredTypeFlinkTableFunction(
     val tableFunction: TableFunction[_],

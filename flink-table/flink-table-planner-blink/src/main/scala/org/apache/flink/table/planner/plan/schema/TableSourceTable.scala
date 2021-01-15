@@ -29,19 +29,26 @@ import org.apache.calcite.rel.`type`.RelDataType
 import java.util
 
 /**
- * A [[FlinkPreparingTableBase]] implementation which defines the context variables
- * required to translate the Calcite [[org.apache.calcite.plan.RelOptTable]] to the Flink specific
- * relational expression with [[DynamicTableSource]].
+ * A [[FlinkPreparingTableBase]] implementation which defines the context variables required to
+ * translate the Calcite [[org.apache.calcite.plan.RelOptTable]] to the Flink specific relational
+ * expression with [[DynamicTableSource]].
  *
- * @param relOptSchema The RelOptSchema that this table comes from
- * @param tableIdentifier The full path of the table to retrieve.
- * @param rowType The table row type
- * @param statistic The table statistics
- * @param tableSource The [[DynamicTableSource]] for which is converted to a Calcite Table
- * @param isStreamingMode A flag that tells if the current table is in stream mode
- * @param catalogTable Catalog table where this table source table comes from
- * @param extraDigests The extra digests which will be added into `getQualifiedName`
- *                     as a part of table digest
+ * @param relOptSchema
+ *   The RelOptSchema that this table comes from
+ * @param tableIdentifier
+ *   The full path of the table to retrieve.
+ * @param rowType
+ *   The table row type
+ * @param statistic
+ *   The table statistics
+ * @param tableSource
+ *   The [[DynamicTableSource]] for which is converted to a Calcite Table
+ * @param isStreamingMode
+ *   A flag that tells if the current table is in stream mode
+ * @param catalogTable
+ *   Catalog table where this table source table comes from
+ * @param extraDigests
+ *   The extra digests which will be added into `getQualifiedName` as a part of table digest
  */
 class TableSourceTable(
     relOptSchema: RelOptSchema,
@@ -72,9 +79,12 @@ class TableSourceTable(
   /**
    * Creates a copy of this table with specified digest.
    *
-   * @param newTableSource tableSource to replace
-   * @param newRowType new row type
-   * @return added TableSourceTable instance with specified digest
+   * @param newTableSource
+   *   tableSource to replace
+   * @param newRowType
+   *   new row type
+   * @return
+   *   added TableSourceTable instance with specified digest
    */
   def copy(
       newTableSource: DynamicTableSource,
@@ -94,9 +104,12 @@ class TableSourceTable(
   /**
    * Creates a copy of this table with specified digest and statistic.
    *
-   * @param newTableSource tableSource to replace
-   * @param newStatistic statistic to replace
-   * @return added TableSourceTable instance with specified digest and statistic
+   * @param newTableSource
+   *   tableSource to replace
+   * @param newStatistic
+   *   statistic to replace
+   * @return
+   *   added TableSourceTable instance with specified digest and statistic
    */
   def copy(
       newTableSource: DynamicTableSource,

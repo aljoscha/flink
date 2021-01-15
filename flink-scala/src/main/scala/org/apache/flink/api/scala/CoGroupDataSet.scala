@@ -57,8 +57,10 @@ import scala.reflect.ClassTag
  *   }
  * }}}
  *
- * @tparam L Type of the left input of the coGroup.
- * @tparam R Type of the right input of the coGroup.
+ * @tparam L
+ *   Type of the left input of the coGroup.
+ * @tparam R
+ *   Type of the right input of the coGroup.
  */
 @Public
 class CoGroupDataSet[L, R](
@@ -137,8 +139,8 @@ class CoGroupDataSet[L, R](
    * function. The function can output zero or more elements using the [[Collector]] which will form
    * the result.
    *
-   * A [[RichCoGroupFunction]] can be used to access the
-   * broadcast variables and the [[org.apache.flink.api.common.functions.RuntimeContext]].
+   * A [[RichCoGroupFunction]] can be used to access the broadcast variables and the
+   * [[org.apache.flink.api.common.functions.RuntimeContext]].
    */
   def apply[O: TypeInformation: ClassTag](coGrouper: CoGroupFunction[L, R, O]): DataSet[O] = {
     require(coGrouper != null, "CoGroup function must not be null.")

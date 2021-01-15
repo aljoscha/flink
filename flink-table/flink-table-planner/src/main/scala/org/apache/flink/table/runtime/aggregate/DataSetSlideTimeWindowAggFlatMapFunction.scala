@@ -25,13 +25,16 @@ import org.apache.flink.types.Row
 import org.apache.flink.util.Collector
 
 /**
- * It is used for sliding windows on batch for time-windows. It takes a prepared input row,
- * aligns the window start, and replicates or omits records for different panes of a sliding
- * window. It is used for non-partial aggregations.
+ * It is used for sliding windows on batch for time-windows. It takes a prepared input row, aligns
+ * the window start, and replicates or omits records for different panes of a sliding window. It is
+ * used for non-partial aggregations.
  *
- * @param windowSize window size of the sliding window
- * @param windowSlide window slide of the sliding window
- * @param returnType return type of this function
+ * @param windowSize
+ *   window size of the sliding window
+ * @param windowSlide
+ *   window slide of the sliding window
+ * @param returnType
+ *   return type of this function
  */
 class DataSetSlideTimeWindowAggFlatMapFunction(
     private val timeFieldPos: Int,

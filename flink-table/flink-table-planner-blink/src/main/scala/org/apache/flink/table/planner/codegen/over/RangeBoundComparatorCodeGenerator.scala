@@ -46,15 +46,21 @@ import org.apache.calcite.tools.RelBuilder
 import java.math.BigDecimal
 
 /**
- * A code generator for generating [[RecordComparator]] on the [[RexWindowBound]] based range
- * over window.
+ * A code generator for generating [[RecordComparator]] on the [[RexWindowBound]] based range over
+ * window.
  *
- * @param inputType       type of the input
- * @param bound        the bound value for the window, its type may be Long or BigDecimal.
- * @param key          key position describe which fields are keys in what order
- * @param keyType      type for the key field.
- * @param keyOrder     sort order for the key field.
- * @param isLowerBound the RexWindowBound is lower or not.
+ * @param inputType
+ *   type of the input
+ * @param bound
+ *   the bound value for the window, its type may be Long or BigDecimal.
+ * @param key
+ *   key position describe which fields are keys in what order
+ * @param keyType
+ *   type for the key field.
+ * @param keyOrder
+ *   sort order for the key field.
+ * @param isLowerBound
+ *   the RexWindowBound is lower or not.
  */
 class RangeBoundComparatorCodeGenerator(
     relBuilder: RelBuilder,

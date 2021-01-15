@@ -48,8 +48,8 @@ import scala.collection.JavaConversions._
 object SetOpRewriteUtil {
 
   /**
-   * Generate equals condition by keys (The index on both sides is the same) to
-   * join left relNode and right relNode.
+   * Generate equals condition by keys (The index on both sides is the same) to join left relNode
+   * and right relNode.
    */
   def generateEqualsCondition(
       relBuilder: RelBuilder,
@@ -71,8 +71,8 @@ object SetOpRewriteUtil {
   }
 
   /**
-   * Use table function to replicate the row N times. First field is long type,
-   * and the rest are the row fields.
+   * Use table function to replicate the row N times. First field is long type, and the rest are the
+   * row fields.
    */
   def replicateRows(
       builder: RelBuilder,

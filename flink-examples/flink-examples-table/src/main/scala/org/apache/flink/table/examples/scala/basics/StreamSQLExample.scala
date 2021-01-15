@@ -29,9 +29,9 @@ import org.apache.flink.table.api.bridge.scala._
  * <p>Usage: <code>StreamSQLExample --planner &lt;blink|flink&gt;</code><br>
  *
  * <p>This example shows how to:
- *  - Convert DataStreams to Tables
- *  - Register a Table under a name
- *  - Run a StreamSQL query on the registered Table
+ *   - Convert DataStreams to Tables
+ *   - Register a Table under a name
+ *   - Run a StreamSQL query on the registered Table
  */
 object StreamSQLExample {
 

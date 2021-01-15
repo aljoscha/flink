@@ -577,8 +577,8 @@ class FlinkRelMdModifiedMonotonicity private extends MetadataHandler[ModifiedMon
   def getRelModifiedMonotonicity(rel: RelNode, mq: RelMetadataQuery): RelModifiedMonotonicity = null
 
   /**
-   * Utility to create a RelModifiedMonotonicity which all fields is modified constant which
-   * means all the field's value will not be modified.
+   * Utility to create a RelModifiedMonotonicity which all fields is modified constant which means
+   * all the field's value will not be modified.
    */
   def constants(fieldCount: Int): RelModifiedMonotonicity = {
     new RelModifiedMonotonicity(Array.fill(fieldCount)(CONSTANT))

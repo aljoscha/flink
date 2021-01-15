@@ -181,8 +181,8 @@ case class TemporalOverlaps(
   override def toString: String = s"temporalOverlaps(${children.mkString(", ")})"
 
   /**
-   * Standard conversion of the OVERLAPS operator.
-   * Source: [[org.apache.calcite.sql2rel.StandardConvertletTable#convertOverlaps()]]
+   * Standard conversion of the OVERLAPS operator. Source:
+   * [[org.apache.calcite.sql2rel.StandardConvertletTable#convertOverlaps()]]
    */
   private def convertOverlaps(
       leftP: RexNode,

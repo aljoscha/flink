@@ -29,7 +29,8 @@ import scala.reflect.ClassTag
  * The result of [[DataSet.sortPartition]]. This can be used to append additional sort fields to the
  * one sort-partition operator.
  *
- * @tparam T The type of the DataSet, i.e., the type of the elements of the DataSet.
+ * @tparam T
+ *   The type of the DataSet, i.e., the type of the elements of the DataSet.
  */
 @Public
 class PartitionSortedDataSet[T: ClassTag](set: SortPartitionOperator[T]) extends DataSet[T](set) {

@@ -28,13 +28,13 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
- * A FlinkOptimizeProgram that transforms a relational expression into
- * another relational expression with [[RuleSet]].
+ * A FlinkOptimizeProgram that transforms a relational expression into another relational expression
+ * with [[RuleSet]].
  */
 abstract class FlinkRuleSetProgram[OC <: FlinkOptimizeContext] extends FlinkOptimizeProgram[OC] {
 
   /**
-   * All [[RelOptRule]]s for optimizing associated with this program.
+   * All [[RelOptRule]] s for optimizing associated with this program.
    */
   protected val rules: util.List[RelOptRule] = new util.ArrayList[RelOptRule]()
 

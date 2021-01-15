@@ -25,12 +25,12 @@ import org.apache.flink.types.Row
 import org.junit.Test
 
 /**
- * Tests all SQL expressions that are currently supported according to the documentation.
- * This tests should be kept in sync with the documentation to reduce confusion due to the
- * large amount of SQL functions.
+ * Tests all SQL expressions that are currently supported according to the documentation. This tests
+ * should be kept in sync with the documentation to reduce confusion due to the large amount of SQL
+ * functions.
  *
- * The tests do not test every parameter combination of a function.
- * They are rather a function existence test and simple functional test.
+ * The tests do not test every parameter combination of a function. They are rather a function
+ * existence test and simple functional test.
  *
  * The tests are split up and ordered like the sections in the documentation.
  */

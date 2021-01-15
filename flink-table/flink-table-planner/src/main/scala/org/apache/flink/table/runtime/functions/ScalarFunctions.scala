@@ -35,8 +35,8 @@ import scala.annotation.varargs
  * NOTE: Before you add functions here, check if Calcite provides it in
  * [[org.apache.calcite.runtime.SqlFunctions]]. Furthermore, make sure to implement the function
  * efficiently. Sometimes it makes sense to create a
- * [[org.apache.flink.table.codegen.calls.CallGenerator]] instead to avoid massive object
- * creation and reuse instances.
+ * [[org.apache.flink.table.codegen.calls.CallGenerator]] instead to avoid massive object creation
+ * and reuse instances.
  */
 class ScalarFunctions {}
 
@@ -54,8 +54,8 @@ object ScalarFunctions {
   }
 
   /**
-   * Returns the string that results from concatenating the arguments.
-   * Returns NULL if any argument is NULL.
+   * Returns the string that results from concatenating the arguments. Returns NULL if any argument
+   * is NULL.
    */
   @varargs
   def concat(args: String*): String = {
@@ -72,11 +72,11 @@ object ScalarFunctions {
   }
 
   /**
-   * Returns the string that results from concatenating the arguments and separator.
-   * Returns NULL If the separator is NULL.
+   * Returns the string that results from concatenating the arguments and separator. Returns NULL If
+   * the separator is NULL.
    *
-   * Note: CONCAT_WS() does not skip empty strings. However, it does skip any NULL values after
-   * the separator argument.
+   * Note: CONCAT_WS() does not skip empty strings. However, it does skip any NULL values after the
+   * separator argument.
    */
   @varargs
   def concat_ws(separator: String, args: String*): String = {
@@ -165,8 +165,8 @@ object ScalarFunctions {
   }
 
   /**
-   * Returns the string str left-padded with the string pad to a length of len characters.
-   * If str is longer than len, the return value is shortened to len characters.
+   * Returns the string str left-padded with the string pad to a length of len characters. If str is
+   * longer than len, the return value is shortened to len characters.
    */
   def lpad(base: String, len: Integer, pad: String): String = {
     if (len < 0) {
@@ -204,8 +204,8 @@ object ScalarFunctions {
   }
 
   /**
-   * Returns the string str right-padded with the string pad to a length of len characters.
-   * If str is longer than len, the return value is shortened to len characters.
+   * Returns the string str right-padded with the string pad to a length of len characters. If str
+   * is longer than len, the return value is shortened to len characters.
    */
   def rpad(base: String, len: Integer, pad: String): String = {
     if (len < 0) {
@@ -240,8 +240,8 @@ object ScalarFunctions {
   }
 
   /**
-   * Returns a string resulting from replacing all substrings
-   * that match the regular expression with replacement.
+   * Returns a string resulting from replacing all substrings that match the regular expression with
+   * replacement.
    */
   def regexp_replace(str: String, regex: String, replacement: String): String = {
     if (str == null || regex == null || replacement == null) {
@@ -269,8 +269,8 @@ object ScalarFunctions {
   }
 
   /**
-   * Returns a string extracted with a specified regular expression and
-   * a optional regex match group index.
+   * Returns a string extracted with a specified regular expression and a optional regex match group
+   * index.
    */
   def regexp_extract(str: String, regex: String): String = {
     regexp_extract(str, regex, 0)

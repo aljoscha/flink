@@ -25,10 +25,11 @@ import java.io.Serializable
 trait Context[T] extends Serializable {
 
   /**
-   * @return An { @link Iterable} over the already accepted elements
-   *                    for a given pattern. Elements are iterated in the order they were
-   *                    inserted in the pattern.
-   * @param name The name of the pattern.
+   * @return
+   *   An { @link Iterable} over the already accepted elements for a given pattern. Elements are
+   *   iterated in the order they were inserted in the pattern.
+   * @param name
+   *   The name of the pattern.
    */
   def getEventsForPattern(name: String): Iterable[T]
 }

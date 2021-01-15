@@ -28,8 +28,8 @@ import org.apache.calcite.rel.RelNode
 import scala.collection.JavaConversions._
 
 /**
- * Rule that converts non-SEMI/ANTI [[FlinkLogicalJoin]] with window bounds in join condition
- * to [[StreamExecIntervalJoin]].
+ * Rule that converts non-SEMI/ANTI [[FlinkLogicalJoin]] with window bounds in join condition to
+ * [[StreamExecIntervalJoin]].
  */
 class StreamExecIntervalJoinRule extends StreamPhysicalJoinRuleBase("StreamExecIntervalJoinRule") {
 

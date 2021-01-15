@@ -46,8 +46,8 @@ import org.apache.calcite.rex.{RexCorrelVariable, RexFieldAccess}
 /**
  * Base implementation that matches temporal join node.
  *
- * <p> The initial temporal table join (FOR SYSTEM_TIME AS OF) is a Correlate, rewrite it into
- * a Join to make join condition can be pushed-down. The join will be translated into
+ * <p> The initial temporal table join (FOR SYSTEM_TIME AS OF) is a Correlate, rewrite it into a
+ * Join to make join condition can be pushed-down. The join will be translated into
  * [[StreamExecLookupJoin]] in physical or translated into [[StreamPhysicalTemporalJoin]].
  */
 trait CommonTemporalTableJoinRule {

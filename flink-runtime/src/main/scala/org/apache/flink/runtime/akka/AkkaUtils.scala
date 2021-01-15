@@ -63,8 +63,10 @@ object AkkaUtils {
   /**
    * Creates a local actor system without remoting.
    *
-   * @param configuration instance containing the user provided configuration values
-   * @return The created actor system
+   * @param configuration
+   *   instance containing the user provided configuration values
+   * @return
+   *   The created actor system
    */
   def createLocalActorSystem(configuration: Configuration): ActorSystem = {
     val akkaConfig = getAkkaConfig(configuration, None)
@@ -74,10 +76,14 @@ object AkkaUtils {
   /**
    * Creates an actor system bound to the given hostname and port.
    *
-   * @param configuration instance containing the user provided configuration values
-   * @param hostname of the network interface to bind to
-   * @param port of to bind to
-   * @return created actor system
+   * @param configuration
+   *   instance containing the user provided configuration values
+   * @param hostname
+   *   of the network interface to bind to
+   * @param port
+   *   of to bind to
+   * @return
+   *   created actor system
    */
   def createActorSystem(configuration: Configuration, hostname: String, port: Int): ActorSystem = {
 
@@ -86,13 +92,16 @@ object AkkaUtils {
 
   /**
    * Creates an actor system. If a listening address is specified, then the actor system will listen
-   * on that address for messages from a remote actor system. If not, then a local actor system
-   * will be instantiated.
+   * on that address for messages from a remote actor system. If not, then a local actor system will
+   * be instantiated.
    *
-   * @param configuration instance containing the user provided configuration values
-   * @param listeningAddress an optional tuple containing a bindAddress and a port to bind to.
-   *                        If the parameter is None, then a local actor system will be created.
-   * @return created actor system
+   * @param configuration
+   *   instance containing the user provided configuration values
+   * @param listeningAddress
+   *   an optional tuple containing a bindAddress and a port to bind to. If the parameter is None,
+   *   then a local actor system will be created.
+   * @return
+   *   created actor system
    */
   def createActorSystem(
       configuration: Configuration,
@@ -104,8 +113,10 @@ object AkkaUtils {
   /**
    * Creates an actor system with the given akka config.
    *
-   * @param akkaConfig configuration for the actor system
-   * @return created actor system
+   * @param akkaConfig
+   *   configuration for the actor system
+   * @return
+   *   created actor system
    */
   def createActorSystem(akkaConfig: Config): ActorSystem = {
     createActorSystem(FLINK_ACTOR_SYSTEM_NAME, akkaConfig)
@@ -114,8 +125,10 @@ object AkkaUtils {
   /**
    * Creates an actor system with the given akka config.
    *
-   * @param akkaConfig configuration for the actor system
-   * @return created actor system
+   * @param akkaConfig
+   *   configuration for the actor system
+   * @return
+   *   created actor system
    */
   def createActorSystem(actorSystemName: String, akkaConfig: Config): ActorSystem = {
     // Initialize slf4j as logger of Akka's Netty instead of java.util.logging (FLINK-1650)
@@ -127,7 +140,8 @@ object AkkaUtils {
    * Creates an actor system with the default config and listening on a random port of the
    * localhost.
    *
-   * @return default actor system listening on a random port of the localhost
+   * @return
+   *   default actor system listening on a random port of the localhost
    */
   def createDefaultActorSystem(): ActorSystem = {
     createActorSystem(getDefaultAkkaConfig)
@@ -136,11 +150,16 @@ object AkkaUtils {
   /**
    * Returns a remote Akka config for the given configuration values.
    *
-   * @param configuration containing the user provided configuration values
-   * @param hostname to bind against. If null, then the loopback interface is used
-   * @param port to bind against
-   * @param executorConfig containing the user specified config of executor
-   * @return A remote Akka config
+   * @param configuration
+   *   containing the user provided configuration values
+   * @param hostname
+   *   to bind against. If null, then the loopback interface is used
+   * @param port
+   *   to bind against
+   * @param executorConfig
+   *   containing the user specified config of executor
+   * @return
+   *   A remote Akka config
    */
   def getAkkaConfig(
       configuration: Configuration,
@@ -153,10 +172,14 @@ object AkkaUtils {
   /**
    * Returns a remote Akka config for the given configuration values.
    *
-   * @param configuration containing the user provided configuration values
-   * @param hostname to bind against. If null, then the loopback interface is used
-   * @param port to bind against
-   * @return A remote Akka config
+   * @param configuration
+   *   containing the user provided configuration values
+   * @param hostname
+   *   to bind against. If null, then the loopback interface is used
+   * @param port
+   *   to bind against
+   * @return
+   *   A remote Akka config
    */
   def getAkkaConfig(configuration: Configuration, hostname: String, port: Int): Config = {
     getAkkaConfig(configuration, Some((hostname, port)))
@@ -165,8 +188,10 @@ object AkkaUtils {
   /**
    * Return a local Akka config for the given configuration values.
    *
-   * @param configuration containing the user provided configuration values
-   * @return A local Akka config
+   * @param configuration
+   *   containing the user provided configuration values
+   * @return
+   *   A local Akka config
    */
   def getAkkaConfig(configuration: Configuration): Config = {
     getAkkaConfig(configuration, None)
@@ -176,11 +201,13 @@ object AkkaUtils {
    * Creates an akka config with the provided configuration values. If the listening address is
    * specified, then the actor system will listen on the respective address.
    *
-   * @param configuration instance containing the user provided configuration values
-   * @param externalAddress optional tuple of bindAddress and port to be reachable at.
-   *                        If None is given, then an Akka config for local actor system
-   *                        will be returned
-   * @return Akka config
+   * @param configuration
+   *   instance containing the user provided configuration values
+   * @param externalAddress
+   *   optional tuple of bindAddress and port to be reachable at. If None is given, then an Akka
+   *   config for local actor system will be returned
+   * @return
+   *   Akka config
    */
   @throws(classOf[UnknownHostException])
   def getAkkaConfig(
@@ -197,15 +224,18 @@ object AkkaUtils {
    * Creates an akka config with the provided configuration values. If the listening address is
    * specified, then the actor system will listen on the respective address.
    *
-   * @param configuration instance containing the user provided configuration values
-   * @param externalAddress optional tuple of external address and port to be reachable at.
-   *                        If None is given, then an Akka config for local actor system
-   *                        will be returned
-   * @param bindAddress optional tuple of bind address and port to be used locally.
-   *                    If None is given, wildcard IP address and the external port wil be used.
-   *                    Take effects only if externalAddress is not None.
-   * @param executorConfig config defining the used executor by the default dispatcher
-   * @return Akka config
+   * @param configuration
+   *   instance containing the user provided configuration values
+   * @param externalAddress
+   *   optional tuple of external address and port to be reachable at. If None is given, then an
+   *   Akka config for local actor system will be returned
+   * @param bindAddress
+   *   optional tuple of bind address and port to be used locally. If None is given, wildcard IP
+   *   address and the external port wil be used. Take effects only if externalAddress is not None.
+   * @param executorConfig
+   *   config defining the used executor by the default dispatcher
+   * @return
+   *   Akka config
    */
   @throws(classOf[UnknownHostException])
   def getAkkaConfig(
@@ -248,10 +278,11 @@ object AkkaUtils {
   }
 
   /**
-   * Creates the default akka configuration which listens on a random port on the local machine.
-   * All configuration values are set to default values.
+   * Creates the default akka configuration which listens on a random port on the local machine. All
+   * configuration values are set to default values.
    *
-   * @return Flink's Akka default config
+   * @return
+   *   Flink's Akka default config
    */
   def getDefaultAkkaConfig: Config = {
     getAkkaConfig(new Configuration(), Some(("", 0)))
@@ -260,8 +291,10 @@ object AkkaUtils {
   /**
    * Gets the basic Akka config which is shared by remote and local actor systems.
    *
-   * @param configuration instance which contains the user specified values for the configuration
-   * @return Flink's basic Akka config
+   * @param configuration
+   *   instance which contains the user specified values for the configuration
+   * @return
+   *   Flink's basic Akka config
    */
   private def getBasicAkkaConfig(configuration: Configuration): Config = {
     val akkaThroughput = configuration.getInteger(AkkaOptions.DISPATCHER_THROUGHPUT)
@@ -409,12 +442,18 @@ object AkkaUtils {
    * Creates a Akka config for a remote actor system listening on port on the network interface
    * identified by bindAddress.
    *
-   * @param configuration instance containing the user provided configuration values
-   * @param bindAddress of the network interface to bind on
-   * @param port to bind to or if 0 then Akka picks a free port automatically
-   * @param externalHostname The host name to expect for Akka messages
-   * @param externalPort The port to expect for Akka messages
-   * @return Flink's Akka configuration for remote actor systems
+   * @param configuration
+   *   instance containing the user provided configuration values
+   * @param bindAddress
+   *   of the network interface to bind on
+   * @param port
+   *   to bind to or if 0 then Akka picks a free port automatically
+   * @param externalHostname
+   *   The host name to expect for Akka messages
+   * @param externalPort
+   *   The port to expect for Akka messages
+   * @return
+   *   Flink's Akka configuration for remote actor systems
    */
   private def getRemoteAkkaConfig(
       configuration: Configuration,
@@ -653,11 +692,16 @@ object AkkaUtils {
    * Returns a [[Future]] to the [[ActorRef]] of the child of a given actor. The child is specified
    * by providing its actor name.
    *
-   * @param parent [[ActorRef]] to the parent of the child to be retrieved
-   * @param child Name of the child actor
-   * @param system [[ActorSystem]] to be used
-   * @param timeout Maximum timeout for the future
-   * @return [[Future]] to the [[ActorRef]] of the child actor
+   * @param parent
+   *   [[ActorRef]] to the parent of the child to be retrieved
+   * @param child
+   *   Name of the child actor
+   * @param system
+   *   [[ActorSystem]] to be used
+   * @param timeout
+   *   Maximum timeout for the future
+   * @return
+   *   [[Future]] to the [[ActorRef]] of the child actor
    */
   def getChild(
       parent: ActorRef,
@@ -670,10 +714,14 @@ object AkkaUtils {
   /**
    * Returns a [[Future]] to the [[ActorRef]] of an actor. The actor is specified by its path.
    *
-   * @param path Path to the actor to be retrieved
-   * @param system [[ActorSystem]] to be used
-   * @param timeout Maximum timeout for the future
-   * @return [[Future]] to the [[ActorRef]] of the actor
+   * @param path
+   *   Path to the actor to be retrieved
+   * @param system
+   *   [[ActorSystem]] to be used
+   * @param timeout
+   *   Maximum timeout for the future
+   * @return
+   *   [[Future]] to the [[ActorRef]] of the actor
    */
   def getActorRefFuture(
       path: String,
@@ -685,11 +733,16 @@ object AkkaUtils {
   /**
    * Returns an [[ActorRef]] for the actor specified by the path parameter.
    *
-   * @param path Path to the actor to be retrieved
-   * @param system [[ActorSystem]] to be used
-   * @param timeout Maximum timeout for the future
-   * @throws java.io.IOException
-   * @return [[ActorRef]] of the requested [[Actor]]
+   * @param path
+   *   Path to the actor to be retrieved
+   * @param system
+   *   [[ActorSystem]] to be used
+   * @param timeout
+   *   Maximum timeout for the future
+   * @throws
+   *   java.io.IOException
+   * @return
+   *   [[ActorRef]] of the requested [[Actor]]
    */
   @throws(classOf[IOException])
   def getActorRef(path: String, system: ActorSystem, timeout: FiniteDuration): ActorRef = {
@@ -712,11 +765,16 @@ object AkkaUtils {
    * Utility function to construct a future which tries multiple times to execute itself if it
    * fails. If the maximum number of tries are exceeded, then the future fails.
    *
-   * @param body function describing the future action
-   * @param tries number of maximum tries before the future fails
-   * @param executionContext which shall execute the future
-   * @tparam T return type of the future
-   * @return future which tries to recover by re-executing itself a given number of times
+   * @param body
+   *   function describing the future action
+   * @param tries
+   *   number of maximum tries before the future fails
+   * @param executionContext
+   *   which shall execute the future
+   * @tparam T
+   *   return type of the future
+   * @return
+   *   future which tries to recover by re-executing itself a given number of times
    */
   def retry[T](body: => T, tries: Int)(implicit executionContext: ExecutionContext): Future[T] = {
     Future { body }.recoverWith { case t: Throwable =>
@@ -732,11 +790,16 @@ object AkkaUtils {
    * Utility function to construct a future which tries multiple times to execute itself if it
    * fails. If the maximum number of tries are exceeded, then the future fails.
    *
-   * @param callable future action
-   * @param tries maximum number of tries before the future fails
-   * @param executionContext which shall execute the future
-   * @tparam T return type of the future
-   * @return future which tries to recover by re-executing itself a given number of times
+   * @param callable
+   *   future action
+   * @param tries
+   *   maximum number of tries before the future fails
+   * @param executionContext
+   *   which shall execute the future
+   * @tparam T
+   *   return type of the future
+   * @return
+   *   future which tries to recover by re-executing itself a given number of times
    */
   def retry[T](callable: Callable[T], tries: Int)(implicit
       executionContext: ExecutionContext): Future[T] = {
@@ -747,12 +810,18 @@ object AkkaUtils {
    * Utility function to construct a future which tries multiple times to execute itself if it
    * fails. If the maximum number of tries are exceeded, then the future fails.
    *
-   * @param target actor which receives the message
-   * @param message to be sent to the target actor
-   * @param tries maximum number of tries before the future fails
-   * @param executionContext which shall execute the future
-   * @param timeout of the future
-   * @return future which tries to recover by re-executing itself a given number of times
+   * @param target
+   *   actor which receives the message
+   * @param message
+   *   to be sent to the target actor
+   * @param tries
+   *   maximum number of tries before the future fails
+   * @param executionContext
+   *   which shall execute the future
+   * @param timeout
+   *   of the future
+   * @return
+   *   future which tries to recover by re-executing itself a given number of times
    */
   def retry(target: ActorRef, message: Any, tries: Int)(implicit
       executionContext: ExecutionContext,
@@ -792,23 +861,28 @@ object AkkaUtils {
   }
 
   /**
-   * Returns the address of the given [[ActorSystem]]. The [[Address]] object contains
-   * the port and the host under which the actor system is reachable
+   * Returns the address of the given [[ActorSystem]]. The [[Address]] object contains the port and
+   * the host under which the actor system is reachable
    *
-   * @param system [[ActorSystem]] for which the [[Address]] shall be retrieved
-   * @return [[Address]] of the given [[ActorSystem]]
+   * @param system
+   *   [[ActorSystem]] for which the [[Address]] shall be retrieved
+   * @return
+   *   [[Address]] of the given [[ActorSystem]]
    */
   def getAddress(system: ActorSystem): Address = {
     RemoteAddressExtension(system).address
   }
 
   /**
-   * Returns the given [[ActorRef]]'s path string representation with host and port of the
+   * Returns the given [[ActorRef]] 's path string representation with host and port of the
    * [[ActorSystem]] in which the actor is running.
    *
-   * @param system [[ActorSystem]] in which the given [[ActorRef]] is running
-   * @param actor [[ActorRef]] of the [[Actor]] for which the URL has to be generated
-   * @return String containing the [[ActorSystem]] independent URL of the [[Actor]]
+   * @param system
+   *   [[ActorSystem]] in which the given [[ActorRef]] is running
+   * @param actor
+   *   [[ActorRef]] of the [[Actor]] for which the URL has to be generated
+   * @return
+   *   String containing the [[ActorSystem]] independent URL of the [[Actor]]
    */
   def getAkkaURL(system: ActorSystem, actor: ActorRef): String = {
     val address = getAddress(system)
@@ -819,10 +893,12 @@ object AkkaUtils {
    * Returns the AkkaURL for a given [[ActorSystem]] and a path describing a running [[Actor]] in
    * the actor system.
    *
-   * @param system [[ActorSystem]] in which the given [[Actor]] is running
-   * @param path Path describing an [[Actor]] for which the URL has to be generated
-   * @return String containing the [[ActorSystem]] independent URL of an [[Actor]] specified by
-   *         path.
+   * @param system
+   *   [[ActorSystem]] in which the given [[Actor]] is running
+   * @param path
+   *   Path describing an [[Actor]] for which the URL has to be generated
+   * @return
+   *   String containing the [[ActorSystem]] independent URL of an [[Actor]] specified by path.
    */
   def getAkkaURL(system: ActorSystem, path: String): String = {
     val address = getAddress(system)
@@ -831,13 +907,16 @@ object AkkaUtils {
 
   /**
    * Extracts the hostname and the port of the remote actor system from the given Akka URL. The
-   * result is an [[InetSocketAddress]] instance containing the extracted hostname and port. If
-   * the Akka URL does not contain the hostname and port information, e.g. a local Akka URL is
-   * provided, then an [[Exception]] is thrown.
+   * result is an [[InetSocketAddress]] instance containing the extracted hostname and port. If the
+   * Akka URL does not contain the hostname and port information, e.g. a local Akka URL is provided,
+   * then an [[Exception]] is thrown.
    *
-   * @param akkaURL The URL to extract the host and port from.
-   * @throws java.lang.Exception Thrown, if the given string does not represent a proper url
-   * @return The InetSocketAddress with the extracted host and port.
+   * @param akkaURL
+   *   The URL to extract the host and port from.
+   * @throws
+   *   java.lang.Exception Thrown, if the given string does not represent a proper url
+   * @return
+   *   The InetSocketAddress with the extracted host and port.
    */
   @throws(classOf[Exception])
   def getInetSocketAddressFromAkkaURL(akkaURL: String): InetSocketAddress = {
@@ -858,10 +937,12 @@ object AkkaUtils {
   /**
    * Extracts the [[Address]] from the given akka URL.
    *
-   * @param akkaURL to extract the [[Address]] from
-   * @throws java.net.MalformedURLException if the [[Address]] could not be parsed from
-   *                                        the given akka URL
-   * @return Extracted [[Address]] from the given akka URL
+   * @param akkaURL
+   *   to extract the [[Address]] from
+   * @throws
+   *   java.net.MalformedURLException if the [[Address]] could not be parsed from the given akka URL
+   * @return
+   *   Extracted [[Address]] from the given akka URL
    */
   @throws(classOf[MalformedURLException])
   def getAddressFromAkkaURL(akkaURL: String): Address = {
@@ -877,8 +958,10 @@ object AkkaUtils {
   /**
    * Returns the local akka url for the given actor name.
    *
-   * @param actorName Actor name identifying the actor
-   * @return Local Akka URL for the given actor
+   * @param actorName
+   *   Actor name identifying the actor
+   * @return
+   *   Local Akka URL for the given actor
    */
   def getLocalAkkaURL(actorName: String): String = {
     "akka://flink/user/" + actorName
@@ -887,11 +970,16 @@ object AkkaUtils {
   /**
    * Retries a function if it fails because of a [[java.net.BindException]].
    *
-   * @param fn The function to retry
-   * @param stopCond Flag to signal termination
-   * @param maxSleepBetweenRetries Max random sleep time between retries
-   * @tparam T Return type of the function to retry
-   * @return Return value of the function to retry
+   * @param fn
+   *   The function to retry
+   * @param stopCond
+   *   Flag to signal termination
+   * @param maxSleepBetweenRetries
+   *   Max random sleep time between retries
+   * @tparam T
+   *   Return type of the function to retry
+   * @return
+   *   Return value of the function to retry
    */
   @tailrec
   def retryOnBindException[T](
@@ -936,8 +1024,10 @@ object AkkaUtils {
   /**
    * Terminates the given [[ActorSystem]] and returns its termination future.
    *
-   * @param actorSystem to terminate
-   * @return Termination future
+   * @param actorSystem
+   *   to terminate
+   * @return
+   *   Termination future
    */
   def terminateActorSystem(actorSystem: ActorSystem): CompletableFuture[Void] = {
     FutureUtils.toJava(actorSystem.terminate).thenAccept(FunctionUtils.ignoreFn())

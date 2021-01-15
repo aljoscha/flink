@@ -51,8 +51,8 @@ import java.util.Collections
 import _root_.scala.collection.JavaConversions._
 
 /**
- * Planner rule that transforms simple [[LogicalAggregate]] on a [[LogicalProject]]
- * with windowing expression to [[LogicalWindowAggregate]].
+ * Planner rule that transforms simple [[LogicalAggregate]] on a [[LogicalProject]] with windowing
+ * expression to [[LogicalWindowAggregate]].
  */
 abstract class LogicalWindowAggregateRuleBase(description: String)
     extends RelOptRule(
@@ -155,22 +155,18 @@ abstract class LogicalWindowAggregateRuleBase(description: String)
   }
 
   /**
-   * Rewrite plan with PROCTIME() as window call operand: rewrite the window call to
-   * reference the input instead of invoke the PROCTIME() directly, in order to simplify the
-   * subsequent rewrite logic.
+   * Rewrite plan with PROCTIME() as window call operand: rewrite the window call to reference the
+   * input instead of invoke the PROCTIME() directly, in order to simplify the subsequent rewrite
+   * logic.
    *
-   * For example, plan
-   * <pre>
-   * LogicalProject($f0=[TUMBLE(PROCTIME(), 1000:INTERVAL SECOND)], a=[$0], b=[$1])
-   *   +- LogicalTableScan
-   * </pre>
+   * For example, plan <pre> LogicalProject($f0=[TUMBLE(PROCTIME(), 1000:INTERVAL SECOND)], a=[$0],
+   * b=[$1])
+   * +- LogicalTableScan </pre>
    *
-   * would be rewritten to
-   * <pre>
-   * LogicalProject($f0=[TUMBLE($2, 1000:INTERVAL SECOND)], a=[$0], b=[$1])
-   *   +- LogicalProject(a=[$0], b=[$1], $f2=[PROCTIME()])
-   *     +- LogicalTableScan
-   * </pre>
+   * would be rewritten to <pre> LogicalProject($f0=[TUMBLE($2, 1000:INTERVAL SECOND)], a=[$0],
+   * b=[$1])
+   * +- LogicalProject(a=[$0], b=[$1], $f2=[PROCTIME()])
+   * +- LogicalTableScan </pre>
    */
   private def rewriteProctimeWindows(
       project: LogicalProject,

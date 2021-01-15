@@ -22,9 +22,9 @@ import org.apache.calcite.plan.{RelOptCost, RelOptUtil}
 import org.apache.calcite.runtime.Utilities
 
 /**
- * This class is based on Apache Calcite's [[org.apache.calcite.plan.volcano.VolcanoCost]]
- * and has an adapted cost comparison method `isLe(other: RelOptCost)`
- * that takes io, cpu, network and memory into account.
+ * This class is based on Apache Calcite's [[org.apache.calcite.plan.volcano.VolcanoCost]] and has
+ * an adapted cost comparison method `isLe(other: RelOptCost)` that takes io, cpu, network and
+ * memory into account.
  */
 class FlinkCost(
     val rowCount: Double,
@@ -35,37 +35,41 @@ class FlinkCost(
     extends FlinkCostBase {
 
   /**
-   * @return number of rows processed; this should not be confused with the
-   *         row count produced by a relational expression
-   *         ({ @link org.apache.calcite.rel.RelNode#estimateRowCount})
+   * @return
+   *   number of rows processed; this should not be confused with the row count produced by a
+   *   relational expression ({ @link org.apache.calcite.rel.RelNode#estimateRowCount})
    */
   override def getRows: Double = rowCount
 
   /**
-   * @return usage of CPU resources
+   * @return
+   *   usage of CPU resources
    */
   override def getCpu: Double = cpu
 
   /**
-   * @return usage of I/O resources
+   * @return
+   *   usage of I/O resources
    */
   override def getIo: Double = io
 
   /**
-   * @return usage of network resources
+   * @return
+   *   usage of network resources
    */
   override def getNetwork: Double = network
 
   /**
-   * @return usage of memory resources
+   * @return
+   *   usage of memory resources
    */
   override def getMemory: Double = memory
 
   /**
-   * @return true iff this cost represents an expression that hasn't actually
-   *         been implemented (e.g. a pure relational algebra expression) or can't
-   *         actually be implemented, e.g. a transfer of data between two disconnected
-   *         sites
+   * @return
+   *   true iff this cost represents an expression that hasn't actually been implemented (e.g. a
+   *   pure relational algebra expression) or can't actually be implemented, e.g. a transfer of data
+   *   between two disconnected sites
    */
   override def isInfinite: Boolean = {
     (this eq FlinkCost.Infinity) ||
@@ -79,8 +83,10 @@ class FlinkCost(
   /**
    * Compares this to another cost.
    *
-   * @param other another cost
-   * @return true iff this is exactly equal to other cost
+   * @param other
+   *   another cost
+   * @return
+   *   true iff this is exactly equal to other cost
    */
   override def equals(other: RelOptCost): Boolean = {
     (this eq other) ||
@@ -95,9 +101,10 @@ class FlinkCost(
   /**
    * Compares this to another cost, allowing for slight roundoff errors.
    *
-   * @param other another cost
-   * @return true iff this is the same as the other cost within a roundoff
-   *         margin of error
+   * @param other
+   *   another cost
+   * @return
+   *   true iff this is the same as the other cost within a roundoff margin of error
    */
   override def isEqWithEpsilon(other: RelOptCost): Boolean = {
     if (!other.isInstanceOf[FlinkCost]) {
@@ -115,19 +122,17 @@ class FlinkCost(
   /**
    * Compares this to another cost.
    *
-   * <p>NOTES:
-   * * The optimization goal is to use minimal resources now, so the comparison order of factors
-   * is:
-   * * 1. first compare CPU. Each operator will use CPU, so we think it's the most important
-   * factor.
-   * * 2.then compare MEMORY, NETWORK and IO as a normalized value. Comparison order of them is
-   * * not easy to decide, so convert them to CPU cost by different ratio.
-   * * 3.finally compare ROWS. ROWS has been counted when calculating other factory.
-   * * e.g. CPU of Sort = nLogN(ROWS) * number of sort keys,
-   * * CPU of Filter = ROWS * condition cost on a row.
+   * <p>NOTES: * The optimization goal is to use minimal resources now, so the comparison order of
+   * factors is: * 1. first compare CPU. Each operator will use CPU, so we think it's the most
+   * important factor. * 2.then compare MEMORY, NETWORK and IO as a normalized value. Comparison
+   * order of them is * not easy to decide, so convert them to CPU cost by different ratio. *
+   * 3.finally compare ROWS. ROWS has been counted when calculating other factory. * e.g. CPU of
+   * Sort = nLogN(ROWS) * number of sort keys, * CPU of Filter = ROWS * condition cost on a row.
    *
-   * @param other another cost
-   * @return true iff this is less than or equal to other cost
+   * @param other
+   *   another cost
+   * @return
+   *   true iff this is less than or equal to other cost
    */
   override def isLe(other: RelOptCost): Boolean = {
     val that: FlinkCost = other.asInstanceOf[FlinkCost]
@@ -151,16 +156,20 @@ class FlinkCost(
   /**
    * Compares this to another cost.
    *
-   * @param other another cost
-   * @return true iff this is strictly less than other cost
+   * @param other
+   *   another cost
+   * @return
+   *   true iff this is strictly less than other cost
    */
   override def isLt(other: RelOptCost): Boolean = isLe(other) && !this.equals(other)
 
   /**
    * Adds another cost to this.
    *
-   * @param other another cost
-   * @return sum of this and other cost
+   * @param other
+   *   another cost
+   * @return
+   *   sum of this and other cost
    */
   override def plus(other: RelOptCost): RelOptCost = {
     val that: FlinkCost = other.asInstanceOf[FlinkCost]
@@ -178,8 +187,10 @@ class FlinkCost(
   /**
    * Subtracts another cost from this.
    *
-   * @param other another cost
-   * @return difference between this and other cost
+   * @param other
+   *   another cost
+   * @return
+   *   difference between this and other cost
    */
   override def minus(other: RelOptCost): RelOptCost = {
     if (this eq FlinkCost.Infinity) {
@@ -197,8 +208,10 @@ class FlinkCost(
   /**
    * Multiplies this cost by a scalar factor.
    *
-   * @param factor scalar factor
-   * @return scalar product of this and factor
+   * @param factor
+   *   scalar factor
+   * @return
+   *   scalar product of this and factor
    */
   override def multiplyBy(factor: Double): RelOptCost = {
     if (this eq FlinkCost.Infinity) {
@@ -210,12 +223,13 @@ class FlinkCost(
   /**
    * Computes the ratio between this cost and another cost.
    *
-   * <p>divideBy is the inverse of multiplyBy(double). For any
-   * finite, non-zero cost and factor f, <code>
-   * cost.divideBy(cost.multiplyBy(f))</code> yields <code>1 / f</code>.
+   * <p>divideBy is the inverse of multiplyBy(double). For any finite, non-zero cost and factor f,
+   * <code> cost.divideBy(cost.multiplyBy(f))</code> yields <code>1 / f</code>.
    *
-   * @param cost Other cost
-   * @return Ratio between costs
+   * @param cost
+   *   Other cost
+   * @return
+   *   Ratio between costs
    */
   override def divideBy(cost: RelOptCost): Double = {
     val that: FlinkCost = cost.asInstanceOf[FlinkCost]
@@ -305,9 +319,8 @@ object FlinkCost {
 
   /**
    * Hash cpu cost per field (for now we don't distinguish between fields of different types)
-   * involves the cost of the following operations:
-   * compute hash value, probe hash table, walk hash chain and compare with each element,
-   * add to the end of hash chain if no match found
+   * involves the cost of the following operations: compute hash value, probe hash table, walk hash
+   * chain and compare with each element, add to the end of hash chain if no match found
    */
   val HASH_CPU_COST: Int = 8 * BASE_CPU_COST
 
@@ -342,9 +355,8 @@ object FlinkCost {
   val RANGE_PARTITION_CPU_COST: Int = 12 * BASE_CPU_COST
 
   /**
-   * Default data size of a worker to process.
-   * Note: only used in estimates cost of RelNode.
-   * It is irrelevant to decides the parallelism of operators.
+   * Default data size of a worker to process. Note: only used in estimates cost of RelNode. It is
+   * irrelevant to decides the parallelism of operators.
    */
   val SQL_DEFAULT_PARALLELISM_WORKER_PROCESS_SIZE: Int = 1024 * 1024 * 1024
 

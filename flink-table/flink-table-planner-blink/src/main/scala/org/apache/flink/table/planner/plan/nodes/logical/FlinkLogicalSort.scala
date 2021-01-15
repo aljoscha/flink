@@ -34,8 +34,8 @@ import org.apache.calcite.rex.{RexLiteral, RexNode}
 import org.apache.calcite.sql.`type`.SqlTypeName
 
 /**
- * Sub-class of [[Sort]] that is a relational expression which imposes
- * a particular sort order on its input without otherwise changing its content in Flink.
+ * Sub-class of [[Sort]] that is a relational expression which imposes a particular sort order on
+ * its input without otherwise changing its content in Flink.
  */
 class FlinkLogicalSort(
     cluster: RelOptCluster,

@@ -85,9 +85,11 @@ class JsonFunctionsTest extends ExpressionTestBase {
   /**
    * Utility for verify predicates.
    *
-   * @param candidate to be verified, can be a scalar or a column
-   * @param expectedValues array of expected values as result of
-   *                       (IS_JSON_VALUE, IS_JSON_OBJECT, IS_JSON_ARRAY, IS_JSON_SCALAR)
+   * @param candidate
+   *   to be verified, can be a scalar or a column
+   * @param expectedValues
+   *   array of expected values as result of (IS_JSON_VALUE, IS_JSON_OBJECT, IS_JSON_ARRAY,
+   *   IS_JSON_SCALAR)
    */
   private def verifyPredicates(candidate: String, expectedValues: Array[Boolean]): Unit = {
     assert(expectedValues.length == 4)

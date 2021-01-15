@@ -38,8 +38,8 @@ import java.util.Collections
 import java.util.function.Supplier
 
 /**
- * Sub-class of [[TableScan]] that is a relational operator
- * which returns the contents of a [[TableSource]] in Flink.
+ * Sub-class of [[TableScan]] that is a relational operator which returns the contents of a
+ * [[TableSource]] in Flink.
  */
 class FlinkLogicalLegacyTableSourceScan(
     cluster: RelOptCluster,

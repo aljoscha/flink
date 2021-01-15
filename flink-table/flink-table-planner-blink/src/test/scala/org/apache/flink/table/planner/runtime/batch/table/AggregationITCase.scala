@@ -442,8 +442,8 @@ class AggregationITCase extends BatchTestBase {
 case class WC(word: String, frequency: Long)
 
 /**
- * User-defined aggregation function to compute the TOP 10 most visited pages.
- * We use and Array[Tuple2[Int, Float]] as accumulator to store the 10 most visited pages.
+ * User-defined aggregation function to compute the TOP 10 most visited pages. We use and
+ * Array[Tuple2[Int, Float]] as accumulator to store the 10 most visited pages.
  *
  * The result is emitted as Array as well.
  */
@@ -457,9 +457,12 @@ class Top10 extends AggregateFunction[Array[JTuple2[JInt, JFloat]], Array[JTuple
   /**
    * Adds a new pages and count to the Top10 pages if necessary.
    *
-   * @param acc The current top 10
-   * @param adId The id of the ad
-   * @param revenue The revenue for the ad
+   * @param acc
+   *   The current top 10
+   * @param adId
+   *   The id of the ad
+   * @param revenue
+   *   The revenue for the ad
    */
   def accumulate(acc: Array[JTuple2[JInt, JFloat]], adId: Int, revenue: Float) {
 

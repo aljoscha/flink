@@ -496,8 +496,8 @@ class TableSinkITCase extends StreamingTestBase {
   }
 
   /**
-   * Writing changelog of an aggregation into a memory sink, and read it again as a
-   * changelog source, and apply another aggregation, then verify the result.
+   * Writing changelog of an aggregation into a memory sink, and read it again as a changelog
+   * source, and apply another aggregation, then verify the result.
    */
   @Test
   def testChangelogSourceAndChangelogSink(): Unit = {

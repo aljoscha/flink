@@ -38,10 +38,14 @@ import scala.collection.JavaConverters._
 /**
  * Calcite wrapper for user-defined scalar functions.
  *
- * @param identifier     function identifier to uniquely identify this function
- * @param displayName    name to be displayed in operator name
- * @param scalarFunction scalar function to be called
- * @param typeFactory    type factory for converting Flink's between Calcite's types
+ * @param identifier
+ *   function identifier to uniquely identify this function
+ * @param displayName
+ *   name to be displayed in operator name
+ * @param scalarFunction
+ *   scalar function to be called
+ * @param typeFactory
+ *   type factory for converting Flink's between Calcite's types
  */
 class ScalarSqlFunction(
     identifier: FunctionIdentifier,
@@ -59,8 +63,8 @@ class ScalarSqlFunction(
       SqlFunctionCategory.USER_DEFINED_FUNCTION) {
 
   /**
-   * This is temporary solution for hive udf and should be removed once FLIP-65 is finished,
-   * please pass the non-null input arguments.
+   * This is temporary solution for hive udf and should be removed once FLIP-65 is finished, please
+   * pass the non-null input arguments.
    */
   def makeFunction(constants: Array[AnyRef], argTypes: Array[LogicalType]): ScalarFunction =
     scalarFunction

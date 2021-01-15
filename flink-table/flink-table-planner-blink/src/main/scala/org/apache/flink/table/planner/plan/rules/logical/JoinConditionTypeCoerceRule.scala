@@ -33,13 +33,13 @@ import scala.collection.JavaConversions._
 import scala.collection.mutable
 
 /**
- * Planner rule that coerces the both sides of EQUALS(`=`) operator in Join condition
- * to the same type while sans nullability.
+ * Planner rule that coerces the both sides of EQUALS(`=`) operator in Join condition to the same
+ * type while sans nullability.
  *
- * <p>For most cases, we already did the type coercion during type validation by implicit
- * type coercion or during sqlNode to relNode conversion, this rule just does a rechecking
- * to ensure a strongly uniform equals type, so that during a HashJoin shuffle we can have
- * the same hashcode of the same value.
+ * <p>For most cases, we already did the type coercion during type validation by implicit type
+ * coercion or during sqlNode to relNode conversion, this rule just does a rechecking to ensure a
+ * strongly uniform equals type, so that during a HashJoin shuffle we can have the same hashcode of
+ * the same value.
  */
 class JoinConditionTypeCoerceRule
     extends RelOptRule(operand(classOf[Join], any), "JoinConditionTypeCoerceRule") {
@@ -96,8 +96,8 @@ class JoinConditionTypeCoerceRule
   }
 
   /**
-   * Returns true if two input refs of an equal call have different types in join condition,
-   * else false.
+   * Returns true if two input refs of an equal call have different types in join condition, else
+   * false.
    */
   private def hasEqualsRefsOfDifferentTypes(
       typeFactory: RelDataTypeFactory,

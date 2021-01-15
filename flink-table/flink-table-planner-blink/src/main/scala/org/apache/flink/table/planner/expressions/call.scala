@@ -48,8 +48,10 @@ case class ApiResolvedExpression(resolvedDataType: DataType) extends LeafExpress
 /**
  * Over call with unresolved alias for over window.
  *
- * @param agg The aggregation of the over call.
- * @param alias The alias of the referenced over window.
+ * @param agg
+ *   The aggregation of the over call.
+ * @param alias
+ *   The alias of the referenced over window.
  */
 case class UnresolvedOverCall(agg: PlannerExpression, alias: PlannerExpression)
     extends PlannerExpression {
@@ -65,11 +67,16 @@ case class UnresolvedOverCall(agg: PlannerExpression, alias: PlannerExpression)
 /**
  * Over expression for Calcite over transform.
  *
- * @param agg            over-agg expression
- * @param partitionBy    The fields by which the over window is partitioned
- * @param orderBy        The field by which the over window is sorted
- * @param preceding      The lower bound of the window
- * @param following      The upper bound of the window
+ * @param agg
+ *   over-agg expression
+ * @param partitionBy
+ *   The fields by which the over window is partitioned
+ * @param orderBy
+ *   The field by which the over window is sorted
+ * @param preceding
+ *   The lower bound of the window
+ * @param following
+ *   The upper bound of the window
  */
 case class OverCall(
     agg: PlannerExpression,
@@ -166,8 +173,10 @@ case class OverCall(
 /**
  * Expression for calling a user-defined scalar functions.
  *
- * @param scalarFunction scalar function to be called (might be overloaded)
- * @param parameters actual parameters that determine target evaluation method
+ * @param scalarFunction
+ *   scalar function to be called (might be overloaded)
+ * @param parameters
+ *   actual parameters that determine target evaluation method
  */
 case class PlannerScalarFunctionCall(
     scalarFunction: ScalarFunction,
@@ -202,10 +211,14 @@ case class PlannerScalarFunctionCall(
 /**
  * Expression for calling a user-defined table function with actual parameters.
  *
- * @param functionName function name
- * @param tableFunction user-defined table function
- * @param parameters actual parameters of function
- * @param resultType type information of returned table
+ * @param functionName
+ *   function name
+ * @param tableFunction
+ *   user-defined table function
+ * @param parameters
+ *   actual parameters of function
+ * @param resultType
+ *   type information of returned table
  */
 case class PlannerTableFunctionCall(
     functionName: String,

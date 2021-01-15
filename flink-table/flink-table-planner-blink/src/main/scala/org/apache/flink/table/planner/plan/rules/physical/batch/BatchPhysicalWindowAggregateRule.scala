@@ -59,22 +59,22 @@ import scala.collection.JavaConversions._
  * {{{
  *   BatchPhysicalHash(or Sort)WindowAggregate (global)
  *   +- BatchPhysicalExchange (hash by group keys if group keys is not empty, else singleton)
- *      +- BatchPhysicalLocalHash(or Sort)WindowAggregate (local)
+ *     +- BatchPhysicalLocalHash(or Sort)WindowAggregate (local)
  *         +- input of window agg
  * }}}
- * when all aggregate functions are mergeable
- * and [[OptimizerConfigOptions.TABLE_OPTIMIZER_AGG_PHASE_STRATEGY]] is TWO_PHASE, or
+ * when all aggregate functions are mergeable and
+ * [[OptimizerConfigOptions.TABLE_OPTIMIZER_AGG_PHASE_STRATEGY]] is TWO_PHASE, or
  * {{{
  *   BatchPhysicalHash(or Sort)WindowAggregate
  *   +- BatchPhysicalExchange (hash by group keys if group keys is not empty, else singleton)
- *      +- input of window agg
+ *     +- input of window agg
  * }}}
- * when some aggregate functions are not mergeable
- * or [[OptimizerConfigOptions.TABLE_OPTIMIZER_AGG_PHASE_STRATEGY]] is ONE_PHASE.
+ * when some aggregate functions are not mergeable or
+ * [[OptimizerConfigOptions.TABLE_OPTIMIZER_AGG_PHASE_STRATEGY]] is ONE_PHASE.
  *
- * Notes: if [[OptimizerConfigOptions.TABLE_OPTIMIZER_AGG_PHASE_STRATEGY]] is NONE,
- * this rule will try to create two possibilities above, and chooses the best one based on cost.
- * if all aggregate function buffer are fix length, the rule will choose hash window agg.
+ * Notes: if [[OptimizerConfigOptions.TABLE_OPTIMIZER_AGG_PHASE_STRATEGY]] is NONE, this rule will
+ * try to create two possibilities above, and chooses the best one based on cost. if all aggregate
+ * function buffer are fix length, the rule will choose hash window agg.
  */
 class BatchPhysicalWindowAggregateRule
     extends RelOptRule(
@@ -353,9 +353,9 @@ class BatchPhysicalWindowAggregateRule
 
   /**
    * Return true when sliding window with slideSize < windowSize && gcd(windowSize, slideSize) > 1.
-   * Otherwise return false, including the cases of tumbling window,
-   * sliding window with slideSize >= windowSize and
-   * sliding window with slideSize < windowSize but gcd(windowSize, slideSize) == 1.
+   * Otherwise return false, including the cases of tumbling window, sliding window with slideSize
+   * >= windowSize and sliding window with slideSize < windowSize but gcd(windowSize, slideSize) ==
+   * 1.
    */
   private def useAssignPane(
       aggregateList: Array[UserDefinedFunction],
@@ -366,10 +366,9 @@ class BatchPhysicalWindowAggregateRule
   }
 
   /**
-   * In the case of sliding window without the optimization of assigning pane which means
-   * slideSize < windowSize && ArithmeticUtils.gcd(windowSize, slideSize) == 1, we will disable the
-   * local aggregate.
-   * Otherwise, we use the same way as the group aggregate to make the decision whether
+   * In the case of sliding window without the optimization of assigning pane which means slideSize
+   * < windowSize && ArithmeticUtils.gcd(windowSize, slideSize) == 1, we will disable the local
+   * aggregate. Otherwise, we use the same way as the group aggregate to make the decision whether
    * to use a local aggregate or not.
    */
   private def supportLocalWindowAgg(

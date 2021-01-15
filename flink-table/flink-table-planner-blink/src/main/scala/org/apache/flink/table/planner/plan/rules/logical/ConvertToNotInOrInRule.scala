@@ -36,10 +36,9 @@ import scala.collection.mutable
  * Rule for converting a cascade of predicates to [[IN]] or [[NOT_IN]].
  *
  * For example,
- * 1. convert predicate: (x = 1 OR x = 2 OR x = 3 OR x = 4) AND y = 5
- * to predicate: x IN (1, 2, 3, 4) AND y = 5.
- * 2. convert predicate: (x <> 1 AND x <> 2 AND x <> 3 AND x <> 4) AND y = 5
- * to predicate: x NOT IN (1, 2, 3, 4) AND y = 5.
+ *   1. convert predicate: (x = 1 OR x = 2 OR x = 3 OR x = 4) AND y = 5 to predicate: x IN (1, 2, 3,
+ *      4) AND y = 5. 2. convert predicate: (x <> 1 AND x <> 2 AND x <> 3 AND x <> 4) AND y = 5 to
+ *      predicate: x NOT IN (1, 2, 3, 4) AND y = 5.
  */
 class ConvertToNotInOrInRule
     extends RelOptRule(operand(classOf[Filter], any), "ConvertToNotInOrInRule") {
@@ -87,9 +86,12 @@ class ConvertToNotInOrInRule
   /**
    * Convert a cascade predicates to [[IN]] or [[NOT_IN]].
    *
-   * @param builder The [[RelBuilder]] to build the [[RexNode]].
-   * @param rex     The predicates to be converted.
-   * @return The converted predicates.
+   * @param builder
+   *   The [[RelBuilder]] to build the [[RexNode]].
+   * @param rex
+   *   The predicates to be converted.
+   * @return
+   *   The converted predicates.
    */
   private def convertToNotInOrIn(
       builder: RelBuilder,

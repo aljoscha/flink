@@ -31,13 +31,18 @@ import org.apache.flink.util.Collector
  * [[org.apache.flink.api.java.operators.GroupReduceOperator]]. It is used for tumbling time-window
  * on batch.
  *
- * @param genAggregations  Code-generated [[GeneratedAggregations]]
- * @param windowSize       Tumbling time window size
- * @param windowStartPos   The relative window-start field position to the last field of output row
- * @param windowEndPos     The relative window-end field position to the last field of output row
- * @param windowRowtimePos The relative window-rowtime field position to the last field of
- *                         output row
- * @param keysAndAggregatesArity    The total arity of keys and aggregates
+ * @param genAggregations
+ *   Code-generated [[GeneratedAggregations]]
+ * @param windowSize
+ *   Tumbling time window size
+ * @param windowStartPos
+ *   The relative window-start field position to the last field of output row
+ * @param windowEndPos
+ *   The relative window-end field position to the last field of output row
+ * @param windowRowtimePos
+ *   The relative window-rowtime field position to the last field of output row
+ * @param keysAndAggregatesArity
+ *   The total arity of keys and aggregates
  */
 class DataSetTumbleTimeWindowAggReduceGroupFunction(
     genAggregations: GeneratedAggregationsFunction,

@@ -30,15 +30,14 @@ import org.apache.calcite.plan.RelOptRuleCall
 /**
  * An [[EnforceLocalAggRuleBase]] that matches [[BatchPhysicalHashAggregate]]
  *
- * for example: select count(*) from t group by rollup (a, b)
- * The physical plan
+ * for example: select count(*) from t group by rollup (a, b) The physical plan
  *
  * {{{
  * HashAggregate(isMerge=[false], groupBy=[a, b, $e], select=[a, b, $e, COUNT(*)])
  * +- Exchange(distribution=[hash[a, b, $e]])
- *    +- Expand(projects=[{a=[$0], b=[$1], $e=[0]},
- *                        {a=[$0], b=[null], $e=[1]},
- *                        {a=[null], b=[null], $e=[3]}])
+ *   +- Expand(projects=[{a=[$0], b=[$1], $e=[0]},
+ *                       {a=[$0], b=[null], $e=[1]},
+ *                       {a=[null], b=[null], $e=[3]}])
  * }}}
  *
  * will be rewritten to
@@ -46,7 +45,7 @@ import org.apache.calcite.plan.RelOptRuleCall
  * {{{
  * HashAggregate(isMerge=[true], groupBy=[a, b, $e], select=[a, b, $e, Final_COUNT(count1$0)])
  * +- Exchange(distribution=[hash[a, b, $e]])
- *    +- LocalHashAggregate(groupBy=[a, b, $e], select=[a, b, $e, Partial_COUNT(*) AS count1$0]
+ *   +- LocalHashAggregate(groupBy=[a, b, $e], select=[a, b, $e, Partial_COUNT(*) AS count1$0]
  *       +- Expand(projects=[{a=[$0], b=[$1], $e=[0]},
  *                           {a=[$0], b=[null], $e=[1]},
  *                           {a=[null], b=[null], $e=[3]}])

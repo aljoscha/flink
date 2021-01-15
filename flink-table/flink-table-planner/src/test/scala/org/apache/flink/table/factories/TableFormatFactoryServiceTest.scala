@@ -38,13 +38,12 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
- * Tests for testing format discovery using [[TableFactoryService]]. The tests assume the two
- * format factories [[TestTableFormatFactory]] and [[TestAmbiguousTableFormatFactory]] are
- * registered.
+ * Tests for testing format discovery using [[TableFactoryService]]. The tests assume the two format
+ * factories [[TestTableFormatFactory]] and [[TestAmbiguousTableFormatFactory]] are registered.
  *
- * The first format does not support SPECIAL_PATH but supports schema derivation. The
- * latter format does not support UNIQUE_PROPERTY nor schema derivation. Both formats
- * have the same context and support COMMON_PATH.
+ * The first format does not support SPECIAL_PATH but supports schema derivation. The latter format
+ * does not support UNIQUE_PROPERTY nor schema derivation. Both formats have the same context and
+ * support COMMON_PATH.
  */
 class TableFormatFactoryServiceTest {
 

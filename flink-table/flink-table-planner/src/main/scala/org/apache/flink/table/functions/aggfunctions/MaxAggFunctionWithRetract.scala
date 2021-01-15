@@ -36,7 +36,8 @@ class MaxWithRetractAccumulator[T] {
 /**
  * Base class for built-in Max with retraction aggregate function
  *
- * @tparam T the type for the aggregation result
+ * @tparam T
+ *   the type for the aggregation result
  */
 abstract class MaxWithRetractAggFunction[T](implicit ord: Ordering[T])
     extends AggregateFunction[T, MaxWithRetractAccumulator[T]] {

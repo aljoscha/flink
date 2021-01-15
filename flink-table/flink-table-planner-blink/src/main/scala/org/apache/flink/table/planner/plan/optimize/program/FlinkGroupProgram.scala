@@ -30,10 +30,11 @@ import scala.collection.JavaConversions._
 
 /**
  * A FlinkOptimizeProgram that contains a sequence of sub-[[FlinkOptimizeProgram]]s as a group.
- * Programs in the group will be executed in sequence,
- * and the group will be executed `iterations` times.
+ * Programs in the group will be executed in sequence, and the group will be executed `iterations`
+ * times.
  *
- * @tparam OC OptimizeContext
+ * @tparam OC
+ *   OptimizeContext
  */
 class FlinkGroupProgram[OC <: FlinkOptimizeContext] extends FlinkOptimizeProgram[OC] with Logging {
 

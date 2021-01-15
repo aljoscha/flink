@@ -34,8 +34,8 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
- * Rule to convert complex aggregation functions into simpler ones.
- * Have a look at [[AggregateReduceFunctionsRule]] for details.
+ * Rule to convert complex aggregation functions into simpler ones. Have a look at
+ * [[AggregateReduceFunctionsRule]] for details.
  */
 class WindowAggregateReduceFunctionsRule
     extends AggregateReduceFunctionsRule(

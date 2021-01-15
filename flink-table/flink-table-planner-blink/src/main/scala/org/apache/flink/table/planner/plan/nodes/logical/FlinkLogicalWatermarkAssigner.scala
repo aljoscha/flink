@@ -29,8 +29,8 @@ import org.apache.flink.table.planner.plan.nodes.calcite.{
 }
 
 /**
- * Sub-class of [[WatermarkAssigner]] that is a relational operator
- * which generates [[org.apache.flink.streaming.api.watermark.Watermark]].
+ * Sub-class of [[WatermarkAssigner]] that is a relational operator which generates
+ * [[org.apache.flink.streaming.api.watermark.Watermark]].
  */
 class FlinkLogicalWatermarkAssigner(
     cluster: RelOptCluster,

@@ -34,9 +34,12 @@ import _root_.scala.collection.JavaConverters._
 /**
  * The implementation for the Java [[BatchTableEnvironment]] that works with [[DataSet]].
  *
- * @param execEnv The Java batch [[ExecutionEnvironment]] of the TableEnvironment.
- * @param config The configuration of the TableEnvironment.
- * @deprecated This constructor will be removed. Use [[BatchTableEnvironment#create()]] instead.
+ * @param execEnv
+ *   The Java batch [[ExecutionEnvironment]] of the TableEnvironment.
+ * @param config
+ *   The configuration of the TableEnvironment.
+ * @deprecated
+ *   This constructor will be removed. Use [[BatchTableEnvironment#create()]] instead.
  */
 class BatchTableEnvironmentImpl(
     execEnv: ExecutionEnvironment,

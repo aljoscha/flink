@@ -56,8 +56,7 @@ object FlinkRelFactories {
   val DEFAULT_RANK_FACTORY = new RankFactoryImpl
 
   /**
-   * Can create a [[LogicalExpand]] of the
-   * appropriate type for this rule's calling convention.
+   * Can create a [[LogicalExpand]] of the appropriate type for this rule's calling convention.
    */
   trait ExpandFactory {
     def createExpand(
@@ -79,8 +78,7 @@ object FlinkRelFactories {
   }
 
   /**
-   * Can create a [[LogicalRank]] of the
-   * appropriate type for this rule's calling convention.
+   * Can create a [[LogicalRank]] of the appropriate type for this rule's calling convention.
    */
   trait RankFactory {
     def createRank(

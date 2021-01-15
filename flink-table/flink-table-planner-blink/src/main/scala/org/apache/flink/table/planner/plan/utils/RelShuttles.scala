@@ -46,15 +46,15 @@ class DefaultRelShuttle extends RelHomogeneousShuttle {
 }
 
 /**
- * Convert all [[QueryOperationCatalogViewTable]]s (including tables in [[RexSubQuery]])
- * to to a relational expression.
+ * Convert all [[QueryOperationCatalogViewTable]] s (including tables in [[RexSubQuery]] ) to to a
+ * relational expression.
  */
 class ExpandTableScanShuttle extends RelShuttleImpl {
 
   /**
-   * Override this method to use `replaceInput` method instead of `copy` method
-   * if any children change. This will not change any output of LogicalTableScan
-   * when LogicalTableScan is replaced with RelNode tree in its RelTable.
+   * Override this method to use `replaceInput` method instead of `copy` method if any children
+   * change. This will not change any output of LogicalTableScan when LogicalTableScan is replaced
+   * with RelNode tree in its RelTable.
    */
   override def visitChild(parent: RelNode, i: Int, child: RelNode): RelNode = {
     stack.push(parent)
@@ -138,8 +138,8 @@ class ExpandTableScanShuttle extends RelShuttleImpl {
   }
 
   /**
-   * Converts [[LogicalTableScan]] the result [[RelNode]] tree
-   * by calling [[QueryOperationCatalogViewTable]]#toRel
+   * Converts [[LogicalTableScan]] the result [[RelNode]] tree by calling
+   * [[QueryOperationCatalogViewTable]] #toRel
    */
   override def visit(scan: TableScan): RelNode = {
     scan match {
@@ -161,11 +161,11 @@ class ExpandTableScanShuttle extends RelShuttleImpl {
  *
  * <p>e.g.
  * {{{
- *      Join                       Join
+ *     Join                       Join
  *     /    \                     /    \
  * Filter1 Filter2     =>     Filter1 Filter2
  *     \   /                     |      |
- *      Scan                  Scan1    Scan2
+ *     Scan                  Scan1    Scan2
  * }}}
  * After rewrote, Scan1 and Scan2 are different object but have same digest.
  */

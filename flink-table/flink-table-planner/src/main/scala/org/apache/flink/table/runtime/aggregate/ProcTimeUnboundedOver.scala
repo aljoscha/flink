@@ -31,8 +31,10 @@ import org.apache.flink.util.Collector
 /**
  * Process Function for processing-time unbounded OVER window
  *
- * @param genAggregations Generated aggregate helper function
- * @param aggregationStateType     row type info of aggregation
+ * @param genAggregations
+ *   Generated aggregate helper function
+ * @param aggregationStateType
+ *   row type info of aggregation
  */
 class ProcTimeUnboundedOver[K](
     genAggregations: GeneratedAggregationsFunction,

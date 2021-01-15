@@ -30,8 +30,8 @@ import org.apache.calcite.rex._
 /**
  * Planner rule that apply various simplifying transformations on filter condition.
  *
- * if `simplifySubQuery` is true, this rule will also simplify the filter condition
- * in [[RexSubQuery]].
+ * if `simplifySubQuery` is true, this rule will also simplify the filter condition in
+ * [[RexSubQuery]].
  */
 class SimplifyFilterConditionRule(simplifySubQuery: Boolean, description: String)
     extends RelOptRule(operand(classOf[Filter], any()), description) {

@@ -34,8 +34,8 @@ import org.junit.{Before, Rule, Test}
 import java.math.BigDecimal
 
 /**
- * We only test some aggregations until better testing of constructed DataStream
- * programs is possible.
+ * We only test some aggregations until better testing of constructed DataStream programs is
+ * possible.
  */
 class GroupWindowTableAggregateITCase extends AbstractTestBase {
 

@@ -74,7 +74,7 @@ class ExprCodeGenerator(ctx: CodeGeneratorContext, nullableInput: Boolean)
   }
 
   /**
-   * term of the [[ProcessFunction]]'s context, can be changed when needed
+   * term of the [[ProcessFunction]] 's context, can be changed when needed
    */
   var contextTerm = "ctx"
 
@@ -126,8 +126,8 @@ class ExprCodeGenerator(ctx: CodeGeneratorContext, nullableInput: Boolean)
 
   /**
    * In some cases, we should use user-defined input for constructor. For example,
-   * ScalaFunctionCodeGen allows to use user-defined context term rather than get
-   * from invoking getRuntimeContext() method.
+   * ScalaFunctionCodeGen allows to use user-defined context term rather than get from invoking
+   * getRuntimeContext() method.
    */
   def bindConstructorTerm(inputFunctionContextTerm: String): ExprCodeGenerator = {
     functionContextTerm = Some(inputFunctionContextTerm)
@@ -160,8 +160,10 @@ class ExprCodeGenerator(ctx: CodeGeneratorContext, nullableInput: Boolean)
    * Generates an expression from a RexNode. If objects or variables can be reused, they will be
    * added to reusable code sections internally.
    *
-   * @param rex Calcite row expression
-   * @return instance of GeneratedExpression
+   * @param rex
+   *   Calcite row expression
+   * @return
+   *   instance of GeneratedExpression
    */
   def generateExpression(rex: RexNode): GeneratedExpression = {
     rex.accept(this)
@@ -169,16 +171,21 @@ class ExprCodeGenerator(ctx: CodeGeneratorContext, nullableInput: Boolean)
 
   /**
    * Generates an expression that converts the first input (and second input) into the given type.
-   * If two inputs are converted, the second input is appended. If objects or variables can
-   * be reused, they will be added to reusable code sections internally. The evaluation result
-   * will be stored in the variable outRecordTerm.
+   * If two inputs are converted, the second input is appended. If objects or variables can be
+   * reused, they will be added to reusable code sections internally. The evaluation result will be
+   * stored in the variable outRecordTerm.
    *
-   * @param returnType conversion target type. Inputs and output must have the same arity.
-   * @param outRecordTerm the result term
-   * @param outRecordWriterTerm the result writer term
-   * @param reusedOutRow If objects or variables can be reused, they will be added to reusable
-   * code sections internally.
-   * @return instance of GeneratedExpression
+   * @param returnType
+   *   conversion target type. Inputs and output must have the same arity.
+   * @param outRecordTerm
+   *   the result term
+   * @param outRecordWriterTerm
+   *   the result writer term
+   * @param reusedOutRow
+   *   If objects or variables can be reused, they will be added to reusable code sections
+   *   internally.
+   * @return
+   *   instance of GeneratedExpression
    */
   def generateConverterResultExpression(
       returnType: RowType,
@@ -228,17 +235,24 @@ class ExprCodeGenerator(ctx: CodeGeneratorContext, nullableInput: Boolean)
   }
 
   /**
-   * Generates an expression from a sequence of other expressions. The evaluation result
-   * may be stored in the variable outRecordTerm.
+   * Generates an expression from a sequence of other expressions. The evaluation result may be
+   * stored in the variable outRecordTerm.
    *
-   * @param fieldExprs field expressions to be converted
-   * @param returnType conversion target type. Type must have the same arity than fieldExprs.
-   * @param outRow the result term
-   * @param outRowWriter the result writer term for BinaryRowData.
-   * @param reusedOutRow If objects or variables can be reused, they will be added to reusable
-   *                     code sections internally.
-   * @param outRowAlreadyExists Don't need addReusableRecord if out row already exists.
-   * @return instance of GeneratedExpression
+   * @param fieldExprs
+   *   field expressions to be converted
+   * @param returnType
+   *   conversion target type. Type must have the same arity than fieldExprs.
+   * @param outRow
+   *   the result term
+   * @param outRowWriter
+   *   the result writer term for BinaryRowData.
+   * @param reusedOutRow
+   *   If objects or variables can be reused, they will be added to reusable code sections
+   *   internally.
+   * @param outRowAlreadyExists
+   *   Don't need addReusableRecord if out row already exists.
+   * @return
+   *   instance of GeneratedExpression
    */
   def generateResultExpression(
       fieldExprs: Seq[GeneratedExpression],
@@ -265,19 +279,26 @@ class ExprCodeGenerator(ctx: CodeGeneratorContext, nullableInput: Boolean)
   }
 
   /**
-   * Generates an expression from a sequence of other expressions. The evaluation result
-   * may be stored in the variable outRecordTerm.
+   * Generates an expression from a sequence of other expressions. The evaluation result may be
+   * stored in the variable outRecordTerm.
    *
-   * @param fieldExprs field expressions to be converted
-   * @param fieldExprIdxToOutputRowPosMap Mapping index of fieldExpr in `fieldExprs`
-   *                                      to position of output row.
-   * @param returnType conversion target type. Type must have the same arity than fieldExprs.
-   * @param outRow the result term
-   * @param outRowWriter the result writer term for BinaryRowData.
-   * @param reusedOutRow If objects or variables can be reused, they will be added to reusable
-   *                     code sections internally.
-   * @param outRowAlreadyExists Don't need addReusableRecord if out row already exists.
-   * @return instance of GeneratedExpression
+   * @param fieldExprs
+   *   field expressions to be converted
+   * @param fieldExprIdxToOutputRowPosMap
+   *   Mapping index of fieldExpr in `fieldExprs` to position of output row.
+   * @param returnType
+   *   conversion target type. Type must have the same arity than fieldExprs.
+   * @param outRow
+   *   the result term
+   * @param outRowWriter
+   *   the result writer term for BinaryRowData.
+   * @param reusedOutRow
+   *   If objects or variables can be reused, they will be added to reusable code sections
+   *   internally.
+   * @param outRowAlreadyExists
+   *   Don't need addReusableRecord if out row already exists.
+   * @return
+   *   instance of GeneratedExpression
    */
   def generateResultExpression(
       fieldExprs: Seq[GeneratedExpression],

@@ -27,13 +27,12 @@ import org.apache.flink.util.Collector
  * An implementation of the connected components algorithm, using a delta iteration.
  *
  * Initially, the algorithm assigns each vertex an unique ID. In each step, a vertex picks the
- * minimum of its own ID and its neighbors' IDs, as its new ID and tells its neighbors about its
- * new ID. After the algorithm has completed, all vertices in the same component will have the same
- * ID.
+ * minimum of its own ID and its neighbors' IDs, as its new ID and tells its neighbors about its new
+ * ID. After the algorithm has completed, all vertices in the same component will have the same ID.
  *
- * A vertex whose component ID did not change needs not propagate its information in the next
- * step. Because of that, the algorithm is easily expressible via a delta iteration. We here model
- * the solution set as the vertices with their current component ids, and the workset as the changed
+ * A vertex whose component ID did not change needs not propagate its information in the next step.
+ * Because of that, the algorithm is easily expressible via a delta iteration. We here model the
+ * solution set as the vertices with their current component ids, and the workset as the changed
  * vertices. Because we see all vertices initially as changed, the initial workset and the initial
  * solution set are identical. Also, the delta to the solution set is consequently also the next
  * workset.
@@ -43,8 +42,8 @@ import org.apache.flink.util.Collector
  *   - Vertices represented as IDs and separated by new-line characters. For example,
  *     `"1\n2\n12\n42\n63"` gives five vertices (1), (2), (12), (42), and (63).
  *   - Edges are represented as pairs for vertex IDs which are separated by space characters. Edges
- *     are separated by new-line characters. For example `"1 2\n2 12\n1 12\n42 63"`
- *     gives four (undirected) edges (1)-(2), (2)-(12), (1)-(12), and (42)-(63).
+ *     are separated by new-line characters. For example `"1 2\n2 12\n1 12\n42 63"` gives four
+ *     (undirected) edges (1)-(2), (2)-(12), (1)-(12), and (42)-(63).
  *
  * Usage:
  * {{{

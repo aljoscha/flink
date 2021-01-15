@@ -31,7 +31,8 @@ import org.apache.calcite.rel.{RelNode, RelWriter}
 /**
  * Stream physical RelNode for unbounded global group aggregate.
  *
- * @see [[StreamPhysicalGroupAggregateBase]] for more info.
+ * @see
+ *   [[StreamPhysicalGroupAggregateBase]] for more info.
  */
 class StreamPhysicalGlobalGroupAggregate(
     cluster: RelOptCluster,

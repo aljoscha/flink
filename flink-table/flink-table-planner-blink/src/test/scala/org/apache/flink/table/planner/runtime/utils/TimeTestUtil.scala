@@ -57,9 +57,9 @@ object TimeTestUtil {
   }
 
   /**
-   * A streaming operator to emit records and watermark depends on the input data.
-   * The last emitted watermark will be stored in state to emit it again on recovery.
-   * This is necessary for late arrival testing with [[FailingCollectionSource]].
+   * A streaming operator to emit records and watermark depends on the input data. The last emitted
+   * watermark will be stored in state to emit it again on recovery. This is necessary for late
+   * arrival testing with [[FailingCollectionSource]].
    */
   class EventTimeProcessOperator[T]
       extends AbstractStreamOperator[T]

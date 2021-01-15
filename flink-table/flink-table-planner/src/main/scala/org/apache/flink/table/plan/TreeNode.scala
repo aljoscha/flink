@@ -25,8 +25,8 @@ import org.apache.flink.table.typeutils.TypeCheckUtils
 abstract class TreeNode[A <: TreeNode[A]] extends Product { self: A =>
 
   /**
-   * List of child nodes that should be considered when doing transformations. Other values
-   * in the Product will not be transformed, only handed through.
+   * List of child nodes that should be considered when doing transformations. Other values in the
+   * Product will not be transformed, only handed through.
    */
   private[flink] def children: Seq[A]
 
@@ -85,8 +85,8 @@ abstract class TreeNode[A <: TreeNode[A]] extends Product { self: A =>
   }
 
   /**
-   * Creates a new copy of this expression with new children. This is used during transformation
-   * if children change.
+   * Creates a new copy of this expression with new children. This is used during transformation if
+   * children change.
    */
   private[flink] def makeCopy(newArgs: Array[AnyRef]): A = {
     val ctors = getClass.getConstructors.filter(_.getParameterTypes.length > 0)

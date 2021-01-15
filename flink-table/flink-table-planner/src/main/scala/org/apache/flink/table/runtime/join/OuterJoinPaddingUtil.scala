@@ -43,8 +43,10 @@ class OuterJoinPaddingUtil(leftArity: Int, rightArity: Int) extends java.io.Seri
 
   /**
    * Returns a padding result with the given right row.
-   * @param rightRow the right row to pad
-   * @return the reusable null padding result
+   * @param rightRow
+   *   the right row to pad
+   * @return
+   *   the reusable null padding result
    */
   final def padRight(rightRow: Row): Row = {
     var i = 0
@@ -57,8 +59,10 @@ class OuterJoinPaddingUtil(leftArity: Int, rightArity: Int) extends java.io.Seri
 
   /**
    * Returns a padding result with the given left row.
-   * @param leftRow the left row to pad
-   * @return the reusable null padding result
+   * @param leftRow
+   *   the left row to pad
+   * @return
+   *   the reusable null padding result
    */
   final def padLeft(leftRow: Row): Row = {
     var i = 0

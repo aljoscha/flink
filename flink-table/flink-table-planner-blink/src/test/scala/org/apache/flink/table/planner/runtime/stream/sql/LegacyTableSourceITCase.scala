@@ -459,8 +459,8 @@ class LegacyTableSourceITCase extends StreamingTestBase {
   }
 
   /**
-   * StreamTableSource must use type info in DataStream, so it will loose precision.
-   * Just support default precision decimal.
+   * StreamTableSource must use type info in DataStream, so it will loose precision. Just support
+   * default precision decimal.
    */
   @Test
   def testLegacyDecimalSourceUsingStreamTableSource(): Unit = {

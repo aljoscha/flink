@@ -31,16 +31,11 @@ import scala.collection.JavaConverters._
 abstract class FSMSpec extends FSMSpecLike {}
 
 /**
- * Implementation trait for class <code>FSMSpec</code>, which extends wordspec
- * with FSM functionality.
+ * Implementation trait for class <code>FSMSpec</code>, which extends wordspec with FSM
+ * functionality.
  *
- * For example: "MyFSM" when inState {
- *   "Connected" should handle {
- *     "Disconnect" which {
- *       "transitions to Disconnected" in (pending)
- *     }
- *   }
- * }
+ * For example: "MyFSM" when inState { "Connected" should handle { "Disconnect" which { "transitions
+ * to Disconnected" in (pending) } } }
  */
 abstract trait FSMSpecLike extends WordSpecLike {
 

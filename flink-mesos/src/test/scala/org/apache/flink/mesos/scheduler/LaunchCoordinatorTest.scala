@@ -191,8 +191,7 @@ class LaunchCoordinatorTest
   }
 
   /**
-   * Mock a task scheduler.
-   * The task assigner/unassigner is pre-wired.
+   * Mock a task scheduler. The task assigner/unassigner is pre-wired.
    */
   def taskScheduler() = {
     val optimizer = mock(classOf[TaskScheduler])

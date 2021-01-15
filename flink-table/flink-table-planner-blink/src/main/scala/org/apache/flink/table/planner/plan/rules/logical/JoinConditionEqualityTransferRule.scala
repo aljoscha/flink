@@ -31,13 +31,11 @@ import scala.collection.JavaConversions._
 import scala.collection.mutable
 
 /**
- * Planner rule that converts Join's conditions to the left or right table's own
- * independent filter as much as possible, so that the rules of filter-push-down can push down
- * the filter to below.
+ * Planner rule that converts Join's conditions to the left or right table's own independent filter
+ * as much as possible, so that the rules of filter-push-down can push down the filter to below.
  *
- * <p>e.g. join condition: l_a = r_b and l_a = r_c.
- * The l_a is a field from left input, both r_b and r_c are fields from the right input.
- * After rewrite, condition will be: l_a = r_b and r_b = r_c.
+ * <p>e.g. join condition: l_a = r_b and l_a = r_c. The l_a is a field from left input, both r_b and
+ * r_c are fields from the right input. After rewrite, condition will be: l_a = r_b and r_b = r_c.
  * r_b = r_c can be pushed down to the right input.
  */
 class JoinConditionEqualityTransferRule

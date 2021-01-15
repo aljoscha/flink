@@ -52,7 +52,7 @@ object ChangelogPlanUtils {
   /**
    * Returns true if the inputs of current node produce insert-only changes.
    *
-   *  <p>Note: this method must be called after [[FlinkChangelogModeInferenceProgram]] is applied.
+   * <p>Note: this method must be called after [[FlinkChangelogModeInferenceProgram]] is applied.
    */
   def inputInsertOnly(node: StreamPhysicalRel): Boolean = {
     node.getInputs.forall { case input: StreamPhysicalRel =>
@@ -63,7 +63,7 @@ object ChangelogPlanUtils {
   /**
    * Returns true if current node produces insert-only changes.
    *
-   *  <p>Note: this method must be called after [[FlinkChangelogModeInferenceProgram]] is applied.
+   * <p>Note: this method must be called after [[FlinkChangelogModeInferenceProgram]] is applied.
    */
   def isInsertOnly(node: StreamPhysicalRel): Boolean = {
     val modifyKindSetTrait = node.getTraitSet.getTrait(ModifyKindSetTraitDef.INSTANCE)
@@ -71,9 +71,9 @@ object ChangelogPlanUtils {
   }
 
   /**
-   * Returns true if the [[RelNode]] will generate UPDATE_BEFORE messages.
-   * This method is used to determine whether the runtime operator should
-   * produce UPDATE_BEFORE messages with UPDATE_AFTER message together.
+   * Returns true if the [[RelNode]] will generate UPDATE_BEFORE messages. This method is used to
+   * determine whether the runtime operator should produce UPDATE_BEFORE messages with UPDATE_AFTER
+   * message together.
    *
    * <p>Note: this method must be called after [[FlinkChangelogModeInferenceProgram]] is applied.
    */
@@ -83,9 +83,9 @@ object ChangelogPlanUtils {
   }
 
   /**
-   * Gets an optional [[ChangelogMode]] of the given physical node.
-   * The [[ChangelogMode]] is inferred from ModifyKindSetTrait and UpdateKindTrait.
-   * The returned value is None if the given node is Sink node.
+   * Gets an optional [[ChangelogMode]] of the given physical node. The [[ChangelogMode]] is
+   * inferred from ModifyKindSetTrait and UpdateKindTrait. The returned value is None if the given
+   * node is Sink node.
    *
    * <p>Note: this method must be called after [[FlinkChangelogModeInferenceProgram]] is applied.
    */

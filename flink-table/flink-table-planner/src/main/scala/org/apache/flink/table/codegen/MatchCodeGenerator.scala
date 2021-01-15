@@ -68,19 +68,18 @@ import scala.collection.mutable
  * A code generator for generating CEP related functions.
  *
  * Aggregates are generated as follows:
- * 1. all aggregate [[RexCall]]s are grouped by corresponding pattern variable
- * 2. even if the same aggregation is used multiple times in an expression
- *    (e.g. SUM(A.price) > SUM(A.price) + 1) it will be calculated once. To do so [[AggBuilder]]
- *    keeps set of already seen different aggregation calls, and reuses the code to access
- *    appropriate field of aggregation result
- * 3. after translating every expression (either in [[generateCondition]] or in
- *    [[generateOneRowPerMatchExpression]]) there will be generated code for
- *       - [[GeneratedFunction]], which will be an inner class
- *       - said [[GeneratedFunction]] will be instantiated in the ctor and opened/closed
- *         in corresponding methods of top level generated classes
- *       - function that transforms input rows (row by row) into aggregate input rows
- *       - function that calculates aggregates for variable, that uses the previous method
- *    The generated code will look similar to this:
+ *   1. all aggregate [[RexCall]] s are grouped by corresponding pattern variable 2. even if the
+ *      same aggregation is used multiple times in an expression (e.g. SUM(A.price) > SUM(A.price) +
+ *      1) it will be calculated once. To do so [[AggBuilder]] keeps set of already seen different
+ *      aggregation calls, and reuses the code to access appropriate field of aggregation result 3.
+ *      after translating every expression (either in [[generateCondition]] or in
+ *      [[generateOneRowPerMatchExpression]] ) there will be generated code for
+ *      - [[GeneratedFunction]], which will be an inner class
+ *      - said [[GeneratedFunction]] will be instantiated in the ctor and opened/closed in
+ *        corresponding methods of top level generated classes
+ *      - function that transforms input rows (row by row) into aggregate input rows
+ *      - function that calculates aggregates for variable, that uses the previous method The
+ *        generated code will look similar to this:
  *
  * {{{
  *
@@ -156,11 +155,14 @@ import scala.collection.mutable
  * }
  * }}}
  *
- * @param config configuration that determines runtime behavior
- * @param patternNames sorted sequence of pattern variables
- * @param input type information about the first input of the Function
- * @param currentPattern if generating condition the name of pattern, which the condition will
- *                       be applied to
+ * @param config
+ *   configuration that determines runtime behavior
+ * @param patternNames
+ *   sorted sequence of pattern variables
+ * @param input
+ *   type information about the first input of the Function
+ * @param currentPattern
+ *   if generating condition the name of pattern, which the condition will be applied to
  */
 class MatchCodeGenerator(
     config: TableConfig,
@@ -172,8 +174,8 @@ class MatchCodeGenerator(
   private case class GeneratedPatternList(resultTerm: String, code: String)
 
   /**
-   * Used to assign unique names for list of events per pattern variable name. Those lists
-   * are treated as inputs and are needed by input access code.
+   * Used to assign unique names for list of events per pattern variable name. Those lists are
+   * treated as inputs and are needed by input access code.
    */
   private val reusablePatternLists: mutable.HashMap[String, GeneratedPatternList] = mutable
     .HashMap[String, GeneratedPatternList]()
@@ -185,8 +187,8 @@ class MatchCodeGenerator(
   private val reusableAggregationExpr = new mutable.HashMap[String, GeneratedExpression]()
 
   /**
-   * Context information used by Pattern reference variable to index rows mapped to it.
-   * Indexes element at offset either from beginning or the end based on the value of first.
+   * Context information used by Pattern reference variable to index rows mapped to it. Indexes
+   * element at offset either from beginning or the end based on the value of first.
    */
   private var offset: Int = 0
   private var first: Boolean = false
@@ -217,8 +219,10 @@ class MatchCodeGenerator(
    * Sets the new reference variable indexing context. This should be used when resolving logical
    * offsets = LAST/FIRST
    *
-   * @param first  true if indexing from the beginning, false otherwise
-   * @param offset offset from either beginning or the end
+   * @param first
+   *   true if indexing from the beginning, false otherwise
+   * @param offset
+   *   offset from either beginning or the end
    */
   private def updateOffsets(first: Boolean, offset: Int): Unit = {
     this.first = first
@@ -246,9 +250,11 @@ class MatchCodeGenerator(
    * Generates a wrapper [[IterativeConditionRunner]] around code generated [[IterativeCondition]]
    * for a single pattern definition defined in DEFINE clause.
    *
-   * @param patternDefinition pattern definition as defined in DEFINE clause
-   * @return a code generated condition that can be used in constructing a
-   *         [[org.apache.flink.cep.pattern.Pattern]]
+   * @param patternDefinition
+   *   pattern definition as defined in DEFINE clause
+   * @return
+   *   a code generated condition that can be used in constructing a
+   *   [[org.apache.flink.cep.pattern.Pattern]]
    */
   def generateIterativeCondition(patternDefinition: RexNode): IterativeConditionRunner = {
     val condition = generateCondition(patternDefinition)
@@ -268,14 +274,17 @@ class MatchCodeGenerator(
 
   /**
    * Generates a wrapper [[PatternProcessFunctionRunner]] around code generated
-   * [[PatternProcessFunction]] that transform found matches into expected output as defined
-   * in the MEASURES. It also accounts for fields used in PARTITION BY.
+   * [[PatternProcessFunction]] that transform found matches into expected output as defined in the
+   * MEASURES. It also accounts for fields used in PARTITION BY.
    *
-   * @param returnType the schema of output row
-   * @param partitionKeys keys used for partitioning incoming data, they will be included in the
-   *                      output
-   * @param measures definitions from MEASURE clause
-   * @return a process function that can be applied to [[org.apache.flink.cep.PatternStream]]
+   * @param returnType
+   *   the schema of output row
+   * @param partitionKeys
+   *   keys used for partitioning incoming data, they will be included in the output
+   * @param measures
+   *   definitions from MEASURE clause
+   * @return
+   *   a process function that can be applied to [[org.apache.flink.cep.PatternStream]]
    */
   def generateOneRowPerMatchExpression(
       returnType: RowSchema,
@@ -300,15 +309,21 @@ class MatchCodeGenerator(
    * Generates a [[org.apache.flink.api.common.functions.Function]] that can be passed to Java
    * compiler.
    *
-   * @param name Class name of the Function. Must not be unique but has to be a valid Java class
-   *             identifier.
-   * @param clazz Flink Function to be generated.
-   * @param bodyCode code contents of the SAM (Single Abstract Method). Inputs, collector, or
-   *                 output record can be accessed via the given term methods.
-   * @param returnType expected return type
-   * @tparam F Flink Function to be generated.
-   * @tparam T Return type of the Flink Function.
-   * @return instance of GeneratedFunction
+   * @param name
+   *   Class name of the Function. Must not be unique but has to be a valid Java class identifier.
+   * @param clazz
+   *   Flink Function to be generated.
+   * @param bodyCode
+   *   code contents of the SAM (Single Abstract Method). Inputs, collector, or output record can be
+   *   accessed via the given term methods.
+   * @param returnType
+   *   expected return type
+   * @tparam F
+   *   Flink Function to be generated.
+   * @tparam T
+   *   Return type of the Flink Function.
+   * @return
+   *   instance of GeneratedFunction
    */
   private def generateMatchFunction[F <: Function, T <: Any](
       name: String,
@@ -410,8 +425,10 @@ class MatchCodeGenerator(
   /**
    * Extracts partition keys from any element of the match
    *
-   * @param partitionKey partition key to be extracted
-   * @return generated code for the given key
+   * @param partitionKey
+   *   partition key to be extracted
+   * @return
+   *   generated code for the given key
    */
   private def generatePartitionKeyAccess(partitionIdx: Int): GeneratedExpression = {
 

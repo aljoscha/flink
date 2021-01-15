@@ -139,7 +139,7 @@ object ReconciliationCoordinator {
    * The state data of the reconciliation coordinator.
    *
    * @param remaining
-   * @param retries
+   *   @param retries
    */
   case class ReconciliationData(
       remaining: Map[Protos.TaskID, Protos.TaskStatus] = Map(),

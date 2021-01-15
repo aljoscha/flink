@@ -210,8 +210,8 @@ class TemporalJoinHarnessTest extends HarnessTestBase {
   }
 
   /**
-   * Cleaning up the state when processing watermark exceeding all events should always keep
-   * one latest event in TemporalTable.
+   * Cleaning up the state when processing watermark exceeding all events should always keep one
+   * latest event in TemporalTable.
    */
   @Test
   def testRowtimeStateCleanUpShouldAlwaysKeepOneLatestRow() {
@@ -332,8 +332,9 @@ class TemporalJoinHarnessTest extends HarnessTestBase {
         ORDERS_PROCTIME) {
 
         /**
-         * @return [[LogicalTemporalTableJoin.TEMPORAL_JOIN_CONDITION]](...) AND
-         *        leftInputRef(3) > rightInputRef(3)
+         * @return
+         *   [[LogicalTemporalTableJoin.TEMPORAL_JOIN_CONDITION]] (...) AND leftInputRef(3) >
+         *   rightInputRef(3)
          */
         override def getRemaining(rexBuilder: RexBuilder): RexNode = {
           rexBuilder.makeCall(

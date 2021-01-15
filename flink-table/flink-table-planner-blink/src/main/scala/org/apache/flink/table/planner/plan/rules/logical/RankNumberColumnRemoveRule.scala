@@ -28,8 +28,8 @@ import org.apache.calcite.rex.RexProgramBuilder
 import java.math.{BigDecimal => JBigDecimal}
 
 /**
- * Planner rule that removes the output column of rank number
- * iff there is a equality condition for the rank column.
+ * Planner rule that removes the output column of rank number iff there is a equality condition for
+ * the rank column.
  */
 class RankNumberColumnRemoveRule
     extends RelOptRule(operand(classOf[FlinkLogicalRank], any()), "RankFunctionColumnRemoveRule") {

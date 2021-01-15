@@ -28,13 +28,20 @@ import org.apache.flink.util.Collector
 /**
  * Computes the final (table)aggregate value from incrementally computed aggregates.
  *
- * @param numGroupingKey the number of grouping keys
- * @param numAggregates the number of aggregates
- * @param windowStartOffset the offset of the window start property
- * @param windowEndOffset   the offset of the window end property
- * @param windowRowtimeOffset the offset of the window rowtime property
- * @param finalRowArity  The arity of the final output row.
- * @param isTableAggregate Whether it is table aggregate.
+ * @param numGroupingKey
+ *   the number of grouping keys
+ * @param numAggregates
+ *   the number of aggregates
+ * @param windowStartOffset
+ *   the offset of the window start property
+ * @param windowEndOffset
+ *   the offset of the window end property
+ * @param windowRowtimeOffset
+ *   the offset of the window rowtime property
+ * @param finalRowArity
+ *   The arity of the final output row.
+ * @param isTableAggregate
+ *   Whether it is table aggregate.
  */
 class IncrementalAggregateTimeWindowFunction(
     private val numGroupingKey: Int,

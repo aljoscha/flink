@@ -27,9 +27,12 @@ import org.apache.flink.table.operations.OutputConversionModifyOperation
 /**
  * A special [[TableSink]] that represents information of [[OutputConversionModifyOperation]].
  *
- * @param outputType The [[TypeInformation]] that specifies the type of the [[DataStream]].
- * @param withChangeFlag Set to true to emit records with change flags.
- * @tparam T The type of the resulting [[DataStream]].
+ * @param outputType
+ *   The [[TypeInformation]] that specifies the type of the [[DataStream]].
+ * @param withChangeFlag
+ *   Set to true to emit records with change flags.
+ * @tparam T
+ *   The type of the resulting [[DataStream]].
  */
 @Internal
 class DataStreamTableSink[T](
@@ -43,7 +46,8 @@ class DataStreamTableSink[T](
    *
    * This type should depend on the types returned by [[getTableSchema]].
    *
-   * @return The type expected by this [[TableSink]].
+   * @return
+   *   The type expected by this [[TableSink]].
    */
   override def getOutputType: TypeInformation[T] = outputType
 

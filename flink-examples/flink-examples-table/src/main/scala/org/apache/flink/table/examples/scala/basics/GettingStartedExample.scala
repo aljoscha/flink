@@ -31,12 +31,13 @@ import scala.collection.JavaConverters._
  * Example for getting started with the Table & SQL API in Scala.
  *
  * The example shows how to create, transform, and query a table. It should give a first impression
- * about the look-and-feel of the API without going too much into details. See the other examples for
- * using connectors or more complex operations.
+ * about the look-and-feel of the API without going too much into details. See the other examples
+ * for using connectors or more complex operations.
  *
  * In particular, the example shows how to
  *   - setup a [[TableEnvironment]],
- *   - use the environment for creating example tables, registering views, and executing SQL queries,
+ *   - use the environment for creating example tables, registering views, and executing SQL
+ *     queries,
  *   - transform tables with filters and projections,
  *   - declare user-defined functions,
  *   - and print/collect results locally.

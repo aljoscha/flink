@@ -29,12 +29,18 @@ import org.apache.flink.util.Collector
 /**
  * Connect data for left stream and right stream. Base class for stream non-window outer Join.
  *
- * @param leftType        the input type of left stream
- * @param rightType       the input type of right stream
- * @param genJoinFuncName the function code of other non-equi condition
- * @param genJoinFuncCode the function name of other non-equi condition
- * @param isLeftJoin      the type of join, whether it is the type of left join
- * @param config          configuration that determines runtime behavior
+ * @param leftType
+ *   the input type of left stream
+ * @param rightType
+ *   the input type of right stream
+ * @param genJoinFuncName
+ *   the function code of other non-equi condition
+ * @param genJoinFuncCode
+ *   the function name of other non-equi condition
+ * @param isLeftJoin
+ *   the type of join, whether it is the type of left join
+ * @param config
+ *   configuration that determines runtime behavior
  */
 abstract class NonWindowOuterJoin(
     leftType: TypeInformation[Row],
@@ -66,14 +72,18 @@ abstract class NonWindowOuterJoin(
   }
 
   /**
-   * Join current row with other side rows. Preserve current row if there are no matched rows
-   * from other side. The RowWrapper has been reset before we call preservedJoin and we also
-   * assume that the current change of cRowWrapper is equal to value.change.
+   * Join current row with other side rows. Preserve current row if there are no matched rows from
+   * other side. The RowWrapper has been reset before we call preservedJoin and we also assume that
+   * the current change of cRowWrapper is equal to value.change.
    *
-   * @param inputRow         the input row
-   * @param inputRowFromLeft the flag indicat whether input row is from left
-   * @param otherSideState   the other side state
-   * @return the number of matched rows
+   * @param inputRow
+   *   the input row
+   * @param inputRowFromLeft
+   *   the flag indicat whether input row is from left
+   * @param otherSideState
+   *   the other side state
+   * @return
+   *   the number of matched rows
    */
   protected def preservedJoin(
       inputRow: Row,
@@ -105,8 +115,8 @@ abstract class NonWindowOuterJoin(
   /**
    * Join current row with other side rows. Retract previous output row if matched condition
    * changed, i.e, matched condition is changed from matched to unmatched or vice versa. The
-   * RowWrapper has been reset before we call retractJoin and we also assume that the current
-   * change of cRowWrapper is equal to value.change.
+   * RowWrapper has been reset before we call retractJoin and we also assume that the current change
+   * of cRowWrapper is equal to value.change.
    */
   protected def retractJoin(
       value: CRow,
@@ -151,8 +161,8 @@ abstract class NonWindowOuterJoin(
   }
 
   /**
-   * Return approximate number of records in corresponding state. Only check if record number is
-   * 0, 1 or bigger.
+   * Return approximate number of records in corresponding state. Only check if record number is 0,
+   * 1 or bigger.
    */
   protected def approxiRecordNumInState(
       currentSideState: MapState[Row, JTuple2[Long, Long]]): Long = {

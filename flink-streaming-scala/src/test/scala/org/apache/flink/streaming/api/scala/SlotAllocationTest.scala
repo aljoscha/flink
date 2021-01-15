@@ -25,8 +25,8 @@ import org.junit.Test
 /**
  * This verifies that slot sharing groups are correctly forwarded from user job to JobGraph.
  *
- * These tests also implicitly verify that chaining does not work across
- * resource groups/slot sharing groups.
+ * These tests also implicitly verify that chaining does not work across resource groups/slot
+ * sharing groups.
  */
 class SlotAllocationTest {
 

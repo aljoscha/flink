@@ -75,14 +75,17 @@ object FlinkRelMdUtil {
   }
 
   /**
-   * Creates a RexNode that stores a selectivity value corresponding to the
-   * selectivity of a semi-join/anti-join. This can be added to a filter to simulate the
-   * effect of the semi-join/anti-join during costing, but should never appear in a real
-   * plan since it has no physical implementation.
+   * Creates a RexNode that stores a selectivity value corresponding to the selectivity of a
+   * semi-join/anti-join. This can be added to a filter to simulate the effect of the
+   * semi-join/anti-join during costing, but should never appear in a real plan since it has no
+   * physical implementation.
    *
-   * @param mq  instance of metadata query
-   * @param rel the SEMI/ANTI join of interest
-   * @return constructed rexNode
+   * @param mq
+   *   instance of metadata query
+   * @param rel
+   *   the SEMI/ANTI join of interest
+   * @return
+   *   constructed rexNode
    */
   def makeSemiAntiJoinSelectivityRexNode(mq: RelMetadataQuery, rel: Join): RexNode = {
     require(rel.getJoinType == JoinRelType.SEMI || rel.getJoinType == JoinRelType.ANTI)
@@ -131,14 +134,17 @@ object FlinkRelMdUtil {
   }
 
   /**
-   * Estimates new distinctRowCount of currentNode after it applies a condition.
-   * The estimation based on one assumption:
-   * even distribution of all distinct data
+   * Estimates new distinctRowCount of currentNode after it applies a condition. The estimation
+   * based on one assumption: even distribution of all distinct data
    *
-   * @param rowCount         rowcount of node.
-   * @param distinctRowCount distinct rowcount of node.
-   * @param selectivity      selectivity of condition expression.
-   * @return new distinctRowCount
+   * @param rowCount
+   *   rowcount of node.
+   * @param distinctRowCount
+   *   distinct rowcount of node.
+   * @param selectivity
+   *   selectivity of condition expression.
+   * @return
+   *   new distinctRowCount
    */
   def adaptNdvBasedOnSelectivity(
       rowCount: JDouble,
@@ -151,26 +157,29 @@ object FlinkRelMdUtil {
   /**
    * Estimates ratio outputRowCount/ inputRowCount of agg when ndv of groupKeys is unavailable.
    *
-   * the value of `1.0 - math.exp(-0.1 * groupCount)` increases with groupCount
-   * from 0.095 until close to 1.0. when groupCount is 1, the formula result is 0.095,
-   * when groupCount is 2, the formula result is 0.18,
-   * when groupCount is 3, the formula result is 0.25.
-   * ...
+   * the value of `1.0 - math.exp(-0.1 * groupCount)` increases with groupCount from 0.095 until
+   * close to 1.0. when groupCount is 1, the formula result is 0.095, when groupCount is 2, the
+   * formula result is 0.18, when groupCount is 3, the formula result is 0.25. ...
    *
-   * @param groupingLength grouping keys length of aggregate
-   * @return the ratio outputRowCount/ inputRowCount of agg when ndv of groupKeys is unavailable.
+   * @param groupingLength
+   *   grouping keys length of aggregate
+   * @return
+   *   the ratio outputRowCount/ inputRowCount of agg when ndv of groupKeys is unavailable.
    */
   def getAggregationRatioIfNdvUnavailable(groupingLength: Int): JDouble =
     1.0 - math.exp(-0.1 * groupingLength)
 
   /**
-   * Creates a RexNode that stores a selectivity value corresponding to the
-   * selectivity of a NamedProperties predicate.
+   * Creates a RexNode that stores a selectivity value corresponding to the selectivity of a
+   * NamedProperties predicate.
    *
-   * @param winAgg  window aggregate node
-   * @param predicate a RexNode
-   * @return constructed rexNode including non-NamedProperties predicates and
-   *         a predicate that stores NamedProperties predicate's selectivity
+   * @param winAgg
+   *   window aggregate node
+   * @param predicate
+   *   a RexNode
+   * @return
+   *   constructed rexNode including non-NamedProperties predicates and a predicate that stores
+   *   NamedProperties predicate's selectivity
    */
   def makeNamePropertiesSelectivityRexNode(winAgg: WindowAggregate, predicate: RexNode): RexNode = {
     val fullGroupSet = AggregateUtil.checkAndGetFullGroupSet(winAgg)
@@ -178,13 +187,16 @@ object FlinkRelMdUtil {
   }
 
   /**
-   * Creates a RexNode that stores a selectivity value corresponding to the
-   * selectivity of a NamedProperties predicate.
+   * Creates a RexNode that stores a selectivity value corresponding to the selectivity of a
+   * NamedProperties predicate.
    *
-   * @param globalWinAgg global window aggregate node
-   * @param predicate a RexNode
-   * @return constructed rexNode including non-NamedProperties predicates and
-   *         a predicate that stores NamedProperties predicate's selectivity
+   * @param globalWinAgg
+   *   global window aggregate node
+   * @param predicate
+   *   a RexNode
+   * @return
+   *   constructed rexNode including non-NamedProperties predicates and a predicate that stores
+   *   NamedProperties predicate's selectivity
    */
   def makeNamePropertiesSelectivityRexNode(
       globalWinAgg: BatchPhysicalWindowAggregateBase,
@@ -199,15 +211,20 @@ object FlinkRelMdUtil {
   }
 
   /**
-   * Creates a RexNode that stores a selectivity value corresponding to the
-   * selectivity of a NamedProperties predicate.
+   * Creates a RexNode that stores a selectivity value corresponding to the selectivity of a
+   * NamedProperties predicate.
    *
-   * @param winAgg window aggregate node
-   * @param fullGrouping full groupSets
-   * @param namedProperties NamedWindowProperty list
-   * @param predicate a RexNode
-   * @return constructed rexNode including non-NamedProperties predicates and
-   *         a predicate that stores NamedProperties predicate's selectivity
+   * @param winAgg
+   *   window aggregate node
+   * @param fullGrouping
+   *   full groupSets
+   * @param namedProperties
+   *   NamedWindowProperty list
+   * @param predicate
+   *   a RexNode
+   * @return
+   *   constructed rexNode including non-NamedProperties predicates and a predicate that stores
+   *   NamedProperties predicate's selectivity
    */
   def makeNamePropertiesSelectivityRexNode(
       winAgg: SingleRel,
@@ -239,16 +256,14 @@ object FlinkRelMdUtil {
   }
 
   /**
-   * Returns the number of distinct values provided numSelected are selected
-   * where there are domainSize distinct values.
+   * Returns the number of distinct values provided numSelected are selected where there are
+   * domainSize distinct values.
    *
-   * <p>Current implementation of RelMdUtil#numDistinctVals in Calcite 1.26
-   * has precision problem, so we treat small and large inputs differently
-   * here and handle large inputs with the old implementation of
-   * RelMdUtil#numDistinctVals in Calcite 1.22.
+   * <p>Current implementation of RelMdUtil#numDistinctVals in Calcite 1.26 has precision problem,
+   * so we treat small and large inputs differently here and handle large inputs with the old
+   * implementation of RelMdUtil#numDistinctVals in Calcite 1.22.
    *
-   * <p>This method should be removed once CALCITE-4351 is fixed. See CALCITE-4351
-   * and FLINK-19780.
+   * <p>This method should be removed once CALCITE-4351 is fixed. See CALCITE-4351 and FLINK-19780.
    */
   def numDistinctVals(domainSize: Double, numSelected: Double): Double = {
     val EPS = 1e-9
@@ -268,13 +283,17 @@ object FlinkRelMdUtil {
    * Estimates outputRowCount of local aggregate.
    *
    * output rowcount of local agg is (1 - pow((1 - 1/x) , n/m)) * m * x, based on two assumption:
-   * 1. even distribution of all distinct data
-   * 2. even distribution of all data in each concurrent local agg worker
+   *   1. even distribution of all distinct data 2. even distribution of all data in each concurrent
+   *      local agg worker
    *
-   * @param parallelism       number of concurrent worker of local aggregate
-   * @param inputRowCount     rowcount of input node of aggregate.
-   * @param globalAggRowCount rowcount of output of global aggregate.
-   * @return outputRowCount of local aggregate.
+   * @param parallelism
+   *   number of concurrent worker of local aggregate
+   * @param inputRowCount
+   *   rowcount of input node of aggregate.
+   * @param globalAggRowCount
+   *   rowcount of output of global aggregate.
+   * @return
+   *   outputRowCount of local aggregate.
    */
   def getRowCountOfLocalAgg(
       parallelism: Int,
@@ -286,11 +305,13 @@ object FlinkRelMdUtil {
       inputRowCount)
 
   /**
-   * Takes a bitmap representing a set of input references and extracts the
-   * ones that reference the group by columns in an aggregate.
+   * Takes a bitmap representing a set of input references and extracts the ones that reference the
+   * group by columns in an aggregate.
    *
-   * @param groupKey the original bitmap
-   * @param aggRel   the aggregate
+   * @param groupKey
+   *   the original bitmap
+   * @param aggRel
+   *   the aggregate
    */
   def setAggChildKeys(
       groupKey: ImmutableBitSet,
@@ -315,11 +336,13 @@ object FlinkRelMdUtil {
   }
 
   /**
-   * Takes a bitmap representing a set of input references and extracts the
-   * ones that reference the group by columns in an aggregate.
+   * Takes a bitmap representing a set of input references and extracts the ones that reference the
+   * group by columns in an aggregate.
    *
-   * @param groupKey the original bitmap
-   * @param aggRel   the aggregate
+   * @param groupKey
+   *   the original bitmap
+   * @param aggRel
+   *   the aggregate
    */
   def setAggChildKeys(
       groupKey: ImmutableBitSet,
@@ -329,11 +352,13 @@ object FlinkRelMdUtil {
   }
 
   /**
-   * Takes a bitmap representing a set of input references and extracts the
-   * ones that reference the group by columns in an aggregate.
+   * Takes a bitmap representing a set of input references and extracts the ones that reference the
+   * group by columns in an aggregate.
    *
-   * @param groupKey the original bitmap
-   * @param aggRel   the aggregate
+   * @param groupKey
+   *   the original bitmap
+   * @param aggRel
+   *   the aggregate
    */
   def setAggChildKeys(
       groupKey: ImmutableBitSet,
@@ -377,13 +402,15 @@ object FlinkRelMdUtil {
   /**
    * Takes a bitmap representing a set of local window aggregate references.
    *
-   * global win-agg output type: groupSet + auxGroupSet + aggCall + namedProperties
-   * local win-agg output type: groupSet + assignTs + auxGroupSet + aggCalls
+   * global win-agg output type: groupSet + auxGroupSet + aggCall + namedProperties local win-agg
+   * output type: groupSet + assignTs + auxGroupSet + aggCalls
    *
    * Skips `assignTs` when mapping `groupKey` to `childKey`.
    *
-   * @param groupKey the original bitmap
-   * @param globalWinAgg the global window aggregate
+   * @param groupKey
+   *   the original bitmap
+   * @param globalWinAgg
+   *   the global window aggregate
    */
   def setChildKeysOfWinAgg(
       groupKey: ImmutableBitSet,
@@ -405,8 +432,10 @@ object FlinkRelMdUtil {
    * Split groupKeys on Aggregate/ BatchPhysicalGroupAggregateBase/ BatchPhysicalWindowAggregateBase
    * into keys on aggregate's groupKey and aggregate's aggregateCalls.
    *
-   * @param agg      the aggregate
-   * @param groupKey the original bitmap
+   * @param agg
+   *   the aggregate
+   * @param groupKey
+   *   the original bitmap
    */
   def splitGroupKeysOnAggregate(
       agg: SingleRel,
@@ -445,13 +474,16 @@ object FlinkRelMdUtil {
   }
 
   /**
-   * Split a predicate on Aggregate into two parts, the first one is pushable part,
-   * the second one is rest part.
+   * Split a predicate on Aggregate into two parts, the first one is pushable part, the second one
+   * is rest part.
    *
-   * @param agg       Aggregate which to analyze
-   * @param predicate Predicate which to analyze
-   * @return a tuple, first element is pushable part, second element is rest part.
-   *         Note, pushable condition will be converted based on the input field position.
+   * @param agg
+   *   Aggregate which to analyze
+   * @param predicate
+   *   Predicate which to analyze
+   * @return
+   *   a tuple, first element is pushable part, second element is rest part. Note, pushable
+   *   condition will be converted based on the input field position.
    */
   def splitPredicateOnAggregate(
       agg: Aggregate,
@@ -461,13 +493,16 @@ object FlinkRelMdUtil {
   }
 
   /**
-   * Split a predicate on BatchExecGroupAggregateBase into two parts,
-   * the first one is pushable part, the second one is rest part.
+   * Split a predicate on BatchExecGroupAggregateBase into two parts, the first one is pushable
+   * part, the second one is rest part.
    *
-   * @param agg       Aggregate which to analyze
-   * @param predicate Predicate which to analyze
-   * @return a tuple, first element is pushable part, second element is rest part.
-   *         Note, pushable condition will be converted based on the input field position.
+   * @param agg
+   *   Aggregate which to analyze
+   * @param predicate
+   *   Predicate which to analyze
+   * @return
+   *   a tuple, first element is pushable part, second element is rest part. Note, pushable
+   *   condition will be converted based on the input field position.
    */
   def splitPredicateOnAggregate(
       agg: BatchPhysicalGroupAggregateBase,
@@ -476,13 +511,16 @@ object FlinkRelMdUtil {
   }
 
   /**
-   * Split a predicate on WindowAggregateBatchExecBase into two parts,
-   * the first one is pushable part, the second one is rest part.
+   * Split a predicate on WindowAggregateBatchExecBase into two parts, the first one is pushable
+   * part, the second one is rest part.
    *
-   * @param agg       Aggregate which to analyze
-   * @param predicate Predicate which to analyze
-   * @return a tuple, first element is pushable part, second element is rest part.
-   *         Note, pushable condition will be converted based on the input field position.
+   * @param agg
+   *   Aggregate which to analyze
+   * @param predicate
+   *   Predicate which to analyze
+   * @return
+   *   a tuple, first element is pushable part, second element is rest part. Note, pushable
+   *   condition will be converted based on the input field position.
    */
   def splitPredicateOnAggregate(
       agg: BatchPhysicalWindowAggregateBase,
@@ -491,14 +529,16 @@ object FlinkRelMdUtil {
   }
 
   /**
-   * Shifts every [[RexInputRef]] in an expression higher than length of full grouping
-   * (for skips `assignTs`).
+   * Shifts every [[RexInputRef]] in an expression higher than length of full grouping (for skips
+   * `assignTs`).
    *
-   * global win-agg output type: groupSet + auxGroupSet + aggCall + namedProperties
-   * local win-agg output type: groupSet + assignTs + auxGroupSet + aggCalls
+   * global win-agg output type: groupSet + auxGroupSet + aggCall + namedProperties local win-agg
+   * output type: groupSet + assignTs + auxGroupSet + aggCalls
    *
-   * @param predicate a RexNode
-   * @param globalWinAgg the global window aggregate
+   * @param predicate
+   *   a RexNode
+   * @param globalWinAgg
+   *   the global window aggregate
    */
   def setChildPredicateOfWinAgg(
       predicate: RexNode,
@@ -623,8 +663,8 @@ object FlinkRelMdUtil {
   }
 
   /**
-   * Returns [[RexInputRef]] index set of projects corresponding to the given column index.
-   * The index will be set as -1 if the given column in project is not a [[RexInputRef]].
+   * Returns [[RexInputRef]] index set of projects corresponding to the given column index. The
+   * index will be set as -1 if the given column in project is not a [[RexInputRef]].
    */
   def getInputRefIndices(index: Int, expand: Expand): util.Set[Int] = {
     val inputRefs = new util.HashSet[Int]()
@@ -650,25 +690,29 @@ object FlinkRelMdUtil {
   }
 
   /**
-   * Computes the cardinality of a particular expression from the projection
-   * list.
+   * Computes the cardinality of a particular expression from the projection list.
    *
-   * @param mq   metadata query instance
-   * @param calc calc RelNode
-   * @param expr projection expression
-   * @return cardinality
+   * @param mq
+   *   metadata query instance
+   * @param calc
+   *   calc RelNode
+   * @param expr
+   *   projection expression
+   * @return
+   *   cardinality
    */
   def cardOfCalcExpr(mq: RelMetadataQuery, calc: Calc, expr: RexNode): JDouble = {
     expr.accept(new CardOfCalcExpr(mq, calc))
   }
 
   /**
-   * Visitor that walks over a scalar expression and computes the
-   * cardinality of its result.
-   * The code is borrowed from RelMdUtil
+   * Visitor that walks over a scalar expression and computes the cardinality of its result. The
+   * code is borrowed from RelMdUtil
    *
-   * @param mq   metadata query instance
-   * @param calc calc relnode
+   * @param mq
+   *   metadata query instance
+   * @param calc
+   *   calc relnode
    */
   private class CardOfCalcExpr(mq: RelMetadataQuery, calc: Calc)
       extends RexVisitorImpl[JDouble](true) {

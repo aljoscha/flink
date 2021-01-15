@@ -37,11 +37,11 @@ import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 
 /**
- * Rule will split a [[FlinkLogicalCalc]] which is the upstream of a [[FlinkLogicalCorrelate]]
- * and contains Python Functions in condition into two [[FlinkLogicalCalc]]s. One of the
+ * Rule will split a [[FlinkLogicalCalc]] which is the upstream of a [[FlinkLogicalCorrelate]] and
+ * contains Python Functions in condition into two [[FlinkLogicalCalc]] s. One of the
  * [[FlinkLogicalCalc]] without python function condition is the upstream of the
- * [[FlinkLogicalCorrelate]], but the other [[[FlinkLogicalCalc]] with python function conditions
- * is the downstream of the [[FlinkLogicalCorrelate]]. Currently, only inner join is supported.
+ * [[FlinkLogicalCorrelate]], but the other [[[FlinkLogicalCalc]] with python function conditions is
+ * the downstream of the [[FlinkLogicalCorrelate]]. Currently, only inner join is supported.
  *
  * After this rule is applied, there will be no Python Functions in the condition of the upstream
  * [[FlinkLogicalCalc]].
@@ -133,7 +133,8 @@ class SplitPythonConditionFromCorrelateRule
  * is pushed to the downstream calc node of the correlate node, the inputRef need to rewrite the
  * index.
  *
- * @param offset the start offset of the inputRef in the downstream calc.
+ * @param offset
+ *   the start offset of the inputRef in the downstream calc.
  */
 private class InputRefRewriter(offset: Int) extends RexDefaultVisitor[RexNode] {
 

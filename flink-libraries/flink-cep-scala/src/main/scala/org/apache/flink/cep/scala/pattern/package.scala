@@ -25,13 +25,17 @@ import scala.collection.JavaConverters._
 package object pattern {
 
   /**
-   * Utility method to wrap [[org.apache.flink.cep.pattern.Pattern]] and its subclasses
-   * for usage with the Scala API.
+   * Utility method to wrap [[org.apache.flink.cep.pattern.Pattern]] and its subclasses for usage
+   * with the Scala API.
    *
-   * @param javaPattern The underlying pattern from the Java API
-   * @tparam T Base type of the elements appearing in the pattern
-   * @tparam F Subtype of T to which the current pattern operator is constrained
-   * @return A pattern from the Scala API which wraps the pattern from the Java API
+   * @param javaPattern
+   *   The underlying pattern from the Java API
+   * @tparam T
+   *   Base type of the elements appearing in the pattern
+   * @tparam F
+   *   Subtype of T to which the current pattern operator is constrained
+   * @return
+   *   A pattern from the Scala API which wraps the pattern from the Java API
    */
   private[flink] def wrapPattern[T, F <: T](javaPattern: JPattern[T, F]): Option[Pattern[T, F]] =
     javaPattern match {

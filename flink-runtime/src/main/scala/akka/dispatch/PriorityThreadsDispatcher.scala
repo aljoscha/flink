@@ -25,27 +25,19 @@ import com.typesafe.config.Config
  *
  * Example of configuration:
  *
- *   low-priority-threads-dispatcher {
- *     type = akka.dispatch.PriorityThreadsDispatcher
- *     executor = "thread-pool-executor"
- *     # should be between Thread.MIN_PRIORITY (which is 1) and Thread.MAX_PRIORITY (which is 10)
- *     threads-priority = 1
- *     thread-pool-executor {
- *       core-pool-size-min = 0
- *       core-pool-size-factor = 2.0
- *       core-pool-size-max = 10
- *     }
- *   }
+ * low-priority-threads-dispatcher { type = akka.dispatch.PriorityThreadsDispatcher executor =
+ * "thread-pool-executor" # should be between Thread.MIN_PRIORITY (which is 1) and
+ * Thread.MAX_PRIORITY (which is 10) threads-priority = 1 thread-pool-executor { core-pool-size-min
+ * = 0 core-pool-size-factor = 2.0 core-pool-size-max = 10 } }
  *
- * Two arguments constructor (the primary constructor) is automatically called by Akka
- * when it founds:
- *   abcde-dispatcher {
- *     type = akka.dispatch.PriorityThreadsDispatcher <-- the class that Akka will instantiate
- *     ...
- *   }
+ * Two arguments constructor (the primary constructor) is automatically called by Akka when it
+ * founds: abcde-dispatcher { type = akka.dispatch.PriorityThreadsDispatcher <-- the class that Akka
+ * will instantiate ... }
  *
- * @param config passed automatically by Akka, should contains information about threads priority
- * @param prerequisites passed automatically by Akka
+ * @param config
+ *   passed automatically by Akka, should contains information about threads priority
+ * @param prerequisites
+ *   passed automatically by Akka
  */
 class PriorityThreadsDispatcher(config: Config, prerequisites: DispatcherPrerequisites)
     extends DispatcherConfigurator(

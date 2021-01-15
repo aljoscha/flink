@@ -29,9 +29,9 @@ import org.apache.flink.table.api.TableException
 import org.apache.flink.table.calcite.FlinkTypeFactory
 
 /**
- * This is heavily inspired by Calcite's [[org.apache.calcite.schema.impl.TableFunctionImpl]].
- * We need it in order to create a [[org.apache.flink.table.functions.utils.TableSqlFunction]].
- * The main difference is that we override the [[getRowType()]] and [[getElementType()]].
+ * This is heavily inspired by Calcite's [[org.apache.calcite.schema.impl.TableFunctionImpl]]. We
+ * need it in order to create a [[org.apache.flink.table.functions.utils.TableSqlFunction]]. The
+ * main difference is that we override the [[getRowType()]] and [[getElementType()]].
  */
 class FlinkTableFunctionImpl[T](
     val typeInfo: TypeInformation[T],

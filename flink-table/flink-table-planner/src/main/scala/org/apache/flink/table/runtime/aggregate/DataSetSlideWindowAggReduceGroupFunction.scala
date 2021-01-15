@@ -32,13 +32,18 @@ import org.apache.flink.util.Collector
  *
  * It is used for sliding on batch for both time and count-windows.
  *
- * @param genAggregations Code-generated [[GeneratedAggregations]]
- * @param keysAndAggregatesArity The total arity of keys and aggregates
- * @param finalRowWindowStartPos relative window-start position to last field of output row
- * @param finalRowWindowEndPos relative window-end position to last field of output row
- * @param finalRowWindowRowtimePos relative window-rowtime position to the last field of the
- *                                 output row
- * @param windowSize size of the window, used to determine window-end for output row
+ * @param genAggregations
+ *   Code-generated [[GeneratedAggregations]]
+ * @param keysAndAggregatesArity
+ *   The total arity of keys and aggregates
+ * @param finalRowWindowStartPos
+ *   relative window-start position to last field of output row
+ * @param finalRowWindowEndPos
+ *   relative window-end position to last field of output row
+ * @param finalRowWindowRowtimePos
+ *   relative window-rowtime position to the last field of the output row
+ * @param windowSize
+ *   size of the window, used to determine window-end for output row
  */
 class DataSetSlideWindowAggReduceGroupFunction(
     genAggregations: GeneratedAggregationsFunction,

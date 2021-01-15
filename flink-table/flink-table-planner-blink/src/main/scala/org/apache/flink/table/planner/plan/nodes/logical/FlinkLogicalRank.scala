@@ -33,8 +33,8 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
- * Sub-class of [[Rank]] that is a relational expression which returns
- * the rows in which the rank function value of each row is in the given range.
+ * Sub-class of [[Rank]] that is a relational expression which returns the rows in which the rank
+ * function value of each row is in the given range.
  */
 class FlinkLogicalRank(
     cluster: RelOptCluster,

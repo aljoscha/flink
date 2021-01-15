@@ -32,7 +32,8 @@ import org.apache.calcite.util.Util
 /**
  * Batch physical RelNode for hash-based aggregate operator.
  *
- * @see [[BatchPhysicalGroupAggregateBase]] for more info.
+ * @see
+ *   [[BatchPhysicalGroupAggregateBase]] for more info.
  */
 abstract class BatchPhysicalHashAggregateBase(
     cluster: RelOptCluster,

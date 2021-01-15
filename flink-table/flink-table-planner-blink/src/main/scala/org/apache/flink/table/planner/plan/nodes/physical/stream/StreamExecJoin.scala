@@ -45,8 +45,8 @@ import scala.collection.JavaConversions._
 /**
  * Stream physical RelNode for regular [[Join]].
  *
- * Regular joins are the most generic type of join in which any new records or changes to
- * either side of the join input are visible and are affecting the whole join result.
+ * Regular joins are the most generic type of join in which any new records or changes to either
+ * side of the join input are visible and are affecting the whole join result.
  */
 class StreamExecJoin(
     cluster: RelOptCluster,
@@ -60,20 +60,19 @@ class StreamExecJoin(
     with LegacyStreamExecNode[RowData] {
 
   /**
-   * This is mainly used in `FlinkChangelogModeInferenceProgram.SatisfyUpdateKindTraitVisitor`.
-   * If the unique key of input contains join key, then it can support ignoring UPDATE_BEFORE.
+   * This is mainly used in `FlinkChangelogModeInferenceProgram.SatisfyUpdateKindTraitVisitor`. If
+   * the unique key of input contains join key, then it can support ignoring UPDATE_BEFORE.
    * Otherwise, it can't ignore UPDATE_BEFORE. For example, if the input schema is [id, name, cnt]
    * with the unique key (id). The join key is (id, name), then an insert and update on the id:
    *
    * +I(1001, Tim, 10)
-   * -U(1001, Tim, 10)
-   * +U(1001, Timo, 11)
+   * -U(1001, Tim, 10) +U(1001, Timo, 11)
    *
    * If the UPDATE_BEFORE is ignored, the `+I(1001, Tim, 10)` record in join will never be
-   * retracted. Therefore, if we want to ignore UPDATE_BEFORE, the unique key must contain
-   * join key.
+   * retracted. Therefore, if we want to ignore UPDATE_BEFORE, the unique key must contain join key.
    *
-   * @see FlinkChangelogModeInferenceProgram
+   * @see
+   *   FlinkChangelogModeInferenceProgram
    */
   def inputUniqueKeyContainsJoinKey(inputOrdinal: Int): Boolean = {
     val input = getInput(inputOrdinal)

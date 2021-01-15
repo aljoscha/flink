@@ -35,8 +35,8 @@ import java.util.function.IntFunction
 import scala.collection.JavaConversions._
 
 /**
- * Planner rule that pushes a [[Project]] down in a tree past a semi/anti [[Join]]
- * by splitting the projection into a projection on top of left child of the Join.
+ * Planner rule that pushes a [[Project]] down in a tree past a semi/anti [[Join]] by splitting the
+ * projection into a projection on top of left child of the Join.
  */
 class ProjectSemiAntiJoinTransposeRule
     extends RelOptRule(

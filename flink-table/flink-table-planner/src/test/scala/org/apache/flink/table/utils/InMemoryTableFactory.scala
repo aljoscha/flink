@@ -48,7 +48,8 @@ import java.util
  * See [[MemoryTableSourceSinkUtil.UnsafeMemoryTableSource]] and
  * [[MemoryTableSourceSinkUtil.UnsafeMemoryAppendTableSink]].
  *
- * @param terminationCount determines when to shutdown the streaming source function
+ * @param terminationCount
+ *   determines when to shutdown the streaming source function
  */
 class InMemoryTableFactory(terminationCount: Int)
     extends TableFactory

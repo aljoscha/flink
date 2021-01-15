@@ -572,8 +572,8 @@ class TypeInformationGenTest {
 
   /**
    * Tests the "implicit val scalaNothingTypeInfo" in
-   * flink-scala/src/main/scala/org/apache/flink/api/scala/package.scala
-   * This does not compile without that line.
+   * flink-scala/src/main/scala/org/apache/flink/api/scala/package.scala This does not compile
+   * without that line.
    */
   @Test
   def testNothingTypeInfoIsAvailableImplicitly(): Unit = {

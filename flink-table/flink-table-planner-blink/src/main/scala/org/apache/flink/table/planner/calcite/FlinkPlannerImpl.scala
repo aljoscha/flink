@@ -45,10 +45,9 @@ import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 
 /**
- * NOTE: this is heavily inspired by Calcite's PlannerImpl.
- * We need it in order to share the planner between the Table API relational plans
- * and the SQL relation plans that are created by the Calcite parser.
- * The main difference is that we do not create a new RelOptPlanner in the ready() method.
+ * NOTE: this is heavily inspired by Calcite's PlannerImpl. We need it in order to share the planner
+ * between the Table API relational plans and the SQL relation plans that are created by the Calcite
+ * parser. The main difference is that we do not create a new RelOptPlanner in the ready() method.
  */
 class FlinkPlannerImpl(
     val config: FrameworkConfig,
@@ -79,13 +78,13 @@ class FlinkPlannerImpl(
   }
 
   /**
-   * Get the [[FlinkCalciteSqlValidator]] instance from this planner, create a new instance
-   * if current validator has not been initialized, or returns the validator
-   * instance directly.
+   * Get the [[FlinkCalciteSqlValidator]] instance from this planner, create a new instance if
+   * current validator has not been initialized, or returns the validator instance directly.
    *
    * <p>The validator instance creation is not thread safe.
    *
-   * @return a new validator instance or current existed one
+   * @return
+   *   a new validator instance or current existed one
    */
   def getOrCreateSqlValidator(): FlinkCalciteSqlValidator = {
     if (validator == null) {
@@ -252,9 +251,8 @@ class FlinkPlannerImpl(
 object FlinkPlannerImpl {
 
   /**
-   * the null default direction if not specified. Consistent with HIVE/SPARK/MYSQL/FLINK-RUNTIME.
-   * So the default value only is set [[NullCollation.LOW]] for keeping consistent with
-   * FLINK-RUNTIME.
+   * the null default direction if not specified. Consistent with HIVE/SPARK/MYSQL/FLINK-RUNTIME. So
+   * the default value only is set [[NullCollation.LOW]] for keeping consistent with FLINK-RUNTIME.
    * [[NullCollation.LOW]] means null values appear first when the order is ASC (ascending), and
    * ordered last when the order is DESC (descending).
    */

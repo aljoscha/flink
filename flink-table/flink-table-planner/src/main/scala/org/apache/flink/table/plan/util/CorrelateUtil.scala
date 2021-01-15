@@ -46,8 +46,10 @@ object CorrelateUtil {
   /**
    * Merge continuous calcs.
    *
-   * @param calc the input calc
-   * @return the single merged calc
+   * @param calc
+   *   the input calc
+   * @return
+   *   the single merged calc
    */
   def getMergedCalc(calc: FlinkLogicalCalc): FlinkLogicalCalc = {
     val child = calc.getInput match {

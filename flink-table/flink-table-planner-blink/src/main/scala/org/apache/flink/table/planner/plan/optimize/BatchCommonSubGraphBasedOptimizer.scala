@@ -75,8 +75,10 @@ class BatchCommonSubGraphBasedOptimizer(planner: BatchPlanner)
   /**
    * Generates the optimized [[RelNode]] tree from the original relational node tree.
    *
-   * @param relNode The original [[RelNode]] tree
-   * @return The optimized [[RelNode]] tree
+   * @param relNode
+   *   The original [[RelNode]] tree
+   * @return
+   *   The optimized [[RelNode]] tree
    */
   private def optimizeTree(relNode: RelNode): RelNode = {
     val config = planner.getTableConfig

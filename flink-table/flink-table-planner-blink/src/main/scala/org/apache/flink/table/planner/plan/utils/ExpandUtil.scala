@@ -38,9 +38,8 @@ import scala.collection.mutable
 object ExpandUtil {
 
   /**
-   * Build the [[Expand]] node.
-   * The input node should be pushed into the RelBuilder before calling this method
-   * and the created Expand node will be at the top of the stack of the RelBuilder.
+   * Build the [[Expand]] node. The input node should be pushed into the RelBuilder before calling
+   * this method and the created Expand node will be at the top of the stack of the RelBuilder.
    */
   def buildExpandNode(
       cluster: RelOptCluster,
@@ -102,9 +101,12 @@ object ExpandUtil {
   /**
    * Mapping original duplicate field index to new index in [[LogicalExpand]].
    *
-   * @param inputType Input row type.
-   * @param duplicateFieldIndexes Fields indexes that will be output as duplicate.
-   * @return a Map that mapping original index to new index for duplicate fields.
+   * @param inputType
+   *   Input row type.
+   * @param duplicateFieldIndexes
+   *   Fields indexes that will be output as duplicate.
+   * @return
+   *   a Map that mapping original index to new index for duplicate fields.
    */
   private def buildDuplicateFieldMap(
       inputType: RelDataType,
@@ -122,15 +124,17 @@ object ExpandUtil {
   /**
    * Build row type for [[LogicalExpand]].
    *
-   * the order of fields are:
-   * first, the input fields,
-   * second, expand_id field(to distinguish different expanded rows),
-   * last, optional duplicate fields.
+   * the order of fields are: first, the input fields, second, expand_id field(to distinguish
+   * different expanded rows), last, optional duplicate fields.
    *
-   * @param typeFactory Type factory.
-   * @param inputType Input row type.
-   * @param duplicateFieldIndexes Fields indexes that will be output as duplicate.
-   * @return Row type for [[LogicalExpand]].
+   * @param typeFactory
+   *   Type factory.
+   * @param inputType
+   *   Input row type.
+   * @param duplicateFieldIndexes
+   *   Fields indexes that will be output as duplicate.
+   * @return
+   *   Row type for [[LogicalExpand]].
    */
   def buildExpandRowType(
       typeFactory: RelDataTypeFactory,
@@ -161,8 +165,8 @@ object ExpandUtil {
   }
 
   /**
-   * Get unique field name based on existed `allFieldNames` collection.
-   * NOTES: the new unique field name will be added to existed `allFieldNames` collection.
+   * Get unique field name based on existed `allFieldNames` collection. NOTES: the new unique field
+   * name will be added to existed `allFieldNames` collection.
    */
   private def buildUniqueFieldName(
       allFieldNames: util.Set[String],
@@ -178,16 +182,23 @@ object ExpandUtil {
   }
 
   /**
-   * Create Project list for [[LogicalExpand]].
-   * One input row will expand to multiple output rows, so multi projects will be created.
+   * Create Project list for [[LogicalExpand]]. One input row will expand to multiple output rows,
+   * so multi projects will be created.
    *
-   * @param rexBuilder Rex builder.
-   * @param inputType Input row type.
-   * @param outputType Row type of [[LogicalExpand]].
-   * @param groupSet The original groupSet of a aggregate before expanded.
-   * @param groupSets The original groupSets of a aggregate before expanded.
-   * @param duplicateFieldIndexes Fields indexes that will be output as duplicate.
-   * @return List of expressions of expanded row.
+   * @param rexBuilder
+   *   Rex builder.
+   * @param inputType
+   *   Input row type.
+   * @param outputType
+   *   Row type of [[LogicalExpand]].
+   * @param groupSet
+   *   The original groupSet of a aggregate before expanded.
+   * @param groupSets
+   *   The original groupSets of a aggregate before expanded.
+   * @param duplicateFieldIndexes
+   *   Fields indexes that will be output as duplicate.
+   * @return
+   *   List of expressions of expanded row.
    */
   def createExpandProjects(
       rexBuilder: RexBuilder,

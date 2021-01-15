@@ -255,8 +255,8 @@ object MetadataTestUtil {
 }
 
 /**
- * A mock table used for metadata test, it implements both [[Table]]
- * and [[FlinkPreparingTableBase]].
+ * A mock table used for metadata test, it implements both [[Table]] and
+ * [[FlinkPreparingTableBase]].
  */
 class MockMetaTable(rowType: RelDataType, statistic: FlinkStatistic)
     extends FlinkPreparingTableBase(

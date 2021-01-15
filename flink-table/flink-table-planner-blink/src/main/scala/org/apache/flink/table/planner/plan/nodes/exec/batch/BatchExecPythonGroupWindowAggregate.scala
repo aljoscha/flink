@@ -48,9 +48,8 @@ import java.util.Collections
 /**
  * Batch [[ExecNode]] for group widow aggregate (Python user defined aggregate function).
  *
- * <p>Note: This class can't be ported to Java,
- * because java class can't extend scala interface with default implementation.
- * FLINK-20858 will port this class to Java.
+ * <p>Note: This class can't be ported to Java, because java class can't extend scala interface with
+ * default implementation. FLINK-20858 will port this class to Java.
  */
 class BatchExecPythonGroupWindowAggregate(
     grouping: Array[Int],

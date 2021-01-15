@@ -27,8 +27,8 @@ import org.apache.calcite.rel.core.{Aggregate, Intersect, Join, JoinRelType, Rel
 import scala.collection.JavaConversions._
 
 /**
- * Planner rule that replaces distinct [[Intersect]] with
- * a distinct [[Aggregate]] on a SEMI [[Join]].
+ * Planner rule that replaces distinct [[Intersect]] with a distinct [[Aggregate]] on a SEMI
+ * [[Join]].
  *
  * Only handle the case of input size 2.
  */

@@ -37,7 +37,7 @@ import java.io.File
 import java.util
 
 /**
- * A code generator for generating [[WatermarkGenerator]]s.
+ * A code generator for generating [[WatermarkGenerator]] s.
  */
 object WatermarkGeneratorCodeGenerator {
 

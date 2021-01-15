@@ -34,15 +34,15 @@ import scala.concurrent.duration._
 /**
  * Monitors a Mesos task throughout its lifecycle.
  *
- * Models a task with a state machine reflecting the perceived state of the task in Mesos.
- * The state is primarily updated when task status information arrives from Mesos.
+ * Models a task with a state machine reflecting the perceived state of the task in Mesos. The state
+ * is primarily updated when task status information arrives from Mesos.
  *
- * The associated state data primarily tracks the task's goal (intended) state, as
- * persisted by the scheduler. Keep in mind that goal state is persisted before actions are taken.
- * The goal state strictly transitions thru New->Launched->Released.
+ * The associated state data primarily tracks the task's goal (intended) state, as persisted by the
+ * scheduler. Keep in mind that goal state is persisted before actions are taken. The goal state
+ * strictly transitions thru New->Launched->Released.
  *
- * Unlike most exchanges with Mesos, task status is delivered at-least-once,
- * so status handling should be idempotent.
+ * Unlike most exchanges with Mesos, task status is delivered at-least-once, so status handling
+ * should be idempotent.
  */
 class TaskMonitor(
     flinkConfig: Configuration,
@@ -212,7 +212,8 @@ object TaskMonitor {
 
   /**
    * The task monitor state data.
-   * @param goal the goal (intentional) state of the task.
+   * @param goal
+   *   the goal (intentional) state of the task.
    */
   case class StateData(goal: TaskGoalState)
 
@@ -247,12 +248,18 @@ object TaskMonitor {
   /**
    * Creates the properties for the TaskMonitor actor.
    *
-   * @param actorClass the task monitor actor class
-   * @param flinkConfig the Flink configuration
-   * @param schedulerDriver the Mesos scheduler driver
-   * @param goalState the task's goal state
-   * @tparam T the type of the task monitor actor class
-   * @return the Props to create the task monitor
+   * @param actorClass
+   *   the task monitor actor class
+   * @param flinkConfig
+   *   the Flink configuration
+   * @param schedulerDriver
+   *   the Mesos scheduler driver
+   * @param goalState
+   *   the task's goal state
+   * @tparam T
+   *   the type of the task monitor actor class
+   * @return
+   *   the Props to create the task monitor
    */
   def createActorProps[T <: TaskMonitor](
       actorClass: Class[T],

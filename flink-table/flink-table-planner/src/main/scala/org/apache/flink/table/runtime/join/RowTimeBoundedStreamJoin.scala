@@ -52,7 +52,8 @@ final class RowTimeBoundedStreamJoin(
    * Get the maximum interval between receiving a row and emitting it (as part of a joined result).
    * This is the time interval by which watermarks need to be held back.
    *
-   * @return the maximum delay for the outputs
+   * @return
+   *   the maximum delay for the outputs
    */
   def getMaxOutputDelay: Long = Math.max(leftRelativeSize, rightRelativeSize) + allowedLateness
 

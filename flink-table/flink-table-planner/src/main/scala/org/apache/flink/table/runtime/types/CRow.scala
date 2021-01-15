@@ -23,11 +23,13 @@ import org.apache.flink.types.Row
 /**
  * Wrapper for a [[Row]] to add retraction information.
  *
- * If [[change]] is true, the [[CRow]] is an accumulate message, if it is false it is a
- * retraction message.
+ * If [[change]] is true, the [[CRow]] is an accumulate message, if it is false it is a retraction
+ * message.
  *
- * @param row The wrapped [[Row]].
- * @param change true for an accumulate message, false for a retraction message.
+ * @param row
+ *   The wrapped [[Row]].
+ * @param change
+ *   true for an accumulate message, false for a retraction message.
  */
 class CRow(var row: Row, var change: Boolean) {
 

@@ -30,7 +30,8 @@ import org.apache.flink.table.dataview.{ListViewTypeInfo, MapViewTypeInfo}
 /**
  * Data view specification.
  *
- * @tparam ACC type extends [[DataView]]
+ * @tparam ACC
+ *   type extends [[DataView]]
  */
 trait DataViewSpec[ACC <: DataView] {
   def stateId: String

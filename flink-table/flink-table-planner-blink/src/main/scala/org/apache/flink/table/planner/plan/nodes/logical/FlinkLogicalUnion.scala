@@ -32,8 +32,8 @@ import java.util.{List => JList}
 import scala.collection.JavaConversions._
 
 /**
- * Sub-class of [[Union]] that is a relational expression
- * which returns the union of the rows of its inputs in Flink.
+ * Sub-class of [[Union]] that is a relational expression which returns the union of the rows of its
+ * inputs in Flink.
  */
 class FlinkLogicalUnion(
     cluster: RelOptCluster,

@@ -43,8 +43,8 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
- * Contains factory interface and default implementation for creating various
- * flink logical rel nodes.
+ * Contains factory interface and default implementation for creating various flink logical rel
+ * nodes.
  */
 object FlinkLogicalRelFactories {
 
@@ -61,8 +61,8 @@ object FlinkLogicalRelFactories {
   val FLINK_LOGICAL_RANK_FACTORY = new RankFactoryImpl
 
   /**
-   * A [[RelBuilderFactory]] that creates a [[RelBuilder]] that will
-   * create logical relational expressions for everything.
+   * A [[RelBuilderFactory]] that creates a [[RelBuilder]] that will create logical relational
+   * expressions for everything.
    */
   val FLINK_LOGICAL_REL_BUILDER: RelBuilderFactory = FlinkRelBuilder.proto(
     Contexts.of(
@@ -111,9 +111,8 @@ object FlinkLogicalRelFactories {
   }
 
   /**
-   * Implementation of [[SetOpFactory]] that
-   * returns a flink [[org.apache.calcite.rel.core.SetOp]] for the particular kind of set
-   * operation (UNION, EXCEPT, INTERSECT).
+   * Implementation of [[SetOpFactory]] that returns a flink [[org.apache.calcite.rel.core.SetOp]]
+   * for the particular kind of set operation (UNION, EXCEPT, INTERSECT).
    */
   class SetOpFactoryImpl extends SetOpFactory {
     def createSetOp(kind: SqlKind, inputs: util.List[RelNode], all: Boolean): RelNode = {
@@ -210,8 +209,8 @@ object FlinkLogicalRelFactories {
   }
 
   /**
-   * Implementation of [[TableScanFactory]] that returns a
-   * [[FlinkLogicalLegacyTableSourceScan]] or [[FlinkLogicalDataStreamTableScan]].
+   * Implementation of [[TableScanFactory]] that returns a [[FlinkLogicalLegacyTableSourceScan]] or
+   * [[FlinkLogicalDataStreamTableScan]].
    */
   class TableScanFactoryImpl extends TableScanFactory {
     def createScan(toRelContext: ToRelContext, table: RelOptTable): RelNode = {
@@ -232,8 +231,7 @@ object FlinkLogicalRelFactories {
   }
 
   /**
-   * Implementation of [[FlinkRelFactories.ExpandFactory]] that returns a
-   * [[FlinkLogicalExpand]].
+   * Implementation of [[FlinkRelFactories.ExpandFactory]] that returns a [[FlinkLogicalExpand]].
    */
   class ExpandFactoryImpl extends ExpandFactory {
     def createExpand(
@@ -246,8 +244,7 @@ object FlinkLogicalRelFactories {
   }
 
   /**
-   * Implementation of [[FlinkRelFactories.RankFactory]] that returns a
-   * [[FlinkLogicalRank]].
+   * Implementation of [[FlinkRelFactories.RankFactory]] that returns a [[FlinkLogicalRank]].
    */
   class RankFactoryImpl extends RankFactory {
     def createRank(

@@ -99,12 +99,10 @@ class FlinkTypeSystem extends RelDataTypeSystemImpl {
   }
 
   /**
-   * Calcite's default impl for division is apparently borrowed from T-SQL,
-   * but the details are a little different, e.g. when Decimal(34,0)/Decimal(10,0)
-   * To avoid confusion, follow the exact T-SQL behavior.
-   * Note that for (+-*), Calcite is also different from T-SQL;
-   * however, Calcite conforms to SQL2003 while T-SQL does not.
-   * therefore we keep Calcite's behavior on (+-*).
+   * Calcite's default impl for division is apparently borrowed from T-SQL, but the details are a
+   * little different, e.g. when Decimal(34,0)/Decimal(10,0) To avoid confusion, follow the exact
+   * T-SQL behavior. Note that for (+-*), Calcite is also different from T-SQL; however, Calcite
+   * conforms to SQL2003 while T-SQL does not. therefore we keep Calcite's behavior on (+-*).
    */
   override def deriveDecimalDivideType(
       typeFactory: RelDataTypeFactory,
@@ -156,9 +154,9 @@ object FlinkTypeSystem {
   def inferAggSumType(scale: Int) = new DecimalType(38, scale)
 
   /**
-   * https://docs.microsoft.com/en-us/sql/t-sql/functions/avg-transact-sql
-   * however, we count by LONG, therefore divide by Decimal(20,0),
-   * but the end result is actually the same, which is Decimal(38, max(6,s)).
+   * https://docs.microsoft.com/en-us/sql/t-sql/functions/avg-transact-sql however, we count by
+   * LONG, therefore divide by Decimal(20,0), but the end result is actually the same, which is
+   * Decimal(38, max(6,s)).
    */
   def inferAggAvgType(scale: Int): DecimalType =
     LogicalTypeMerging.findDivisionDecimalType(38, scale, 20, 0)

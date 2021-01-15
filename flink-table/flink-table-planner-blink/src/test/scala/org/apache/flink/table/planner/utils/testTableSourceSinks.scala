@@ -489,18 +489,24 @@ class TestLegacyProjectableTableSourceFactory extends StreamTableSourceFactory[R
 }
 
 /**
- * A data source that implements some very basic filtering in-memory in order to test
- * expression push-down logic.
+ * A data source that implements some very basic filtering in-memory in order to test expression
+ * push-down logic.
  *
- * <p>NOTE: Currently, only `>, >=, &lt;, <=, =, &lt;>` operators and UPPER and LOWER functions
- * are allowed to be pushed down into this source.
+ * <p>NOTE: Currently, only `>, >=, &lt;, <=, =, &lt;>` operators and UPPER and LOWER functions are
+ * allowed to be pushed down into this source.
  *
- * @param isBounded whether this is a bounded source
- * @param schema The TableSchema for the source.
- * @param data The data that filtering is applied to in order to get the final dataset.
- * @param filterableFields The fields that are allowed to be filtered.
- * @param filterPredicates The predicates that should be used to filter.
- * @param filterPushedDown Whether predicates have been pushed down yet.
+ * @param isBounded
+ *   whether this is a bounded source
+ * @param schema
+ *   The TableSchema for the source.
+ * @param data
+ *   The data that filtering is applied to in order to get the final dataset.
+ * @param filterableFields
+ *   The fields that are allowed to be filtered.
+ * @param filterPredicates
+ *   The predicates that should be used to filter.
+ * @param filterPushedDown
+ *   Whether predicates have been pushed down yet.
  */
 class TestLegacyFilterableTableSource(
     override val isBounded: Boolean,
@@ -1047,8 +1053,10 @@ class TestFileInputFormatTableSourceFactory extends StreamTableSourceFactory[Row
 /**
  * A data source that implements some very basic partitionable table source in-memory.
  *
- * @param isBounded whether this is a bounded source
- * @param remainingPartitions remaining partitions after partition pruning
+ * @param isBounded
+ *   whether this is a bounded source
+ * @param remainingPartitions
+ *   remaining partitions after partition pruning
  */
 class TestPartitionableTableSource(
     override val isBounded: Boolean,

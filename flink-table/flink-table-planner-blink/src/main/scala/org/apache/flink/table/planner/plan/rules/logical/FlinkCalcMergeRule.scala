@@ -32,16 +32,16 @@ import scala.collection.JavaConversions._
  * This rule is copied from Calcite's [[org.apache.calcite.rel.rules.CalcMergeRule]].
  *
  * Modification:
- * - Condition in the merged program will be simplified if it exists.
- * - If the two [[Calc]] can merge into one, each non-deterministic [[RexNode]] of bottom [[Calc]]
- *   should appear at most once in the project list and filter list of top [[Calc]].
+ *   - Condition in the merged program will be simplified if it exists.
+ *   - If the two [[Calc]] can merge into one, each non-deterministic [[RexNode]] of bottom [[Calc]]
+ *     should appear at most once in the project list and filter list of top [[Calc]].
  */
 
 /**
  * Planner rule that merges a [[Calc]] onto a [[Calc]].
  *
- * <p>The resulting [[Calc]] has the same project list as the upper [[Calc]],
- * but expressed in terms of the lower [[Calc]]'s inputs.
+ * <p>The resulting [[Calc]] has the same project list as the upper [[Calc]], but expressed in terms
+ * of the lower [[Calc]] 's inputs.
  */
 class FlinkCalcMergeRule(relBuilderFactory: RelBuilderFactory)
     extends RelOptRule(

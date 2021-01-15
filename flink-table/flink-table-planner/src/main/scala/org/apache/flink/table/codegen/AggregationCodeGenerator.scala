@@ -67,37 +67,48 @@ import scala.collection.JavaConversions._
 import scala.collection.mutable
 
 /**
- * A code generator for generating [[GeneratedAggregations]] or
- * [[GeneratedTableAggregations]].
+ * A code generator for generating [[GeneratedAggregations]] or [[GeneratedTableAggregations]].
  *
- * @param config                 configuration that determines runtime behavior
- * @param nullableInput          input(s) can be null.
- * @param inputTypeInfo          type information about the input of the Function
- * @param constants              constant expressions that act like a second input in the
- *                               parameter indices.
- * @param classNamePrefix        Class name of the function.
- *                               Does not need to be unique but has to be a valid Java class
- *                               identifier.
- * @param physicalInputTypes     Physical input row types
- * @param aggregates             All aggregate functions
- * @param aggFields              Indexes of the input fields for all aggregate functions
- * @param aggMapping             The mapping of aggregates to output fields
- * @param distinctAccMapping     The mapping of the distinct accumulator index to the
- *                               corresponding aggregates.
- * @param isStateBackedDataViews a flag to indicate if distinct filter uses state backend.
- * @param partialResults         A flag defining whether final or partial results (accumulators)
- *                               are set
- *                               to the output row.
- * @param fwdMapping             The mapping of input fields to output fields
- * @param mergeMapping           An optional mapping to specify the accumulators to merge. If not
- *                               set, we
- *                               assume that both rows have the accumulators at the same position.
- * @param outputArity            The number of fields in the output row.
- * @param needRetract            a flag to indicate if the aggregate needs the retract method
- * @param needMerge              a flag to indicate if the aggregate needs the merge method
- * @param needReset              a flag to indicate if the aggregate needs the resetAccumulator
- *                               method
- * @param accConfig              Data view specification for accumulators
+ * @param config
+ *   configuration that determines runtime behavior
+ * @param nullableInput
+ *   input(s) can be null.
+ * @param inputTypeInfo
+ *   type information about the input of the Function
+ * @param constants
+ *   constant expressions that act like a second input in the parameter indices.
+ * @param classNamePrefix
+ *   Class name of the function. Does not need to be unique but has to be a valid Java class
+ *   identifier.
+ * @param physicalInputTypes
+ *   Physical input row types
+ * @param aggregates
+ *   All aggregate functions
+ * @param aggFields
+ *   Indexes of the input fields for all aggregate functions
+ * @param aggMapping
+ *   The mapping of aggregates to output fields
+ * @param distinctAccMapping
+ *   The mapping of the distinct accumulator index to the corresponding aggregates.
+ * @param isStateBackedDataViews
+ *   a flag to indicate if distinct filter uses state backend.
+ * @param partialResults
+ *   A flag defining whether final or partial results (accumulators) are set to the output row.
+ * @param fwdMapping
+ *   The mapping of input fields to output fields
+ * @param mergeMapping
+ *   An optional mapping to specify the accumulators to merge. If not set, we assume that both rows
+ *   have the accumulators at the same position.
+ * @param outputArity
+ *   The number of fields in the output row.
+ * @param needRetract
+ *   a flag to indicate if the aggregate needs the retract method
+ * @param needMerge
+ *   a flag to indicate if the aggregate needs the merge method
+ * @param needReset
+ *   a flag to indicate if the aggregate needs the resetAccumulator method
+ * @param accConfig
+ *   Data view specification for accumulators
  */
 class AggregationCodeGenerator(
     config: TableConfig,
@@ -153,8 +164,9 @@ class AggregationCodeGenerator(
   val isTableAggregate = AggregateUtil.containsTableAggregateFunction(aggregates)
 
   /**
-   * @return code block of statements that need to be placed in the cleanup() method of
-   *         [[GeneratedAggregations]]
+   * @return
+   *   code block of statements that need to be placed in the cleanup() method of
+   *   [[GeneratedAggregations]]
    */
   def reuseCleanupCode(): String = {
     reusableCleanupStatements.mkString("", "\n", "\n")
@@ -287,8 +299,8 @@ class AggregationCodeGenerator(
   }
 
   /**
-   * Add all data views for all field accumulators and distinct filters defined by
-   * aggregation functions.
+   * Add all data views for all field accumulators and distinct filters defined by aggregation
+   * functions.
    */
   def addAccumulatorDataViews(): Unit = {
     if (accConfig.isDefined) {
@@ -314,20 +326,26 @@ class AggregationCodeGenerator(
   /**
    * Create DataView Term, for example, acc1_map_dataview.
    *
-   * @param aggIndex index of aggregate function
-   * @param fieldName field name of DataView
-   * @return term to access [[MapView]] or [[ListView]]
+   * @param aggIndex
+   *   index of aggregate function
+   * @param fieldName
+   *   field name of DataView
+   * @return
+   *   term to access [[MapView]] or [[ListView]]
    */
   def createDataViewTerm(aggIndex: Int, fieldName: String): String = {
     s"acc${aggIndex}_${fieldName}_dataview"
   }
 
   /**
-   * Adds a reusable [[org.apache.flink.table.api.dataview.DataView]] to the open, cleanup,
-   * close and member area of the generated function.
-   * @param spec the [[DataViewSpec]] of the desired data view term.
-   * @param desc the [[StateDescriptor]] of the desired data view term.
-   * @param aggIndex the aggregation function index associate with the data view.
+   * Adds a reusable [[org.apache.flink.table.api.dataview.DataView]] to the open, cleanup, close
+   * and member area of the generated function.
+   * @param spec
+   *   the [[DataViewSpec]] of the desired data view term.
+   * @param desc
+   *   the [[StateDescriptor]] of the desired data view term.
+   * @param aggIndex
+   *   the aggregation function index associate with the data view.
    */
   def addReusableDataView(
       spec: DataViewSpec[_],
@@ -394,10 +412,14 @@ class AggregationCodeGenerator(
   /**
    * Generate statements to set data view field when use state backend.
    *
-   * @param specs aggregation [[DataViewSpec]]s for this aggregation term.
-   * @param accTerm aggregation term
-   * @param aggIndex index of aggregation
-   * @return data view field set statements
+   * @param specs
+   *   aggregation [[DataViewSpec]] s for this aggregation term.
+   * @param accTerm
+   *   aggregation term
+   * @param aggIndex
+   *   index of aggregation
+   * @return
+   *   data view field set statements
    */
   def genDataViewFieldSetter(
       specs: Seq[DataViewSpec[_]],
@@ -799,7 +821,8 @@ class AggregationCodeGenerator(
   /**
    * Generates a [[GeneratedAggregations]] that can be passed to a Java compiler.
    *
-   * @return A GeneratedAggregationsFunction
+   * @return
+   *   A GeneratedAggregationsFunction
    */
   def generateAggregations: GeneratedAggregationsFunction = {
 
@@ -850,7 +873,8 @@ class AggregationCodeGenerator(
    * Generates a [[org.apache.flink.table.runtime.aggregate.GeneratedAggregations]] that can be
    * passed to a Java compiler.
    *
-   * @return A GeneratedAggregationsFunction
+   * @return
+   *   A GeneratedAggregationsFunction
    */
   def generateTableAggregations(
       tableAggOutputRowType: RowTypeInfo,
@@ -1058,15 +1082,19 @@ class AggregationCodeGenerator(
   }
 
   /**
-   * Generates a [[GeneratedAggregations]] or a [[GeneratedTableAggregations]] that can be passed
-   * to a Java compiler.
+   * Generates a [[GeneratedAggregations]] or a [[GeneratedTableAggregations]] that can be passed to
+   * a Java compiler.
    *
-   * @param outputType      Output type of the (table)aggregate node.
-   * @param groupSize       The size of the groupings.
-   * @param namedAggregates The correspond named aggregates in the aggregate operator.
-   * @param supportEmitIncrementally Whether support emit values incrementally. Window operators
-   *                                 don't support it yet.
-   * @return A GeneratedAggregationsFunction
+   * @param outputType
+   *   Output type of the (table)aggregate node.
+   * @param groupSize
+   *   The size of the groupings.
+   * @param namedAggregates
+   *   The correspond named aggregates in the aggregate operator.
+   * @param supportEmitIncrementally
+   *   Whether support emit values incrementally. Window operators don't support it yet.
+   * @return
+   *   A GeneratedAggregationsFunction
    */
   def genAggregationsOrTableAggregations(
       outputType: RelDataType,

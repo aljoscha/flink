@@ -28,8 +28,8 @@ import org.apache.flink.table.validate._
 object TypeCheckUtils {
 
   /**
-   * Checks if type information is an advanced type that can be converted to a
-   * SQL type but NOT vice versa.
+   * Checks if type information is an advanced type that can be converted to a SQL type but NOT vice
+   * versa.
    */
   def isAdvanced(dataType: TypeInformation[_]): Boolean = dataType match {
     case _: TimeIndicatorTypeInfo   => false
@@ -40,8 +40,7 @@ object TypeCheckUtils {
   }
 
   /**
-   * Checks if type information is a simple type that can be converted to a
-   * SQL type and vice versa.
+   * Checks if type information is a simple type that can be converted to a SQL type and vice versa.
    */
   def isSimple(dataType: TypeInformation[_]): Boolean = !isAdvanced(dataType)
 
@@ -123,11 +122,13 @@ object TypeCheckUtils {
   }
 
   /**
-   * Checks whether a type implements own hashCode() and equals() methods for storing an instance
-   * in Flink's state or performing a keyBy operation.
+   * Checks whether a type implements own hashCode() and equals() methods for storing an instance in
+   * Flink's state or performing a keyBy operation.
    *
-   * @param name name of the operation
-   * @param t type information to be validated
+   * @param name
+   *   name of the operation
+   * @param t
+   *   type information to be validated
    */
   def validateEqualsHashCode(name: String, t: TypeInformation[_]): Unit = t match {
 
@@ -153,8 +154,10 @@ object TypeCheckUtils {
    * Checks whether a class implements own hashCode() and equals() methods for storing an instance
    * in Flink's state or performing a keyBy operation.
    *
-   * @param name name of the operation
-   * @param c class to be validated
+   * @param name
+   *   name of the operation
+   * @param c
+   *   class to be validated
    */
   def validateEqualsHashCode(name: String, c: Class[_]): Unit = {
 
@@ -197,8 +200,8 @@ object TypeCheckUtils {
   /**
    * Checks if one class can be assigned to a variable of another class.
    *
-   * Adopted from o.a.commons.lang.ClassUtils#isAssignable(java.lang.Class[], java.lang.Class[])
-   * but without null checks.
+   * Adopted from o.a.commons.lang.ClassUtils#isAssignable(java.lang.Class[], java.lang.Class[]) but
+   * without null checks.
    */
   def isAssignable(classArray: Array[Class[_]], toClassArray: Array[Class[_]]): Boolean = {
     if (classArray.length != toClassArray.length) {

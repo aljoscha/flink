@@ -27,10 +27,11 @@ import org.apache.flink.types.Row
 import org.apache.flink.util.Collector
 
 /**
- * [[RichGroupReduceFunction]] and [[MapPartitionFunction]] to compute aggregates that do
- * not support pre-aggregation for batch(DataSet) queries.
+ * [[RichGroupReduceFunction]] and [[MapPartitionFunction]] to compute aggregates that do not
+ * support pre-aggregation for batch(DataSet) queries.
  *
- * @param genAggregations Code-generated [[GeneratedAggregations]]
+ * @param genAggregations
+ *   Code-generated [[GeneratedAggregations]]
  */
 class DataSetAggFunction(private val genAggregations: GeneratedAggregationsFunction)
     extends RichGroupReduceFunction[Row, Row]
@@ -59,8 +60,10 @@ class DataSetAggFunction(private val genAggregations: GeneratedAggregationsFunct
   /**
    * Computes a non-pre-aggregated aggregation.
    *
-   * @param records An iterator over all records of the group.
-   * @param out     The collector to hand results to.
+   * @param records
+   *   An iterator over all records of the group.
+   * @param out
+   *   The collector to hand results to.
    */
   override def reduce(records: Iterable[Row], out: Collector[Row]): Unit = {
 
@@ -89,8 +92,10 @@ class DataSetAggFunction(private val genAggregations: GeneratedAggregationsFunct
   /**
    * Computes a non-pre-aggregated aggregation and returns a row even if the input is empty.
    *
-   * @param records An iterator over all records of the partition.
-   * @param out     The collector to hand results to.
+   * @param records
+   *   An iterator over all records of the partition.
+   * @param out
+   *   The collector to hand results to.
    */
   override def mapPartition(records: Iterable[Row], out: Collector[Row]): Unit = {
     reduce(records, out)

@@ -36,8 +36,8 @@ import org.apache.flink.table.runtime.operators.TableStreamOperator
 import org.apache.flink.table.types.logical.RowType
 
 /**
- * Sort aggregation code generator to deal with all aggregate functions with keys.
- * It require input in keys order.
+ * Sort aggregation code generator to deal with all aggregate functions with keys. It require input
+ * in keys order.
  */
 object SortAggCodeGenerator {
 

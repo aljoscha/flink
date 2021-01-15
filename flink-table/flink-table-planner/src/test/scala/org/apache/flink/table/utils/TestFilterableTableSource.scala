@@ -42,7 +42,8 @@ import scala.collection.mutable
 object TestFilterableTableSource {
 
   /**
-   * @return The default filterable table source.
+   * @return
+   *   The default filterable table source.
    */
   def apply(): TestFilterableTableSource = {
     apply(defaultTypeInfo, defaultRows, defaultFilterableFields)
@@ -50,11 +51,14 @@ object TestFilterableTableSource {
 
   /**
    * A filterable data source with custom data.
-   * @param rowTypeInfo The type of the data. Its expected that both types and field
-   *                    names are provided.
-   * @param rows The data as a sequence of rows.
-   * @param filterableFields The fields that are allowed to be filtered on.
-   * @return The table source.
+   * @param rowTypeInfo
+   *   The type of the data. Its expected that both types and field names are provided.
+   * @param rows
+   *   The data as a sequence of rows.
+   * @param filterableFields
+   *   The fields that are allowed to be filtered on.
+   * @return
+   *   The table source.
    */
   def apply(
       rowTypeInfo: RowTypeInfo,
@@ -87,7 +91,8 @@ object TestFilterableTableSource {
 object TestFilterableTableSourceWithoutExplainSourceOverride {
 
   /**
-   * @return The default filterable table source.
+   * @return
+   *   The default filterable table source.
    */
   def apply(): TestFilterableTableSourceWithoutExplainSourceOverride = {
     apply(defaultTypeInfo, defaultRows, defaultFilterableFields)
@@ -95,11 +100,14 @@ object TestFilterableTableSourceWithoutExplainSourceOverride {
 
   /**
    * A filterable data source with custom data.
-   * @param rowTypeInfo The type of the data. Its expected that both types and field
-   *                    names are provided.
-   * @param rows The data as a sequence of rows.
-   * @param filterableFields The fields that are allowed to be filtered on.
-   * @return The table source.
+   * @param rowTypeInfo
+   *   The type of the data. Its expected that both types and field names are provided.
+   * @param rows
+   *   The data as a sequence of rows.
+   * @param filterableFields
+   *   The fields that are allowed to be filtered on.
+   * @return
+   *   The table source.
    */
   def apply(
       rowTypeInfo: RowTypeInfo,
@@ -130,14 +138,19 @@ object TestFilterableTableSourceWithoutExplainSourceOverride {
 }
 
 /**
- * A data source that implements some very basic filtering in-memory in order to test
- * expression push-down logic.
+ * A data source that implements some very basic filtering in-memory in order to test expression
+ * push-down logic.
  *
- * @param rowTypeInfo The type info for the rows.
- * @param data The data that filtering is applied to in order to get the final dataset.
- * @param filterableFields The fields that are allowed to be filtered.
- * @param filterPredicates The predicates that should be used to filter.
- * @param filterPushedDown Whether predicates have been pushed down yet.
+ * @param rowTypeInfo
+ *   The type info for the rows.
+ * @param data
+ *   The data that filtering is applied to in order to get the final dataset.
+ * @param filterableFields
+ *   The fields that are allowed to be filtered.
+ * @param filterPredicates
+ *   The predicates that should be used to filter.
+ * @param filterPushedDown
+ *   Whether predicates have been pushed down yet.
  */
 class TestFilterableTableSource(
     rowTypeInfo: RowTypeInfo,

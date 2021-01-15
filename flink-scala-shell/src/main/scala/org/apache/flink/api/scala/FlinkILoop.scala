@@ -146,10 +146,11 @@ class FlinkILoop(
   }
 
   /**
-   * Packages the compiled classes of the current shell session into a Jar file for execution
-   * on a Flink cluster.
+   * Packages the compiled classes of the current shell session into a Jar file for execution on a
+   * Flink cluster.
    *
-   * @return The path of the created Jar file
+   * @return
+   *   The path of the created Jar file
    */
   def writeFilesToDisk(): File = {
     val vd = intp.virtualDirectory

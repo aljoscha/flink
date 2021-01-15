@@ -31,9 +31,12 @@ import scala.collection.mutable
 /**
  * Generates a call to user-defined [[TableFunction]].
  *
- * @param tableFunction user-defined [[TableFunction]] that might be overloaded
- * @param signature actual signature with which the function is called
- * @param returnType actual return type required by the surrounding
+ * @param tableFunction
+ *   user-defined [[TableFunction]] that might be overloaded
+ * @param signature
+ *   actual signature with which the function is called
+ * @param returnType
+ *   actual return type required by the surrounding
  */
 class TableFunctionCallGen(
     tableFunction: TableFunction[_],

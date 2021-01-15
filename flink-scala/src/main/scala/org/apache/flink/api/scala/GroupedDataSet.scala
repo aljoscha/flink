@@ -44,8 +44,8 @@ import scala.reflect.ClassTag
  * A [[DataSet]] to which a grouping key was added. Operations work on groups of elements with the
  * same key (`aggregate`, `reduce`, and `reduceGroup`).
  *
- * A secondary sort order can be added with sortGroup, but this is only used when using one
- * of the group-at-a-time operations, i.e. `reduceGroup`.
+ * A secondary sort order can be added with sortGroup, but this is only used when using one of the
+ * group-at-a-time operations, i.e. `reduceGroup`.
  */
 @Public
 class GroupedDataSet[T: ClassTag](private val set: DataSet[T], private val keys: Keys[T]) {
@@ -60,8 +60,8 @@ class GroupedDataSet[T: ClassTag](private val set: DataSet[T], private val keys:
   private var groupSortKeySelector: Option[Keys.SelectorFunctionKeys[T, _]] = None
 
   /**
-   * Adds a secondary sort key to this [[GroupedDataSet]]. This will only have an effect if you
-   * use one of the group-at-a-time, i.e. `reduceGroup`.
+   * Adds a secondary sort key to this [[GroupedDataSet]]. This will only have an effect if you use
+   * one of the group-at-a-time, i.e. `reduceGroup`.
    *
    * This only works on Tuple DataSets.
    */
@@ -85,8 +85,8 @@ class GroupedDataSet[T: ClassTag](private val set: DataSet[T], private val keys:
   }
 
   /**
-   * Adds a secondary sort key to this [[GroupedDataSet]]. This will only have an effect if you
-   * use one of the group-at-a-time, i.e. `reduceGroup`.
+   * Adds a secondary sort key to this [[GroupedDataSet]]. This will only have an effect if you use
+   * one of the group-at-a-time, i.e. `reduceGroup`.
    *
    * This only works on CaseClass DataSets.
    */
@@ -110,8 +110,8 @@ class GroupedDataSet[T: ClassTag](private val set: DataSet[T], private val keys:
   }
 
   /**
-   * Adds a secondary sort key to this [[GroupedDataSet]]. This will only have an effect if you
-   * use one of the group-at-a-time, i.e. `reduceGroup`.
+   * Adds a secondary sort key to this [[GroupedDataSet]]. This will only have an effect if you use
+   * one of the group-at-a-time, i.e. `reduceGroup`.
    *
    * This works on any data type.
    */
@@ -204,8 +204,7 @@ class GroupedDataSet[T: ClassTag](private val set: DataSet[T], private val keys:
   }
 
   /**
-   * Gets the custom partitioner to be used for this grouping, or null, if
-   * none was defined.
+   * Gets the custom partitioner to be used for this grouping, or null, if none was defined.
    */
   @Internal
   def getCustomPartitioner[K](): Partitioner[K] = {
@@ -218,8 +217,8 @@ class GroupedDataSet[T: ClassTag](private val set: DataSet[T], private val keys:
 
   /**
    * Creates a new [[DataSet]] by aggregating the specified tuple field using the given aggregation
-   * function. Since this is a keyed DataSet the aggregation will be performed on groups of
-   * tuples with the same key.
+   * function. Since this is a keyed DataSet the aggregation will be performed on groups of tuples
+   * with the same key.
    *
    * This only works on Tuple DataSets.
    */
@@ -231,8 +230,8 @@ class GroupedDataSet[T: ClassTag](private val set: DataSet[T], private val keys:
 
   /**
    * Creates a new [[DataSet]] by aggregating the specified field using the given aggregation
-   * function. Since this is a keyed DataSet the aggregation will be performed on groups of
-   * elements with the same key.
+   * function. Since this is a keyed DataSet the aggregation will be performed on groups of elements
+   * with the same key.
    *
    * This only works on CaseClass DataSets.
    */
@@ -292,8 +291,7 @@ class GroupedDataSet[T: ClassTag](private val set: DataSet[T], private val keys:
 
   /**
    * Special [[reduce]] operation for explicitly telling the system what strategy to use for the
-   * combine phase.
-   * If null is given as the strategy, then the optimizer will pick the strategy.
+   * combine phase. If null is given as the strategy, then the optimizer will pick the strategy.
    */
   @PublicEvolving
   def reduce(fun: (T, T) => T, strategy: CombineHint): DataSet[T] = {
@@ -325,8 +323,7 @@ class GroupedDataSet[T: ClassTag](private val set: DataSet[T], private val keys:
 
   /**
    * Special [[reduce]] operation for explicitly telling the system what strategy to use for the
-   * combine phase.
-   * If null is given as the strategy, then the optimizer will pick the strategy.
+   * combine phase. If null is given as the strategy, then the optimizer will pick the strategy.
    */
   @PublicEvolving
   def reduce(reducer: ReduceFunction[T], strategy: CombineHint): DataSet[T] = {
@@ -344,9 +341,9 @@ class GroupedDataSet[T: ClassTag](private val set: DataSet[T], private val keys:
   }
 
   /**
-   * Creates a new [[DataSet]] by passing for each group (elements with the same key) the list
-   * of elements to the group reduce function. The function must output one element. The
-   * concatenation of those will form the resulting [[DataSet]].
+   * Creates a new [[DataSet]] by passing for each group (elements with the same key) the list of
+   * elements to the group reduce function. The function must output one element. The concatenation
+   * of those will form the resulting [[DataSet]].
    */
   def reduceGroup[R: TypeInformation: ClassTag](fun: (Iterator[T]) => R): DataSet[R] = {
     require(fun != null, "Group reduce function must not be null.")
@@ -365,9 +362,9 @@ class GroupedDataSet[T: ClassTag](private val set: DataSet[T], private val keys:
   }
 
   /**
-   * Creates a new [[DataSet]] by passing for each group (elements with the same key) the list
-   * of elements to the group reduce function. The function can output zero or more elements using
-   * the [[Collector]]. The concatenation of the emitted values will form the resulting [[DataSet]].
+   * Creates a new [[DataSet]] by passing for each group (elements with the same key) the list of
+   * elements to the group reduce function. The function can output zero or more elements using the
+   * [[Collector]]. The concatenation of the emitted values will form the resulting [[DataSet]].
    */
   def reduceGroup[R: TypeInformation: ClassTag](
       fun: (Iterator[T], Collector[R]) => Unit): DataSet[R] = {
@@ -387,8 +384,8 @@ class GroupedDataSet[T: ClassTag](private val set: DataSet[T], private val keys:
   }
 
   /**
-   * Creates a new [[DataSet]] by passing for each group (elements with the same key) the list
-   * of elements to the [[GroupReduceFunction]]. The function can output zero or more elements. The
+   * Creates a new [[DataSet]] by passing for each group (elements with the same key) the list of
+   * elements to the [[GroupReduceFunction]]. The function can output zero or more elements. The
    * concatenation of the emitted values will form the resulting [[DataSet]].
    */
   def reduceGroup[R: TypeInformation: ClassTag](reducer: GroupReduceFunction[T, R]): DataSet[R] = {
@@ -402,10 +399,10 @@ class GroupedDataSet[T: ClassTag](private val set: DataSet[T], private val keys:
   }
 
   /**
-   * Applies a special case of a reduce transformation `maxBy` on a grouped [[DataSet]]
-   * The transformation consecutively calls a [[ReduceFunction]]
-   * until only a single element remains which is the result of the transformation.
-   * A ReduceFunction combines two elements into one new element of the same type.
+   * Applies a special case of a reduce transformation `maxBy` on a grouped [[DataSet]] The
+   * transformation consecutively calls a [[ReduceFunction]] until only a single element remains
+   * which is the result of the transformation. A ReduceFunction combines two elements into one new
+   * element of the same type.
    */
   def maxBy(fields: Int*): DataSet[T] = {
     if (!set.getType().isTupleType) {
@@ -416,10 +413,10 @@ class GroupedDataSet[T: ClassTag](private val set: DataSet[T], private val keys:
   }
 
   /**
-   * Applies a special case of a reduce transformation `minBy` on a grouped [[DataSet]].
-   * The transformation consecutively calls a [[ReduceFunction]]
-   * until only a single element remains which is the result of the transformation.
-   * A ReduceFunction combines two elements into one new element of the same type.
+   * Applies a special case of a reduce transformation `minBy` on a grouped [[DataSet]]. The
+   * transformation consecutively calls a [[ReduceFunction]] until only a single element remains
+   * which is the result of the transformation. A ReduceFunction combines two elements into one new
+   * element of the same type.
    */
   def minBy(fields: Int*): DataSet[T] = {
     if (!set.getType().isTupleType) {
@@ -430,18 +427,14 @@ class GroupedDataSet[T: ClassTag](private val set: DataSet[T], private val keys:
   }
 
   /**
-   *  Applies a CombineFunction on a grouped [[DataSet]].  A
-   *  CombineFunction is similar to a GroupReduceFunction but does not
-   *  perform a full data exchange. Instead, the CombineFunction calls
-   *  the combine method once per partition for combining a group of
-   *  results. This operator is suitable for combining values into an
-   *  intermediate format before doing a proper groupReduce where the
-   *  data is shuffled across the node for further reduction. The
-   *  GroupReduce operator can also be supplied with a combiner by
-   *  implementing the RichGroupReduce function. The combine method of
-   *  the RichGroupReduce function demands input and output type to be
-   *  the same. The CombineFunction, on the other side, can have an
-   *  arbitrary output type.
+   * Applies a CombineFunction on a grouped [[DataSet]]. A CombineFunction is similar to a
+   * GroupReduceFunction but does not perform a full data exchange. Instead, the CombineFunction
+   * calls the combine method once per partition for combining a group of results. This operator is
+   * suitable for combining values into an intermediate format before doing a proper groupReduce
+   * where the data is shuffled across the node for further reduction. The GroupReduce operator can
+   * also be supplied with a combiner by implementing the RichGroupReduce function. The combine
+   * method of the RichGroupReduce function demands input and output type to be the same. The
+   * CombineFunction, on the other side, can have an arbitrary output type.
    */
   def combineGroup[R: TypeInformation: ClassTag](
       fun: (Iterator[T], Collector[R]) => Unit): DataSet[R] = {
@@ -461,18 +454,14 @@ class GroupedDataSet[T: ClassTag](private val set: DataSet[T], private val keys:
   }
 
   /**
-   *  Applies a CombineFunction on a grouped [[DataSet]].  A
-   *  CombineFunction is similar to a GroupReduceFunction but does not
-   *  perform a full data exchange. Instead, the CombineFunction calls
-   *  the combine method once per partition for combining a group of
-   *  results. This operator is suitable for combining values into an
-   *  intermediate format before doing a proper groupReduce where the
-   *  data is shuffled across the node for further reduction. The
-   *  GroupReduce operator can also be supplied with a combiner by
-   *  implementing the RichGroupReduce function. The combine method of
-   *  the RichGroupReduce function demands input and output type to be
-   *  the same. The CombineFunction, on the other side, can have an
-   *  arbitrary output type.
+   * Applies a CombineFunction on a grouped [[DataSet]]. A CombineFunction is similar to a
+   * GroupReduceFunction but does not perform a full data exchange. Instead, the CombineFunction
+   * calls the combine method once per partition for combining a group of results. This operator is
+   * suitable for combining values into an intermediate format before doing a proper groupReduce
+   * where the data is shuffled across the node for further reduction. The GroupReduce operator can
+   * also be supplied with a combiner by implementing the RichGroupReduce function. The combine
+   * method of the RichGroupReduce function demands input and output type to be the same. The
+   * CombineFunction, on the other side, can have an arbitrary output type.
    */
   def combineGroup[R: TypeInformation: ClassTag](
       combiner: GroupCombineFunction[T, R]): DataSet[R] = {

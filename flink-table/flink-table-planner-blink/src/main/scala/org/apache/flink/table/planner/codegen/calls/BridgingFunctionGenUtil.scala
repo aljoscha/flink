@@ -48,8 +48,8 @@ import org.apache.flink.util.Preconditions
 import java.util.concurrent.CompletableFuture
 
 /**
- * Helps in generating a call to a user-defined [[ScalarFunction]], [[TableFunction]],
- * or [[AsyncTableFunction]].
+ * Helps in generating a call to a user-defined [[ScalarFunction]], [[TableFunction]], or
+ * [[AsyncTableFunction]].
  *
  * Table functions are a special case because they are using a collector. Thus, the result of the
  * generation will be a reference to a [[WrappingCollector]]. Furthermore, atomic types are wrapped

@@ -49,11 +49,11 @@ import org.junit.Assert._
 import org.junit.Test
 
 /**
- * These tests verify that the api calls on [[WindowedStream]] instantiate the correct
- * window operator.
+ * These tests verify that the api calls on [[WindowedStream]] instantiate the correct window
+ * operator.
  *
- * We also create a test harness and push one element into the operator to verify
- * that we get some output.
+ * We also create a test harness and push one element into the operator to verify that we get some
+ * output.
  */
 class WindowTranslationTest {
 
@@ -62,8 +62,8 @@ class WindowTranslationTest {
   // --------------------------------------------------------------------------
 
   /**
-   * .reduce() does not support [[RichReduceFunction]], since the reduce function is used
-   * internally in a [[org.apache.flink.api.common.state.ReducingState]].
+   * .reduce() does not support [[RichReduceFunction]], since the reduce function is used internally
+   * in a [[org.apache.flink.api.common.state.ReducingState]].
    */
   @Test(expected = classOf[UnsupportedOperationException])
   def testReduceWithRichReducerFails() {
@@ -81,8 +81,8 @@ class WindowTranslationTest {
   }
 
   /**
-   * .reduce() does not support [[RichReduceFunction]], since the reduce function is used
-   * internally in a [[org.apache.flink.api.common.state.ReducingState]].
+   * .reduce() does not support [[RichReduceFunction]], since the reduce function is used internally
+   * in a [[org.apache.flink.api.common.state.ReducingState]].
    */
   @Test(expected = classOf[UnsupportedOperationException])
   def testAggregateWithRichFunctionFails() {
@@ -1262,8 +1262,8 @@ class WindowTranslationTest {
   }
 
   /**
-   * Ensure that we get some output from the given operator when pushing in an element and
-   * setting watermark and processing time to `Long.MaxValue`.
+   * Ensure that we get some output from the given operator when pushing in an element and setting
+   * watermark and processing time to `Long.MaxValue`.
    */
   @throws[Exception]
   private def processElementAndEnsureOutput[K, IN, OUT](

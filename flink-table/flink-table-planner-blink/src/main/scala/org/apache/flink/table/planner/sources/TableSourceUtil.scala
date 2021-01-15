@@ -58,13 +58,16 @@ object TableSourceUtil {
 
   /**
    * Fixes the precision of [[TableSource#getProducedDataType()]] with the given logical schema
-   * type. The precision of producedDataType may lose, because the data type may comes from
-   * legacy type (e.g. Types.BIG_DEC). However, the precision is important to convert output of
-   * source to internal row.
+   * type. The precision of producedDataType may lose, because the data type may comes from legacy
+   * type (e.g. Types.BIG_DEC). However, the precision is important to convert output of source to
+   * internal row.
    *
-   * @param tableSource the table source
-   * @param logicalSchema the logical schema from DDL which carries the correct precisions
-   * @return the produced data type with correct precisions.
+   * @param tableSource
+   *   the table source
+   * @param logicalSchema
+   *   the logical schema from DDL which carries the correct precisions
+   * @return
+   *   the produced data type with correct precisions.
    */
   def fixPrecisionForProducedDataType(
       tableSource: TableSource[_],
@@ -124,14 +127,18 @@ object TableSourceUtil {
   /**
    * Returns schema of the selected fields of the given [[TableSource]].
    *
-   * <p> The watermark strategy specifications should either come from the [[TableSchema]]
-   * or [[TableSource]].
+   * <p> The watermark strategy specifications should either come from the [[TableSchema]] or
+   * [[TableSource]].
    *
-   * @param typeFactory Type factory to create the type
-   * @param tableSource Table source to derive watermark strategies
-   * @param streaming Flag to determine whether the schema of a stream or batch table is created
-   * @return The row type for the selected fields of the given [[TableSource]], this type would
-   *         also be patched with time attributes defined in the give [[WatermarkSpec]]
+   * @param typeFactory
+   *   Type factory to create the type
+   * @param tableSource
+   *   Table source to derive watermark strategies
+   * @param streaming
+   *   Flag to determine whether the schema of a stream or batch table is created
+   * @return
+   *   The row type for the selected fields of the given [[TableSource]], this type would also be
+   *   patched with time attributes defined in the give [[WatermarkSpec]]
    */
   def getSourceRowTypeFromSource(
       typeFactory: FlinkTypeFactory,
@@ -166,15 +173,20 @@ object TableSourceUtil {
   /**
    * Returns schema of the selected fields of the given [[TableSource]].
    *
-   * <p> The watermark strategy specifications should either come from the [[TableSchema]]
-   * or [[TableSource]].
+   * <p> The watermark strategy specifications should either come from the [[TableSchema]] or
+   * [[TableSource]].
    *
-   * @param typeFactory Type factory to create the type
-   * @param tableSchema Table schema to derive table field names and data types
-   * @param tableSource Table source to derive watermark strategies
-   * @param streaming Flag to determine whether the schema of a stream or batch table is created
-   * @return The row type for the selected fields of the given [[TableSource]], this type would
-   *         also be patched with time attributes defined in the give [[WatermarkSpec]]
+   * @param typeFactory
+   *   Type factory to create the type
+   * @param tableSchema
+   *   Table schema to derive table field names and data types
+   * @param tableSource
+   *   Table source to derive watermark strategies
+   * @param streaming
+   *   Flag to determine whether the schema of a stream or batch table is created
+   * @return
+   *   The row type for the selected fields of the given [[TableSource]], this type would also be
+   *   patched with time attributes defined in the give [[WatermarkSpec]]
    */
   def getSourceRowType(
       typeFactory: FlinkTypeFactory,
@@ -196,10 +208,12 @@ object TableSourceUtil {
   /**
    * Returns the [[RowtimeAttributeDescriptor]] of a [[TableSource]].
    *
-   * @param tableSource The [[TableSource]] for which the [[RowtimeAttributeDescriptor]] is
-   *                    returned.
-   * @param rowType The table source table row type
-   * @return The [[RowtimeAttributeDescriptor]] of the [[TableSource]].
+   * @param tableSource
+   *   The [[TableSource]] for which the [[RowtimeAttributeDescriptor]] is returned.
+   * @param rowType
+   *   The table source table row type
+   * @return
+   *   The [[RowtimeAttributeDescriptor]] of the [[TableSource]].
    */
   def getRowtimeAttributeDescriptor(
       tableSource: TableSource[_],
@@ -230,13 +244,17 @@ object TableSourceUtil {
   /**
    * Retrieves an expression to compute a rowtime attribute.
    *
-   * @param extractor Timestamp extractor to construct an expression for.
-   * @param physicalInputType Physical input type that the timestamp extractor accesses.
-   * @param relBuilder  Builder needed to construct the resulting RexNode.
-   * @param nameMapping Additional remapping of a logical to a physical field name.
-   *                    TimestampExtractor works with logical names, but accesses physical
-   *                    fields
-   * @return The [[RexNode]] expression to extract the timestamp.
+   * @param extractor
+   *   Timestamp extractor to construct an expression for.
+   * @param physicalInputType
+   *   Physical input type that the timestamp extractor accesses.
+   * @param relBuilder
+   *   Builder needed to construct the resulting RexNode.
+   * @param nameMapping
+   *   Additional remapping of a logical to a physical field name. TimestampExtractor works with
+   *   logical names, but accesses physical fields
+   * @return
+   *   The [[RexNode]] expression to extract the timestamp.
    */
   def getRowtimeExtractionExpression(
       extractor: TimestampExtractor,

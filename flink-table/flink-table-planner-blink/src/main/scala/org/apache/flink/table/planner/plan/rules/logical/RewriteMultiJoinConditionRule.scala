@@ -31,12 +31,11 @@ import scala.collection.mutable
 /**
  * Planner rule to apply transitive closure on [[MultiJoin]] for equi-join predicates.
  *
- * <p>e.g.
- * MJ(A, B, C) ON A.a1=B.b1 AND B.b1=C.c1 &rarr;
- * MJ(A, B, C) ON A.a1=B.b1 AND B.b1=C.c1 AND A.a1=C.c1
+ * <p>e.g. MJ(A, B, C) ON A.a1=B.b1 AND B.b1=C.c1 &rarr; MJ(A, B, C) ON A.a1=B.b1 AND B.b1=C.c1 AND
+ * A.a1=C.c1
  *
- * The advantage of applying this rule is that it increases the choice of join reorder;
- * at the same time, the disadvantage is that it will use more CPU for additional join predicates.
+ * The advantage of applying this rule is that it increases the choice of join reorder; at the same
+ * time, the disadvantage is that it will use more CPU for additional join predicates.
  */
 class RewriteMultiJoinConditionRule
     extends RelOptRule(operand(classOf[MultiJoin], any), "RewriteMultiJoinConditionRule") {

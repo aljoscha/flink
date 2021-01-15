@@ -41,12 +41,18 @@ import java.util
 /**
  * Calcite wrapper for user-defined table functions.
  *
- * @param identifier         function identifier to uniquely identify this function
- * @param udtf               user-defined table function to be called
- * @param implicitResultType Implicit result type information
- * @param typeFactory        type factory for converting Flink's between Calcite's types
- * @param functionImpl       Calcite table function schema
- * @return [[TableSqlFunction]]
+ * @param identifier
+ *   function identifier to uniquely identify this function
+ * @param udtf
+ *   user-defined table function to be called
+ * @param implicitResultType
+ *   Implicit result type information
+ * @param typeFactory
+ *   type factory for converting Flink's between Calcite's types
+ * @param functionImpl
+ *   Calcite table function schema
+ * @return
+ *   [[TableSqlFunction]]
  */
 class TableSqlFunction(
     identifier: FunctionIdentifier,
@@ -69,8 +75,8 @@ class TableSqlFunction(
       functionImpl) {
 
   /**
-   * This is temporary solution for hive udf and should be removed once FLIP-65 is finished,
-   * please pass the non-null input arguments.
+   * This is temporary solution for hive udf and should be removed once FLIP-65 is finished, please
+   * pass the non-null input arguments.
    */
   def makeFunction(constants: Array[AnyRef], argTypes: Array[LogicalType]): TableFunction[_] =
     udtf
@@ -144,13 +150,16 @@ object TableSqlFunction {
   }
 
   /**
-   * Converts arguments from [[org.apache.calcite.sql.SqlNode]] to
-   * java object format.
+   * Converts arguments from [[org.apache.calcite.sql.SqlNode]] to java object format.
    *
-   * @param callBinding Operator bound to arguments
-   * @param function target function to get parameter types from
-   * @param opName name of the operator to use in error message
-   * @return converted list of arguments
+   * @param callBinding
+   *   Operator bound to arguments
+   * @param function
+   *   target function to get parameter types from
+   * @param opName
+   *   name of the operator to use in error message
+   * @return
+   *   converted list of arguments
    */
   private[flink] def convertArguments(
       callBinding: SqlOperatorBinding,

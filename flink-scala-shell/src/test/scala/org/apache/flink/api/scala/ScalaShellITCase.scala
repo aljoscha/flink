@@ -237,8 +237,7 @@ class ScalaShellITCase extends TestLogger {
   }
 
   /**
-   * Submit external library.
-   * Disabled due to FLINK-7111.
+   * Submit external library. Disabled due to FLINK-7111.
    */
   @Ignore
   @Test
@@ -260,8 +259,7 @@ class ScalaShellITCase extends TestLogger {
   }
 
   /**
-   * Submit external library.
-   * Disabled due to FLINK-7111.
+   * Submit external library. Disabled due to FLINK-7111.
    */
   @Ignore
   @Test
@@ -284,8 +282,8 @@ class ScalaShellITCase extends TestLogger {
   }
 
   /**
-   * tests flink shell startup with remote cluster (starts cluster internally)
-   * for both streaming and batch api
+   * tests flink shell startup with remote cluster (starts cluster internally) for both streaming
+   * and batch api
    */
   @Test
   def testRemoteCluster: Unit = {
@@ -466,8 +464,10 @@ object ScalaShellITCase {
   /**
    * Run the input using a Scala Shell and return the output of the shell.
    *
-   * @param input commands to be processed in the shell
-   * @return output of shell
+   * @param input
+   *   commands to be processed in the shell
+   * @return
+   *   output of shell
    */
   def processInShell(input: String, externalJars: Option[String] = None): String = {
     val in = new BufferedReader(new StringReader(input + "\n"))

@@ -452,11 +452,15 @@ object RelTimeIndicatorConverter {
   /**
    * Materializes time indicator accesses in an expression.
    *
-   * @param expr The expression in which time indicators are materialized.
-   * @param rowType The input schema of the expression.
-   * @param rexBuilder A RexBuilder.
+   * @param expr
+   *   The expression in which time indicators are materialized.
+   * @param rowType
+   *   The input schema of the expression.
+   * @param rexBuilder
+   *   A RexBuilder.
    *
-   * @return The expression with materialized time indicators.
+   * @return
+   *   The expression with materialized time indicators.
    */
   def convertExpression(expr: RexNode, rowType: RelDataType, rexBuilder: RexBuilder): RexNode = {
     // check if input field contains time indicator type
@@ -490,8 +494,8 @@ object RelTimeIndicatorConverter {
 }
 
 /**
- * Takes `newResolvedInput` types of the [[RexNode]] and if those types have changed rewrites
- * the [[RexNode]] to make it consistent with new type.
+ * Takes `newResolvedInput` types of the [[RexNode]] and if those types have changed rewrites the
+ * [[RexNode]] to make it consistent with new type.
  */
 class RexTimeIndicatorMaterializer(
     private val rexBuilder: RexBuilder,

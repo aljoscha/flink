@@ -34,12 +34,17 @@ object ComparatorCodeGenerator {
   /**
    * Generates a [[RecordComparator]] that can be passed to a Java compiler.
    *
-   * @param tableConfig Table config.
-   * @param name        Class name of the function.
-   *                    Does not need to be unique but has to be a valid Java class identifier.
-   * @param inputType   input type.
-   * @param sortSpec    sort specification.
-   * @return A GeneratedRecordComparator
+   * @param tableConfig
+   *   Table config.
+   * @param name
+   *   Class name of the function. Does not need to be unique but has to be a valid Java class
+   *   identifier.
+   * @param inputType
+   *   input type.
+   * @param sortSpec
+   *   sort specification.
+   * @return
+   *   A GeneratedRecordComparator
    */
   def gen(
       tableConfig: TableConfig,

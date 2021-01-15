@@ -45,11 +45,11 @@ import java.lang.reflect.Method
 
 /**
  * Code generator for call with string parameters or return value.
- * 1.Some specific optimization of StringData.
- * 2.Deal with conversions between Java String and internal String.
+ * 1.Some specific optimization of StringData. 2.Deal with conversions between Java String and
+ * internal String.
  *
- * <p>TODO Need to rewrite most of the methods here, calculated directly on the StringData
- * instead of convert StringData to String.
+ * <p>TODO Need to rewrite most of the methods here, calculated directly on the StringData instead
+ * of convert StringData to String.
  */
 object StringCallGen {
 

@@ -40,7 +40,8 @@ import org.apache.flink.table.types.utils.TypeConversions.fromLegacyInfoToDataTy
 /**
  * Generates a call to user-defined [[ScalarFunction]].
  *
- * @param scalarFunction user-defined [[ScalarFunction]] that might be overloaded
+ * @param scalarFunction
+ *   user-defined [[ScalarFunction]] that might be overloaded
  */
 class ScalarFunctionCallGen(scalarFunction: ScalarFunction) extends CallGenerator {
 

@@ -30,10 +30,11 @@ import org.apache.calcite.util.Util
 import scala.collection.JavaConversions._
 
 /**
- * A FlinkOptimizeProgram that decorrelates a query
- * and validates whether the result still has correlate variables.
+ * A FlinkOptimizeProgram that decorrelates a query and validates whether the result still has
+ * correlate variables.
  *
- * @tparam OC OptimizeContext
+ * @tparam OC
+ *   OptimizeContext
  */
 class FlinkDecorrelateProgram[OC <: FlinkOptimizeContext] extends FlinkOptimizeProgram[OC] {
 
@@ -46,8 +47,8 @@ class FlinkDecorrelateProgram[OC <: FlinkOptimizeContext] extends FlinkOptimizeP
   /**
    * Check if there is still correlate variables after decorrelating.
    *
-   * NOTES: this method only checks correlate variables in join, project and filter,
-   * and will ignore the correlate variables from UNNEST (inputs of Uncollect).
+   * NOTES: this method only checks correlate variables in join, project and filter, and will ignore
+   * the correlate variables from UNNEST (inputs of Uncollect).
    */
   private def checkCorrelVariableExists(root: RelNode): Unit = {
     try {

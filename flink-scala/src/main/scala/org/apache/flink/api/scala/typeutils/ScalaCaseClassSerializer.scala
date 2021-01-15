@@ -32,8 +32,8 @@ import scala.reflect.runtime.universe
 /**
  * This is a non macro-generated, concrete Scala case class serializer.
  *
- * <p>We need this serializer to replace the previously macro generated,
- * anonymous [[CaseClassSerializer]].
+ * <p>We need this serializer to replace the previously macro generated, anonymous
+ * [[CaseClassSerializer]].
  */
 @SerialVersionUID(1L)
 class ScalaCaseClassSerializer[T <: Product](

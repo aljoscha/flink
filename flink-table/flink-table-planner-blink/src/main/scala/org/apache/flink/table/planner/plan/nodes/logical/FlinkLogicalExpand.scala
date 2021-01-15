@@ -30,8 +30,8 @@ import org.apache.calcite.rex.RexNode
 import java.util
 
 /**
- * Sub-class of [[Expand]] that is a relational expression
- * which returns multiple rows expanded from one input row.
+ * Sub-class of [[Expand]] that is a relational expression which returns multiple rows expanded from
+ * one input row.
  */
 class FlinkLogicalExpand(
     cluster: RelOptCluster,

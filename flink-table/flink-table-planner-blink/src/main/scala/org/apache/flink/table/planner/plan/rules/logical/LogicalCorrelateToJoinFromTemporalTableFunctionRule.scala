@@ -43,10 +43,9 @@ import org.apache.calcite.rel.logical.{LogicalCorrelate}
 import org.apache.calcite.rex._
 
 /**
- * The initial temporal TableFunction join (LATERAL TemporalTableFunction(o.proctime)) is
- * a correlate. Rewrite it into a Join with a special temporal join condition wraps time
- * attribute and primary key information. The join will be translated into
- * [[StreamExecTemporalJoin]] in physical.
+ * The initial temporal TableFunction join (LATERAL TemporalTableFunction(o.proctime)) is a
+ * correlate. Rewrite it into a Join with a special temporal join condition wraps time attribute and
+ * primary key information. The join will be translated into [[StreamExecTemporalJoin]] in physical.
  */
 class LogicalCorrelateToJoinFromTemporalTableFunctionRule
     extends RelOptRule(
@@ -170,8 +169,8 @@ object LogicalCorrelateToJoinFromTemporalTableFunctionRule {
 }
 
 /**
- * Simple pojo class for extracted [[TemporalTableFunction]] with time attribute
- * extracted from RexNode with [[TemporalTableFunction]] call.
+ * Simple pojo class for extracted [[TemporalTableFunction]] with time attribute extracted from
+ * RexNode with [[TemporalTableFunction]] call.
  */
 case class TemporalTableFunctionCall(
     var temporalTableFunction: TemporalTableFunction,
@@ -217,8 +216,8 @@ class GetTemporalTableFunctionCall(var rexBuilder: RexBuilder, var leftSide: Rel
 }
 
 /**
- * This converts field accesses like `$cor0.o_rowtime` to valid input references
- * for join condition context without `$cor` reference.
+ * This converts field accesses like `$cor0.o_rowtime` to valid input references for join condition
+ * context without `$cor` reference.
  */
 class CorrelatedFieldAccessRemoval(
     var temporalTableFunction: TemporalTableFunctionImpl,

@@ -20,7 +20,9 @@ package org.apache.flink.api.scala.extensions.data
 /**
  * Simple case class to test the `acceptPartialFunctions` extension
  *
- * @param id A numerical identifier
- * @param value A textual value
+ * @param id
+ *   A numerical identifier
+ * @param value
+ *   A textual value
  */
 private[extensions] case class KeyValuePair(id: Int, value: String)

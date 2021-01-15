@@ -30,9 +30,8 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
- * Sub-class of [[Rank]] that is a relational expression which returns
- * the rows in which the rank function value of each row is in the given range.
- * This class corresponds to Calcite logical rel.
+ * Sub-class of [[Rank]] that is a relational expression which returns the rows in which the rank
+ * function value of each row is in the given range. This class corresponds to Calcite logical rel.
  */
 final class LogicalRank(
     cluster: RelOptCluster,

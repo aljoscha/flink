@@ -79,9 +79,9 @@ class FlinkLogicalTableFunctionScanConverter
 
   /**
    * This rule do not match to [[TemporalTableFunction]]. We do not support reading from
-   * [[TemporalTableFunction]]s as TableFunctions. We expect them to be rewritten into
-   * [[org.apache.flink.table.plan.nodes.datastream.DataStreamScan]] followed by for
-   * example [[org.apache.flink.table.plan.nodes.datastream.DataStreamTemporalTableJoin]].
+   * [[TemporalTableFunction]] s as TableFunctions. We expect them to be rewritten into
+   * [[org.apache.flink.table.plan.nodes.datastream.DataStreamScan]] followed by for example
+   * [[org.apache.flink.table.plan.nodes.datastream.DataStreamTemporalTableJoin]].
    */
   override def matches(call: RelOptRuleCall): Boolean = {
     val logicalTableFunction: LogicalTableFunctionScan = call.rel(0)

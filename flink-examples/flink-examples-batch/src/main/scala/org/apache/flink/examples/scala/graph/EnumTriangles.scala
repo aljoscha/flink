@@ -30,39 +30,32 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 /**
- * Triangle enumeration is a pre-processing step to find closely connected parts in graphs.
- * A triangle consists of three edges that connect three vertices with each other.
+ * Triangle enumeration is a pre-processing step to find closely connected parts in graphs. A
+ * triangle consists of three edges that connect three vertices with each other.
  *
- * The algorithm works as follows:
- * It groups all edges that share a common vertex and builds triads, i.e., triples of vertices
- * that are connected by two edges. Finally, all triads are filtered for which no third edge exists
- * that closes the triangle.
+ * The algorithm works as follows: It groups all edges that share a common vertex and builds triads,
+ * i.e., triples of vertices that are connected by two edges. Finally, all triads are filtered for
+ * which no third edge exists that closes the triangle.
  *
  * Input files are plain text files and must be formatted as follows:
  *
- *  - Edges are represented as pairs for vertex IDs which are separated by space
- *   characters. Edges are separated by new-line characters.
- *   For example `"1 2\n2 12\n1 12\n42 63"` gives four (undirected) edges (1)-(2), (2)-(12),
- *   (1)-(12), and (42)-(63) that include a triangle
+ *   - Edges are represented as pairs for vertex IDs which are separated by space characters. Edges
+ *     are separated by new-line characters. For example `"1 2\n2 12\n1 12\n42 63"` gives four
+ *     (undirected) edges (1)-(2), (2)-(12), (1)-(12), and (42)-(63) that include a triangle
  *
- * <pre>
- *     (1)
- *     /  \
- *   (2)-(12)
- * </pre>
+ * <pre> (1) / \ (2)-(12) </pre>
  *
  * Usage:
  * {{{
  * EnumTriangleBasic <edge path> <result path>
  * }}}
- * <br>
- * If no parameters are provided, the program is run with default data from
+ * <br> If no parameters are provided, the program is run with default data from
  * [[org.apache.flink.examples.java.graph.util.EnumTrianglesData]]
  *
  * This example shows how to use:
  *
- *  - Custom Java objects which extend Tuple
- *  - Group Sorting
+ *   - Custom Java objects which extend Tuple
+ *   - Group Sorting
  */
 object EnumTriangles {
 
@@ -130,9 +123,9 @@ object EnumTriangles {
   // *************************************************************************
 
   /**
-   *  Builds triads (triples of vertices) from pairs of edges that share a vertex. The first vertex
-   *  of a triad is the shared vertex, the second and third vertex are ordered by vertexId. Assumes
-   *  that input edges share the first vertex and are in ascending order of the second vertex.
+   * Builds triads (triples of vertices) from pairs of edges that share a vertex. The first vertex
+   * of a triad is the shared vertex, the second and third vertex are ordered by vertexId. Assumes
+   * that input edges share the first vertex and are in ascending order of the second vertex.
    */
   @ForwardedFields(Array("v1->v1"))
   class TriadBuilder extends GroupReduceFunction[Edge, Triad] {

@@ -1108,26 +1108,19 @@ class CalcITCase extends BatchTestBase {
   }
 
   /**
-   * TODO Support below string timestamp format to cast to timestamp:
-   * yyyy
-   * yyyy-[m]m
-   * yyyy-[m]m-[d]d
-   * yyyy-[m]m-[d]d
-   * yyyy-[m]m-[d]d [h]h:[m]m:[s]s.[ms][ms][ms][us][us][us]
-   * yyyy-[m]m-[d]d [h]h:[m]m:[s]s.[ms][ms][ms][us][us][us]Z
-   * yyyy-[m]m-[d]d [h]h:[m]m:[s]s.[ms][ms][ms][us][us][us]-[h]h:[m]m
-   * yyyy-[m]m-[d]d [h]h:[m]m:[s]s.[ms][ms][ms][us][us][us]+[h]h:[m]m
+   * TODO Support below string timestamp format to cast to timestamp: yyyy yyyy-[m]m yyyy-[m]m-[d]d
+   * yyyy-[m]m-[d]d yyyy-[m]m-[d]d [h]h:[m]m:[s]s.[ms][ms][ms][us][us][us] yyyy-[m]m-[d]d
+   * [h]h:[m]m:[s]s.[ms][ms][ms][us][us][us]Z yyyy-[m]m-[d]d
+   * [h]h:[m]m:[s]s.[ms][ms][ms][us][us][us]-[h]h:[m]m yyyy-[m]m-[d]d
+   * [h]h:[m]m:[s]s.[ms][ms][ms][us][us][us]+[h]h:[m]m
    * yyyy-[m]m-[d]dT[h]h:[m]m:[s]s.[ms][ms][ms][us][us][us]
    * yyyy-[m]m-[d]dT[h]h:[m]m:[s]s.[ms][ms][ms][us][us][us]Z
    * yyyy-[m]m-[d]dT[h]h:[m]m:[s]s.[ms][ms][ms][us][us][us]-[h]h:[m]m
    * yyyy-[m]m-[d]dT[h]h:[m]m:[s]s.[ms][ms][ms][us][us][us]+[h]h:[m]m
-   * [h]h:[m]m:[s]s.[ms][ms][ms][us][us][us]
-   * [h]h:[m]m:[s]s.[ms][ms][ms][us][us][us]Z
+   * [h]h:[m]m:[s]s.[ms][ms][ms][us][us][us] [h]h:[m]m:[s]s.[ms][ms][ms][us][us][us]Z
    * [h]h:[m]m:[s]s.[ms][ms][ms][us][us][us]-[h]h:[m]m
-   * [h]h:[m]m:[s]s.[ms][ms][ms][us][us][us]+[h]h:[m]m
-   * T[h]h:[m]m:[s]s.[ms][ms][ms][us][us][us]
-   * T[h]h:[m]m:[s]s.[ms][ms][ms][us][us][us]Z
-   * T[h]h:[m]m:[s]s.[ms][ms][ms][us][us][us]-[h]h:[m]m
+   * [h]h:[m]m:[s]s.[ms][ms][ms][us][us][us]+[h]h:[m]m T[h]h:[m]m:[s]s.[ms][ms][ms][us][us][us]
+   * T[h]h:[m]m:[s]s.[ms][ms][ms][us][us][us]Z T[h]h:[m]m:[s]s.[ms][ms][ms][us][us][us]-[h]h:[m]m
    * T[h]h:[m]m:[s]s.[ms][ms][ms][us][us][us]+[h]h:[m]m
    */
   @Test

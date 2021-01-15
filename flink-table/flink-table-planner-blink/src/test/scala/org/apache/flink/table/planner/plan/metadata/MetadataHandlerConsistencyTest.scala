@@ -40,20 +40,18 @@ import scala.collection.JavaConversions._
 import scala.collection.mutable
 
 /**
- * Metadata estimation for logical RelNode and relative physical RelNode should be same.
- * Now almost every logical RelNode has same parent class with its relative physical RelNode except
- * for Aggregate and Correlate.
- * This test ensure two points.
- * 1. all subclasses of [[MetadataHandler]] have explicit metadata estimation
- * for [[Aggregate]] and [[BatchPhysicalGroupAggregateBase]] or have no metadata estimation for
- * [[Aggregate]] and [[BatchPhysicalGroupAggregateBase]] either.
- * 2. all subclasses of [[MetadataHandler]] have explicit metadata estimation
- * for [[Correlate]] and  [[BatchPhysicalGroupAggregateBase]] or have no metadata estimation for
- * [[Correlate]] and  [[BatchPhysicalGroupAggregateBase]] either.
- * Be cautious that if logical Aggregate and physical Aggregate or logical Correlate and physical
- * Correlate both are present in a MetadataHandler class, their metadata estimation should be same.
- * This test does not check this point because every MetadataHandler could have different
- * parameters with each other.
+ * Metadata estimation for logical RelNode and relative physical RelNode should be same. Now almost
+ * every logical RelNode has same parent class with its relative physical RelNode except for
+ * Aggregate and Correlate. This test ensure two points.
+ *   1. all subclasses of [[MetadataHandler]] have explicit metadata estimation for [[Aggregate]]
+ *      and [[BatchPhysicalGroupAggregateBase]] or have no metadata estimation for [[Aggregate]] and
+ *      [[BatchPhysicalGroupAggregateBase]] either. 2. all subclasses of [[MetadataHandler]] have
+ *      explicit metadata estimation for [[Correlate]] and [[BatchPhysicalGroupAggregateBase]] or
+ *      have no metadata estimation for [[Correlate]] and [[BatchPhysicalGroupAggregateBase]]
+ *      either. Be cautious that if logical Aggregate and physical Aggregate or logical Correlate
+ *      and physical Correlate both are present in a MetadataHandler class, their metadata
+ *      estimation should be same. This test does not check this point because every MetadataHandler
+ *      could have different parameters with each other.
  */
 @RunWith(classOf[Parameterized])
 class MetadataHandlerConsistencyTest(
@@ -100,7 +98,8 @@ class MetadataHandlerConsistencyTest(
   /**
    * Scan packages to find out all subclasses of [[MetadataHandler]] in flink.
    *
-   * @return A list contains all subclasses of [[MetadataHandler]] in flink.
+   * @return
+   *   A list contains all subclasses of [[MetadataHandler]] in flink.
    */
   private def fetchAllExtendedMetadataHandlers: Seq[Class[_ <: MetadataHandler[_]]] = {
     val reflections = new Reflections(
@@ -117,11 +116,15 @@ class MetadataHandlerConsistencyTest(
    * Gets whether the given metadataHandler contains explicit metadata estimation for the given
    * RelNode class.
    *
-   * @param mdHandlerClazz class of metadata handler
-   * @param relNodeClazz   class of RelNode
-   * @param methodInDef    metadata estimation method
-   * @return True if the given metadataHandler contains explicit metadata estimation for the given
-   * RelNode class, false else.
+   * @param mdHandlerClazz
+   *   class of metadata handler
+   * @param relNodeClazz
+   *   class of RelNode
+   * @param methodInDef
+   *   metadata estimation method
+   * @return
+   *   True if the given metadataHandler contains explicit metadata estimation for the given RelNode
+   *   class, false else.
    */
   private def existExplicitEstimation(
       mdHandlerClazz: Class[_ <: MetadataHandler[_]],

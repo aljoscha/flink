@@ -451,10 +451,14 @@ object FunctionGenerator {
    * Returns a [[CallGenerator]] that generates all required code for calling the given
    * [[SqlOperator]].
    *
-   * @param sqlOperator SQL operator (might be overloaded)
-   * @param operandTypes actual operand types
-   * @param resultType expected return type
-   * @return [[CallGenerator]]
+   * @param sqlOperator
+   *   SQL operator (might be overloaded)
+   * @param operandTypes
+   *   actual operand types
+   * @param resultType
+   *   expected return type
+   * @return
+   *   [[CallGenerator]]
    */
   def getCallGenerator(
       sqlOperator: SqlOperator,
@@ -481,8 +485,8 @@ object FunctionGenerator {
   }
 
   /**
-   * Returns whether this type should be automatically casted to
-   * the target type in an arithmetic operation.
+   * Returns whether this type should be automatically casted to the target type in an arithmetic
+   * operation.
    */
   def shouldAutoCastTo(from: LogicalTypeRoot, to: LogicalTypeRoot): Boolean = {
     from match {

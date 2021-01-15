@@ -31,11 +31,10 @@ import org.apache.flink.graph.scala.utils.Tuple3ToEdgeMap
  *
  * It is an implementation of the Single-Source-Shortest-Paths algorithm.
  *
- * The input file is a plain text file and must be formatted as follows:
- * Edges are represented by tuples of srcVertexId, trgVertexId, distance which are
- * separated by tabs. Edges themselves are separated by newlines.
- * For example: <code>1\t2\t0.1\n1\t3\t1.4\n</code> defines two edges,
- * edge 1-2 with distance 0.1, and edge 1-3 with distance 1.4.
+ * The input file is a plain text file and must be formatted as follows: Edges are represented by
+ * tuples of srcVertexId, trgVertexId, distance which are separated by tabs. Edges themselves are
+ * separated by newlines. For example: <code>1\t2\t0.1\n1\t3\t1.4\n</code> defines two edges, edge
+ * 1-2 with distance 0.1, and edge 1-3 with distance 1.4.
  *
  * If no parameters are provided, the program is run with default data from
  * [[SingleSourceShortestPathsData]]

@@ -50,8 +50,8 @@ import java.util.Collections
 import scala.collection.JavaConversions._
 
 /**
- * Implements [[org.apache.calcite.sql.util.SqlVisitor]]
- * interface to do some rewrite work before sql node validation.
+ * Implements [[org.apache.calcite.sql.util.SqlVisitor]] interface to do some rewrite work before
+ * sql node validation.
  */
 class PreValidateReWriter(
     val validator: FlinkCalciteSqlValidator,
@@ -83,24 +83,23 @@ object PreValidateReWriter {
    * Append the static partitions to the data source projection list. The columns are appended to
    * the corresponding positions.
    *
-   * <p>If we have a table A with schema (&lt;a&gt;, &lt;b&gt;, &lt;c&gt) whose
-   * partition columns are (&lt;a&gt;, &lt;c&gt;), and got a query
-   * <blockquote><pre>
-   * insert into A partition(a='11', c='22')
-   * select b from B
-   * </pre></blockquote>
-   * The query would be rewritten to:
-   * <blockquote><pre>
-   * insert into A partition(a='11', c='22')
-   * select cast('11' as tpe1), b, cast('22' as tpe2) from B
-   * </pre></blockquote>
-   * Where the "tpe1" and "tpe2" are data types of column a and c of target table A.
+   * <p>If we have a table A with schema (&lt;a&gt;, &lt;b&gt;, &lt;c&gt) whose partition columns
+   * are (&lt;a&gt;, &lt;c&gt;), and got a query <blockquote><pre> insert into A partition(a='11',
+   * c='22') select b from B </pre></blockquote> The query would be rewritten to: <blockquote><pre>
+   * insert into A partition(a='11', c='22') select cast('11' as tpe1), b, cast('22' as tpe2) from B
+   * </pre></blockquote> Where the "tpe1" and "tpe2" are data types of column a and c of target
+   * table A.
    *
-   * @param sqlInsert            RichSqlInsert instance
-   * @param validator            Validator
-   * @param typeFactory          type factory
-   * @param source               Source to rewrite
-   * @param partitions           Static partition statements
+   * @param sqlInsert
+   *   RichSqlInsert instance
+   * @param validator
+   *   Validator
+   * @param typeFactory
+   *   type factory
+   * @param source
+   *   Source to rewrite
+   * @param partitions
+   *   Static partition statements
    */
   def appendPartitionProjects(
       sqlInsert: RichSqlInsert,
@@ -211,15 +210,19 @@ object PreValidateReWriter {
    * Derives a row-type for INSERT and UPDATE operations.
    *
    * <p>This code snippet is almost inspired by
-   * [[org.apache.calcite.sql.validate.SqlValidatorImpl#createTargetRowType]].
-   * It is the best that the logic can be merged into Apache Calcite,
-   * but this needs time.
+   * [[org.apache.calcite.sql.validate.SqlValidatorImpl#createTargetRowType]]. It is the best that
+   * the logic can be merged into Apache Calcite, but this needs time.
    *
-   * @param typeFactory      TypeFactory
-   * @param catalogReader    CalciteCatalogReader
-   * @param table            Target table for INSERT/UPDATE
-   * @param targetColumnList List of target columns, or null if not specified
-   * @return Rowtype
+   * @param typeFactory
+   *   TypeFactory
+   * @param catalogReader
+   *   CalciteCatalogReader
+   * @param table
+   *   Target table for INSERT/UPDATE
+   * @param targetColumnList
+   *   List of target columns, or null if not specified
+   * @return
+   *   Rowtype
    */
   private def createTargetRowType(
       typeFactory: RelDataTypeFactory,

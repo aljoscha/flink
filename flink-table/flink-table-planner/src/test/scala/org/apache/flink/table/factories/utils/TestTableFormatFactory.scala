@@ -33,8 +33,8 @@ import org.apache.flink.types.Row
 /**
  * Table format factory for testing.
  *
- * It has the same context as [[TestAmbiguousTableFormatFactory]] and both support COMMON_PATH.
- * This format does not support SPECIAL_PATH but supports schema derivation.
+ * It has the same context as [[TestAmbiguousTableFormatFactory]] and both support COMMON_PATH. This
+ * format does not support SPECIAL_PATH but supports schema derivation.
  */
 class TestTableFormatFactory
     extends TableFormatFactoryBase[Row](TableFormatFactoryServiceTest.TEST_FORMAT_TYPE, 1, true)

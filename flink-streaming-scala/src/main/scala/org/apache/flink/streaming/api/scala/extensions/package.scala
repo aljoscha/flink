@@ -22,14 +22,14 @@ import org.apache.flink.streaming.api.scala.extensions.impl.acceptPartialFunctio
 import org.apache.flink.streaming.api.windowing.windows.Window
 
 /**
- * acceptPartialFunctions extends the original DataStream with methods with unique names
- * that delegate to core higher-order functions (e.g. `map`) so that we can work around
- * the fact that overloaded methods taking functions as parameters can't accept partial
- * functions as well. This enables the possibility to directly apply pattern matching
- * to decompose inputs such as tuples, case classes and collections.
+ * acceptPartialFunctions extends the original DataStream with methods with unique names that
+ * delegate to core higher-order functions (e.g. `map`) so that we can work around the fact that
+ * overloaded methods taking functions as parameters can't accept partial functions as well. This
+ * enables the possibility to directly apply pattern matching to decompose inputs such as tuples,
+ * case classes and collections.
  *
- * The following is a small example that showcases how this extensions would work on
- * a Flink data stream:
+ * The following is a small example that showcases how this extensions would work on a Flink data
+ * stream:
  *
  * {{{
  *   object Main {

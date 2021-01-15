@@ -31,10 +31,9 @@ import org.apache.calcite.rex._
 import _root_.java.math.{BigDecimal => JBigDecimal}
 
 /**
- * Planner rule that transforms simple [[LogicalAggregate]] on a [[LogicalProject]]
- * with windowing expression to
- * [[org.apache.flink.table.planner.plan.nodes.calcite.LogicalWindowAggregate]]
- * for batch.
+ * Planner rule that transforms simple [[LogicalAggregate]] on a [[LogicalProject]] with windowing
+ * expression to [[org.apache.flink.table.planner.plan.nodes.calcite.LogicalWindowAggregate]] for
+ * batch.
  */
 class BatchLogicalWindowAggregateRule
     extends LogicalWindowAggregateRuleBase("BatchLogicalWindowAggregateRule") {

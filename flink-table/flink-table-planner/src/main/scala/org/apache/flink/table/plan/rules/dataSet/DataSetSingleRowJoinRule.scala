@@ -50,8 +50,8 @@ class DataSetSingleRowJoinRule
   }
 
   /**
-   * Recursively checks if a [[RelNode]] returns at most a single row.
-   * Input must be a global aggregation possibly followed by projections or filters.
+   * Recursively checks if a [[RelNode]] returns at most a single row. Input must be a global
+   * aggregation possibly followed by projections or filters.
    */
   private def isSingleRow(node: RelNode): Boolean = {
     node match {

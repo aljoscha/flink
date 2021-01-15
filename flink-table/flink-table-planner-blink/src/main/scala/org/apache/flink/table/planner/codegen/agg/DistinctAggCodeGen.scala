@@ -47,24 +47,36 @@ import org.apache.calcite.tools.RelBuilder
 import java.lang.{Long => JLong}
 
 /**
- * It is for code generate distinct aggregate. The distinct aggregate buffer is a MapView which
- * is used to store the unique keys and the frequency of appearance. When a key is been seen the
- * first time, we will trigger the inner aggregate function's accumulate() function.
+ * It is for code generate distinct aggregate. The distinct aggregate buffer is a MapView which is
+ * used to store the unique keys and the frequency of appearance. When a key is been seen the first
+ * time, we will trigger the inner aggregate function's accumulate() function.
  *
- * @param ctx  the code gen context
- * @param distinctInfo the distinct information
- * @param distinctIndex  the index of this distinct in all distincts
- * @param innerAggCodeGens the code generator of inner aggregate
- * @param filterExpressions filter argument access expression, none if no filter
- * @param mergedAccOffset   the mergedAcc may come from local aggregate,
- *                          this is the first buffer offset in the row
- * @param aggBufferOffset   the offset in the buffers of this aggregate
- * @param aggBufferSize     the total size of aggregate buffers
- * @param hasNamespace      whether the accumulators state has namespace
- * @param mergedAccOnHeap   whether the merged accumulator is on heap, otherwise is on state
- * @param consumeRetraction whether the distinct consumes retraction
- * @param inputFieldCopy    copy input field element if true (only mutable type will be copied)
- * @param relBuilder        the rel builder to translate expressions to calcite rex nodes
+ * @param ctx
+ *   the code gen context
+ * @param distinctInfo
+ *   the distinct information
+ * @param distinctIndex
+ *   the index of this distinct in all distincts
+ * @param innerAggCodeGens
+ *   the code generator of inner aggregate
+ * @param filterExpressions
+ *   filter argument access expression, none if no filter
+ * @param mergedAccOffset
+ *   the mergedAcc may come from local aggregate, this is the first buffer offset in the row
+ * @param aggBufferOffset
+ *   the offset in the buffers of this aggregate
+ * @param aggBufferSize
+ *   the total size of aggregate buffers
+ * @param hasNamespace
+ *   whether the accumulators state has namespace
+ * @param mergedAccOnHeap
+ *   whether the merged accumulator is on heap, otherwise is on state
+ * @param consumeRetraction
+ *   whether the distinct consumes retraction
+ * @param inputFieldCopy
+ *   copy input field element if true (only mutable type will be copied)
+ * @param relBuilder
+ *   the rel builder to translate expressions to calcite rex nodes
  */
 class DistinctAggCodeGen(
     ctx: CodeGeneratorContext,
@@ -510,25 +522,22 @@ class DistinctAggCodeGen(
   // ---------------------------- Distinct Value Code Generator ---------------------------
 
   /**
-   * The [[DistinctValueGenerator]] is an abstraction for generating codes about the
-   * distinct value.
+   * The [[DistinctValueGenerator]] is an abstraction for generating codes about the distinct value.
    *
-   * The value of distinct state maybe long or long[] depends on the input stream
-   * and the number of the distinct aggregates.
+   * The value of distinct state maybe long or long[] depends on the input stream and the number of
+   * the distinct aggregates.
    *
-   * 1. when the input is not a retraction stream, and the distinct agg number <= 64,
-   *   then long is used as the value, each bit indicate whether each condition is satisfied.
+   *   1. when the input is not a retraction stream, and the distinct agg number <= 64, then long is
+   *      used as the value, each bit indicate whether each condition is satisfied.
    *
-   * 2. when the input is not a retraction stream, and the distinct agg number > 64,
-   *   then long[] is used as the value, each bit indicate whether each condition is satisfied.
+   * 2. when the input is not a retraction stream, and the distinct agg number > 64, then long[] is
+   * used as the value, each bit indicate whether each condition is satisfied.
    *
-   * 3. when the input is a retraction stream, and the distinct agg number == 1,
-   *   then long is used as the value, the long indicates the number of elements
-   *   satisfy the aggregate condition.
+   * 3. when the input is a retraction stream, and the distinct agg number == 1, then long is used
+   * as the value, the long indicates the number of elements satisfy the aggregate condition.
    *
-   * 4. when the input is a retraction stream, and the distinct agg number > 1,
-   *   then long[] is used as the value, each long indicate the number of elements
-   * *   satisfy each aggregate condition.
+   * 4. when the input is a retraction stream, and the distinct agg number > 1, then long[] is used
+   * as the value, each long indicate the number of elements * satisfy each aggregate condition.
    */
   trait DistinctValueGenerator {
 
@@ -539,8 +548,8 @@ class DistinctAggCodeGen(
     def initialValue: String
 
     /**
-     * Accumulate the value of distinct state,
-     * and generates each accumulate codes for every aggregates.
+     * Accumulate the value of distinct state, and generates each accumulate codes for every
+     * aggregates.
      */
     def foreachAccumulate(
         valueTerm: String,
@@ -548,8 +557,7 @@ class DistinctAggCodeGen(
         filterResults: Array[Option[String]]): String
 
     /**
-     * Retract the value of distinct state,
-     * and generates each retract codes for every aggregates.
+     * Retract the value of distinct state, and generates each retract codes for every aggregates.
      */
     def foreachRetract(
         valueTerm: String,
@@ -557,8 +565,7 @@ class DistinctAggCodeGen(
         filterResults: Array[Option[String]]): String
 
     /**
-     * Merge the value of distinct state,
-     * and generates accumulate/retract codes when needed.
+     * Merge the value of distinct state, and generates accumulate/retract codes when needed.
      */
     def foreachMerge(
         thisValueTerm: String,

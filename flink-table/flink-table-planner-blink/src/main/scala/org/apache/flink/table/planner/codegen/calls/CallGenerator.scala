@@ -22,8 +22,8 @@ import org.apache.flink.table.planner.codegen.{CodeGeneratorContext, GeneratedEx
 import org.apache.flink.table.types.logical.LogicalType
 
 /**
- * Generator to generate a call expression. It is usually used when the generation
- * depends on some other parameters or the generation is too complex to be a util method.
+ * Generator to generate a call expression. It is usually used when the generation depends on some
+ * other parameters or the generation is too complex to be a util method.
  */
 trait CallGenerator {
 

@@ -54,18 +54,24 @@ import scala.collection.mutable
 
 /**
  * [[CodeGenerator]] is the base code generator for generating Flink
- * [[org.apache.flink.api.common.functions.Function]]s.
- * It is responsible for expression generation and tracks the context (member variables etc).
+ * [[org.apache.flink.api.common.functions.Function]] s. It is responsible for expression generation
+ * and tracks the context (member variables etc).
  *
- * @param config configuration that determines runtime behavior
- * @param nullableInput input(s) can be null.
- * @param input1 type information about the first input of the Function
- * @param input2 type information about the second input if the Function is binary
- * @param input1FieldMapping additional mapping information for input1.
- *   POJO types have no deterministic field order and some input fields might not be read.
- *   The input1FieldMapping is also used to inject time indicator attributes.
- * @param input2FieldMapping additional mapping information for input2.
- *   POJO types have no deterministic field order and some input fields might not be read.
+ * @param config
+ *   configuration that determines runtime behavior
+ * @param nullableInput
+ *   input(s) can be null.
+ * @param input1
+ *   type information about the first input of the Function
+ * @param input2
+ *   type information about the second input if the Function is binary
+ * @param input1FieldMapping
+ *   additional mapping information for input1. POJO types have no deterministic field order and
+ *   some input fields might not be read. The input1FieldMapping is also used to inject time
+ *   indicator attributes.
+ * @param input2FieldMapping
+ *   additional mapping information for input2. POJO types have no deterministic field order and
+ *   some input fields might not be read.
  */
 abstract class CodeGenerator(
     config: TableConfig,
@@ -154,51 +160,58 @@ abstract class CodeGenerator(
   protected var hasCodeSplits: Boolean = false
 
   /**
-   * @return code block of statements that need to be placed in the member area of the Function
-   *         (e.g. member variables and their initialization)
+   * @return
+   *   code block of statements that need to be placed in the member area of the Function (e.g.
+   *   member variables and their initialization)
    */
   def reuseMemberCode(): String = {
     reusableMemberStatements.mkString("", "\n", "\n")
   }
 
   /**
-   * @return code block of statements that need to be placed in the constructor of the Function
+   * @return
+   *   code block of statements that need to be placed in the constructor of the Function
    */
   def reuseInitCode(): String = {
     reusableInitStatements.mkString("", "\n", "\n")
   }
 
   /**
-   * @return code block of statements that need to be placed in the open() method of RichFunction
+   * @return
+   *   code block of statements that need to be placed in the open() method of RichFunction
    */
   def reuseOpenCode(): String = {
     reusableOpenStatements.mkString("", "\n", "\n")
   }
 
   /**
-   * @return code block of statements that need to be placed in the close() method of RichFunction
+   * @return
+   *   code block of statements that need to be placed in the close() method of RichFunction
    */
   def reuseCloseCode(): String = {
     reusableCloseStatements.mkString("", "\n", "\n")
   }
 
   /**
-   * @return code block of statements that need to be placed in the SAM of the Function
+   * @return
+   *   code block of statements that need to be placed in the SAM of the Function
    */
   def reusePerRecordCode(): String = {
     reusablePerRecordStatements.mkString("", "\n", "\n")
   }
 
   /**
-   * @return code block of statements that unbox input variables to a primitive variable
-   *         and a corresponding null flag variable
+   * @return
+   *   code block of statements that unbox input variables to a primitive variable and a
+   *   corresponding null flag variable
    */
   def reuseInputUnboxingCode(): String = {
     reusableInputUnboxingExprs.values.map(_.code).mkString("", "\n", "\n")
   }
 
   /**
-   * @return code block of constructor statements for the Function
+   * @return
+   *   code block of constructor statements for the Function
    */
   def reuseConstructorCode(className: String): String = {
     reusableConstructorStatements
@@ -214,32 +227,38 @@ abstract class CodeGenerator(
   }
 
   /**
-   * @return term of the (casted and possibly boxed) first input
+   * @return
+   *   term of the (casted and possibly boxed) first input
    */
   var input1Term = "in1"
 
   /**
-   * @return term of the (casted and possibly boxed) second input
+   * @return
+   *   term of the (casted and possibly boxed) second input
    */
   var input2Term = "in2"
 
   /**
-   * @return term of the (casted) output collector
+   * @return
+   *   term of the (casted) output collector
    */
   var collectorTerm = "c"
 
   /**
-   * @return term of the output record (possibly defined in the member area e.g. Row, Tuple)
+   * @return
+   *   term of the output record (possibly defined in the member area e.g. Row, Tuple)
    */
   var outRecordTerm = "out"
 
   /**
-   * @return term of the [[ProcessFunction]]'s context
+   * @return
+   *   term of the [[ProcessFunction]] 's context
    */
   var contextTerm = "ctx"
 
   /**
-   * @return returns if null checking is enabled
+   * @return
+   *   returns if null checking is enabled
    */
   def nullCheck: Boolean = config.getNullCheck
 
@@ -247,8 +266,10 @@ abstract class CodeGenerator(
    * Generates an expression from a RexNode. If objects or variables can be reused, they will be
    * added to reusable code sections internally.
    *
-   * @param rex Calcite row expression
-   * @return instance of GeneratedExpression
+   * @param rex
+   *   Calcite row expression
+   * @return
+   *   instance of GeneratedExpression
    */
   def generateExpression(rex: RexNode): GeneratedExpression = {
     rex.accept(this)
@@ -256,16 +277,19 @@ abstract class CodeGenerator(
 
   /**
    * Generates an expression that converts the first input (and second input) into the given type.
-   * If two inputs are converted, the second input is appended. If objects or variables can
-   * be reused, they will be added to reusable code sections internally. The evaluation result
-   * may be stored in the global result variable (see [[outRecordTerm]]).
+   * If two inputs are converted, the second input is appended. If objects or variables can be
+   * reused, they will be added to reusable code sections internally. The evaluation result may be
+   * stored in the global result variable (see [[outRecordTerm]] ).
    *
-   * @param returnType conversion target type. Inputs and output must have the same arity.
-   * @param resultFieldNames result field names necessary for a mapping to POJO fields.
-   * @param rowtimeExpression an expression to extract the value of a rowtime field from
-   *                          the input data. Required if the field indices include a rowtime
-   *                          marker.
-   * @return instance of GeneratedExpression
+   * @param returnType
+   *   conversion target type. Inputs and output must have the same arity.
+   * @param resultFieldNames
+   *   result field names necessary for a mapping to POJO fields.
+   * @param rowtimeExpression
+   *   an expression to extract the value of a rowtime field from the input data. Required if the
+   *   field indices include a rowtime marker.
+   * @return
+   *   instance of GeneratedExpression
    */
   def generateConverterResultExpression(
       returnType: TypeInformation[_ <: Any],
@@ -323,14 +347,18 @@ abstract class CodeGenerator(
   }
 
   /**
-   * Generates an expression from a sequence of RexNode. If objects or variables can be reused,
-   * they will be added to reusable code sections internally. The evaluation result
-   * may be stored in the global result variable (see [[outRecordTerm]]).
+   * Generates an expression from a sequence of RexNode. If objects or variables can be reused, they
+   * will be added to reusable code sections internally. The evaluation result may be stored in the
+   * global result variable (see [[outRecordTerm]] ).
    *
-   * @param returnType conversion target type. Type must have the same arity than rexNodes.
-   * @param resultFieldNames result field names necessary for a mapping to POJO fields.
-   * @param rexNodes sequence of RexNode to be converted
-   * @return instance of GeneratedExpression
+   * @param returnType
+   *   conversion target type. Type must have the same arity than rexNodes.
+   * @param resultFieldNames
+   *   result field names necessary for a mapping to POJO fields.
+   * @param rexNodes
+   *   sequence of RexNode to be converted
+   * @return
+   *   instance of GeneratedExpression
    */
   def generateResultExpression(
       returnType: TypeInformation[_ <: Any],
@@ -341,14 +369,18 @@ abstract class CodeGenerator(
   }
 
   /**
-   * Generates an expression from a sequence of other expressions. If objects or variables can
-   * be reused, they will be added to reusable code sections internally. The evaluation result
-   * may be stored in the global result variable (see [[outRecordTerm]]).
+   * Generates an expression from a sequence of other expressions. If objects or variables can be
+   * reused, they will be added to reusable code sections internally. The evaluation result may be
+   * stored in the global result variable (see [[outRecordTerm]] ).
    *
-   * @param fieldExprs field expressions to be converted
-   * @param returnType conversion target type. Type must have the same arity than fieldExprs.
-   * @param resultFieldNames result field names necessary for a mapping to POJO fields.
-   * @return instance of GeneratedExpression
+   * @param fieldExprs
+   *   field expressions to be converted
+   * @param returnType
+   *   conversion target type. Type must have the same arity than fieldExprs.
+   * @param resultFieldNames
+   *   result field names necessary for a mapping to POJO fields.
+   * @return
+   *   instance of GeneratedExpression
    */
   def generateResultExpression(
       fieldExprs: Seq[GeneratedExpression],
@@ -1311,9 +1343,12 @@ abstract class CodeGenerator(
   /**
    * Generates access to a term (e.g. a field) that does not require unboxing logic.
    *
-   * @param fieldType type of field
-   * @param fieldTerm expression term of field (already unboxed)
-   * @return internal unboxed field representation
+   * @param fieldType
+   *   type of field
+   * @param fieldTerm
+   *   expression term of field (already unboxed)
+   * @return
+   *   internal unboxed field representation
    */
   private[flink] def generateTerm(
       fieldType: TypeInformation[_],
@@ -1331,12 +1366,15 @@ abstract class CodeGenerator(
   /**
    * Converts the external boxed format to an internal mostly primitive field representation.
    * Wrapper types can autoboxed to their corresponding primitive type (Integer -> int). External
-   * objects are converted to their internal representation (Timestamp -> internal timestamp
-   * in long).
+   * objects are converted to their internal representation (Timestamp -> internal timestamp in
+   * long).
    *
-   * @param fieldType type of field
-   * @param fieldTerm expression term of field to be unboxed
-   * @return internal unboxed field representation
+   * @param fieldType
+   *   type of field
+   * @param fieldTerm
+   *   expression term of field to be unboxed
+   * @return
+   *   internal unboxed field representation
    */
   private[flink] def generateInputFieldUnboxing(
       fieldType: TypeInformation[_],
@@ -1388,11 +1426,13 @@ abstract class CodeGenerator(
   /**
    * Converts the internal mostly primitive field representation to an external boxed format.
    * Primitive types can autoboxed to their corresponding object type (int -> Integer). Internal
-   * representations are converted to their external objects (internal timestamp
-   * in long -> Timestamp).
+   * representations are converted to their external objects (internal timestamp in long ->
+   * Timestamp).
    *
-   * @param expr expression to be boxed
-   * @return external boxed field representation
+   * @param expr
+   *   expression to be boxed
+   * @return
+   *   external boxed field representation
    */
   private[flink] def generateOutputFieldBoxing(expr: GeneratedExpression): GeneratedExpression = {
     expr.resultType match {
@@ -1477,11 +1517,13 @@ abstract class CodeGenerator(
   // ----------------------------------------------------------------------------------------------
 
   /**
-   * Adds a reusable output record to the member area of the generated [[Function]].
-   * The passed [[TypeInformation]] defines the type class to be instantiated.
+   * Adds a reusable output record to the member area of the generated [[Function]]. The passed
+   * [[TypeInformation]] defines the type class to be instantiated.
    *
-   * @param ti type information of type class to be instantiated during runtime
-   * @return member variable term
+   * @param ti
+   *   type information of type class to be instantiated during runtime
+   * @return
+   *   member variable term
    */
   def addReusableOutRecord(ti: TypeInformation[_]): Unit = {
     val statement = ti match {
@@ -1501,12 +1543,15 @@ abstract class CodeGenerator(
 
   /**
    * Adds a reusable [[java.lang.reflect.Field]] to the member area of the generated [[Function]].
-   * The field can be used for accessing POJO fields more efficiently during runtime, however,
-   * the field does not have to be public.
+   * The field can be used for accessing POJO fields more efficiently during runtime, however, the
+   * field does not have to be public.
    *
-   * @param clazz class of containing field
-   * @param fieldName name of field to be extracted and instantiated during runtime
-   * @return member variable term
+   * @param clazz
+   *   class of containing field
+   * @param fieldName
+   *   name of field to be extracted and instantiated during runtime
+   * @return
+   *   member variable term
    */
   def addReusablePrivateFieldAccess(clazz: Class[_], fieldName: String): String = {
     val fieldTerm = s"field_${clazz.getCanonicalName.replace('.', '$')}_$fieldName"
@@ -1530,8 +1575,10 @@ abstract class CodeGenerator(
   /**
    * Adds a reusable [[java.math.BigDecimal]] to the member area of the generated [[Function]].
    *
-   * @param decimal decimal object to be instantiated during runtime
-   * @return member variable term
+   * @param decimal
+   *   decimal object to be instantiated during runtime
+   * @return
+   *   member variable term
    */
   def addReusableDecimal(decimal: JBigDecimal): String = decimal match {
     case JBigDecimal.ZERO => "java.math.BigDecimal.ZERO"
@@ -1553,7 +1600,8 @@ abstract class CodeGenerator(
    *
    * The seed parameter must be a literal/constant expression.
    *
-   * @return member variable term
+   * @return
+   *   member variable term
    */
   def addReusableRandom(seedExpr: Option[GeneratedExpression]): String = {
     val fieldTerm = newName("random")
@@ -1593,7 +1641,8 @@ abstract class CodeGenerator(
   /**
    * Adds a reusable DateFormatter to the member area of the generated [[Function]].
    *
-   * @return member variable term
+   * @return
+   *   member variable term
    */
   def addReusableDateFormatter(format: GeneratedExpression): String = {
     val fieldTerm = newName("dateFormatter")
@@ -1618,9 +1667,12 @@ abstract class CodeGenerator(
   /**
    * Adds a reusable [[UserDefinedFunction]] to the member area of the generated [[Function]].
    *
-   * @param function [[UserDefinedFunction]] object to be instantiated during runtime
-   * @param contextTerm [[RuntimeContext]] term to access the [[RuntimeContext]]
-   * @return member variable term
+   * @param function
+   *   [[UserDefinedFunction]] object to be instantiated during runtime
+   * @param contextTerm
+   *   [[RuntimeContext]] term to access the [[RuntimeContext]]
+   * @return
+   *   member variable term
    */
   def addReusableFunction(
       function: UserDefinedFunction,
@@ -1669,8 +1721,10 @@ abstract class CodeGenerator(
   /**
    * Adds a reusable constructor statement with the given parameter types.
    *
-   * @param parameterTypes The parameter types to construct the function
-   * @return member variable terms
+   * @param parameterTypes
+   *   The parameter types to construct the function
+   * @return
+   *   member variable terms
    */
   def addReusableConstructor(parameterTypes: Class[_]*): Array[String] = {
     val parameters = mutable.ListBuffer[String]()
@@ -1693,8 +1747,8 @@ abstract class CodeGenerator(
   }
 
   /**
-   * Adds a reusable [[org.apache.flink.types.Row]]
-   * to the member area of the generated [[Function]].
+   * Adds a reusable [[org.apache.flink.types.Row]] to the member area of the generated
+   * [[Function]].
    */
   def addReusableRow(arity: Int): String = {
     val fieldTerm = newName("row")
@@ -1850,8 +1904,10 @@ abstract class CodeGenerator(
   /**
    * Adds a reusable [[java.util.HashSet]] to the member area of the generated [[Function]].
    *
-   * @param elements elements to be added to the set (including null)
-   * @return member variable term
+   * @param elements
+   *   elements to be added to the set (including null)
+   * @return
+   *   member variable term
    */
   def addReusableSet(elements: Seq[GeneratedExpression]): String = {
     val fieldTerm = newName("set")
@@ -1888,8 +1944,10 @@ abstract class CodeGenerator(
   /**
    * Adds a reusable constant to the member area of the generated [[Function]].
    *
-   * @param constant constant expression
-   * @return member variable term
+   * @param constant
+   *   constant expression
+   * @return
+   *   member variable term
    */
   def addReusableBoxedConstant(constant: GeneratedExpression): String = {
     require(constant.literal, "Literal expected")
@@ -1918,7 +1976,8 @@ abstract class CodeGenerator(
   /**
    * Adds a known reusable MessageDigest to the member area of the generated [[Function]].
    *
-   * @return member variable term
+   * @return
+   *   member variable term
    */
   def addReusableMessageDigest(algorithm: String): String = {
     val fieldTerm = newName("messageDigest")
@@ -1945,7 +2004,8 @@ abstract class CodeGenerator(
   /**
    * Adds a constant SHA2 reusable MessageDigest to the member area of the generated [[Function]].
    *
-   * @return member variable term
+   * @return
+   *   member variable term
    */
   def addReusableSha2MessageDigest(constant: GeneratedExpression): String = {
     require(constant.literal, "Literal expected")

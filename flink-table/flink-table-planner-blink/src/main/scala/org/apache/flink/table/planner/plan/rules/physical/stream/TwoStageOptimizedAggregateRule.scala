@@ -41,18 +41,17 @@ import org.apache.calcite.rel.RelNode
 import java.util
 
 /**
- * Rule that matches [[StreamPhysicalGroupAggregate]] on [[StreamPhysicalExchange]]
- * with the following condition:
- * 1. mini-batch is enabled in given TableConfig,
- * 2. two-phase aggregation is enabled in given TableConfig,
- * 3. all aggregate functions are mergeable,
- * 4. the input of exchange does not satisfy the shuffle distribution,
+ * Rule that matches [[StreamPhysicalGroupAggregate]] on [[StreamPhysicalExchange]] with the
+ * following condition:
+ *   1. mini-batch is enabled in given TableConfig, 2. two-phase aggregation is enabled in given
+ *      TableConfig, 3. all aggregate functions are mergeable, 4. the input of exchange does not
+ *      satisfy the shuffle distribution,
  *
  * and converts them to
  * {{{
  *   StreamPhysicalGlobalGroupAggregate
  *   +- StreamPhysicalExchange
- *      +- StreamPhysicalLocalGroupAggregate
+ *     +- StreamPhysicalLocalGroupAggregate
  *         +- input of exchange
  * }}}
  */

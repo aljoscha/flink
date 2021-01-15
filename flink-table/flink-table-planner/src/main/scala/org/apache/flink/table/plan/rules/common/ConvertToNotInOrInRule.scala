@@ -32,12 +32,14 @@ import scala.collection.mutable
 /**
  * Rule for converting a cascade of predicates to [[IN]] or [[NOT_IN]].
  *
- * For example, convert predicate: (x = 1 OR x = 2 OR x = 3) AND y = 4 to
- * predicate: x IN (1, 2, 3) AND y = 4.
+ * For example, convert predicate: (x = 1 OR x = 2 OR x = 3) AND y = 4 to predicate: x IN (1, 2, 3)
+ * AND y = 4.
  *
- * @param toOperator       The toOperator, for example, when convert to [[IN]], toOperator is
- *                         [[IN]]. We convert a cascade of [[EQUALS]] to [[IN]].
- * @param description      The description of the rule.
+ * @param toOperator
+ *   The toOperator, for example, when convert to [[IN]], toOperator is [[IN]]. We convert a cascade
+ *   of [[EQUALS]] to [[IN]].
+ * @param description
+ *   The description of the rule.
  */
 class ConvertToNotInOrInRule(toOperator: SqlBinaryOperator, description: String)
     extends RelOptRule(operand(classOf[Filter], any), description) {
@@ -65,9 +67,12 @@ class ConvertToNotInOrInRule(toOperator: SqlBinaryOperator, description: String)
   /**
    * Convert a cascade predicates to [[IN]] or [[NOT_IN]].
    *
-   * @param builder The [[RelBuilder]] to build the [[RexNode]].
-   * @param rex     The predicates to be converted.
-   * @return The converted predicates.
+   * @param builder
+   *   The [[RelBuilder]] to build the [[RexNode]].
+   * @param rex
+   *   The predicates to be converted.
+   * @return
+   *   The converted predicates.
    */
   private def convertToNotInOrIn(builder: RelBuilder, rex: RexNode): Option[RexNode] = {
 
@@ -153,16 +158,16 @@ object ConvertToNotInOrInRule {
   /**
    * Rule to convert multi [[EQUALS]] to [[IN]].
    *
-   * For example, convert predicate: (x = 1 OR x = 2 OR x = 3) AND y = 4 to
-   * predicate: x IN (1, 2, 3) AND y = 4.
+   * For example, convert predicate: (x = 1 OR x = 2 OR x = 3) AND y = 4 to predicate: x IN (1, 2,
+   * 3) AND y = 4.
    */
   val IN_INSTANCE = new ConvertToNotInOrInRule(IN, "MergeMultiEqualsToInRule")
 
   /**
    * Rule to convert multi [[NOT_EQUALS]] to [[NOT_IN]].
    *
-   * For example, convert predicate: (x <> 1 AND x <> 2 AND x <> 3) OR y <> 4 to
-   * predicate: x NOT_IN (1, 2, 3) OR y <> 4.
+   * For example, convert predicate: (x <> 1 AND x <> 2 AND x <> 3) OR y <> 4 to predicate: x NOT_IN
+   * (1, 2, 3) OR y <> 4.
    */
   val NOT_IN_INSTANCE = new ConvertToNotInOrInRule(NOT_IN, "MergeMultiNotEqualsToNotInRule")
 }

@@ -82,9 +82,9 @@ class CRowSerializer(val rowSerializer: TypeSerializer[Row]) extends TypeSeriali
 object CRowSerializer {
 
   /**
-   * [[CRowSerializer]] is not meant to be used for persisting state. In versions 1.6+ there
-   * were changes introduced that resulted in incompatibility in java serialization. Thus one
-   * cannot read state in 1.8+ from snapshot written with previous versions of Flink.
+   * [[CRowSerializer]] is not meant to be used for persisting state. In versions 1.6+ there were
+   * changes introduced that resulted in incompatibility in java serialization. Thus one cannot read
+   * state in 1.8+ from snapshot written with previous versions of Flink.
    *
    * Moreover this serializer is meant to be dropped once we migrate to the new planner
    * implementation.

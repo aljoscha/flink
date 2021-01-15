@@ -33,8 +33,8 @@ trait StreamOptimizeContext extends FlinkOptimizeContext {
   def getRexBuilder: RexBuilder
 
   /**
-   * Returns true if the root is required to send UPDATE_BEFORE message with
-   * UPDATE_AFTER message together for update changes.
+   * Returns true if the root is required to send UPDATE_BEFORE message with UPDATE_AFTER message
+   * together for update changes.
    */
   def isUpdateBeforeRequired: Boolean
 
@@ -44,8 +44,8 @@ trait StreamOptimizeContext extends FlinkOptimizeContext {
   def getMiniBatchInterval: MiniBatchInterval
 
   /**
-   * Returns true if the output node needs final TimeIndicator conversion
-   * defined in [[org.apache.flink.table.api.TableEnvironment#optimize]].
+   * Returns true if the output node needs final TimeIndicator conversion defined in
+   * [[org.apache.flink.table.api.TableEnvironment#optimize]].
    */
   def needFinalTimeIndicatorConversion: Boolean
 

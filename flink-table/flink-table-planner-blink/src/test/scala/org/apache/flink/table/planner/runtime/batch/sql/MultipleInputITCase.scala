@@ -39,8 +39,8 @@ import scala.util.Random
 /**
  * IT cases for multiple input.
  *
- * <p>This test class works by comparing the results with and without multiple input.
- * The following IT cases are picked from
+ * <p>This test class works by comparing the results with and without multiple input. The following
+ * IT cases are picked from
  * [[org.apache.flink.table.planner.plan.batch.sql.MultipleInputCreationTest]].
  */
 @RunWith(classOf[Parameterized])

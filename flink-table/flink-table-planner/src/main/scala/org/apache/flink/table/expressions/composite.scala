@@ -26,8 +26,7 @@ import org.apache.flink.table.api.UnresolvedException
 import org.apache.flink.table.validate.{ValidationFailure, ValidationResult, ValidationSuccess}
 
 /**
- * Flattening of composite types. All flattenings are resolved into
- * `GetCompositeField` expressions.
+ * Flattening of composite types. All flattenings are resolved into `GetCompositeField` expressions.
  */
 case class Flattening(child: PlannerExpression) extends UnaryExpression {
 

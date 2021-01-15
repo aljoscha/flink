@@ -48,9 +48,9 @@ import scala.collection.JavaConversions._
 import scala.collection.mutable
 
 /**
- * Base rule that splits [[FlinkLogicalCalc]] into multiple [[FlinkLogicalCalc]]s.
- * It is mainly to ensure that each [[FlinkLogicalCalc]] only contains Java/Scala
- * [[ScalarFunction]]s or Python [[ScalarFunction]]s.
+ * Base rule that splits [[FlinkLogicalCalc]] into multiple [[FlinkLogicalCalc]] s. It is mainly to
+ * ensure that each [[FlinkLogicalCalc]] only contains Java/Scala [[ScalarFunction]] s or Python
+ * [[ScalarFunction]] s.
  */
 abstract class PythonCalcSplitRuleBase(description: String)
     extends RelOptRule(operand(classOf[FlinkLogicalCalc], any), description) {
@@ -138,9 +138,8 @@ abstract class PythonCalcSplitRuleBase(description: String)
   def needConvert(program: RexProgram, node: RexNode): Boolean
 
   /**
-   * Splits the specified [[RexProgram]] using the specified [[ScalarFunctionSplitter]].
-   * It returns a triple of (bottom calc condition, top calc condition, top calc projects)
-   * as the split result.
+   * Splits the specified [[RexProgram]] using the specified [[ScalarFunctionSplitter]]. It returns
+   * a triple of (bottom calc condition, top calc condition, top calc projects) as the split result.
    */
   def split(
       program: RexProgram,
@@ -148,9 +147,9 @@ abstract class PythonCalcSplitRuleBase(description: String)
 }
 
 /**
- * Rule that splits [[FlinkLogicalCalc]]s which contain Python functions in the condition
- * into multiple [[FlinkLogicalCalc]]s. After this rule is applied, there will be no
- * Python functions in the condition of the [[FlinkLogicalCalc]]s.
+ * Rule that splits [[FlinkLogicalCalc]] s which contain Python functions in the condition into
+ * multiple [[FlinkLogicalCalc]] s. After this rule is applied, there will be no Python functions in
+ * the condition of the [[FlinkLogicalCalc]] s.
  */
 object PythonCalcSplitConditionRule
     extends PythonCalcSplitRuleBase("PythonCalcSplitConditionRule") {
@@ -214,7 +213,7 @@ abstract class PythonCalcSplitRexFieldRuleBase(description: String)
 
 /**
  * Rule that splits the RexField with the input of Python function contained in the projection of
- * [[FlinkLogicalCalc]]s.
+ * [[FlinkLogicalCalc]] s.
  */
 object PythonCalcSplitProjectionRexFieldRule
     extends PythonCalcSplitRexFieldRuleBase("PythonCalcSplitProjectionRexFieldRule") {
@@ -238,7 +237,7 @@ object PythonCalcSplitProjectionRexFieldRule
 
 /**
  * Rule that splits the RexField with the input of Python function contained in the condition of
- * [[FlinkLogicalCalc]]s.
+ * [[FlinkLogicalCalc]] s.
  */
 object PythonCalcSplitConditionRexFieldRule
     extends PythonCalcSplitRexFieldRuleBase("PythonCalcSplitConditionRexFieldRule") {
@@ -262,9 +261,9 @@ object PythonCalcSplitConditionRexFieldRule
 }
 
 /**
- * Rule that splits [[FlinkLogicalCalc]]s which contain both Java functions and Python functions
- * in the projection into multiple [[FlinkLogicalCalc]]s. After this rule is applied, it will
- * only contain Python functions or Java functions in the projection of each [[FlinkLogicalCalc]].
+ * Rule that splits [[FlinkLogicalCalc]] s which contain both Java functions and Python functions in
+ * the projection into multiple [[FlinkLogicalCalc]] s. After this rule is applied, it will only
+ * contain Python functions or Java functions in the projection of each [[FlinkLogicalCalc]].
  */
 object PythonCalcSplitProjectionRule
     extends PythonCalcSplitProjectionRuleBase("PythonCalcSplitProjectionRule") {
@@ -283,10 +282,10 @@ object PythonCalcSplitProjectionRule
 }
 
 /**
- * Rule that splits [[FlinkLogicalCalc]]s which contain both general Python functions and
- * pandas Python functions in the projection into multiple [[FlinkLogicalCalc]]s. After
- * this rule is applied, it will only contain general Python functions or pandas Python
- * functions in the projection of each [[FlinkLogicalCalc]].
+ * Rule that splits [[FlinkLogicalCalc]] s which contain both general Python functions and pandas
+ * Python functions in the projection into multiple [[FlinkLogicalCalc]] s. After this rule is
+ * applied, it will only contain general Python functions or pandas Python functions in the
+ * projection of each [[FlinkLogicalCalc]].
  */
 object PythonCalcSplitPandasInProjectionRule
     extends PythonCalcSplitProjectionRuleBase("PythonCalcSplitPandasInProjectionRule") {
@@ -311,8 +310,8 @@ object PythonCalcSplitPandasInProjectionRule
 }
 
 /**
- * Rule that expands the RexFieldAccess inputs of Python functions contained in
- * the projection of [[FlinkLogicalCalc]]s.
+ * Rule that expands the RexFieldAccess inputs of Python functions contained in the projection of
+ * [[FlinkLogicalCalc]] s.
  */
 object PythonCalcExpandProjectRule extends PythonCalcSplitRuleBase("PythonCalcExpandProjectRule") {
 
@@ -345,8 +344,8 @@ object PythonCalcExpandProjectRule extends PythonCalcSplitRuleBase("PythonCalcEx
 }
 
 /**
- * Rule that pushes the condition of [[FlinkLogicalCalc]]s before it for the
- * [[FlinkLogicalCalc]]s which contain Python functions in the projection.
+ * Rule that pushes the condition of [[FlinkLogicalCalc]] s before it for the [[FlinkLogicalCalc]] s
+ * which contain Python functions in the projection.
  */
 object PythonCalcPushConditionRule extends PythonCalcSplitRuleBase("PythonCalcPushConditionRule") {
 
@@ -373,11 +372,10 @@ object PythonCalcPushConditionRule extends PythonCalcSplitRuleBase("PythonCalcPu
 }
 
 /**
- * Rule that ensures that it only contains [[RexInputRef]]s at the beginning of
- * the project list and [[RexCall]]s at the end of the project list for [[FlinkLogicalCalc]]s
- * which contain Python functions in the projection. This rule exists to keep
- * DataStreamPythonCalc as simple as possible and ensures that it only needs to
- * handle the Python function execution.
+ * Rule that ensures that it only contains [[RexInputRef]] s at the beginning of the project list
+ * and [[RexCall]] s at the end of the project list for [[FlinkLogicalCalc]] s which contain Python
+ * functions in the projection. This rule exists to keep DataStreamPythonCalc as simple as possible
+ * and ensures that it only needs to handle the Python function execution.
  */
 object PythonCalcRewriteProjectionRule
     extends PythonCalcSplitRuleBase("PythonCalcRewriteProjectionRule") {
@@ -463,13 +461,15 @@ private class ScalarFunctionSplitter(
 
 /**
  * Rewrite field accesses of a RexNode as not all the fields from the original input are forwarded:
- * 1) Fields of index greater than or equal to extractedFunctionOffset refer to the
- *    extracted function.
- * 2) Fields of index less than extractedFunctionOffset refer to the original input field.
+ * 1) Fields of index greater than or equal to extractedFunctionOffset refer to the extracted
+ * function. 2) Fields of index less than extractedFunctionOffset refer to the original input field.
  *
- * @param rexBuilder the RexBuilder
- * @param extractedFunctionOffset the original start offset of the extracted functions
- * @param accessedFields the accessed fields which will be forwarded
+ * @param rexBuilder
+ *   the RexBuilder
+ * @param extractedFunctionOffset
+ *   the original start offset of the extracted functions
+ * @param accessedFields
+ *   the accessed fields which will be forwarded
  */
 private class ExtractedFunctionInputRewriter(
     rexBuilder: RexBuilder,
@@ -510,9 +510,8 @@ private class ExtractedFunctionInputRewriter(
 object PythonCalcSplitRule {
 
   /**
-   * These rules should be applied sequentially in the order of
-   * SPLIT_CONDITION, SPLIT_PROJECT, SPLIT_PANDAS_IN_PROJECT, EXPAND_PROJECT, PUSH_CONDITION
-   * and REWRITE_PROJECT.
+   * These rules should be applied sequentially in the order of SPLIT_CONDITION, SPLIT_PROJECT,
+   * SPLIT_PANDAS_IN_PROJECT, EXPAND_PROJECT, PUSH_CONDITION and REWRITE_PROJECT.
    */
   val SPLIT_CONDITION: RelOptRule = PythonCalcSplitConditionRule
   val SPLIT_PROJECT: RelOptRule = PythonCalcSplitProjectionRule

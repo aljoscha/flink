@@ -244,11 +244,11 @@ class PushPartitionIntoLegacyTableSourceScanRule
   }
 
   /**
-   * adjust the partition field reference index to evaluate the partition values.
-   * e.g. the original input fields is: a, b, c, p, and p is partition field. the partition values
-   * are: List(Map("p"->"1"), Map("p" -> "2"), Map("p" -> "3")). If the original partition
-   * predicate is $3 > 1. after adjusting, the new predicate is ($0 > 1).
-   * and use ($0 > 1) to evaluate partition values (row(1), row(2), row(3)).
+   * adjust the partition field reference index to evaluate the partition values. e.g. the original
+   * input fields is: a, b, c, p, and p is partition field. the partition values are:
+   * List(Map("p"->"1"), Map("p" -> "2"), Map("p" -> "3")). If the original partition predicate is
+   * $3 > 1. after adjusting, the new predicate is ($0 > 1). and use ($0 > 1) to evaluate partition
+   * values (row(1), row(2), row(3)).
    */
   private def adjustPartitionPredicate(
       inputFieldNames: Array[String],

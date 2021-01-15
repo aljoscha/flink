@@ -31,7 +31,7 @@ import org.apache.flink.table.runtime.generated.{
 import org.apache.flink.table.types.logical.LogicalType
 
 /**
- * A code generator for generating Flink [[org.apache.flink.api.common.functions.Function]]s.
+ * A code generator for generating Flink [[org.apache.flink.api.common.functions.Function]] s.
  * Including [[MapFunction]], [[FlatMapFunction]], [[FlatJoinFunction]], [[ProcessFunction]], and
  * the corresponding rich version of the functions.
  */
@@ -41,21 +41,33 @@ object FunctionCodeGenerator {
    * Generates a [[org.apache.flink.api.common.functions.Function]] that can be passed to Java
    * compiler.
    *
-   * @param ctx The context of the code generator
-   * @param name Class name of the Function. Must not be unique but has to be a valid Java class
-   *             identifier.
-   * @param clazz Flink Function to be generated.
-   * @param bodyCode code contents of the SAM (Single Abstract Method). Inputs, collector, or
-   *                 output record can be accessed via the given term methods.
-   * @param returnType expected return type
-   * @param input1Type the first input type
-   * @param input1Term the first input term
-   * @param input2Type the second input type, optional.
-   * @param input2Term the second input term.
-   * @param collectorTerm the collector term
-   * @param contextTerm the context term
-   * @tparam F Flink Function to be generated.
-   * @return instance of GeneratedFunction
+   * @param ctx
+   *   The context of the code generator
+   * @param name
+   *   Class name of the Function. Must not be unique but has to be a valid Java class identifier.
+   * @param clazz
+   *   Flink Function to be generated.
+   * @param bodyCode
+   *   code contents of the SAM (Single Abstract Method). Inputs, collector, or output record can be
+   *   accessed via the given term methods.
+   * @param returnType
+   *   expected return type
+   * @param input1Type
+   *   the first input type
+   * @param input1Term
+   *   the first input term
+   * @param input2Type
+   *   the second input type, optional.
+   * @param input2Term
+   *   the second input term.
+   * @param collectorTerm
+   *   the collector term
+   * @param contextTerm
+   *   the context term
+   * @tparam F
+   *   Flink Function to be generated.
+   * @return
+   *   instance of GeneratedFunction
    */
   def generateFunction[F <: Function](
       ctx: CodeGeneratorContext,
@@ -173,13 +185,18 @@ object FunctionCodeGenerator {
   /**
    * Generates a [[JoinCondition]] that can be passed to Java compiler.
    *
-   * @param ctx The context of the code generator
-   * @param name Class name of the Function. Not must be unique but has to be a valid Java class
-   *             identifier.
-   * @param bodyCode code contents of the SAM (Single Abstract Method).
-   * @param input1Term the first input term
-   * @param input2Term the second input term.
-   * @return instance of GeneratedJoinCondition
+   * @param ctx
+   *   The context of the code generator
+   * @param name
+   *   Class name of the Function. Not must be unique but has to be a valid Java class identifier.
+   * @param bodyCode
+   *   code contents of the SAM (Single Abstract Method).
+   * @param input1Term
+   *   the first input term
+   * @param input2Term
+   *   the second input term.
+   * @return
+   *   instance of GeneratedJoinCondition
    */
   def generateJoinCondition(
       ctx: CodeGeneratorContext,

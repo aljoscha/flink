@@ -40,8 +40,8 @@ import java.lang.{Boolean => JBoolean}
 import scala.collection.JavaConversions._
 
 /**
- * Rule that converts [[FlinkLogicalJoin]] to [[BatchPhysicalSortMergeJoin]]
- * if there exists at least one equal-join condition and SortMergeJoin is enabled.
+ * Rule that converts [[FlinkLogicalJoin]] to [[BatchPhysicalSortMergeJoin]] if there exists at
+ * least one equal-join condition and SortMergeJoin is enabled.
  */
 class BatchPhysicalSortMergeJoinRule
     extends RelOptRule(

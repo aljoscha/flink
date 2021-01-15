@@ -147,9 +147,8 @@ class BaseTwoInputStreamOperatorWithStateRetentionTest extends HarnessTestBase {
   // -------------------------------- Test Classes --------------------------------
 
   /**
-   * A mock [[BaseTwoInputStreamOperatorWithStateRetention]] which registers
-   * the timestamps of the clean-up timers that fired (not the registered
-   * ones, which can be deleted without firing).
+   * A mock [[BaseTwoInputStreamOperatorWithStateRetention]] which registers the timestamps of the
+   * clean-up timers that fired (not the registered ones, which can be deleted without firing).
    */
   class StubOperatorWithStateTTL(minRetentionTime: Long, maxRetentionTime: Long)
       extends BaseTwoInputStreamOperatorWithStateRetention(minRetentionTime, maxRetentionTime) {

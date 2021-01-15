@@ -68,12 +68,15 @@ import _root_.scala.collection.JavaConverters._
  * (The new [[org.apache.flink.table.sources.InputFormatTableSource]] should work, but will be
  * handled as streaming sources, and no batch specific optimizations will be applied).
  *
- * @param executor        instance of [[StreamExecutor]], needed to extract
- *                        [[StreamExecutionEnvironment]] for
- *                        [[org.apache.flink.table.sources.StreamTableSource.getDataStream]]
- * @param config          mutable configuration passed from corresponding [[TableEnvironment]]
- * @param functionCatalog catalog of functions
- * @param catalogManager  manager of catalog meta objects such as tables, views, databases etc.
+ * @param executor
+ *   instance of [[StreamExecutor]], needed to extract [[StreamExecutionEnvironment]] for
+ *   [[org.apache.flink.table.sources.StreamTableSource.getDataStream]]
+ * @param config
+ *   mutable configuration passed from corresponding [[TableEnvironment]]
+ * @param functionCatalog
+ *   catalog of functions
+ * @param catalogManager
+ *   manager of catalog meta objects such as tables, views, databases etc.
  */
 class StreamPlanner(
     executor: Executor,

@@ -39,17 +39,17 @@ import scala.collection.JavaConverters._
  * dampening factor to the sum. The result is the new rank of the page. A new iteration is started
  * with the new ranks of all pages. This implementation terminates after a fixed number of
  * iterations. This is the Wikipedia entry for the
- * [[http://en.wikipedia.org/wiki/Page_rank Page Rank algorithm]]
+ * [[http://en.wikipedia.org/wiki/Page_rankPageRankalgorithm]]
  *
  * Input files are plain text files and must be formatted as follows:
  *
- *  - Pages represented as an (long) ID separated by new-line characters.
- *    For example `"1\n2\n12\n42\n63"` gives five pages with IDs 1, 2, 12, 42, and 63.
- *  - Links are represented as pairs of page IDs which are separated by space  characters. Links
- *    are separated by new-line characters.
- *    For example `"1 2\n2 12\n1 12\n42 63"` gives four (directed) links (1)->(2), (2)->(12),
- *    (1)->(12), and (42)->(63). For this simple implementation it is required that each page has
- *    at least one incoming and one outgoing link (a page can point to itself).
+ *   - Pages represented as an (long) ID separated by new-line characters. For example
+ *     `"1\n2\n12\n42\n63"` gives five pages with IDs 1, 2, 12, 42, and 63.
+ *   - Links are represented as pairs of page IDs which are separated by space characters. Links are
+ *     separated by new-line characters. For example `"1 2\n2 12\n1 12\n42 63"` gives four
+ *     (directed) links (1)->(2), (2)->(12), (1)->(12), and (42)->(63). For this simple
+ *     implementation it is required that each page has at least one incoming and one outgoing link
+ *     (a page can point to itself).
  *
  * Usage:
  * {{{
@@ -61,9 +61,9 @@ import scala.collection.JavaConverters._
  *
  * This example shows how to use:
  *
- *  - Bulk Iterations
- *  - Default Join
- *  - Configure user-defined functions using constructor parameters.
+ *   - Bulk Iterations
+ *   - Default Join
+ *   - Configure user-defined functions using constructor parameters.
  */
 object PageRankBasic {
 

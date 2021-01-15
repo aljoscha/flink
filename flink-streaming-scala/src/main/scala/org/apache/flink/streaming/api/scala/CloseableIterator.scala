@@ -21,8 +21,8 @@ package org.apache.flink.streaming.api.scala
 import org.apache.flink.util.{CloseableIterator => JCloseableIterator}
 
 /**
- * This interface represents an [[Iterator]] that is also [[AutoCloseable]]. A typical use-case
- * for this interface are iterators that are based on native-resources such as files, network, or
+ * This interface represents an [[Iterator]] that is also [[AutoCloseable]]. A typical use-case for
+ * this interface are iterators that are based on native-resources such as files, network, or
  * database connections. Clients must call close after using the iterator.
  */
 trait CloseableIterator[T] extends Iterator[T] with AutoCloseable {}

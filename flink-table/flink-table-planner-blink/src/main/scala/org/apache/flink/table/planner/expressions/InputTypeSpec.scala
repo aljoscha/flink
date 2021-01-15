@@ -37,8 +37,8 @@ trait InputTypeSpec extends PlannerExpression {
    * }}}
    *
    * Inputs that don't match the expected type will be safely casted to a higher type. Therefore,
-   * use the decimal type with caution as all numeric types would be casted to a very
-   * inefficient type.
+   * use the decimal type with caution as all numeric types would be casted to a very inefficient
+   * type.
    */
   private[flink] def expectedTypes: Seq[TypeInformation[_]]
 

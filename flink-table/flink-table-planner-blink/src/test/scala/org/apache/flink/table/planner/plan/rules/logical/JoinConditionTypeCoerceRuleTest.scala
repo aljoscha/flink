@@ -32,9 +32,8 @@ import org.apache.calcite.tools.RuleSets
 import org.junit.{Before, Test}
 
 /**
- * Test for [[JoinConditionTypeCoerceRule]].
- * Now only semi-join rewrite will lost the type consistency, so we only cover this kind of
- * cases.
+ * Test for [[JoinConditionTypeCoerceRule]]. Now only semi-join rewrite will lost the type
+ * consistency, so we only cover this kind of cases.
  */
 class JoinConditionTypeCoerceRuleTest extends TableTestBase {
   private val util = batchTestUtil()

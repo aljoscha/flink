@@ -28,8 +28,8 @@ import org.apache.calcite.rel.RelNode
 import scala.collection.JavaConversions._
 
 /**
- * Planner rule that matches a global [[BatchPhysicalRank]] on a local [[BatchPhysicalRank]],
- * and merge them into a global [[BatchPhysicalRank]].
+ * Planner rule that matches a global [[BatchPhysicalRank]] on a local [[BatchPhysicalRank]], and
+ * merge them into a global [[BatchPhysicalRank]].
  */
 class RemoveRedundantLocalRankRule
     extends RelOptRule(

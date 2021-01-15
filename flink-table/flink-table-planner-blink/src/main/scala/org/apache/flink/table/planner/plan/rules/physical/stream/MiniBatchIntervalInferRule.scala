@@ -47,14 +47,14 @@ import scala.collection.JavaConversions._
  * Planner rule that infers the mini-batch interval of minibatch asssigner.
  *
  * This rule could handle the following two kinds of operator:
- * 1. supports operators which supports mini-batch and does not require watermark, e.g.
- * group aggregate. In this case, [[StreamPhysicalMiniBatchAssigner]] with Protime mode will be
- * created if not exist, and the interval value will be set as
- * [[ExecutionConfigOptions.TABLE_EXEC_MINIBATCH_ALLOW_LATENCY]].
- * 2. supports operators which requires watermark, e.g. window join, window aggregate.
- * In this case, [[StreamPhysicalWatermarkAssigner]] already exists, and its MiniBatchIntervalTrait
- * will be updated as the merged intervals from its outputs.
- * Currently, mini-batched window aggregate is not supported, and will be introduced later.
+ *   1. supports operators which supports mini-batch and does not require watermark, e.g. group
+ *      aggregate. In this case, [[StreamPhysicalMiniBatchAssigner]] with Protime mode will be
+ *      created if not exist, and the interval value will be set as
+ *      [[ExecutionConfigOptions.TABLE_EXEC_MINIBATCH_ALLOW_LATENCY]]. 2. supports operators which
+ *      requires watermark, e.g. window join, window aggregate. In this case,
+ *      [[StreamPhysicalWatermarkAssigner]] already exists, and its MiniBatchIntervalTrait will be
+ *      updated as the merged intervals from its outputs. Currently, mini-batched window aggregate
+ *      is not supported, and will be introduced later.
  *
  * NOTES: This rule only supports HepPlanner with TOP_DOWN match order.
  */
@@ -64,8 +64,10 @@ class MiniBatchIntervalInferRule
   /**
    * Get all children RelNodes of a RelNode.
    *
-   * @param parent The parent RelNode
-   * @return All child nodes
+   * @param parent
+   *   The parent RelNode
+   * @return
+   *   All child nodes
    */
   def getInputs(parent: RelNode): Seq[RelNode] = {
     parent.getInputs.map(_.asInstanceOf[HepRelVertex].getCurrentRel)

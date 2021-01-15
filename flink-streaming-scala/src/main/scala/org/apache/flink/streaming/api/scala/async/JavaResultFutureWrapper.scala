@@ -28,8 +28,10 @@ import scala.collection.JavaConverters._
  * [[org.apache.flink.streaming.api.functions.async.ResultFuture]] to a Scala
  * [[org.apache.flink.streaming.api.scala.async.ResultFuture]].
  *
- * @param javaResultFuture to forward the calls to
- * @tparam OUT type of the output elements
+ * @param javaResultFuture
+ *   to forward the calls to
+ * @tparam OUT
+ *   type of the output elements
  */
 @Internal
 class JavaResultFutureWrapper[OUT](val javaResultFuture: async.ResultFuture[OUT])

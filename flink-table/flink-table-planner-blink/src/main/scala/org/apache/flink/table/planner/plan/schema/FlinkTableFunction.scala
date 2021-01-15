@@ -28,11 +28,12 @@ import java.util
 import java.util.Collections
 
 /**
- * A [[FlinkTableFunction]] is an implementation of  [[org.apache.calcite.schema.TableFunction]].
- * It is also an abstraction and instance holder of Table Function in Flink's Table API & SQL.
- * We can create different kinds of [[FlinkTableFunction]] for different usages.
+ * A [[FlinkTableFunction]] is an implementation of [[org.apache.calcite.schema.TableFunction]]. It
+ * is also an abstraction and instance holder of Table Function in Flink's Table API & SQL. We can
+ * create different kinds of [[FlinkTableFunction]] for different usages.
  *
- * @param tableFunction The Table Function instance
+ * @param tableFunction
+ *   The Table Function instance
  */
 abstract class FlinkTableFunction(tableFunction: functions.TableFunction[_]) extends TableFunction {
 

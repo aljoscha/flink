@@ -36,19 +36,21 @@ import _root_.scala.reflect.ClassTag
 package object utils {
 
   /**
-   * This class provides simple utility methods for zipping elements in a data set with an index
-   * or with a unique identifier, sampling elements from a data set.
+   * This class provides simple utility methods for zipping elements in a data set with an index or
+   * with a unique identifier, sampling elements from a data set.
    *
-   * @param self Data Set
+   * @param self
+   *   Data Set
    */
   @PublicEvolving
   implicit class DataSetUtils[T: TypeInformation: ClassTag](val self: DataSet[T]) {
 
     /**
-     * Method that goes over all the elements in each partition in order to retrieve
-     * the total number of elements.
+     * Method that goes over all the elements in each partition in order to retrieve the total
+     * number of elements.
      *
-     * @return a data set of tuple2 consisting of (subtask index, number of elements mappings)
+     * @return
+     *   a data set of tuple2 consisting of (subtask index, number of elements mappings)
      */
     def countElementsPerPartition: DataSet[(Int, Long)] = {
       implicit val typeInfo = createTuple2TypeInformation[Int, Long](
@@ -58,10 +60,11 @@ package object utils {
     }
 
     /**
-     * Method that takes a set of subtask index, total number of elements mappings
-     * and assigns ids to all the elements from the input data set.
+     * Method that takes a set of subtask index, total number of elements mappings and assigns ids
+     * to all the elements from the input data set.
      *
-     * @return a data set of tuple 2 consisting of consecutive ids and initial values.
+     * @return
+     *   a data set of tuple 2 consisting of consecutive ids and initial values.
      */
     def zipWithIndex: DataSet[(Long, T)] = {
       implicit val typeInfo = createTuple2TypeInformation[Long, T](
@@ -75,7 +78,8 @@ package object utils {
     /**
      * Method that assigns a unique id to all the elements of the input data set.
      *
-     * @return a data set of tuple 2 consisting of ids and initial values.
+     * @return
+     *   a data set of tuple 2 consisting of ids and initial values.
      */
     def zipWithUniqueId: DataSet[(Long, T)] = {
       implicit val typeInfo = createTuple2TypeInformation[Long, T](
@@ -92,13 +96,16 @@ package object utils {
     /**
      * Generate a sample of DataSet by the probability fraction of each element.
      *
-     * @param withReplacement Whether element can be selected more than once.
-     * @param fraction        Probability that each element is chosen, should be [0,1] without
-     *                        replacement, and [0, ∞) with replacement. While fraction is larger
-     *                        than 1, the elements are expected to be selected multi times into
-     *                        sample on average.
-     * @param seed            Random number generator seed.
-     * @return The sampled DataSet
+     * @param withReplacement
+     *   Whether element can be selected more than once.
+     * @param fraction
+     *   Probability that each element is chosen, should be [0,1] without replacement, and [0, ∞)
+     *   with replacement. While fraction is larger than 1, the elements are expected to be selected
+     *   multi times into sample on average.
+     * @param seed
+     *   Random number generator seed.
+     * @return
+     *   The sampled DataSet
      */
     def sample(
         withReplacement: Boolean,
@@ -108,16 +115,18 @@ package object utils {
     }
 
     /**
-     * Generate a sample of DataSet with fixed sample size.
-     * <p>
-     * <strong>NOTE:</strong> Sample with fixed size is not as efficient as sample with fraction,
-     * use sample with fraction unless you need exact precision.
-     * <p/>
+     * Generate a sample of DataSet with fixed sample size. <p> <strong>NOTE:</strong> Sample with
+     * fixed size is not as efficient as sample with fraction, use sample with fraction unless you
+     * need exact precision. <p/>
      *
-     * @param withReplacement Whether element can be selected more than once.
-     * @param numSamples       The expected sample size.
-     * @param seed            Random number generator seed.
-     * @return The sampled DataSet
+     * @param withReplacement
+     *   Whether element can be selected more than once.
+     * @param numSamples
+     *   The expected sample size.
+     * @param seed
+     *   Random number generator seed.
+     * @return
+     *   The sampled DataSet
      */
     def sampleWithSize(
         withReplacement: Boolean,
@@ -186,11 +195,13 @@ package object utils {
     // --------------------------------------------------------------------------------------------
 
     /**
-     * Convenience method to get the count (number of elements) of a DataSet
-     * as well as the checksum (sum over element hashes).
+     * Convenience method to get the count (number of elements) of a DataSet as well as the checksum
+     * (sum over element hashes).
      *
-     * @return A ChecksumHashCode with the count and checksum of elements in the data set.
-     * @see [[org.apache.flink.api.java.Utils.ChecksumHashCodeHelper]]
+     * @return
+     *   A ChecksumHashCode with the count and checksum of elements in the data set.
+     * @see
+     *   [[org.apache.flink.api.java.Utils.ChecksumHashCodeHelper]]
      */
     def checksumHashCode(): ChecksumHashCode = {
       val id = new AbstractID().toString

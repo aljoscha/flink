@@ -38,24 +38,24 @@ import scala.collection.JavaConversions._
  * {{{
  *   BatchPhysicalSortAggregate (global)
  *   +- Sort (exists if group keys are not empty)
- *      +- BatchPhysicalExchange (hash by group keys if group keys is not empty, else singleton)
+ *     +- BatchPhysicalExchange (hash by group keys if group keys is not empty, else singleton)
  *         +- BatchPhysicalLocalSortAggregate (local)
  *           +- Sort (exists if group keys are not empty)
- *              +- input of agg
+ *             +- input of agg
  * }}}
- * when all aggregate functions are mergeable
- * and [[OptimizerConfigOptions.TABLE_OPTIMIZER_AGG_PHASE_STRATEGY]] is TWO_PHASE, or
+ * when all aggregate functions are mergeable and
+ * [[OptimizerConfigOptions.TABLE_OPTIMIZER_AGG_PHASE_STRATEGY]] is TWO_PHASE, or
  * {{{
  *   BatchPhysicalSortAggregate
  *   +- Sort (exists if group keys are not empty)
- *      +- BatchPhysicalExchange (hash by group keys if group keys is not empty, else singleton)
+ *     +- BatchPhysicalExchange (hash by group keys if group keys is not empty, else singleton)
  *         +- input of agg
  * }}}
- * when some aggregate functions are not mergeable
- * or [[OptimizerConfigOptions.TABLE_OPTIMIZER_AGG_PHASE_STRATEGY]] is ONE_PHASE.
+ * when some aggregate functions are not mergeable or
+ * [[OptimizerConfigOptions.TABLE_OPTIMIZER_AGG_PHASE_STRATEGY]] is ONE_PHASE.
  *
- * Notes: if [[OptimizerConfigOptions.TABLE_OPTIMIZER_AGG_PHASE_STRATEGY]] is NONE,
- * this rule will try to create two possibilities above, and chooses the best one based on cost.
+ * Notes: if [[OptimizerConfigOptions.TABLE_OPTIMIZER_AGG_PHASE_STRATEGY]] is NONE, this rule will
+ * try to create two possibilities above, and chooses the best one based on cost.
  */
 class BatchPhysicalSortAggRule
     extends RelOptRule(

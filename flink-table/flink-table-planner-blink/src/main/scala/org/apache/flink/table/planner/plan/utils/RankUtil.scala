@@ -37,7 +37,7 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
- * Util for [[Rank]]s.
+ * Util for [[Rank]] s.
  */
 object RankUtil {
 
@@ -62,11 +62,16 @@ object RankUtil {
   /**
    * Extracts the TopN offset and fetch bounds from a predicate.
    *
-   * @param  oriPred             the original predicate
-   * @param  rankFieldIndex      the index of rank field
-   * @param  rexBuilder          RexBuilder
-   * @param  config              TableConfig
-   * @return A Tuple2 of extracted rank range and remaining predicates.
+   * @param oriPred
+   *   the original predicate
+   * @param rankFieldIndex
+   *   the index of rank field
+   * @param rexBuilder
+   *   RexBuilder
+   * @param config
+   *   TableConfig
+   * @return
+   *   A Tuple2 of extracted rank range and remaining predicates.
    */
   def extractRankRange(
       oriPred: RexNode,
@@ -135,18 +140,18 @@ object RankUtil {
   }
 
   /**
-   * Analyzes a predicate and identifies whether it is a valid predicate for a TopN.
-   * A valid TopN predicate is a comparison predicate (<, <=, =>, >) or equal predicate
-   * that accesses rank fields of input rel node, the rank field reference must be on
-   * one side of the condition alone.
+   * Analyzes a predicate and identifies whether it is a valid predicate for a TopN. A valid TopN
+   * predicate is a comparison predicate (<, <=, =>, >) or equal predicate that accesses rank fields
+   * of input rel node, the rank field reference must be on one side of the condition alone.
    *
    * Examples:
-   * - rank <= 10 => valid (Top 10)
-   * - rank + 1 <= 10 => invalid: rank is not alone in the condition
-   * - rank == 10 => valid (10th)
-   * - rank <= rank + 2 => invalid: rank on same side
+   *   - rank <= 10 => valid (Top 10)
+   *   - rank + 1 <= 10 => invalid: rank is not alone in the condition
+   *   - rank == 10 => valid (10th)
+   *   - rank <= rank + 2 => invalid: rank on same side
    *
-   * @return Either a valid time predicate (Left) or a valid non-time predicate (Right)
+   * @return
+   *   Either a valid time predicate (Left) or a valid non-time predicate (Right)
    */
   private def identifyLimitPredicate(
       pred: RexNode,
@@ -183,9 +188,12 @@ object RankUtil {
   /**
    * Checks if an expression accesses a rank field.
    *
-   * @param expr The expression to check.
-   * @param rankFieldIndex The rank field index.
-   * @return True, if the expression accesses a time attribute. False otherwise.
+   * @param expr
+   *   The expression to check.
+   * @param rankFieldIndex
+   *   The rank field index.
+   * @return
+   *   True, if the expression accesses a time attribute. False otherwise.
    */
   def accessesRankField(expr: RexNode, rankFieldIndex: Int): Boolean = expr match {
     case i: RexInputRef => i.getIndex == rankFieldIndex
@@ -194,10 +202,11 @@ object RankUtil {
   }
 
   /**
-   * Computes the absolute bound on the left operand of a comparison expression and
-   * whether the bound is an upper or lower bound.
+   * Computes the absolute bound on the left operand of a comparison expression and whether the
+   * bound is an upper or lower bound.
    *
-   * @return sort boundary (lower boundary, upper boundary)
+   * @return
+   *   sort boundary (lower boundary, upper boundary)
    */
   private def computeWindowBoundFromPredicate(
       limitPred: LimitPredicate,
@@ -256,13 +265,17 @@ object RankUtil {
   }
 
   /**
-   * Replaces the rank aggregate reference on of a predicate by a zero literal and
-   * reduces the expressions on both sides to a long literal.
+   * Replaces the rank aggregate reference on of a predicate by a zero literal and reduces the
+   * expressions on both sides to a long literal.
    *
-   * @param limitPred The limit predicate which both sides are reduced.
-   * @param rexBuilder A RexBuilder
-   * @param config A TableConfig.
-   * @return The values of the reduced literals on both sides of the comparison predicate.
+   * @param limitPred
+   *   The limit predicate which both sides are reduced.
+   * @param rexBuilder
+   *   A RexBuilder
+   * @param config
+   *   A TableConfig.
+   * @return
+   *   The values of the reduced literals on both sides of the comparison predicate.
    */
   private def reduceComparisonPredicate(
       limitPred: LimitPredicate,

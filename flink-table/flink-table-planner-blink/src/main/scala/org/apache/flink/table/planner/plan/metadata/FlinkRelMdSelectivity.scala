@@ -35,8 +35,8 @@ import org.apache.calcite.util.{BuiltInMethod, ImmutableBitSet, Util}
 import scala.collection.JavaConversions._
 
 /**
- * FlinkRelMdSelectivity supplies a implementation of
- * [[RelMetadataQuery#getSelectivity]] for the standard logical algebra.
+ * FlinkRelMdSelectivity supplies a implementation of [[RelMetadataQuery#getSelectivity]] for the
+ * standard logical algebra.
  */
 class FlinkRelMdSelectivity private extends MetadataHandler[BuiltInMetadata.Selectivity] {
 

@@ -46,8 +46,8 @@ import java.lang.{Double => JDouble, Long => JLong}
 import scala.collection.JavaConversions._
 
 /**
- * FlinkRelMdRowCount supplies a implementation of
- * [[RelMetadataQuery#getRowCount]] for the standard logical algebra.
+ * FlinkRelMdRowCount supplies a implementation of [[RelMetadataQuery#getRowCount]] for the standard
+ * logical algebra.
  */
 class FlinkRelMdRowCount private extends MetadataHandler[BuiltInMetadata.RowCount] {
 
@@ -107,11 +107,16 @@ class FlinkRelMdRowCount private extends MetadataHandler[BuiltInMetadata.RowCoun
   /**
    * Get output rowCount and input rowCount of agg
    *
-   * @param rel           agg relNode
-   * @param groupSet      agg groupSet
-   * @param groupSetsSize agg groupSets count
-   * @param mq            metadata query
-   * @return a tuple, the first element is output rowCount, second one is input rowCount
+   * @param rel
+   *   agg relNode
+   * @param groupSet
+   *   agg groupSet
+   * @param groupSetsSize
+   *   agg groupSets count
+   * @param mq
+   *   metadata query
+   * @return
+   *   a tuple, the first element is output rowCount, second one is input rowCount
    */
   private def getRowCountOfAgg(
       rel: SingleRel,
@@ -429,11 +434,11 @@ class FlinkRelMdRowCount private extends MetadataHandler[BuiltInMetadata.RowCoun
   }
 
   /**
-   * Catch-all implementation for
-   * [[BuiltInMetadata.RowCount#getRowCount()]],
-   * invoked using reflection.
+   * Catch-all implementation for [[BuiltInMetadata.RowCount#getRowCount()]], invoked using
+   * reflection.
    *
-   * @see org.apache.calcite.rel.metadata.RelMetadataQuery#getRowCount(RelNode)
+   * @see
+   *   org.apache.calcite.rel.metadata.RelMetadataQuery#getRowCount(RelNode)
    */
   def getRowCount(rel: RelNode, mq: RelMetadataQuery): JDouble = rel.estimateRowCount(mq)
 

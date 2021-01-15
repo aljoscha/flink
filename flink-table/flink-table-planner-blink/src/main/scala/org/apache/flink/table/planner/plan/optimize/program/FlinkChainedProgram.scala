@@ -30,15 +30,16 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
- * A FlinkOptimizeProgram contains a sequence of [[FlinkOptimizeProgram]]s which are chained
+ * A FlinkOptimizeProgram contains a sequence of [[FlinkOptimizeProgram]] s which are chained
  * together.
  *
- * The chained-order of programs can be adjusted by [[addFirst]], [[addLast]], [[addBefore]]
- * and [[remove]] methods.
+ * The chained-order of programs can be adjusted by [[addFirst]], [[addLast]], [[addBefore]] and
+ * [[remove]] methods.
  *
  * When [[optimize]] method called, each program's optimize method will be called in sequence.
  *
- * @tparam OC OptimizeContext
+ * @tparam OC
+ *   OptimizeContext
  */
 class FlinkChainedProgram[OC <: FlinkOptimizeContext]
     extends FlinkOptimizeProgram[OC]
@@ -76,10 +77,9 @@ class FlinkChainedProgram[OC <: FlinkOptimizeContext]
   def get(name: String): Option[FlinkOptimizeProgram[OC]] = Option.apply(programMap.get(name))
 
   /**
-   * Gets FlinkRuleSetProgram associated with the given name. If the program is not found or is
-   * not a [[FlinkRuleSetProgram]], return [[None]].
-   * This method is mainly used for updating rules in FlinkRuleSetProgram for existed
-   * FlinkChainedPrograms instance.
+   * Gets FlinkRuleSetProgram associated with the given name. If the program is not found or is not
+   * a [[FlinkRuleSetProgram]], return [[None]]. This method is mainly used for updating rules in
+   * FlinkRuleSetProgram for existed FlinkChainedPrograms instance.
    */
   def getFlinkRuleSetProgram(name: String): Option[FlinkRuleSetProgram[OC]] = {
     get(name).getOrElse(None) match {
@@ -91,7 +91,8 @@ class FlinkChainedProgram[OC <: FlinkOptimizeContext]
   /**
    * Appends the specified program to the end of program collection.
    *
-   * @return false if program collection contains the specified program; otherwise true.
+   * @return
+   *   false if program collection contains the specified program; otherwise true.
    */
   def addLast(name: String, program: FlinkOptimizeProgram[OC]): Boolean = {
     Preconditions.checkNotNull(name)
@@ -109,7 +110,8 @@ class FlinkChainedProgram[OC <: FlinkOptimizeContext]
   /**
    * Inserts the specified program to the beginning of program collection.
    *
-   * @return false if program collection contains the specified program; otherwise true.
+   * @return
+   *   false if program collection contains the specified program; otherwise true.
    */
   def addFirst(name: String, program: FlinkOptimizeProgram[OC]): Boolean = {
     Preconditions.checkNotNull(name)
@@ -127,8 +129,9 @@ class FlinkChainedProgram[OC <: FlinkOptimizeContext]
   /**
    * Inserts the specified program before `nameOfBefore`.
    *
-   * @return false if program collection contains the specified program or
-   *         does not contain `nameOfBefore`; otherwise true.
+   * @return
+   *   false if program collection contains the specified program or does not contain
+   *   `nameOfBefore`; otherwise true.
    */
   def addBefore(nameOfBefore: String, name: String, program: FlinkOptimizeProgram[OC]): Boolean = {
     Preconditions.checkNotNull(nameOfBefore)
@@ -150,7 +153,8 @@ class FlinkChainedProgram[OC <: FlinkOptimizeContext]
   /**
    * Removes program associated with the given name from program collection.
    *
-   * @return The removed program associated with the given name. If not found, return [[None]].
+   * @return
+   *   The removed program associated with the given name. If not found, return [[None]].
    */
   def remove(name: String): Option[FlinkOptimizeProgram[OC]] = {
     programNames.remove(name)

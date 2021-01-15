@@ -47,7 +47,8 @@ import scala.collection.JavaConversions._
  * generator will be a reference to a [[WrappingCollector]]. Furthermore, atomic types are wrapped
  * into a row by the collector.
  *
- * @param tableFunction user-defined [[TableFunction]] that might be overloaded
+ * @param tableFunction
+ *   user-defined [[TableFunction]] that might be overloaded
  */
 class TableFunctionCallGen(rexCall: RexCall, tableFunction: TableFunction[_])
     extends CallGenerator {

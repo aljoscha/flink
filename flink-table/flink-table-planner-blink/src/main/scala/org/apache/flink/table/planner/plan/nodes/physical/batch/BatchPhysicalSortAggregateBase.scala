@@ -29,7 +29,8 @@ import org.apache.calcite.rel.metadata.RelMetadataQuery
 /**
  * Batch physical RelNode for sort-based aggregate operator.
  *
- * @see [[BatchPhysicalGroupAggregateBase]] for more info.
+ * @see
+ *   [[BatchPhysicalGroupAggregateBase]] for more info.
  */
 abstract class BatchPhysicalSortAggregateBase(
     cluster: RelOptCluster,

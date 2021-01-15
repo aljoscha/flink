@@ -36,12 +36,12 @@ import scala.collection.JavaConversions._
 trait FlinkRelNode extends RelNode {
 
   /**
-   * Returns a string which describes the detailed information of relational expression
-   * with attributes which contribute to the plan output.
+   * Returns a string which describes the detailed information of relational expression with
+   * attributes which contribute to the plan output.
    *
    * This method leverages [[RelNode#explain]] with
-   * [[org.apache.calcite.sql.SqlExplainLevel.EXPPLAN_ATTRIBUTES]] explain level to generate
-   * the description.
+   * [[org.apache.calcite.sql.SqlExplainLevel.EXPPLAN_ATTRIBUTES]] explain level to generate the
+   * description.
    */
   def getRelDetailedDescription: String = {
     val sw = new StringWriter
@@ -135,10 +135,8 @@ trait FlinkRelNode extends RelNode {
 /**
  * Infix, Postfix and Prefix notations are three different but equivalent ways of writing
  * expressions. It is easiest to demonstrate the differences by looking at examples of operators
- * that take two operands.
- * Infix notation: (X + Y)
- * Postfix notation: (X Y) +
- * Prefix notation: + (X Y)
+ * that take two operands. Infix notation: (X + Y) Postfix notation: (X Y) + Prefix notation: + (X
+ * Y)
  */
 object ExpressionFormat extends Enumeration {
   type ExpressionFormat = Value

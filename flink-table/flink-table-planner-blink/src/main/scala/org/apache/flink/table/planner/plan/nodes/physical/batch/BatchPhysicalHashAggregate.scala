@@ -43,7 +43,8 @@ import scala.collection.JavaConversions._
 /**
  * Batch physical RelNode for (global) hash-based aggregate operator.
  *
- * @see [[BatchPhysicalGroupAggregateBase]] for more info.
+ * @see
+ *   [[BatchPhysicalGroupAggregateBase]] for more info.
  */
 class BatchPhysicalHashAggregate(
     cluster: RelOptCluster,

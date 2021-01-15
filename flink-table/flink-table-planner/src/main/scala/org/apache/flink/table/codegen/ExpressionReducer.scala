@@ -168,10 +168,11 @@ class ExpressionReducer(config: TableConfig)
 }
 
 /**
- * A [[ConstantFunctionContext]] allows to obtain user-defined configuration information set
- * in [[TableConfig]].
+ * A [[ConstantFunctionContext]] allows to obtain user-defined configuration information set in
+ * [[TableConfig]].
  *
- * @param parameters User-defined configuration set in [[TableConfig]].
+ * @param parameters
+ *   User-defined configuration set in [[TableConfig]].
  */
 class ConstantFunctionContext(parameters: Configuration) extends FunctionContext(null) {
 
@@ -186,10 +187,13 @@ class ConstantFunctionContext(parameters: Configuration) extends FunctionContext
   /**
    * Gets the user-defined configuration value associated with the given key as a string.
    *
-   * @param key          key pointing to the associated value
-   * @param defaultValue default value which is returned in case user-defined configuration
-   *                     value is null or there is no value associated with the given key
-   * @return (default) value associated with the given key
+   * @param key
+   *   key pointing to the associated value
+   * @param defaultValue
+   *   default value which is returned in case user-defined configuration value is null or there is
+   *   no value associated with the given key
+   * @return
+   *   (default) value associated with the given key
    */
   override def getJobParameter(key: String, defaultValue: String): String = {
     parameters.getString(key, defaultValue)
@@ -198,9 +202,12 @@ class ConstantFunctionContext(parameters: Configuration) extends FunctionContext
 
 /**
  * A [[ConstantFunctionCodeGenerator]] used for constant expression code generator
- * @param config configuration that determines runtime behavior
- * @param nullableInput input(s) can be null.
- * @param input1 type information about the first input of the Function
+ * @param config
+ *   configuration that determines runtime behavior
+ * @param nullableInput
+ *   input(s) can be null.
+ * @param input1
+ *   type information about the first input of the Function
  */
 class ConstantFunctionCodeGenerator(
     config: TableConfig,
@@ -211,9 +218,12 @@ class ConstantFunctionCodeGenerator(
   /**
    * Adds a reusable [[UserDefinedFunction]] to the member area of the generated [[Function]].
    *
-   * @param function    [[UserDefinedFunction]] object to be instantiated during runtime
-   * @param contextTerm term to access the Context
-   * @return member variable term
+   * @param function
+   *   [[UserDefinedFunction]] object to be instantiated during runtime
+   * @param contextTerm
+   *   term to access the Context
+   * @return
+   *   member variable term
    */
   override def addReusableFunction(
       function: UserDefinedFunction,

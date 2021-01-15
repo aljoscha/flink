@@ -31,21 +31,19 @@ import org.apache.calcite.tools.RelBuilderFactory
 import scala.collection.JavaConversions._
 
 /**
- * Planner rule that rewrites scalar query in filter like:
- * `select * from T1 where (select count(*) from T2) > 0`
- * to
- * `select * from T1 where exists (select * from T2)`,
- * which could be converted to SEMI join by [[FlinkSubQueryRemoveRule]].
+ * Planner rule that rewrites scalar query in filter like: `select * from T1 where (select count(*)
+ * from T2) > 0` to `select * from T1 where exists (select * from T2)`, which could be converted to
+ * SEMI join by [[FlinkSubQueryRemoveRule]].
  *
- * Without this rule, the original query will be rewritten to a filter on a join on an aggregate
- * by [[org.apache.calcite.rel.rules.SubQueryRemoveRule]]. the full logical plan is
+ * Without this rule, the original query will be rewritten to a filter on a join on an aggregate by
+ * [[org.apache.calcite.rel.rules.SubQueryRemoveRule]]. the full logical plan is
  * {{{
  * LogicalProject(a=[$0], b=[$1], c=[$2])
  * +- LogicalJoin(condition=[$3], joinType=[semi])
- *    :- LogicalTableScan(table=[[x, source: [TestTableSource(a, b, c)]]])
- *    +- LogicalProject($f0=[IS NOT NULL($0)])
+ *   :- LogicalTableScan(table=[[x, source: [TestTableSource(a, b, c)]]])
+ *   +- LogicalProject($f0=[IS NOT NULL($0)])
  *       +- LogicalAggregate(group=[{}], m=[MIN($0)])
- *          +- LogicalProject(i=[true])
+ *         +- LogicalProject(i=[true])
  *             +- LogicalTableScan(table=[[y, source: [TestTableSource(d, e, f)]]])
  * }}}
  */

@@ -31,8 +31,8 @@ import _root_.scala.collection.JavaConversions._
 abstract class PlannerExpression extends TreeNode[PlannerExpression] with Expression {
 
   /**
-   * Returns the [[TypeInformation]] for evaluating this expression.
-   * It is sometimes not available until the expression is valid.
+   * Returns the [[TypeInformation]] for evaluating this expression. It is sometimes not available
+   * until the expression is valid.
    */
   private[flink] def resultType: TypeInformation[_]
 
@@ -44,10 +44,9 @@ abstract class PlannerExpression extends TreeNode[PlannerExpression] with Expres
   private[flink] def childrenValid: Boolean = children.forall(_.valid)
 
   /**
-   * Check input data types, inputs number or other properties specified by this expression.
-   * Return `ValidationSuccess` if it pass the check,
-   * or `ValidationFailure` with supplement message explaining the error.
-   * Note: we should only call this method until `childrenValid == true`
+   * Check input data types, inputs number or other properties specified by this expression. Return
+   * `ValidationSuccess` if it pass the check, or `ValidationFailure` with supplement message
+   * explaining the error. Note: we should only call this method until `childrenValid == true`
    */
   private[flink] def validateInput(): ValidationResult = ValidationSuccess
 

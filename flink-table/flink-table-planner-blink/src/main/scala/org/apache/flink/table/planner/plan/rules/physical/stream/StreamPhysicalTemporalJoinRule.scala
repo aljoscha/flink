@@ -29,8 +29,8 @@ import org.apache.calcite.rel.RelNode
 import org.apache.calcite.rel.core.JoinRelType
 
 /**
- * Rule that matches a temporal join node and converts it to [[StreamPhysicalTemporalJoin]],
- * the temporal join node is a [[FlinkLogicalJoin]] which contains [[TEMPORAL_JOIN_CONDITION]].
+ * Rule that matches a temporal join node and converts it to [[StreamPhysicalTemporalJoin]], the
+ * temporal join node is a [[FlinkLogicalJoin]] which contains [[TEMPORAL_JOIN_CONDITION]].
  */
 class StreamPhysicalTemporalJoinRule
     extends StreamPhysicalJoinRuleBase("StreamPhysicalTemporalJoinRule") {

@@ -31,8 +31,10 @@ import org.apache.flink.streaming.api.operators.TimestampedCollector
 /**
  * ProcessFunction to sort on processing time and additional attributes.
  *
- * @param inputRowType The data type of the input data.
- * @param rowComparator A comparator to sort rows.
+ * @param inputRowType
+ *   The data type of the input data.
+ * @param rowComparator
+ *   A comparator to sort rows.
  */
 class ProcTimeSortProcessFunction[K](
     private val inputRowType: CRowTypeInfo,

@@ -21,11 +21,12 @@ package akka.dispatch
 import java.util.concurrent.ThreadFactory
 
 /**
- * Composition over the [[DispatcherPrerequisites.threadFactory]] that set priority
- * for newly created threads.
+ * Composition over the [[DispatcherPrerequisites.threadFactory]] that set priority for newly
+ * created threads.
  *
- * @param newThreadPriority priority that will be set to each newly created thread
- *                          should be between Thread.MIN_PRIORITY and Thread.MAX_PRIORITY
+ * @param newThreadPriority
+ *   priority that will be set to each newly created thread should be between Thread.MIN_PRIORITY
+ *   and Thread.MAX_PRIORITY
  */
 class PriorityThreadFactory(prerequisites: DispatcherPrerequisites, newThreadPriority: Int)
     extends ThreadFactory {

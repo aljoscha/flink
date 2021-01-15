@@ -23,10 +23,9 @@ import org.apache.flink.table.planner.plan.`trait`.MiniBatchMode.MiniBatchMode
 import org.apache.calcite.plan.{RelOptPlanner, RelTrait, RelTraitDef}
 
 /**
- * The MiniBatchIntervalTrait is used to describe how the elements are divided into batches
- * when flowing out from a [[org.apache.calcite.rel.RelNode]],
- * e,g,. MiniBatchIntervalTrait(1000L, ProcTime)
- * means elements are divided into 1000ms proctime mini batches.
+ * The MiniBatchIntervalTrait is used to describe how the elements are divided into batches when
+ * flowing out from a [[org.apache.calcite.rel.RelNode]], e,g,. MiniBatchIntervalTrait(1000L,
+ * ProcTime) means elements are divided into 1000ms proctime mini batches.
  */
 class MiniBatchIntervalTrait(miniBatchInterval: MiniBatchInterval) extends RelTrait {
 
@@ -55,8 +54,10 @@ class MiniBatchIntervalTrait(miniBatchInterval: MiniBatchInterval) extends RelTr
 }
 
 /**
- * @param interval interval of mini-batch
- * @param mode type of mini-batch: rowtime/proctime
+ * @param interval
+ *   interval of mini-batch
+ * @param mode
+ *   type of mini-batch: rowtime/proctime
  */
 case class MiniBatchInterval(interval: Long, mode: MiniBatchMode)
 
@@ -88,8 +89,8 @@ object MiniBatchMode extends Enumeration {
   val ProcTime = Value
 
   /**
-   * An operator in [[RowTime]] mode requires watermarks extracted from elements,
-   * and emitted in rowtime interval, e.g., window, window join...
+   * An operator in [[RowTime]] mode requires watermarks extracted from elements, and emitted in
+   * rowtime interval, e.g., window, window join...
    */
   val RowTime = Value
 

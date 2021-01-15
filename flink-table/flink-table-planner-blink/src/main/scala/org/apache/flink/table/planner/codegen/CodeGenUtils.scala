@@ -833,8 +833,8 @@ object CodeGenUtils {
    * Generates code for converting the given term of external data type to an internal data
    * structure.
    *
-   * Use this function for converting at the edges of the API where PRIMITIVE TYPES can occur or
-   * the RESULT CAN BE NULL.
+   * Use this function for converting at the edges of the API where PRIMITIVE TYPES can occur or the
+   * RESULT CAN BE NULL.
    */
   def genToInternalConverterAll(
       ctx: CodeGeneratorContext,
@@ -863,8 +863,8 @@ object CodeGenUtils {
   }
 
   /**
-   * Generates code for converting the given term of internal data structure to the given
-   * external target data type.
+   * Generates code for converting the given term of internal data structure to the given external
+   * target data type.
    *
    * Use this function for converting at the edges of the API where primitive types CAN NOT occur
    * and NO NULL CHECKING is required as it might have been done by surrounding layers.
@@ -893,8 +893,8 @@ object CodeGenUtils {
    * Generates code for converting the given expression of internal data structure to the given
    * external target data type.
    *
-   * Use this function for converting at the edges of the API where PRIMITIVE TYPES can occur or
-   * the RESULT CAN BE NULL.
+   * Use this function for converting at the edges of the API where PRIMITIVE TYPES can occur or the
+   * RESULT CAN BE NULL.
    */
   def genToExternalConverterAll(
       ctx: CodeGeneratorContext,
@@ -929,8 +929,8 @@ object CodeGenUtils {
   }
 
   /**
-   * If it's internally compatible, don't need to DataStructure converter.
-   * clazz != classOf[Row] => Row can only infer GenericType[Row].
+   * If it's internally compatible, don't need to DataStructure converter. clazz != classOf[Row] =>
+   * Row can only infer GenericType[Row].
    */
   @deprecated
   def isInternalClass(t: DataType): Boolean = {
@@ -951,7 +951,8 @@ object CodeGenUtils {
    * Use this function for converting at the edges of the API where primitive types CAN NOT occur
    * and NO NULL CHECKING is required as it might have been done by surrounding layers.
    *
-   * @deprecated This uses the legacy [[DataFormatConverters]] including legacy types.
+   * @deprecated
+   *   This uses the legacy [[DataFormatConverters]] including legacy types.
    */
   @deprecated
   private def genToInternalConverterWithLegacy(
@@ -969,7 +970,8 @@ object CodeGenUtils {
   }
 
   /**
-   * @deprecated This uses the legacy [[DataFormatConverters]] including legacy types.
+   * @deprecated
+   *   This uses the legacy [[DataFormatConverters]] including legacy types.
    */
   @deprecated
   private def genToInternalConverterAllWithLegacy(
@@ -993,7 +995,8 @@ object CodeGenUtils {
   }
 
   /**
-   * @deprecated This uses the legacy [[DataFormatConverters]] including legacy types.
+   * @deprecated
+   *   This uses the legacy [[DataFormatConverters]] including legacy types.
    */
   @deprecated
   def genToExternalConverterWithLegacy( // still public due to FLINK-18701
@@ -1012,7 +1015,8 @@ object CodeGenUtils {
   }
 
   /**
-   * @deprecated This uses the legacy [[DataFormatConverters]] including legacy types.
+   * @deprecated
+   *   This uses the legacy [[DataFormatConverters]] including legacy types.
    */
   @deprecated
   private def genToExternalConverterAllWithLegacy(

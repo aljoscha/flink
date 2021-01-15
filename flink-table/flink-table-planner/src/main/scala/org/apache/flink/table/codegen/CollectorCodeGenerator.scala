@@ -25,16 +25,22 @@ import org.apache.flink.table.codegen.Indenter.toISC
 import org.apache.flink.table.runtime.TableFunctionCollector
 
 /**
- * A code generator for generating [[org.apache.flink.util.Collector]]s.
+ * A code generator for generating [[org.apache.flink.util.Collector]] s.
  *
- * @param config configuration that determines runtime behavior
- * @param nullableInput input(s) can be null.
- * @param input1 type information about the first input of the Function
- * @param input2 type information about the second input if the Function is binary
- * @param input1FieldMapping additional mapping information for input1
- *   (e.g. POJO types have no deterministic field order and some input fields might not be read)
- * @param input2FieldMapping additional mapping information for input2
- *   (e.g. POJO types have no deterministic field order and some input fields might not be read)
+ * @param config
+ *   configuration that determines runtime behavior
+ * @param nullableInput
+ *   input(s) can be null.
+ * @param input1
+ *   type information about the first input of the Function
+ * @param input2
+ *   type information about the second input if the Function is binary
+ * @param input1FieldMapping
+ *   additional mapping information for input1 (e.g. POJO types have no deterministic field order
+ *   and some input fields might not be read)
+ * @param input2FieldMapping
+ *   additional mapping information for input2 (e.g. POJO types have no deterministic field order
+ *   and some input fields might not be read)
  */
 class CollectorCodeGenerator(
     config: TableConfig,
@@ -54,12 +60,17 @@ class CollectorCodeGenerator(
   /**
    * Generates a [[TableFunctionCollector]] that can be passed to Java compiler.
    *
-   * @param name Class name of the table function collector. Must not be unique but has to be a
-   *             valid Java class identifier.
-   * @param bodyCode body code for the collector method
-   * @param collectedType The type information of the element collected by the collector
-   * @param filterGenerator generator containing context information for the generated body code
-   * @return instance of GeneratedCollector
+   * @param name
+   *   Class name of the table function collector. Must not be unique but has to be a valid Java
+   *   class identifier.
+   * @param bodyCode
+   *   body code for the collector method
+   * @param collectedType
+   *   The type information of the element collected by the collector
+   * @param filterGenerator
+   *   generator containing context information for the generated body code
+   * @return
+   *   instance of GeneratedCollector
    */
   def generateTableFunctionCollector(
       name: String,

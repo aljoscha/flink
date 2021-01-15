@@ -62,14 +62,18 @@ import _root_.scala.collection.JavaConversions._
 object TableSinkUtils {
 
   /**
-   * It checks whether the [[TableSink]] is compatible to the INSERT INTO clause, e.g.
-   * whether the sink is a [[PartitionableTableSink]] and the partitions are valid.
+   * It checks whether the [[TableSink]] is compatible to the INSERT INTO clause, e.g. whether the
+   * sink is a [[PartitionableTableSink]] and the partitions are valid.
    *
-   * @param sinkOperation The sink operation with the query that is supposed to be written.
-   * @param sinkIdentifier Tha path of the sink. It is needed just for logging. It does not
-   *                      participate in the validation.
-   * @param sink     The sink that we want to write to.
-   * @param partitionKeys The partition keys of this table.
+   * @param sinkOperation
+   *   The sink operation with the query that is supposed to be written.
+   * @param sinkIdentifier
+   *   Tha path of the sink. It is needed just for logging. It does not participate in the
+   *   validation.
+   * @param sink
+   *   The sink that we want to write to.
+   * @param partitionKeys
+   *   The partition keys of this table.
    */
   def validateTableSink(
       sinkOperation: CatalogSinkModifyOperation,
@@ -112,11 +116,13 @@ object TableSinkUtils {
   }
 
   /**
-   * Inferences the physical schema of [[TableSink]], the physical schema ignores change flag
-   * field and normalizes physical types (can be generic type or POJO type) into [[TableSchema]].
-   * @param queryLogicalType the logical type of query, will be used to full-fill sink physical
-   *                         schema if the sink physical type is not specified.
-   * @param sink the instance of [[TableSink]]
+   * Inferences the physical schema of [[TableSink]], the physical schema ignores change flag field
+   * and normalizes physical types (can be generic type or POJO type) into [[TableSchema]].
+   * @param queryLogicalType
+   *   the logical type of query, will be used to full-fill sink physical schema if the sink
+   *   physical type is not specified.
+   * @param sink
+   *   the instance of [[TableSink]]
    */
   def inferSinkPhysicalSchema(queryLogicalType: RowType, sink: TableSink[_]): TableSchema = {
     val withChangeFlag = sink match {
@@ -128,13 +134,16 @@ object TableSinkUtils {
   }
 
   /**
-   * Inferences the physical schema of [[TableSink]], the physical schema ignores change flag
-   * field and normalizes physical types (can be generic type or POJO type) into [[TableSchema]].
+   * Inferences the physical schema of [[TableSink]], the physical schema ignores change flag field
+   * and normalizes physical types (can be generic type or POJO type) into [[TableSchema]].
    *
-   * @param consumedDataType the consumed data type of sink
-   * @param queryLogicalType the logical type of query, will be used to full-fill sink physical
-   *                         schema if the sink physical type is not specified.
-   * @param withChangeFlag true if the emitted records contains change flags.
+   * @param consumedDataType
+   *   the consumed data type of sink
+   * @param queryLogicalType
+   *   the logical type of query, will be used to full-fill sink physical schema if the sink
+   *   physical type is not specified.
+   * @param withChangeFlag
+   *   true if the emitted records contains change flags.
    */
   def inferSinkPhysicalSchema(
       consumedDataType: DataType,
@@ -157,10 +166,9 @@ object TableSinkUtils {
   }
 
   /**
-   * Expands a [[PojoTypeInfo]] to a corresponding [[TableSchema]].
-   * This is a special handling for [[PojoTypeInfo]], because fields of [[PojoTypeInfo]] is not
-   * in the defined order but the alphabet order. In order to match the query schema, we should
-   * reorder the Pojo schema.
+   * Expands a [[PojoTypeInfo]] to a corresponding [[TableSchema]]. This is a special handling for
+   * [[PojoTypeInfo]], because fields of [[PojoTypeInfo]] is not in the defined order but the
+   * alphabet order. In order to match the query schema, we should reorder the Pojo schema.
    */
   private def expandPojoTypeToSchema(
       pojo: PojoTypeInfo[_],
@@ -186,13 +194,16 @@ object TableSinkUtils {
   }
 
   /**
-   * Inferences the physical data type of [[TableSink]], the physical data type ignores
-   * the change flag field.
+   * Inferences the physical data type of [[TableSink]], the physical data type ignores the change
+   * flag field.
    *
-   * @param consumedDataType the consumed data type of sink
-   * @param queryLogicalType the logical type of query, will be used to full-fill sink physical
-   *                         schema if the sink physical type is not specified.
-   * @param withChangeFlag true if the emitted records contains change flags.
+   * @param consumedDataType
+   *   the consumed data type of sink
+   * @param queryLogicalType
+   *   the logical type of query, will be used to full-fill sink physical schema if the sink
+   *   physical type is not specified.
+   * @param withChangeFlag
+   *   true if the emitted records contains change flags.
    */
   def inferSinkPhysicalDataType(
       consumedDataType: DataType,
@@ -244,12 +255,15 @@ object TableSinkUtils {
   }
 
   /**
-   * Checks whether the logical schema (from DDL) and physical schema
-   * (from TableSink.getConsumedDataType()) of sink are compatible.
+   * Checks whether the logical schema (from DDL) and physical schema (from
+   * TableSink.getConsumedDataType()) of sink are compatible.
    *
-   * @param catalogTable the catalog table of sink
-   * @param sink the instance of [[TableSink]]
-   * @param queryLogicalType the logical type of query
+   * @param catalogTable
+   *   the catalog table of sink
+   * @param sink
+   *   the instance of [[TableSink]]
+   * @param queryLogicalType
+   *   the logical type of query
    */
   def validateLogicalPhysicalTypesCompatible(
       catalogTable: CatalogTable,

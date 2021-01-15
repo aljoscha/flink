@@ -29,24 +29,18 @@ import org.apache.flink.graph.scala._
 import org.apache.flink.types.NullValue
 
 /**
- * This example shows how to use Gelly's library methods.
- * You can find all available library methods in [[org.apache.flink.graph.library]].
+ * This example shows how to use Gelly's library methods. You can find all available library methods
+ * in [[org.apache.flink.graph.library]].
  *
- * In particular, this example uses the
- * [[GSAConnectedComponents]]
- * library method to compute the connected components of the input graph.
+ * In particular, this example uses the [[GSAConnectedComponents]] library method to compute the
+ * connected components of the input graph.
  *
- * The input file is a plain text file and must be formatted as follows:
- * Edges are represented by tuples of srcVertexId, trgVertexId which are
- * separated by tabs. Edges themselves are separated by newlines.
- * For example: <code>1\t2\n1\t3\n</code> defines two edges,
- * 1-2 and 1-3.
+ * The input file is a plain text file and must be formatted as follows: Edges are represented by
+ * tuples of srcVertexId, trgVertexId which are separated by tabs. Edges themselves are separated by
+ * newlines. For example: <code>1\t2\n1\t3\n</code> defines two edges, 1-2 and 1-3.
  *
- * Usage {{
- *   ConnectedComponents <edge path> <result path> <number of iterations>
- *   }}
- * If no parameters are provided, the program is run with default data from
- * [[ConnectedComponentsDefaultData]]
+ * Usage {{ ConnectedComponents <edge path> <result path> <number of iterations> }} If no parameters
+ * are provided, the program is run with default data from [[ConnectedComponentsDefaultData]]
  */
 object ConnectedComponents {
   def main(args: Array[String]) {

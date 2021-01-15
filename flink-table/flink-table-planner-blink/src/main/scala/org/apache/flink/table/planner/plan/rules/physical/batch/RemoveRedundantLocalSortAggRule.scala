@@ -30,9 +30,9 @@ import org.apache.calcite.plan.{RelOptRule, RelOptRuleCall, RelOptRuleOperand}
 import org.apache.calcite.rel.RelNode
 
 /**
- * There maybe exist a subTree like localSortAggregate -> globalSortAggregate, or
- * localSortAggregate -> sort -> globalSortAggregate which the middle shuffle is removed.
- * The rule could remove redundant localSortAggregate node.
+ * There maybe exist a subTree like localSortAggregate -> globalSortAggregate, or localSortAggregate
+ * -> sort -> globalSortAggregate which the middle shuffle is removed. The rule could remove
+ * redundant localSortAggregate node.
  */
 abstract class RemoveRedundantLocalSortAggRule(operand: RelOptRuleOperand, ruleName: String)
     extends RelOptRule(operand, ruleName) {

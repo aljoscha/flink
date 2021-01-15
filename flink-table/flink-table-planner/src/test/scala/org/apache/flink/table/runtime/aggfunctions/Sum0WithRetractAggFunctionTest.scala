@@ -26,7 +26,8 @@ import org.apache.flink.table.functions.aggfunctions._
 /**
  * Test case for built-in sum0 with retract aggregate function
  *
- * @tparam T the type for the aggregation result
+ * @tparam T
+ *   the type for the aggregation result
  */
 abstract class Sum0WithRetractAggFunctionTestBase[T: Numeric]
     extends AggFunctionTestBase[T, SumWithRetractAccumulator[T]] {

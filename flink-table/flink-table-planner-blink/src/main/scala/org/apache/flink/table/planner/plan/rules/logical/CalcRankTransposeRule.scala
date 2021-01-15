@@ -33,8 +33,8 @@ import org.apache.calcite.util.ImmutableBitSet
 import scala.collection.JavaConversions._
 
 /**
- * Planner rule that transposes [[FlinkLogicalCalc]] past [[FlinkLogicalRank]]
- * to reduce rank input fields.
+ * Planner rule that transposes [[FlinkLogicalCalc]] past [[FlinkLogicalRank]] to reduce rank input
+ * fields.
  */
 class CalcRankTransposeRule
     extends RelOptRule(

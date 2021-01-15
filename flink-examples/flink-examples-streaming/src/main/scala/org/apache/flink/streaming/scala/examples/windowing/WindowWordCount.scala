@@ -37,14 +37,13 @@ import org.apache.flink.streaming.examples.wordcount.util.WordCountData
  * --slide <n>
  * }}}
  *
- * If no parameters are provided, the program is run with default data from
- * [[WordCountData]].
+ * If no parameters are provided, the program is run with default data from [[WordCountData]].
  *
  * This example shows how to:
  *
- *  - write a simple Flink Streaming program,
- *  - use tuple data types,
- *  - use basic windowing abstractions.
+ *   - write a simple Flink Streaming program,
+ *   - use tuple data types,
+ *   - use basic windowing abstractions.
  */
 object WindowWordCount {
 

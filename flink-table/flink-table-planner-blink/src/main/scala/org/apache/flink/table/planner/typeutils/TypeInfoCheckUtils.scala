@@ -72,8 +72,8 @@ object TypeInfoCheckUtils {
   /**
    * Checks if one class can be assigned to a variable of another class.
    *
-   * Adopted from o.a.commons.lang.ClassUtils#isAssignable(java.lang.Class[], java.lang.Class[])
-   * but without null checks.
+   * Adopted from o.a.commons.lang.ClassUtils#isAssignable(java.lang.Class[], java.lang.Class[]) but
+   * without null checks.
    */
   def isAssignable(classArray: Array[Class[_]], toClassArray: Array[Class[_]]): Boolean = {
     if (classArray.length != toClassArray.length) {

@@ -35,12 +35,15 @@ import org.apache.calcite.schema.impl.AbstractTable
 import java.util.function.{Function => JFunction}
 
 /**
- * Abstract class which define the interfaces required to convert a [[TableSource]] to
- * a Calcite Table.
+ * Abstract class which define the interfaces required to convert a [[TableSource]] to a Calcite
+ * Table.
  *
- * @param tableSource The [[TableSource]] for which is converted to a Calcite Table.
- * @param isStreamingMode A flag that tells if the current table is in stream mode.
- * @param statistic The table statistics.
+ * @param tableSource
+ *   The [[TableSource]] for which is converted to a Calcite Table.
+ * @param isStreamingMode
+ *   A flag that tells if the current table is in stream mode.
+ * @param statistic
+ *   The table statistics.
  */
 class TableSourceTable[T](
     val tableSchema: TableSchema,
@@ -54,7 +57,8 @@ class TableSourceTable[T](
   /**
    * Returns statistics of current table
    *
-   * @return statistics of current table
+   * @return
+   *   statistics of current table
    */
   override def getStatistic: Statistic = statistic
 

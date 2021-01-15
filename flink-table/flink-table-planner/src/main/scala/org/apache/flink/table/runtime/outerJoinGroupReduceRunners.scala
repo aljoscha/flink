@@ -143,8 +143,8 @@ class RightOuterJoinGroupReduceRunner(name: String, code: String, returnType: Ty
 /**
  * Emits a part of the results of a full outer join:
  *
- * - join result from matching join pairs (left + right)
- * - preserved left rows (left + null)
+ *   - join result from matching join pairs (left + right)
+ *   - preserved left rows (left + null)
  *
  * Preserved right rows (null, right) are emitted by RightFullOuterJoinGroupReduceRunner.
  */
@@ -199,7 +199,7 @@ class LeftFullOuterJoinGroupReduceRunner(
 /**
  * Emits a part of the results of a full outer join:
  *
- * - preserved right rows (null, right)
+ *   - preserved right rows (null, right)
  *
  * Join result from matching join pairs (left + right) and preserved left rows (left + null) are
  * emitted by LeftFullOuterJoinGroupReduceRunner.

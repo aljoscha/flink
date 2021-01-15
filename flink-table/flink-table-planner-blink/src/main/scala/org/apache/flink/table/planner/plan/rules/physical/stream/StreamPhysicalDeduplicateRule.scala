@@ -34,29 +34,21 @@ import org.apache.calcite.rel.convert.ConverterRule
 import org.apache.calcite.rel.{RelCollation, RelNode}
 
 /**
- * Rule that matches [[FlinkLogicalRank]] which is sorted by time attribute and
- * limits 1 and its rank type is ROW_NUMBER, and converts it to [[StreamPhysicalDeduplicate]].
+ * Rule that matches [[FlinkLogicalRank]] which is sorted by time attribute and limits 1 and its
+ * rank type is ROW_NUMBER, and converts it to [[StreamPhysicalDeduplicate]].
  *
  * NOTES: Queries that can be converted to [[StreamPhysicalDeduplicate]] could be converted to
  * [[StreamPhysicalRank]] too. [[StreamPhysicalDeduplicate]] is more efficient than
  * [[StreamPhysicalRank]] due to mini-batch and less state access.
  *
  * e.g.
- * 1. {{{
- * SELECT a, b, c FROM (
- *   SELECT a, b, c, proctime,
- *          ROW_NUMBER() OVER (PARTITION BY a ORDER BY proctime ASC) as row_num
- *   FROM MyTable
- * ) WHERE row_num <= 1
- * }}} will be converted to StreamExecDeduplicate which keeps first row in proctime.
+ *   1. {{{ SELECT a, b, c FROM ( SELECT a, b, c, proctime, ROW_NUMBER() OVER (PARTITION BY a ORDER
+ *      BY proctime ASC) as row_num FROM MyTable ) WHERE row_num <= 1 }}} will be converted to
+ *      StreamExecDeduplicate which keeps first row in proctime.
  *
- * 2. {{{
- * SELECT a, b, c FROM (
- *   SELECT a, b, c, rowtime,
- *          ROW_NUMBER() OVER (PARTITION BY a ORDER BY rowtime DESC) as row_num
- *   FROM MyTable
- * ) WHERE row_num <= 1
- * }}} will be converted to StreamExecDeduplicate which keeps last row in rowtime.
+ * 2. {{{ SELECT a, b, c FROM ( SELECT a, b, c, rowtime, ROW_NUMBER() OVER (PARTITION BY a ORDER BY
+ * rowtime DESC) as row_num FROM MyTable ) WHERE row_num <= 1 }}} will be converted to
+ * StreamExecDeduplicate which keeps last row in rowtime.
  */
 class StreamPhysicalDeduplicateRule
     extends ConverterRule(
@@ -113,11 +105,13 @@ object StreamPhysicalDeduplicateRule {
   /**
    * Whether the given rank could be converted to [[StreamPhysicalDeduplicate]].
    *
-   * Returns true if the given rank is sorted by time attribute and limits 1
-   * and its RankFunction is ROW_NUMBER, else false.
+   * Returns true if the given rank is sorted by time attribute and limits 1 and its RankFunction is
+   * ROW_NUMBER, else false.
    *
-   * @param rank The [[FlinkLogicalRank]] node
-   * @return True if the input rank could be converted to [[StreamPhysicalDeduplicate]]
+   * @param rank
+   *   The [[FlinkLogicalRank]] node
+   * @return
+   *   True if the input rank could be converted to [[StreamPhysicalDeduplicate]]
    */
   def canConvertToDeduplicate(rank: FlinkLogicalRank): Boolean = {
     val sortCollation = rank.orderKey

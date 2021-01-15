@@ -48,8 +48,8 @@ object FlinkBatchRuleSets {
     CoreRules.JOIN_SUB_QUERY_TO_CORRELATE)
 
   /**
-   * Expand plan by replacing references to tables into a proper plan sub trees. Those rules
-   * can create new plan nodes.
+   * Expand plan by replacing references to tables into a proper plan sub trees. Those rules can
+   * create new plan nodes.
    */
   val EXPAND_PLAN_RULES: RuleSet = RuleSets.ofList(
     LogicalCorrelateToJoinFromTemporalTableRule.LOOKUP_JOIN_WITH_FILTER,
@@ -231,8 +231,7 @@ object FlinkBatchRuleSets {
     CoreRules.MULTI_JOIN_OPTIMIZE)
 
   /**
-   * RuleSet to do logical optimize.
-   * This RuleSet is a sub-set of [[LOGICAL_OPT_RULES]].
+   * RuleSet to do logical optimize. This RuleSet is a sub-set of [[LOGICAL_OPT_RULES]].
    */
   private val LOGICAL_RULES: RuleSet = RuleSets.ofList(
     // scan optimization

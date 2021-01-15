@@ -26,13 +26,17 @@ import org.apache.flink.api.common.typeinfo.TypeInformation
 /**
  * Describes a generated expression.
  *
- * @param resultTerm term to access the result of the expression
- * @param nullTerm boolean term that indicates if expression is null
- * @param code code necessary to produce resultTerm and nullTerm
- * @param resultType type of the resultTerm
- * @param literal flag to indicate a constant expression do not reference input and can thus
- *                 be used in the member area (e.g. as constructor parameter of a reusable
- *                 instance)
+ * @param resultTerm
+ *   term to access the result of the expression
+ * @param nullTerm
+ *   boolean term that indicates if expression is null
+ * @param code
+ *   code necessary to produce resultTerm and nullTerm
+ * @param resultType
+ *   type of the resultTerm
+ * @param literal
+ *   flag to indicate a constant expression do not reference input and can thus be used in the
+ *   member area (e.g. as constructor parameter of a reusable instance)
  */
 case class GeneratedExpression(
     resultTerm: String,
@@ -50,11 +54,16 @@ object GeneratedExpression {
 /**
  * Describes a generated [[functions.Function]]
  *
- * @param name class name of the generated Function.
- * @param returnType the type information of the result type
- * @param code code of the generated Function.
- * @tparam F type of function
- * @tparam T type of function
+ * @param name
+ *   class name of the generated Function.
+ * @param returnType
+ *   the type information of the result type
+ * @param code
+ *   code of the generated Function.
+ * @tparam F
+ *   type of function
+ * @tparam T
+ *   type of function
  */
 case class GeneratedFunction[F <: Function, T <: Any](
     name: String,
@@ -64,17 +73,22 @@ case class GeneratedFunction[F <: Function, T <: Any](
 /**
  * Describes a generated aggregate helper function
  *
- * @param name class name of the generated Function.
- * @param code code of the generated Function.
+ * @param name
+ *   class name of the generated Function.
+ * @param code
+ *   code of the generated Function.
  */
 case class GeneratedAggregationsFunction(name: String, code: String)
 
 /**
  * Describes a generated table aggregate helper function
  *
- * @param name class name of the generated Function.
- * @param code code of the generated Function.
- * @param emitValuesIncrementally whether emit incremental values.
+ * @param name
+ *   class name of the generated Function.
+ * @param code
+ *   code of the generated Function.
+ * @param emitValuesIncrementally
+ *   whether emit incremental values.
  */
 class GeneratedTableAggregationsFunction(
     name: String,
@@ -85,11 +99,16 @@ class GeneratedTableAggregationsFunction(
 /**
  * Describes a generated [[InputFormat]].
  *
- * @param name class name of the generated input function.
- * @param returnType the type information of the result type
- * @param code code of the generated Function.
- * @tparam F type of function
- * @tparam T type of function
+ * @param name
+ *   class name of the generated input function.
+ * @param returnType
+ *   the type information of the result type
+ * @param code
+ *   code of the generated Function.
+ * @tparam F
+ *   type of function
+ * @tparam T
+ *   type of function
  */
 case class GeneratedInput[F <: InputFormat[_, _], T <: Any](
     name: String,
@@ -99,7 +118,9 @@ case class GeneratedInput[F <: InputFormat[_, _], T <: Any](
 /**
  * Describes a generated [[org.apache.flink.util.Collector]].
  *
- * @param name class name of the generated Collector.
- * @param code code of the generated Collector.
+ * @param name
+ *   class name of the generated Collector.
+ * @param code
+ *   code of the generated Collector.
  */
 case class GeneratedCollector(name: String, code: String)

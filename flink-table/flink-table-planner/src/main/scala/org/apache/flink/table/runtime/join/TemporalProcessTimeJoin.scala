@@ -104,7 +104,8 @@ class TemporalProcessTimeJoin(
   /**
    * The method to be called when a cleanup timer fires.
    *
-   * @param time The timestamp of the fired timer.
+   * @param time
+   *   The timestamp of the fired timer.
    */
   override def cleanUpState(time: Long): Unit = {
     rightState.clear()

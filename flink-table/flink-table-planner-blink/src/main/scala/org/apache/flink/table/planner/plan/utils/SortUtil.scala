@@ -54,8 +54,10 @@ object SortUtil {
   /**
    * Returns the direction of the first sort field.
    *
-   * @param collationSort The list of sort collations.
-   * @return The direction of the first sort field.
+   * @param collationSort
+   *   The list of sort collations.
+   * @return
+   *   The direction of the first sort field.
    */
   def getFirstSortDirection(collationSort: RelCollation): Direction = {
     collationSort.getFieldCollations.get(0).direction
@@ -64,9 +66,12 @@ object SortUtil {
   /**
    * Returns the first sort field.
    *
-   * @param collationSort The list of sort collations.
-   * @param rowType       The row type of the input.
-   * @return The first sort field.
+   * @param collationSort
+   *   The list of sort collations.
+   * @param rowType
+   *   The row type of the input.
+   * @return
+   *   The first sort field.
    */
   def getFirstSortField(collationSort: RelCollation, rowType: RelDataType): RelDataTypeField = {
     val idx = collationSort.getFieldCollations.get(0).getFieldIndex

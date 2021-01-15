@@ -30,10 +30,14 @@ import org.apache.flink.util.Collector
 /**
  * Computes the final (table)aggregate value from incrementally computed aggregates.
  *
- * @param numGroupingKey The number of grouping keys.
- * @param numAggregates The number of aggregates.
- * @param finalRowArity The arity of the final output row.
- * @param isTableAggregate Whether it is table aggregate.
+ * @param numGroupingKey
+ *   The number of grouping keys.
+ * @param numAggregates
+ *   The number of aggregates.
+ * @param finalRowArity
+ *   The arity of the final output row.
+ * @param isTableAggregate
+ *   Whether it is table aggregate.
  */
 class IncrementalAggregateWindowFunction[W <: Window](
     private val numGroupingKey: Int,
@@ -54,8 +58,8 @@ class IncrementalAggregateWindowFunction[W <: Window](
   }
 
   /**
-   * Calculate aggregated values output by aggregate buffer, and set them into output
-   * Row based on the mapping relation between intermediate aggregate data and output data.
+   * Calculate aggregated values output by aggregate buffer, and set them into output Row based on
+   * the mapping relation between intermediate aggregate data and output data.
    */
   override def apply(key: Row, window: W, records: Iterable[Row], out: Collector[CRow]): Unit = {
 

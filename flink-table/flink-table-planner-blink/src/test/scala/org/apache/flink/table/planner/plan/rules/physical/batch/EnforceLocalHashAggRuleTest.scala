@@ -65,9 +65,8 @@ class EnforceLocalHashAggRuleTest extends EnforceLocalAggRuleTestBase {
 }
 
 /**
- * Planner rule that ignore the [[OptimizerConfigOptions.TABLE_OPTIMIZER_AGG_PHASE_STRATEGY]]
- * value, and only enable one phase aggregate.
- * This rule only used for test.
+ * Planner rule that ignore the [[OptimizerConfigOptions.TABLE_OPTIMIZER_AGG_PHASE_STRATEGY]] value,
+ * and only enable one phase aggregate. This rule only used for test.
  */
 class BatchPhysicalHashAggRuleForOnePhase extends BatchPhysicalHashAggRule {
   override protected def isTwoPhaseAggWorkable(

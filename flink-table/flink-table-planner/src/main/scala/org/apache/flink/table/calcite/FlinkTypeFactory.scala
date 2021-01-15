@@ -52,8 +52,8 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 /**
- * Flink specific type factory that represents the interface between Flink's [[TypeInformation]]
- * and Calcite's [[RelDataType]].
+ * Flink specific type factory that represents the interface between Flink's [[TypeInformation]] and
+ * Calcite's [[RelDataType]].
  */
 class FlinkTypeFactory(typeSystem: RelDataTypeSystem)
     extends JavaTypeFactoryImpl(typeSystem)
@@ -119,7 +119,7 @@ class FlinkTypeFactory(typeSystem: RelDataTypeSystem)
   }
 
   /**
-   * Creates types that create custom [[RelDataType]]s that wrap Flink's [[TypeInformation]].
+   * Creates types that create custom [[RelDataType]] s that wrap Flink's [[TypeInformation]].
    */
   private def createAdvancedType(typeInfo: TypeInformation[_], isNullable: Boolean): RelDataType = {
 
@@ -172,8 +172,10 @@ class FlinkTypeFactory(typeSystem: RelDataTypeSystem)
   /**
    * Creates a struct type with the input fieldNames and input fieldTypes using FlinkTypeFactory
    *
-   * @param tableSchema schema to convert to Calcite's specific one
-   * @return a struct type with the input fieldNames, input fieldTypes, and system fields
+   * @param tableSchema
+   *   schema to convert to Calcite's specific one
+   * @return
+   *   a struct type with the input fieldNames, input fieldTypes, and system fields
    */
   def buildLogicalRowType(tableSchema: TableSchema): RelDataType = {
     buildLogicalRowType(tableSchema.getFieldNames, tableSchema.getFieldDataTypes)
@@ -182,9 +184,12 @@ class FlinkTypeFactory(typeSystem: RelDataTypeSystem)
   /**
    * Creates a struct type with the input fieldNames and input fieldTypes using FlinkTypeFactory
    *
-   * @param fieldNames field names
-   * @param fieldTypes field types, every element is Flink's [[DataType]]
-   * @return a struct type with the input fieldNames, input fieldTypes, and system fields
+   * @param fieldNames
+   *   field names
+   * @param fieldTypes
+   *   field types, every element is Flink's [[DataType]]
+   * @return
+   *   a struct type with the input fieldNames, input fieldTypes, and system fields
    */
   def buildLogicalRowType(fieldNames: Array[String], fieldTypes: Array[DataType]): RelDataType = {
     val logicalRowTypeBuilder = builder
@@ -210,9 +215,12 @@ class FlinkTypeFactory(typeSystem: RelDataTypeSystem)
   /**
    * Creates a struct type with the input fieldNames and input fieldTypes using FlinkTypeFactory
    *
-   * @param fieldNames field names
-   * @param fieldTypes field types, every element is Flink's [[TypeInformation]]
-   * @return a struct type with the input fieldNames, input fieldTypes, and system fields
+   * @param fieldNames
+   *   field names
+   * @param fieldTypes
+   *   field types, every element is Flink's [[TypeInformation]]
+   * @return
+   *   a struct type with the input fieldNames, input fieldTypes, and system fields
    */
   def buildLogicalRowType(
       fieldNames: Seq[String],

@@ -28,15 +28,21 @@ import org.apache.flink.types.Row
 import org.apache.flink.util.Collector
 
 /**
- * Connect data for left stream and right stream. Only use for left or right join without
- * non-equal predicates.
+ * Connect data for left stream and right stream. Only use for left or right join without non-equal
+ * predicates.
  *
- * @param leftType        the input type of left stream
- * @param rightType       the input type of right stream
- * @param genJoinFuncName the function code without any non-equi condition
- * @param genJoinFuncCode the function name without any non-equi condition
- * @param isLeftJoin      the type of join, whether it is the type of left join
- * @param config          configuration that determines runtime behavior
+ * @param leftType
+ *   the input type of left stream
+ * @param rightType
+ *   the input type of right stream
+ * @param genJoinFuncName
+ *   the function code without any non-equi condition
+ * @param genJoinFuncCode
+ *   the function name without any non-equi condition
+ * @param isLeftJoin
+ *   the type of join, whether it is the type of left join
+ * @param config
+ *   configuration that determines runtime behavior
  */
 class NonWindowLeftRightJoin(
     leftType: TypeInformation[Row],
@@ -64,8 +70,7 @@ class NonWindowLeftRightJoin(
   /**
    * Puts or Retract an element from the input stream into state and search the other state to
    * output records meet the condition. The input row will be preserved and appended with null, if
-   * there is no match. Records will be expired in state if state retention time has been
-   * specified.
+   * there is no match. Records will be expired in state if state retention time has been specified.
    */
   override def processElement(
       value: CRow,

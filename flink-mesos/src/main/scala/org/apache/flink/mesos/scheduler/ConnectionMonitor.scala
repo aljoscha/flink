@@ -112,10 +112,14 @@ object ConnectionMonitor {
   /**
    * Creates the properties for the ConnectionMonitor actor.
    *
-   * @param actorClass the connection monitor actor class
-   * @param flinkConfig the Flink configuration.
-   * @tparam T the type of the connection monitor actor class
-   * @return the Props to create the connection monitor
+   * @param actorClass
+   *   the connection monitor actor class
+   * @param flinkConfig
+   *   the Flink configuration.
+   * @tparam T
+   *   the type of the connection monitor actor class
+   * @return
+   *   the Props to create the connection monitor
    */
   def createActorProps[T <: ConnectionMonitor](
       actorClass: Class[T],

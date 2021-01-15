@@ -49,66 +49,60 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
- * Planner rule that splits aggregations containing distinct aggregates, e.g, count distinct,
- * into partial aggregations and final aggregations.
+ * Planner rule that splits aggregations containing distinct aggregates, e.g, count distinct, into
+ * partial aggregations and final aggregations.
  *
- * This rule rewrites an aggregate query with distinct aggregations into an expanded
- * double aggregations. The first aggregation compute the results in sub-partition and
- * the results are combined by the second aggregation.
+ * This rule rewrites an aggregate query with distinct aggregations into an expanded double
+ * aggregations. The first aggregation compute the results in sub-partition and the results are
+ * combined by the second aggregation.
  *
  * Examples:
  *
  * MyTable: a: BIGINT, b: INT, c: VARCHAR
  *
  * Original records:
- * +-----+-----+-----+
- * |  a  |  b  |  c  |
- * +-----+-----+-----+
- * |  1  |  1  |  c1 |
- * +-----+-----+-----+
- * |  1  |  2  |  c1 |
- * +-----+-----+-----+
- * |  2  |  1  |  c2 |
- * +-----+-----+-----+
+ * | a | b | c  |
+ * |:-:|:-:|:--:|
+ * | 1 | 1 | c1 |
+ * | 1 | 2 | c1 |
+ * | 2 | 1 | c2 |
  *
- * SQL:
- * SELECT SUM(b), COUNT(DISTINCT c), AVG(b) FROM MyTable GROUP BY a
+ * SQL: SELECT SUM(b), COUNT(DISTINCT c), AVG(b) FROM MyTable GROUP BY a
  *
  * flink logical plan:
  * {{{
  * FlinkLogicalCalc(select=[a, $f1, $f2, CAST(IF(=($f4, 0:BIGINT), null:INTEGER, /($f3, $f4))) AS
  *     $f3])
  * +- FlinkLogicalAggregate(group=[{0}], agg#0=[SUM($2)], agg#1=[$SUM0($3)], agg#2=[$SUM0($4)],
- *        agg#3=[$SUM0($5)])
- *    +- FlinkLogicalAggregate(group=[{0, 3}], agg#0=[SUM($1) FILTER $4], agg#1=[COUNT(DISTINCT $2)
+ *       agg#3=[$SUM0($5)])
+ *   +- FlinkLogicalAggregate(group=[{0, 3}], agg#0=[SUM($1) FILTER $4], agg#1=[COUNT(DISTINCT $2)
  *           FILTER $5], agg#2=[$SUM0($1) FILTER $4], agg#3=[COUNT($1) FILTER $4])
  *       +- FlinkLogicalCalc(select=[a, b, c, $f3, =($e, 1) AS $g_1, =($e, 0) AS $g_0])
- *          +- FlinkLogicalExpand(projects=[{a=[$0], b=[$1], c=[$2], $f3=[$3], $e=[0]},
+ *         +- FlinkLogicalExpand(projects=[{a=[$0], b=[$1], c=[$2], $f3=[$3], $e=[0]},
  *                 {a=[$0], b=[$1], c=[$2], $f3=[null], $e=[1]}])
  *             +- FlinkLogicalCalc(select=[a, b, c, MOD(HASH_CODE(c), 1024) AS $f3])
- *                +- FlinkLogicalTableSourceScan(table=[[MyTable,
+ *               +- FlinkLogicalTableSourceScan(table=[[MyTable,
  *                       source: [TestTableSource(a, b, c)]]], fields=[a, b, c])
  * }}}
  *
- * '$e = 0' is equivalent to 'group by a, hash(c) % 256'
- * '$e = 1' is equivalent to 'group by a'
+ * '$e = 0' is equivalent to 'group by a, hash(c) % 256' '$e = 1' is equivalent to 'group by a'
  *
  * Expanded records:
  * +-----+-----+-----+------------------+-----+
- * |  a  |  b  |  c  |  hash(c) % 256   | $e  |
- * +-----+-----+-----+------------------+-----+        ---+---
- * |  1  |  1  | null|       null       |  1  |           |
- * +-----+-----+-----+------------------+-----|  records expanded by record1
- * |  1  |  1  |  c1 |  hash(c1) % 256  |  0  |           |
- * +-----+-----+-----+------------------+-----+        ---+---
- * |  1  |  2  | null|       null       |  1  |           |
- * +-----+-----+-----+------------------+-----+  records expanded by record2
- * |  1  |  2  |  c1 |  hash(c1) % 256  |  0  |           |
- * +-----+-----+-----+------------------+-----+        ---+---
- * |  2  |  1  | null|       null       |  1  |           |
- * +-----+-----+-----+------------------+-----+  records expanded by record3
- * |  2  |  1  |  c2 |  hash(c2) % 256  |  0  |           |
- * +-----+-----+-----+------------------+-----+        ---+---
+ * | a | b | c | hash(c) % 256 | $e |
+ * +-----+-----+-----+------------------+-----+ ---+---
+ * | 1 | 1 | null| null | 1 | |
+ * +-----+-----+-----+------------------+-----| records expanded by record1
+ * | 1 | 1 | c1 | hash(c1) % 256 | 0 | |
+ * +-----+-----+-----+------------------+-----+ ---+---
+ * | 1 | 2 | null| null | 1 | |
+ * +-----+-----+-----+------------------+-----+ records expanded by record2
+ * | 1 | 2 | c1 | hash(c1) % 256 | 0 | |
+ * +-----+-----+-----+------------------+-----+ ---+---
+ * | 2 | 1 | null| null | 1 | |
+ * +-----+-----+-----+------------------+-----+ records expanded by record3
+ * | 2 | 1 | c2 | hash(c2) % 256 | 0 | |
+ * +-----+-----+-----+------------------+-----+ ---+---
  *
  * NOTES: this rule is only used for Stream now.
  */
@@ -421,8 +415,10 @@ object SplitAggregateRule {
   /**
    * Compute the group sets of the final aggregation.
    *
-   * @param groupSet the group set of the previous partial aggregation
-   * @param originalGroupSets the group set of the original aggregation
+   * @param groupSet
+   *   the group set of the previous partial aggregation
+   * @param originalGroupSets
+   *   the group set of the original aggregation
    */
   private def remap(
       groupSet: ImmutableBitSet,
@@ -437,8 +433,10 @@ object SplitAggregateRule {
   /**
    * Compute the group set of the final aggregation.
    *
-   * @param groupSet the group set of the previous partial aggregation
-   * @param originalGroupSet the group set of the original aggregation
+   * @param groupSet
+   *   the group set of the previous partial aggregation
+   * @param originalGroupSet
+   *   the group set of the original aggregation
    */
   private def remap(
       groupSet: ImmutableBitSet,

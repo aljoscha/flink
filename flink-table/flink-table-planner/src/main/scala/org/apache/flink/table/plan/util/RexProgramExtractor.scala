@@ -48,8 +48,10 @@ object RexProgramExtractor {
   /**
    * Extracts the indices of input fields which accessed by the RexProgram.
    *
-   * @param rexProgram The RexProgram to analyze
-   * @return The indices of accessed input fields
+   * @param rexProgram
+   *   The RexProgram to analyze
+   * @return
+   *   The indices of accessed input fields
    */
   def extractRefInputFields(rexProgram: RexProgram): Array[Int] = {
     val visitor = new InputRefVisitor
@@ -69,8 +71,10 @@ object RexProgramExtractor {
   /**
    * Extract condition from RexProgram and convert it into independent CNF expressions.
    *
-   * @param rexProgram The RexProgram to analyze
-   * @return converted expressions as well as RexNodes which cannot be translated
+   * @param rexProgram
+   *   The RexProgram to analyze
+   * @return
+   *   converted expressions as well as RexNodes which cannot be translated
    */
   def extractConjunctiveConditions(
       rexProgram: RexProgram,
@@ -110,11 +114,13 @@ object RexProgramExtractor {
   }
 
   /**
-   * Extracts the name of nested input fields accessed by the RexProgram and returns the
-   * prefix of the accesses.
+   * Extracts the name of nested input fields accessed by the RexProgram and returns the prefix of
+   * the accesses.
    *
-   * @param rexProgram The RexProgram to analyze
-   * @return The full names of accessed input fields. e.g. field.subfield
+   * @param rexProgram
+   *   The RexProgram to analyze
+   * @return
+   *   The full names of accessed input fields. e.g. field.subfield
    */
   def extractRefNestedInputFields(
       rexProgram: RexProgram,
@@ -150,8 +156,10 @@ class InputRefVisitor extends RexVisitorImpl[Unit](true) {
 /**
  * An RexVisitor to convert RexNode to Expression.
  *
- * @param inputNames      The input names of the relation node
- * @param functionCatalog The function catalog
+ * @param inputNames
+ *   The input names of the relation node
+ * @param functionCatalog
+ *   The function catalog
  */
 class RexNodeToExpressionConverter(
     rexBuilder: RexBuilder,

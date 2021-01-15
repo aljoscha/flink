@@ -43,7 +43,7 @@ import scala.collection.JavaConversions._
 object ColumnIntervalUtil {
 
   /**
-   * try get value interval if the operator is  +, -, *
+   * try get value interval if the operator is +, -, *
    */
   def getValueIntervalOfRexCall(
       rexCall: RexCall,
@@ -179,20 +179,23 @@ object ColumnIntervalUtil {
    * Calculate the interval of column which is referred in predicate expression, and intersect the
    * result with the origin interval of the column.
    *
-   * e.g for condition $1 <= 2 and $1 >= -1
-   * the interval of $1 is originInterval intersect with [-1, 2]
+   * e.g for condition $1 <= 2 and $1 >= -1 the interval of $1 is originInterval intersect with [-1,
+   * 2]
    *
-   * for condition: $1 <= 2 and not ($1 < -1 or $2 is true),
-   * the interval of $1 is originInterval intersect with (-Inf, -1]
+   * for condition: $1 <= 2 and not ($1 < -1 or $2 is true), the interval of $1 is originInterval
+   * intersect with (-Inf, -1]
    *
-   * for condition $1 <= 2 or $1 > -1
-   * the interval of $1 is (originInterval intersect with (-Inf, 2]) union
-   * (originInterval intersect with (-1, Inf])
+   * for condition $1 <= 2 or $1 > -1 the interval of $1 is (originInterval intersect with (-Inf,
+   * 2]) union (originInterval intersect with (-1, Inf])
    *
-   * @param originInterval origin interval of the column
-   * @param oriPred        the predicate expression
-   * @param inputRef       the index of the given column
-   * @param rexBuilder     RexBuilder instance to analyze the predicate expression
+   * @param originInterval
+   *   origin interval of the column
+   * @param oriPred
+   *   the predicate expression
+   * @param inputRef
+   *   the index of the given column
+   * @param rexBuilder
+   *   RexBuilder instance to analyze the predicate expression
    * @return
    */
   def getColumnIntervalWithFilter(

@@ -26,9 +26,8 @@ import org.apache.flink.streaming.api.windowing.time.Time
 /**
  * Implements a streaming windowed version of the "WordCount" program.
  *
- * This program connects to a server socket and reads strings from the socket.
- * The easiest way to try this out is to open a text sever (at port 12345)
- * using the ''netcat'' tool via
+ * This program connects to a server socket and reads strings from the socket. The easiest way to
+ * try this out is to open a text sever (at port 12345) using the ''netcat'' tool via
  * {{{
  * nc -l 12345 on Linux or nc -l -p 12345 on Windows
  * }}}

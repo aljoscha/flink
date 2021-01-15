@@ -29,8 +29,8 @@ import org.apache.flink.table.planner.plan.utils.RankProcessStrategy
 import org.apache.flink.table.planner.plan.nodes.physical.stream.StreamPhysicalDeduplicate
 
 /**
- * Rule that converts [[FlinkLogicalRank]] with fetch to [[StreamPhysicalRank]].
- * NOTES: the rank can not be converted to [[StreamPhysicalDeduplicate]].
+ * Rule that converts [[FlinkLogicalRank]] with fetch to [[StreamPhysicalRank]]. NOTES: the rank can
+ * not be converted to [[StreamPhysicalDeduplicate]].
  */
 class StreamPhysicalRankRule
     extends ConverterRule(

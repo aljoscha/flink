@@ -38,12 +38,11 @@ import org.apache.calcite.rex.RexUtil
 import scala.collection.JavaConversions._
 
 /**
- * Planner rule that writes one phase aggregate to two phase aggregate,
- * when the following conditions are met:
- * 1. there is no local aggregate,
- * 2. the aggregate has non-empty grouping and two phase aggregate strategy is enabled,
- * 3. the input is [[BatchPhysicalExpand]] and there is at least one expand row
- * which the columns for grouping are all constant.
+ * Planner rule that writes one phase aggregate to two phase aggregate, when the following
+ * conditions are met:
+ *   1. there is no local aggregate, 2. the aggregate has non-empty grouping and two phase aggregate
+ *      strategy is enabled, 3. the input is [[BatchPhysicalExpand]] and there is at least one
+ *      expand row which the columns for grouping are all constant.
  */
 abstract class EnforceLocalAggRuleBase(operand: RelOptRuleOperand, description: String)
     extends RelOptRule(operand, description)

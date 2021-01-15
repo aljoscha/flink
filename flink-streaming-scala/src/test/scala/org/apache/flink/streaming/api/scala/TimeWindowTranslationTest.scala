@@ -43,8 +43,8 @@ import java.util.concurrent.TimeUnit
 class TimeWindowTranslationTest extends AbstractTestBase {
 
   /**
-   * Verifies that calls to timeWindow() instantiate a regular
-   * windowOperator instead of an aligned one.
+   * Verifies that calls to timeWindow() instantiate a regular windowOperator instead of an aligned
+   * one.
    */
   @Test
   def testAlignedWindowDeprecation(): Unit = {

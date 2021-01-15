@@ -32,8 +32,8 @@ import org.junit.Test
 import org.apache.flink.api.scala._
 
 /**
- * This is a minimal test to verify that semantic annotations are evaluated against
- * the type information properly translated correctly to the common data flow API.
+ * This is a minimal test to verify that semantic annotations are evaluated against the type
+ * information properly translated correctly to the common data flow API.
  *
  * This covers only the constant fields annotations currently !!!
  */

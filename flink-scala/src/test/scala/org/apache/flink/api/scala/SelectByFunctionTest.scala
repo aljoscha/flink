@@ -61,9 +61,9 @@ class SelectByFunctionTest {
   // ----------------------- MAXIMUM FUNCTION TEST BELOW --------------------------
 
   /**
-   * This test cases checks when two tuples only differ in one value, but this value is not
-   * in the fields list. In that case it should be seen as equal
-   * and then the first given tuple (value1) should be returned by reduce().
+   * This test cases checks when two tuples only differ in one value, but this value is not in the
+   * fields list. In that case it should be seen as equal and then the first given tuple (value1)
+   * should be returned by reduce().
    */
   @Test
   def testMaxByComparisonSpecialCase1(): Unit = {
@@ -163,8 +163,8 @@ class SelectByFunctionTest {
   // ----------------------- MINIMUM FUNCTION TEST BELOW --------------------------
 
   /**
-   * This test validates whether the order of tuples has any impact
-   * on the outcome and if the smaller tuple is returned.
+   * This test validates whether the order of tuples has any impact on the outcome and if the
+   * smaller tuple is returned.
    */
   @Test
   def testMinByComparison(): Unit = {
@@ -188,9 +188,9 @@ class SelectByFunctionTest {
   }
 
   /**
-   * This test cases checks when two tuples only differ in one value, but this value is not
-   * in the fields list. In that case it should be seen as equal and
-   * then the first given tuple (value1) should be returned by reduce().
+   * This test cases checks when two tuples only differ in one value, but this value is not in the
+   * fields list. In that case it should be seen as equal and then the first given tuple (value1)
+   * should be returned by reduce().
    */
   @Test
   def testMinByComparisonSpecialCase1(): Unit = {
@@ -215,9 +215,8 @@ class SelectByFunctionTest {
   }
 
   /**
-   * This test validates that when two tuples only differ in one value
-   * and that value's index is given at construction time. The smaller tuple must be returned
-   * then.
+   * This test validates that when two tuples only differ in one value and that value's index is
+   * given at construction time. The smaller tuple must be returned then.
    */
   @Test
   def testMinByComparisonSpecialCase2(): Unit = {

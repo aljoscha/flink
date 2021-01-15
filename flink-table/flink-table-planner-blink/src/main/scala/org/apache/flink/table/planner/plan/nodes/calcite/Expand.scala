@@ -31,18 +31,23 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
- * Relational expression that apply a number of projects to every input row,
- * hence we will get multiple output rows for an input row.
+ * Relational expression that apply a number of projects to every input row, hence we will get
+ * multiple output rows for an input row.
  *
  * <p/> Values of expand_id should be unique.
  *
- * @param cluster       cluster that this relational expression belongs to
- * @param traits        the traits of this rel
- * @param input         input relational expression
- * @param outputRowType output row type
- * @param projects      all projects, each project contains list of expressions for
- *                      the output columns
- * @param expandIdIndex expand_id('$e') field index
+ * @param cluster
+ *   cluster that this relational expression belongs to
+ * @param traits
+ *   the traits of this rel
+ * @param input
+ *   input relational expression
+ * @param outputRowType
+ *   output row type
+ * @param projects
+ *   all projects, each project contains list of expressions for the output columns
+ * @param expandIdIndex
+ *   expand_id('$e') field index
  */
 abstract class Expand(
     cluster: RelOptCluster,

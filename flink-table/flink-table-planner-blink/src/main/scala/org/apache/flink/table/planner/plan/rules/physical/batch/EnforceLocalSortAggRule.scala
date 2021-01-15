@@ -33,13 +33,12 @@ import org.apache.calcite.rel.{RelCollationTraitDef, RelNode}
 /**
  * An [[EnforceLocalAggRuleBase]] that matches [[BatchPhysicalSortAggregate]]
  *
- * for example: select count(*) from t group by rollup (a, b)
- * The physical plan
+ * for example: select count(*) from t group by rollup (a, b) The physical plan
  *
- *  {{{
+ * {{{
  * SortAggregate(isMerge=[false], groupBy=[a, b, $e], select=[a, b, $e, COUNT(*)])
  * +- Sort(orderBy=[a ASC, c ASC, $e ASC])
- *    +- Exchange(distribution=[hash[a, b, $e]])
+ *   +- Exchange(distribution=[hash[a, b, $e]])
  *       +- Expand(projects=[{a=[$0], b=[$1], $e=[0]},
  *                           {a=[$0], b=[null], $e=[1]},
  *                           {a=[null], b=[null], $e=[3]}])
@@ -50,9 +49,9 @@ import org.apache.calcite.rel.{RelCollationTraitDef, RelNode}
  * {{{
  * SortAggregate(isMerge=[true], groupBy=[a, b, $e], select=[a, b, $e, Final_COUNT(count1$0)])
  * +- Sort(orderBy=[a ASC, c ASC, $e ASC])
- *    +- Exchange(distribution=[hash[a, b, $e]])
+ *   +- Exchange(distribution=[hash[a, b, $e]])
  *       +- LocalSortAggregate(groupBy=[a, b, $e], select=[a, b, $e, Partial_COUNT(*) AS count1$0]
- *          +- Sort(orderBy=[a ASC, c ASC, $e ASC])
+ *         +- Sort(orderBy=[a ASC, c ASC, $e ASC])
  *             +- Expand(projects=[{a=[$0], b=[$1], $e=[0]},
  *                                 {a=[$0], b=[null], $e=[1]},
  *                                 {a=[null], b=[null], $e=[3]}])

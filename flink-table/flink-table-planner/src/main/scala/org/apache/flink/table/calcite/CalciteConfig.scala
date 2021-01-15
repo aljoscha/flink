@@ -45,8 +45,8 @@ import scala.collection.JavaConverters._
 class CalciteConfigBuilder {
 
   /**
-   * Defines the normalization rule set. Normalization rules are dedicated for rewriting
-   * predicated logical plan before volcano optimization.
+   * Defines the normalization rule set. Normalization rules are dedicated for rewriting predicated
+   * logical plan before volcano optimization.
    */
   private var replaceNormRules: Boolean = false
   private var normRuleSets: List[RuleSet] = Nil
@@ -171,8 +171,8 @@ class CalciteConfigBuilder {
   /**
    * Replaces the built-in decoration rule set with the given rule set.
    *
-   * The decoration rules are applied after the cost-based optimization phase.
-   * The decoration phase allows to rewrite the optimized plan and is not cost-based.
+   * The decoration rules are applied after the cost-based optimization phase. The decoration phase
+   * allows to rewrite the optimized plan and is not cost-based.
    */
   def replaceDecoRuleSet(replaceRuleSet: RuleSet): CalciteConfigBuilder = {
     Preconditions.checkNotNull(replaceRuleSet)
@@ -184,8 +184,8 @@ class CalciteConfigBuilder {
   /**
    * Appends the given decoration rule set to the built-in rule set.
    *
-   * The decoration rules are applied after the cost-based optimization phase.
-   * The decoration phase allows to rewrite the optimized plan and is not cost-based.
+   * The decoration rules are applied after the cost-based optimization phase. The decoration phase
+   * allows to rewrite the optimized plan and is not cost-based.
    */
   def addDecoRuleSet(addedRuleSet: RuleSet): CalciteConfigBuilder = {
     Preconditions.checkNotNull(addedRuleSet)

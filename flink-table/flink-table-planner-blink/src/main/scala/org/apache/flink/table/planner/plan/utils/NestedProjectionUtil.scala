@@ -30,24 +30,24 @@ import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 
 /**
- * [[NestedColumn]] is a tree node to build the used nested fields tree. For
- * non-nested field, it is a single node in the tree.
+ * [[NestedColumn]] is a tree node to build the used nested fields tree. For non-nested field, it is
+ * a single node in the tree.
  *
- * @param name                    The name of the fields in the origin schema
- * @param indexInOriginSchema     The index of the field in the origin schema.
- *                                It only works for the RowType.
- * @param originFieldType         The type of the field. It is useful when
- *                                rewriting the projections.
- * @param isLeaf                  Mark the field is the leaf node in the tree.
- * @param children                Store the children of the field. It's safe
- *                                to use name as the index because name is
- *                                unique in every level. It uses the
- *                                LinkedHashMap to keep the insert order.
- *                                In some cases, it can reduce the cost of the
- *                                reorder of the fields in query.
- * @param indexOfLeafInNewSchema  It is used by the leaf node to memorize the
- *                                index in the new schema. For non-leaf node
- *                                the value is always -1.
+ * @param name
+ *   The name of the fields in the origin schema
+ * @param indexInOriginSchema
+ *   The index of the field in the origin schema. It only works for the RowType.
+ * @param originFieldType
+ *   The type of the field. It is useful when rewriting the projections.
+ * @param isLeaf
+ *   Mark the field is the leaf node in the tree.
+ * @param children
+ *   Store the children of the field. It's safe to use name as the index because name is unique in
+ *   every level. It uses the LinkedHashMap to keep the insert order. In some cases, it can reduce
+ *   the cost of the reorder of the fields in query.
+ * @param indexOfLeafInNewSchema
+ *   It is used by the leaf node to memorize the index in the new schema. For non-leaf node the
+ *   value is always -1.
  */
 class NestedColumn(
     val name: String,
@@ -75,12 +75,14 @@ class NestedColumn(
 }
 
 /**
- * [[NestedSchema]] could be regard as a table schema that represents
- * a table's structure with field names and data types. It uses a
- * LinkedHashMap to store the pairs of name: String and column: RexNodeNestedField.
+ * [[NestedSchema]] could be regard as a table schema that represents a table's structure with field
+ * names and data types. It uses a LinkedHashMap to store the pairs of name: String and column:
+ * RexNodeNestedField.
  *
- * @param inputRowType  The data type of the origin schema.
- * @param columns        Fields in the origin schema are used by the query.
+ * @param inputRowType
+ *   The data type of the origin schema.
+ * @param columns
+ *   Fields in the origin schema are used by the query.
  */
 class NestedSchema(
     val inputRowType: RelDataType,
@@ -89,19 +91,16 @@ class NestedSchema(
 object NestedProjectionUtil {
 
   /**
-   * It will uses the RexNodes to build a tree of the used fields.
-   * It uses a visitor to visit the operands of the expression. For
-   * input ref, it sits on the top level of the schema and it is the
-   * direct child of the root. For field access, it first decompose
-   * the field into a list and then create the node for every node in
-   * the list.
+   * It will uses the RexNodes to build a tree of the used fields. It uses a visitor to visit the
+   * operands of the expression. For input ref, it sits on the top level of the schema and it is the
+   * direct child of the root. For field access, it first decompose the field into a list and then
+   * create the node for every node in the list.
    *
-   * In some situation, it will delete node. For example, the input
-   * expressions are "$0.child" and "$0". It will first create the
-   * intermediate node "$0" and leaf node "child". When coming to the
-   * expression "$0", it indicate the query will use the whole fields "$0"
-   * rather than the child "child" only. In this situation, it will mark
-   * the node "$0" as a leaf node and delete its children.
+   * In some situation, it will delete node. For example, the input expressions are "$0.child" and
+   * "$0". It will first create the intermediate node "$0" and leaf node "child". When coming to the
+   * expression "$0", it indicate the query will use the whole fields "$0" rather than the child
+   * "child" only. In this situation, it will mark the node "$0" as a leaf node and delete its
+   * children.
    */
   def build(exprs: JList[RexNode], inputRowType: RelDataType): NestedSchema = {
     val schema = new NestedSchema(inputRowType)
@@ -113,16 +112,15 @@ object NestedProjectionUtil {
   }
 
   /**
-   * After the projection, the used fields location has been changed.
-   * If the node in the tree has been labeled with the new index, it will
-   * rewrite the index in the old schema with the new index.
+   * After the projection, the used fields location has been changed. If the node in the tree has
+   * been labeled with the new index, it will rewrite the index in the old schema with the new
+   * index.
    *
-   * It uses a visitor to visit operands of the RexNode. If the type of
-   * operand is InputRef, it still in the top level of the schema and get
-   * the location of the fields using map. If the type of the operand is
-   * FieldAccess, it will first traverse to the top level of the field and
-   * iterate every level of the field with the name in the RexNode. For more
-   * details, please refer to NestedFieldReWriter.
+   * It uses a visitor to visit operands of the RexNode. If the type of operand is InputRef, it
+   * still in the top level of the schema and get the location of the fields using map. If the type
+   * of the operand is FieldAccess, it will first traverse to the top level of the field and iterate
+   * every level of the field with the name in the RexNode. For more details, please refer to
+   * NestedFieldReWriter.
    */
   def rewrite(exprs: JList[RexNode], schema: NestedSchema, builder: RexBuilder): JList[RexNode] = {
     val writer = new NestedSchemaRewriter(schema, builder)
@@ -130,10 +128,9 @@ object NestedProjectionUtil {
   }
 
   /**
-   * It will label the index of the leaf node in the new schema with the
-   * insert order rather than the natural order of the name and output the path
-   * to the every leaf node. The paths are useful for interface
-   * [[SupportsProjectionPushDown]] and test(debug).
+   * It will label the index of the leaf node in the new schema with the insert order rather than
+   * the natural order of the name and output the path to the every leaf node. The paths are useful
+   * for interface [[SupportsProjectionPushDown]] and test(debug).
    */
   def convertToIndexArray(root: NestedSchema): Array[Array[Int]] = {
     val allPaths = new JLinkedList[Array[Int]]()
@@ -180,23 +177,21 @@ object NestedProjectionUtil {
 /**
  * A RexShuttle to rewrite field accesses of RexNode with nested projection.
  *
- * For `RexInputRef`, it uses the old input ref name to find the new input fields ref
- * and use the [[NestedColumn.indexOfLeafInNewSchema]] to generate the new input ref.
+ * For `RexInputRef`, it uses the old input ref name to find the new input fields ref and use the
+ * [[NestedColumn.indexOfLeafInNewSchema]] to generate the new input ref.
  *
- * For `RexFieldAccess`, it will traverse to the top level of the field access and
- * then to generate new RexNode. There are 3 situations we need to consider:
- *  1. if top level field is marked to use all sub-fields , make field access of the reference
- *  and warp the ref as RexFieldAccess with the sub field name;
- *  2. if top level field isn't marked to use all sub-fields and its direct field
- *  is marked as leaf node, make field reference of the direct subfield;
- *  3. if neither situation above happens, return from the recursion with the updated parent.
+ * For `RexFieldAccess`, it will traverse to the top level of the field access and then to generate
+ * new RexNode. There are 3 situations we need to consider:
+ *   1. if top level field is marked to use all sub-fields , make field access of the reference and
+ *      warp the ref as RexFieldAccess with the sub field name; 2. if top level field isn't marked
+ *      to use all sub-fields and its direct field is marked as leaf node, make field reference of
+ *      the direct subfield; 3. if neither situation above happens, return from the recursion with
+ *      the updated parent.
  *
- * When the process is back from the recursion, it still has 2 situations need to
- * consider:
- *  1. if the process has found the reference of the upper level, just make an access on the
- *  reference founded before;
- *  2. if the process hasn't found the first reference, the process continues to search under
- *  the current parent.
+ * When the process is back from the recursion, it still has 2 situations need to consider:
+ *   1. if the process has found the reference of the upper level, just make an access on the
+ *      reference founded before; 2. if the process hasn't found the first reference, the process
+ *      continues to search under the current parent.
  */
 private class NestedSchemaRewriter(schema: NestedSchema, builder: RexBuilder) extends RexShuttle {
   override def visitInputRef(inputRef: RexInputRef): RexNode = {

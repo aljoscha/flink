@@ -39,12 +39,12 @@ import scala.collection.JavaConversions._
 import scala.collection.mutable
 
 /**
- * Planner rule that filters null values before join if the count null value from join input
- * is greater than null filter threshold.
+ * Planner rule that filters null values before join if the count null value from join input is
+ * greater than null filter threshold.
  *
  * Since the key of the Null value is impossible to match in the inner join, and there is a single
- * point skew due to too many Null values. We should push down a not-null filter into the child
- * node of join.
+ * point skew due to too many Null values. We should push down a not-null filter into the child node
+ * of join.
  */
 class JoinDeriveNullFilterRule
     extends RelOptRule(operand(classOf[LogicalJoin], any()), "JoinDeriveNullFilterRule") {

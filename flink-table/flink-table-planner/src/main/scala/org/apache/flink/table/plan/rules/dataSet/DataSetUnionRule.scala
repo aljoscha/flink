@@ -36,9 +36,8 @@ class DataSetUnionRule
       "DataSetUnionRule") {
 
   /**
-   * Only translate UNION ALL.
-   * Note: A distinct Union are translated into
-   * an Aggregate on top of a UNION ALL by [[UnionToDistinctRule]]
+   * Only translate UNION ALL. Note: A distinct Union are translated into an Aggregate on top of a
+   * UNION ALL by [[UnionToDistinctRule]]
    */
   override def matches(call: RelOptRuleCall): Boolean = {
     val union: FlinkLogicalUnion = call.rel(0).asInstanceOf[FlinkLogicalUnion]

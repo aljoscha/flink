@@ -22,10 +22,11 @@ import java.math.BigDecimal
 import org.apache.flink.api.common.typeinfo.BasicTypeInfo
 
 /**
- * Base class for built-in Sum0 with retract aggregate function.
- * If all values are null, 0 is returned.
+ * Base class for built-in Sum0 with retract aggregate function. If all values are null, 0 is
+ * returned.
  *
- * @tparam T the type for the aggregation result
+ * @tparam T
+ *   the type for the aggregation result
  */
 abstract class Sum0WithRetractAggFunction[T: Numeric] extends SumWithRetractAggFunction[T] {
 

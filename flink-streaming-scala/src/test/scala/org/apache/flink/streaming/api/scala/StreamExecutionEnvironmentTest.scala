@@ -53,8 +53,8 @@ class StreamExecutionEnvironmentTest {
   }
 
   /**
-   * Verifies that calls to fromSequence() instantiate a new DataStream
-   * that contains a sequence of numbers.
+   * Verifies that calls to fromSequence() instantiate a new DataStream that contains a sequence of
+   * numbers.
    */
   @Test
   def testFromSequence(): Unit = {

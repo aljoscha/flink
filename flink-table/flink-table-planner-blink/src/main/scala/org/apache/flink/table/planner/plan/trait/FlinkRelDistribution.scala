@@ -32,8 +32,8 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
- * Description of the physical distribution of a relational expression.
- * See [[RelDistribution]] for more details.
+ * Description of the physical distribution of a relational expression. See [[RelDistribution]] for
+ * more details.
  *
  * NOTE: it's intended to have a private constructor for this class.
  */

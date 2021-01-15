@@ -25,9 +25,12 @@ import org.apache.flink.api.common.typeinfo.TypeInformation
 /**
  * Generic type for encapsulating Flink's [[TypeInformation]].
  *
- * @param typeInfo TypeInformation to encapsulate
- * @param nullable flag if type can be nullable
- * @param typeSystem Flink's type system
+ * @param typeInfo
+ *   TypeInformation to encapsulate
+ * @param nullable
+ *   flag if type can be nullable
+ * @param typeSystem
+ *   Flink's type system
  */
 class GenericRelDataType(
     val typeInfo: TypeInformation[_],

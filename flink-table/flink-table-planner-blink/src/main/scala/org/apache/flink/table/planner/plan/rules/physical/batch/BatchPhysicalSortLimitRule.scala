@@ -35,14 +35,14 @@ import org.apache.calcite.sql.`type`.SqlTypeName
  * {{{
  * BatchPhysicalSortLimit (global)
  * +- BatchPhysicalExchange (singleton)
- *    +- BatchPhysicalSortLimit (local)
+ *   +- BatchPhysicalSortLimit (local)
  *       +- input of sort
  * }}}
  * when fetch is not null, or
  * {{{
  * BatchPhysicalSortLimit (global)
  * +- BatchPhysicalExchange (singleton)
- *    +- input of sort
+ *   +- input of sort
  * }}}
  * when fetch is null
  */

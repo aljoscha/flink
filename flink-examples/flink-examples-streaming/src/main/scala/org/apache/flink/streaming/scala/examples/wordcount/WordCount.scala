@@ -23,8 +23,8 @@ import org.apache.flink.streaming.api.scala._
 import org.apache.flink.streaming.examples.wordcount.util.WordCountData
 
 /**
- * Implements the "WordCount" program that computes a simple word occurrence
- * histogram over text files in a streaming fashion.
+ * Implements the "WordCount" program that computes a simple word occurrence histogram over text
+ * files in a streaming fashion.
  *
  * The input is a plain text file with lines separated by newline characters.
  *
@@ -33,14 +33,13 @@ import org.apache.flink.streaming.examples.wordcount.util.WordCountData
  * WordCount --input <path> --output <path>
  * }}}
  *
- * If no parameters are provided, the program is run with default data from
- * {@link WordCountData}.
+ * If no parameters are provided, the program is run with default data from {@link WordCountData}.
  *
  * This example shows how to:
  *
- *  - write a simple Flink Streaming program,
- *  - use tuple data types,
- *  - write and use transformation functions.
+ *   - write a simple Flink Streaming program,
+ *   - use tuple data types,
+ *   - write and use transformation functions.
  */
 object WordCount {
 

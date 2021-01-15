@@ -122,8 +122,8 @@ object AggCodeGenHelper {
   }
 
   /**
-   * The generated codes only supports the comparison of the key terms
-   * in the form of binary row with only one memory segment.
+   * The generated codes only supports the comparison of the key terms in the form of binary row
+   * with only one memory segment.
    */
   private[flink] def genGroupKeyChangedCheckCode(
       currentKeyTerm: String,
@@ -216,13 +216,13 @@ object AggCodeGenHelper {
   }
 
   /**
-   * Build an arg mapping for reference binding. The mapping will be a 2-dimension array.
-   * The first dimension represents the aggregate index, the order is same with agg calls in plan.
-   * The second dimension information represents input count of the aggregate. The meaning will
-   * be different depends on whether we should do merge.
+   * Build an arg mapping for reference binding. The mapping will be a 2-dimension array. The first
+   * dimension represents the aggregate index, the order is same with agg calls in plan. The second
+   * dimension information represents input count of the aggregate. The meaning will be different
+   * depends on whether we should do merge.
    *
-   * In non-merge case, aggregate functions will treat inputs as operands. In merge case, the
-   * input is local aggregation's buffer, we need to merge with our local aggregate buffers.
+   * In non-merge case, aggregate functions will treat inputs as operands. In merge case, the input
+   * is local aggregation's buffer, we need to merge with our local aggregate buffers.
    */
   private[flink] def buildAggregateArgsMapping(
       isMerge: Boolean,
@@ -257,7 +257,8 @@ object AggCodeGenHelper {
   /**
    * Resolves the given expression to a resolved Expression.
    *
-   * @param isMerge this is called from merge() method
+   * @param isMerge
+   *   this is called from merge() method
    */
   private case class ResolveReference(
       ctx: CodeGeneratorContext,

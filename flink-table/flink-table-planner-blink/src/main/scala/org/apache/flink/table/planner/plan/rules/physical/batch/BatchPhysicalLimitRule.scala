@@ -31,19 +31,18 @@ import org.apache.calcite.rex.RexLiteral
 import org.apache.calcite.sql.`type`.SqlTypeName
 
 /**
- * Rule that matches [[FlinkLogicalSort]] with empty sort fields,
- * and converts it to
+ * Rule that matches [[FlinkLogicalSort]] with empty sort fields, and converts it to
  * {{{
  * BatchPhysicalLimit (global)
  * +- BatchPhysicalExchange (singleton)
- *    +- BatchPhysicalLimit (local)
+ *   +- BatchPhysicalLimit (local)
  *       +- input of sort
  * }}}
  * when fetch is not null, or
  * {{{
  * BatchPhysicalLimit
  * +- BatchPhysicalExchange (singleton)
- *    +- input of sort
+ *   +- input of sort
  * }}}
  * when fetch is null.
  */

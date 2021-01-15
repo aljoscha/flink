@@ -103,8 +103,8 @@ class DataStreamTest extends AbstractTestBase {
   }
 
   /**
-   * Tests that [[DataStream.keyBy]] and [[DataStream.partitionCustom]] result in
-   * different and correct topologies. Does the some for the [[ConnectedStreams]].
+   * Tests that [[DataStream.keyBy]] and [[DataStream.partitionCustom]] result in different and
+   * correct topologies. Does the some for the [[ConnectedStreams]].
    */
   @Test
   def testPartitioning(): Unit = {
@@ -303,8 +303,8 @@ class DataStreamTest extends AbstractTestBase {
   }
 
   /**
-   * Tests setting the parallelism after a partitioning operation (e.g., broadcast, rescale)
-   * should fail.
+   * Tests setting the parallelism after a partitioning operation (e.g., broadcast, rescale) should
+   * fail.
    */
   @Test
   def testParallelismFailAfterPartitioning(): Unit = {
@@ -431,8 +431,8 @@ class DataStreamTest extends AbstractTestBase {
   }
 
   /**
-   * Verify that a [[KeyedStream.process(ProcessFunction)]] call is correctly
-   * translated to an operator.
+   * Verify that a [[KeyedStream.process(ProcessFunction)]] call is correctly translated to an
+   * operator.
    */
   @Test
   def testKeyedStreamProcessTranslation(): Unit = {
@@ -454,8 +454,8 @@ class DataStreamTest extends AbstractTestBase {
   }
 
   /**
-   * Verify that a [[KeyedStream.process(KeyedProcessFunction)]] call is correctly
-   * translated to an operator.
+   * Verify that a [[KeyedStream.process(KeyedProcessFunction)]] call is correctly translated to an
+   * operator.
    */
   @Test
   def testKeyedStreamKeyedProcessTranslation(): Unit = {
@@ -477,8 +477,8 @@ class DataStreamTest extends AbstractTestBase {
   }
 
   /**
-   * Verify that a [[DataStream.process(ProcessFunction)]] call is correctly
-   * translated to an operator.
+   * Verify that a [[DataStream.process(ProcessFunction)]] call is correctly translated to an
+   * operator.
    */
   @Test
   def testProcessTranslation(): Unit = {

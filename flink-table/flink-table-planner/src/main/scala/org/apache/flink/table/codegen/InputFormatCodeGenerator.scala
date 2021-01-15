@@ -26,9 +26,10 @@ import org.apache.flink.table.codegen.Indenter.toISC
 import org.apache.flink.types.Row
 
 /**
- * A code generator for generating Flink [[GenericInputFormat]]s.
+ * A code generator for generating Flink [[GenericInputFormat]] s.
  *
- * @param config configuration that determines runtime behavior
+ * @param config
+ *   configuration that determines runtime behavior
  */
 class InputFormatCodeGenerator(config: TableConfig)
     extends CodeGenerator(config, false, new RowTypeInfo(), None, None) {
@@ -36,12 +37,17 @@ class InputFormatCodeGenerator(config: TableConfig)
   /**
    * Generates a values input format that can be passed to Java compiler.
    *
-   * @param name Class name of the input format. Must not be unique but has to be a
-   *             valid Java class identifier.
-   * @param records code for creating records
-   * @param returnType expected return type
-   * @tparam T Return type of the Flink Function.
-   * @return instance of GeneratedFunction
+   * @param name
+   *   Class name of the input format. Must not be unique but has to be a valid Java class
+   *   identifier.
+   * @param records
+   *   code for creating records
+   * @param returnType
+   *   expected return type
+   * @tparam T
+   *   Return type of the Flink Function.
+   * @return
+   *   instance of GeneratedFunction
    */
   def generateValuesInputFormat[T <: Row](
       name: String,

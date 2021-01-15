@@ -32,8 +32,8 @@ import org.apache.calcite.rel.metadata.RelMetadataQuery
 import java.util
 
 /**
- * Batch physical RelNode to read data from an external source defined by a
- * bounded [[StreamTableSource]].
+ * Batch physical RelNode to read data from an external source defined by a bounded
+ * [[StreamTableSource]].
  */
 class BatchPhysicalLegacyTableSourceScan(
     cluster: RelOptCluster,

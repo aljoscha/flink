@@ -38,8 +38,8 @@ import java.util.{List => JList}
 import scala.collection.JavaConversions._
 
 /**
- * Sub-class of [[Window]] that is a relational expression
- * which represents a set of over window aggregates in Flink.
+ * Sub-class of [[Window]] that is a relational expression which represents a set of over window
+ * aggregates in Flink.
  */
 class FlinkLogicalOverAggregate(
     cluster: RelOptCluster,

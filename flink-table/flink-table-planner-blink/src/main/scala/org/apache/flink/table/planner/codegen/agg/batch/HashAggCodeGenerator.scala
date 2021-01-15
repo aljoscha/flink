@@ -38,9 +38,9 @@ import org.apache.flink.table.types.logical.{LogicalType, RowType}
 import org.apache.calcite.tools.RelBuilder
 
 /**
- * Operator code generator for HashAggregation, Only deal with [[DeclarativeAggregateFunction]]
- * and aggregateBuffers should be update(e.g.: setInt) in [[BinaryRowData]].
- * (Hash Aggregate performs much better than Sort Aggregate).
+ * Operator code generator for HashAggregation, Only deal with [[DeclarativeAggregateFunction]] and
+ * aggregateBuffers should be update(e.g.: setInt) in [[BinaryRowData]]. (Hash Aggregate performs
+ * much better than Sort Aggregate).
  */
 class HashAggCodeGenerator(
     ctx: CodeGeneratorContext,

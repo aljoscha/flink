@@ -59,8 +59,10 @@ import scala.reflect.ClassTag
  *   }
  * }}}
  *
- * @tparam L Type of the left input of the join.
- * @tparam R Type of the right input of the join.
+ * @tparam L
+ *   Type of the left input of the join.
+ * @tparam R
+ *   Type of the right input of the join.
  */
 @Public
 class JoinDataSet[L, R](
@@ -75,8 +77,8 @@ class JoinDataSet[L, R](
   private var customPartitioner: Partitioner[_] = _
 
   /**
-   * Creates a new [[DataSet]] where the result for each pair of joined elements is the result
-   * of the given function.
+   * Creates a new [[DataSet]] where the result for each pair of joined elements is the result of
+   * the given function.
    */
   def apply[O: TypeInformation: ClassTag](fun: (L, R) => O): DataSet[O] = {
     require(fun != null, "Join function must not be null.")
@@ -105,9 +107,8 @@ class JoinDataSet[L, R](
   }
 
   /**
-   * Creates a new [[DataSet]] by passing each pair of joined values to the given function.
-   * The function can output zero or more elements using the [[Collector]] which will form the
-   * result.
+   * Creates a new [[DataSet]] by passing each pair of joined values to the given function. The
+   * function can output zero or more elements using the [[Collector]] which will form the result.
    */
   def apply[O: TypeInformation: ClassTag](fun: (L, R, Collector[O]) => Unit): DataSet[O] = {
     require(fun != null, "Join function must not be null.")
@@ -136,12 +137,11 @@ class JoinDataSet[L, R](
   }
 
   /**
-   * Creates a new [[DataSet]] by passing each pair of joined values to the given function.
-   * The function can output zero or more elements using the [[Collector]] which will form the
-   * result.
+   * Creates a new [[DataSet]] by passing each pair of joined values to the given function. The
+   * function can output zero or more elements using the [[Collector]] which will form the result.
    *
-   * A [[RichFlatJoinFunction]] can be used to access the
-   * broadcast variables and the [[org.apache.flink.api.common.functions.RuntimeContext]].
+   * A [[RichFlatJoinFunction]] can be used to access the broadcast variables and the
+   * [[org.apache.flink.api.common.functions.RuntimeContext]].
    */
   def apply[O: TypeInformation: ClassTag](joiner: FlatJoinFunction[L, R, O]): DataSet[O] = {
     require(joiner != null, "Join function must not be null.")
@@ -165,8 +165,8 @@ class JoinDataSet[L, R](
   }
 
   /**
-   * Creates a new [[DataSet]] by passing each pair of joined values to the given function.
-   * The function must output one value. The concatenation of those will be new the DataSet.
+   * Creates a new [[DataSet]] by passing each pair of joined values to the given function. The
+   * function must output one value. The concatenation of those will be new the DataSet.
    *
    * A [[org.apache.flink.api.common.functions.RichJoinFunction]] can be used to access the
    * broadcast variables and the [[org.apache.flink.api.common.functions.RuntimeContext]].
@@ -258,8 +258,8 @@ private[flink] abstract class UnfinishedJoinOperationBase[L, R, O <: JoinFunctio
 }
 
 /**
- * An unfinished inner join operation that results from calling [[DataSet.join()]].
- * The keys for the left and right side must be specified using first `where` and then `equalTo`.
+ * An unfinished inner join operation that results from calling [[DataSet.join()]]. The keys for the
+ * left and right side must be specified using first `where` and then `equalTo`.
  *
  * For example:
  *
@@ -269,8 +269,10 @@ private[flink] abstract class UnfinishedJoinOperationBase[L, R, O <: JoinFunctio
  *   val joinResult = left.join(right).where(...).equalTo(...)
  * }}}
  *
- * @tparam L The type of the left input of the join.
- * @tparam R The type of the right input of the join.
+ * @tparam L
+ *   The type of the left input of the join.
+ * @tparam R
+ *   The type of the right input of the join.
  */
 @Public
 class UnfinishedJoinOperation[L, R](leftSet: DataSet[L], rightSet: DataSet[R], joinHint: JoinHint)
@@ -303,8 +305,10 @@ class UnfinishedJoinOperation[L, R](leftSet: DataSet[L], rightSet: DataSet[R], j
  *   }
  * }}}
  *
- * @tparam L The type of the left input of the join.
- * @tparam R The type of the right input of the join.
+ * @tparam L
+ *   The type of the left input of the join.
+ * @tparam R
+ *   The type of the right input of the join.
  */
 @Public
 class UnfinishedOuterJoinOperation[L, R](

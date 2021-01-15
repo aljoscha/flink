@@ -47,8 +47,8 @@ object RelExplainUtil {
 
   /**
    * Returns the prefer [[ExpressionFormat]] of the [[RelWriter]]. Use Prefix for traditional
-   * writers, but use Infix for [[RelDescriptionWriterImpl]] which is more readable.
-   * The [[RelDescriptionWriterImpl]] is mainly used to generate
+   * writers, but use Infix for [[RelDescriptionWriterImpl]] which is more readable. The
+   * [[RelDescriptionWriterImpl]] is mainly used to generate
    * [[org.apache.flink.table.planner.plan.nodes.FlinkRelNode#getRelDetailedDescription()]].
    */
   def preferExpressionFormat(pw: RelWriter): ExpressionFormat = pw match {
@@ -683,9 +683,9 @@ object RelExplainUtil {
     val outFields = rowType.getFieldNames
 
     /**
-     *  - local window agg input type: grouping keys + aux-grouping keys + agg arg list
-     *  - global window agg input type: grouping keys + timestamp + aux-grouping keys + agg buffer
-     *  agg buffer as agg merge args list
+     *   - local window agg input type: grouping keys + aux-grouping keys + agg arg list
+     *   - global window agg input type: grouping keys + timestamp + aux-grouping keys + agg buffer
+     *     agg buffer as agg merge args list
      */
     var offset = if (isMerge) {
       grouping.length + 1 + auxGrouping.length
@@ -719,9 +719,9 @@ object RelExplainUtil {
     }
 
     /**
-     * - local window agg output type: grouping keys + timestamp + aux-grouping keys + agg buffer
-     * - global window agg output type:
-     * grouping keys + aux-grouping keys + agg result + window props
+     *   - local window agg output type: grouping keys + timestamp + aux-grouping keys + agg buffer
+     *   - global window agg output type: grouping keys + aux-grouping keys + agg result + window
+     *     props
      */
     offset = if (!isGlobal) {
       grouping.length + 1 + auxGrouping.length

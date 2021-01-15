@@ -34,7 +34,8 @@ class MaxAccumulator[T] extends JTuple2[T, Boolean]
 /**
  * Base class for built-in Max aggregate function
  *
- * @tparam T the type for the aggregation result
+ * @tparam T
+ *   the type for the aggregation result
  */
 abstract class MaxAggFunction[T](implicit ord: Ordering[T])
     extends AggregateFunction[T, MaxAccumulator[T]] {

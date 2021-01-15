@@ -181,8 +181,10 @@ class StreamTableSourceScan(
 /**
  * Generates periodic watermarks based on a [[PeriodicWatermarkAssigner]].
  *
- * @param timeFieldIdx the index of the rowtime attribute.
- * @param assigner the watermark assigner.
+ * @param timeFieldIdx
+ *   the index of the rowtime attribute.
+ * @param assigner
+ *   the watermark assigner.
  */
 private class PeriodicWatermarkAssignerWrapper(
     timeFieldIdx: Int,
@@ -201,8 +203,10 @@ private class PeriodicWatermarkAssignerWrapper(
 /**
  * Generates periodic watermarks based on a [[PunctuatedWatermarkAssigner]].
  *
- * @param timeFieldIdx the index of the rowtime attribute.
- * @param assigner the watermark assigner.
+ * @param timeFieldIdx
+ *   the index of the rowtime attribute.
+ * @param assigner
+ *   the watermark assigner.
  */
 private class PunctuatedWatermarkAssignerWrapper(
     timeFieldIdx: Int,

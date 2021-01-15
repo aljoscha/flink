@@ -35,10 +35,14 @@ import org.apache.flink.util.{Collector, Preconditions}
 /**
  * Process Function for RANGE clause event-time bounded OVER window
  *
- * @param genAggregations Generated aggregate helper function
- * @param aggregationStateType     row type info of aggregation
- * @param inputRowType             row type info of input row
- * @param precedingOffset          preceding offset
+ * @param genAggregations
+ *   Generated aggregate helper function
+ * @param aggregationStateType
+ *   row type info of aggregation
+ * @param inputRowType
+ *   row type info of input row
+ * @param precedingOffset
+ *   preceding offset
  */
 class RowTimeBoundedRangeOver[K](
     genAggregations: GeneratedAggregationsFunction,

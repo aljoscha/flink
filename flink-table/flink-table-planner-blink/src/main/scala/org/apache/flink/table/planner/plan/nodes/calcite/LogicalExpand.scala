@@ -26,9 +26,8 @@ import org.apache.calcite.rex.RexNode
 import java.util
 
 /**
- * Sub-class of [[Expand]] that is a relational expression
- * which returns multiple rows expanded from one input row.
- * This class corresponds to Calcite logical rel.
+ * Sub-class of [[Expand]] that is a relational expression which returns multiple rows expanded from
+ * one input row. This class corresponds to Calcite logical rel.
  */
 final class LogicalExpand(
     cluster: RelOptCluster,

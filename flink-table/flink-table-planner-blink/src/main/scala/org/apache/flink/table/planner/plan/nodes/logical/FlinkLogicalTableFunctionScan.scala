@@ -38,8 +38,8 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
- * Sub-class of [[TableFunctionScan]] that is a relational expression
- * which calls a table-valued function in Flink.
+ * Sub-class of [[TableFunctionScan]] that is a relational expression which calls a table-valued
+ * function in Flink.
  */
 class FlinkLogicalTableFunctionScan(
     cluster: RelOptCluster,

@@ -41,8 +41,8 @@ object FlinkRuleSets {
     CoreRules.JOIN_SUB_QUERY_TO_CORRELATE)
 
   /**
-   * Expand plan by replacing references to tables into a proper plan sub trees. Those rules
-   * can create new plan nodes.
+   * Expand plan by replacing references to tables into a proper plan sub trees. Those rules can
+   * create new plan nodes.
    */
   val EXPAND_PLAN_RULES: RuleSet = RuleSets.ofList(LogicalCorrelateToTemporalTableJoinRule.INSTANCE)
 

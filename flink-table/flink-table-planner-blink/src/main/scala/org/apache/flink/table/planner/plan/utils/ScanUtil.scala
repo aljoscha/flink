@@ -46,7 +46,7 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
- * Util for [[TableScan]]s.
+ * Util for [[TableScan]] s.
  */
 object ScanUtil {
 
@@ -134,7 +134,8 @@ object ScanUtil {
   }
 
   /**
-   * @param qualifiedName qualified name for table
+   * @param qualifiedName
+   *   qualified name for table
    */
   private[flink] def getOperatorName(qualifiedName: Seq[String], rowType: RowType): String = {
     val tableQualifiedName = qualifiedName.mkString(".")

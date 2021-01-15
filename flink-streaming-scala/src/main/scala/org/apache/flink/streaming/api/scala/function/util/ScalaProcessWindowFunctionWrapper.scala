@@ -39,8 +39,8 @@ import org.apache.flink.util.Collector
 import scala.collection.JavaConverters._
 
 /**
- * A wrapper function that exposes a Scala ProcessWindowFunction
- * as a ProcessWindowFunction function.
+ * A wrapper function that exposes a Scala ProcessWindowFunction as a ProcessWindowFunction
+ * function.
  *
  * The Scala and Java Window functions differ in their type of "Iterable":
  *   - Scala WindowFunction: scala.Iterable
@@ -114,8 +114,8 @@ final class ScalaProcessWindowFunctionWrapper[IN, OUT, KEY, W <: Window](
 }
 
 /**
- * A wrapper function that exposes a Scala ProcessWindowFunction
- * as a ProcessWindowFunction function.
+ * A wrapper function that exposes a Scala ProcessWindowFunction as a ProcessWindowFunction
+ * function.
  *
  * The Scala and Java Window functions differ in their type of "Iterable":
  *   - Scala WindowFunction: scala.Iterable

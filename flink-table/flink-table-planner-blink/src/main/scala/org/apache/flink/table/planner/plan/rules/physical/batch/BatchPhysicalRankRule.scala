@@ -33,12 +33,12 @@ import org.apache.calcite.rel.{RelCollations, RelNode}
 import scala.collection.JavaConversions._
 
 /**
- * Rule that matches [[FlinkLogicalRank]] with rank function and constant rank range,
- * and converts it to
+ * Rule that matches [[FlinkLogicalRank]] with rank function and constant rank range, and converts
+ * it to
  * {{{
  * BatchPhysicalRank (global)
  * +- BatchPhysicalExchange (singleton if partition keys is empty, else hash)
- *    +- BatchPhysicalRank (local)
+ *   +- BatchPhysicalRank (local)
  *       +- input of rank
  * }}}
  */

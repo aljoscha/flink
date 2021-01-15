@@ -41,13 +41,14 @@ import scala.collection.JavaConversions._
 /**
  * Estimates selectivity of rows meeting an agg-call predicate on an Aggregate.
  *
- * A filter predicate on an Aggregate may contain two parts:
- * one is on group by columns, another is on aggregate call's result.
- * The first part is handled by [[SelectivityEstimator]],
- * the second part is handled by this Estimator.
+ * A filter predicate on an Aggregate may contain two parts: one is on group by columns, another is
+ * on aggregate call's result. The first part is handled by [[SelectivityEstimator]], the second
+ * part is handled by this Estimator.
  *
- * @param agg aggregate node
- * @param mq  Metadata query
+ * @param agg
+ *   aggregate node
+ * @param mq
+ *   Metadata query
  */
 class AggCallSelectivityEstimator(agg: RelNode, mq: FlinkRelMetadataQuery)
     extends RexVisitorImpl[Option[Double]](true) {
@@ -84,8 +85,7 @@ class AggCallSelectivityEstimator(agg: RelNode, mq: FlinkRelMetadataQuery)
   }
 
   /**
-   * Returns whether the given aggCall is supported now
-   * TODO supports more
+   * Returns whether the given aggCall is supported now TODO supports more
    */
   def isSupportedAggCall(aggCall: AggregateCall): Boolean = {
     aggCall.getAggregation.getKind match {
@@ -166,9 +166,11 @@ class AggCallSelectivityEstimator(agg: RelNode, mq: FlinkRelMetadataQuery)
   /**
    * Returns a percentage of rows meeting a filter predicate on aggregate.
    *
-   * @param predicate predicate whose selectivity is to be estimated against aggregate calls.
-   * @return estimated selectivity (between 0.0 and 1.0),
-   *         or None if no reliable estimate can be determined.
+   * @param predicate
+   *   predicate whose selectivity is to be estimated against aggregate calls.
+   * @return
+   *   estimated selectivity (between 0.0 and 1.0), or None if no reliable estimate can be
+   *   determined.
    */
   def evaluate(predicate: RexNode): Option[Double] = {
     try {
@@ -220,9 +222,11 @@ class AggCallSelectivityEstimator(agg: RelNode, mq: FlinkRelMetadataQuery)
   /**
    * Returns a percentage of rows meeting a single condition in Filter node.
    *
-   * @param singlePredicate predicate whose selectivity is to be estimated against aggregate calls.
-   * @return an optional double value to show the percentage of rows meeting a given condition.
-   *         It returns None if the condition is not supported.
+   * @param singlePredicate
+   *   predicate whose selectivity is to be estimated against aggregate calls.
+   * @return
+   *   an optional double value to show the percentage of rows meeting a given condition. It returns
+   *   None if the condition is not supported.
    */
   private def estimateSinglePredicate(singlePredicate: RexCall): Option[Double] = {
     val operands = singlePredicate.getOperands
@@ -257,11 +261,15 @@ class AggCallSelectivityEstimator(agg: RelNode, mq: FlinkRelMetadataQuery)
   /**
    * Returns a percentage of rows meeting a binary comparison expression containing two columns.
    *
-   * @param op    a binary comparison operator, including =, <=>, <, <=, >, >=
-   * @param left  the left RexInputRef
-   * @param right the right RexInputRef
-   * @return an optional double value to show the percentage of rows meeting a given condition.
-   *         It returns None if no statistics collected for a given column.
+   * @param op
+   *   a binary comparison operator, including =, <=>, <, <=, >, >=
+   * @param left
+   *   the left RexInputRef
+   * @param right
+   *   the right RexInputRef
+   * @return
+   *   an optional double value to show the percentage of rows meeting a given condition. It returns
+   *   None if no statistics collected for a given column.
    */
   private def estimateComparison(op: SqlOperator, left: RexNode, right: RexNode): Option[Double] = {
     // if we can't handle some cases, uses SelectivityEstimator's default value
@@ -312,13 +320,15 @@ class AggCallSelectivityEstimator(agg: RelNode, mq: FlinkRelMetadataQuery)
   }
 
   /**
-   * Returns a percentage of rows meeting an equality (=) expression.
-   * e.g. count(a) = 10
+   * Returns a percentage of rows meeting an equality (=) expression. e.g. count(a) = 10
    *
-   * @param inputRef a RexInputRef
-   * @param literal  a literal value (or constant)
-   * @return an optional double value to show the percentage of rows meeting a given condition.
-   *         It returns None if no statistics collected for a given column.
+   * @param inputRef
+   *   a RexInputRef
+   * @param literal
+   *   a literal value (or constant)
+   * @return
+   *   an optional double value to show the percentage of rows meeting a given condition. It returns
+   *   None if no statistics collected for a given column.
    */
   private def estimateEquals(inputRef: RexInputRef, literal: RexLiteral): Option[Double] = {
     if (literal.isNull) {
@@ -355,14 +365,17 @@ class AggCallSelectivityEstimator(agg: RelNode, mq: FlinkRelMetadataQuery)
   }
 
   /**
-   * Returns a percentage of rows meeting a binary comparison expression.
-   * e.g. sum(a) > 10
+   * Returns a percentage of rows meeting a binary comparison expression. e.g. sum(a) > 10
    *
-   * @param op       a binary comparison operator, including <, <=, >, >=
-   * @param inputRef a RexInputRef
-   * @param literal  a literal value (or constant)
-   * @return an optional double value to show the percentage of rows meeting a given condition.
-   *         It returns None if no statistics collected for a given column.
+   * @param op
+   *   a binary comparison operator, including <, <=, >, >=
+   * @param inputRef
+   *   a RexInputRef
+   * @param literal
+   *   a literal value (or constant)
+   * @return
+   *   an optional double value to show the percentage of rows meeting a given condition. It returns
+   *   None if no statistics collected for a given column.
    */
   private def estimateComparison(
       op: SqlOperator,
@@ -382,14 +395,18 @@ class AggCallSelectivityEstimator(agg: RelNode, mq: FlinkRelMetadataQuery)
   }
 
   /**
-   * Returns a percentage of rows meeting a binary numeric comparison expression.
-   * This method evaluate expression for Numeric/Boolean/Date/Time/Timestamp columns.
+   * Returns a percentage of rows meeting a binary numeric comparison expression. This method
+   * evaluate expression for Numeric/Boolean/Date/Time/Timestamp columns.
    *
-   * @param op      a binary comparison operator, including <, <=, >, >=
-   * @param aggCall an AggregateCall
-   * @param literal a literal value (or constant)
-   * @return an optional double value to show the percentage of rows meeting a given condition.
-   *         It returns None if no statistics collected for a given column.
+   * @param op
+   *   a binary comparison operator, including <, <=, >, >=
+   * @param aggCall
+   *   an AggregateCall
+   * @param literal
+   *   a literal value (or constant)
+   * @return
+   *   an optional double value to show the percentage of rows meeting a given condition. It returns
+   *   None if no statistics collected for a given column.
    */
   private def estimateNumericComparison(
       op: SqlOperator,

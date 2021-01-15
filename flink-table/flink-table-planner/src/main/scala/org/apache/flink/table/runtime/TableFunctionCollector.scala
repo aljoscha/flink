@@ -30,16 +30,16 @@ abstract class TableFunctionCollector[T] extends AbstractRichFunction with Colle
   private var collected: Boolean = _
 
   /**
-   * Sets the input row from left table,
-   * which will be used to cross join with the result of table function.
+   * Sets the input row from left table, which will be used to cross join with the result of table
+   * function.
    */
   def setInput(input: Any): Unit = {
     this.input = input
   }
 
   /**
-   * Gets the input value from left table,
-   * which will be used to cross join with the result of table function.
+   * Gets the input value from left table, which will be used to cross join with the result of table
+   * function.
    */
   def getInput: Any = {
     input
@@ -69,7 +69,8 @@ abstract class TableFunctionCollector[T] extends AbstractRichFunction with Colle
   /**
    * Whether [[collect(T)]] has been called.
    *
-   * @return True if [[collect(T)]] has been called.
+   * @return
+   *   True if [[collect(T)]] has been called.
    */
   def isCollected: Boolean = collected
 

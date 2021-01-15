@@ -152,9 +152,8 @@ class AbstractTwoInputStreamOperatorWithTTLTest extends HarnessTestBase(HEAP_BAC
   // -------------------------------- Test Classes --------------------------------
 
   /**
-   * A mock [[BaseTwoInputStreamOperatorWithStateRetention]] which registers
-   * the timestamps of the clean-up timers that fired (not the registered
-   * ones, which can be deleted without firing).
+   * A mock [[BaseTwoInputStreamOperatorWithStateRetention]] which registers the timestamps of the
+   * clean-up timers that fired (not the registered ones, which can be deleted without firing).
    */
   class StubOperatorWithStateTTL(minRetentionTime: Time, maxRetentionTime: Time)
       extends BaseTwoInputStreamOperatorWithStateRetention(

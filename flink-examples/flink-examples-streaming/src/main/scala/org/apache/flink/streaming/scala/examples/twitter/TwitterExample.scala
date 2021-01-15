@@ -32,8 +32,8 @@ import org.apache.flink.util.Collector
 import scala.collection.mutable.ListBuffer
 
 /**
- * Implements the "TwitterStream" program that computes a most used word
- * occurrence over JSON objects in a streaming fashion.
+ * Implements the "TwitterStream" program that computes a most used word occurrence over JSON
+ * objects in a streaming fashion.
  *
  * The input is a Tweet stream from a TwitterSource.
  *
@@ -46,14 +46,14 @@ import scala.collection.mutable.ListBuffer
  * --twitter-source.tokenSecret <tokenSecret>]
  * }}}
  *
- * If no parameters are provided, the program is run with default data from
- * {@link TwitterExampleData}.
+ * If no parameters are provided, the program is run with default data from {@link
+ * TwitterExampleData}.
  *
  * This example shows how to:
  *
- *  - acquire external data,
- *  - use in-line defined functions,
- *  - handle flattened stream inputs.
+ *   - acquire external data,
+ *   - use in-line defined functions,
+ *   - handle flattened stream inputs.
  */
 object TwitterExample {
 
@@ -115,9 +115,9 @@ object TwitterExample {
   /**
    * Deserialize JSON from twitter source
    *
-   * Implements a string tokenizer that splits sentences into words as a
-   * user-defined FlatMapFunction. The function takes a line (String) and
-   * splits it into multiple pairs in the form of "(word,1)" ({{{ Tuple2<String, Integer> }}}).
+   * Implements a string tokenizer that splits sentences into words as a user-defined
+   * FlatMapFunction. The function takes a line (String) and splits it into multiple pairs in the
+   * form of "(word,1)" ({{{ Tuple2<String, Integer> }}}).
    */
   private class SelectEnglishAndTokenizeFlatMap extends FlatMapFunction[String, (String, Int)] {
     lazy val jsonParser = new ObjectMapper()

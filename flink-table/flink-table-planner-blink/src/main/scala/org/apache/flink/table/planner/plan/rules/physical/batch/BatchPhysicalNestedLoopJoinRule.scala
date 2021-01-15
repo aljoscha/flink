@@ -29,8 +29,8 @@ import org.apache.calcite.rel.RelNode
 import org.apache.calcite.rel.core.{Join, JoinRelType}
 
 /**
- * Rule that converts [[FlinkLogicalJoin]] to [[BatchPhysicalNestedLoopJoin]]
- * if NestedLoopJoin is enabled.
+ * Rule that converts [[FlinkLogicalJoin]] to [[BatchPhysicalNestedLoopJoin]] if NestedLoopJoin is
+ * enabled.
  */
 class BatchPhysicalNestedLoopJoinRule
     extends RelOptRule(

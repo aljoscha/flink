@@ -38,8 +38,10 @@ import scala.reflect.ClassTag
  *   val coGroupResult = left.coGroup(right).where(...).equalTo(...)
  * }}}
  *
- * @tparam L The type of the left input of the coGroup.
- * @tparam R The type of the right input of the coGroup.
+ * @tparam L
+ *   The type of the left input of the coGroup.
+ * @tparam R
+ *   The type of the right input of the coGroup.
  */
 @Public
 class UnfinishedCoGroupOperation[L: ClassTag, R: ClassTag](

@@ -39,8 +39,7 @@ import org.apache.calcite.util.{BuiltInMethod, ImmutableNullableList, NlsString,
 import scala.collection.JavaConversions._
 
 /**
- * FlinkRelMdSize supplies a implementation of
- * [[RelMetadataQuery#getAverageRowSize]] and
+ * FlinkRelMdSize supplies a implementation of [[RelMetadataQuery#getAverageRowSize]] and
  * [[RelMetadataQuery#getAverageColumnSizes]] for the standard logical algebra.
  */
 class FlinkRelMdSize private extends MetadataHandler[BuiltInMetadata.Size] {
@@ -346,9 +345,9 @@ class FlinkRelMdSize private extends MetadataHandler[BuiltInMetadata.Size] {
   }
 
   /**
-   * Gets each column size of rel output from input column size or from column type.
-   * column size is from input column size if the column index is in `mapInputToOutput` keys,
-   * otherwise from column type.
+   * Gets each column size of rel output from input column size or from column type. column size is
+   * from input column size if the column index is in `mapInputToOutput` keys, otherwise from column
+   * type.
    */
   private def getColumnSizesFromInputOrType(
       rel: SingleRel,

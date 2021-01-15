@@ -37,11 +37,16 @@ import org.apache.flink.util.Collector
 /**
  * Connect data for left stream and right stream. Base class for stream-stream non-window Join.
  *
- * @param leftType          the input type of left stream
- * @param rightType         the input type of right stream
- * @param genJoinFuncName   the function code of other non-equi condition
- * @param genJoinFuncCode   the function name of other non-equi condition
- * @param config            configuration that determines runtime behavior
+ * @param leftType
+ *   the input type of left stream
+ * @param rightType
+ *   the input type of right stream
+ * @param genJoinFuncName
+ *   the function code of other non-equi condition
+ * @param genJoinFuncCode
+ *   the function name of other non-equi condition
+ * @param config
+ *   configuration that determines runtime behavior
  */
 abstract class NonWindowJoin(
     leftType: TypeInformation[Row],
@@ -101,9 +106,12 @@ abstract class NonWindowJoin(
   /**
    * Process left stream records
    *
-   * @param valueC The input value.
-   * @param ctx    The ctx to register timer or get current time
-   * @param out    The collector for returning result values.
+   * @param valueC
+   *   The input value.
+   * @param ctx
+   *   The ctx to register timer or get current time
+   * @param out
+   *   The collector for returning result values.
    */
   override def processElement1(
       valueC: CRow,
@@ -116,9 +124,12 @@ abstract class NonWindowJoin(
   /**
    * Process right stream records
    *
-   * @param valueC The input value.
-   * @param ctx    The ctx to register timer or get current time
-   * @param out    The collector for returning result values.
+   * @param valueC
+   *   The input value.
+   * @param ctx
+   *   The ctx to register timer or get current time
+   * @param out
+   *   The collector for returning result values.
    */
   override def processElement2(
       valueC: CRow,
@@ -129,12 +140,15 @@ abstract class NonWindowJoin(
   }
 
   /**
-   * Called when a processing timer trigger.
-   * Expire left/right records which are expired in left and right state.
+   * Called when a processing timer trigger. Expire left/right records which are expired in left and
+   * right state.
    *
-   * @param timestamp The timestamp of the firing timer.
-   * @param ctx       The ctx to register timer or get current time
-   * @param out       The collector for returning result values.
+   * @param timestamp
+   *   The timestamp of the firing timer.
+   * @param ctx
+   *   The ctx to register timer or get current time
+   * @param out
+   *   The collector for returning result values.
    */
   override def onTimer(
       timestamp: Long,
@@ -157,8 +171,8 @@ abstract class NonWindowJoin(
 
   /**
    * Puts or Retract an element from the input stream into state and search the other state to
-   * output records meet the condition. Records will be expired in state if state retention time
-   * has been specified.
+   * output records meet the condition. Records will be expired in state if state retention time has
+   * been specified.
    */
   protected def processElement(
       value: CRow,
@@ -172,10 +186,14 @@ abstract class NonWindowJoin(
    * Update current side state. Put row and it's number and expired time into row state. Also,
    * register a timer if state retention time has been specified.
    *
-   * @param value            The input CRow
-   * @param ctx              The ctx to register timer or get current time
-   * @param currentSideState The state to hold current side stream element
-   * @return The row number and expired time for current input row
+   * @param value
+   *   The input CRow
+   * @param ctx
+   *   The ctx to register timer or get current time
+   * @param currentSideState
+   *   The state to hold current side stream element
+   * @return
+   *   The row number and expired time for current input row
    */
   protected def updateCurrentSide(
       value: CRow,

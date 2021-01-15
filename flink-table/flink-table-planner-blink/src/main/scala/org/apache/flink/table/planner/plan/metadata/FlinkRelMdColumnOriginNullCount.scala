@@ -35,9 +35,9 @@ import scala.collection.JavaConversions._
 
 /**
  * FlinkRelMdColumnOriginNullCount supplies a default implementation of
- * [[FlinkRelMetadataQuery.getColumnOriginNullCount]] for the standard logical algebra.
- * If there is null, then return the original stats. If there is no null, then return 0.
- * If don't know, then return null.
+ * [[FlinkRelMetadataQuery.getColumnOriginNullCount]] for the standard logical algebra. If there is
+ * null, then return the original stats. If there is no null, then return 0. If don't know, then
+ * return null.
  */
 class FlinkRelMdColumnOriginNullCount private extends MetadataHandler[ColumnOriginNullCount] {
 

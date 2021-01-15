@@ -26,15 +26,21 @@ import org.apache.flink.table.runtime.types.CRow
 import org.apache.flink.types.Row
 
 /**
- * Connect data for left stream and right stream. Base class for stream non-window outer Join
- * with non-equal predicates.
+ * Connect data for left stream and right stream. Base class for stream non-window outer Join with
+ * non-equal predicates.
  *
- * @param leftType        the input type of left stream
- * @param rightType       the input type of right stream
- * @param genJoinFuncName the function code of other non-equi condition
- * @param genJoinFuncCode the function name of other non-equi condition
- * @param isLeftJoin      the type of join, whether it is the type of left join
- * @param config          configuration that determines runtime behavior
+ * @param leftType
+ *   the input type of left stream
+ * @param rightType
+ *   the input type of right stream
+ * @param genJoinFuncName
+ *   the function code of other non-equi condition
+ * @param genJoinFuncCode
+ *   the function name of other non-equi condition
+ * @param isLeftJoin
+ *   the type of join, whether it is the type of left join
+ * @param config
+ *   configuration that determines runtime behavior
  */
 abstract class NonWindowOuterJoinWithNonEquiPredicates(
     leftType: TypeInformation[Row],
@@ -85,8 +91,8 @@ abstract class NonWindowOuterJoinWithNonEquiPredicates(
   /**
    * Join current row with other side rows when contains non-equal predicates. Retract previous
    * output row if matched condition changed, i.e, matched condition is changed from matched to
-   * unmatched or vice versa. The RowWrapper has been reset before we call retractJoin and we
-   * also assume that the current change of cRowWrapper is equal to value.change.
+   * unmatched or vice versa. The RowWrapper has been reset before we call retractJoin and we also
+   * assume that the current change of cRowWrapper is equal to value.change.
    */
   protected def retractJoinWithNonEquiPreds(
       value: CRow,
@@ -139,10 +145,12 @@ abstract class NonWindowOuterJoinWithNonEquiPredicates(
   /**
    * Get left or right join cnt state.
    *
-   * @param joinCntState    the join cnt state array, index 0 is left join cnt state, index 1
-   *                        is right
-   * @param isLeftCntState the flag whether get the left join cnt state
-   * @return the corresponding join cnt state
+   * @param joinCntState
+   *   the join cnt state array, index 0 is left join cnt state, index 1 is right
+   * @param isLeftCntState
+   *   the flag whether get the left join cnt state
+   * @return
+   *   the corresponding join cnt state
    */
   protected def getJoinCntState(
       joinCntState: Array[MapState[Row, Long]],

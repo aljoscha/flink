@@ -31,7 +31,8 @@ class SumAccumulator[T] extends JTuple2[T, Boolean]
 /**
  * Base class for built-in Sum aggregate function
  *
- * @tparam T the type for the aggregation result
+ * @tparam T
+ *   the type for the aggregation result
  */
 abstract class SumAggFunction[T: Numeric] extends AggregateFunction[T, SumAccumulator[T]] {
 

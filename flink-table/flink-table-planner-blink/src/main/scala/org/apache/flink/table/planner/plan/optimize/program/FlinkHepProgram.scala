@@ -29,17 +29,17 @@ import org.apache.calcite.rel.RelNode
 /**
  * A FlinkOptimizeProgram that runs with [[HepPlanner]].
  *
- * <p>In most case, [[FlinkHepRuleSetProgram]] could meet our requirements.
- * Otherwise we could choose this program for some advanced features,
- * and use [[org.apache.calcite.plan.hep.HepProgramBuilder]] to create [[HepProgram]].
+ * <p>In most case, [[FlinkHepRuleSetProgram]] could meet our requirements. Otherwise we could
+ * choose this program for some advanced features, and use
+ * [[org.apache.calcite.plan.hep.HepProgramBuilder]] to create [[HepProgram]].
  *
- * @tparam OC OptimizeContext
+ * @tparam OC
+ *   OptimizeContext
  */
 class FlinkHepProgram[OC <: FlinkOptimizeContext] extends FlinkOptimizeProgram[OC] {
 
   /**
-   * [[HepProgram]] instance for [[HepPlanner]],
-   * this must not be None when doing optimize.
+   * [[HepProgram]] instance for [[HepPlanner]], this must not be None when doing optimize.
    */
   private var hepProgram: Option[HepProgram] = None
 

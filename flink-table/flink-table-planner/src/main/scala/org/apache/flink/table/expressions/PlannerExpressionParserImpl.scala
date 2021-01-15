@@ -49,13 +49,13 @@ class PlannerExpressionParserImpl extends PlannerExpressionParser {
 }
 
 /**
- * Parser for expressions inside a String. This parses exactly the same expressions that
- * would be accepted by the Scala Expression DSL.
+ * Parser for expressions inside a String. This parses exactly the same expressions that would be
+ * accepted by the Scala Expression DSL.
  *
  * See [[org.apache.flink.table.api.bridge.scala.ImplicitExpressionConversions]] and
  * [[org.apache.flink.table.api.bridge.scala.ImplicitExpressionOperations]] for the constructs
- * available in the Scala Expression DSL. This parser must be kept in sync with the Scala DSL
- * lazy valined in the above files.
+ * available in the Scala Expression DSL. This parser must be kept in sync with the Scala DSL lazy
+ * valined in the above files.
  */
 object PlannerExpressionParserImpl
     extends JavaTokenParsers

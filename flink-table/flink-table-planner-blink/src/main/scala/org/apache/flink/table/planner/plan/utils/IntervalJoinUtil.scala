@@ -63,9 +63,12 @@ object IntervalJoinUtil {
   /**
    * Checks if an expression accesses a time attribute.
    *
-   * @param expr      The expression to check.
-   * @param inputType The input type of the expression.
-   * @return True, if the expression accesses a time attribute. False otherwise.
+   * @param expr
+   *   The expression to check.
+   * @param inputType
+   *   The input type of the expression.
+   * @return
+   *   True, if the expression accesses a time attribute. False otherwise.
    */
   def accessesTimeAttribute(expr: RexNode, inputType: RelDataType): Boolean = {
     expr match {
@@ -81,13 +84,20 @@ object IntervalJoinUtil {
   /**
    * Generates a JoinFunction that applies additional join predicates and projects the result.
    *
-   * @param  config          table env config
-   * @param  joinType        join type to determine whether input can be null
-   * @param  leftType        left stream type
-   * @param  rightType       right stream type
-   * @param  returnType      return type
-   * @param  otherCondition  non-equi condition
-   * @param  funcName        name of generated function
+   * @param config
+   *   table env config
+   * @param joinType
+   *   join type to determine whether input can be null
+   * @param leftType
+   *   left stream type
+   * @param rightType
+   *   right stream type
+   * @param returnType
+   *   return type
+   * @param otherCondition
+   *   non-equi condition
+   * @param funcName
+   *   name of generated function
    */
   private[flink] def generateJoinFunction(
       config: TableConfig,
@@ -153,12 +163,18 @@ object IntervalJoinUtil {
   /**
    * Extracts the window bounds from a join predicate.
    *
-   * @param  predicate           join predicate
-   * @param  leftLogicalFieldCnt number of attributes on the left join input
-   * @param  joinRowType         row type of the join result
-   * @param  rexBuilder          RexBuilder
-   * @param  config              TableConfig
-   * @return A Tuple2 of extracted window bounds and remaining predicates.
+   * @param predicate
+   *   join predicate
+   * @param leftLogicalFieldCnt
+   *   number of attributes on the left join input
+   * @param joinRowType
+   *   row type of the join result
+   * @param rexBuilder
+   *   RexBuilder
+   * @param config
+   *   TableConfig
+   * @return
+   *   A Tuple2 of extracted window bounds and remaining predicates.
    */
   private[flink] def extractWindowBoundsFromPredicate(
       predicate: RexNode,
@@ -265,20 +281,21 @@ object IntervalJoinUtil {
   /**
    * Analyzes a predicate and identifies whether it is a valid predicate for a window join.
    *
-   * A valid window join predicate is a range or equality predicate (<, <=, ==, =>, >) that
-   * accesses time attributes of both inputs, each input on a different side of the condition.
-   * Both accessed time attributes must be of the same time type, i.e., row-time or proc-time.
+   * A valid window join predicate is a range or equality predicate (<, <=, ==, =>, >) that accesses
+   * time attributes of both inputs, each input on a different side of the condition. Both accessed
+   * time attributes must be of the same time type, i.e., row-time or proc-time.
    *
    * Examples:
-   * - left.rowtime > right.rowtime + 2.minutes => valid
-   * - left.rowtime == right.rowtime => valid
-   * - left.proctime < right.rowtime + 2.minutes => invalid: different time type
-   * - left.rowtime - right.rowtime < 2.minutes => invalid: both time attributes on same side
+   *   - left.rowtime > right.rowtime + 2.minutes => valid
+   *   - left.rowtime == right.rowtime => valid
+   *   - left.proctime < right.rowtime + 2.minutes => invalid: different time type
+   *   - left.rowtime - right.rowtime < 2.minutes => invalid: both time attributes on same side
    *
    * If the predicate is a regular join predicate, i.e., it accesses no time attribute it is
    * returned as well.
    *
-   * @return Either a valid time predicate (Left) or a valid non-time predicate (Right)
+   * @return
+   *   Either a valid time predicate (Left) or a valid non-time predicate (Right)
    */
   private def identifyTimePredicate(
       pred: RexNode,
@@ -349,7 +366,8 @@ object IntervalJoinUtil {
   /**
    * Extracts all time attributes that are accessed in an expression.
    *
-   * @return A Seq of all time attribute accessed in the expression.
+   * @return
+   *   A Seq of all time attribute accessed in the expression.
    */
   private def extractTimeAttributeAccesses(
       expr: RexNode,
@@ -384,9 +402,12 @@ object IntervalJoinUtil {
   /**
    * Checks if an expression accesses a non-time attribute.
    *
-   * @param expr      The expression to check.
-   * @param inputType The input type of the expression.
-   * @return True, if the expression accesses a non-time attribute. False otherwise.
+   * @param expr
+   *   The expression to check.
+   * @param inputType
+   *   The input type of the expression.
+   * @return
+   *   True, if the expression accesses a non-time attribute. False otherwise.
    */
   private def accessesNonTimeAttribute(expr: RexNode, inputType: RelDataType): Boolean = {
     expr match {
@@ -409,10 +430,11 @@ object IntervalJoinUtil {
   }
 
   /**
-   * Computes the absolute bound on the left operand of a comparison expression and
-   * whether the bound is an upper or lower bound.
+   * Computes the absolute bound on the left operand of a comparison expression and whether the
+   * bound is an upper or lower bound.
    *
-   * @return window boundary, is left lower bound
+   * @return
+   *   window boundary, is left lower bound
    */
   private def computeWindowBoundFromPredicate(
       timePred: TimePredicate,
@@ -461,13 +483,17 @@ object IntervalJoinUtil {
   }
 
   /**
-   * Replaces the time attributes on both sides of a time predicate by a zero literal and
-   * reduces the expressions on both sides to a long literal.
+   * Replaces the time attributes on both sides of a time predicate by a zero literal and reduces
+   * the expressions on both sides to a long literal.
    *
-   * @param timePred   The time predicate which both sides are reduced.
-   * @param rexBuilder A RexBuilder
-   * @param config     A TableConfig.
-   * @return The values of the reduced literals on both sides of the time comparison predicate.
+   * @param timePred
+   *   The time predicate which both sides are reduced.
+   * @param rexBuilder
+   *   A RexBuilder
+   * @param config
+   *   A TableConfig.
+   * @return
+   *   The values of the reduced literals on both sides of the time comparison predicate.
    */
   private def reduceTimeExpression(
       timePred: TimePredicate,

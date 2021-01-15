@@ -52,8 +52,8 @@ case class CharLength(child: PlannerExpression) extends UnaryExpression {
 }
 
 /**
- * Returns str with the first letter of each word in uppercase.
- * All other letters are in lowercase. Words are delimited by white space.
+ * Returns str with the first letter of each word in uppercase. All other letters are in lowercase.
+ * Words are delimited by white space.
  */
 case class InitCap(child: PlannerExpression) extends UnaryExpression {
   override private[flink] def resultType: TypeInformation[_] = STRING_TYPE_INFO
@@ -251,8 +251,8 @@ case class Position(needle: PlannerExpression, haystack: PlannerExpression)
 }
 
 /**
- * Replaces a substring of a string with a replacement string.
- * Starting at a position for a given length.
+ * Replaces a substring of a string with a replacement string. Starting at a position for a given
+ * length.
  */
 case class Overlay(
     str: PlannerExpression,
@@ -286,8 +286,8 @@ case class Overlay(
 }
 
 /**
- * Returns the string that results from concatenating the arguments.
- * Returns NULL if any argument is NULL.
+ * Returns the string that results from concatenating the arguments. Returns NULL if any argument is
+ * NULL.
  */
 case class Concat(strings: Seq[PlannerExpression]) extends PlannerExpression with InputTypeSpec {
 
@@ -306,8 +306,8 @@ case class Concat(strings: Seq[PlannerExpression]) extends PlannerExpression wit
 }
 
 /**
- * Returns the string that results from concatenating the arguments and separator.
- * Returns NULL If the separator is NULL.
+ * Returns the string that results from concatenating the arguments and separator. Returns NULL If
+ * the separator is NULL.
  *
  * Note: this user-defined function does not skip empty strings. However, it does skip any NULL
  * values after the separator argument.
@@ -367,8 +367,8 @@ case class Rpad(text: PlannerExpression, len: PlannerExpression, pad: PlannerExp
 }
 
 /**
- * Returns a string with all substrings that match the regular expression consecutively
- * being replaced.
+ * Returns a string with all substrings that match the regular expression consecutively being
+ * replaced.
  */
 case class RegexpReplace(
     str: PlannerExpression,
@@ -439,8 +439,7 @@ object RegexpExtract {
 }
 
 /**
- * Returns the base string decoded with base64.
- * Returns NULL If the input string is NULL.
+ * Returns the base string decoded with base64. Returns NULL If the input string is NULL.
  */
 case class FromBase64(child: PlannerExpression) extends UnaryExpression with InputTypeSpec {
 
@@ -576,8 +575,8 @@ case class Repeat(str: PlannerExpression, n: PlannerExpression)
 }
 
 /**
- * Returns a new string which replaces all the occurrences of the search target
- * with the replacement string (non-overlapping).
+ * Returns a new string which replaces all the occurrences of the search target with the replacement
+ * string (non-overlapping).
  */
 case class Replace(
     str: PlannerExpression,

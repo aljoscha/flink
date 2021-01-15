@@ -32,8 +32,8 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
- * Sub-class of [[LegacySink]] that is a relational expression
- * which writes out data of input node into a [[TableSink]].
+ * Sub-class of [[LegacySink]] that is a relational expression which writes out data of input node
+ * into a [[TableSink]].
  */
 class FlinkLogicalLegacySink(
     cluster: RelOptCluster,

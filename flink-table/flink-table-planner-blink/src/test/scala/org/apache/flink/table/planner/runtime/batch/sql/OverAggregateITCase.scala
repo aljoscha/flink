@@ -208,10 +208,8 @@ class OverAggregateITCase extends BatchTestBase {
   def testWindowAggregationNormalWindowAgg(): Unit = {
 
     /**
-     * sum,count,max,min
-     * over range ubounded preceding and current row is not supported right now
-     * row_number
-     * over rows ubounded preceding and current row is supported right now
+     * sum,count,max,min over range ubounded preceding and current row is not supported right now
+     * row_number over rows ubounded preceding and current row is supported right now
      */
     checkResult(
       "SELECT d, e, row_number() over (partition by d order by e desc), " +

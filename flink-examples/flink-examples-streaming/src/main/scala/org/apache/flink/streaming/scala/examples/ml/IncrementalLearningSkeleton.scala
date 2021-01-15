@@ -33,19 +33,17 @@ import org.apache.flink.streaming.api.windowing.windows.TimeWindow
 import org.apache.flink.util.Collector
 
 /**
- * Skeleton for incremental machine learning algorithm consisting of a
- * pre-computed model, which gets updated for the new inputs and new input data
- * for which the job provides predictions.
+ * Skeleton for incremental machine learning algorithm consisting of a pre-computed model, which
+ * gets updated for the new inputs and new input data for which the job provides predictions.
  *
- * This may serve as a base of a number of algorithms, e.g. updating an
- * incremental Alternating Least Squares model while also providing the
- * predictions.
+ * This may serve as a base of a number of algorithms, e.g. updating an incremental Alternating
+ * Least Squares model while also providing the predictions.
  *
  * This example shows how to use:
  *
- *  - Connected streams
- *  - CoFunctions
- *  - Tuple data types
+ *   - Connected streams
+ *   - CoFunctions
+ *   - Tuple data types
  */
 object IncrementalLearningSkeleton {
 
@@ -89,8 +87,8 @@ object IncrementalLearningSkeleton {
   // *************************************************************************
 
   /**
-   * Feeds new data for newData. By default it is implemented as constantly
-   * emitting the Integer 1 in a loop.
+   * Feeds new data for newData. By default it is implemented as constantly emitting the Integer 1
+   * in a loop.
    */
   private class FiniteNewDataSource extends SourceFunction[Integer] {
     override def run(ctx: SourceContext[Integer]) = {
@@ -107,8 +105,8 @@ object IncrementalLearningSkeleton {
   }
 
   /**
-   * Feeds new training data for the partial model builder. By default it is
-   * implemented as constantly emitting the Integer 1 in a loop.
+   * Feeds new training data for the partial model builder. By default it is implemented as
+   * constantly emitting the Integer 1 in a loop.
    */
   private class FiniteTrainingDataSource extends SourceFunction[Integer] {
     override def run(ctx: SourceContext[Integer]) =
@@ -150,11 +148,9 @@ object IncrementalLearningSkeleton {
   }
 
   /**
-   * Creates newData using the model produced in batch-processing and the
-   * up-to-date partial model.
+   * Creates newData using the model produced in batch-processing and the up-to-date partial model.
    *
-   * By default emits the Integer 0 for every newData and the Integer 1
-   * for every model update.
+   * By default emits the Integer 0 for every newData and the Integer 1 for every model update.
    */
   private class Predictor extends CoMapFunction[Integer, Array[java.lang.Double], Integer] {
 

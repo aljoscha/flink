@@ -32,9 +32,8 @@ import org.apache.calcite.rel.{RelNode, RelWriter}
 import scala.collection.JavaConverters._
 
 /**
- * Flink RelNode which matches along with DataStreamSource.
- * It ensures that types without deterministic field order (e.g. POJOs) are not part of
- * the plan translation.
+ * Flink RelNode which matches along with DataStreamSource. It ensures that types without
+ * deterministic field order (e.g. POJOs) are not part of the plan translation.
  */
 class StreamPhysicalDataStreamScan(
     cluster: RelOptCluster,

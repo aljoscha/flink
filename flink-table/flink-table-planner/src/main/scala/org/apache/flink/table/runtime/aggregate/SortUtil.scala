@@ -44,18 +44,22 @@ import org.apache.flink.api.common.operators.Order
 import scala.collection.JavaConverters._
 
 /**
- * Class represents a collection of helper methods to build the sort logic.
- * It encapsulates as well the implementation for ordering and generic interfaces
+ * Class represents a collection of helper methods to build the sort logic. It encapsulates as well
+ * the implementation for ordering and generic interfaces
  */
 object SortUtil {
 
   /**
    * Creates a ProcessFunction to sort rows based on event time and possibly other secondary fields.
    *
-   * @param collationSort The list of sort collations.
-   * @param inputType The row type of the input.
-   * @param execCfg Execution configuration to configure comparators.
-   * @return A function to sort stream values based on event-time and secondary sort fields.
+   * @param collationSort
+   *   The list of sort collations.
+   * @param inputType
+   *   The row type of the input.
+   * @param execCfg
+   *   Execution configuration to configure comparators.
+   * @return
+   *   A function to sort stream values based on event-time and secondary sort fields.
    */
   private[flink] def createRowTimeSortFunction(
       collationSort: RelCollation,
@@ -87,10 +91,14 @@ object SortUtil {
   /**
    * Creates a ProcessFunction to sort rows based on processing time and additional fields.
    *
-   * @param collationSort The list of sort collations.
-   * @param inputType The row type of the input.
-   * @param execCfg Execution configuration to configure comparators.
-   * @return A function to sort stream values based on proctime and other secondary sort fields.
+   * @param collationSort
+   *   The list of sort collations.
+   * @param inputType
+   *   The row type of the input.
+   * @param execCfg
+   *   Execution configuration to configure comparators.
+   * @return
+   *   A function to sort stream values based on proctime and other secondary sort fields.
    */
   private[flink] def createProcTimeSortFunction(
       collationSort: RelCollation,
@@ -114,11 +122,15 @@ object SortUtil {
   /**
    * Creates a RowComparator for the provided field collations and input type.
    *
-   * @param inputType the row type of the input.
-   * @param fieldCollations the field collations
-   * @param execConfig the execution configuration.
+   * @param inputType
+   *   the row type of the input.
+   * @param fieldCollations
+   *   the field collations
+   * @param execConfig
+   *   the execution configuration.
    *
-   * @return A RowComparator for the provided sort collations and input type.
+   * @return
+   *   A RowComparator for the provided sort collations and input type.
    */
   def createRowComparator(
       inputType: RelDataType,
@@ -153,8 +165,10 @@ object SortUtil {
   /**
    * Returns the direction of the first sort field.
    *
-   * @param collationSort The list of sort collations.
-   * @return The direction of the first sort field.
+   * @param collationSort
+   *   The list of sort collations.
+   * @return
+   *   The direction of the first sort field.
    */
   def getFirstSortDirection(collationSort: RelCollation): Direction = {
     Preconditions.checkArgument(collationSort.getFieldCollations.size() > 0)
@@ -164,9 +178,12 @@ object SortUtil {
   /**
    * Returns the first sort field.
    *
-   * @param collationSort The list of sort collations.
-   * @param rowType The row type of the input.
-   * @return The first sort field.
+   * @param collationSort
+   *   The list of sort collations.
+   * @param rowType
+   *   The row type of the input.
+   * @return
+   *   The first sort field.
    */
   def getFirstSortField(collationSort: RelCollation, rowType: RelDataType): RelDataTypeField = {
     Preconditions.checkArgument(collationSort.getFieldCollations.size() > 0)
@@ -177,8 +194,10 @@ object SortUtil {
   /**
    * Translates direction into Order
    *
-   * @param direction order direction
-   * @return corresponding order
+   * @param direction
+   *   order direction
+   * @return
+   *   corresponding order
    */
   def directionToOrder(direction: Direction): Order = {
     direction match {

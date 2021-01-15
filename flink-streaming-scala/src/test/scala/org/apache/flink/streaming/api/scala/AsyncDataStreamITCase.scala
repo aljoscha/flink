@@ -186,10 +186,9 @@ class AsyncFunctionWithTimeoutExpired extends RichAsyncFunction[Int, Int] {
 }
 
 /**
- * The asyncInvoke and timeout might be invoked at the same time.
- * The target is checking whether there is a race condition or not between asyncInvoke,
- * timeout and timer cancellation.
- * See https://issues.apache.org/jira/browse/FLINK-13605 for more details.
+ * The asyncInvoke and timeout might be invoked at the same time. The target is checking whether
+ * there is a race condition or not between asyncInvoke, timeout and timer cancellation. See
+ * https://issues.apache.org/jira/browse/FLINK-13605 for more details.
  */
 class AsyncFunctionWithoutTimeoutExpired extends RichAsyncFunction[Int, Int] {
   @transient var timeoutLatch: CountDownLatch = _

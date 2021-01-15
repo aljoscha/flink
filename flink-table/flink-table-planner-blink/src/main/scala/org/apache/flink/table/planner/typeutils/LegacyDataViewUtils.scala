@@ -50,12 +50,17 @@ object LegacyDataViewUtils {
   /**
    * Use NullSerializer for StateView fields from accumulator type information.
    *
-   * @param index index of aggregate function
-   * @param aggFun aggregate or table aggregate function
-   * @param externalAccType accumulator type information, only support pojo type
-   * @param isStateBackedDataViews is data views use state backend
-   * @return mapping of accumulator type information and data view config which contains id,
-   *         field name and state descriptor
+   * @param index
+   *   index of aggregate function
+   * @param aggFun
+   *   aggregate or table aggregate function
+   * @param externalAccType
+   *   accumulator type information, only support pojo type
+   * @param isStateBackedDataViews
+   *   is data views use state backend
+   * @return
+   *   mapping of accumulator type information and data view config which contains id, field name
+   *   and state descriptor
    */
   def useNullSerializerForStateViewFieldsFromAccType(
       index: Int,

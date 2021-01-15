@@ -46,16 +46,17 @@ import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 
 /**
- * A legacy implementation of [[FlinkPreparingTableBase]] which defines the interfaces required
- * to translate the Calcite [[RelOptTable]] to the Flink specific [[LegacyTableSourceTable]].
+ * A legacy implementation of [[FlinkPreparingTableBase]] which defines the interfaces required to
+ * translate the Calcite [[RelOptTable]] to the Flink specific [[LegacyTableSourceTable]].
  *
- * <p>This table is only used to translate the catalog table into [[LegacyTableSourceTable]]
- * during the last phrase of sql-to-rel conversion, it is overdue once the sql node was converted
- * to relational expression.
+ * <p>This table is only used to translate the catalog table into [[LegacyTableSourceTable]] during
+ * the last phrase of sql-to-rel conversion, it is overdue once the sql node was converted to
+ * relational expression.
  *
  * <p>Note: this class can be removed once legacy [[TableSource]] interface is removed.
  *
- * @param schemaTable Schema table which takes the variables needed to find the table source
+ * @param schemaTable
+ *   Schema table which takes the variables needed to find the table source
  */
 class LegacyCatalogSourceTable[T](
     relOptSchema: RelOptSchema,

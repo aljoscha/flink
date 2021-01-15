@@ -22,8 +22,8 @@ import org.apache.flink.api.common.typeinfo.{SqlTimeTypeInfo, TypeInformation}
 import org.apache.flink.table.codegen.{CodeGenerator, GeneratedExpression}
 
 /**
- * Generates function call to determine current time point (as date/time/timestamp) in
- * local timezone or not.
+ * Generates function call to determine current time point (as date/time/timestamp) in local
+ * timezone or not.
  */
 class CurrentTimePointCallGen(targetType: TypeInformation[_], local: Boolean)
     extends CallGenerator {

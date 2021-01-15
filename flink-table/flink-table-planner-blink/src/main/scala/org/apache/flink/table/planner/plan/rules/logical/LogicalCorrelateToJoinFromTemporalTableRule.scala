@@ -48,9 +48,9 @@ import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 
 /**
- * The initial temporal table join (FOR SYSTEM_TIME AS OF) is a Correlate, rewrite it into a Join
- * to make join condition can be pushed-down. The join will be translated into
- * [[StreamExecLookupJoin]] or translated into [[StreamPhysicalTemporalJoin]] in physical.
+ * The initial temporal table join (FOR SYSTEM_TIME AS OF) is a Correlate, rewrite it into a Join to
+ * make join condition can be pushed-down. The join will be translated into [[StreamExecLookupJoin]]
+ * or translated into [[StreamPhysicalTemporalJoin]] in physical.
  *
  * Notice: This rule can only be used in [[HepPlanner]].
  */
@@ -154,8 +154,8 @@ abstract class LogicalCorrelateToJoinFromTemporalTableRule(
 }
 
 /**
- * Lookup join is a kind of temporal table join implementation which only supports
- * Processing-time temporal table join and the right input required a [[LookupTableSource]].
+ * Lookup join is a kind of temporal table join implementation which only supports Processing-time
+ * temporal table join and the right input required a [[LookupTableSource]].
  */
 abstract class LogicalCorrelateToJoinFromLookupTemporalTableRule(
     operand: RelOptRuleOperand,
@@ -338,9 +338,8 @@ abstract class LogicalCorrelateToJoinFromGeneralTemporalTableRule(
 
 /**
  * Planner rule that matches temporal table join which implemented by lookup join, the join
- * condition is not true, that means the right input of the Correlate is a Filter.
- * e.g. SELECT * FROM MyTable AS T JOIN lookupTable FOR SYSTEM_TIME AS OF T.proctime AS D
- * ON T.a = D.id
+ * condition is not true, that means the right input of the Correlate is a Filter. e.g. SELECT *
+ * FROM MyTable AS T JOIN lookupTable FOR SYSTEM_TIME AS OF T.proctime AS D ON T.a = D.id
  */
 class LogicalCorrelateToJoinFromLookupTableRuleWithFilter
     extends LogicalCorrelateToJoinFromLookupTemporalTableRule(
@@ -369,9 +368,8 @@ class LogicalCorrelateToJoinFromLookupTableRuleWithFilter
 
 /**
  * Planner rule that matches temporal table join which implemented by lookup join, the join
- * condition is true, that means the right input of the Correlate is a Snapshot.
- * e.g. SELECT * FROM MyTable AS T JOIN temporalTable
- * FOR SYSTEM_TIME AS OF T.proctime AS D ON true
+ * condition is true, that means the right input of the Correlate is a Snapshot. e.g. SELECT * FROM
+ * MyTable AS T JOIN temporalTable FOR SYSTEM_TIME AS OF T.proctime AS D ON true
  */
 class LogicalCorrelateToJoinFromLookupTableRuleWithoutFilter
     extends LogicalCorrelateToJoinFromLookupTemporalTableRule(
@@ -397,10 +395,9 @@ class LogicalCorrelateToJoinFromLookupTableRuleWithoutFilter
 }
 
 /**
- * Planner rule that matches general temporal table join except lookup join, the join
- * condition is not true, that means the right input of the Correlate is a Filter.
- * e.g. SELECT * FROM MyTable AS T JOIN temporalTable FOR SYSTEM_TIME AS OF T.rowtime AS D
- * ON T.a = D.id
+ * Planner rule that matches general temporal table join except lookup join, the join condition is
+ * not true, that means the right input of the Correlate is a Filter. e.g. SELECT * FROM MyTable AS
+ * T JOIN temporalTable FOR SYSTEM_TIME AS OF T.rowtime AS D ON T.a = D.id
  */
 class LogicalCorrelateToJoinFromTemporalTableRuleWithFilter
     extends LogicalCorrelateToJoinFromGeneralTemporalTableRule(
@@ -429,9 +426,9 @@ class LogicalCorrelateToJoinFromTemporalTableRuleWithFilter
 }
 
 /**
- * Planner rule that matches general temporal table join except lookup join, the join
- * condition is true, that means the right input of the Correlate is a Snapshot.
- * e.g. SELECT * FROM MyTable AS T JOIN temporalTable FOR SYSTEM_TIME AS OF T.rowtime AS D ON true
+ * Planner rule that matches general temporal table join except lookup join, the join condition is
+ * true, that means the right input of the Correlate is a Snapshot. e.g. SELECT * FROM MyTable AS T
+ * JOIN temporalTable FOR SYSTEM_TIME AS OF T.rowtime AS D ON true
  */
 class LogicalCorrelateToJoinFromTemporalTableRuleWithoutFilter
     extends LogicalCorrelateToJoinFromGeneralTemporalTableRule(

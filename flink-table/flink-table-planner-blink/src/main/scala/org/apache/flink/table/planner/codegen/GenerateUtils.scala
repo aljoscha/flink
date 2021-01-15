@@ -130,8 +130,8 @@ object GenerateUtils {
   }
 
   /**
-   * Generates a string result call with a single result statement.
-   * This will convert the String result to BinaryStringData.
+   * Generates a string result call with a single result statement. This will convert the String
+   * result to BinaryStringData.
    */
   def generateStringResultCallIfArgsNotNull(
       ctx: CodeGeneratorContext,
@@ -142,8 +142,8 @@ object GenerateUtils {
   }
 
   /**
-   * Generates a string result call with auxiliary statements and result expression.
-   * This will convert the String result to BinaryStringData.
+   * Generates a string result call with auxiliary statements and result expression. This will
+   * convert the String result to BinaryStringData.
    */
   def generateStringResultCallWithStmtIfArgsNotNull(
       ctx: CodeGeneratorContext,
@@ -210,15 +210,21 @@ object GenerateUtils {
   // --------------------------- General Generate Utils ----------------------------------
 
   /**
-   * Generates a record declaration statement, and add it to reusable member. The record
-   * can be any type of RowData or other types.
+   * Generates a record declaration statement, and add it to reusable member. The record can be any
+   * type of RowData or other types.
    *
-   * @param t  the record type
-   * @param clazz  the specified class of the type (only used when RowType)
-   * @param recordTerm the record term to be declared
-   * @param recordWriterTerm the record writer term (only used when BinaryRowData type)
-   * @param ctx the code generator context
-   * @return the record initialization statement
+   * @param t
+   *   the record type
+   * @param clazz
+   *   the specified class of the type (only used when RowType)
+   * @param recordTerm
+   *   the record term to be declared
+   * @param recordWriterTerm
+   *   the record writer term (only used when BinaryRowData type)
+   * @param ctx
+   *   the code generator context
+   * @return
+   *   the record initialization statement
    */
   @tailrec
   def generateRecordStatement(
@@ -472,9 +478,12 @@ object GenerateUtils {
   /**
    * Generates access to a non-null field that does not require unboxing logic.
    *
-   * @param fieldType type of field
-   * @param fieldTerm expression term of field (already unboxed)
-   * @return internal unboxed field representation
+   * @param fieldType
+   *   type of field
+   * @param fieldTerm
+   *   expression term of field (already unboxed)
+   * @return
+   *   internal unboxed field representation
    */
   private[flink] def generateNonNullField(
       fieldType: LogicalType,
@@ -524,12 +533,18 @@ object GenerateUtils {
 
   /**
    * Generates access to a field of the input.
-   * @param ctx  code generator context which maintains various code statements.
-   * @param inputType  input type
-   * @param inputTerm  input term
-   * @param index  the field index to access
-   * @param nullableInput  whether the input is nullable
-   * @param deepCopy whether to copy the accessed field (usually needed when buffered)
+   * @param ctx
+   *   code generator context which maintains various code statements.
+   * @param inputType
+   *   input type
+   * @param inputTerm
+   *   input term
+   * @param index
+   *   the field index to access
+   * @param nullableInput
+   *   whether the input is nullable
+   * @param deepCopy
+   *   whether to copy the accessed field (usually needed when buffered)
    */
   def generateInputAccess(
       ctx: CodeGeneratorContext,
@@ -600,11 +615,16 @@ object GenerateUtils {
    * Converts the external boxed format to an internal mostly primitive field representation.
    * Wrapper types can autoboxed to their corresponding primitive type (Integer -> int).
    *
-   * @param ctx code generator context which maintains various code statements.
-   * @param inputType type of field
-   * @param inputTerm expression term of field to be unboxed
-   * @param inputUnboxingTerm unboxing/conversion term
-   * @return internal unboxed field representation
+   * @param ctx
+   *   code generator context which maintains various code statements.
+   * @param inputType
+   *   type of field
+   * @param inputTerm
+   *   expression term of field to be unboxed
+   * @param inputUnboxingTerm
+   *   unboxing/conversion term
+   * @return
+   *   internal unboxed field representation
    */
   def generateInputFieldUnboxing(
       ctx: CodeGeneratorContext,
@@ -637,9 +657,9 @@ object GenerateUtils {
 
   /**
    * Generates field access code expression. The different between this method and
-   * [[generateFieldAccess(ctx, inputType, inputTerm, index)]] is that this method
-   * accepts an additional `deepCopy` parameter. When deepCopy is set to true, the returned
-   * result will be copied.
+   * [[generateFieldAccess(ctx,inputType,inputTerm,index)]] is that this method accepts an
+   * additional `deepCopy` parameter. When deepCopy is set to true, the returned result will be
+   * copied.
    *
    * NOTE: Please set `deepCopy` to true when the result will be buffered.
    */

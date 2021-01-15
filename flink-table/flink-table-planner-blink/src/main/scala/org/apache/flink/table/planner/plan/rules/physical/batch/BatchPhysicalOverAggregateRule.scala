@@ -44,9 +44,9 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable.ArrayBuffer
 
 /**
- * Rule that converts [[FlinkLogicalOverAggregate]] to one or more [[BatchPhysicalOverAggregate]]s.
- * If there are more than one [[Group]], this rule will combine adjacent [[Group]]s with the
- * same partition keys and order keys into one BatchExecOverAggregate.
+ * Rule that converts [[FlinkLogicalOverAggregate]] to one or more [[BatchPhysicalOverAggregate]] s.
+ * If there are more than one [[Group]], this rule will combine adjacent [[Group]] s with the same
+ * partition keys and order keys into one BatchExecOverAggregate.
  */
 class BatchPhysicalOverAggregateRule
     extends RelOptRule(

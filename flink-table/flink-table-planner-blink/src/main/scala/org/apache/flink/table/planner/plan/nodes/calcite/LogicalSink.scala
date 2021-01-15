@@ -29,9 +29,8 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
- * Sub-class of [[Sink]] that is a relational expression
- * which writes out data of input node into a [[DynamicTableSink]].
- * This class corresponds to Calcite logical rel.
+ * Sub-class of [[Sink]] that is a relational expression which writes out data of input node into a
+ * [[DynamicTableSink]]. This class corresponds to Calcite logical rel.
  */
 final class LogicalSink(
     cluster: RelOptCluster,

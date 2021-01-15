@@ -45,9 +45,9 @@ import scala.collection.mutable.ListBuffer
 /**
  * Evaluates constant expressions with code generator.
  *
- * @param allowChangeNullability If the reduced expr's nullability can be changed, e.g. a null
- *                               literal is definitely nullable and the other literals are
- *                               not null.
+ * @param allowChangeNullability
+ *   If the reduced expr's nullability can be changed, e.g. a null literal is definitely nullable
+ *   and the other literals are not null.
  */
 class ExpressionReducer(config: TableConfig, allowChangeNullability: Boolean = false)
     extends RexExecutor

@@ -53,10 +53,14 @@ trait WithUpper extends ValueInterval {
 /**
  * This is for finite interval which has lower and upper both.
  *
- * @param lower        lower limit of interval
- * @param upper        upper limit of interval
- * @param includeLower whether include lower
- * @param includeUpper whether include upper
+ * @param lower
+ *   lower limit of interval
+ * @param upper
+ *   upper limit of interval
+ * @param includeLower
+ *   whether include lower
+ * @param includeUpper
+ *   whether include upper
  */
 case class FiniteValueInterval private (
     lower: Comparable[_],
@@ -71,8 +75,10 @@ case class FiniteValueInterval private (
 /**
  * This is for left semi infinite interval, which only has upper limit .
  *
- * @param upper        upper limit of interval
- * @param includeUpper whether include upper
+ * @param upper
+ *   upper limit of interval
+ * @param includeUpper
+ *   whether include upper
  */
 case class LeftSemiInfiniteValueInterval private (
     upper: Comparable[_],
@@ -84,8 +90,10 @@ case class LeftSemiInfiniteValueInterval private (
 /**
  * This is for right semi infinite interval, which only has lower limit .
  *
- * @param lower        lower limit of interval
- * @param includeLower whether include lower
+ * @param lower
+ *   lower limit of interval
+ * @param includeLower
+ *   whether include lower
  */
 case class RightSemiInfiniteValueInterval private (
     lower: Comparable[_],
@@ -151,9 +159,12 @@ object ValueInterval {
   /**
    * Get union result of two intervals
    *
-   * @param first  first interval
-   * @param second second interval
-   * @return union result of two input intervals.
+   * @param first
+   *   first interval
+   * @param second
+   *   second interval
+   * @return
+   *   union result of two input intervals.
    */
   def union(first: ValueInterval, second: ValueInterval): ValueInterval = (first, second) match {
     case (EmptyValueInterval, _)                                 => second
@@ -180,10 +191,13 @@ object ValueInterval {
   /**
    * Get intersected results of two intervals.
    *
-   * @param first  first interval
-   * @param second second interval
-   * @return NullValueInterval if two intervals are not intersected,
-   *         or intersected results of two intervals.
+   * @param first
+   *   first interval
+   * @param second
+   *   second interval
+   * @return
+   *   NullValueInterval if two intervals are not intersected, or intersected results of two
+   *   intervals.
    */
   def intersect(first: ValueInterval, second: ValueInterval): ValueInterval = {
     if (!isIntersected(first, second)) {
@@ -225,9 +239,12 @@ object ValueInterval {
   /**
    * Get whether two input intervals is intersected
    *
-   * @param first  first interval
-   * @param second second interval
-   * @return true if two input intervals is intersected, or false else.
+   * @param first
+   *   first interval
+   * @param second
+   *   second interval
+   * @return
+   *   true if two input intervals is intersected, or false else.
    */
   def isIntersected(first: ValueInterval, second: ValueInterval): Boolean = (first, second) match {
     case (_, EmptyValueInterval) | (EmptyValueInterval, _)       => false

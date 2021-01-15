@@ -21,9 +21,12 @@ package org.apache.flink.table.api
 /**
  * Exception for adding an already existent table
  *
- * @param catalog    catalog name
- * @param table      table name
- * @param cause      the cause
+ * @param catalog
+ *   catalog name
+ * @param table
+ *   table name
+ * @param cause
+ *   the cause
  */
 case class TableAlreadyExistException(catalog: String, table: String, cause: Throwable)
     extends RuntimeException(s"Table $catalog.$table already exists.", cause) {
@@ -35,8 +38,10 @@ case class TableAlreadyExistException(catalog: String, table: String, cause: Thr
 /**
  * Exception for adding an already existent catalog
  *
- * @param catalog catalog name
- * @param cause the cause
+ * @param catalog
+ *   catalog name
+ * @param cause
+ *   the cause
  */
 case class CatalogAlreadyExistException(catalog: String, cause: Throwable)
     extends RuntimeException(s"Catalog $catalog already exists.", cause) {

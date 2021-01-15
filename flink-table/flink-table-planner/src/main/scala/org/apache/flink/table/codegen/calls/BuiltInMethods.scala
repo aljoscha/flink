@@ -30,8 +30,8 @@ import org.apache.flink.table.runtime.functions.ScalarFunctions
  * Contains references to built-in functions.
  *
  * NOTE: When adding functions here. Check if Calcite provides it in
- * [[org.apache.calcite.util.BuiltInMethod]]. The function generator supports Java's auto casting
- * so we don't need the full matrix of data types for every function. Only [[JBigDecimal]] needs
+ * [[org.apache.calcite.util.BuiltInMethod]]. The function generator supports Java's auto casting so
+ * we don't need the full matrix of data types for every function. Only [[JBigDecimal]] needs
  * special handling.
  */
 object BuiltInMethods {

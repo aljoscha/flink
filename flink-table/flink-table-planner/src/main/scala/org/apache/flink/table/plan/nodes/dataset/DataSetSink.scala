@@ -31,11 +31,11 @@ import org.apache.calcite.rel.RelNode
 /**
  * A special [[DataSetRel]] which make explain result more pretty.
  *
- * <p>NOTES: We can't move the [[BatchTableSink#consumeDataSet]]/[[DataSet#output]] logic
- * from [[BatchTableEnvImpl]] to this node, because the return types of
- * [[DataSetRel#translateToPlan]] (which returns [[DataSet]]) and
- * [[BatchTableSink#consumeDataSet]]/[[DataSet#output]] (which returns [[DataSink]]) are
- * different. [[DataSetSink#translateToPlan]] just returns the input's translated result.
+ * <p>NOTES: We can't move the [[BatchTableSink#consumeDataSet]] /[[DataSet#output]] logic from
+ * [[BatchTableEnvImpl]] to this node, because the return types of [[DataSetRel#translateToPlan]]
+ * (which returns [[DataSet]] ) and [[BatchTableSink#consumeDataSet]] /[[DataSet#output]] (which
+ * returns [[DataSink]] ) are different. [[DataSetSink#translateToPlan]] just returns the input's
+ * translated result.
  */
 class DataSetSink(
     cluster: RelOptCluster,

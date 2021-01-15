@@ -38,8 +38,7 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
- * Stream physical RelNode to to write data into an external sink defined by a
- * [[DynamicTableSink]].
+ * Stream physical RelNode to to write data into an external sink defined by a [[DynamicTableSink]].
  */
 class StreamExecSink(
     cluster: RelOptCluster,

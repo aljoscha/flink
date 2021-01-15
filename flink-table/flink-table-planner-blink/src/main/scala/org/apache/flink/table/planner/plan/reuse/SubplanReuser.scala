@@ -42,18 +42,16 @@ import scala.collection.JavaConversions._
 /**
  * An utility class for finding out duplicated sub-plans by digest and reusing them.
  *
- * <p>e.g.
- * if Project1-Scan1 and Project2-Scan2 have same digest, they could be reused,
- * and only one of duplicated sub-plan will be retained.
- * after
+ * <p>e.g. if Project1-Scan1 and Project2-Scan2 have same digest, they could be reused, and only one
+ * of duplicated sub-plan will be retained. after
  * {{{
  *       Join                      Join
  *     /      \                  /      \
  * Filter1  Filter2          Filter1  Filter2
- *    |        |        =>       \     /
+ *   |        |        =>       \     /
  * Project1 Project2            Project1
- *    |        |                   |
- *  Scan1    Scan2               Scan1
+ *   |        |                   |
+ * Scan1    Scan2               Scan1
  * }}}
  */
 object SubplanReuser {
@@ -77,21 +75,20 @@ object SubplanReuser {
    * The Context holds sub-plan reuse information.
    *
    * <p>If two sub-plan ([[RelNode]] tree with leaf node) , even belongs to different tree, have
-   * same digest, they are in a reusable sub-plan group.
-   * In a reusable sub-plan group, the leftmost sub-plan in the earlier visited tree is reused
-   * sub-plan and the remaining will reuse the leftmost one in the earlier visited tree.
-   * <p>Uses reuse id to distinguish different reusable sub-plan group,
-   * the reuse id of each sub-plan is same in a group.
+   * same digest, they are in a reusable sub-plan group. In a reusable sub-plan group, the leftmost
+   * sub-plan in the earlier visited tree is reused sub-plan and the remaining will reuse the
+   * leftmost one in the earlier visited tree. <p>Uses reuse id to distinguish different reusable
+   * sub-plan group, the reuse id of each sub-plan is same in a group.
    *
    * <p>e.g.
    * {{{
    *       Join
    *     /      \
    * Filter1  Filter2
-   *    |        |
+   *   |        |
    * Project1 Project2
-   *    |        |
-   *  Scan1    Scan2
+   *   |        |
+   * Scan1    Scan2
    * }}}
    * Project1-Scan1 and Project2-Scan2 have same digest, so they are in a reusable sub-plan group.
    */
@@ -119,9 +116,8 @@ object SubplanReuser {
     }
 
     /**
-     * Returns true if the given node can reuse other node, else false.
-     * The nodes with same digest are reusable,
-     * and the non-head node of node-list can reuse the head node.
+     * Returns true if the given node can reuse other node, else false. The nodes with same digest
+     * are reusable, and the non-head node of node-list can reuse the head node.
      */
     def reuseOtherNode(node: RelNode): Boolean = {
       val reusableNodes = getReusableNodes(node)
@@ -197,16 +193,15 @@ object SubplanReuser {
   /**
    * Rewrite reusable sub-plans with different rel objects to same rel object.
    *
-   * <p>e.g.
-   * Scan1-Project1 and Scan2-Project2 have same digest, so they can be reused.
+   * <p>e.g. Scan1-Project1 and Scan2-Project2 have same digest, so they can be reused.
    * {{{
-   *      Join                       Join
+   *     Join                       Join
    *     /    \                     /    \
    * Filter1 Filter2            Filter1 Filter2
-   *    |      |          =>        \      /
+   *   |      |          =>        \      /
    * Project1 Project2              Project1
-   *    |      |                       |
-   *  Scan1   Scan2                  Scan1
+   *   |      |                       |
+   * Scan1   Scan2                  Scan1
    * }}}
    * After rewrote, Scan2-Project2 is replaced by Scan1-Project1.
    *

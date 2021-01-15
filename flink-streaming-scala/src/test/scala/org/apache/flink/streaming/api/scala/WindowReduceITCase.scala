@@ -42,8 +42,8 @@ import org.junit.Test
 import scala.collection.mutable
 
 /**
- * Tests for Folds over windows. These also test whether OutputTypeConfigurable functions
- * work for windows, because FoldWindowFunction is OutputTypeConfigurable.
+ * Tests for Folds over windows. These also test whether OutputTypeConfigurable functions work for
+ * windows, because FoldWindowFunction is OutputTypeConfigurable.
  */
 class WindowReduceITCase extends AbstractTestBase {
 

@@ -70,18 +70,21 @@ import java.util.function.{Function => JFunction, Supplier => JSupplier}
 import _root_.scala.collection.JavaConversions._
 
 /**
- * Implementation of [[Planner]] for blink planner. It supports only streaming use cases.
- * (The new [[org.apache.flink.table.sources.InputFormatTableSource]] should work, but will be
- * handled as streaming sources, and no batch specific optimizations will be applied).
+ * Implementation of [[Planner]] for blink planner. It supports only streaming use cases. (The new
+ * [[org.apache.flink.table.sources.InputFormatTableSource]] should work, but will be handled as
+ * streaming sources, and no batch specific optimizations will be applied).
  *
- * @param executor        instance of [[Executor]], needed to extract
- *                        [[StreamExecutionEnvironment]] for
- *                        [[org.apache.flink.table.sources.StreamTableSource.getDataStream]]
- * @param config          mutable configuration passed from corresponding [[TableEnvironment]]
- * @param functionCatalog catalog of functions
- * @param catalogManager  manager of catalog meta objects such as tables, views, databases etc.
- * @param isStreamingMode Determines if the planner should work in a batch (false}) or
- *                        streaming (true) mode.
+ * @param executor
+ *   instance of [[Executor]], needed to extract [[StreamExecutionEnvironment]] for
+ *   [[org.apache.flink.table.sources.StreamTableSource.getDataStream]]
+ * @param config
+ *   mutable configuration passed from corresponding [[TableEnvironment]]
+ * @param functionCatalog
+ *   catalog of functions
+ * @param catalogManager
+ *   manager of catalog meta objects such as tables, views, databases etc.
+ * @param isStreamingMode
+ *   Determines if the planner should work in a batch (false}) or streaming (true) mode.
  */
 abstract class PlannerBase(
     executor: Executor,
@@ -325,16 +328,20 @@ abstract class PlannerBase(
   /**
    * Translates a [[ExecNode]] DAG into a [[Transformation]] DAG.
    *
-   * @param execNodes The node DAG to translate.
-   * @return The [[Transformation]] DAG that corresponds to the node DAG.
+   * @param execNodes
+   *   The node DAG to translate.
+   * @return
+   *   The [[Transformation]] DAG that corresponds to the node DAG.
    */
   protected def translateToPlan(execNodes: util.List[ExecNode[_]]): util.List[Transformation[_]]
 
   /**
    * Creates a [[SelectTableSinkBase]] for a select query.
    *
-   * @param tableSchema the table schema of select result.
-   * @return The sink to fetch the select result.
+   * @param tableSchema
+   *   the table schema of select result.
+   * @return
+   *   The sink to fetch the select result.
    */
   protected def createSelectTableSink(tableSchema: TableSchema): SelectTableSinkBase[_]
 

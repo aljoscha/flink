@@ -27,8 +27,8 @@ import org.apache.calcite.rel.core._
 import scala.collection.JavaConversions._
 
 /**
- * Planner rule that replaces distinct [[Minus]] (SQL keyword: EXCEPT) with
- * a distinct [[Aggregate]] on an ANTI [[Join]].
+ * Planner rule that replaces distinct [[Minus]] (SQL keyword: EXCEPT) with a distinct [[Aggregate]]
+ * on an ANTI [[Join]].
  *
  * Only handle the case of input size 2.
  */

@@ -36,27 +36,35 @@ import org.apache.calcite.util.{ImmutableBitSet, NumberUtil}
 import scala.collection.JavaConversions._
 
 /**
- * Relational expression that returns the rows in which the rank number of each row
- * is in the given range.
+ * Relational expression that returns the rows in which the rank number of each row is in the given
+ * range.
  *
- * The node is an optimization of `OVER` for some special cases,
- * e.g.
+ * The node is an optimization of `OVER` for some special cases, e.g.
  * {{{
  * SELECT * FROM (
- *  SELECT a, b, RANK() OVER (PARTITION BY b ORDER BY c) rk FROM MyTable) t
+ * SELECT a, b, RANK() OVER (PARTITION BY b ORDER BY c) rk FROM MyTable) t
  * WHERE rk < 10
  * }}}
  * can be converted to this node.
  *
- * @param cluster          cluster that this relational expression belongs to
- * @param traitSet         the traits of this rel
- * @param input            input relational expression
- * @param partitionKey     partition keys (may be empty)
- * @param orderKey         order keys (should not be empty)
- * @param rankType         rank type to define how exactly generate rank number
- * @param rankRange        the expected range of rank number value
- * @param rankNumberType   the field type of rank number
- * @param outputRankNumber whether output rank number
+ * @param cluster
+ *   cluster that this relational expression belongs to
+ * @param traitSet
+ *   the traits of this rel
+ * @param input
+ *   input relational expression
+ * @param partitionKey
+ *   partition keys (may be empty)
+ * @param orderKey
+ *   order keys (should not be empty)
+ * @param rankType
+ *   rank type to define how exactly generate rank number
+ * @param rankRange
+ *   the expected range of rank number value
+ * @param rankNumberType
+ *   the field type of rank number
+ * @param outputRankNumber
+ *   whether output rank number
  */
 abstract class Rank(
     cluster: RelOptCluster,

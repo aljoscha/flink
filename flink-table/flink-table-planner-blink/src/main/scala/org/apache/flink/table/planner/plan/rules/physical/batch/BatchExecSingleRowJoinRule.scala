@@ -29,8 +29,8 @@ import org.apache.calcite.rel.convert.ConverterRule
 import org.apache.calcite.rel.core._
 
 /**
- * Rule that converts [[FlinkLogicalJoin]] to [[BatchPhysicalNestedLoopJoin]]
- * if one of join input sides returns at most a single row.
+ * Rule that converts [[FlinkLogicalJoin]] to [[BatchPhysicalNestedLoopJoin]] if one of join input
+ * sides returns at most a single row.
  */
 class BatchExecSingleRowJoinRule
     extends ConverterRule(
@@ -54,8 +54,8 @@ class BatchExecSingleRowJoinRule
   }
 
   /**
-   * Recursively checks if a [[RelNode]] returns at most a single row.
-   * Input must be a global aggregation possibly followed by projections or filters.
+   * Recursively checks if a [[RelNode]] returns at most a single row. Input must be a global
+   * aggregation possibly followed by projections or filters.
    */
   private def isSingleRow(node: RelNode): Boolean = {
     node match {

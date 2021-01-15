@@ -31,11 +31,12 @@ import org.apache.flink.table.util.DummyExecutionEnvironment
 import _root_.scala.reflect.ClassTag
 
 /**
- * The implementation for a Scala [[BatchTableEnvironment]] that works
- * with [[DataSet]]s.
+ * The implementation for a Scala [[BatchTableEnvironment]] that works with [[DataSet]] s.
  *
- * @param execEnv The Scala batch [[ExecutionEnvironment]] of the TableEnvironment.
- * @param config The configuration of the TableEnvironment.
+ * @param execEnv
+ *   The Scala batch [[ExecutionEnvironment]] of the TableEnvironment.
+ * @param config
+ *   The configuration of the TableEnvironment.
  */
 class BatchTableEnvironmentImpl(
     execEnv: ExecutionEnvironment,

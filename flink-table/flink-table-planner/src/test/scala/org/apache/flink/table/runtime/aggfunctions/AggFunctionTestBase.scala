@@ -36,7 +36,8 @@ import org.junit.Test
 /**
  * Base class for aggregate function test
  *
- * @tparam T the type for the aggregation result
+ * @tparam T
+ *   the type for the aggregation result
  */
 abstract class AggFunctionTestBase[T, ACC] {
   def inputValueSets: Seq[Seq[_]]

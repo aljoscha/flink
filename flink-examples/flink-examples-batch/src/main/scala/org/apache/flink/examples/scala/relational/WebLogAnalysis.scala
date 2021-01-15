@@ -24,8 +24,8 @@ import org.apache.flink.examples.java.relational.util.WebLogData
 import org.apache.flink.util.Collector
 
 /**
- * This program processes web logs and relational data.
- * It implements the following relational query:
+ * This program processes web logs and relational data. It implements the following relational
+ * query:
  *
  * {{{
  * SELECT
@@ -33,42 +33,42 @@ import org.apache.flink.util.Collector
  *       r.pageRank,
  *       r.avgDuration
  * FROM documents d JOIN rankings r
- *                  ON d.url = r.url
+ *                 ON d.url = r.url
  * WHERE CONTAINS(d.text, [keywords])
  *       AND r.rank > [rank]
  *       AND NOT EXISTS
  *           (
- *              SELECT * FROM Visits v
- *              WHERE v.destUrl = d.url
- *                    AND v.visitDate < [date]
+ *             SELECT * FROM Visits v
+ *             WHERE v.destUrl = d.url
+ *                   AND v.visitDate < [date]
  *           );
  * }}}
  *
- * Input files are plain text CSV files using the pipe character ('|') as field separator.
- * The tables referenced in the query can be generated using the
- * [org.apache.flink.examples.java.relational.util.WebLogDataGenerator]] and
- * have the following schemas
+ * Input files are plain text CSV files using the pipe character ('|') as field separator. The
+ * tables referenced in the query can be generated using the
+ * [org.apache.flink.examples.java.relational.util.WebLogDataGenerator]] and have the following
+ * schemas
  *
  * {{{
  * CREATE TABLE Documents (
- *                url VARCHAR(100) PRIMARY KEY,
- *                contents TEXT );
+ *               url VARCHAR(100) PRIMARY KEY,
+ *               contents TEXT );
  *
  * CREATE TABLE Rankings (
- *                pageRank INT,
- *                pageURL VARCHAR(100) PRIMARY KEY,
- *                avgDuration INT );
+ *               pageRank INT,
+ *               pageURL VARCHAR(100) PRIMARY KEY,
+ *               avgDuration INT );
  *
  * CREATE TABLE Visits (
- *                sourceIP VARCHAR(16),
- *                destURL VARCHAR(100),
- *                visitDate DATE,
- *                adRevenue FLOAT,
- *                userAgent VARCHAR(64),
- *                countryCode VARCHAR(3),
- *                languageCode VARCHAR(6),
- *                searchWord VARCHAR(32),
- *                duration INT );
+ *               sourceIP VARCHAR(16),
+ *               destURL VARCHAR(100),
+ *               visitDate DATE,
+ *               adRevenue FLOAT,
+ *               userAgent VARCHAR(64),
+ *               countryCode VARCHAR(3),
+ *               languageCode VARCHAR(6),
+ *               searchWord VARCHAR(32),
+ *               duration INT );
  * }}}
  *
  * Usage
@@ -81,9 +81,9 @@ import org.apache.flink.util.Collector
  *
  * This example shows how to use:
  *
- *  - tuple data types
- *  - projection and join projection
- *  - the CoGroup transformation for an anti-join
+ *   - tuple data types
+ *   - projection and join projection
+ *   - the CoGroup transformation for an anti-join
  */
 object WebLogAnalysis {
 

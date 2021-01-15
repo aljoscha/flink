@@ -52,8 +52,9 @@ import java.util.Optional
 /**
  * A code generator for generating [[AggsHandleFunction]].
  *
- * @param copyInputField copy input field element if true (only mutable type will be copied),
- *                       set to true if field will be buffered (such as local aggregate)
+ * @param copyInputField
+ *   copy input field element if true (only mutable type will be copied), set to true if field will
+ *   be buffered (such as local aggregate)
  */
 class AggsHandlerCodeGenerator(
     ctx: CodeGeneratorContext,
@@ -89,16 +90,16 @@ class AggsHandlerCodeGenerator(
   var valueType: RowType = _
 
   /**
-   * The [[aggBufferCodeGens]] and [[aggActionCodeGens]] will be both created when code generate
-   * an [[AggsHandleFunction]] or [[NamespaceAggsHandleFunction]]. They both contain all the
-   * same AggCodeGens, but are different in the organizational form. The [[aggBufferCodeGens]]
-   * flatten all the AggCodeGens in a flat format. The [[aggActionCodeGens]] organize all the
-   * AggCodeGens in a tree format. If there is no distinct aggregate, the [[aggBufferCodeGens]]
-   * and [[aggActionCodeGens]] are totally the same.
+   * The [[aggBufferCodeGens]] and [[aggActionCodeGens]] will be both created when code generate an
+   * [[AggsHandleFunction]] or [[NamespaceAggsHandleFunction]]. They both contain all the same
+   * AggCodeGens, but are different in the organizational form. The [[aggBufferCodeGens]] flatten
+   * all the AggCodeGens in a flat format. The [[aggActionCodeGens]] organize all the AggCodeGens in
+   * a tree format. If there is no distinct aggregate, the [[aggBufferCodeGens]] and
+   * [[aggActionCodeGens]] are totally the same.
    *
-   * When different aggregate distinct on the same field but on different filter conditions,
-   * they will share the same distinct state, see DistinctAggCodeGen.DistinctValueGenerator
-   * for more information.
+   * When different aggregate distinct on the same field but on different filter conditions, they
+   * will share the same distinct state, see DistinctAggCodeGen.DistinctValueGenerator for more
+   * information.
    */
 
   /**
@@ -106,33 +107,32 @@ class AggsHandlerCodeGenerator(
    * format, and is only used to generate the methods relative to accumulators, Such as
    * [[genCreateAccumulators()]], [[genGetAccumulators()]], [[genSetAccumulators()]].
    *
-   * For example if we have :
-   * count(*), count(distinct a), count(distinct a) filter d > 5, sum(a), sum(distinct a)
+   * For example if we have : count(*), count(distinct a), count(distinct a) filter d > 5, sum(a),
+   * sum(distinct a)
    *
    * then the members of aggBufferCodeGens are organized looks like this:
    * +----------+-----------+-----------+---------+---------+----------------+
-   * | count(*) | count(a') | count(a') |  sum(a) | sum(a') | distinct(a) a' |
+   * | count(*) | count(a') | count(a') | sum(a) | sum(a') | distinct(a) a' |
    * +----------+-----------+-----------+---------+---------+----------------+
    */
   private var aggBufferCodeGens: Array[AggCodeGen] = _
 
   /**
-   * The aggActionCodeGens is organized according to the aggregate calling order, which is in
-   * a tree format. Such as the aggregates distinct on the same fields should be accumulated
-   * together when distinct is satisfied. And this is only used to generate the methods relative
-   * to aggregate action. Such as [[genAccumulate()]], [[genRetract()]], [[genMerge()]].
+   * The aggActionCodeGens is organized according to the aggregate calling order, which is in a tree
+   * format. Such as the aggregates distinct on the same fields should be accumulated together when
+   * distinct is satisfied. And this is only used to generate the methods relative to aggregate
+   * action. Such as [[genAccumulate()]], [[genRetract()]], [[genMerge()]].
    *
-   * For example if we have :
-   * count(*), count(distinct a), count(distinct a) filter d > 5, sum(a), sum(distinct a)
+   * For example if we have : count(*), count(distinct a), count(distinct a) filter d > 5, sum(a),
+   * sum(distinct a)
    *
    * then the members of aggActionCodeGens are organized looks like this:
    *
-   * +----------------------------------------------------+
-   * | count(*) | sum(a) | distinct(a) a'                 |
-   * |          |        |   |-- count(a')                |
-   * |          |        |   |-- count(a') (filter d > 5) |
-   * |          |        |   |-- sum(a')                  |
-   * +----------------------------------------------------+
+   * | count(*) | sum(a) | distinct(a) a' |                             |
+   * |:---------|:-------|:---------------|:----------------------------|
+   * |          |        |                | -- count(a')                |
+   * |          |        |                | -- count(a') (filter d > 5) |
+   * |          |        |                | -- sum(a')                  |
    */
   private var aggActionCodeGens: Array[AggCodeGen] = _
 
@@ -169,14 +169,16 @@ class AggsHandlerCodeGenerator(
   }
 
   /**
-   * Tells the generator to generate `merge(..)` method with the merged accumulator information
-   * for the [[AggsHandleFunction]] and [[NamespaceAggsHandleFunction]].
-   * Default not generate `merge(..)` method.
+   * Tells the generator to generate `merge(..)` method with the merged accumulator information for
+   * the [[AggsHandleFunction]] and [[NamespaceAggsHandleFunction]]. Default not generate
+   * `merge(..)` method.
    *
-   * @param mergedAccOffset the mergedAcc may come from local aggregate,
-   *                         this is the first buffer offset in the row
-   * @param mergedAccOnHeap true if the mergedAcc is on heap, otherwise
-   * @param mergedAccExternalTypes the merged acc types
+   * @param mergedAccOffset
+   *   the mergedAcc may come from local aggregate, this is the first buffer offset in the row
+   * @param mergedAccOnHeap
+   *   true if the mergedAcc is on heap, otherwise
+   * @param mergedAccExternalTypes
+   *   the merged acc types
    */
   def needMerge(
       mergedAccOffset: Int,
@@ -415,8 +417,7 @@ class AggsHandlerCodeGenerator(
   }
 
   /**
-   * Generate [[GeneratedTableAggsHandleFunction]] with the given function name and aggregate
-   * infos.
+   * Generate [[GeneratedTableAggsHandleFunction]] with the given function name and aggregate infos.
    */
   def generateTableAggsHandler(
       name: String,
@@ -566,8 +567,8 @@ class AggsHandlerCodeGenerator(
   }
 
   /**
-   * Generate [[NamespaceAggsHandleFunction]] with the given function name and aggregate infos
-   * and window properties.
+   * Generate [[NamespaceAggsHandleFunction]] with the given function name and aggregate infos and
+   * window properties.
    */
   def generateNamespaceAggsHandler[N](
       name: String,
@@ -1181,7 +1182,8 @@ object AggsHandlerCodeGenerator {
   /**
    * Create DataView term, for example, acc1_map_dataview.
    *
-   * @return term to access MapView or ListView
+   * @return
+   *   term to access MapView or ListView
    */
   def createDataViewTerm(spec: DataViewSpec): String = {
     s"${spec.getStateId}_dataview"
@@ -1195,11 +1197,11 @@ object AggsHandlerCodeGenerator {
   }
 
   /**
-   * Create DataView backup term, for example, acc1_map_dataview_backup.
-   * The backup dataview term is used for merging two statebackend
-   * dataviews, e.g. session window.
+   * Create DataView backup term, for example, acc1_map_dataview_backup. The backup dataview term is
+   * used for merging two statebackend dataviews, e.g. session window.
    *
-   * @return term to access backup MapView or ListView
+   * @return
+   *   term to access backup MapView or ListView
    */
   def createDataViewBackupTerm(spec: DataViewSpec): String = {
     s"${spec.getStateId}_dataview_backup"

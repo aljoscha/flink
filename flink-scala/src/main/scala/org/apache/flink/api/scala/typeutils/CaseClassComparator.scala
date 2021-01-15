@@ -24,8 +24,8 @@ import org.apache.flink.core.memory.MemorySegment
 import org.apache.flink.types.{KeyFieldOutOfBoundsException, NullKeyFieldException}
 
 /**
- * Comparator for Case Classes. Access is different from
- * our Java Tuples so we have to treat them differently.
+ * Comparator for Case Classes. Access is different from our Java Tuples so we have to treat them
+ * differently.
  */
 @Internal
 class CaseClassComparator[T <: Product](

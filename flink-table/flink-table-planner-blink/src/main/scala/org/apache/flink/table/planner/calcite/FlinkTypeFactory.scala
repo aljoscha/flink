@@ -47,8 +47,8 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 /**
- * Flink specific type factory that represents the interface between Flink's [[LogicalType]]
- * and Calcite's [[RelDataType]].
+ * Flink specific type factory that represents the interface between Flink's [[LogicalType]] and
+ * Calcite's [[RelDataType]].
  */
 class FlinkTypeFactory(typeSystem: RelDataTypeSystem)
     extends JavaTypeFactoryImpl(typeSystem)
@@ -57,11 +57,13 @@ class FlinkTypeFactory(typeSystem: RelDataTypeSystem)
   private val seenTypes = mutable.HashMap[LogicalType, RelDataType]()
 
   /**
-   * Create a calcite field type in table schema from [[LogicalType]]. It use
-   * PEEK_FIELDS_NO_EXPAND when type is a nested struct type (Flink [[RowType]]).
+   * Create a calcite field type in table schema from [[LogicalType]]. It use PEEK_FIELDS_NO_EXPAND
+   * when type is a nested struct type (Flink [[RowType]] ).
    *
-   * @param t flink logical type.
-   * @return calcite [[RelDataType]].
+   * @param t
+   *   flink logical type.
+   * @return
+   *   calcite [[RelDataType]].
    */
   def createFieldTypeFromLogicalType(t: LogicalType): RelDataType = {
     def newRelDataType(): RelDataType = t.getTypeRoot match {
@@ -202,8 +204,10 @@ class FlinkTypeFactory(typeSystem: RelDataTypeSystem)
   /**
    * Creates a struct type with the input fieldNames and input fieldTypes using FlinkTypeFactory
    *
-   * @param tableSchema schema to convert to Calcite's specific one
-   * @return a struct type with the input fieldNames, input fieldTypes, and system fields
+   * @param tableSchema
+   *   schema to convert to Calcite's specific one
+   * @return
+   *   a struct type with the input fieldNames, input fieldTypes, and system fields
    */
   def buildRelNodeRowType(tableSchema: TableSchema): RelDataType = {
     buildRelNodeRowType(
@@ -212,22 +216,25 @@ class FlinkTypeFactory(typeSystem: RelDataTypeSystem)
   }
 
   /**
-   * Creates a table row type with the input fieldNames and input fieldTypes using
-   * FlinkTypeFactory. Table row type is table schema for Calcite RelNode. See getRowType of
-   * [[RelNode]]. Use FULLY_QUALIFIED to let each field must be referenced explicitly.
+   * Creates a table row type with the input fieldNames and input fieldTypes using FlinkTypeFactory.
+   * Table row type is table schema for Calcite RelNode. See getRowType of [[RelNode]]. Use
+   * FULLY_QUALIFIED to let each field must be referenced explicitly.
    *
-   * @param fieldNames field names
-   * @param fieldTypes field types, every element is Flink's [[LogicalType]]
-   * @return a table row type with the input fieldNames, input fieldTypes.
+   * @param fieldNames
+   *   field names
+   * @param fieldTypes
+   *   field types, every element is Flink's [[LogicalType]]
+   * @return
+   *   a table row type with the input fieldNames, input fieldTypes.
    */
   def buildRelNodeRowType(fieldNames: Seq[String], fieldTypes: Seq[LogicalType]): RelDataType = {
     buildStructType(fieldNames, fieldTypes, StructKind.FULLY_QUALIFIED)
   }
 
   /**
-   * Creates a table row type with the input fieldNames and input fieldTypes using
-   * FlinkTypeFactory. Table row type is table schema for Calcite RelNode. See getRowType of
-   * [[RelNode]]. Use FULLY_QUALIFIED to let each field must be referenced explicitly.
+   * Creates a table row type with the input fieldNames and input fieldTypes using FlinkTypeFactory.
+   * Table row type is table schema for Calcite RelNode. See getRowType of [[RelNode]]. Use
+   * FULLY_QUALIFIED to let each field must be referenced explicitly.
    */
   def buildRelNodeRowType(rowType: RowType): RelDataType = {
     val fields = rowType.getFields
@@ -237,10 +244,14 @@ class FlinkTypeFactory(typeSystem: RelDataTypeSystem)
   /**
    * Creates a struct type with the input fieldNames and input fieldTypes using FlinkTypeFactory.
    *
-   * @param fieldNames field names
-   * @param fieldTypes field types, every element is Flink's [[LogicalType]].
-   * @param structKind Name resolution policy. See more information in [[StructKind]].
-   * @return a struct type with the input fieldNames, input fieldTypes.
+   * @param fieldNames
+   *   field names
+   * @param fieldTypes
+   *   field types, every element is Flink's [[LogicalType]].
+   * @param structKind
+   *   Name resolution policy. See more information in [[StructKind]].
+   * @return
+   *   a struct type with the input fieldNames, input fieldTypes.
    */
   private def buildStructType(
       fieldNames: Seq[String],

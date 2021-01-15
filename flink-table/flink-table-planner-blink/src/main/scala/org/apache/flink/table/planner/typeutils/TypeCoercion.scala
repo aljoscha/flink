@@ -70,9 +70,8 @@ object TypeCoercion {
   /**
    * All the supported cast types in flink-table.
    *
-   * Note: No distinction between explicit and implicit conversions
-   * Note: This is a subset of SqlTypeAssignmentRule
-   * Note: This may lose type during the cast.
+   * Note: No distinction between explicit and implicit conversions Note: This is a subset of
+   * SqlTypeAssignmentRule Note: This may lose type during the cast.
    */
   def canCast(from: LogicalType, to: LogicalType): Boolean =
     (from.getTypeRoot, to.getTypeRoot) match {

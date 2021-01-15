@@ -22,8 +22,9 @@ package akka.dispatch
  * Composition over [[DefaultDispatcherPrerequisites]] that replaces thread factory with one that
  * allow to configure thread priority.
  *
- * @param newThreadPriority priority that will be set to each newly created thread
- *                          should be between Thread.MIN_PRIORITY and Thread.MAX_PRIORITY
+ * @param newThreadPriority
+ *   priority that will be set to each newly created thread should be between Thread.MIN_PRIORITY
+ *   and Thread.MAX_PRIORITY
  */
 class PriorityThreadsDispatcherPrerequisites(
     prerequisites: DispatcherPrerequisites,

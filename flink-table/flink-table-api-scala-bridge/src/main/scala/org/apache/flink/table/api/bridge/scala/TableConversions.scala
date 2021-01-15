@@ -28,7 +28,8 @@ import org.apache.flink.table.api.{Table, TableException, ValidationException}
 /**
  * Holds methods to convert a [[Table]] into a [[DataSet]] or a [[DataStream]].
  *
- * @param table The table to convert.
+ * @param table
+ *   The table to convert.
  */
 @PublicEvolving
 class TableConversions(table: Table) {
@@ -39,12 +40,14 @@ class TableConversions(table: Table) {
    * Converts the given [[Table]] into a [[DataSet]] of a specified type.
    *
    * The fields of the [[Table]] are mapped to [[DataSet]] fields as follows:
-   * - [[org.apache.flink.types.Row]] and [[org.apache.flink.api.java.tuple.Tuple]]
-   * types: Fields are mapped by position, field types must match.
-   * - POJO [[DataSet]] types: Fields are mapped by field name, field types must match.
+   *   - [[org.apache.flink.types.Row]] and [[org.apache.flink.api.java.tuple.Tuple]] types: Fields
+   *     are mapped by position, field types must match.
+   *   - POJO [[DataSet]] types: Fields are mapped by field name, field types must match.
    *
-   * @tparam T The type of the resulting [[DataSet]].
-   * @return The converted [[DataSet]].
+   * @tparam T
+   *   The type of the resulting [[DataSet]].
+   * @return
+   *   The converted [[DataSet]].
    */
   def toDataSet[T: TypeInformation]: DataSet[T] = {
 
@@ -60,16 +63,18 @@ class TableConversions(table: Table) {
   /**
    * Converts the given [[Table]] into an append [[DataStream]] of a specified type.
    *
-   * The [[Table]] must only have insert (append) changes. If the [[Table]] is also modified
-   * by update or delete changes, the conversion will fail.
+   * The [[Table]] must only have insert (append) changes. If the [[Table]] is also modified by
+   * update or delete changes, the conversion will fail.
    *
    * The fields of the [[Table]] are mapped to [[DataStream]] fields as follows:
-   * - [[org.apache.flink.types.Row]] and Scala Tuple types: Fields are mapped by position, field
-   * types must match.
-   * - POJO [[DataStream]] types: Fields are mapped by field name, field types must match.
+   *   - [[org.apache.flink.types.Row]] and Scala Tuple types: Fields are mapped by position, field
+   *     types must match.
+   *   - POJO [[DataStream]] types: Fields are mapped by field name, field types must match.
    *
-   * @tparam T The type of the resulting [[DataStream]].
-   * @return The converted [[DataStream]].
+   * @tparam T
+   *   The type of the resulting [[DataStream]].
+   * @return
+   *   The converted [[DataStream]].
    */
   def toAppendStream[T: TypeInformation]: DataStream[T] = {
 
@@ -84,9 +89,9 @@ class TableConversions(table: Table) {
   }
 
   /**
-   * Converts the [[Table]] to a [[DataStream]] of add and retract messages.
-   * The message will be encoded as [[Tuple2]]. The first field is a [[Boolean]] flag,
-   * the second field holds the record of the specified type [[T]].
+   * Converts the [[Table]] to a [[DataStream]] of add and retract messages. The message will be
+   * encoded as [[Tuple2]]. The first field is a [[Boolean]] flag, the second field holds the record
+   * of the specified type [[T]].
    *
    * A true [[Boolean]] flag indicates an add message, a false flag indicates a retract message.
    */

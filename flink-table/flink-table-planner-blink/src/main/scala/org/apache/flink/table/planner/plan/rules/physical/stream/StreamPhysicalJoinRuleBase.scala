@@ -35,8 +35,8 @@ import org.apache.calcite.rex.RexNode
 import java.util
 
 /**
- * Base implementation for rules match stream-stream join, including
- * regular stream join, interval join and temporal join.
+ * Base implementation for rules match stream-stream join, including regular stream join, interval
+ * join and temporal join.
  */
 abstract class StreamPhysicalJoinRuleBase(description: String)
     extends RelOptRule(

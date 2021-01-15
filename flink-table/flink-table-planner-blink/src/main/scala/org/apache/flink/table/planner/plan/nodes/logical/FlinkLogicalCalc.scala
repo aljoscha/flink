@@ -33,8 +33,8 @@ import java.util
 import java.util.function.Supplier
 
 /**
- * Sub-class of [[Calc]] that is a relational expression which computes project expressions
- * and also filters in Flink.
+ * Sub-class of [[Calc]] that is a relational expression which computes project expressions and also
+ * filters in Flink.
  */
 class FlinkLogicalCalc(
     cluster: RelOptCluster,

@@ -46,15 +46,21 @@ import java.util
 import java.util.Collections
 
 /**
- * Calcite wrapper for user-defined aggregate functions. Currently, the aggregate function can be
- * an [[AggregateFunction]] or a [[TableAggregateFunction]]
+ * Calcite wrapper for user-defined aggregate functions. Currently, the aggregate function can be an
+ * [[AggregateFunction]] or a [[TableAggregateFunction]]
  *
- * @param name function name (used by SQL parser)
- * @param displayName name to be displayed in operator name
- * @param aggregateFunction user defined aggregate function to be called
- * @param returnType the type information of returned value
- * @param accType the type information of the accumulator
- * @param typeFactory type factory for converting Flink's between Calcite's types
+ * @param name
+ *   function name (used by SQL parser)
+ * @param displayName
+ *   name to be displayed in operator name
+ * @param aggregateFunction
+ *   user defined aggregate function to be called
+ * @param returnType
+ *   the type information of returned value
+ * @param accType
+ *   the type information of the accumulator
+ * @param typeFactory
+ *   type factory for converting Flink's between Calcite's types
  */
 class AggSqlFunction(
     name: String,

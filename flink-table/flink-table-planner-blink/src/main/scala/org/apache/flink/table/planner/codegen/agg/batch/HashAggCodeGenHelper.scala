@@ -341,7 +341,8 @@ object HashAggCodeGenHelper {
   /**
    * Resolves the given expression to a resolved Expression.
    *
-   * @param isMerge this is called from merge() method
+   * @param isMerge
+   *   this is called from merge() method
    */
   private case class ResolveReference(
       ctx: CodeGeneratorContext,
@@ -371,8 +372,7 @@ object HashAggCodeGenHelper {
   }
 
   /**
-   * Generate codes which will read input,
-   * merge aggregate buffers and update the aggregation map
+   * Generate codes which will read input, merge aggregate buffers and update the aggregation map
    */
   private[flink] def genMergeAggBuffer(
       ctx: CodeGeneratorContext,
@@ -442,8 +442,8 @@ object HashAggCodeGenHelper {
   }
 
   /**
-   * Generate codes which will read input,
-   * accumulating aggregate buffers and updating the aggregation map
+   * Generate codes which will read input, accumulating aggregate buffers and updating the
+   * aggregation map
    */
   private[flink] def genAccumulateAggBuffer(
       ctx: CodeGeneratorContext,
@@ -520,8 +520,7 @@ object HashAggCodeGenHelper {
   }
 
   /**
-   * Generate codes which will read aggregation map,
-   * get the aggregate values
+   * Generate codes which will read aggregation map, get the aggregate values
    */
   private[flink] def genAggMapIterationAndOutput(
       ctx: CodeGeneratorContext,

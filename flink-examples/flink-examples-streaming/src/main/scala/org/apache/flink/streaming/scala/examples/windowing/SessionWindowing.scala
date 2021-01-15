@@ -29,8 +29,8 @@ import org.apache.flink.streaming.api.windowing.assigners.EventTimeSessionWindow
 import org.apache.flink.streaming.api.windowing.time.Time
 
 /**
- * An example of grouped stream windowing in session windows with session timeout of 3 msec.
- * A source fetches elements with key, timestamp, and count.
+ * An example of grouped stream windowing in session windows with session timeout of 3 msec. A
+ * source fetches elements with key, timestamp, and count.
  */
 object SessionWindowing {
 

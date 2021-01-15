@@ -29,8 +29,7 @@ import scala.collection.JavaConversions._
 
 /**
  * This test base provides full cluster-like integration tests for batch programs. Only runtime
- * operator tests should use this test base as they are expensive.
- * (e.g. [[GroupWindowITCase]])
+ * operator tests should use this test base as they are expensive. (e.g. [[GroupWindowITCase]] )
  */
 class TableProgramsClusterTestBase(
     executionMode: TestExecutionMode,

@@ -40,9 +40,8 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
- * Rule that converts [[FlinkLogicalJoin]] to [[BatchPhysicalHashJoin]]
- * if there exists at least one equal-join condition and
- * ShuffleHashJoin or BroadcastHashJoin are enabled.
+ * Rule that converts [[FlinkLogicalJoin]] to [[BatchPhysicalHashJoin]] if there exists at least one
+ * equal-join condition and ShuffleHashJoin or BroadcastHashJoin are enabled.
  */
 class BatchPhysicalHashJoinRule
     extends RelOptRule(
@@ -161,12 +160,16 @@ class BatchPhysicalHashJoinRule
   /**
    * Decides whether the join can convert to BroadcastHashJoin.
    *
-   * @param joinType  flink join type
-   * @param leftSize  size of join left child
-   * @param rightSize size of join right child
-   * @return an Tuple2 instance. The first element of tuple is true if join can convert to
-   *         broadcast hash join, false else. The second element of tuple is true if left side used
-   *         as broadcast side, false else.
+   * @param joinType
+   *   flink join type
+   * @param leftSize
+   *   size of join left child
+   * @param rightSize
+   *   size of join right child
+   * @return
+   *   an Tuple2 instance. The first element of tuple is true if join can convert to broadcast hash
+   *   join, false else. The second element of tuple is true if left side used as broadcast side,
+   *   false else.
    */
   private def canBroadcast(
       joinType: JoinRelType,

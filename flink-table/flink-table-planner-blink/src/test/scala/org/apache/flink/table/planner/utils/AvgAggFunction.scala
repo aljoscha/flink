@@ -38,7 +38,8 @@ class IntegralAvgAccumulator extends JTuple2[Long, Long] {
 /**
  * Base class for built-in Integral Avg aggregate function
  *
- * @tparam T the type for the aggregation result
+ * @tparam T
+ *   the type for the aggregation result
  */
 // NOTE: T is always scala.Double in subclasses; however it's problematics
 //       if we remove [T] and replace T with Double;
@@ -89,9 +90,11 @@ abstract class IntegralAvgAggFunction[T] extends AggregateFunction[T, IntegralAv
   /**
    * Convert the intermediate result to the expected aggregation result type
    *
-   * @param value the intermediate result. We use a Long container to save
-   *              the intermediate result to avoid the overflow by sum operation.
-   * @return the result value with the expected aggregation result type
+   * @param value
+   *   the intermediate result. We use a Long container to save the intermediate result to avoid the
+   *   overflow by sum operation.
+   * @return
+   *   the result value with the expected aggregation result type
    */
   def resultTypeConvert(value: Long): T
 }
@@ -126,7 +129,8 @@ class BigIntegralAvgAccumulator extends JTuple2[BigInteger, Long] {
 /**
  * Base Class for Built-in Big Integral Avg aggregate function
  *
- * @tparam T the type for the aggregation result
+ * @tparam T
+ *   the type for the aggregation result
  */
 abstract class BigIntegralAvgAggFunction[T]
     extends AggregateFunction[T, BigIntegralAvgAccumulator] {
@@ -175,10 +179,11 @@ abstract class BigIntegralAvgAggFunction[T]
   /**
    * Convert the intermediate result to the expected aggregation result type
    *
-   * @param value the intermediate result. We use a BigInteger container to
-   *              save the intermediate result to avoid the overflow by sum
-   *              operation.
-   * @return the result value with the expected aggregation result type
+   * @param value
+   *   the intermediate result. We use a BigInteger container to save the intermediate result to
+   *   avoid the overflow by sum operation.
+   * @return
+   *   the result value with the expected aggregation result type
    */
   def resultTypeConvert(value: BigInteger): T
 }
@@ -199,7 +204,8 @@ class FloatingAvgAccumulator extends JTuple2[Double, Long] {
 /**
  * Base class for built-in Floating Avg aggregate function
  *
- * @tparam T the type for the aggregation result
+ * @tparam T
+ *   the type for the aggregation result
  */
 abstract class FloatingAvgAggFunction[T] extends AggregateFunction[T, FloatingAvgAccumulator] {
 
@@ -247,9 +253,11 @@ abstract class FloatingAvgAggFunction[T] extends AggregateFunction[T, FloatingAv
   /**
    * Convert the intermediate result to the expected aggregation result type
    *
-   * @param value the intermediate result. We use a Double container to save
-   *              the intermediate result to avoid the overflow by sum operation.
-   * @return the result value with the expected aggregation result type
+   * @param value
+   *   the intermediate result. We use a Double container to save the intermediate result to avoid
+   *   the overflow by sum operation.
+   * @return
+   *   the result value with the expected aggregation result type
    */
   def resultTypeConvert(value: Double): T
 }

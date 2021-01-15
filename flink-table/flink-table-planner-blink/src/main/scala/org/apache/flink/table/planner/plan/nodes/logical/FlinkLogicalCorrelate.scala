@@ -28,8 +28,8 @@ import org.apache.calcite.rel.logical.LogicalCorrelate
 import org.apache.calcite.util.ImmutableBitSet
 
 /**
- * Sub-class of [[Correlate]] that is a relational operator
- * which performs nested-loop joins in Flink.
+ * Sub-class of [[Correlate]] that is a relational operator which performs nested-loop joins in
+ * Flink.
  */
 class FlinkLogicalCorrelate(
     cluster: RelOptCluster,

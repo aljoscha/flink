@@ -49,8 +49,8 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
- * FlinkRelMdColumnUniqueness supplies a implementation of
- * [[RelMetadataQuery#areColumnsUnique]] for the standard logical algebra.
+ * FlinkRelMdColumnUniqueness supplies a implementation of [[RelMetadataQuery#areColumnsUnique]] for
+ * the standard logical algebra.
  */
 class FlinkRelMdColumnUniqueness private extends MetadataHandler[BuiltInMetadata.ColumnUniqueness] {
 
@@ -148,14 +148,17 @@ class FlinkRelMdColumnUniqueness private extends MetadataHandler[BuiltInMetadata
   /**
    * Determines whether a specified set of columns from a Calc relational expression are unique.
    *
-   * @param rel         the Calc relational expression
-   * @param mq          metadata query instance
-   * @param columns     column mask representing the subset of columns for which
-   *                    uniqueness will be determined
-   * @param ignoreNulls if true, ignore null values when determining column
-   *                    uniqueness
-   * @return whether the columns are unique, or
-   *         null if not enough information is available to make that determination
+   * @param rel
+   *   the Calc relational expression
+   * @param mq
+   *   metadata query instance
+   * @param columns
+   *   column mask representing the subset of columns for which uniqueness will be determined
+   * @param ignoreNulls
+   *   if true, ignore null values when determining column uniqueness
+   * @return
+   *   whether the columns are unique, or null if not enough information is available to make that
+   *   determination
    */
   def areColumnsUnique(
       rel: Calc,
@@ -677,13 +680,17 @@ class FlinkRelMdColumnUniqueness private extends MetadataHandler[BuiltInMetadata
    *
    * FIX BUG in <a href="https://issues.apache.org/jira/browse/CALCITE-2134">[CALCITE-2134] </a>
    *
-   * @param subset      the RelSubSet relational expression
-   * @param mq          metadata query instance
-   * @param columns     column mask representing the subset of columns for which
-   *                    uniqueness will be determined
-   * @param ignoreNulls if true, ignore null values when determining column uniqueness
-   * @return whether the columns are unique, or
-   *         null if not enough information is available to make that determination
+   * @param subset
+   *   the RelSubSet relational expression
+   * @param mq
+   *   metadata query instance
+   * @param columns
+   *   column mask representing the subset of columns for which uniqueness will be determined
+   * @param ignoreNulls
+   *   if true, ignore null values when determining column uniqueness
+   * @return
+   *   whether the columns are unique, or null if not enough information is available to make that
+   *   determination
    */
   def areColumnsUnique(
       subset: RelSubset,
@@ -724,19 +731,23 @@ class FlinkRelMdColumnUniqueness private extends MetadataHandler[BuiltInMetadata
 
   /**
    * Catch-all implementation for
-   * [[BuiltInMetadata.ColumnUniqueness#areColumnsUnique(ImmutableBitSet, boolean)]],
-   * invoked using reflection, for any relational expression not
-   * handled by a more specific method.
+   * [[BuiltInMetadata.ColumnUniqueness#areColumnsUnique(ImmutableBitSet,boolean)]], invoked using
+   * reflection, for any relational expression not handled by a more specific method.
    *
-   * @param rel         Relational expression
-   * @param mq          Metadata query
-   * @param columns     column mask representing the subset of columns for which
-   *                    uniqueness will be determined
-   * @param ignoreNulls if true, ignore null values when determining column uniqueness
-   * @return whether the columns are unique, or
-   *         null if not enough information is available to make that determination
-   * @see org.apache.calcite.rel.metadata.RelMetadataQuery#areColumnsUnique(
-   *      RelNode, ImmutableBitSet, boolean)
+   * @param rel
+   *   Relational expression
+   * @param mq
+   *   Metadata query
+   * @param columns
+   *   column mask representing the subset of columns for which uniqueness will be determined
+   * @param ignoreNulls
+   *   if true, ignore null values when determining column uniqueness
+   * @return
+   *   whether the columns are unique, or null if not enough information is available to make that
+   *   determination
+   * @see
+   *   org.apache.calcite.rel.metadata.RelMetadataQuery#areColumnsUnique( RelNode, ImmutableBitSet,
+   *   boolean)
    */
   def areColumnsUnique(
       rel: RelNode,

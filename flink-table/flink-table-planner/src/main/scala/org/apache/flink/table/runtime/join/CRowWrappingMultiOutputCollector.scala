@@ -23,8 +23,8 @@ import org.apache.flink.types.Row
 import org.apache.flink.util.Collector
 
 /**
- * The collector to wrap a [[Row]] into a [[CRow]] and collect it multiple times. This collector
- * can also used to count output record number.
+ * The collector to wrap a [[Row]] into a [[CRow]] and collect it multiple times. This collector can
+ * also used to count output record number.
  */
 class CRowWrappingMultiOutputCollector extends Collector[Row] {
 

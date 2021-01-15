@@ -22,8 +22,8 @@ import org.apache.calcite.plan.{RelOptUtil, RelOptCostFactory, RelOptCost}
 import org.apache.calcite.util.Util
 
 /**
- * This class is based on Apache Calcite's `org.apache.calcite.plan.volcano.VolcanoCost` and has
- * an adapted cost comparison method `isLe(other: RelOptCost)` that takes io and cpu into account.
+ * This class is based on Apache Calcite's `org.apache.calcite.plan.volcano.VolcanoCost` and has an
+ * adapted cost comparison method `isLe(other: RelOptCost)` that takes io and cpu into account.
  */
 class DataSetCost(val rowCount: Double, val cpu: Double, val io: Double) extends RelOptCost {
 

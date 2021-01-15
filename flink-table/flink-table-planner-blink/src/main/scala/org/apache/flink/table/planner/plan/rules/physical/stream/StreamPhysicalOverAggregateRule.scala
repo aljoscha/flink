@@ -32,9 +32,9 @@ import org.apache.calcite.rel.convert.ConverterRule
 import scala.collection.JavaConverters._
 
 /**
- * Rule that converts [[FlinkLogicalOverAggregate]] to [[StreamPhysicalOverAggregate]].
- * NOTES: StreamExecOverAggregate only supports one [[org.apache.calcite.rel.core.Window.Group]],
- * else throw exception now
+ * Rule that converts [[FlinkLogicalOverAggregate]] to [[StreamPhysicalOverAggregate]]. NOTES:
+ * StreamExecOverAggregate only supports one [[org.apache.calcite.rel.core.Window.Group]], else
+ * throw exception now
  */
 class StreamPhysicalOverAggregateRule
     extends ConverterRule(

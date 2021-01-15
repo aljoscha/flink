@@ -26,8 +26,8 @@ import org.junit.Test
 import scala.language.existentials
 
 /**
- * This checks whether the CEP Scala API is up to feature parity with the Java API.
- * Implements the [[ScalaAPICompletenessTestBase]] for CEP.
+ * This checks whether the CEP Scala API is up to feature parity with the Java API. Implements the
+ * [[ScalaAPICompletenessTestBase]] for CEP.
  */
 class CEPScalaAPICompletenessTest extends ScalaAPICompletenessTestBase {
 

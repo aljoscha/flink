@@ -42,16 +42,16 @@ object TemporalJoinUtil {
   // ----------------------------------------------------------------------------------------
 
   /**
-   * [[TEMPORAL_JOIN_CONDITION]] is a specific join condition which correctly defines
-   * references to rightTimeAttribute, rightPrimaryKeyExpression and leftTimeAttribute.
-   * The condition is used to mark this is a temporal table join and ensure columns these
-   * expressions depends on will not be pruned.
+   * [[TEMPORAL_JOIN_CONDITION]] is a specific join condition which correctly defines references to
+   * rightTimeAttribute, rightPrimaryKeyExpression and leftTimeAttribute. The condition is used to
+   * mark this is a temporal table join and ensure columns these expressions depends on will not be
+   * pruned.
    *
-   * The join key pair is necessary for temporal table join to ensure the
-   * the condition will not be pushed down.
+   * The join key pair is necessary for temporal table join to ensure the the condition will not be
+   * pushed down.
    *
-   * The rightTimeAttribute, rightPrimaryKeyExpression and leftTimeAttribute will be
-   * extracted from the condition in physical phase.
+   * The rightTimeAttribute, rightPrimaryKeyExpression and leftTimeAttribute will be extracted from
+   * the condition in physical phase.
    */
   val TEMPORAL_JOIN_CONDITION = new SqlFunction(
     "__TEMPORAL_JOIN_CONDITION",
@@ -90,8 +90,8 @@ object TemporalJoinUtil {
     SqlFunctionCategory.SYSTEM)
 
   /**
-   * Initial temporal condition used in rewrite phase of logical plan, this condition will
-   * be replaced with [[TEMPORAL_JOIN_CONDITION]] after the primary key inferred.
+   * Initial temporal condition used in rewrite phase of logical plan, this condition will be
+   * replaced with [[TEMPORAL_JOIN_CONDITION]] after the primary key inferred.
    */
   val INITIAL_TEMPORAL_JOIN_CONDITION = new SqlFunction(
     "__INITIAL_TEMPORAL_JOIN_CONDITION",

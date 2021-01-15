@@ -84,8 +84,10 @@ import _root_.scala.collection.JavaConverters._
 /**
  * The abstract base class for the implementation of batch TableEnvironments.
  *
- * @param execEnv The [[ExecutionEnvironment]] which is wrapped in this [[BatchTableEnvImpl]].
- * @param config  The [[TableConfig]] of this [[BatchTableEnvImpl]].
+ * @param execEnv
+ *   The [[ExecutionEnvironment]] which is wrapped in this [[BatchTableEnvImpl]].
+ * @param config
+ *   The [[TableConfig]] of this [[BatchTableEnvImpl]].
  */
 abstract class BatchTableEnvImpl(
     private[flink] val execEnv: ExecutionEnvironment,
@@ -113,10 +115,11 @@ abstract class BatchTableEnvImpl(
   }
 
   /**
-   * Registers an internal [[BatchTableSource]] in this [[TableEnvImpl]]'s catalog without
-   * name checking. Registered tables can be referenced in SQL queries.
+   * Registers an internal [[BatchTableSource]] in this [[TableEnvImpl]] 's catalog without name
+   * checking. Registered tables can be referenced in SQL queries.
    *
-   * @param tableSource The [[TableSource]] to register.
+   * @param tableSource
+   *   The [[TableSource]] to register.
    */
   override protected def validateTableSource(tableSource: TableSource[_]): Unit = {
     TableSourceValidation.validateTableSource(tableSource, tableSource.getTableSchema)
@@ -143,15 +146,17 @@ abstract class BatchTableEnvImpl(
   }
 
   /**
-   * Writes a [[QueryOperation]] to a [[TableSink]],
-   * and translates them into a [[DataSink]].
+   * Writes a [[QueryOperation]] to a [[TableSink]], and translates them into a [[DataSink]].
    *
-   * Internally, the [[QueryOperation]] is translated into a [[DataSet]]
-   * and handed over to the [[TableSink]] to write it.
+   * Internally, the [[QueryOperation]] is translated into a [[DataSet]] and handed over to the
+   * [[TableSink]] to write it.
    *
-   * @param queryOperation The [[QueryOperation]] to write.
-   * @param tableSink The [[TableSink]] to write the [[Table]] to.
-   * @return [[DataSink]] which represents the plan.
+   * @param queryOperation
+   *   The [[QueryOperation]] to write.
+   * @param tableSink
+   *   The [[TableSink]] to write the [[Table]] to.
+   * @return
+   *   [[DataSink]] which represents the plan.
    */
   override protected def writeToSinkAndTranslate[T](
       queryOperation: QueryOperation,
@@ -197,11 +202,14 @@ abstract class BatchTableEnvImpl(
   /**
    * Creates a final converter that maps the internal row type to external type.
    *
-   * @param physicalTypeInfo the input of the sink
-   * @param schema the input schema with correct field names (esp. for POJO field mapping)
-   * @param requestedTypeInfo the output type of the sink
-   * @param functionName name of the map function. Must not be unique but has to be a
-   *                     valid Java class identifier.
+   * @param physicalTypeInfo
+   *   the input of the sink
+   * @param schema
+   *   the input schema with correct field names (esp. for POJO field mapping)
+   * @param requestedTypeInfo
+   *   the output type of the sink
+   * @param functionName
+   *   name of the map function. Must not be unique but has to be a valid Java class identifier.
    */
   private def getConversionMapper[IN, OUT](
       physicalTypeInfo: TypeInformation[IN],
@@ -226,8 +234,10 @@ abstract class BatchTableEnvImpl(
    * Returns the AST of the specified Table API and SQL queries and the execution plan to compute
    * the result of the given [[Table]].
    *
-   * @param table The table for which the AST and execution plan will be returned.
-   * @param extended Flag to include detailed optimizer estimates.
+   * @param table
+   *   The table for which the AST and execution plan will be returned.
+   * @param extended
+   *   Flag to include detailed optimizer estimates.
    */
   private[flink] def explain(table: Table, extended: Boolean): String = {
     explainInternal(
@@ -382,9 +392,9 @@ abstract class BatchTableEnvImpl(
   /**
    * Translate the buffered sinks to Plan, and clear the buffer.
    *
-   * <p>The buffer will be clear even if the `translate` fails. In most cases,
-   * the failure is not retryable (e.g. type mismatch, can't generate physical plan).
-   * If the buffer is not clear after failure, the following `translate` will also fail.
+   * <p>The buffer will be clear even if the `translate` fails. In most cases, the failure is not
+   * retryable (e.g. type mismatch, can't generate physical plan). If the buffer is not clear after
+   * failure, the following `translate` will also fail.
    */
   private def createPipelineAndClearBuffer(jobName: String): Pipeline = {
     val dataSinks = translate(bufferedModifyOperations)
@@ -448,10 +458,13 @@ abstract class BatchTableEnvImpl(
    *
    * The transformation does not involve optimizing the relational expression tree.
    *
-   * @param modifyOperation The root ModifyOperation of the relational expression tree.
-   * @param addLogicalSink Whether add [[LogicalSink]] as the root.
-   *                       Currently, LogicalSink only is only used for explaining.
-   * @return The [[RelNode]] that corresponds to the translated [[ModifyOperation]].
+   * @param modifyOperation
+   *   The root ModifyOperation of the relational expression tree.
+   * @param addLogicalSink
+   *   Whether add [[LogicalSink]] as the root. Currently, LogicalSink only is only used for
+   *   explaining.
+   * @return
+   *   The [[RelNode]] that corresponds to the translated [[ModifyOperation]].
    */
   private def translateToRel(modifyOperation: ModifyOperation, addLogicalSink: Boolean): RelNode = {
     val input = getRelBuilder.tableOperation(modifyOperation.getChild).build()
@@ -471,11 +484,13 @@ abstract class BatchTableEnvImpl(
   /**
    * Translates a list of [[ModifyOperation]] into a list of [[DataSink]].
    *
-   * The transformation involves optimizing the relational expression tree as defined by
-   * Table API calls and / or SQL queries and generating corresponding [[DataSet]] operators.
+   * The transformation involves optimizing the relational expression tree as defined by Table API
+   * calls and / or SQL queries and generating corresponding [[DataSet]] operators.
    *
-   * @param modifyOperations The root [[ModifyOperation]]s of the relational expression tree.
-   * @return The [[DataSink]] that corresponds to the translated [[ModifyOperation]]s.
+   * @param modifyOperations
+   *   The root [[ModifyOperation]] s of the relational expression tree.
+   * @return
+   *   The [[DataSink]] that corresponds to the translated [[ModifyOperation]] s.
    */
   private def translate[T](modifyOperations: JList[ModifyOperation]): JList[DataSink[_]] = {
     val relNodes = modifyOperations.asScala.map(o => translateToRel(o, addLogicalSink = false))
@@ -496,12 +511,15 @@ abstract class BatchTableEnvImpl(
   }
 
   /**
-   * Translates an optimized [[RelNode]] into a [[DataSet]]
-   * and handed over to the [[TableSink]] to write it.
+   * Translates an optimized [[RelNode]] into a [[DataSet]] and handed over to the [[TableSink]] to
+   * write it.
    *
-   * @param optimizedNode The [[RelNode]] to translate.
-   * @param tableSink The [[TableSink]] to write the [[Table]] to.
-   * @return The [[DataSink]] that corresponds to the [[RelNode]] and the [[TableSink]].
+   * @param optimizedNode
+   *   The [[RelNode]] to translate.
+   * @param tableSink
+   *   The [[TableSink]] to write the [[Table]] to.
+   * @return
+   *   The [[DataSink]] that corresponds to the [[RelNode]] and the [[TableSink]].
    */
   private def translate[T](
       batchTableEnv: BatchTableEnvImpl,
@@ -543,13 +561,17 @@ abstract class BatchTableEnvImpl(
   /**
    * Translates a [[Table]] into a [[DataSet]].
    *
-   * The transformation involves optimizing the relational expression tree as defined by
-   * Table API calls and / or SQL queries and generating corresponding [[DataSet]] operators.
+   * The transformation involves optimizing the relational expression tree as defined by Table API
+   * calls and / or SQL queries and generating corresponding [[DataSet]] operators.
    *
-   * @param table The root node of the relational expression tree.
-   * @param tpe   The [[TypeInformation]] of the resulting [[DataSet]].
-   * @tparam A The type of the resulting [[DataSet]].
-   * @return The [[DataSet]] that corresponds to the translated [[Table]].
+   * @param table
+   *   The root node of the relational expression tree.
+   * @param tpe
+   *   The [[TypeInformation]] of the resulting [[DataSet]].
+   * @tparam A
+   *   The type of the resulting [[DataSet]].
+   * @return
+   *   The [[DataSet]] that corresponds to the translated [[Table]].
    */
   protected def translate[A](table: Table)(implicit tpe: TypeInformation[A]): DataSet[A] = {
     translate(table.getQueryOperation)(tpe)
@@ -558,13 +580,17 @@ abstract class BatchTableEnvImpl(
   /**
    * Translates a [[QueryOperation]] into a [[DataSet]].
    *
-   * The transformation involves optimizing the relational expression tree as defined by
-   * Table API calls and / or SQL queries and generating corresponding [[DataSet]] operators.
+   * The transformation involves optimizing the relational expression tree as defined by Table API
+   * calls and / or SQL queries and generating corresponding [[DataSet]] operators.
    *
-   * @param queryOperation The root operation of the relational expression tree.
-   * @param tpe   The [[TypeInformation]] of the resulting [[DataSet]].
-   * @tparam A The type of the resulting [[DataSet]].
-   * @return The [[DataSet]] that corresponds to the translated [[Table]].
+   * @param queryOperation
+   *   The root operation of the relational expression tree.
+   * @param tpe
+   *   The [[TypeInformation]] of the resulting [[DataSet]].
+   * @tparam A
+   *   The type of the resulting [[DataSet]].
+   * @return
+   *   The [[DataSet]] that corresponds to the translated [[Table]].
    */
   protected def translate[A](queryOperation: QueryOperation)(implicit
       tpe: TypeInformation[A]): DataSet[A] = {
@@ -576,12 +602,17 @@ abstract class BatchTableEnvImpl(
   /**
    * Translates a logical [[RelNode]] into a [[DataSet]]. Converts to target type if necessary.
    *
-   * @param logicalPlan The root node of the relational expression tree.
-   * @param logicalType The row type of the result. Since the logicalPlan can lose the
-   *                    field naming during optimization we pass the row type separately.
-   * @param tpe         The [[TypeInformation]] of the resulting [[DataSet]].
-   * @tparam A The type of the resulting [[DataSet]].
-   * @return The [[DataSet]] that corresponds to the translated [[Table]].
+   * @param logicalPlan
+   *   The root node of the relational expression tree.
+   * @param logicalType
+   *   The row type of the result. Since the logicalPlan can lose the field naming during
+   *   optimization we pass the row type separately.
+   * @param tpe
+   *   The [[TypeInformation]] of the resulting [[DataSet]].
+   * @tparam A
+   *   The type of the resulting [[DataSet]].
+   * @return
+   *   The [[DataSet]] that corresponds to the translated [[Table]].
    */
   protected def translate[A](logicalPlan: RelNode, logicalType: TableSchema)(implicit
       tpe: TypeInformation[A]): DataSet[A] = {

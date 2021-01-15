@@ -61,8 +61,8 @@ class StreamingTestBase extends AbstractTestBase {
   }
 
   /**
-   * Creates a new Row and assigns the given values to the Row's fields.
-   * We use [[rowOf()]] here to avoid conflicts with [[ImplicitExpressionConversions.row]].
+   * Creates a new Row and assigns the given values to the Row's fields. We use [[rowOf()]] here to
+   * avoid conflicts with [[ImplicitExpressionConversions.row]].
    */
   protected def rowOf(args: Any*): Row = {
     val row = new Row(args.length)

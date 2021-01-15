@@ -32,15 +32,15 @@ import _root_.scala.reflect.ClassTag
 import language.experimental.macros
 
 /**
- * The Flink Scala API. [[org.apache.flink.api.scala.ExecutionEnvironment]] is the starting-point
- * of any Flink program. It can be used to read from local files, HDFS, or other sources.
+ * The Flink Scala API. [[org.apache.flink.api.scala.ExecutionEnvironment]] is the starting-point of
+ * any Flink program. It can be used to read from local files, HDFS, or other sources.
  * [[org.apache.flink.api.scala.DataSet]] is the main abstraction of data in Flink. It provides
  * operations that create new DataSets via transformations.
  * [[org.apache.flink.api.scala.GroupedDataSet]] provides operations on grouped data that results
  * from [[org.apache.flink.api.scala.DataSet.groupBy()]].
  *
- * Use [[org.apache.flink.api.scala.ExecutionEnvironment.getExecutionEnvironment]] to obtain
- * an execution environment. This will either create a local environment or a remote environment,
+ * Use [[org.apache.flink.api.scala.ExecutionEnvironment.getExecutionEnvironment]] to obtain an
+ * execution environment. This will either create a local environment or a remote environment,
  * depending on the context where your program is executing.
  */
 package object scala {
@@ -96,8 +96,8 @@ package object scala {
   }
 
   /**
-   * The definition of the class [[Tuple2CaseClassSerializer]] is not visible from Java,
-   * because it is defined within a scala package object, and we need it in
+   * The definition of the class [[Tuple2CaseClassSerializer]] is not visible from Java, because it
+   * is defined within a scala package object, and we need it in
    * [[Tuple2CaseClassSerializerSnapshot]] so we need to expose it as a subtype, via this method.
    */
   @Internal()
@@ -107,10 +107,9 @@ package object scala {
   }
 
   /**
-   * The definition of the class [[Tuple2CaseClassSerializer]] is not visible from Java
-   * because it is defined within a scala package object, and we need to be able to create new
-   * instances of it from [[Tuple2CaseClassSerializerSnapshot]] so we need to expose it via
-   * this method.
+   * The definition of the class [[Tuple2CaseClassSerializer]] is not visible from Java because it
+   * is defined within a scala package object, and we need to be able to create new instances of it
+   * from [[Tuple2CaseClassSerializerSnapshot]] so we need to expose it via this method.
    */
   @Internal()
   private[scala] def tuple2Serializer[T1, T2](

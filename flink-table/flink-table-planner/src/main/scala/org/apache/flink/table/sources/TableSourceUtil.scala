@@ -45,11 +45,12 @@ object TableSourceUtil {
   /**
    * Returns the [[RowtimeAttributeDescriptor]] of a [[TableSource]].
    *
-   * @param tableSource The [[TableSource]] for which the [[RowtimeAttributeDescriptor]] is
-   *                    returned.
-   * @param selectedFields The fields which are selected from the [[TableSource]].
-   *                       If None, all fields are selected.
-   * @return The [[RowtimeAttributeDescriptor]] of the [[TableSource]].
+   * @param tableSource
+   *   The [[TableSource]] for which the [[RowtimeAttributeDescriptor]] is returned.
+   * @param selectedFields
+   *   The fields which are selected from the [[TableSource]]. If None, all fields are selected.
+   * @return
+   *   The [[RowtimeAttributeDescriptor]] of the [[TableSource]].
    */
   def getRowtimeAttributeDescriptor(
       tableSource: TableSource[_],
@@ -87,15 +88,19 @@ object TableSourceUtil {
   /**
    * Retrieves an expression to compute a rowtime attribute.
    *
-   * @param extractor Timestamp extractor to construct an expression for.
-   * @param physicalInputType Physical input type that the timestamp extractor accesses.
-   * @param expectedDataType Expected type of the expression. Different in case of batch and
-   *                         streaming.
-   * @param relBuilder  Builder needed to construct the resulting RexNode.
-   * @param nameMapping Additional remapping of a logical to a physical field name.
-   *                    TimestampExtractor works with logical names, but accesses physical
-   *                    fields
-   * @return The [[RexNode]] expression to extract the timestamp.
+   * @param extractor
+   *   Timestamp extractor to construct an expression for.
+   * @param physicalInputType
+   *   Physical input type that the timestamp extractor accesses.
+   * @param expectedDataType
+   *   Expected type of the expression. Different in case of batch and streaming.
+   * @param relBuilder
+   *   Builder needed to construct the resulting RexNode.
+   * @param nameMapping
+   *   Additional remapping of a logical to a physical field name. TimestampExtractor works with
+   *   logical names, but accesses physical fields
+   * @return
+   *   The [[RexNode]] expression to extract the timestamp.
    */
   def getRowtimeExtractionExpression(
       extractor: TimestampExtractor,

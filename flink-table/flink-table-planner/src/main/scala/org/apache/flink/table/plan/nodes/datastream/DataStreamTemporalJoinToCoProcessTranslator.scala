@@ -36,7 +36,8 @@ import org.apache.flink.types.Row
 import org.apache.flink.util.Preconditions.checkState
 
 /**
- * @param rightTimeAttributeInputReference is defined only for event time joins.
+ * @param rightTimeAttributeInputReference
+ *   is defined only for event time joins.
  */
 class DataStreamTemporalJoinToCoProcessTranslator private (
     textualRepresentation: String,

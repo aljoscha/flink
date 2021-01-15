@@ -30,12 +30,12 @@ import org.apache.calcite.util.Util
 import scala.collection.JavaConversions._
 
 /**
- * Replaces logical [[Minus]] operator using a combination of union all, aggregate
- * and table function.
+ * Replaces logical [[Minus]] operator using a combination of union all, aggregate and table
+ * function.
  *
  * Original Query :
  * {{{
- *    SELECT c1 FROM ut1 EXCEPT ALL SELECT c1 FROM ut2
+ *   SELECT c1 FROM ut1 EXCEPT ALL SELECT c1 FROM ut2
  * }}}
  *
  * Rewritten Query:

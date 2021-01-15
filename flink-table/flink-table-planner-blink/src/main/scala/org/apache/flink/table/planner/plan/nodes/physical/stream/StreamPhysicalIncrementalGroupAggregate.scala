@@ -36,24 +36,24 @@ import java.util
  * {{{
  *   StreamPhysicalGlobalGroupAggregate (final-global-aggregate)
  *   +- StreamPhysicalExchange
- *      +- StreamPhysicalLocalGroupAggregate (final-local-aggregate)
+ *     +- StreamPhysicalLocalGroupAggregate (final-local-aggregate)
  *         +- StreamPhysicalGlobalGroupAggregate (partial-global-aggregate)
- *            +- StreamPhysicalExchange
+ *           +- StreamPhysicalExchange
  *               +- StreamPhysicalLocalGroupAggregate (partial-local-aggregate)
  * }}}
  *
- * partial-global-aggregate and final-local-aggregate can be combined as
- * this node to share [[org.apache.flink.api.common.state.State]].
- * now the sub-plan is
+ * partial-global-aggregate and final-local-aggregate can be combined as this node to share
+ * [[org.apache.flink.api.common.state.State]]. now the sub-plan is
  * {{{
  *   StreamPhysicalGlobalGroupAggregate (final-global-aggregate)
  *   +- StreamPhysicalExchange
- *      +- StreamPhysicalIncrementalGroupAggregate
+ *     +- StreamPhysicalIncrementalGroupAggregate
  *         +- StreamPhysicalExchange
- *            +- StreamPhysicalLocalGroupAggregate (partial-local-aggregate)
+ *           +- StreamPhysicalLocalGroupAggregate (partial-local-aggregate)
  * }}}
  *
- * @see [[StreamPhysicalGroupAggregateBase]] for more info.
+ * @see
+ *   [[StreamPhysicalGroupAggregateBase]] for more info.
  */
 class StreamPhysicalIncrementalGroupAggregate(
     cluster: RelOptCluster,

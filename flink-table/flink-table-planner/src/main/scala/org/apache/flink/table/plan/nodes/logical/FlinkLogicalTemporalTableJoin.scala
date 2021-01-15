@@ -28,9 +28,8 @@ import org.apache.flink.table.plan.nodes.FlinkConventions
 import org.apache.flink.util.Preconditions.checkArgument
 
 /**
- * Represents a join between a table and
- * [[org.apache.flink.table.functions.TemporalTableFunction]]. For more details please check
- * [[LogicalTemporalTableJoin]].
+ * Represents a join between a table and [[org.apache.flink.table.functions.TemporalTableFunction]].
+ * For more details please check [[LogicalTemporalTableJoin]].
  */
 class FlinkLogicalTemporalTableJoin(
     cluster: RelOptCluster,

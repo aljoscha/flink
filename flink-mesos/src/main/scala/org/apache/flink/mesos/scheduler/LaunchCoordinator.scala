@@ -40,13 +40,13 @@ import scala.concurrent.duration._
 import org.apache.flink.mesos.configuration.MesosOptions._
 
 /**
- * The launch coordinator handles offer processing, including
- * matching offers to tasks and making reservations.
+ * The launch coordinator handles offer processing, including matching offers to tasks and making
+ * reservations.
  *
- * The coordinator uses Netflix Fenzo to optimize task placement.   During the GatheringOffers
- * phase, offers are evaluated by Fenzo for suitability to the planned tasks.   Reservations are
- * then placed against the best offers, leading to revised offers containing reserved resources
- * with which to launch task(s).
+ * The coordinator uses Netflix Fenzo to optimize task placement. During the GatheringOffers phase,
+ * offers are evaluated by Fenzo for suitability to the planned tasks. Reservations are then placed
+ * against the best offers, leading to revised offers containing reserved resources with which to
+ * launch task(s).
  */
 class LaunchCoordinator(
     manager: ActorRef,
@@ -72,8 +72,8 @@ class LaunchCoordinator(
    * The task placement optimizer.
    *
    * The optimizer contains the following state:
-   *  - unused offers
-   *  - existing task placement (for fitness calculation involving task colocation)
+   *   - unused offers
+   *   - existing task placement (for fitness calculation involving task colocation)
    */
   private[mesos] val optimizer: TaskScheduler = {
     optimizerBuilder
@@ -318,8 +318,10 @@ object LaunchCoordinator {
   /**
    * FSM state data.
    *
-   * @param tasks the tasks to launch.
-   * @param newLeases new leases not yet handed to the optimizer.
+   * @param tasks
+   *   the tasks to launch.
+   * @param newLeases
+   *   new leases not yet handed to the optimizer.
    */
   case class GatherData(tasks: Seq[LaunchableTask] = Nil, newLeases: Seq[VirtualMachineLease] = Nil)
 
@@ -335,17 +337,17 @@ object LaunchCoordinator {
   }
 
   /**
-   * Informs the launch coordinator that some task(s) are assigned
-   * to a host (for planning purposes).
+   * Informs the launch coordinator that some task(s) are assigned to a host (for planning
+   * purposes).
    *
-   * This is sent by the RM in recovery procedures to recover the optimizer state.
-   * In normal operation, the launch coordinator itself updates the optimizer state.
+   * This is sent by the RM in recovery procedures to recover the optimizer state. In normal
+   * operation, the launch coordinator itself updates the optimizer state.
    */
   case class Assign(tasks: java.util.List[FlinkTuple2[TaskRequest, String]])
 
   /**
-   * Informs the launch coordinator that some task is no longer assigned
-   * to a host (for planning purposes).
+   * Informs the launch coordinator that some task is no longer assigned to a host (for planning
+   * purposes).
    */
   case class Unassign(taskID: Protos.TaskID, hostname: String)
 
@@ -358,11 +360,16 @@ object LaunchCoordinator {
    *
    * The operations may include reservations and task launches.
    *
-   * @param log the logger to use.
-   * @param slaveId the slave associated with the given assignments.
-   * @param assignments the task assignments as provided by the optimizer.
-   * @param allTasks all known tasks, keyed by taskId.
-   * @return the operations to perform.
+   * @param log
+   *   the logger to use.
+   * @param slaveId
+   *   the slave associated with the given assignments.
+   * @param assignments
+   *   the task assignments as provided by the optimizer.
+   * @param allTasks
+   *   all known tasks, keyed by taskId.
+   * @return
+   *   the operations to perform.
    */
   private def processAssignments(
       log: Logger,
@@ -397,11 +404,16 @@ object LaunchCoordinator {
   /**
    * Get the configuration properties for the launch coordinator.
    *
-   * @param actorClass the launch coordinator actor class.
-   * @param flinkConfig the Flink configuration.
-   * @param schedulerDriver the Mesos scheduler driver.
-   * @tparam T the launch coordinator actor class.
-   * @return the Akka props to create the launch coordinator actor.
+   * @param actorClass
+   *   the launch coordinator actor class.
+   * @param flinkConfig
+   *   the Flink configuration.
+   * @param schedulerDriver
+   *   the Mesos scheduler driver.
+   * @tparam T
+   *   the launch coordinator actor class.
+   * @return
+   *   the Akka props to create the launch coordinator actor.
    */
   def createActorProps[T <: LaunchCoordinator](
       actorClass: Class[T],

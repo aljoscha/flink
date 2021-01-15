@@ -129,8 +129,10 @@ class StreamExecLegacySink[T](
   /**
    * Translates a logical [[RelNode]] into a [[Transformation]].
    *
-   * @param withChangeFlag Set to true to emit records with change flags.
-   * @return The [[Transformation]] that corresponds to the translated [[Table]].
+   * @param withChangeFlag
+   *   Set to true to emit records with change flags.
+   * @return
+   *   The [[Transformation]] that corresponds to the translated [[Table]].
    */
   private def translateToTransformation(
       withChangeFlag: Boolean,

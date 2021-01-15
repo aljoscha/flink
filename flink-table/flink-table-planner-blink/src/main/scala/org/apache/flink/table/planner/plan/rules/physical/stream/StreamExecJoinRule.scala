@@ -34,8 +34,8 @@ import org.apache.calcite.rel.RelNode
 import scala.collection.JavaConversions._
 
 /**
- * Rule that converts [[FlinkLogicalJoin]] without window bounds in join condition
- * to [[StreamExecJoin]].
+ * Rule that converts [[FlinkLogicalJoin]] without window bounds in join condition to
+ * [[StreamExecJoin]].
  */
 class StreamExecJoinRule extends StreamPhysicalJoinRuleBase("StreamExecJoinRule") {
 

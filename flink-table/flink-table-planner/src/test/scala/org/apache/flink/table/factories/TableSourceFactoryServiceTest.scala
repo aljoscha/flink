@@ -42,12 +42,12 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
- * Tests for testing table source discovery using [[TableFactoryService]]. The tests assume the
- * two table source factories [[TestFixedFormatTableFactory]] and
+ * Tests for testing table source discovery using [[TableFactoryService]]. The tests assume the two
+ * table source factories [[TestFixedFormatTableFactory]] and
  * [[TestWildcardFormatTableSourceFactory]] are registered.
  *
- * The first table source has a [[FORMAT_TYPE_VALUE_TEST]] type where as the second source uses
- * a wildcard to match arbitrary formats.
+ * The first table source has a [[FORMAT_TYPE_VALUE_TEST]] type where as the second source uses a
+ * wildcard to match arbitrary formats.
  */
 class TableSourceFactoryServiceTest {
 

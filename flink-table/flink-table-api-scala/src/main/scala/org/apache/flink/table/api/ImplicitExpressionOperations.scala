@@ -26,8 +26,8 @@ import org.apache.flink.table.functions.BuiltInFunctionDefinitions._
 import scala.language.implicitConversions
 
 /**
- * These are all the operations that can be used to construct an [[Expression]] AST for
- * expression operations.
+ * These are all the operations that can be used to construct an [[Expression]] AST for expression
+ * operations.
  */
 @PublicEvolving
 trait ImplicitExpressionOperations extends BaseExpressions[Expression, Expression] {
@@ -40,9 +40,12 @@ trait ImplicitExpressionOperations extends BaseExpressions[Expression, Expressio
   /**
    * Specifies a name for an expression i.e. a field.
    *
-   * @param name name for one field
-   * @param extraNames additional names if the expression expands to multiple fields
-   * @return field with an alias
+   * @param name
+   *   name for one field
+   * @param extraNames
+   *   additional names if the expression expands to multiple fields
+   * @return
+   *   field with an alias
    */
   def as(name: Symbol, extraNames: Symbol*): Expression = as(name.name, extraNames.map(_.name): _*)
 
@@ -122,8 +125,8 @@ trait ImplicitExpressionOperations extends BaseExpressions[Expression, Expressio
   def *(other: Expression): Expression = times(other)
 
   /**
-   * Returns the remainder (modulus) of left divided by right.
-   * The result is negative only if left is negative.
+   * Returns the remainder (modulus) of left divided by right. The result is negative only if left
+   * is negative.
    */
   def %(other: Expression): Expression = mod(other)
 
@@ -136,13 +139,15 @@ trait ImplicitExpressionOperations extends BaseExpressions[Expression, Expressio
   def to(other: Expression): Expression = unresolvedCall(RANGE_TO, expr, objectToExpression(other))
 
   /**
-   * Ternary conditional operator that decides which of two other expressions should be
-   * based on a evaluated boolean condition.
+   * Ternary conditional operator that decides which of two other expressions should be based on a
+   * evaluated boolean condition.
    *
    * e.g. ($"f0" > 5).?("A", "B") leads to "A"
    *
-   * @param ifTrue expression to be evaluated if condition holds
-   * @param ifFalse expression to be evaluated if condition does not hold
+   * @param ifTrue
+   *   expression to be evaluated if condition holds
+   * @param ifFalse
+   *   expression to be evaluated if condition does not hold
    */
   def ?(ifTrue: Expression, ifFalse: Expression): Expression =
     Expressions.ifThenElse(expr, ifTrue, ifFalse).toExpr
@@ -152,10 +157,14 @@ trait ImplicitExpressionOperations extends BaseExpressions[Expression, Expressio
   /**
    * Removes leading and/or trailing characters from the given string.
    *
-   * @param removeLeading if true, remove leading characters (default: true)
-   * @param removeTrailing if true, remove trailing characters (default: true)
-   * @param character string containing the character (default: " ")
-   * @return trimmed string
+   * @param removeLeading
+   *   if true, remove leading characters (default: true)
+   * @param removeTrailing
+   *   if true, remove trailing characters (default: true)
+   * @param character
+   *   string containing the character (default: " ")
+   * @return
+   *   trimmed string
    */
   def trim(
       removeLeading: Boolean = true,
@@ -174,7 +183,8 @@ trait ImplicitExpressionOperations extends BaseExpressions[Expression, Expressio
   /**
    * Creates an interval of rows.
    *
-   * @return interval of rows
+   * @return
+   *   interval of rows
    */
   def rows: Expression = toRowInterval(expr)
 }

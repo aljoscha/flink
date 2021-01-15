@@ -43,18 +43,17 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
- * Planner rule that rewrites sort correlation to a Rank.
- * Typically, the following plan
+ * Planner rule that rewrites sort correlation to a Rank. Typically, the following plan
  *
  * {{{
  *   LogicalProject(state=[$0], name=[$1])
  *   +- LogicalCorrelate(correlation=[$cor0], joinType=[inner], requiredColumns=[{0}])
- *      :- LogicalAggregate(group=[{0}])
- *      :  +- LogicalProject(state=[$1])
- *      :     +- LogicalTableScan(table=[[default_catalog, default_database, cities]])
- *      +- LogicalSort(sort0=[$1], dir0=[DESC-nulls-last], fetch=[3])
+ *     :- LogicalAggregate(group=[{0}])
+ *     :  +- LogicalProject(state=[$1])
+ *     :     +- LogicalTableScan(table=[[default_catalog, default_database, cities]])
+ *     +- LogicalSort(sort0=[$1], dir0=[DESC-nulls-last], fetch=[3])
  *         +- LogicalProject(name=[$0], pop=[$2])
- *            +- LogicalFilter(condition=[=($1, $cor0.state)])
+ *           +- LogicalFilter(condition=[=($1, $cor0.state)])
  *               +- LogicalTableScan(table=[[default_catalog, default_database, cities]])
  * }}}
  *
@@ -62,14 +61,14 @@ import scala.collection.JavaConversions._
  *
  * {{{
  *   LogicalProject(state=[$0], name=[$1])
- *    +- LogicalProject(state=[$1], name=[$0], pop=[$2])
+ *   +- LogicalProject(state=[$1], name=[$0], pop=[$2])
  *       +- LogicalRank(rankType=[ROW_NUMBER], rankRange=[rankStart=1, rankEnd=3],
- *            partitionBy=[$1], orderBy=[$2 DESC], select=[name=$0, state=$1, pop=$2])
- *          +- LogicalTableScan(table=[[default_catalog, default_database, cities]])
+ *           partitionBy=[$1], orderBy=[$2 DESC], select=[name=$0, state=$1, pop=$2])
+ *         +- LogicalTableScan(table=[[default_catalog, default_database, cities]])
  * }}}
  *
- * <p>To match the Correlate, the LHS needs to be a global Aggregate on a scan, the RHS should
- * be a Sort with an equal Filter predicate whose keys are same with the LHS grouping keys.
+ * <p>To match the Correlate, the LHS needs to be a global Aggregate on a scan, the RHS should be a
+ * Sort with an equal Filter predicate whose keys are same with the LHS grouping keys.
  *
  * <p>This rule can only be used in HepPlanner.
  */
@@ -128,9 +127,10 @@ class CorrelateSortToRankRule
   /**
    * Resolves the filter condition with specific pattern: input ref and field access.
    *
-   * @param condition The join condition
-   * @return tuple of operands (RexInputRef, RexFieldAccess),
-   *         or null if the pattern does not match
+   * @param condition
+   *   The join condition
+   * @return
+   *   tuple of operands (RexInputRef, RexFieldAccess), or null if the pattern does not match
    */
   def resolveFilterCondition(condition: RexNode): (RexInputRef, RexFieldAccess) = {
     val condCall = condition.asInstanceOf[RexCall]

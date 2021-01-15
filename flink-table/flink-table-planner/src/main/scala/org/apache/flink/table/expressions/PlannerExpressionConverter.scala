@@ -33,7 +33,7 @@ import org.apache.flink.table.util.Logging
 import _root_.scala.collection.JavaConverters._
 
 /**
- * Visitor implementation for converting [[Expression]]s to [[PlannerExpression]]s.
+ * Visitor implementation for converting [[Expression]] s to [[PlannerExpression]] s.
  */
 class PlannerExpressionConverter private
     extends ApiExpressionVisitor[PlannerExpression]

@@ -34,28 +34,26 @@ import scala.collection.JavaConversions._
  * <p>In most case this program could meet our requirements, otherwise we could choose
  * [[FlinkHepProgram]] for some advanced features.
  *
- * <p>Currently, default hep execution type is [[HEP_RULES_EXECUTION_TYPE.RULE_SEQUENCE]].
- * (Please refer to [[HEP_RULES_EXECUTION_TYPE]] for more info about execution types)
+ * <p>Currently, default hep execution type is [[HEP_RULES_EXECUTION_TYPE.RULE_SEQUENCE]]. (Please
+ * refer to [[HEP_RULES_EXECUTION_TYPE]] for more info about execution types)
  *
- * @tparam OC OptimizeContext
+ * @tparam OC
+ *   OptimizeContext
  */
 class FlinkHepRuleSetProgram[OC <: FlinkOptimizeContext] extends FlinkRuleSetProgram[OC] {
 
   /**
-   * The order of graph traversal when looking for rule matches,
-   * default match order is ARBITRARY.
+   * The order of graph traversal when looking for rule matches, default match order is ARBITRARY.
    */
   private var matchOrder: HepMatchOrder = HepMatchOrder.ARBITRARY
 
   /**
-   * The limit of pattern matches for this program,
-   * default match limit is Integer.MAX_VALUE.
+   * The limit of pattern matches for this program, default match limit is Integer.MAX_VALUE.
    */
   private var matchLimit: Int = Integer.MAX_VALUE
 
   /**
-   * Hep rule execution type. This is a required item,
-   * default execution type is RULE_SEQUENCE.
+   * Hep rule execution type. This is a required item, default execution type is RULE_SEQUENCE.
    */
   private var executionType: HEP_RULES_EXECUTION_TYPE = HEP_RULES_EXECUTION_TYPE.RULE_SEQUENCE
 
@@ -118,28 +116,28 @@ class FlinkHepRuleSetProgram[OC <: FlinkOptimizeContext] extends FlinkRuleSetPro
 }
 
 /**
- * An enumeration of hep rule execution type, to tell the [[HepPlanner]]
- * how exactly execute the rules.
+ * An enumeration of hep rule execution type, to tell the [[HepPlanner]] how exactly execute the
+ * rules.
  */
 object HEP_RULES_EXECUTION_TYPE extends Enumeration {
   type HEP_RULES_EXECUTION_TYPE = Value
 
   /**
-   * Rules in RULE_SEQUENCE type are executed with RuleInstance.
-   * RuleInstance is an instruction that matches a specific rule, each rule in the rule
-   * collection is associated with one RuleInstance. Each RuleInstance will be executed
-   * only once according to the order defined by the rule collection, but a rule may be applied
-   * more than once. If arbitrary order is needed, use RULE_COLLECTION instead.
+   * Rules in RULE_SEQUENCE type are executed with RuleInstance. RuleInstance is an instruction that
+   * matches a specific rule, each rule in the rule collection is associated with one RuleInstance.
+   * Each RuleInstance will be executed only once according to the order defined by the rule
+   * collection, but a rule may be applied more than once. If arbitrary order is needed, use
+   * RULE_COLLECTION instead.
    *
    * Please refer to [[HepProgramBuilder#addRuleInstance]] for more info about RuleInstance.
    */
   val RULE_SEQUENCE: HEP_RULES_EXECUTION_TYPE.Value = Value
 
   /**
-   * Rules in RULE_COLLECTION type are executed with RuleCollection.
-   * RuleCollection is an instruction that matches any rules in a given collection.
-   * The order in which the rules within a collection will be attempted is arbitrary,
-   * so if more control is needed, use RULE_SEQUENCE instead.
+   * Rules in RULE_COLLECTION type are executed with RuleCollection. RuleCollection is an
+   * instruction that matches any rules in a given collection. The order in which the rules within a
+   * collection will be attempted is arbitrary, so if more control is needed, use RULE_SEQUENCE
+   * instead.
    *
    * Please refer to [[HepProgramBuilder#addRuleCollection]] for more info about RuleCollection.
    */

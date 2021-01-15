@@ -23,7 +23,7 @@ package org.apache.flink.table
  * from the implicit DSL conversions in
  * [[org.apache.flink.table.api.bridge.scala.ImplicitExpressionConversions]] and
  * [[org.apache.flink.table.api.bridge.scala.ImplicitExpressionOperations]]. For the Java API,
- * expression trees should be generated from a string parser that parses expressions and creates
- * AST nodes.
+ * expression trees should be generated from a string parser that parses expressions and creates AST
+ * nodes.
  */
 package object expressions

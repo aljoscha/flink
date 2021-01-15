@@ -189,10 +189,14 @@ object UpdatingPlanChecker {
     /**
      * Get output keys for non-window join according to it's inputs.
      *
-     * @param inNames  Field names of join
-     * @param inKeys   Input keys of join
-     * @param joinKeys JoinKeys of join
-     * @return Return output keys of join
+     * @param inNames
+     *   Field names of join
+     * @param inKeys
+     *   Input keys of join
+     * @param joinKeys
+     *   JoinKeys of join
+     * @return
+     *   Return output keys of join
      */
     def getOutputKeysForNonWindowJoin(
         inNames: Seq[String],

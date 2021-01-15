@@ -73,19 +73,30 @@ object AggregateUtil {
    * Create an [[org.apache.flink.streaming.api.functions.ProcessFunction]] for unbounded OVER
    * window to evaluate final aggregate value.
    *
-   * @param config             configuration that determines runtime behavior
-   * @param nullableInput      input(s) can be null.
-   * @param input              type information about the input of the Function
-   * @param constants          constant expressions that act like a second input in the
-   *                           parameter indices.
-   * @param namedAggregates    Physical calls to aggregate functions and their output field names
-   * @param aggregateInputType Physical type of the aggregate functions's input row.
-   * @param inputType          Physical type of the row.
-   * @param inputTypeInfo      Physical type information of the row.
-   * @param inputFieldTypeInfo Physical type information of the row's fields.
-   * @param rowTimeIdx         The index of the rowtime field or None in case of processing time.
-   * @param isPartitioned      It is a tag that indicate whether the input is partitioned
-   * @param isRowsClause       It is a tag that indicates whether the OVER clause is ROWS clause
+   * @param config
+   *   configuration that determines runtime behavior
+   * @param nullableInput
+   *   input(s) can be null.
+   * @param input
+   *   type information about the input of the Function
+   * @param constants
+   *   constant expressions that act like a second input in the parameter indices.
+   * @param namedAggregates
+   *   Physical calls to aggregate functions and their output field names
+   * @param aggregateInputType
+   *   Physical type of the aggregate functions's input row.
+   * @param inputType
+   *   Physical type of the row.
+   * @param inputTypeInfo
+   *   Physical type information of the row.
+   * @param inputFieldTypeInfo
+   *   Physical type information of the row's fields.
+   * @param rowTimeIdx
+   *   The index of the rowtime field or None in case of processing time.
+   * @param isPartitioned
+   *   It is a tag that indicate whether the input is partitioned
+   * @param isRowsClause
+   *   It is a tag that indicates whether the OVER clause is ROWS clause
    */
   private[flink] def createUnboundedOverProcessFunction[K](
       config: TableConfig,
@@ -172,19 +183,30 @@ object AggregateUtil {
    * Create an [[org.apache.flink.streaming.api.functions.ProcessFunction]] for group (without
    * window) aggregate to evaluate final aggregate value.
    *
-   * @param config             configuration that determines runtime behavior
-   * @param nullableInput      input(s) can be null.
-   * @param input              type information about the input of the Function
-   * @param constants          constant expressions that act like a second input in the
-   *                           parameter indices.
-   * @param namedAggregates    List of calls to aggregate functions and their output field names
-   * @param inputRowType       Input row type
-   * @param inputFieldTypes    Types of the physical input fields
-   * @param outputType         Output type of the (table)aggregate node
-   * @param groupings          the position (in the input Row) of the grouping keys
-   * @param generateRetraction It is a tag that indicates whether generate retract record.
-   * @param consumeRetraction  It is a tag that indicates whether consume the retract record.
-   * @return [[org.apache.flink.streaming.api.functions.ProcessFunction]]
+   * @param config
+   *   configuration that determines runtime behavior
+   * @param nullableInput
+   *   input(s) can be null.
+   * @param input
+   *   type information about the input of the Function
+   * @param constants
+   *   constant expressions that act like a second input in the parameter indices.
+   * @param namedAggregates
+   *   List of calls to aggregate functions and their output field names
+   * @param inputRowType
+   *   Input row type
+   * @param inputFieldTypes
+   *   Types of the physical input fields
+   * @param outputType
+   *   Output type of the (table)aggregate node
+   * @param groupings
+   *   the position (in the input Row) of the grouping keys
+   * @param generateRetraction
+   *   It is a tag that indicates whether generate retract record.
+   * @param consumeRetraction
+   *   It is a tag that indicates whether consume the retract record.
+   * @return
+   *   [[org.apache.flink.streaming.api.functions.ProcessFunction]]
    */
   private[flink] def createDataStreamGroupAggregateFunction[K](
       config: TableConfig,
@@ -257,23 +279,35 @@ object AggregateUtil {
   }
 
   /**
-   * Create an [[org.apache.flink.streaming.api.functions.ProcessFunction]] for ROWS clause
-   * bounded OVER window to evaluate final aggregate value.
+   * Create an [[org.apache.flink.streaming.api.functions.ProcessFunction]] for ROWS clause bounded
+   * OVER window to evaluate final aggregate value.
    *
-   * @param config             configuration that determines runtime behavior
-   * @param nullableInput      input(s) can be null.
-   * @param input              type information about the input of the Function
-   * @param constants          constant expressions that act like a second input in the
-   *                           parameter indices.
-   * @param namedAggregates    Physical calls to aggregate functions and their output field names
-   * @param aggregateInputType Physical type of the aggregate functions's input row.
-   * @param inputType          Physical type of the row.
-   * @param inputTypeInfo      Physical type information of the row.
-   * @param inputFieldTypeInfo Physical type information of the row's fields.
-   * @param precedingOffset    the preceding offset
-   * @param isRowsClause       It is a tag that indicates whether the OVER clause is ROWS clause
-   * @param rowTimeIdx         The index of the rowtime field or None in case of processing time.
-   * @return [[org.apache.flink.streaming.api.functions.ProcessFunction]]
+   * @param config
+   *   configuration that determines runtime behavior
+   * @param nullableInput
+   *   input(s) can be null.
+   * @param input
+   *   type information about the input of the Function
+   * @param constants
+   *   constant expressions that act like a second input in the parameter indices.
+   * @param namedAggregates
+   *   Physical calls to aggregate functions and their output field names
+   * @param aggregateInputType
+   *   Physical type of the aggregate functions's input row.
+   * @param inputType
+   *   Physical type of the row.
+   * @param inputTypeInfo
+   *   Physical type information of the row.
+   * @param inputFieldTypeInfo
+   *   Physical type information of the row's fields.
+   * @param precedingOffset
+   *   the preceding offset
+   * @param isRowsClause
+   *   It is a tag that indicates whether the OVER clause is ROWS clause
+   * @param rowTimeIdx
+   *   The index of the rowtime field or None in case of processing time.
+   * @return
+   *   [[org.apache.flink.streaming.api.functions.ProcessFunction]]
    */
   private[flink] def createBoundedOverProcessFunction[K](
       config: TableConfig,
@@ -373,20 +407,20 @@ object AggregateUtil {
   /**
    * Create a [[org.apache.flink.api.common.functions.MapFunction]] that prepares for aggregates.
    * The output of the function contains the grouping keys and the timestamp and the intermediate
-   * aggregate values of all aggregate function. The timestamp field is aligned to time window
-   * start and used to be a grouping key in case of time window. In case of count window on
-   * event-time, the timestamp is not aligned and used to sort.
+   * aggregate values of all aggregate function. The timestamp field is aligned to time window start
+   * and used to be a grouping key in case of time window. In case of count window on event-time,
+   * the timestamp is not aligned and used to sort.
    *
    * The output is stored in Row by the following format:
    * {{{
-   *                      avg(x)                           count(z)
+   *                     avg(x)                           count(z)
    *                       |                                 |
    *                       v                                 v
    *   +---------+---------+----------------+----------------+------------------+-------+
    *   |groupKey1|groupKey2| AvgAccumulator | SumAccumulator | CountAccumulator |rowtime|
    *   +---------+---------+----------------+----------------+------------------+-------+
-   *                                        ^                                   ^
-   *                                        |                                   |
+   *                                       ^                                   ^
+   *                                       |                                   |
    *                                       sum(y)                        rowtime to group or sort
    * }}}
    *
@@ -483,26 +517,26 @@ object AggregateUtil {
 
   /**
    * Create a [[org.apache.flink.api.common.functions.GroupReduceFunction]] that prepares for
-   * partial aggregates of sliding windows (time and count-windows).
-   * It requires a prepared input (with intermediate aggregate fields and aligned rowtime for
-   * pre-tumbling in case of time-windows), pre-aggregates (pre-tumbles) rows, aligns the
-   * window-start, and replicates or omits records for different panes of a sliding window.
+   * partial aggregates of sliding windows (time and count-windows). It requires a prepared input
+   * (with intermediate aggregate fields and aligned rowtime for pre-tumbling in case of
+   * time-windows), pre-aggregates (pre-tumbles) rows, aligns the window-start, and replicates or
+   * omits records for different panes of a sliding window.
    *
-   * The output of the function contains the grouping keys, the intermediate aggregate values of
-   * all aggregate function and the aligned window start. Window start must not be a timestamp,
-   * but can also be a count value for count-windows.
+   * The output of the function contains the grouping keys, the intermediate aggregate values of all
+   * aggregate function and the aligned window start. Window start must not be a timestamp, but can
+   * also be a count value for count-windows.
    *
    * The output is stored in Row by the following format:
    *
    * {{{
-   *                      avg(x) aggOffsetInRow = 2      count(z) aggOffsetInRow = 5
-   *                            |                          |
-   *                            v                          v
-   *        +---------+---------+--------+--------+--------+--------+-------------+
-   *        |groupKey1|groupKey2|  sum1  | count1 |  sum2  | count2 | windowStart |
-   *        +---------+---------+--------+--------+--------+--------+-------------+
-   *                                              ^                 ^
-   *                                              |                 |
+   *                     avg(x) aggOffsetInRow = 2      count(z) aggOffsetInRow = 5
+   *                           |                          |
+   *                           v                          v
+   *       +---------+---------+--------+--------+--------+--------+-------------+
+   *       |groupKey1|groupKey2|  sum1  | count1 |  sum2  | count2 | windowStart |
+   *       +---------+---------+--------+--------+--------+--------+-------------+
+   *                                             ^                 ^
+   *                                             |                 |
    *                                 sum(y) aggOffsetInRow = 4    window start for pane mapping
    * }}}
    *
@@ -579,23 +613,23 @@ object AggregateUtil {
    * Create a [[org.apache.flink.api.common.functions.FlatMapFunction]] that prepares for
    * non-incremental aggregates of sliding windows (time-windows).
    *
-   * It requires a prepared input (with intermediate aggregate fields), aligns the
-   * window-start, and replicates or omits records for different panes of a sliding window.
+   * It requires a prepared input (with intermediate aggregate fields), aligns the window-start, and
+   * replicates or omits records for different panes of a sliding window.
    *
-   * The output of the function contains the grouping keys, the intermediate aggregate values of
-   * all aggregate function and the aligned window start.
+   * The output of the function contains the grouping keys, the intermediate aggregate values of all
+   * aggregate function and the aligned window start.
    *
    * The output is stored in Row by the following format:
    *
    * {{{
-   *                      avg(x) aggOffsetInRow = 2      count(z) aggOffsetInRow = 5
-   *                            |                          |
-   *                            v                          v
-   *        +---------+---------+--------+--------+--------+--------+-------------+
-   *        |groupKey1|groupKey2|  sum1  | count1 |  sum2  | count2 | windowStart |
-   *        +---------+---------+--------+--------+--------+--------+-------------+
-   *                                              ^                 ^
-   *                                              |                 |
+   *                     avg(x) aggOffsetInRow = 2      count(z) aggOffsetInRow = 5
+   *                           |                          |
+   *                           v                          v
+   *       +---------+---------+--------+--------+--------+--------+-------------+
+   *       |groupKey1|groupKey2|  sum1  | count1 |  sum2  | count2 | windowStart |
+   *       +---------+---------+--------+--------+--------+--------+-------------+
+   *                                             ^                 ^
+   *                                             |                 |
    *                                 sum(y) aggOffsetInRow = 4      window start for pane mapping
    * }}}
    *
@@ -624,8 +658,8 @@ object AggregateUtil {
 
   /**
    * Create a [[org.apache.flink.api.common.functions.GroupReduceFunction]] to compute window
-   * aggregates on batch tables. If all aggregates support partial aggregation and is a time
-   * window, the [[org.apache.flink.api.common.functions.GroupReduceFunction]] implements
+   * aggregates on batch tables. If all aggregates support partial aggregation and is a time window,
+   * the [[org.apache.flink.api.common.functions.GroupReduceFunction]] implements
    * [[org.apache.flink.api.common.functions.CombineFunction]] as well.
    *
    * NOTE: this function is only used for window on batch tables.
@@ -778,19 +812,18 @@ object AggregateUtil {
   }
 
   /**
-   * Create a [[org.apache.flink.api.common.functions.MapPartitionFunction]] that aggregation
-   * for aggregates.
-   * The function returns aggregate values of all aggregate function which are
-   * organized by the following format:
+   * Create a [[org.apache.flink.api.common.functions.MapPartitionFunction]] that aggregation for
+   * aggregates. The function returns aggregate values of all aggregate function which are organized
+   * by the following format:
    *
    * {{{
    *       avg(x) aggOffsetInRow = 2  count(z) aggOffsetInRow = 5
    *           |                          |          windowEnd(max(rowtime)
    *           |                          |                   |
    *           v                          v                   v
-   *        +--------+--------+--------+--------+-----------+---------+
-   *        |  sum1  | count1 |  sum2  | count2 |windowStart|windowEnd|
-   *        +--------+--------+--------+--------+-----------+---------+
+   *       +--------+--------+--------+--------+-----------+---------+
+   *       |  sum1  | count1 |  sum2  | count2 |windowStart|windowEnd|
+   *       +--------+--------+--------+--------+-----------+---------+
    *                               ^                 ^
    *                               |                 |
    *             sum(y) aggOffsetInRow = 4    windowStart(min(rowtime))
@@ -864,18 +897,17 @@ object AggregateUtil {
 
   /**
    * Create a [[org.apache.flink.api.common.functions.GroupCombineFunction]] that pre-aggregation
-   * for aggregates.
-   * The function returns intermediate aggregate values of all aggregate function which are
-   * organized by the following format:
+   * for aggregates. The function returns intermediate aggregate values of all aggregate function
+   * which are organized by the following format:
    * {{{
-   *                      avg(x)                           windowEnd(max(rowtime)
+   *                     avg(x)                           windowEnd(max(rowtime)
    *                       |                                 |
    *                       v                                 v
    *   +---------+---------+----------------+----------------+-------------+-----------+
    *   |groupKey1|groupKey2| AvgAccumulator | SumAccumulator | windowStart | windowEnd |
    *   +---------+---------+----------------+----------------+-------------+-----------+
-   *                                        ^                              ^
-   *                                        |                              |
+   *                                       ^                              ^
+   *                                       |                              |
    *                                       sum(y)                       windowStart(min(rowtime))
    * }}}
    */
@@ -1221,8 +1253,9 @@ object AggregateUtil {
   }
 
   /**
-   * @return A mappings of field positions from input type to output type for grouping keys and
-   *         aggregates.
+   * @return
+   *   A mappings of field positions from input type to output type for grouping keys and
+   *   aggregates.
    */
   private def getOutputMappings(
       namedAggregates: Seq[CalcitePair[AggregateCall, String]],
@@ -1350,20 +1383,31 @@ object AggregateUtil {
    * Prepares metadata [[AggregateCallMetadata]] required to generate code for
    * [[GeneratedAggregations]] for a single [[SqlAggFunction]].
    *
-   * @param aggregateFunction calcite's aggregate function
-   * @param isDistinct true if should be distinct aggregation
-   * @param distinctAccMap mapping of the distinct aggregate input fields index
-   *                       to the corresponding acc index
-   * @param argList indexes of the input fields of given aggregates
-   * @param aggregateCount number of aggregates
-   * @param inputFieldsCount number of input fields
-   * @param aggregateInputTypes input types of given aggregate
-   * @param needRetraction if the [[AggregateFunction]] should produce retractions
-   * @param tableConfig tableConfig, required for decimal precision
-   * @param isStateBackedDataViews if data should be backed by state backend
-   * @param uniqueIdWithinAggregate index within an AggregateCallMetadata, used to create unique
-   *                                state names for each aggregate function
-   * @return the result contains required metadata:
+   * @param aggregateFunction
+   *   calcite's aggregate function
+   * @param isDistinct
+   *   true if should be distinct aggregation
+   * @param distinctAccMap
+   *   mapping of the distinct aggregate input fields index to the corresponding acc index
+   * @param argList
+   *   indexes of the input fields of given aggregates
+   * @param aggregateCount
+   *   number of aggregates
+   * @param inputFieldsCount
+   *   number of input fields
+   * @param aggregateInputTypes
+   *   input types of given aggregate
+   * @param needRetraction
+   *   if the [[AggregateFunction]] should produce retractions
+   * @param tableConfig
+   *   tableConfig, required for decimal precision
+   * @param isStateBackedDataViews
+   *   if data should be backed by state backend
+   * @param uniqueIdWithinAggregate
+   *   index within an AggregateCallMetadata, used to create unique state names for each aggregate
+   *   function
+   * @return
+   *   the result contains required metadata:
    *   - flink's aggregate function
    *   - required accumulator information (type and specifications)
    *   - if the aggregate is distinct
@@ -1427,20 +1471,27 @@ object AggregateUtil {
   }
 
   /**
-   * Prepares metadata [[AggregateMetadata]] required to generate code for
-   * [[AggregationsFunction]] for all [[AggregateCall]].
+   * Prepares metadata [[AggregateMetadata]] required to generate code for [[AggregationsFunction]]
+   * for all [[AggregateCall]].
    *
-   * @param aggregateCalls calcite's aggregate function
-   * @param aggregateInputType input type of given aggregates
-   * @param inputFieldsCount number of input fields
-   * @param needRetraction if the [[AggregateFunction]] should produce retractions
-   * @param tableConfig tableConfig, required for decimal precision
-   * @param isStateBackedDataViews if data should be backed by state backend
-   * @return the result contains required metadata:
-   * - flink's aggregate function
-   * - required accumulator information (type and specifications)
-   * - indices important for each aggregate
-   * - if the aggregate is distinct
+   * @param aggregateCalls
+   *   calcite's aggregate function
+   * @param aggregateInputType
+   *   input type of given aggregates
+   * @param inputFieldsCount
+   *   number of input fields
+   * @param needRetraction
+   *   if the [[AggregateFunction]] should produce retractions
+   * @param tableConfig
+   *   tableConfig, required for decimal precision
+   * @param isStateBackedDataViews
+   *   if data should be backed by state backend
+   * @return
+   *   the result contains required metadata:
+   *   - flink's aggregate function
+   *   - required accumulator information (type and specifications)
+   *   - indices important for each aggregate
+   *   - if the aggregate is distinct
    */
   private def extractAggregateMetadata(
       aggregateCalls: Seq[AggregateCall],
@@ -1498,8 +1549,8 @@ object AggregateUtil {
   }
 
   /**
-   * Converts calcite's [[SqlAggFunction]] to a Flink's UDF [[AggregateFunction]].
-   * create aggregate function instances by function type and aggregate field data type.
+   * Converts calcite's [[SqlAggFunction]] to a Flink's UDF [[AggregateFunction]]. create aggregate
+   * function instances by function type and aggregate field data type.
    */
   private def createFlinkAggFunction(
       aggFunc: SqlAggFunction,

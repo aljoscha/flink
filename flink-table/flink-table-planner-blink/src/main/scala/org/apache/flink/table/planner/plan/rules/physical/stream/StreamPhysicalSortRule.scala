@@ -27,8 +27,8 @@ import org.apache.calcite.rel.RelNode
 import org.apache.calcite.rel.convert.ConverterRule
 
 /**
- * Rule that matches [[FlinkLogicalSort]] which `fetch` is null or `fetch` is 0,
- * and converts it to [[StreamPhysicalSort]].
+ * Rule that matches [[FlinkLogicalSort]] which `fetch` is null or `fetch` is 0, and converts it to
+ * [[StreamPhysicalSort]].
  */
 class StreamPhysicalSortRule
     extends ConverterRule(

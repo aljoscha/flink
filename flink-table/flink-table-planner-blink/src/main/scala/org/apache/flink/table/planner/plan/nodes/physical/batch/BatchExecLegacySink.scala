@@ -154,8 +154,10 @@ class BatchExecLegacySink[T](
 
   /**
    * Validate if class represented by the typeInfo is static and globally accessible
-   * @param dataType type to check
-   * @throws TableException if type does not meet these criteria
+   * @param dataType
+   *   type to check
+   * @throws
+   *   TableException if type does not meet these criteria
    */
   private def validateType(dataType: DataType): Unit = {
     var clazz = dataType.getConversionClass

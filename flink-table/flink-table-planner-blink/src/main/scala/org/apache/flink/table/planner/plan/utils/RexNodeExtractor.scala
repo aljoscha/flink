@@ -60,8 +60,10 @@ object RexNodeExtractor extends Logging {
   /**
    * Extracts the indices of input fields which accessed by the expressions.
    *
-   * @param exprs The RexNode list to analyze
-   * @return The indices of accessed input fields
+   * @param exprs
+   *   The RexNode list to analyze
+   * @return
+   *   The indices of accessed input fields
    */
   def extractRefInputFields(exprs: JList[RexNode]): Array[Int] = {
     val visitor = new InputRefVisitor
@@ -71,12 +73,15 @@ object RexNodeExtractor extends Logging {
   }
 
   /**
-   * Extracts the name of nested input fields accessed by the expressions and returns the
-   * prefix of the accesses.
+   * Extracts the name of nested input fields accessed by the expressions and returns the prefix of
+   * the accesses.
    *
-   * @param exprs The expressions to analyze
-   * @param usedFields indices of used input fields
-   * @return The full names of accessed input fields. e.g. field.subfield
+   * @param exprs
+   *   The expressions to analyze
+   * @param usedFields
+   *   indices of used input fields
+   * @return
+   *   The full names of accessed input fields. e.g. field.subfield
    */
   def extractRefNestedInputFields(
       exprs: JList[RexNode],
@@ -89,11 +94,16 @@ object RexNodeExtractor extends Logging {
   /**
    * Convert rexNode into independent CNF expressions.
    *
-   * @param expr            The RexNode to analyze
-   * @param inputFieldNames The input names of the RexNode
-   * @param rexBuilder      The factory to build CNF expressions
-   * @param functionCatalog The function catalog
-   * @return converted expressions and unconverted rex nodes
+   * @param expr
+   *   The RexNode to analyze
+   * @param inputFieldNames
+   *   The input names of the RexNode
+   * @param rexBuilder
+   *   The factory to build CNF expressions
+   * @param functionCatalog
+   *   The function catalog
+   * @return
+   *   converted expressions and unconverted rex nodes
    */
   def extractConjunctiveConditions(
       expr: RexNode,
@@ -155,11 +165,16 @@ object RexNodeExtractor extends Logging {
   /**
    * Extract partition predicate from filter condition.
    *
-   * @param expr            The RexNode to analyze
-   * @param inputFieldNames The input names of the RexNode
-   * @param rexBuilder      The factory to build CNF expressions
-   * @param partitionFieldNames Partition field names.
-   * @return Partition predicates and non-partition predicates.
+   * @param expr
+   *   The RexNode to analyze
+   * @param inputFieldNames
+   *   The input names of the RexNode
+   * @param rexBuilder
+   *   The factory to build CNF expressions
+   * @param partitionFieldNames
+   *   Partition field names.
+   * @return
+   *   Partition predicates and non-partition predicates.
    */
   def extractPartitionPredicateList(
       expr: RexNode,
@@ -180,7 +195,7 @@ object RexNodeExtractor extends Logging {
 
   /**
    * returns true if the given predicate only contains [[RexInputRef]], [[RexLiteral]] and
-   * [[RexCall]], and all [[RexInputRef]]s reference partition fields. otherwise false.
+   * [[RexCall]], and all [[RexInputRef]] s reference partition fields. otherwise false.
    */
   private def isSupportedPartitionPredicate(
       predicate: RexNode,
@@ -346,8 +361,10 @@ class RefFieldAccessorVisitor(usedFields: Array[Int]) extends RexVisitorImpl[Uni
 /**
  * An RexVisitor to convert RexNode to Expression.
  *
- * @param inputNames      The input names of the relation node
- * @param functionCatalog The function catalog
+ * @param inputNames
+ *   The input names of the relation node
+ * @param functionCatalog
+ *   The function catalog
  */
 class RexNodeToExpressionConverter(
     rexBuilder: RexBuilder,

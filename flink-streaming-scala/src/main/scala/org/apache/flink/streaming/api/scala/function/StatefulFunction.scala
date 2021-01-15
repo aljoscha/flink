@@ -25,9 +25,9 @@ import org.apache.flink.api.common.typeutils.TypeSerializer
 import org.apache.flink.configuration.Configuration
 
 /**
- * Trait implementing the functionality necessary to apply stateful functions in
- * RichFunctions without exposing the OperatorStates to the user. The user should
- * call the applyWithState method in his own RichFunction implementation.
+ * Trait implementing the functionality necessary to apply stateful functions in RichFunctions
+ * without exposing the OperatorStates to the user. The user should call the applyWithState method
+ * in his own RichFunction implementation.
  */
 @Public
 trait StatefulFunction[I, O, S] extends RichFunction {

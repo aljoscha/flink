@@ -44,9 +44,9 @@ class TemporalTableFunctionJoinITCase(state: StateBackendMode)
     extends StreamingWithStateTestBase(state) {
 
   /**
-   * Because of nature of the processing time, we can not (or at least it is not that easy)
-   * validate the result here. Instead of that, here we are just testing whether there are no
-   * exceptions in a full blown ITCase. Actual correctness is tested in unit tests.
+   * Because of nature of the processing time, we can not (or at least it is not that easy) validate
+   * the result here. Instead of that, here we are just testing whether there are no exceptions in a
+   * full blown ITCase. Actual correctness is tested in unit tests.
    */
   @Test
   def testProcessTimeInnerJoin(): Unit = {

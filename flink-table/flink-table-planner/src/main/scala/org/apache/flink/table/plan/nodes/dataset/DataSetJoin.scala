@@ -488,8 +488,8 @@ class DataSetJoin(
   }
 
   /**
-   * Generates a [[GeneratedFunction]] of a [[JoinFunction]] to evaluate the join predicate.
-   * The function returns the result of the predicate as [[JBool]].
+   * Generates a [[GeneratedFunction]] of a [[JoinFunction]] to evaluate the join predicate. The
+   * function returns the result of the predicate as [[JBool]].
    */
   private def generatePredicateFunction(
       leftType: TypeInformation[Row],

@@ -41,8 +41,8 @@ import java.util.TimeZone
 import scala.collection.mutable
 
 /**
- * The context for code generator, maintaining various reusable statements that could be insert
- * into different code sections in the final generated class.
+ * The context for code generator, maintaining various reusable statements that could be insert into
+ * different code sections in the final generated class.
  */
 class CodeGeneratorContext(val tableConfig: TableConfig) {
 
@@ -114,8 +114,8 @@ class CodeGeneratorContext(val tableConfig: TableConfig) {
     mutable.Map[DataType, String]()
 
   /**
-   * The current method name for [[reusableLocalVariableStatements]]. You can start a new
-   * local variable statements for another method using [[startNewLocalVariableStatement()]]
+   * The current method name for [[reusableLocalVariableStatements]]. You can start a new local
+   * variable statements for another method using [[startNewLocalVariableStatement()]]
    */
   private var currentMethodNameForLocalVariables = "DEFAULT"
 
@@ -133,7 +133,7 @@ class CodeGeneratorContext(val tableConfig: TableConfig) {
     (currentMethodNameForLocalVariables, mutable.LinkedHashSet[String]()))
 
   /**
-   * the class is used as the  generated operator code's base class.
+   * the class is used as the generated operator code's base class.
    */
   private var operatorBaseClass: Class[_] = classOf[TableStreamOperator[_]]
 
@@ -152,7 +152,8 @@ class CodeGeneratorContext(val tableConfig: TableConfig) {
 
   /**
    * Starts a new local variable statements for a generated class with the given method name.
-   * @param methodName the method name which the fields will be placed into if code is not split.
+   * @param methodName
+   *   the method name which the fields will be placed into if code is not split.
    */
   def startNewLocalVariableStatement(methodName: String): Unit = {
     currentMethodNameForLocalVariables = methodName
@@ -160,22 +161,26 @@ class CodeGeneratorContext(val tableConfig: TableConfig) {
   }
 
   /**
-   * Set the flag [[isCodeSplitMap]] to be true for methodName, which indicates
-   * the generated code is split into several methods.
-   * @param methodName the method which will be split.
+   * Set the flag [[isCodeSplitMap]] to be true for methodName, which indicates the generated code
+   * is split into several methods.
+   * @param methodName
+   *   the method which will be split.
    */
   def setCodeSplit(methodName: String = currentMethodNameForLocalVariables): Unit = {
     isCodeSplitMap(methodName) = true
   }
 
   /**
-   * Adds a reusable local variable statement with the given type term and field name.
-   * The local variable statements will be placed in methods or class member area depends
-   * on whether the method length excess max code length.
+   * Adds a reusable local variable statement with the given type term and field name. The local
+   * variable statements will be placed in methods or class member area depends on whether the
+   * method length excess max code length.
    *
-   * @param fieldName  the field name prefix
-   * @param fieldTypeTerm  the field type term
-   * @return a new generated unique field name
+   * @param fieldName
+   *   the field name prefix
+   * @param fieldTypeTerm
+   *   the field type term
+   * @return
+   *   a new generated unique field name
    */
   def addReusableLocalVariable(fieldTypeTerm: String, fieldName: String): String = {
     val fieldTerm = newName(fieldName)
@@ -186,13 +191,13 @@ class CodeGeneratorContext(val tableConfig: TableConfig) {
   }
 
   /**
-   * Adds multiple pairs of local variables.
-   * The local variable statements will be placed in methods or class
-   * member area depends on whether the method length excess max code length.
+   * Adds multiple pairs of local variables. The local variable statements will be placed in methods
+   * or class member area depends on whether the method length excess max code length.
    *
-   * @param fieldTypeAndNames pairs of local variables with
-   *                          left is field type term and right is field name
-   * @return the new generated unique field names for each variable pairs
+   * @param fieldTypeAndNames
+   *   pairs of local variables with left is field type term and right is field name
+   * @return
+   *   the new generated unique field names for each variable pairs
    */
   def addReusableLocalVariables(fieldTypeAndNames: (String, String)*): Seq[String] = {
     val fieldTerms = newNames(fieldTypeAndNames.map(_._2): _*)
@@ -209,16 +214,18 @@ class CodeGeneratorContext(val tableConfig: TableConfig) {
   // ---------------------------------------------------------------------------------
 
   /**
-   * @return code block of statements that need to be placed in the member area of the class
-   *         (e.g. inner class definition)
+   * @return
+   *   code block of statements that need to be placed in the member area of the class (e.g. inner
+   *   class definition)
    */
   def reuseInnerClassDefinitionCode(): String = {
     reusableInnerClassDefinitionStatements.values.mkString("\n")
   }
 
   /**
-   * @return code block of statements that need to be placed in the member area of the class
-   *         (e.g. member variables and their initialization)
+   * @return
+   *   code block of statements that need to be placed in the member area of the class (e.g. member
+   *   variables and their initialization)
    */
   def reuseMemberCode(): String = {
     val result = reusableMemberStatements.mkString("\n")
@@ -239,8 +246,9 @@ class CodeGeneratorContext(val tableConfig: TableConfig) {
   }
 
   /**
-   * @return code block of statements that will be placed in the member area of the class
-   *         if generated code is split or in local variables of method
+   * @return
+   *   code block of statements that will be placed in the member area of the class if generated
+   *   code is split or in local variables of method
    */
   def reuseLocalVariableCode(methodName: String = currentMethodNameForLocalVariables): String = {
     if (isCodeSplitMap.getOrElse(methodName, false)) {
@@ -253,47 +261,53 @@ class CodeGeneratorContext(val tableConfig: TableConfig) {
   }
 
   /**
-   * @return code block of statements that need to be placed in the constructor
+   * @return
+   *   code block of statements that need to be placed in the constructor
    */
   def reuseInitCode(): String = {
     reusableInitStatements.mkString("\n")
   }
 
   /**
-   * @return code block of statements that need to be placed in the per recode process block
-   *         (e.g. Function or StreamOperator's processElement)
+   * @return
+   *   code block of statements that need to be placed in the per recode process block (e.g.
+   *   Function or StreamOperator's processElement)
    */
   def reusePerRecordCode(): String = {
     reusablePerRecordStatements.mkString("\n")
   }
 
   /**
-   * @return code block of statements that need to be placed in the open() method
-   *         (e.g. RichFunction or StreamOperator)
+   * @return
+   *   code block of statements that need to be placed in the open() method (e.g. RichFunction or
+   *   StreamOperator)
    */
   def reuseOpenCode(): String = {
     reusableOpenStatements.mkString("\n")
   }
 
   /**
-   * @return code block of statements that need to be placed in the close() method
-   *         (e.g. RichFunction or StreamOperator)
+   * @return
+   *   code block of statements that need to be placed in the close() method (e.g. RichFunction or
+   *   StreamOperator)
    */
   def reuseCloseCode(): String = {
     reusableCloseStatements.mkString("\n")
   }
 
   /**
-   * @return code block of statements that need to be placed in the cleanup() method of
-   *         [AggregationsFunction]
+   * @return
+   *   code block of statements that need to be placed in the cleanup() method of
+   *   [AggregationsFunction]
    */
   def reuseCleanupCode(): String = {
     reusableCleanupStatements.mkString("", "\n", "\n")
   }
 
   /**
-   * @return code block of statements that unbox input variables to a primitive variable
-   *         and a corresponding null flag variable
+   * @return
+   *   code block of statements that unbox input variables to a primitive variable and a
+   *   corresponding null flag variable
    */
   def reuseInputUnboxingCode(): String = {
     reusableInputUnboxingExprs.values.map(_.code).mkString("\n")
@@ -311,7 +325,8 @@ class CodeGeneratorContext(val tableConfig: TableConfig) {
   }
 
   /**
-   * @return code block of constructor statements
+   * @return
+   *   code block of constructor statements
    */
   def reuseConstructorCode(className: String): String = {
     reusableConstructorStatements
@@ -347,7 +362,8 @@ class CodeGeneratorContext(val tableConfig: TableConfig) {
   /**
    * Adds a reusable member field statement to the member area.
    *
-   * @param memberStatement the member field declare statement
+   * @param memberStatement
+   *   the member field declare statement
    */
   def addReusableMember(memberStatement: String): Unit = {
     reusableMemberStatements.add(memberStatement)
@@ -569,7 +585,8 @@ class CodeGeneratorContext(val tableConfig: TableConfig) {
    *
    * The seed parameter must be a literal/constant expression.
    *
-   * @return member variable term
+   * @return
+   *   member variable term
    */
   def addReusableRandom(seedExpr: Option[GeneratedExpression]): String = {
     val fieldTerm = newName("random")
@@ -608,10 +625,14 @@ class CodeGeneratorContext(val tableConfig: TableConfig) {
 
   /**
    * Adds a reusable Object to the member area of the generated class
-   * @param obj  the object to be added to the generated class
-   * @param fieldNamePrefix  prefix field name of the generated member field term
-   * @param fieldTypeTerm  field type class name
-   * @return the generated unique field term
+   * @param obj
+   *   the object to be added to the generated class
+   * @param fieldNamePrefix
+   *   prefix field name of the generated member field term
+   * @param fieldTypeTerm
+   *   field type class name
+   * @return
+   *   the generated unique field term
    */
   def addReusableObject(
       obj: AnyRef,
@@ -647,10 +668,14 @@ class CodeGeneratorContext(val tableConfig: TableConfig) {
   /**
    * Adds a reusable [[UserDefinedFunction]] to the member area of the generated [[Function]].
    *
-   * @param function [[UserDefinedFunction]] object to be instantiated during runtime
-   * @param functionContextClass class of [[FunctionContext]]
-   * @param contextTerm [[RuntimeContext]] term to access the [[RuntimeContext]]
-   * @return member variable term
+   * @param function
+   *   [[UserDefinedFunction]] object to be instantiated during runtime
+   * @param functionContextClass
+   *   class of [[FunctionContext]]
+   * @param contextTerm
+   *   [[RuntimeContext]] term to access the [[RuntimeContext]]
+   * @return
+   *   member variable term
    */
   def addReusableFunction(
       function: UserDefinedFunction,
@@ -684,8 +709,10 @@ class CodeGeneratorContext(val tableConfig: TableConfig) {
   /**
    * Adds a reusable [[DataStructureConverter]] to the member area of the generated class.
    *
-   * @param dataType converter to be added
-   * @param classLoaderTerm term to access the [[ClassLoader]] for user-defined classes
+   * @param dataType
+   *   converter to be added
+   * @param classLoaderTerm
+   *   term to access the [[ClassLoader]] for user-defined classes
    */
   def addReusableConverter(dataType: DataType, classLoaderTerm: String = null): String = {
     reusableConverters.get(dataType) match {
@@ -713,8 +740,10 @@ class CodeGeneratorContext(val tableConfig: TableConfig) {
   /**
    * Adds a reusable [[TypeSerializer]] to the member area of the generated class.
    *
-   * @param t the internal type which used to generate internal type serializer
-   * @return member variable term
+   * @param t
+   *   the internal type which used to generate internal type serializer
+   * @return
+   *   member variable term
    */
   def addReusableTypeSerializer(t: LogicalType): String = {
     // if type serializer has been used before, we can reuse the code that
@@ -734,8 +763,10 @@ class CodeGeneratorContext(val tableConfig: TableConfig) {
   /**
    * Adds a reusable [[ExternalSerializer]] to the member area of the generated class.
    *
-   * @param t the internal type which used to generate internal type serializer
-   * @return member variable term
+   * @param t
+   *   the internal type which used to generate internal type serializer
+   * @return
+   *   member variable term
    */
   def addReusableExternalSerializer(t: DataType): String = {
     reusableExternalSerializers.get(t) match {
@@ -765,8 +796,10 @@ class CodeGeneratorContext(val tableConfig: TableConfig) {
   /**
    * Adds a reusable constant to the member area of the generated class.
    *
-   * @param constant constant expression
-   * @return generated expression with the fieldTerm and nullTerm
+   * @param constant
+   *   constant expression
+   * @return
+   *   generated expression with the fieldTerm and nullTerm
    */
   def addReusableConstant(
       constant: GeneratedExpression,
@@ -817,7 +850,8 @@ class CodeGeneratorContext(val tableConfig: TableConfig) {
   /**
    * Adds a reusable MessageDigest to the member area of the generated [[Function]].
    *
-   * @return member variable term
+   * @return
+   *   member variable term
    */
   def addReusableMessageDigest(algorithm: String): String = {
     val fieldTerm = newName("messageDigest")
@@ -841,7 +875,8 @@ class CodeGeneratorContext(val tableConfig: TableConfig) {
   /**
    * Adds a constant SHA2 reusable MessageDigest to the member area of the generated [[Function]].
    *
-   * @return member variable term
+   * @return
+   *   member variable term
    */
   def addReusableSha2MessageDigest(constant: GeneratedExpression): String = {
     require(constant.literal, "Literal expected")

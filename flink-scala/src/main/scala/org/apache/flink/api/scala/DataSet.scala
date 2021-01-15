@@ -49,8 +49,8 @@ import scala.reflect.ClassTag
  * The DataSet, the basic abstraction of Flink. This represents a collection of elements of a
  * specific type `T`. The operations in this class can be used to create new DataSets and to combine
  * two DataSets. The methods of [[ExecutionEnvironment]] can be used to create a DataSet from an
- * external source, such as files in HDFS. The `write*` methods can be used to write the elements
- * to storage.
+ * external source, such as files in HDFS. The `write*` methods can be used to write the elements to
+ * storage.
  *
  * All operations accept either a lambda function or an operation-specific function object for
  * specifying the operation. For example, using a lambda:
@@ -73,17 +73,18 @@ import scala.reflect.ClassTag
  * are named similarly. All functions are available in package
  * `org.apache.flink.api.common.functions`.
  *
- * The elements are partitioned depending on the parallelism of the
- * [[ExecutionEnvironment]] or of one specific DataSet.
+ * The elements are partitioned depending on the parallelism of the [[ExecutionEnvironment]] or of
+ * one specific DataSet.
  *
- * Most of the operations have an implicit [[TypeInformation]] parameter. This is supplied by
- * an implicit conversion in the `flink.api.scala` Package. For this to work,
- * [[createTypeInformation]] needs to be imported. This is normally achieved with a
+ * Most of the operations have an implicit [[TypeInformation]] parameter. This is supplied by an
+ * implicit conversion in the `flink.api.scala` Package. For this to work, [[createTypeInformation]]
+ * needs to be imported. This is normally achieved with a
  * {{{
  *   import org.apache.flink.api.scala._
  * }}}
  *
- * @tparam T The type of the DataSet, i.e., the type of the elements of the DataSet.
+ * @tparam T
+ *   The type of the DataSet, i.e., the type of the elements of the DataSet.
  */
 @Public
 class DataSet[T: ClassTag](set: JavaDataSet[T]) {
@@ -97,7 +98,8 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
   /**
    * Returns the execution environment associated with the current DataSet.
    *
-   * @return associated execution environment
+   * @return
+   *   associated execution environment
    */
   def getExecutionEnvironment: ExecutionEnvironment =
     new ExecutionEnvironment(set.getExecutionEnvironment)
@@ -109,16 +111,18 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
 
   /* This code is originally from the Apache Spark project. */
   /**
-   * Clean a closure to make it ready to serialized and send to tasks
-   * (removes unreferenced variables in $outer's, updates REPL variables)
-   * If <tt>checkSerializable</tt> is set, <tt>clean</tt> will also proactively
-   * check to see if <tt>f</tt> is serializable and throw a <tt>SparkException</tt>
-   * if not.
+   * Clean a closure to make it ready to serialized and send to tasks (removes unreferenced
+   * variables in $outer's, updates REPL variables) If <tt>checkSerializable</tt> is set,
+   * <tt>clean</tt> will also proactively check to see if <tt>f</tt> is serializable and throw a
+   * <tt>SparkException</tt> if not.
    *
-   * @param f the closure to clean
-   * @param checkSerializable whether or not to immediately check <tt>f</tt> for serializability
-   * @throws InvalidProgramException if <tt>checkSerializable</tt> is set but <tt>f</tt>
-   *          is not serializable
+   * @param f
+   *   the closure to clean
+   * @param checkSerializable
+   *   whether or not to immediately check <tt>f</tt> for serializability
+   * @throws
+   *   InvalidProgramException if <tt>checkSerializable</tt> is set but <tt>f</tt> is not
+   *   serializable
    */
   private[flink] def clean[F <: AnyRef](f: F, checkSerializable: Boolean = true): F = {
     if (set.getExecutionEnvironment.getConfig.isClosureCleanerEnabled) {
@@ -138,8 +142,8 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
   // here and just pass through the calls to make everything much simpler.
 
   /**
-   * Sets the name of the DataSet. This will appear in logs and graphical
-   * representations of the execution graph.
+   * Sets the name of the DataSet. This will appear in logs and graphical representations of the
+   * execution graph.
    */
   def name(name: String) = {
     javaSet match {
@@ -239,18 +243,19 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
   }
 
   /**
-   * Registers an [[org.apache.flink.api.common.aggregators.Aggregator]]
-   * for the iteration. Aggregators can be used to maintain simple statistics during the
-   * iteration, such as number of elements processed. The aggregators compute global aggregates:
-   * After each iteration step, the values are globally aggregated to produce one aggregate that
-   * represents statistics across all parallel instances.
-   * The value of an aggregator can be accessed in the next iteration.
+   * Registers an [[org.apache.flink.api.common.aggregators.Aggregator]] for the iteration.
+   * Aggregators can be used to maintain simple statistics during the iteration, such as number of
+   * elements processed. The aggregators compute global aggregates: After each iteration step, the
+   * values are globally aggregated to produce one aggregate that represents statistics across all
+   * parallel instances. The value of an aggregator can be accessed in the next iteration.
    *
    * Aggregators can be accessed inside a function via
    * [[org.apache.flink.api.common.functions.AbstractRichFunction#getIterationRuntimeContext]].
    *
-   * @param name The name under which the aggregator is registered.
-   * @param aggregator The aggregator class.
+   * @param name
+   *   The name under which the aggregator is registered.
+   * @param aggregator
+   *   The aggregator class.
    */
   @PublicEvolving
   def registerAggregator(name: String, aggregator: Aggregator[_]): DataSet[T] = {
@@ -266,19 +271,20 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
   }
 
   /**
-   * Adds a certain data set as a broadcast set to this operator. Broadcast data sets are
-   * available at all
-   * parallel instances of this operator. A broadcast data set is registered under a certain
-   * name, and can be
-   * retrieved under that name from the operators runtime context via
+   * Adds a certain data set as a broadcast set to this operator. Broadcast data sets are available
+   * at all parallel instances of this operator. A broadcast data set is registered under a certain
+   * name, and can be retrieved under that name from the operators runtime context via
    * `org.apache.flink.api.common.functions.RuntimeContext.getBroadCastVariable(String)`
    *
    * The runtime context itself is available in all UDFs via
    * `org.apache.flink.api.common.functions.AbstractRichFunction#getRuntimeContext()`
    *
-   * @param data The data set to be broadcast.
-   * @param name The name under which the broadcast data set retrieved.
-   * @return The operator itself, to allow chaining function calls.
+   * @param data
+   *   The data set to be broadcast.
+   * @param name
+   *   The name under which the broadcast data set retrieved.
+   * @return
+   *   The operator itself, to allow chaining function calls.
    */
   def withBroadcastSet(data: DataSet[_], name: String) = {
     javaSet match {
@@ -292,47 +298,44 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
   }
 
   /**
-   * Adds semantic information about forwarded fields of the user-defined function.
-   * The forwarded fields information declares fields which are never modified by the function and
-   * which are forwarded to the same position in the output or copied unchanged to another position
-   * in the output.
+   * Adds semantic information about forwarded fields of the user-defined function. The forwarded
+   * fields information declares fields which are never modified by the function and which are
+   * forwarded to the same position in the output or copied unchanged to another position in the
+   * output.
    *
-   * <p>Fields that are forwarded to the same position are specified just by their position.
-   * The specified position must be valid for the input and output data type and have
-   * the same type.
-   * For example <code>withForwardedFields("_3")</code> declares that the third field of
-   * an input tuple is copied to the third field of an output tuple.
+   * <p>Fields that are forwarded to the same position are specified just by their position. The
+   * specified position must be valid for the input and output data type and have the same type. For
+   * example <code>withForwardedFields("_3")</code> declares that the third field of an input tuple
+   * is copied to the third field of an output tuple.
    *
    * <p>Fields which are copied to another position in the output unchanged are declared by
-   * specifying the source field reference in the input and the target field reference
-   * in the output.
-   * {@code withForwardedFields("_1->_3")} denotes that the first field of the input tuple is
-   * copied to the third field of the output tuple unchanged. When using a wildcard ("*") ensure
+   * specifying the source field reference in the input and the target field reference in the
+   * output. {@code withForwardedFields("_1->_3")} denotes that the first field of the input tuple
+   * is copied to the third field of the output tuple unchanged. When using a wildcard ("*") ensure
    * that the number of declared fields and their types in input and output type match.
    *
-   * <p>Multiple forwarded fields can be annotated in one
-   * ({@code withForwardedFields("_2; _3->_1; _4")})
-   * or separate Strings ({@code withForwardedFields("_2", "_3->_1", "_4")}).
-   * Please refer to the JavaDoc of {@link org.apache.flink.api.common.functions.Function}
-   * or Flink's documentation for details on field references such as nested fields and wildcard.
+   * <p>Multiple forwarded fields can be annotated in one ({@code withForwardedFields("_2; _3->_1;
+   * _4")}) or separate Strings ({@code withForwardedFields("_2", "_3->_1", "_4")}). Please refer to
+   * the JavaDoc of {@link org.apache.flink.api.common.functions.Function} or Flink's documentation
+   * for details on field references such as nested fields and wildcard.
    *
-   * <p>It is not possible to override existing semantic information about forwarded fields
-   * which was for example added by a
-   * {@link org.apache.flink.api.java.functions.FunctionAnnotation.ForwardedFields} class
-   * annotation.
+   * <p>It is not possible to override existing semantic information about forwarded fields which
+   * was for example added by a {@link
+   * org.apache.flink.api.java.functions.FunctionAnnotation.ForwardedFields} class annotation.
    *
-   * <p><b>NOTE: Adding semantic information for functions is optional!
-   * If used correctly, semantic information can help the Flink optimizer to generate more
-   * efficient execution plans.
-   * However, incorrect semantic information can cause the optimizer to generate incorrect
-   * execution plans which compute wrong results!
-   * So be careful when adding semantic information.
-   * </b>
+   * <p><b>NOTE: Adding semantic information for functions is optional! If used correctly, semantic
+   * information can help the Flink optimizer to generate more efficient execution plans. However,
+   * incorrect semantic information can cause the optimizer to generate incorrect execution plans
+   * which compute wrong results! So be careful when adding semantic information. </b>
    *
-   * @param forwardedFields A list of field forward expressions.
-   * @return This operator with annotated forwarded field information.
-   * @see org.apache.flink.api.java.functions.FunctionAnnotation
-   * @see org.apache.flink.api.java.functions.FunctionAnnotation.ForwardedFields
+   * @param forwardedFields
+   *   A list of field forward expressions.
+   * @return
+   *   This operator with annotated forwarded field information.
+   * @see
+   *   org.apache.flink.api.java.functions.FunctionAnnotation
+   * @see
+   *   org.apache.flink.api.java.functions.FunctionAnnotation.ForwardedFields
    */
   def withForwardedFields(forwardedFields: String*) = {
     javaSet match {
@@ -346,50 +349,45 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
   }
 
   /**
-   * Adds semantic information about forwarded fields of the first input
-   * of the user-defined function.
-   * The forwarded fields information declares fields which are never modified by the function and
-   * which are forwarded to the same position in the output or copied unchanged
-   * to another position in the output.
+   * Adds semantic information about forwarded fields of the first input of the user-defined
+   * function. The forwarded fields information declares fields which are never modified by the
+   * function and which are forwarded to the same position in the output or copied unchanged to
+   * another position in the output.
    *
-   * <p>Fields that are forwarded to the same position are specified just by their position.
-   * The specified position must be valid for the input and output data type
-   * and have the same type.
-   * For example <code>withForwardedFieldsFirst("_3")</code> declares that the third field
-   * of an input tuple from the first input is copied to the third field of an output tuple.
+   * <p>Fields that are forwarded to the same position are specified just by their position. The
+   * specified position must be valid for the input and output data type and have the same type. For
+   * example <code>withForwardedFieldsFirst("_3")</code> declares that the third field of an input
+   * tuple from the first input is copied to the third field of an output tuple.
    *
-   * <p>Fields which are copied from the first input to another position in the output unchanged
-   * are declared by specifying the source field reference in the first input and the target field
+   * <p>Fields which are copied from the first input to another position in the output unchanged are
+   * declared by specifying the source field reference in the first input and the target field
    * reference in the output. {@code withForwardedFieldsFirst("_1->_3")} denotes that the first
-   * field of the first input tuple is copied to the third field of the output tuple unchanged.
-   * When using a wildcard ("*") ensure that the number of declared fields and their types
-   * in the first input and output type match.
+   * field of the first input tuple is copied to the third field of the output tuple unchanged. When
+   * using a wildcard ("*") ensure that the number of declared fields and their types in the first
+   * input and output type match.
    *
-   * <p>Multiple forwarded fields can be annotated in one
-   * ({@code withForwardedFieldsFirst("_2; _3->_0; _4")})
-   * or separate Strings ({@code withForwardedFieldsFirst("_2", "_3->_0", "_4")}).
-   * Please refer to the JavaDoc of
-   * {@link org.apache.flink.api.common.functions.Function} or Flink's documentation for
-   * details on field references such as nested fields and wildcard.
+   * <p>Multiple forwarded fields can be annotated in one ({@code withForwardedFieldsFirst("_2;
+   * _3->_0; _4")}) or separate Strings ({@code withForwardedFieldsFirst("_2", "_3->_0", "_4")}).
+   * Please refer to the JavaDoc of {@link org.apache.flink.api.common.functions.Function} or
+   * Flink's documentation for details on field references such as nested fields and wildcard.
    *
-   * <p>It is not possible to override existing semantic information about forwarded fields
-   * of the first input which was for example added by a
-   * {@link org.apache.flink.api.java.functions.FunctionAnnotation.ForwardedFieldsFirst}
-   * class annotation.
+   * <p>It is not possible to override existing semantic information about forwarded fields of the
+   * first input which was for example added by a {@link
+   * org.apache.flink.api.java.functions.FunctionAnnotation.ForwardedFieldsFirst} class annotation.
    *
-   * <p><b>NOTE: Adding semantic information for functions is optional!
-   * If used correctly, semantic information can help the Flink optimizer to generate more
-   * efficient execution plans.
-   * However, incorrect semantic information can cause the optimizer to generate incorrect
-   * execution plans which compute wrong results!
-   * So be careful when adding semantic information.
-   * </b>
+   * <p><b>NOTE: Adding semantic information for functions is optional! If used correctly, semantic
+   * information can help the Flink optimizer to generate more efficient execution plans. However,
+   * incorrect semantic information can cause the optimizer to generate incorrect execution plans
+   * which compute wrong results! So be careful when adding semantic information. </b>
    *
-   * @param forwardedFields A list of forwarded field expressions for the first input
-   *                        of the function.
-   * @return This operator with annotated forwarded field information.
-   * @see org.apache.flink.api.java.functions.FunctionAnnotation
-   * @see org.apache.flink.api.java.functions.FunctionAnnotation.ForwardedFieldsFirst
+   * @param forwardedFields
+   *   A list of forwarded field expressions for the first input of the function.
+   * @return
+   *   This operator with annotated forwarded field information.
+   * @see
+   *   org.apache.flink.api.java.functions.FunctionAnnotation
+   * @see
+   *   org.apache.flink.api.java.functions.FunctionAnnotation.ForwardedFieldsFirst
    */
   def withForwardedFieldsFirst(forwardedFields: String*) = {
     javaSet match {
@@ -403,51 +401,45 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
   }
 
   /**
-   * Adds semantic information about forwarded fields of the second input
-   * of the user-defined function.
-   * The forwarded fields information declares fields which are never modified by the function and
-   * which are forwarded to the same position in the output or copied unchanged
-   * to another position in the output.
+   * Adds semantic information about forwarded fields of the second input of the user-defined
+   * function. The forwarded fields information declares fields which are never modified by the
+   * function and which are forwarded to the same position in the output or copied unchanged to
+   * another position in the output.
    *
-   * <p>Fields that are forwarded to the same position are specified just by their position.
-   * The specified position must be valid for the input and output data type
-   * and have the same type.
-   * For example <code>withForwardedFieldsFirst("_3")</code> declares that the third field
-   * of an input tuple from the second input is copied to the third field of an output tuple.
+   * <p>Fields that are forwarded to the same position are specified just by their position. The
+   * specified position must be valid for the input and output data type and have the same type. For
+   * example <code>withForwardedFieldsFirst("_3")</code> declares that the third field of an input
+   * tuple from the second input is copied to the third field of an output tuple.
    *
-   * <p>Fields which are copied from the second input to another position
-   * in the output unchanged are declared by specifying the source field reference
-   * in the second input and the target field reference in the output.
-   * {@code withForwardedFieldsFirst("_1->_3")} denotes that the first field of the second input
-   * tuple is copied to the third field of the output tuple unchanged. When using a wildcard ("*")
-   * ensure that the number of declared fields and their types in the second input and
-   * output type match.
+   * <p>Fields which are copied from the second input to another position in the output unchanged
+   * are declared by specifying the source field reference in the second input and the target field
+   * reference in the output. {@code withForwardedFieldsFirst("_1->_3")} denotes that the first
+   * field of the second input tuple is copied to the third field of the output tuple unchanged.
+   * When using a wildcard ("*") ensure that the number of declared fields and their types in the
+   * second input and output type match.
    *
-   * <p>Multiple forwarded fields can be annotated in one
-   * ({@code withForwardedFieldsFirst("_2; _3->_0; _4")})
-   * or separate Strings ({@code withForwardedFieldsFirst("_2", "_3->_0", "_4")}).
-   * Please refer to the JavaDoc of
-   * {@link org.apache.flink.api.common.functions.Function} or Flink's documentation for
-   * details on field references such as nested fields and wildcard.
+   * <p>Multiple forwarded fields can be annotated in one ({@code withForwardedFieldsFirst("_2;
+   * _3->_0; _4")}) or separate Strings ({@code withForwardedFieldsFirst("_2", "_3->_0", "_4")}).
+   * Please refer to the JavaDoc of {@link org.apache.flink.api.common.functions.Function} or
+   * Flink's documentation for details on field references such as nested fields and wildcard.
    *
-   * <p>It is not possible to override existing semantic information about forwarded fields
-   * of the second input which was for example added by a
-   * {@link org.apache.flink.api.java.functions.FunctionAnnotation.ForwardedFieldsFirst}
-   * class annotation.
+   * <p>It is not possible to override existing semantic information about forwarded fields of the
+   * second input which was for example added by a {@link
+   * org.apache.flink.api.java.functions.FunctionAnnotation.ForwardedFieldsFirst} class annotation.
    *
-   * <p><b>NOTE: Adding semantic information for functions is optional!
-   * If used correctly, semantic information can help the Flink optimizer to generate more
-   * efficient execution plans.
-   * However, incorrect semantic information can cause the optimizer to generate incorrect
-   * execution plans which compute wrong results!
-   * So be careful when adding semantic information.
-   * </b>
+   * <p><b>NOTE: Adding semantic information for functions is optional! If used correctly, semantic
+   * information can help the Flink optimizer to generate more efficient execution plans. However,
+   * incorrect semantic information can cause the optimizer to generate incorrect execution plans
+   * which compute wrong results! So be careful when adding semantic information. </b>
    *
-   * @param forwardedFields A list of forwarded field expressions for the second input
-   *                        of the function.
-   * @return This operator with annotated forwarded field information.
-   * @see org.apache.flink.api.java.functions.FunctionAnnotation
-   * @see org.apache.flink.api.java.functions.FunctionAnnotation.ForwardedFieldsFirst
+   * @param forwardedFields
+   *   A list of forwarded field expressions for the second input of the function.
+   * @return
+   *   This operator with annotated forwarded field information.
+   * @see
+   *   org.apache.flink.api.java.functions.FunctionAnnotation
+   * @see
+   *   org.apache.flink.api.java.functions.FunctionAnnotation.ForwardedFieldsFirst
    */
   def withForwardedFieldsSecond(forwardedFields: String*) = {
     javaSet match {
@@ -503,12 +495,11 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
   }
 
   /**
-   * Creates a new DataSet by applying the given function to each parallel partition of the
-   * DataSet.
+   * Creates a new DataSet by applying the given function to each parallel partition of the DataSet.
    *
-   * This function is intended for operations that cannot transform individual elements and
-   * requires no grouping of elements. To transform individual elements,
-   * the use of [[map]] and [[flatMap]] is preferable.
+   * This function is intended for operations that cannot transform individual elements and requires
+   * no grouping of elements. To transform individual elements, the use of [[map]] and [[flatMap]]
+   * is preferable.
    */
   def mapPartition[R: TypeInformation: ClassTag](
       partitionMapper: MapPartitionFunction[T, R]): DataSet[R] = {
@@ -524,12 +515,11 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
   }
 
   /**
-   * Creates a new DataSet by applying the given function to each parallel partition of the
-   * DataSet.
+   * Creates a new DataSet by applying the given function to each parallel partition of the DataSet.
    *
-   * This function is intended for operations that cannot transform individual elements and
-   * requires no grouping of elements. To transform individual elements,
-   * the use of [[map]] and [[flatMap]] is preferable.
+   * This function is intended for operations that cannot transform individual elements and requires
+   * no grouping of elements. To transform individual elements, the use of [[map]] and [[flatMap]]
+   * is preferable.
    */
   def mapPartition[R: TypeInformation: ClassTag](
       fun: (Iterator[T], Collector[R]) => Unit): DataSet[R] = {
@@ -551,12 +541,11 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
   }
 
   /**
-   * Creates a new DataSet by applying the given function to each parallel partition of the
-   * DataSet.
+   * Creates a new DataSet by applying the given function to each parallel partition of the DataSet.
    *
-   * This function is intended for operations that cannot transform individual elements and
-   * requires no grouping of elements. To transform individual elements,
-   * the use of [[map]] and [[flatMap]] is preferable.
+   * This function is intended for operations that cannot transform individual elements and requires
+   * no grouping of elements. To transform individual elements, the use of [[map]] and [[flatMap]]
+   * is preferable.
    */
   def mapPartition[R: TypeInformation: ClassTag](
       fun: (Iterator[T]) => TraversableOnce[R]): DataSet[R] = {
@@ -578,8 +567,8 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
   }
 
   /**
-   * Creates a new DataSet by applying the given function to every element and flattening
-   * the results.
+   * Creates a new DataSet by applying the given function to every element and flattening the
+   * results.
    */
   def flatMap[R: TypeInformation: ClassTag](flatMapper: FlatMapFunction[T, R]): DataSet[R] = {
     if (flatMapper == null) {
@@ -594,8 +583,8 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
   }
 
   /**
-   * Creates a new DataSet by applying the given function to every element and flattening
-   * the results.
+   * Creates a new DataSet by applying the given function to every element and flattening the
+   * results.
    */
   def flatMap[R: TypeInformation: ClassTag](fun: (T, Collector[R]) => Unit): DataSet[R] = {
     if (fun == null) {
@@ -614,8 +603,8 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
   }
 
   /**
-   * Creates a new DataSet by applying the given function to every element and flattening
-   * the results.
+   * Creates a new DataSet by applying the given function to every element and flattening the
+   * results.
    */
   def flatMap[R: TypeInformation: ClassTag](fun: T => TraversableOnce[R]): DataSet[R] = {
     if (fun == null) {
@@ -730,8 +719,10 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
   /**
    * Convenience method to get the count (number of elements) of a DataSet
    *
-   * @return A long integer that represents the number of elements in the set
-   * @see org.apache.flink.api.java.Utils.CountHelper
+   * @return
+   *   A long integer that represents the number of elements in the set
+   * @see
+   *   org.apache.flink.api.java.Utils.CountHelper
    */
   @throws(classOf[Exception])
   def count(): Long = {
@@ -742,11 +733,13 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
   }
 
   /**
-   * Convenience method to get the elements of a DataSet as a List
-   * As DataSet can contain a lot of data, this method should be used with caution.
+   * Convenience method to get the elements of a DataSet as a List As DataSet can contain a lot of
+   * data, this method should be used with caution.
    *
-   * @return A Seq containing the elements of the DataSet
-   * @see org.apache.flink.api.java.Utils.CollectHelper
+   * @return
+   *   A Seq containing the elements of the DataSet
+   * @see
+   *   org.apache.flink.api.java.Utils.CollectHelper
    */
   @throws(classOf[Exception])
   def collect(): Seq[T] = {
@@ -860,18 +853,15 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
   }
 
   /**
-   *  Applies a GroupCombineFunction on a grouped [[DataSet]].  A
-   *  GroupCombineFunction is similar to a GroupReduceFunction but does not
-   *  perform a full data exchange. Instead, the GroupCombineFunction calls
-   *  the combine method once per partition for combining a group of
-   *  results. This operator is suitable for combining values into an
-   *  intermediate format before doing a proper groupReduce where the
-   *  data is shuffled across the node for further reduction. The
-   *  GroupReduce operator can also be supplied with a combiner by
-   *  implementing the RichGroupReduce function. The combine method of
-   *  the RichGroupReduce function demands input and output type to be
-   *  the same. The GroupCombineFunction, on the other side, can have an
-   *  arbitrary output type.
+   * Applies a GroupCombineFunction on a grouped [[DataSet]]. A GroupCombineFunction is similar to a
+   * GroupReduceFunction but does not perform a full data exchange. Instead, the
+   * GroupCombineFunction calls the combine method once per partition for combining a group of
+   * results. This operator is suitable for combining values into an intermediate format before
+   * doing a proper groupReduce where the data is shuffled across the node for further reduction.
+   * The GroupReduce operator can also be supplied with a combiner by implementing the
+   * RichGroupReduce function. The combine method of the RichGroupReduce function demands input and
+   * output type to be the same. The GroupCombineFunction, on the other side, can have an arbitrary
+   * output type.
    */
   def combineGroup[R: TypeInformation: ClassTag](
       combiner: GroupCombineFunction[T, R]): DataSet[R] = {
@@ -887,18 +877,15 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
   }
 
   /**
-   *  Applies a GroupCombineFunction on a grouped [[DataSet]].  A
-   *  GroupCombineFunction is similar to a GroupReduceFunction but does not
-   *  perform a full data exchange. Instead, the GroupCombineFunction calls
-   *  the combine method once per partition for combining a group of
-   *  results. This operator is suitable for combining values into an
-   *  intermediate format before doing a proper groupReduce where the
-   *  data is shuffled across the node for further reduction. The
-   *  GroupReduce operator can also be supplied with a combiner by
-   *  implementing the RichGroupReduce function. The combine method of
-   *  the RichGroupReduce function demands input and output type to be
-   *  the same. The GroupCombineFunction, on the other side, can have an
-   *  arbitrary output type.
+   * Applies a GroupCombineFunction on a grouped [[DataSet]]. A GroupCombineFunction is similar to a
+   * GroupReduceFunction but does not perform a full data exchange. Instead, the
+   * GroupCombineFunction calls the combine method once per partition for combining a group of
+   * results. This operator is suitable for combining values into an intermediate format before
+   * doing a proper groupReduce where the data is shuffled across the node for further reduction.
+   * The GroupReduce operator can also be supplied with a combiner by implementing the
+   * RichGroupReduce function. The combine method of the RichGroupReduce function demands input and
+   * output type to be the same. The GroupCombineFunction, on the other side, can have an arbitrary
+   * output type.
    */
   def combineGroup[R: TypeInformation: ClassTag](
       fun: (Iterator[T], Collector[R]) => Unit): DataSet[R] = {
@@ -924,20 +911,17 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
    *
    * The minimum is computed over the specified fields in lexicographical order.
    *
-   * Example 1: Given a data set with elements [0, 1], [1, 0], the
-   * results will be:
+   * Example 1: Given a data set with elements [0, 1], [1, 0], the results will be:
    * {{{
    *   minBy(0)[0, 1]
    *   minBy(1)[1, 0]
    * }}}
-   * Example 2: Given a data set with elements [0, 0], [0, 1], the
-   * results will be:
+   * Example 2: Given a data set with elements [0, 0], [0, 1], the results will be:
    * {{{
    *   minBy(0, 1)[0, 0]
    * }}}
    * If multiple values with minimum value at the specified fields exist, a random one will be
-   * picked.
-   * Internally, this operation is implemented as a [[ReduceFunction]]
+   * picked. Internally, this operation is implemented as a [[ReduceFunction]]
    */
   def minBy(fields: Int*): DataSet[T] = {
     if (!getType.isTupleType) {
@@ -952,20 +936,17 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
    *
    * The maximum is computed over the specified fields in lexicographical order.
    *
-   * Example 1: Given a data set with elements [0, 1], [1, 0], the
-   * results will be:
+   * Example 1: Given a data set with elements [0, 1], [1, 0], the results will be:
    * {{{
    *   maxBy(0)[1, 0]
    *   maxBy(1)[0, 1]
    * }}}
-   * Example 2: Given a data set with elements [0, 0], [0, 1], the
-   * results will be:
+   * Example 2: Given a data set with elements [0, 0], [0, 1], the results will be:
    * {{{
    *   maxBy(0, 1)[0, 1]
    * }}}
    * If multiple values with maximum value at the specified fields exist, a random one will be
-   * picked
-   * Internally, this operation is implemented as a [[ReduceFunction]].
+   * picked Internally, this operation is implemented as a [[ReduceFunction]].
    */
   def maxBy(fields: Int*): DataSet[T] = {
     if (!getType.isTupleType) {
@@ -992,8 +973,9 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
    * Creates a new DataSet containing the distinct elements of this DataSet. The decision whether
    * two elements are distinct or not is made using the return value of the given function.
    *
-   * @param fun The function which extracts the key values from the DataSet on which the
-   *            distinction of the DataSet is decided.
+   * @param fun
+   *   The function which extracts the key values from the DataSet on which the distinction of the
+   *   DataSet is decided.
    */
   def distinct[K: TypeInformation](fun: T => K): DataSet[T] = {
     val keyExtractor = new KeySelector[T, K] {
@@ -1023,12 +1005,13 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
   /**
    * Returns a distinct set of a tuple DataSet using field position keys.
    *
-   * <p>The field position keys specify the fields of Tuples on which the decision is made if
-   * two Tuples are distinct or not.</p>
+   * <p>The field position keys specify the fields of Tuples on which the decision is made if two
+   * Tuples are distinct or not.</p>
    *
    * <p>Note: Field position keys can only be specified for Tuple DataSets.</p>
    *
-   * @param fields One or more field positions on which the distinction of the DataSet is decided.
+   * @param fields
+   *   One or more field positions on which the distinction of the DataSet is decided.
    */
   def distinct(fields: Int*): DataSet[T] = {
     wrap(
@@ -1045,14 +1028,15 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
    * if two elements are distinct or not.</p>
    *
    * <p>The field expression keys specify the fields of a
-   * [[org.apache.flink.api.common.typeutils.CompositeType]] (e.g., Tuple or Pojo type)
-   * on which the decision is made if two elements are distinct or not.
-   * In case of a [[org.apache.flink.api.common.typeinfo.AtomicType]], only the
-   * wildcard expression ("_") is valid.</p>
+   * [[org.apache.flink.api.common.typeutils.CompositeType]] (e.g., Tuple or Pojo type) on which the
+   * decision is made if two elements are distinct or not. In case of a
+   * [[org.apache.flink.api.common.typeinfo.AtomicType]], only the wildcard expression ("_") is
+   * valid.</p>
    *
-   * @param firstField First field position on which the distinction of the DataSet is decided
-   * @param otherFields Zero or more field positions on which the distinction of the DataSet
-   *                    is decided
+   * @param firstField
+   *   First field position on which the distinction of the DataSet is decided
+   * @param otherFields
+   *   Zero or more field positions on which the distinction of the DataSet is decided
    */
   def distinct(firstField: String, otherFields: String*): DataSet[T] = {
     wrap(
@@ -1070,8 +1054,8 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
    * Creates a [[GroupedDataSet]] which provides operations on groups of elements. Elements are
    * grouped based on the value returned by the given function.
    *
-   * This will not create a new DataSet, it will just attach the key function which will be used
-   * for grouping when executing a grouped operation.
+   * This will not create a new DataSet, it will just attach the key function which will be used for
+   * grouping when executing a grouped operation.
    */
   def groupBy[K: TypeInformation](fun: T => K): GroupedDataSet[T] = {
     val keyType = implicitly[TypeInformation[K]]
@@ -1101,8 +1085,8 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
    * Creates a [[GroupedDataSet]] which provides operations on groups of elements. Elements are
    * grouped based on the given fields.
    *
-   * This will not create a new DataSet, it will just attach the field names which will be
-   * used for grouping when executing a grouped operation.
+   * This will not create a new DataSet, it will just attach the field names which will be used for
+   * grouping when executing a grouped operation.
    */
   def groupBy(firstField: String, otherFields: String*): GroupedDataSet[T] = {
     new GroupedDataSet[T](
@@ -1128,9 +1112,9 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
    * }}}
    *
    * The default join result is a DataSet with 2-Tuples of the joined values. In the above example
-   * that would be `((String, Int, Int), (Int, String, Int))`. A custom join function can be used
-   * if more control over the result is required. This can either be given as a lambda or a
-   * custom [[JoinFunction]]. For example:
+   * that would be `((String, Int, Int), (Int, String, Int))`. A custom join function can be used if
+   * more control over the result is required. This can either be given as a lambda or a custom
+   * [[JoinFunction]]. For example:
    * {{{
    *   val left: DataSet[(String, Int, Int)] = ...
    *   val right: DataSet[(Int, String, Int)] = ...
@@ -1138,8 +1122,8 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
    *     (l._1, r._2)
    *   }
    * }}}
-   * A join function with a [[Collector]] can be used to implement a filter directly in the join
-   * or to output more than one values. This type of join function does not return a value, instead
+   * A join function with a [[Collector]] can be used to implement a filter directly in the join or
+   * to output more than one values. This type of join function does not return a value, instead
    * values are emitted using the collector:
    * {{{
    *   val left: DataSet[(String, Int, Int)] = ...
@@ -1159,32 +1143,31 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
     new UnfinishedJoinOperation(this, other, JoinHint.OPTIMIZER_CHOOSES)
 
   /**
-   * Special [[join]] operation for explicitly telling the system what join strategy to use. If
-   * null is given as the join strategy, then the optimizer will pick the strategy.
+   * Special [[join]] operation for explicitly telling the system what join strategy to use. If null
+   * is given as the join strategy, then the optimizer will pick the strategy.
    */
   def join[O](other: DataSet[O], strategy: JoinHint): UnfinishedJoinOperation[T, O] =
     new UnfinishedJoinOperation(this, other, strategy)
 
   /**
-   * Special [[join]] operation for explicitly telling the system that the right side is assumed
-   * to be a lot smaller than the left side of the join.
+   * Special [[join]] operation for explicitly telling the system that the right side is assumed to
+   * be a lot smaller than the left side of the join.
    */
   def joinWithTiny[O](other: DataSet[O]): UnfinishedJoinOperation[T, O] =
     new UnfinishedJoinOperation(this, other, JoinHint.BROADCAST_HASH_SECOND)
 
   /**
-   * Special [[join]] operation for explicitly telling the system that the left side is assumed
-   * to be a lot smaller than the right side of the join.
+   * Special [[join]] operation for explicitly telling the system that the left side is assumed to
+   * be a lot smaller than the right side of the join.
    */
   def joinWithHuge[O](other: DataSet[O]): UnfinishedJoinOperation[T, O] =
     new UnfinishedJoinOperation(this, other, JoinHint.BROADCAST_HASH_FIRST)
 
   /**
-   * Creates a new DataSet by performing a full outer join of `this` DataSet
-   * with the `other` DataSet, by combining two elements of two DataSets on
-   * key equality.
-   * Elements of both DataSets that do not have a matching element on the
-   * opposing side are joined with `null` and emitted to the resulting DataSet.
+   * Creates a new DataSet by performing a full outer join of `this` DataSet with the `other`
+   * DataSet, by combining two elements of two DataSets on key equality. Elements of both DataSets
+   * that do not have a matching element on the opposing side are joined with `null` and emitted to
+   * the resulting DataSet.
    *
    * To specify the join keys the `where` and `equalTo` methods must be used. For example:
    * {{{
@@ -1200,7 +1183,7 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
    *       val a = if (left == null) null else left._1
    *       val b = if (right == null) null else right._3
    *       (a, b)
-   *  }
+   * }
    * }}}
    */
   def fullOuterJoin[O](other: DataSet[O]): UnfinishedOuterJoinOperation[T, O] =
@@ -1221,12 +1204,15 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
   /**
    * An outer join on the left side.
    *
-   * Elements of the left side (i.e. `this`) that do not have a matching element on the other
-   * side are joined with `null` and emitted to the resulting DataSet.
+   * Elements of the left side (i.e. `this`) that do not have a matching element on the other side
+   * are joined with `null` and emitted to the resulting DataSet.
    *
-   * @param other The other DataSet with which this DataSet is joined.
-   * @return An UnfinishedJoinOperation to continue with the definition of the join transformation
-   * @see #fullOuterJoin
+   * @param other
+   *   The other DataSet with which this DataSet is joined.
+   * @return
+   *   An UnfinishedJoinOperation to continue with the definition of the join transformation
+   * @see
+   *   #fullOuterJoin
    */
   def leftOuterJoin[O](other: DataSet[O]): UnfinishedOuterJoinOperation[T, O] =
     new UnfinishedOuterJoinOperation(this, other, JoinHint.OPTIMIZER_CHOOSES, JoinType.LEFT_OUTER)
@@ -1234,14 +1220,18 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
   /**
    * An outer join on the left side.
    *
-   * Elements of the left side (i.e. `this`) that do not have a matching element on the other
-   * side are joined with `null` and emitted to the resulting DataSet.
+   * Elements of the left side (i.e. `this`) that do not have a matching element on the other side
+   * are joined with `null` and emitted to the resulting DataSet.
    *
-   * @param other The other DataSet with which this DataSet is joined.
-   * @param strategy The strategy that should be used execute the join. If { @code null} is given,
-   *                 then the optimizer will pick the join strategy.
-   * @return An UnfinishedJoinOperation to continue with the definition of the join transformation
-   * @see #fullOuterJoin
+   * @param other
+   *   The other DataSet with which this DataSet is joined.
+   * @param strategy
+   *   The strategy that should be used execute the join. If { @code null} is given, then the
+   *   optimizer will pick the join strategy.
+   * @return
+   *   An UnfinishedJoinOperation to continue with the definition of the join transformation
+   * @see
+   *   #fullOuterJoin
    */
   def leftOuterJoin[O](other: DataSet[O], strategy: JoinHint): UnfinishedOuterJoinOperation[T, O] =
     strategy match {
@@ -1255,12 +1245,15 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
   /**
    * An outer join on the right side.
    *
-   * Elements of the right side (i.e. `other`) that do not have a matching element on `this`
-   * side are joined with `null` and emitted to the resulting DataSet.
+   * Elements of the right side (i.e. `other`) that do not have a matching element on `this` side
+   * are joined with `null` and emitted to the resulting DataSet.
    *
-   * @param other The other DataSet with which this DataSet is joined.
-   * @return An UnfinishedJoinOperation to continue with the definition of the join transformation
-   * @see #fullOuterJoin
+   * @param other
+   *   The other DataSet with which this DataSet is joined.
+   * @return
+   *   An UnfinishedJoinOperation to continue with the definition of the join transformation
+   * @see
+   *   #fullOuterJoin
    */
   def rightOuterJoin[O](other: DataSet[O]): UnfinishedOuterJoinOperation[T, O] =
     new UnfinishedOuterJoinOperation(this, other, JoinHint.OPTIMIZER_CHOOSES, JoinType.RIGHT_OUTER)
@@ -1268,14 +1261,18 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
   /**
    * An outer join on the right side.
    *
-   * Elements of the right side (i.e. `other`) that do not have a matching element on `this`
-   * side are joined with `null` and emitted to the resulting DataSet.
+   * Elements of the right side (i.e. `other`) that do not have a matching element on `this` side
+   * are joined with `null` and emitted to the resulting DataSet.
    *
-   * @param other The other DataSet with which this DataSet is joined.
-   * @param strategy The strategy that should be used execute the join. If { @code null} is given,
-   *                 then the optimizer will pick the join strategy.
-   * @return An UnfinishedJoinOperation to continue with the definition of the join transformation
-   * @see #fullOuterJoin
+   * @param other
+   *   The other DataSet with which this DataSet is joined.
+   * @param strategy
+   *   The strategy that should be used execute the join. If { @code null} is given, then the
+   *   optimizer will pick the join strategy.
+   * @return
+   *   An UnfinishedJoinOperation to continue with the definition of the join transformation
+   * @see
+   *   #fullOuterJoin
    */
   def rightOuterJoin[O](other: DataSet[O], strategy: JoinHint): UnfinishedOuterJoinOperation[T, O] =
     strategy match {
@@ -1291,18 +1288,17 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
   // --------------------------------------------------------------------------------------------
 
   /**
-   * For each key in `this` DataSet and the `other` DataSet, create a tuple containing a list
-   * of elements for that key from both DataSets. To specify the join keys the `where` and
-   * `isEqualTo` methods must be used. For example:
+   * For each key in `this` DataSet and the `other` DataSet, create a tuple containing a list of
+   * elements for that key from both DataSets. To specify the join keys the `where` and `isEqualTo`
+   * methods must be used. For example:
    * {{{
    *   val left: DataSet[(String, Int, Int)] = ...
    *   val right: DataSet[(Int, String, Int)] = ...
    *   val coGrouped = left.coGroup(right).where(0).isEqualTo(1)
    * }}}
    *
-   * A custom coGroup function can be used
-   * if more control over the result is required. This can either be given as a lambda or a
-   * custom [[CoGroupFunction]]. For example:
+   * A custom coGroup function can be used if more control over the result is required. This can
+   * either be given as a lambda or a custom [[CoGroupFunction]]. For example:
    * {{{
    *   val left: DataSet[(String, Int, Int)] = ...
    *   val right: DataSet[(Int, String, Int)] = ...
@@ -1336,8 +1332,8 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
    * DataSet.
    *
    * The default cross result is a DataSet with 2-Tuples of the combined values. A custom cross
-   * function can be used if more control over the result is required. This can either be given as
-   * a lambda or a custom [[CrossFunction]]. For example:
+   * function can be used if more control over the result is required. This can either be given as a
+   * lambda or a custom [[CrossFunction]]. For example:
    * {{{
    *   val left: DataSet[(String, Int, Int)] = ...
    *   val right: DataSet[(Int, String, Int)] = ...
@@ -1349,15 +1345,15 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
     CrossDataSet.createCrossOperator(this, other, CrossHint.OPTIMIZER_CHOOSES)
 
   /**
-   * Special [[cross]] operation for explicitly telling the system that the right side is assumed
-   * to be a lot smaller than the left side of the cartesian product.
+   * Special [[cross]] operation for explicitly telling the system that the right side is assumed to
+   * be a lot smaller than the left side of the cartesian product.
    */
   def crossWithTiny[O](other: DataSet[O]): CrossDataSet[T, O] =
     CrossDataSet.createCrossOperator(this, other, CrossHint.SECOND_IS_SMALL)
 
   /**
-   * Special [[cross]] operation for explicitly telling the system that the left side is assumed
-   * to be a lot smaller than the right side of the cartesian product.
+   * Special [[cross]] operation for explicitly telling the system that the left side is assumed to
+   * be a lot smaller than the right side of the cartesian product.
    */
   def crossWithHuge[O](other: DataSet[O]): CrossDataSet[T, O] =
     CrossDataSet.createCrossOperator(this, other, CrossHint.FIRST_IS_SMALL)
@@ -1400,7 +1396,7 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
    * the termination criterion. The iterations terminate when either the termination criterion
    * DataSet contains no elements or when `maxIterations` iterations have been performed.
    *
-   *  For example:
+   * For example:
    * {{{
    *   val input: DataSet[(String, Int)] = ...
    *   val iterated = input.iterateWithTermination(5) { previous =>
@@ -1429,9 +1425,9 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
 
   /**
    * Creates a new DataSet by performing delta (or workset) iterations using the given step
-   * function. At the beginning `this` DataSet is the solution set and `workset` is the Workset.
-   * The iteration step function gets the current solution set and workset and must output the
-   * delta for the solution set and the workset for the next iteration.
+   * function. At the beginning `this` DataSet is the solution set and `workset` is the Workset. The
+   * iteration step function gets the current solution set and workset and must output the delta for
+   * the solution set and the workset for the next iteration.
    *
    * Note: The syntax of delta iterations are very likely going to change soon.
    */
@@ -1455,9 +1451,9 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
 
   /**
    * Creates a new DataSet by performing delta (or workset) iterations using the given step
-   * function. At the beginning `this` DataSet is the solution set and `workset` is the Workset.
-   * The iteration step function gets the current solution set and workset and must output the
-   * delta for the solution set and the workset for the next iteration.
+   * function. At the beginning `this` DataSet is the solution set and `workset` is the Workset. The
+   * iteration step function gets the current solution set and workset and must output the delta for
+   * the solution set and the workset for the next iteration.
    *
    * Note: The syntax of delta iterations are very likely going to change soon.
    */
@@ -1487,9 +1483,9 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
 
   /**
    * Creates a new DataSet by performing delta (or workset) iterations using the given step
-   * function. At the beginning `this` DataSet is the solution set and `workset` is the Workset.
-   * The iteration step function gets the current solution set and workset and must output the
-   * delta for the solution set and the workset for the next iteration.
+   * function. At the beginning `this` DataSet is the solution set and `workset` is the Workset. The
+   * iteration step function gets the current solution set and workset and must output the delta for
+   * the solution set and the workset for the next iteration.
    *
    * Note: The syntax of delta iterations are very likely going to change soon.
    */
@@ -1513,9 +1509,9 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
 
   /**
    * Creates a new DataSet by performing delta (or workset) iterations using the given step
-   * function. At the beginning `this` DataSet is the solution set and `workset` is the Workset.
-   * The iteration step function gets the current solution set and workset and must output the
-   * delta for the solution set and the workset for the next iteration.
+   * function. At the beginning `this` DataSet is the solution set and `workset` is the Workset. The
+   * iteration step function gets the current solution set and workset and must output the delta for
+   * the solution set and the workset for the next iteration.
    *
    * Note: The syntax of delta iterations are very likely going to change soon.
    */
@@ -1563,8 +1559,7 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
   // --------------------------------------------------------------------------------------------
 
   /**
-   * Creates a new DataSet containing the elements from both `this` DataSet and the `other`
-   * DataSet.
+   * Creates a new DataSet containing the elements from both `this` DataSet and the `other` DataSet.
    */
   def union(other: DataSet[T]): DataSet[T] = wrap(
     new UnionOperator[T](javaSet, other.javaSet, getCallLocationName()))
@@ -1629,8 +1624,8 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
    * Range-partitions a DataSet on the specified tuple field positions.
    *
    * '''important:''' This operation requires an extra pass over the DataSet to compute the range
-   * boundaries and shuffles the whole DataSet over the network.
-   * This can take significant amount of time.
+   * boundaries and shuffles the whole DataSet over the network. This can take significant amount of
+   * time.
    */
   def partitionByRange(fields: Int*): DataSet[T] = {
     val op = new PartitionOperator[T](
@@ -1645,8 +1640,8 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
    * Range-partitions a DataSet on the specified fields.
    *
    * '''important:''' This operation requires an extra pass over the DataSet to compute the range
-   * boundaries and shuffles the whole DataSet over the network.
-   * This can take significant amount of time.
+   * boundaries and shuffles the whole DataSet over the network. This can take significant amount of
+   * time.
    */
   def partitionByRange(firstField: String, otherFields: String*): DataSet[T] = {
     val op = new PartitionOperator[T](
@@ -1661,8 +1656,8 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
    * Range-partitions a DataSet using the specified key selector function.
    *
    * '''important:''' This operation requires an extra pass over the DataSet to compute the range
-   * boundaries and shuffles the whole DataSet over the network.
-   * This can take significant amount of time.
+   * boundaries and shuffles the whole DataSet over the network. This can take significant amount of
+   * time.
    */
   def partitionByRange[K: TypeInformation](fun: T => K): DataSet[T] = {
     val keyExtractor = new KeySelector[T, K] {
@@ -1681,11 +1676,9 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
   }
 
   /**
-   * Partitions a tuple DataSet on the specified key fields using a custom partitioner.
-   * This method takes the key position to partition on, and a partitioner that accepts the key
-   * type.
-   * <p>
-   * Note: This method works only on single field keys.
+   * Partitions a tuple DataSet on the specified key fields using a custom partitioner. This method
+   * takes the key position to partition on, and a partitioner that accepts the key type. <p> Note:
+   * This method works only on single field keys.
    */
   def partitionCustom[K: TypeInformation](partitioner: Partitioner[K], field: Int): DataSet[T] = {
     val op = new PartitionOperator[T](
@@ -1699,10 +1692,8 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
   }
 
   /**
-   * Partitions a POJO DataSet on the specified key fields using a custom partitioner.
-   * This method takes the key expression to partition on, and a partitioner that accepts the key
-   * type.
-   * <p>
+   * Partitions a POJO DataSet on the specified key fields using a custom partitioner. This method
+   * takes the key expression to partition on, and a partitioner that accepts the key type. <p>
    * Note: This method works only on single field keys.
    */
   def partitionCustom[K: TypeInformation](
@@ -1719,12 +1710,10 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
   }
 
   /**
-   * Partitions a DataSet on the key returned by the selector, using a custom partitioner.
-   * This method takes the key selector to get the key to partition on, and a partitioner that
-   * accepts the key type.
-   * <p>
-   * Note: This method works only on single field keys, i.e. the selector cannot return tuples
-   * of fields.
+   * Partitions a DataSet on the key returned by the selector, using a custom partitioner. This
+   * method takes the key selector to get the key to partition on, and a partitioner that accepts
+   * the key type. <p> Note: This method works only on single field keys, i.e. the selector cannot
+   * return tuples of fields.
    */
   def partitionCustom[K: TypeInformation](partitioner: Partitioner[K], fun: T => K): DataSet[T] = {
     val keyExtractor = new KeySelector[T, K] {
@@ -1746,14 +1735,14 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
 
   /**
    * Enforces a re-balancing of the DataSet, i.e., the DataSet is evenly distributed over all
-   * parallel instances of the
-   * following task. This can help to improve performance in case of heavy data skew and compute
-   * intensive operations.
+   * parallel instances of the following task. This can help to improve performance in case of heavy
+   * data skew and compute intensive operations.
    *
    * '''Important:''' This operation shuffles the whole DataSet over the network and can take
    * significant amount of time.
    *
-   * @return The rebalanced DataSet.
+   * @return
+   *   The rebalanced DataSet.
    */
   def rebalance(): DataSet[T] = {
     wrap(new PartitionOperator[T](javaSet, PartitionMethod.REBALANCE, getCallLocationName()))
@@ -1764,8 +1753,8 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
   // --------------------------------------------------------------------------------------------
 
   /**
-   * Locally sorts the partitions of the DataSet on the specified field in the specified order.
-   * The DataSet can be sorted on multiple fields by chaining sortPartition() calls.
+   * Locally sorts the partitions of the DataSet on the specified field in the specified order. The
+   * DataSet can be sorted on multiple fields by chaining sortPartition() calls.
    */
   def sortPartition(field: Int, order: Order): DataSet[T] = {
     new PartitionSortedDataSet[T](
@@ -1773,8 +1762,8 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
   }
 
   /**
-   * Locally sorts the partitions of the DataSet on the specified field in the specified order.
-   * The DataSet can be sorted on multiple fields by chaining sortPartition() calls.
+   * Locally sorts the partitions of the DataSet on the specified field in the specified order. The
+   * DataSet can be sorted on multiple fields by chaining sortPartition() calls.
    */
   def sortPartition(field: String, order: Order): DataSet[T] = {
     new PartitionSortedDataSet[T](
@@ -1782,12 +1771,12 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
   }
 
   /**
-   * Locally sorts the partitions of the DataSet on the extracted key in the specified order.
-   * The DataSet can be sorted on multiple values by returning a tuple from the KeySelector.
+   * Locally sorts the partitions of the DataSet on the extracted key in the specified order. The
+   * DataSet can be sorted on multiple values by returning a tuple from the KeySelector.
    *
-   * Note that no additional sort keys can be appended to a KeySelector sort keys. To sort
-   * the partitions by multiple values using KeySelector, the KeySelector must return a tuple
-   * consisting of the values.
+   * Note that no additional sort keys can be appended to a KeySelector sort keys. To sort the
+   * partitions by multiple values using KeySelector, the KeySelector must return a tuple consisting
+   * of the values.
    */
   def sortPartition[K: TypeInformation](fun: T => K, order: Order): DataSet[T] = {
     val keyExtractor = new KeySelector[T, K] {
@@ -1809,10 +1798,10 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
   // --------------------------------------------------------------------------------------------
 
   /**
-   * Writes `this` DataSet to the specified location. This uses [[AnyRef.toString]] on
-   * each element.
+   * Writes `this` DataSet to the specified location. This uses [[AnyRef.toString]] on each element.
    *
-   * @see org.apache.flink.api.java.DataSet#writeAsText(String)
+   * @see
+   *   org.apache.flink.api.java.DataSet#writeAsText(String)
    */
   def writeAsText(filePath: String, writeMode: FileSystem.WriteMode = null): DataSink[T] = {
     val tof: TextOutputFormat[T] = new TextOutputFormat[T](new Path(filePath))
@@ -1827,7 +1816,8 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
    *
    * This only works on Tuple DataSets. For individual tuple fields [[AnyRef.toString]] is used.
    *
-   * @see org.apache.flink.api.java.DataSet#writeAsText(String)
+   * @see
+   *   org.apache.flink.api.java.DataSet#writeAsText(String)
    */
   def writeAsCsv(
       filePath: String,
@@ -1867,60 +1857,61 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
   }
 
   /**
-   * Prints the elements in a DataSet to the standard output stream [[System.out]] of the
-   * JVM that calls the print() method. For programs that are executed in a cluster, this
-   * method needs to gather the contents of the DataSet back to the client, to print it
-   * there.
+   * Prints the elements in a DataSet to the standard output stream [[System.out]] of the JVM that
+   * calls the print() method. For programs that are executed in a cluster, this method needs to
+   * gather the contents of the DataSet back to the client, to print it there.
    *
    * The string written for each element is defined by the [[AnyRef.toString]] method.
    *
-   * This method immediately triggers the program execution, similar to the
-   * [[collect()]] and [[count()]] methods.
+   * This method immediately triggers the program execution, similar to the [[collect()]] and
+   * [[count()]] methods.
    */
   def print(): Unit = {
     javaSet.print()
   }
 
   /**
-   * Prints the elements in a DataSet to the standard error stream [[System.err]] of the
-   * JVM that calls the print() method. For programs that are executed in a cluster, this
-   * method needs to gather the contents of the DataSet back to the client, to print it
-   * there.
+   * Prints the elements in a DataSet to the standard error stream [[System.err]] of the JVM that
+   * calls the print() method. For programs that are executed in a cluster, this method needs to
+   * gather the contents of the DataSet back to the client, to print it there.
    *
    * The string written for each element is defined by the [[AnyRef.toString]] method.
    *
-   * This method immediately triggers the program execution, similar to the
-   * [[collect()]] and [[count()]] methods.
+   * This method immediately triggers the program execution, similar to the [[collect()]] and
+   * [[count()]] methods.
    */
   def printToErr(): Unit = {
     javaSet.printToErr()
   }
 
   /**
-   * Writes a DataSet to the standard output streams (stdout) of the TaskManagers that execute
-   * the program (or more specifically, the data sink operators). On a typical cluster setup, the
-   * data will appear in the TaskManagers' <i>.out</i> files.
+   * Writes a DataSet to the standard output streams (stdout) of the TaskManagers that execute the
+   * program (or more specifically, the data sink operators). On a typical cluster setup, the data
+   * will appear in the TaskManagers' <i>.out</i> files.
    *
    * To print the data to the console or stdout stream of the client process instead, use the
    * [[print()]] method.
    *
    * For each element of the DataSet the result of [[AnyRef.toString()]] is written.
    *
-   * @param prefix The string to prefix each line of the output with. This helps identifying outputs
-   *               from different printing sinks.
-   * @return The DataSink operator that writes the DataSet.
+   * @param prefix
+   *   The string to prefix each line of the output with. This helps identifying outputs from
+   *   different printing sinks.
+   * @return
+   *   The DataSink operator that writes the DataSet.
    */
   def printOnTaskManager(prefix: String): DataSink[T] = {
     javaSet.printOnTaskManager(prefix)
   }
 
   /**
-   * *
-   * Writes a DataSet to the standard output stream (stdout) with a sink identifier prefixed.
-   * This uses [[AnyRef.toString]] on each element.
+   * * Writes a DataSet to the standard output stream (stdout) with a sink identifier prefixed. This
+   * uses [[AnyRef.toString]] on each element.
    *
-   * @param sinkIdentifier The string to prefix the output with.
-   * @deprecated Use [[printOnTaskManager(String)]] instead.
+   * @param sinkIdentifier
+   *   The string to prefix the output with.
+   * @deprecated
+   *   Use [[printOnTaskManager(String)]] instead.
    */
   @deprecated
   @PublicEvolving
@@ -1929,11 +1920,13 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
   }
 
   /**
-   * Writes a DataSet to the standard error stream (stderr) with a sink identifier prefixed.
-   * This uses [[AnyRef.toString]] on each element.
+   * Writes a DataSet to the standard error stream (stderr) with a sink identifier prefixed. This
+   * uses [[AnyRef.toString]] on each element.
    *
-   * @param sinkIdentifier The string to prefix the output with.
-   * @deprecated Use [[printOnTaskManager(String)]] instead.
+   * @param sinkIdentifier
+   *   The string to prefix the output with.
+   * @deprecated
+   *   Use [[printOnTaskManager(String)]] instead.
    */
   @deprecated
   @PublicEvolving

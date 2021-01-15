@@ -31,8 +31,8 @@ import org.apache.calcite.rel.metadata.RelMetadataQuery
 import java.util
 
 /**
- * Batch physical RelNode to read data from an external source defined by a
- * bounded [[org.apache.flink.table.connector.source.ScanTableSource]].
+ * Batch physical RelNode to read data from an external source defined by a bounded
+ * [[org.apache.flink.table.connector.source.ScanTableSource]].
  */
 class BatchPhysicalTableSourceScan(
     cluster: RelOptCluster,

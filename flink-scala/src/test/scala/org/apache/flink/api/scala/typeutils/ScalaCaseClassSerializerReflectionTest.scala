@@ -24,8 +24,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 /**
- * Test obtaining the primary constructor of a case class
- * via reflection.
+ * Test obtaining the primary constructor of a case class via reflection.
  */
 class ScalaCaseClassSerializerReflectionTest extends TestLogger {
 

@@ -41,9 +41,8 @@ import java.util.Collections
 /**
  * Stream [[ExecNode]] for unbounded python group table aggregate.
  *
- * <p>Note: This class can't be ported to Java,
- * because java class can't extend scala interface with default implementation.
- * FLINK-20750 will port this class to Java.
+ * <p>Note: This class can't be ported to Java, because java class can't extend scala interface with
+ * default implementation. FLINK-20750 will port this class to Java.
  */
 class StreamExecPythonGroupTableAggregate(
     grouping: Array[Int],

@@ -27,9 +27,12 @@ import org.apache.flink.table.types.logical.TypeInformationRawType
 /**
  * Generic type for encapsulating Flink's [[TypeInformationRawType]].
  *
- * @param genericType LogicalType to encapsulate
- * @param nullable flag if type can be nullable
- * @param typeSystem Flink's type system
+ * @param genericType
+ *   LogicalType to encapsulate
+ * @param nullable
+ *   flag if type can be nullable
+ * @param typeSystem
+ *   Flink's type system
  */
 class GenericRelDataType(
     val genericType: TypeInformationRawType[_],

@@ -26,12 +26,15 @@ import org.apache.flink.streaming.api.windowing.windows.Window
 import org.apache.flink.util.Collector
 
 /**
- * Base abstract class for functions that are evaluated over keyed (grouped)
- * windows using a context for retrieving extra information.
+ * Base abstract class for functions that are evaluated over keyed (grouped) windows using a context
+ * for retrieving extra information.
  *
- * @tparam IN The type of the input value.
- * @tparam OUT The type of the output value.
- * @tparam W The type of the window.
+ * @tparam IN
+ *   The type of the input value.
+ * @tparam OUT
+ *   The type of the output value.
+ * @tparam W
+ *   The type of the window.
  */
 @PublicEvolving
 abstract class ProcessAllWindowFunction[IN, OUT, W <: Window] extends AbstractRichFunction {
@@ -39,20 +42,26 @@ abstract class ProcessAllWindowFunction[IN, OUT, W <: Window] extends AbstractRi
   /**
    * Evaluates the window and outputs none or several elements.
    *
-   * @param context  The context in which the window is being evaluated.
-   * @param elements The elements in the window being evaluated.
-   * @param out      A collector for emitting elements.
-   * @throws Exception The function may throw exceptions to fail the program and trigger recovery.
+   * @param context
+   *   The context in which the window is being evaluated.
+   * @param elements
+   *   The elements in the window being evaluated.
+   * @param out
+   *   A collector for emitting elements.
+   * @throws
+   *   Exception The function may throw exceptions to fail the program and trigger recovery.
    */
   @throws[Exception]
   def process(context: Context, elements: Iterable[IN], out: Collector[OUT])
 
   /**
-   * Deletes any state in the [[Context]] when the Window expires
-   * (the watermark passes its `maxTimestamp` + `allowedLateness`).
+   * Deletes any state in the [[Context]] when the Window expires (the watermark passes its
+   * `maxTimestamp` + `allowedLateness`).
    *
-   * @param context The context to which the window is being evaluated
-   * @throws Exception The function may throw exceptions to fail the program and trigger recovery.
+   * @param context
+   *   The context to which the window is being evaluated
+   * @throws
+   *   Exception The function may throw exceptions to fail the program and trigger recovery.
    */
   @throws[Exception]
   def clear(context: Context) {}
@@ -63,7 +72,8 @@ abstract class ProcessAllWindowFunction[IN, OUT, W <: Window] extends AbstractRi
   abstract class Context {
 
     /**
-     * @return The window that is being evaluated.
+     * @return
+     *   The window that is being evaluated.
      */
     def window: W
 

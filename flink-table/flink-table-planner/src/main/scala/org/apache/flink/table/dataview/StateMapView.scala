@@ -26,9 +26,12 @@ import org.apache.flink.table.api.dataview.MapView
 /**
  * [[MapView]] use state backend.
  *
- * @param state map state
- * @tparam K key type
- * @tparam V value type
+ * @param state
+ *   map state
+ * @tparam K
+ *   key type
+ * @tparam V
+ *   value type
  */
 class StateMapView[K, V](state: MapState[K, V]) extends MapView[K, V] {
 

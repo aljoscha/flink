@@ -30,9 +30,9 @@ import org.apache.calcite.rel.{RelNode, SingleRel}
 import java.util
 
 /**
- * Stream physical RelNode which will drop the UPDATE_BEFORE messages.
- * This is usually used as an optimization for the downstream operators that doesn't need
- * the UPDATE_BEFORE messages, but the upstream operator can't drop it by itself (e.g. the source).
+ * Stream physical RelNode which will drop the UPDATE_BEFORE messages. This is usually used as an
+ * optimization for the downstream operators that doesn't need the UPDATE_BEFORE messages, but the
+ * upstream operator can't drop it by itself (e.g. the source).
  */
 class StreamPhysicalDropUpdateBefore(cluster: RelOptCluster, traitSet: RelTraitSet, input: RelNode)
     extends SingleRel(cluster, traitSet, input)

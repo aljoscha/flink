@@ -24,8 +24,8 @@ import org.apache.calcite.tools.{RelBuilder, RelBuilderFactory}
 import org.apache.flink.table.expressions.{ExpressionBridge, PlannerExpression}
 
 /**
- * The utility class is to create special [[RelBuilder]] instance
- * this factory ignores merge projection operations.
+ * The utility class is to create special [[RelBuilder]] instance this factory ignores merge
+ * projection operations.
  */
 class FlinkRelBuilderFactory(expressionBridge: ExpressionBridge[PlannerExpression])
     extends RelBuilderFactory {

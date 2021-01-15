@@ -1847,6 +1847,12 @@ under the License.
 
 							<removeUnusedImports />
 						</java>
+						<scala>
+							<scalafmt>
+								<version>2.7.5</version>
+								<file>scalafmt.conf</file> <!-- optional -->
+							</scalafmt>
+						</scala>
 					</configuration>
 					<executions>
 						<execution>

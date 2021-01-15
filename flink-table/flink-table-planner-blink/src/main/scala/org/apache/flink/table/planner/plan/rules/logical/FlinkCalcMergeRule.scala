@@ -18,7 +18,6 @@
 
 package org.apache.flink.table.planner.plan.rules.logical
 
-
 import org.apache.calcite.plan.RelOptRule.{any, operand}
 import org.apache.calcite.plan.RelOptUtil.InputFinder
 import org.apache.calcite.plan.{RelOptRule, RelOptRuleCall}
@@ -30,25 +29,25 @@ import org.apache.flink.table.planner.plan.utils.FlinkRexUtil
 import scala.collection.JavaConversions._
 
 /**
-  * This rule is copied from Calcite's [[org.apache.calcite.rel.rules.CalcMergeRule]].
-  *
-  * Modification:
-  * - Condition in the merged program will be simplified if it exists.
-  * - If the two [[Calc]] can merge into one, each non-deterministic [[RexNode]] of bottom [[Calc]]
-  *   should appear at most once in the project list and filter list of top [[Calc]].
-  */
+ * This rule is copied from Calcite's [[org.apache.calcite.rel.rules.CalcMergeRule]].
+ *
+ * Modification:
+ * - Condition in the merged program will be simplified if it exists.
+ * - If the two [[Calc]] can merge into one, each non-deterministic [[RexNode]] of bottom [[Calc]]
+ *   should appear at most once in the project list and filter list of top [[Calc]].
+ */
 
 /**
-  * Planner rule that merges a [[Calc]] onto a [[Calc]].
-  *
-  * <p>The resulting [[Calc]] has the same project list as the upper [[Calc]],
-  * but expressed in terms of the lower [[Calc]]'s inputs.
-  */
-class FlinkCalcMergeRule(relBuilderFactory: RelBuilderFactory) extends RelOptRule(
-  operand(classOf[Calc],
-    operand(classOf[Calc], any)),
-  relBuilderFactory,
-  "FlinkCalcMergeRule") {
+ * Planner rule that merges a [[Calc]] onto a [[Calc]].
+ *
+ * <p>The resulting [[Calc]] has the same project list as the upper [[Calc]],
+ * but expressed in terms of the lower [[Calc]]'s inputs.
+ */
+class FlinkCalcMergeRule(relBuilderFactory: RelBuilderFactory)
+    extends RelOptRule(
+      operand(classOf[Calc], operand(classOf[Calc], any)),
+      relBuilderFactory,
+      "FlinkCalcMergeRule") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val topCalc: Calc = call.rel(0)
@@ -94,13 +93,11 @@ class FlinkCalcMergeRule(relBuilderFactory: RelBuilderFactory) extends RelOptRul
       case (project: RexNode, index: Int) => {
         var nonDeterministicRexRefCnt = 0
         if (!RexUtil.isDeterministic(project)) {
-          topInputIndices.foreach(
-            indices => indices.foreach(
-              ref => if (ref == index) {
+          topInputIndices.foreach(indices =>
+            indices.foreach(ref =>
+              if (ref == index) {
                 nonDeterministicRexRefCnt += 1
-              }
-            )
-          )
+              }))
         }
         nonDeterministicRexRefCnt <= 1
       }
@@ -114,8 +111,8 @@ class FlinkCalcMergeRule(relBuilderFactory: RelBuilderFactory) extends RelOptRul
     val topProgram = topCalc.getProgram
     val rexBuilder = topCalc.getCluster.getRexBuilder
     // Merge the programs together.
-    val mergedProgram = RexProgramBuilder.mergePrograms(
-      topCalc.getProgram, bottomCalc.getProgram, rexBuilder)
+    val mergedProgram =
+      RexProgramBuilder.mergePrograms(topCalc.getProgram, bottomCalc.getProgram, rexBuilder)
     require(mergedProgram.getOutputRowType eq topProgram.getOutputRowType)
 
     val newMergedProgram = if (mergedProgram.getCondition != null) {

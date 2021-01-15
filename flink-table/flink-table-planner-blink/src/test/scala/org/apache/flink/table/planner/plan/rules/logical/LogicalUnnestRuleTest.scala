@@ -19,7 +19,12 @@
 package org.apache.flink.table.planner.plan.rules.logical
 
 import org.apache.flink.table.planner.plan.common.UnnestTestBase
-import org.apache.flink.table.planner.plan.optimize.program.{BatchOptimizeContext, FlinkChainedProgram, FlinkHepRuleSetProgramBuilder, HEP_RULES_EXECUTION_TYPE}
+import org.apache.flink.table.planner.plan.optimize.program.{
+  BatchOptimizeContext,
+  FlinkChainedProgram,
+  FlinkHepRuleSetProgramBuilder,
+  HEP_RULES_EXECUTION_TYPE
+}
 import org.apache.flink.table.planner.utils.{BatchTableTestUtil, TableTestUtil}
 
 import org.apache.calcite.plan.hep.HepMatchOrder
@@ -27,8 +32,8 @@ import org.apache.calcite.tools.RuleSets
 import org.junit.Before
 
 /**
-  * Test for [[LogicalUnnestRule]].
-  */
+ * Test for [[LogicalUnnestRule]].
+ */
 class LogicalUnnestRuleTest extends UnnestTestBase(false) {
 
   override protected def getTableTestUtil: TableTestUtil = batchTestUtil()
@@ -42,8 +47,7 @@ class LogicalUnnestRuleTest extends UnnestTestBase(false) {
         .setHepRulesExecutionType(HEP_RULES_EXECUTION_TYPE.RULE_SEQUENCE)
         .setHepMatchOrder(HepMatchOrder.BOTTOM_UP)
         .add(RuleSets.ofList(LogicalUnnestRule.INSTANCE))
-        .build()
-    )
+        .build())
     util.asInstanceOf[BatchTableTestUtil].replaceBatchProgram(programs)
   }
 

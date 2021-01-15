@@ -20,12 +20,19 @@ package org.apache.flink.table.utils
 
 import org.apache.flink.api.java.typeutils.RowTypeInfo
 import org.apache.flink.table.api.TableSchema
-import org.apache.flink.table.descriptors.ConnectorDescriptorValidator.{CONNECTOR_PROPERTY_VERSION, CONNECTOR_TYPE}
+import org.apache.flink.table.descriptors.ConnectorDescriptorValidator.{
+  CONNECTOR_PROPERTY_VERSION,
+  CONNECTOR_TYPE
+}
 import org.apache.flink.table.descriptors.DescriptorProperties._
 import org.apache.flink.table.descriptors.Rowtime._
 import org.apache.flink.table.descriptors.Schema._
 import org.apache.flink.table.descriptors.{DescriptorProperties, SchemaValidator}
-import org.apache.flink.table.factories.{StreamTableSinkFactory, StreamTableSourceFactory, TableFactory}
+import org.apache.flink.table.factories.{
+  StreamTableSinkFactory,
+  StreamTableSourceFactory,
+  TableFactory
+}
 import org.apache.flink.table.sinks.StreamTableSink
 import org.apache.flink.table.sources.StreamTableSource
 import org.apache.flink.table.types.logical.LogicalTypeRoot
@@ -36,21 +43,19 @@ import java.sql.Timestamp
 import java.util
 
 /**
-  * Factory for creating stream table sources and sinks.
-  *
-  * See [[MemoryTableSourceSinkUtil.UnsafeMemoryTableSource]] and
-  * [[MemoryTableSourceSinkUtil.UnsafeMemoryAppendTableSink]].
-  *
-  * @param terminationCount determines when to shutdown the streaming source function
-  */
+ * Factory for creating stream table sources and sinks.
+ *
+ * See [[MemoryTableSourceSinkUtil.UnsafeMemoryTableSource]] and
+ * [[MemoryTableSourceSinkUtil.UnsafeMemoryAppendTableSink]].
+ *
+ * @param terminationCount determines when to shutdown the streaming source function
+ */
 class InMemoryTableFactory(terminationCount: Int)
-  extends TableFactory
-  with StreamTableSourceFactory[Row]
-  with StreamTableSinkFactory[Row] {
+    extends TableFactory
+    with StreamTableSourceFactory[Row]
+    with StreamTableSinkFactory[Row] {
 
-  override def createStreamTableSink(
-      properties: util.Map[String, String])
-    : StreamTableSink[Row] = {
+  override def createStreamTableSink(properties: util.Map[String, String]): StreamTableSink[Row] = {
 
     val params: DescriptorProperties = new DescriptorProperties(true)
     params.putProperties(properties)
@@ -74,8 +79,7 @@ class InMemoryTableFactory(terminationCount: Int)
   }
 
   override def createStreamTableSource(
-      properties: util.Map[String, String])
-    : StreamTableSource[Row] = {
+      properties: util.Map[String, String]): StreamTableSource[Row] = {
 
     val params: DescriptorProperties = new DescriptorProperties(true)
     params.putProperties(properties)
@@ -96,8 +100,10 @@ class InMemoryTableFactory(terminationCount: Int)
         t
       }
     })
-    val (names, types) = tableSchema.getFieldNames.zip(fromDataTypeToLegacyInfo(fieldTypes))
-      .filter(_._1 != proctimeAttributeOpt.get()).unzip
+    val (names, types) = tableSchema.getFieldNames
+      .zip(fromDataTypeToLegacyInfo(fieldTypes))
+      .filter(_._1 != proctimeAttributeOpt.get())
+      .unzip
     // rowtime
     val rowtimeDescriptors = SchemaValidator.deriveRowtimeAttributes(params)
     new MemoryTableSourceSinkUtil.UnsafeMemoryTableSource(
@@ -137,9 +143,9 @@ class InMemoryTableFactory(terminationCount: Int)
     properties.add(SCHEMA + ".#." + ROWTIME_WATERMARKS_DELAY)
 
     // watermark
-    properties.add(SCHEMA + "." + WATERMARK + ".#."  + WATERMARK_ROWTIME);
-    properties.add(SCHEMA + "." + WATERMARK + ".#."  + WATERMARK_STRATEGY_EXPR);
-    properties.add(SCHEMA + "." + WATERMARK + ".#."  + WATERMARK_STRATEGY_DATA_TYPE);
+    properties.add(SCHEMA + "." + WATERMARK + ".#." + WATERMARK_ROWTIME);
+    properties.add(SCHEMA + "." + WATERMARK + ".#." + WATERMARK_STRATEGY_EXPR);
+    properties.add(SCHEMA + "." + WATERMARK + ".#." + WATERMARK_STRATEGY_DATA_TYPE);
 
     // computed column
     properties.add(SCHEMA + ".#." + EXPR)

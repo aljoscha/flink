@@ -30,8 +30,7 @@ import scala.reflect.ClassTag
  * @tparam T The type of the DataSet, i.e., the type of the elements of the DataSet.
  */
 @Public
-class AggregateDataSet[T: ClassTag](set: ScalaAggregateOperator[T])
-  extends DataSet[T](set) {
+class AggregateDataSet[T: ClassTag](set: ScalaAggregateOperator[T]) extends DataSet[T](set) {
 
   /**
    * Adds the given aggregation on the given field to the previous aggregation operation.

@@ -67,8 +67,7 @@ class CalciteConfigBuilderTest {
 
     assertEquals(true, cc.replacesSqlOperatorTable)
     assertTrue(cc.getSqlOperatorTable.isDefined)
-    val ops = cc.getSqlOperatorTable.get.getOperatorList
-      .asScala.toSet
+    val ops = cc.getSqlOperatorTable.get.getOperatorList.asScala.toSet
     assertEquals(oracleOps.size, ops.size)
     for (o <- oracleOps) {
       assertTrue(ops.contains(o))
@@ -90,8 +89,7 @@ class CalciteConfigBuilderTest {
 
     assertEquals(true, cc.replacesSqlOperatorTable)
     assertTrue(cc.getSqlOperatorTable.isDefined)
-    val ops = cc.getSqlOperatorTable.get.getOperatorList
-      .asScala.toSet
+    val ops = cc.getSqlOperatorTable.get.getOperatorList.asScala.toSet
     assertEquals(oracleOps.size + stdOps.size, ops.size)
     for (o <- oracleOps) {
       assertTrue(ops.contains(o))
@@ -114,8 +112,7 @@ class CalciteConfigBuilderTest {
 
     assertEquals(false, cc.replacesSqlOperatorTable)
     assertTrue(cc.getSqlOperatorTable.isDefined)
-    val ops = cc.getSqlOperatorTable.get.getOperatorList
-      .asScala.toSet
+    val ops = cc.getSqlOperatorTable.get.getOperatorList.asScala.toSet
     assertEquals(oracleOps.size, ops.size)
     for (o <- oracleOps) {
       assertTrue(ops.contains(o))
@@ -137,8 +134,7 @@ class CalciteConfigBuilderTest {
 
     assertEquals(false, cc.replacesSqlOperatorTable)
     assertTrue(cc.getSqlOperatorTable.isDefined)
-    val ops = cc.getSqlOperatorTable.get.getOperatorList
-      .asScala.toSet
+    val ops = cc.getSqlOperatorTable.get.getOperatorList.asScala.toSet
     assertEquals(oracleOps.size + stdOps.size, ops.size)
     for (o <- oracleOps) {
       assertTrue(ops.contains(o))
@@ -151,7 +147,8 @@ class CalciteConfigBuilderTest {
 
   @Test
   def testReplaceSqlToRelConverterConfig(): Unit = {
-    val config = SqlToRelConverter.config()
+    val config = SqlToRelConverter
+      .config()
       .withTrimUnusedFields(false)
       .withExpand(false)
 
@@ -187,7 +184,8 @@ class CalciteConfigBuilderTest {
     assertTrue(config1.getSqlParserConfig.isEmpty)
     assertTrue(config1.getSqlToRelConverterConfig.isEmpty)
 
-    val sqlToRelConvertConfig = SqlToRelConverter.config()
+    val sqlToRelConvertConfig = SqlToRelConverter
+      .config()
       .withTrimUnusedFields(false)
       .withExpand(false)
     builder.replaceSqlToRelConverterConfig(sqlToRelConvertConfig)
@@ -201,7 +199,8 @@ class CalciteConfigBuilderTest {
     assertFalse(config2.replacesSqlOperatorTable)
     assertTrue(config2.getSqlParserConfig.isEmpty)
 
-    val sqlParserConfig = SqlParser.configBuilder()
+    val sqlParserConfig = SqlParser
+      .configBuilder()
       .setLex(Lex.ORACLE)
       .build()
     builder.replaceSqlParserConfig(sqlParserConfig)

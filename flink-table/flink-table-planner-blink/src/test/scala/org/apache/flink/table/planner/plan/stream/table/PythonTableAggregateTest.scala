@@ -32,7 +32,8 @@ class PythonTableAggregateTest extends TableTestBase {
     val sourceTable = util.addTableSource[(Int, Long, Int)]("MyTable", 'a, 'b, 'c)
     val func = new PythonEmptyTableAggFunc
 
-    val resultTable = sourceTable.groupBy('b)
+    val resultTable = sourceTable
+      .groupBy('b)
       .flatAggregate(func('a, 'c) as ('d, 'e))
       .select('d, 'e)
 
@@ -56,7 +57,8 @@ class PythonTableAggregateTest extends TableTestBase {
     val sourceTable = util.addTableSource[(Int, Long, Int)]("MyTable", 'a, 'b, 'c)
     val func = new PythonEmptyTableAggFunc
 
-    val resultTable = sourceTable.groupBy('b)
+    val resultTable = sourceTable
+      .groupBy('b)
       .flatAggregate(func('a, 'c + 1) as ('d, 'e))
       .select('d, 'e)
 

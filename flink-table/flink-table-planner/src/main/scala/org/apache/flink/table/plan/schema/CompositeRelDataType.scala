@@ -20,7 +20,12 @@ package org.apache.flink.table.plan.schema
 
 import java.util
 
-import org.apache.calcite.rel.`type`.{RelDataTypeField, RelDataTypeFieldImpl, RelRecordType, StructKind}
+import org.apache.calcite.rel.`type`.{
+  RelDataTypeField,
+  RelDataTypeFieldImpl,
+  RelRecordType,
+  StructKind
+}
 import org.apache.flink.api.common.typeutils.CompositeType
 import org.apache.flink.table.calcite.FlinkTypeFactory
 import org.apache.flink.table.plan.schema.CompositeRelDataType.createFieldList
@@ -28,19 +33,19 @@ import org.apache.flink.table.plan.schema.CompositeRelDataType.createFieldList
 import scala.collection.JavaConverters._
 
 /**
-  * Composite type for encapsulating Flink's [[CompositeType]].
-  *
-  * @param compositeType CompositeType to encapsulate
-  * @param nullable flag if type can be nullable
-  * @param typeFactory Flink's type factory
-  */
+ * Composite type for encapsulating Flink's [[CompositeType]].
+ *
+ * @param compositeType CompositeType to encapsulate
+ * @param nullable flag if type can be nullable
+ * @param typeFactory Flink's type factory
+ */
 class CompositeRelDataType(
     val compositeType: CompositeType[_],
     val nullable: Boolean,
     typeFactory: FlinkTypeFactory)
-  extends RelRecordType(
-    StructKind.PEEK_FIELDS_NO_EXPAND,
-    createFieldList(compositeType, typeFactory)) {
+    extends RelRecordType(
+      StructKind.PEEK_FIELDS_NO_EXPAND,
+      createFieldList(compositeType, typeFactory)) {
 
   override def toString = s"COMPOSITE($compositeType)"
 
@@ -66,23 +71,20 @@ class CompositeRelDataType(
 object CompositeRelDataType {
 
   /**
-    * Converts the fields of a composite type to list of [[RelDataTypeField]].
-    */
+   * Converts the fields of a composite type to list of [[RelDataTypeField]].
+   */
   private def createFieldList(
       compositeType: CompositeType[_],
-      typeFactory: FlinkTypeFactory)
-    : util.List[RelDataTypeField] = {
+      typeFactory: FlinkTypeFactory): util.List[RelDataTypeField] = {
 
-    compositeType
-      .getFieldNames
-      .zipWithIndex
+    compositeType.getFieldNames.zipWithIndex
       .map { case (name, index) =>
         new RelDataTypeFieldImpl(
           name,
           index,
           // TODO the composite type should provide the information if subtypes are nullable
-          typeFactory.createTypeFromTypeInfo(compositeType.getTypeAt(index), isNullable = true)
-        ).asInstanceOf[RelDataTypeField]
+          typeFactory.createTypeFromTypeInfo(compositeType.getTypeAt(index), isNullable = true))
+          .asInstanceOf[RelDataTypeField]
       }
       .toList
       .asJava

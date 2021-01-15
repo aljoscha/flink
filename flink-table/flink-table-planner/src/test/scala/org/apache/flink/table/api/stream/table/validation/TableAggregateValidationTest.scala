@@ -30,9 +30,10 @@ class TableAggregateValidationTest extends TableTestBase {
   @Test
   def testInvalidParameterNumber(): Unit = {
     expectedException.expect(classOf[ValidationException])
-    expectedException.expectMessage("Given parameters do not match any signature. \n" +
-      "Actual: (java.lang.Long, java.lang.Integer, java.lang.String) \n" +
-      "Expected: (int), (long, int), (long, java.sql.Timestamp)")
+    expectedException.expectMessage(
+      "Given parameters do not match any signature. \n" +
+        "Actual: (java.lang.Long, java.lang.Integer, java.lang.String) \n" +
+        "Expected: (int), (long, int), (long, java.sql.Timestamp)")
 
     val util = streamTestUtil()
     val table = util.addTable[(Long, Int, String)]('a, 'b, 'c)
@@ -48,9 +49,10 @@ class TableAggregateValidationTest extends TableTestBase {
   @Test
   def testInvalidParameterType(): Unit = {
     expectedException.expect(classOf[ValidationException])
-    expectedException.expectMessage("Given parameters do not match any signature. \n" +
-      "Actual: (java.lang.Long, java.lang.String) \n" +
-      "Expected: (int), (long, int), (long, java.sql.Timestamp)")
+    expectedException.expectMessage(
+      "Given parameters do not match any signature. \n" +
+        "Actual: (java.lang.Long, java.lang.String) \n" +
+        "Expected: (int), (long, int), (long, java.sql.Timestamp)")
 
     val util = streamTestUtil()
     val table = util.addTable[(Long, Int, String)]('a, 'b, 'c)
@@ -81,8 +83,9 @@ class TableAggregateValidationTest extends TableTestBase {
   @Test
   def testInvalidWithAggregation(): Unit = {
     expectedException.expect(classOf[ValidationException])
-    expectedException.expectMessage("Aggregate functions are not supported in the " +
-      "select right after the aggregate or flatAggregate operation.")
+    expectedException.expectMessage(
+      "Aggregate functions are not supported in the " +
+        "select right after the aggregate or flatAggregate operation.")
 
     val util = streamTestUtil()
     val table = util.addTable[(Long, Int, Timestamp)]('a, 'b, 'c)
@@ -114,9 +117,10 @@ class TableAggregateValidationTest extends TableTestBase {
   @Test
   def testInvalidAliasWithWrongNumber(): Unit = {
     expectedException.expect(classOf[ValidationException])
-    expectedException.expectMessage("List of column aliases must have same degree as " +
-      "table; the returned table of function 'org.apache.flink.table.utils.EmptyTableAggFunc' " +
-      "has 2 columns, whereas alias list has 3 columns")
+    expectedException.expectMessage(
+      "List of column aliases must have same degree as " +
+        "table; the returned table of function 'org.apache.flink.table.utils.EmptyTableAggFunc' " +
+        "has 2 columns, whereas alias list has 3 columns")
 
     val util = streamTestUtil()
     val table = util.addTable[(Long, Int, Timestamp)]('a, 'b, 'c)

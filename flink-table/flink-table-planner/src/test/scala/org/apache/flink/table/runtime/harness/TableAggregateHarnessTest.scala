@@ -60,8 +60,8 @@ class TableAggregateHarnessTest extends HarnessTestBase {
       .flatAggregate(top3('b) as ('b1, 'b2))
       .select('a, 'b1, 'b2)
 
-    val testHarness = createHarnessTester[Int, CRow, CRow](
-      resultTable.toRetractStream[Row], "groupBy: (a)")
+    val testHarness =
+      createHarnessTester[Int, CRow, CRow](resultTable.toRetractStream[Row], "groupBy: (a)")
 
     testHarness.open()
 
@@ -125,8 +125,8 @@ class TableAggregateHarnessTest extends HarnessTestBase {
       .flatAggregate(top3('b) as ('b1, 'b2))
       .select('a, 'b1, 'b2)
 
-    val testHarness = createHarnessTester[Int, CRow, CRow](
-      resultTable.toRetractStream[Row], "groupBy: (a)")
+    val testHarness =
+      createHarnessTester[Int, CRow, CRow](resultTable.toRetractStream[Row], "groupBy: (a)")
 
     testHarness.open()
 
@@ -183,7 +183,8 @@ class TableAggregateHarnessTest extends HarnessTestBase {
       .select('b1, 'b2)
 
     val testHarness = createHarnessTester[Int, CRow, CRow](
-      resultTable.toRetractStream[Row], "select: (Top3WithMapView")
+      resultTable.toRetractStream[Row],
+      "select: (Top3WithMapView")
 
     testHarness.open()
 

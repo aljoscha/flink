@@ -38,17 +38,17 @@ class DataStreamGroupWindowAggregate(
     schema: RowSchema,
     inputSchema: RowSchema,
     grouping: Array[Int])
-  extends DataStreamGroupWindowAggregateBase(
-    window,
-    namedProperties,
-    cluster,
-    traitSet,
-    inputNode,
-    namedAggregates,
-    schema,
-    inputSchema,
-    grouping,
-    "Aggregate")
+    extends DataStreamGroupWindowAggregateBase(
+      window,
+      namedProperties,
+      cluster,
+      traitSet,
+      inputNode,
+      namedAggregates,
+      schema,
+      inputSchema,
+      grouping,
+      "Aggregate")
     with CommonAggregate
     with DataStreamRel
     with Logging {
@@ -66,4 +66,3 @@ class DataStreamGroupWindowAggregate(
       grouping)
   }
 }
-

@@ -25,8 +25,8 @@ import org.apache.calcite.rel.core.AggregateCall
 import org.apache.calcite.rel.{RelNode, RelWriter, SingleRel}
 
 /**
-  * Base Stream physical RelNode for unbounded group table aggregate.
-  */
+ * Base Stream physical RelNode for unbounded group table aggregate.
+ */
 abstract class StreamPhysicalGroupTableAggregateBase(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -34,13 +34,11 @@ abstract class StreamPhysicalGroupTableAggregateBase(
     outputRowType: RelDataType,
     val grouping: Array[Int],
     val aggCalls: Seq[AggregateCall])
-  extends SingleRel(cluster, traitSet, inputRel)
-  with StreamPhysicalRel {
+    extends SingleRel(cluster, traitSet, inputRel)
+    with StreamPhysicalRel {
 
-  protected val aggInfoList: AggregateInfoList = AggregateUtil.deriveAggregateInfoList(
-    this,
-    grouping.length,
-    aggCalls)
+  protected val aggInfoList: AggregateInfoList =
+    AggregateUtil.deriveAggregateInfoList(this, grouping.length, aggCalls)
 
   override def requireWatermark: Boolean = false
 
@@ -48,13 +46,12 @@ abstract class StreamPhysicalGroupTableAggregateBase(
 
   override def explainTerms(pw: RelWriter): RelWriter = {
     val inputRowType = getInput.getRowType
-    super.explainTerms(pw)
-      .itemIf("groupBy",
-              RelExplainUtil.fieldToString(grouping, inputRowType), grouping.nonEmpty)
-      .item("select", RelExplainUtil.streamGroupAggregationToString(
-        inputRowType,
-        getRowType,
-        aggInfoList,
-        grouping))
+    super
+      .explainTerms(pw)
+      .itemIf("groupBy", RelExplainUtil.fieldToString(grouping, inputRowType), grouping.nonEmpty)
+      .item(
+        "select",
+        RelExplainUtil
+          .streamGroupAggregationToString(inputRowType, getRowType, aggInfoList, grouping))
   }
 }

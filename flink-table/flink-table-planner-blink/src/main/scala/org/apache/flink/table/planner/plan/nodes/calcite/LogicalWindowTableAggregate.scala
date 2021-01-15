@@ -28,10 +28,10 @@ import org.apache.flink.table.planner.calcite.FlinkRelBuilder.PlannerNamedWindow
 import org.apache.flink.table.planner.plan.logical.LogicalWindow
 
 /**
-  * Sub-class of [[WindowTableAggregate]] that is a relational expression which performs window
-  * aggregations but outputs 0 or more records for a group. This class corresponds to Calcite
-  * logical rel.
-  */
+ * Sub-class of [[WindowTableAggregate]] that is a relational expression which performs window
+ * aggregations but outputs 0 or more records for a group. This class corresponds to Calcite
+ * logical rel.
+ */
 class LogicalWindowTableAggregate(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -41,15 +41,15 @@ class LogicalWindowTableAggregate(
     aggCalls: util.List[AggregateCall],
     window: LogicalWindow,
     namedProperties: Seq[PlannerNamedWindowProperty])
-  extends WindowTableAggregate(
-    cluster,
-    traitSet,
-    input,
-    groupSet,
-    groupSets,
-    aggCalls,
-    window,
-    namedProperties) {
+    extends WindowTableAggregate(
+      cluster,
+      traitSet,
+      input,
+      groupSet,
+      groupSets,
+      aggCalls,
+      window,
+      namedProperties) {
 
   override def copy(traitSet: RelTraitSet, inputs: util.List[RelNode]): WindowTableAggregate = {
     new LogicalWindowTableAggregate(
@@ -67,10 +67,9 @@ class LogicalWindowTableAggregate(
 object LogicalWindowTableAggregate {
 
   def create(
-    window: LogicalWindow,
-    namedProperties: Seq[PlannerNamedWindowProperty],
-    aggregate: Aggregate)
-  : LogicalWindowTableAggregate = {
+      window: LogicalWindow,
+      namedProperties: Seq[PlannerNamedWindowProperty],
+      aggregate: Aggregate): LogicalWindowTableAggregate = {
 
     val cluster: RelOptCluster = aggregate.getCluster
     val traitSet: RelTraitSet = cluster.traitSetOf(Convention.NONE)
@@ -99,4 +98,3 @@ object LogicalWindowTableAggregate {
       logicalWindowAggregate.getNamedProperties)
   }
 }
-

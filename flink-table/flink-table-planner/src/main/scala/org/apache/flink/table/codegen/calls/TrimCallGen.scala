@@ -26,23 +26,21 @@ import org.apache.flink.table.codegen.calls.CallGenerator._
 import org.apache.flink.table.codegen.{CodeGenerator, GeneratedExpression}
 
 /**
-  * Generates a TRIM function call.
-  *
-  * First operand: trim mode (see [[org.apache.calcite.sql.fun.SqlTrimFunction.Flag]])
-  * Second operand: String to be removed
-  * Third operand: String to be trimmed
-  */
+ * Generates a TRIM function call.
+ *
+ * First operand: trim mode (see [[org.apache.calcite.sql.fun.SqlTrimFunction.Flag]])
+ * Second operand: String to be removed
+ * Third operand: String to be trimmed
+ */
 class TrimCallGen extends CallGenerator {
 
   override def generate(
       codeGenerator: CodeGenerator,
-      operands: Seq[GeneratedExpression])
-    : GeneratedExpression = {
-    generateCallIfArgsNotNull(codeGenerator.nullCheck, STRING_TYPE_INFO, operands) {
-      (terms) =>
-        val leading = compareEnum(terms.head, BOTH) || compareEnum(terms.head, LEADING)
-        val trailing = compareEnum(terms.head, BOTH) || compareEnum(terms.head, TRAILING)
-        s"""
+      operands: Seq[GeneratedExpression]): GeneratedExpression = {
+    generateCallIfArgsNotNull(codeGenerator.nullCheck, STRING_TYPE_INFO, operands) { (terms) =>
+      val leading = compareEnum(terms.head, BOTH) || compareEnum(terms.head, LEADING)
+      val trailing = compareEnum(terms.head, BOTH) || compareEnum(terms.head, TRAILING)
+      s"""
           |${qualifyMethod(BuiltInMethod.TRIM.method)}(
           |  $leading, $trailing, ${terms(1)}, ${terms(2)})
           |""".stripMargin

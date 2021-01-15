@@ -27,16 +27,16 @@ import org.apache.flink.types.Row
 import org.apache.flink.util.Collector
 
 /**
-  * [[RichGroupReduceFunction]] and [[MapPartitionFunction]] to compute aggregates that do
-  * not support pre-aggregation for batch(DataSet) queries.
-  *
-  * @param genAggregations Code-generated [[GeneratedAggregations]]
-  */
-class DataSetAggFunction(
-    private val genAggregations: GeneratedAggregationsFunction)
-  extends RichGroupReduceFunction[Row, Row]
+ * [[RichGroupReduceFunction]] and [[MapPartitionFunction]] to compute aggregates that do
+ * not support pre-aggregation for batch(DataSet) queries.
+ *
+ * @param genAggregations Code-generated [[GeneratedAggregations]]
+ */
+class DataSetAggFunction(private val genAggregations: GeneratedAggregationsFunction)
+    extends RichGroupReduceFunction[Row, Row]
     with MapPartitionFunction[Row, Row]
-    with Compiler[GeneratedAggregations] with Logging {
+    with Compiler[GeneratedAggregations]
+    with Logging {
 
   private var output: Row = _
   private var accumulators: Row = _
@@ -44,12 +44,11 @@ class DataSetAggFunction(
   private var function: GeneratedAggregations = _
 
   override def open(config: Configuration) {
-    LOG.debug(s"Compiling AggregateHelper: $genAggregations.name \n\n " +
-                s"Code:\n$genAggregations.code")
-    val clazz = compile(
-      getRuntimeContext.getUserCodeClassLoader,
-      genAggregations.name,
-      genAggregations.code)
+    LOG.debug(
+      s"Compiling AggregateHelper: $genAggregations.name \n\n " +
+        s"Code:\n$genAggregations.code")
+    val clazz =
+      compile(getRuntimeContext.getUserCodeClassLoader, genAggregations.name, genAggregations.code)
     LOG.debug("Instantiating AggregateHelper.")
     function = clazz.newInstance()
 
@@ -58,11 +57,11 @@ class DataSetAggFunction(
   }
 
   /**
-    * Computes a non-pre-aggregated aggregation.
-    *
-    * @param records An iterator over all records of the group.
-    * @param out     The collector to hand results to.
-    */
+   * Computes a non-pre-aggregated aggregation.
+   *
+   * @param records An iterator over all records of the group.
+   * @param out     The collector to hand results to.
+   */
   override def reduce(records: Iterable[Row], out: Collector[Row]): Unit = {
 
     // reset accumulators
@@ -88,11 +87,11 @@ class DataSetAggFunction(
   }
 
   /**
-    * Computes a non-pre-aggregated aggregation and returns a row even if the input is empty.
-    *
-    * @param records An iterator over all records of the partition.
-    * @param out     The collector to hand results to.
-    */
+   * Computes a non-pre-aggregated aggregation and returns a row even if the input is empty.
+   *
+   * @param records An iterator over all records of the partition.
+   * @param out     The collector to hand results to.
+   */
   override def mapPartition(records: Iterable[Row], out: Collector[Row]): Unit = {
     reduce(records, out)
   }

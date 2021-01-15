@@ -34,8 +34,8 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
-  * Batch physical RelNode for temporal table join that implements by lookup.
-  */
+ * Batch physical RelNode for temporal table join that implements by lookup.
+ */
 class BatchExecLookupJoin(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -44,16 +44,16 @@ class BatchExecLookupJoin(
     tableCalcProgram: Option[RexProgram],
     joinInfo: JoinInfo,
     joinType: JoinRelType)
-  extends CommonLookupJoin(
-    cluster,
-    traitSet,
-    input,
-    temporalTable,
-    tableCalcProgram,
-    joinInfo,
-    joinType)
-  with BatchPhysicalRel
-  with LegacyBatchExecNode[RowData] {
+    extends CommonLookupJoin(
+      cluster,
+      traitSet,
+      input,
+      temporalTable,
+      tableCalcProgram,
+      joinInfo,
+      joinType)
+    with BatchPhysicalRel
+    with LegacyBatchExecNode[RowData] {
 
   override def copy(traitSet: RelTraitSet, inputs: util.List[RelNode]): RelNode = {
     new BatchExecLookupJoin(
@@ -70,9 +70,10 @@ class BatchExecLookupJoin(
 
   override def getInputEdges: util.List[ExecEdge] = List(ExecEdge.DEFAULT)
 
-  override protected def translateToPlanInternal(
-    planner: BatchPlanner): Transformation[RowData] = {
-    val inputTransformation = getInputNodes.get(0).translateToPlan(planner)
+  override protected def translateToPlanInternal(planner: BatchPlanner): Transformation[RowData] = {
+    val inputTransformation = getInputNodes
+      .get(0)
+      .translateToPlan(planner)
       .asInstanceOf[Transformation[RowData]]
     translateToPlanInternal(
       inputTransformation,

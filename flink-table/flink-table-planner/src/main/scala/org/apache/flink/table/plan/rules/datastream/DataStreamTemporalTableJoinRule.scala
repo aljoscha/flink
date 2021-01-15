@@ -28,11 +28,11 @@ import org.apache.flink.table.plan.nodes.logical.FlinkLogicalTemporalTableJoin
 import org.apache.flink.table.plan.schema.RowSchema
 
 class DataStreamTemporalTableJoinRule
-  extends ConverterRule(
-    classOf[FlinkLogicalTemporalTableJoin],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.DATASTREAM,
-    "DataStreamTemporalTableJoinRule") {
+    extends ConverterRule(
+      classOf[FlinkLogicalTemporalTableJoin],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.DATASTREAM,
+      "DataStreamTemporalTableJoinRule") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val join: FlinkLogicalTemporalTableJoin = call.rel(0)

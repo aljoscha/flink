@@ -33,9 +33,9 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
-  * Sub-class of [[Rank]] that is a relational expression which returns
-  * the rows in which the rank function value of each row is in the given range.
-  */
+ * Sub-class of [[Rank]] that is a relational expression which returns
+ * the rows in which the rank function value of each row is in the given range.
+ */
 class FlinkLogicalRank(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -46,17 +46,17 @@ class FlinkLogicalRank(
     rankRange: RankRange,
     rankNumberType: RelDataTypeField,
     outputRankNumber: Boolean)
-  extends Rank(
-    cluster,
-    traitSet,
-    input,
-    partitionKey,
-    orderKey,
-    rankType,
-    rankRange,
-    rankNumberType,
-    outputRankNumber)
-  with FlinkLogicalRel {
+    extends Rank(
+      cluster,
+      traitSet,
+      input,
+      partitionKey,
+      orderKey,
+      rankType,
+      rankRange,
+      rankNumberType,
+      outputRankNumber)
+    with FlinkLogicalRel {
 
   override def explainTerms(pw: RelWriter): RelWriter = {
     val inputFieldNames = input.getRowType.getFieldNames
@@ -83,11 +83,12 @@ class FlinkLogicalRank(
 
 }
 
-private class FlinkLogicalRankConverter extends ConverterRule(
-  classOf[LogicalRank],
-  Convention.NONE,
-  FlinkConventions.LOGICAL,
-  "FlinkLogicalRankConverter") {
+private class FlinkLogicalRankConverter
+    extends ConverterRule(
+      classOf[LogicalRank],
+      Convention.NONE,
+      FlinkConventions.LOGICAL,
+      "FlinkLogicalRankConverter") {
   override def convert(rel: RelNode): RelNode = {
     val rank = rel.asInstanceOf[LogicalRank]
     val newInput = RelOptRule.convert(rank.getInput, FlinkConventions.LOGICAL)
@@ -98,8 +99,7 @@ private class FlinkLogicalRankConverter extends ConverterRule(
       rank.rankType,
       rank.rankRange,
       rank.rankNumberType,
-      rank.outputRankNumber
-    )
+      rank.outputRankNumber)
   }
 }
 
@@ -116,8 +116,16 @@ object FlinkLogicalRank {
       outputRankNumber: Boolean): FlinkLogicalRank = {
     val cluster = input.getCluster
     val traits = cluster.traitSetOf(FlinkConventions.LOGICAL).simplify()
-    new FlinkLogicalRank(cluster, traits, input, partitionKey,
-      orderKey, rankType, rankRange, rankNumberType, outputRankNumber)
+    new FlinkLogicalRank(
+      cluster,
+      traits,
+      input,
+      partitionKey,
+      orderKey,
+      rankType,
+      rankRange,
+      rankNumberType,
+      outputRankNumber)
   }
 
 }

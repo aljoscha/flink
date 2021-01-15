@@ -29,11 +29,11 @@ import org.apache.flink.table.plan.nodes.logical.FlinkLogicalUnion
 import scala.collection.JavaConverters._
 
 class DataSetUnionRule
-  extends ConverterRule(
-    classOf[FlinkLogicalUnion],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.DATASET,
-    "DataSetUnionRule") {
+    extends ConverterRule(
+      classOf[FlinkLogicalUnion],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.DATASET,
+      "DataSetUnionRule") {
 
   /**
    * Only translate UNION ALL.
@@ -49,17 +49,11 @@ class DataSetUnionRule
     val union: FlinkLogicalUnion = rel.asInstanceOf[FlinkLogicalUnion]
     val traitSet: RelTraitSet = rel.getTraitSet.replace(FlinkConventions.DATASET)
 
-    val newInputs = union
-      .getInputs
-      .asScala
+    val newInputs = union.getInputs.asScala
       .map(RelOptRule.convert(_, FlinkConventions.DATASET))
       .asJava
 
-    new DataSetUnion(
-      rel.getCluster,
-      traitSet,
-      newInputs,
-      rel.getRowType)
+    new DataSetUnion(rel.getCluster, traitSet, newInputs, rel.getRowType)
   }
 }
 

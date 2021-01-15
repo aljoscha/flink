@@ -43,14 +43,14 @@ class BatchPhysicalPythonOverAggregate(
     inputRowType: RelDataType,
     windowGroups: Seq[Window.Group],
     logicWindow: Window)
-  extends BatchPhysicalOverAggregateBase(
-    cluster,
-    traitSet,
-    inputRel,
-    outputRowType,
-    inputRowType,
-    windowGroups,
-    logicWindow) {
+    extends BatchPhysicalOverAggregateBase(
+      cluster,
+      traitSet,
+      inputRel,
+      outputRowType,
+      inputRowType,
+      windowGroups,
+      logicWindow) {
 
   override def copy(traitSet: RelTraitSet, inputs: java.util.List[RelNode]): RelNode = {
     new BatchPhysicalPythonOverAggregate(
@@ -72,7 +72,6 @@ class BatchPhysicalPythonOverAggregate(
         OverAggregateUtil.calcOriginalInputFields(logicWindow)),
       ExecEdge.DEFAULT,
       FlinkTypeFactory.toLogicalRowType(getRowType),
-      getRelDetailedDescription
-    )
+      getRelDetailedDescription)
   }
 }

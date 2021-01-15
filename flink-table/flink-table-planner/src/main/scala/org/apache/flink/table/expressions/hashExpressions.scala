@@ -103,7 +103,8 @@ case class Sha512(child: PlannerExpression) extends UnaryExpression with InputTy
 }
 
 case class Sha2(child: PlannerExpression, hashLength: PlannerExpression)
-    extends BinaryExpression with InputTypeSpec {
+    extends BinaryExpression
+    with InputTypeSpec {
 
   override private[flink] def left = child
   override private[flink] def right = hashLength
@@ -120,5 +121,3 @@ case class Sha2(child: PlannerExpression, hashLength: PlannerExpression)
   }
 
 }
-
-

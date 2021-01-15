@@ -39,8 +39,8 @@ import scala.collection.JavaConversions._
 import scala.collection.mutable
 
 /**
-  * Utility methods concerning [[RexNode]].
-  */
+ * Utility methods concerning [[RexNode]].
+ */
 object FlinkRexUtil {
 
   // It is a experimental config, will may be removed later.
@@ -48,32 +48,33 @@ object FlinkRexUtil {
   private[flink] val TABLE_OPTIMIZER_CNF_NODES_LIMIT: ConfigOption[Integer] =
     key("table.optimizer.cnf-nodes-limit")
       .defaultValue(Integer.valueOf(-1))
-      .withDescription("When converting to conjunctive normal form (CNF, like '(a AND b) OR" +
-        " c' will be converted to '(a OR c) AND (b OR c)'), fail if the expression  exceeds " +
-        "this threshold; (e.g. predicate in TPC-DS q41.sql will be converted to hundreds of " +
-        "thousands of CNF nodes.) the threshold is expressed in terms of number of nodes " +
-        "(only count RexCall node, including leaves and interior nodes). " +
-        "Negative number to use the default threshold: double of number of nodes.")
+      .withDescription(
+        "When converting to conjunctive normal form (CNF, like '(a AND b) OR" +
+          " c' will be converted to '(a OR c) AND (b OR c)'), fail if the expression  exceeds " +
+          "this threshold; (e.g. predicate in TPC-DS q41.sql will be converted to hundreds of " +
+          "thousands of CNF nodes.) the threshold is expressed in terms of number of nodes " +
+          "(only count RexCall node, including leaves and interior nodes). " +
+          "Negative number to use the default threshold: double of number of nodes.")
 
   /**
-    * Similar to [[RexUtil#toCnf(RexBuilder, Int, RexNode)]]; it lets you
-    * specify a threshold in the number of nodes that can be created out of
-    * the conversion. however, if the threshold is a negative number,
-    * this method will give a default threshold value that is double of
-    * the number of RexCall in the given node.
-    *
-    * <p>If the number of resulting RexCalls exceeds that threshold,
-    * stops conversion and returns the original expression.
-    *
-    * <p>Leaf nodes(e.g. RexInputRef) in the expression do not count towards the threshold.
-    *
-    * <p>We strongly discourage use the [[RexUtil#toCnf(RexBuilder, RexNode)]] and
-    * [[RexUtil#toCnf(RexBuilder, Int, RexNode)]], because there are many bad case when using
-    * [[RexUtil#toCnf(RexBuilder, RexNode)]], such as predicate in TPC-DS q41.sql will be
-    * converted to extremely complex expression (including 736450 RexCalls); and we can not give
-    * an appropriate value for `maxCnfNodeCount` when using
-    * [[RexUtil#toCnf(RexBuilder, Int, RexNode)]].
-    */
+   * Similar to [[RexUtil#toCnf(RexBuilder, Int, RexNode)]]; it lets you
+   * specify a threshold in the number of nodes that can be created out of
+   * the conversion. however, if the threshold is a negative number,
+   * this method will give a default threshold value that is double of
+   * the number of RexCall in the given node.
+   *
+   * <p>If the number of resulting RexCalls exceeds that threshold,
+   * stops conversion and returns the original expression.
+   *
+   * <p>Leaf nodes(e.g. RexInputRef) in the expression do not count towards the threshold.
+   *
+   * <p>We strongly discourage use the [[RexUtil#toCnf(RexBuilder, RexNode)]] and
+   * [[RexUtil#toCnf(RexBuilder, Int, RexNode)]], because there are many bad case when using
+   * [[RexUtil#toCnf(RexBuilder, RexNode)]], such as predicate in TPC-DS q41.sql will be
+   * converted to extremely complex expression (including 736450 RexCalls); and we can not give
+   * an appropriate value for `maxCnfNodeCount` when using
+   * [[RexUtil#toCnf(RexBuilder, Int, RexNode)]].
+   */
   def toCnf(rexBuilder: RexBuilder, maxCnfNodeCount: Int, rex: RexNode): RexNode = {
     val maxCnfNodeCnt = if (maxCnfNodeCount < 0) {
       getNumberOfRexCall(rex) * 2
@@ -84,8 +85,8 @@ object FlinkRexUtil {
   }
 
   /**
-    * Get the number of RexCall in the given node.
-    */
+   * Get the number of RexCall in the given node.
+   */
   private def getNumberOfRexCall(rex: RexNode): Int = {
     var numberOfNodes = 0
     rex.accept(new RexVisitorImpl[Unit](true) {
@@ -102,8 +103,7 @@ object FlinkRexUtil {
 
     /** Exception to catch when we pass the limit. */
     @SuppressWarnings(Array("serial"))
-    private class OverflowError extends ControlFlowException {
-    }
+    private class OverflowError extends ControlFlowException {}
 
     @SuppressWarnings(Array("ThrowableInstanceNeverThrown"))
     private val INSTANCE = new OverflowError
@@ -148,8 +148,8 @@ object FlinkRexUtil {
           val tailCnfs: util.List[RexNode] = RelOptUtil.conjunctions(tailCnf)
           val list: util.List[RexNode] = Lists.newArrayList()
           headCnfs.foreach { h =>
-            tailCnfs.foreach {
-              t => list.add(or(ImmutableList.of(h, t)))
+            tailCnfs.foreach { t =>
+              list.add(or(ImmutableList.of(h, t)))
             }
           }
           val node = and(list)
@@ -187,16 +187,16 @@ object FlinkRexUtil {
   }
 
   /**
-    * Merges same expressions and then simplifies the result expression by [[RexSimplify]].
-    *
-    * Examples for merging same expressions:
-    * 1. a = b AND b = a -> a = b
-    * 2. a = b OR b = a -> a = b
-    * 3. (a > b AND c < 10) AND b < a -> a > b AND c < 10
-    * 4. (a > b OR c < 10) OR b < a -> a > b OR c < 10
-    * 5. a = a, a >= a, a <= a -> true
-    * 6. a <> a, a > a, a < a -> false
-    */
+   * Merges same expressions and then simplifies the result expression by [[RexSimplify]].
+   *
+   * Examples for merging same expressions:
+   * 1. a = b AND b = a -> a = b
+   * 2. a = b OR b = a -> a = b
+   * 3. (a > b AND c < 10) AND b < a -> a > b AND c < 10
+   * 4. (a > b OR c < 10) OR b < a -> a > b OR c < 10
+   * 5. a = a, a >= a, a <= a -> true
+   * 6. a <> a, a > a, a < a -> false
+   */
   def simplify(rexBuilder: RexBuilder, expr: RexNode): RexNode = {
     if (expr.isAlwaysTrue || expr.isAlwaysFalse) {
       return expr
@@ -206,17 +206,20 @@ object FlinkRexUtil {
     val equiExpr = expr.accept(exprShuttle)
     val exprMerger = new SameExprMerger(rexBuilder)
     val sameExprMerged = exprMerger.mergeSameExpr(equiExpr)
-    val binaryComparisonExprReduced = sameExprMerged.accept(
-      new BinaryComparisonExprReducer(rexBuilder))
+    val binaryComparisonExprReduced =
+      sameExprMerged.accept(new BinaryComparisonExprReducer(rexBuilder))
 
     val rexSimplify = new RexSimplify(rexBuilder, RelOptPredicateList.EMPTY, true, RexUtil.EXECUTOR)
     rexSimplify.simplify(binaryComparisonExprReduced)
   }
 
   val BINARY_COMPARISON: util.Set[SqlKind] = util.EnumSet.of(
-    SqlKind.EQUALS, SqlKind.NOT_EQUALS,
-    SqlKind.GREATER_THAN, SqlKind.GREATER_THAN_OR_EQUAL,
-    SqlKind.LESS_THAN, SqlKind.LESS_THAN_OR_EQUAL)
+    SqlKind.EQUALS,
+    SqlKind.NOT_EQUALS,
+    SqlKind.GREATER_THAN,
+    SqlKind.GREATER_THAN_OR_EQUAL,
+    SqlKind.LESS_THAN,
+    SqlKind.LESS_THAN_OR_EQUAL)
 
   private class BinaryComparisonExprReducer(rexBuilder: RexBuilder) extends RexShuttle {
     override def visitCall(call: RexCall): RexNode = {
@@ -262,8 +265,8 @@ object FlinkRexUtil {
       // merges same expressions in conjunctions
       // e.g. (a > b AND c < 10) AND a > b -> a > b AND c < 10 AND true
       sameExprMap.clear()
-      val newConjunctions = RelOptUtil.conjunctions(newExpr1).map {
-        ex => mergeSameExpr(ex, rexBuilder.makeLiteral(true))
+      val newConjunctions = RelOptUtil.conjunctions(newExpr1).map { ex =>
+        mergeSameExpr(ex, rexBuilder.makeLiteral(true))
       }
       val newExpr2 = newConjunctions.size match {
         case 0 => newExpr1 // true AND true
@@ -274,8 +277,8 @@ object FlinkRexUtil {
       // merges same expressions in disjunctions
       // e.g. (a > b OR c < 10) OR a > b -> a > b OR c < 10 OR false
       sameExprMap.clear()
-      val newDisjunctions = RelOptUtil.disjunctions(newExpr2).map {
-        ex => mergeSameExpr(ex, rexBuilder.makeLiteral(false))
+      val newDisjunctions = RelOptUtil.disjunctions(newExpr2).map { ex =>
+        mergeSameExpr(ex, rexBuilder.makeLiteral(false))
       }
       val newExpr3 = newDisjunctions.size match {
         case 0 => newExpr2 // false OR false
@@ -289,10 +292,9 @@ object FlinkRexUtil {
       val newCall = call.getOperator match {
         case AND | OR =>
           sameExprMap.clear()
-          val newOperands = call.getOperands.map {
-            op =>
-              val value = if (call.getOperator == AND) true else false
-              mergeSameExpr(op, rexBuilder.makeLiteral(value))
+          val newOperands = call.getOperands.map { op =>
+            val value = if (call.getOperator == AND) true else false
+            mergeSameExpr(op, rexBuilder.makeLiteral(value))
           }
           call.clone(call.getType, newOperands)
         case _ => call
@@ -302,9 +304,9 @@ object FlinkRexUtil {
   }
 
   /**
-    * Find all inputRefs.
-    * @return InputRef HashSet.
-    */
+   * Find all inputRefs.
+   * @return InputRef HashSet.
+   */
   private[flink] def findAllInputRefs(node: RexNode): util.HashSet[RexInputRef] = {
     val set = new util.HashSet[RexInputRef]
     node.accept(new RexVisitorImpl[Void](true) {
@@ -317,45 +319,39 @@ object FlinkRexUtil {
   }
 
   /**
-    * Adjust the expression's field indices according to fieldsOldToNewIndexMapping.
-    *
-    * @param expr The expression to be adjusted.
-    * @param fieldsOldToNewIndexMapping A map containing the mapping the old field indices to new
-    *                                   field indices.
-    * @param rowType The row type of the new output.
-    * @return Return new expression with new field indices.
-    */
+   * Adjust the expression's field indices according to fieldsOldToNewIndexMapping.
+   *
+   * @param expr The expression to be adjusted.
+   * @param fieldsOldToNewIndexMapping A map containing the mapping the old field indices to new
+   *                                   field indices.
+   * @param rowType The row type of the new output.
+   * @return Return new expression with new field indices.
+   */
   private[flink] def adjustInputRef(
       expr: RexNode,
       fieldsOldToNewIndexMapping: Map[Int, Int],
-      rowType: RelDataType): RexNode = expr.accept(
-    new RexShuttle() {
+      rowType: RelDataType): RexNode = expr.accept(new RexShuttle() {
 
-      override def visitInputRef(inputRef: RexInputRef): RexNode = {
-        require(fieldsOldToNewIndexMapping.containsKey(inputRef.getIndex))
-        val newIndex = fieldsOldToNewIndexMapping(inputRef.getIndex)
-        val ref = RexInputRef.of(newIndex, rowType)
-        if (ref.getIndex == inputRef.getIndex && (ref.getType eq inputRef.getType)) {
-          inputRef
-        } else {
-          // re-use old object, to prevent needless expr cloning
-          ref
-        }
+    override def visitInputRef(inputRef: RexInputRef): RexNode = {
+      require(fieldsOldToNewIndexMapping.containsKey(inputRef.getIndex))
+      val newIndex = fieldsOldToNewIndexMapping(inputRef.getIndex)
+      val ref = RexInputRef.of(newIndex, rowType)
+      if (ref.getIndex == inputRef.getIndex && (ref.getType eq inputRef.getType)) {
+        inputRef
+      } else {
+        // re-use old object, to prevent needless expr cloning
+        ref
       }
-    })
+    }
+  })
 
   /** Expands the SEARCH into normal disjunctions recursively. */
-  def expandSearch(
-      rexBuilder: RexBuilder,
-      rex: RexNode): RexNode = {
+  def expandSearch(rexBuilder: RexBuilder, rex: RexNode): RexNode = {
     expandSearch(rexBuilder, rex, _ => true)
   }
 
   /** Expands the SEARCH into normal disjunctions recursively. */
-  def expandSearch(
-      rexBuilder: RexBuilder,
-      rex: RexNode,
-      tester: RexCall => Boolean): RexNode = {
+  def expandSearch(rexBuilder: RexBuilder, rex: RexNode, tester: RexCall => Boolean): RexNode = {
     val shuttle = new RexShuttle() {
       override def visitCall(call: RexCall): RexNode = {
         if (call.getKind == SqlKind.SEARCH && tester(call)) {
@@ -374,37 +370,37 @@ object FlinkRexUtil {
     val sargLiteral = call.getOperands.get(1).asInstanceOf[RexLiteral]
     val sarg = sargLiteral.getValueAs(classOf[Sarg[_]])
     require(sarg.isPoints)
-    val sargOperands = sarg.rangeSet.asRanges().map(range =>
-      rexBuilder.makeLiteral(range.lowerEndpoint(), sargLiteral.getType, false))
+    val sargOperands = sarg.rangeSet
+      .asRanges()
+      .map(range => rexBuilder.makeLiteral(range.lowerEndpoint(), sargLiteral.getType, false))
     List(call.getOperands.head) ++ sargOperands
   }
 
   /**
-    * Adjust the expression's field indices according to fieldsOldToNewIndexMapping.
-    *
-    * @param expr The expression to be adjusted.
-    * @param fieldsOldToNewIndexMapping A map containing the mapping the old field indices to new
-    *                                   field indices.
-    * @return Return new expression with new field indices.
-    */
+   * Adjust the expression's field indices according to fieldsOldToNewIndexMapping.
+   *
+   * @param expr The expression to be adjusted.
+   * @param fieldsOldToNewIndexMapping A map containing the mapping the old field indices to new
+   *                                   field indices.
+   * @return Return new expression with new field indices.
+   */
   private[flink] def adjustInputRef(
       expr: RexNode,
-      fieldsOldToNewIndexMapping: Map[Int, Int]): RexNode = expr.accept(
-    new RexShuttle() {
-      override def visitInputRef(inputRef: RexInputRef): RexNode = {
-        require(fieldsOldToNewIndexMapping.containsKey(inputRef.getIndex))
-        val newIndex = fieldsOldToNewIndexMapping(inputRef.getIndex)
-        new RexInputRef(newIndex, inputRef.getType)
-      }
-    })
+      fieldsOldToNewIndexMapping: Map[Int, Int]): RexNode = expr.accept(new RexShuttle() {
+    override def visitInputRef(inputRef: RexInputRef): RexNode = {
+      require(fieldsOldToNewIndexMapping.containsKey(inputRef.getIndex))
+      val newIndex = fieldsOldToNewIndexMapping(inputRef.getIndex)
+      new RexInputRef(newIndex, inputRef.getType)
+    }
+  })
 
   private class EquivalentExprShuttle(rexBuilder: RexBuilder) extends RexShuttle {
     private val equiExprMap = mutable.HashMap[String, RexNode]()
 
     override def visitCall(call: RexCall): RexNode = {
       call.getOperator match {
-        case EQUALS | NOT_EQUALS | GREATER_THAN | LESS_THAN |
-             GREATER_THAN_OR_EQUAL | LESS_THAN_OR_EQUAL =>
+        case EQUALS | NOT_EQUALS | GREATER_THAN | LESS_THAN | GREATER_THAN_OR_EQUAL |
+            LESS_THAN_OR_EQUAL =>
           val swapped = swapOperands(call)
           if (equiExprMap.contains(swapped.toString)) {
             swapped
@@ -418,12 +414,12 @@ object FlinkRexUtil {
 
     private def swapOperands(call: RexCall): RexCall = {
       val newOp = call.getOperator match {
-        case EQUALS | NOT_EQUALS => call.getOperator
-        case GREATER_THAN => LESS_THAN
+        case EQUALS | NOT_EQUALS   => call.getOperator
+        case GREATER_THAN          => LESS_THAN
         case GREATER_THAN_OR_EQUAL => LESS_THAN_OR_EQUAL
-        case LESS_THAN => GREATER_THAN
-        case LESS_THAN_OR_EQUAL => GREATER_THAN_OR_EQUAL
-        case _ => throw new IllegalArgumentException(s"Unsupported operator: ${call.getOperator}")
+        case LESS_THAN             => GREATER_THAN
+        case LESS_THAN_OR_EQUAL    => GREATER_THAN_OR_EQUAL
+        case _                     => throw new IllegalArgumentException(s"Unsupported operator: ${call.getOperator}")
       }
       val operands = call.getOperands
       rexBuilder.makeCall(newOp, operands.last, operands.head).asInstanceOf[RexCall]

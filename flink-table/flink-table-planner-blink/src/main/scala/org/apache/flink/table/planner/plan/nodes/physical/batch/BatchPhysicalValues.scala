@@ -34,15 +34,15 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
-  * Batch physical RelNode for [[Values]].
-  */
+ * Batch physical RelNode for [[Values]].
+ */
 class BatchPhysicalValues(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
     tuples: ImmutableList[ImmutableList[RexLiteral]],
     outputRowType: RelDataType)
-  extends Values(cluster, outputRowType, tuples, traitSet)
-  with BatchPhysicalRel {
+    extends Values(cluster, outputRowType, tuples, traitSet)
+    with BatchPhysicalRel {
 
   override def deriveRowType(): RelDataType = outputRowType
 
@@ -51,7 +51,8 @@ class BatchPhysicalValues(
   }
 
   override def explainTerms(pw: RelWriter): RelWriter = {
-    super.explainTerms(pw)
+    super
+      .explainTerms(pw)
       .item("values", getRowType.getFieldNames.toList.mkString(", "))
   }
 
@@ -59,7 +60,6 @@ class BatchPhysicalValues(
     new BatchExecValues(
       tuples.asList().map(_.asList()),
       FlinkTypeFactory.toLogicalRowType(getRowType),
-      getRelDetailedDescription
-    )
+      getRelDetailedDescription)
   }
 }

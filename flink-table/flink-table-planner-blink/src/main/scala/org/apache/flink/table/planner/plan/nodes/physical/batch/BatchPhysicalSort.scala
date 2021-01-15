@@ -33,17 +33,17 @@ import org.apache.calcite.rex.RexNode
 import scala.collection.JavaConversions._
 
 /**
-  * Batch physical RelNode for [[Sort]].
-  *
-  * This node will output all data rather than `limit` records.
-  */
+ * Batch physical RelNode for [[Sort]].
+ *
+ * This node will output all data rather than `limit` records.
+ */
 class BatchPhysicalSort(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
     inputRel: RelNode,
     sortCollation: RelCollation)
-  extends Sort(cluster, traitSet, inputRel, sortCollation)
-  with BatchPhysicalRel {
+    extends Sort(cluster, traitSet, inputRel, sortCollation)
+    with BatchPhysicalRel {
 
   require(sortCollation.getFieldCollations.size() > 0)
 
@@ -82,7 +82,6 @@ class BatchPhysicalSort(
       SortUtil.getSortSpec(sortCollation.getFieldCollations),
       ExecEdge.builder().damBehavior(ExecEdge.DamBehavior.END_INPUT).build(),
       FlinkTypeFactory.toLogicalRowType(getRowType),
-      getRelDetailedDescription
-    )
+      getRelDetailedDescription)
   }
 }

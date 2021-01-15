@@ -44,8 +44,7 @@ class TableScanTest extends TableTestBase {
 
   @Test
   def testDDLTableScan(): Unit = {
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE src (
         |  ts TIMESTAMP(3),
         |  a INT,
@@ -62,8 +61,7 @@ class TableScanTest extends TableTestBase {
   def testDDLWithComputedColumn(): Unit = {
     // Create table with field as atom expression.
     util.tableEnv.registerFunction("my_udf", Func0)
-    util.addTable(
-      s"""
+    util.addTable(s"""
          |create table t1(
          |  a int,
          |  b varchar,
@@ -80,8 +78,7 @@ class TableScanTest extends TableTestBase {
   @Test
   def testDDLWithMetadataColumn(): Unit = {
     // tests reordering, skipping, and casting of metadata
-    util.addTable(
-      s"""
+    util.addTable(s"""
          |CREATE TABLE MetadataTable (
          |  `a` INT,
          |  `other_metadata` INT METADATA FROM 'metadata_3' VIRTUAL,
@@ -102,8 +99,7 @@ class TableScanTest extends TableTestBase {
   @Test
   def testDDLWithMetadataColumnProjectionPushDown(): Unit = {
     // tests reordering, skipping, and casting of metadata
-    util.addTable(
-      s"""
+    util.addTable(s"""
          |CREATE TABLE MetadataTable (
          |  `a` INT,
          |  `other_metadata` INT METADATA FROM 'metadata_3' VIRTUAL,
@@ -124,8 +120,7 @@ class TableScanTest extends TableTestBase {
   def testDDLWithWatermarkComputedColumn(): Unit = {
     // Create table with field as atom expression.
     util.tableEnv.registerFunction("my_udf", Func0)
-    util.addTable(
-      s"""
+    util.addTable(s"""
          |create table t1(
          |  a int,
          |  b varchar,
@@ -142,8 +137,7 @@ class TableScanTest extends TableTestBase {
 
   @Test
   def testDDLWithComputedColumnReferRowtime(): Unit = {
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE src (
         |  ts TIMESTAMP(3),
         |  a INT,
@@ -162,8 +156,7 @@ class TableScanTest extends TableTestBase {
   def testKeywordsWithWatermarkComputedColumn(): Unit = {
     // Create table with field as atom expression.
     util.tableEnv.registerFunction("my_udf", Func0)
-    util.addTable(
-      s"""
+    util.addTable(s"""
          |create table t1(
          |  a int,
          |  b varchar,
@@ -182,8 +175,7 @@ class TableScanTest extends TableTestBase {
 
   @Test
   def testScanOnBoundedSource(): Unit = {
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE src (
         |  ts TIMESTAMP(3),
         |  a INT,
@@ -199,8 +191,7 @@ class TableScanTest extends TableTestBase {
 
   @Test
   def testFilterOnChangelogSource(): Unit = {
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE src (
         |  ts TIMESTAMP(3),
         |  a INT,
@@ -215,8 +206,7 @@ class TableScanTest extends TableTestBase {
 
   @Test
   def testScanOnChangelogSource(): Unit = {
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE src (
         |  ts TIMESTAMP(3),
         |  a INT,
@@ -231,8 +221,7 @@ class TableScanTest extends TableTestBase {
 
   @Test
   def testUnionChangelogSourceAndAggregation(): Unit = {
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE changelog_src (
         |  ts TIMESTAMP(3),
         |  a INT,
@@ -242,8 +231,7 @@ class TableScanTest extends TableTestBase {
         |  'changelog-mode' = 'I,UA,UB,D'
         |)
       """.stripMargin)
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE append_src (
         |  ts TIMESTAMP(3),
         |  a INT,
@@ -267,8 +255,7 @@ class TableScanTest extends TableTestBase {
 
   @Test
   def testAggregateOnChangelogSource(): Unit = {
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE src (
         |  ts TIMESTAMP(3),
         |  a INT,
@@ -288,8 +275,8 @@ class TableScanTest extends TableTestBase {
 
   @Test
   def testJoinOnChangelogSourceWithEventsDuplicate(): Unit = {
-    util.tableEnv.getConfig.getConfiguration.setBoolean(
-      ExecutionConfigOptions.TABLE_EXEC_SOURCE_CDC_EVENTS_DUPLICATE, true)
+    util.tableEnv.getConfig.getConfiguration
+      .setBoolean(ExecutionConfigOptions.TABLE_EXEC_SOURCE_CDC_EVENTS_DUPLICATE, true)
     verifyJoinOnSource("I,UB,UA")
   }
 
@@ -304,8 +291,7 @@ class TableScanTest extends TableTestBase {
   }
 
   private def verifyJoinOnSource(changelogMode: String): Unit = {
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE orders (
         |  amount BIGINT,
         |  currency_id BIGINT,
@@ -315,8 +301,7 @@ class TableScanTest extends TableTestBase {
         | 'changelog-mode' = 'I'
         |)
         |""".stripMargin)
-    util.addTable(
-      s"""
+    util.addTable(s"""
         |CREATE TABLE rates_history (
         |  currency_id BIGINT,
         |  currency_name STRING,
@@ -339,8 +324,7 @@ class TableScanTest extends TableTestBase {
 
   @Test
   def testWatermarkAndChangelogSource(): Unit = {
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE src (
         |  ts TIMESTAMP(3),
         |  a INT,
@@ -356,10 +340,9 @@ class TableScanTest extends TableTestBase {
 
   @Test
   def testChangelogSourceWithEventsDuplicate(): Unit = {
-    util.tableEnv.getConfig.getConfiguration.setBoolean(
-      ExecutionConfigOptions.TABLE_EXEC_SOURCE_CDC_EVENTS_DUPLICATE, true)
-    util.addTable(
-      """
+    util.tableEnv.getConfig.getConfiguration
+      .setBoolean(ExecutionConfigOptions.TABLE_EXEC_SOURCE_CDC_EVENTS_DUPLICATE, true)
+    util.addTable("""
         |CREATE TABLE src (
         |  id STRING,
         |  a INT,
@@ -379,8 +362,7 @@ class TableScanTest extends TableTestBase {
 
   @Test
   def testScanOnUpsertSource(): Unit = {
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE src (
         |  ts TIMESTAMP(3),
         |  id1 STRING,
@@ -399,8 +381,7 @@ class TableScanTest extends TableTestBase {
 
   @Test
   def testUpsertSourceWithComputedColumnAndWatermark(): Unit = {
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE src (
         |  id STRING,
         |  a INT,
@@ -420,8 +401,7 @@ class TableScanTest extends TableTestBase {
 
   @Test
   def testUpsertSourceWithWatermarkPushDown(): Unit = {
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE src (
         |  id STRING,
         |  a INT,
@@ -442,8 +422,7 @@ class TableScanTest extends TableTestBase {
 
   @Test
   def testUnionUpsertSourceAndAggregation(): Unit = {
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE upsert_src (
         |  ts TIMESTAMP(3),
         |  a INT,
@@ -454,8 +433,7 @@ class TableScanTest extends TableTestBase {
         |  'changelog-mode' = 'UA,D'
         |)
       """.stripMargin)
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE append_src (
         |  ts TIMESTAMP(3),
         |  a INT,
@@ -480,8 +458,7 @@ class TableScanTest extends TableTestBase {
 
   @Test
   def testAggregateOnUpsertSource(): Unit = {
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE src (
         |  ts TIMESTAMP(3),
         |  a INT,
@@ -501,8 +478,7 @@ class TableScanTest extends TableTestBase {
 
   @Test
   def testAggregateOnUpsertSourcePrimaryKey(): Unit = {
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE src (
         |  ts TIMESTAMP(3),
         |  a INT,
@@ -522,8 +498,7 @@ class TableScanTest extends TableTestBase {
 
   @Test
   def testProcTimeTemporalJoinOnUpsertSource(): Unit = {
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE orders (
         |  amount BIGINT,
         |  currency STRING,
@@ -533,8 +508,7 @@ class TableScanTest extends TableTestBase {
         | 'changelog-mode' = 'I'
         |)
         |""".stripMargin)
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE rates_history (
         |  currency STRING PRIMARY KEY NOT ENFORCED,
         |  rate BIGINT
@@ -556,8 +530,7 @@ class TableScanTest extends TableTestBase {
 
   @Test
   def testEventTimeTemporalJoinOnUpsertSource(): Unit = {
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE orders (
         |  amount BIGINT,
         |  currency STRING,
@@ -568,8 +541,7 @@ class TableScanTest extends TableTestBase {
         | 'changelog-mode' = 'I'
         |)
         |""".stripMargin)
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE rates_history (
         |  currency STRING PRIMARY KEY NOT ENFORCED,
         |  rate BIGINT,
@@ -593,8 +565,7 @@ class TableScanTest extends TableTestBase {
 
   @Test
   def testUnsupportedWindowAggregateOnChangelogSource(): Unit = {
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE src (
         |  ts AS PROCTIME(),
         |  a INT,
@@ -619,8 +590,7 @@ class TableScanTest extends TableTestBase {
 
   @Test
   def testInvalidSourceChangelogMode(): Unit = {
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE src (
         |  ts TIMESTAMP(3),
         |  a INT,
@@ -633,16 +603,15 @@ class TableScanTest extends TableTestBase {
     thrown.expect(classOf[ValidationException])
     thrown.expectMessage(
       "Invalid source for table 'default_catalog.default_database.src'. A ScanTableSource " +
-      "doesn't support a changelog which contains UPDATE_BEFORE but no UPDATE_AFTER. Please " +
-      "adapt the implementation of class 'org.apache.flink.table.planner.factories." +
-      "TestValuesTableFactory$TestValuesScanLookupTableSource'.")
+        "doesn't support a changelog which contains UPDATE_BEFORE but no UPDATE_AFTER. Please " +
+        "adapt the implementation of class 'org.apache.flink.table.planner.factories." +
+        "TestValuesTableFactory$TestValuesScanLookupTableSource'.")
     util.verifyRelPlan("SELECT * FROM src WHERE a > 1", ExplainDetail.CHANGELOG_MODE)
   }
 
   @Test
   def testMissingPrimaryKeyForUpsertSource(): Unit = {
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE src (
         |  ts TIMESTAMP(3),
         |  a INT,
@@ -653,16 +622,16 @@ class TableScanTest extends TableTestBase {
         |)
       """.stripMargin)
     thrown.expect(classOf[TableException])
-    thrown.expectMessage("Table 'default_catalog.default_database.src' produces a " +
-      "changelog stream contains UPDATE_AFTER, no UPDATE_BEFORE. " +
-      "This requires to define primary key constraint on the table.")
+    thrown.expectMessage(
+      "Table 'default_catalog.default_database.src' produces a " +
+        "changelog stream contains UPDATE_AFTER, no UPDATE_BEFORE. " +
+        "This requires to define primary key constraint on the table.")
     util.verifyRelPlan("SELECT * FROM src WHERE a > 1", ExplainDetail.CHANGELOG_MODE)
   }
 
   @Test
   def testMissingPrimaryKeyForEventsDuplicate(): Unit = {
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE src (
         |  ts TIMESTAMP(3),
         |  a INT,
@@ -672,20 +641,20 @@ class TableScanTest extends TableTestBase {
         |  'changelog-mode' = 'I,UB,UA,D'
         |)
       """.stripMargin)
-    util.tableEnv.getConfig.getConfiguration.setBoolean(
-      ExecutionConfigOptions.TABLE_EXEC_SOURCE_CDC_EVENTS_DUPLICATE, true)
+    util.tableEnv.getConfig.getConfiguration
+      .setBoolean(ExecutionConfigOptions.TABLE_EXEC_SOURCE_CDC_EVENTS_DUPLICATE, true)
 
     thrown.expect(classOf[TableException])
-    thrown.expectMessage("Configuration 'table.exec.source.cdc-events-duplicate' is enabled " +
-      "which requires the changelog sources to define a PRIMARY KEY. " +
-      "However, table 'default_catalog.default_database.src' doesn't have a primary key.")
+    thrown.expectMessage(
+      "Configuration 'table.exec.source.cdc-events-duplicate' is enabled " +
+        "which requires the changelog sources to define a PRIMARY KEY. " +
+        "However, table 'default_catalog.default_database.src' doesn't have a primary key.")
     util.verifyRelPlan("SELECT * FROM src WHERE a > 1", ExplainDetail.CHANGELOG_MODE)
   }
 
   @Test
   def testInvalidScanOnLookupSource(): Unit = {
-    util.addTable(
-      s"""
+    util.addTable(s"""
         |CREATE TABLE src (
         |  ts TIMESTAMP(3),
         |  a INT,
@@ -705,8 +674,7 @@ class TableScanTest extends TableTestBase {
     thrown.expect(classOf[ValidationException])
     thrown.expectMessage(
       "Watermark strategy '' must be of type TIMESTAMP but is of type 'CHAR(0) NOT NULL'.")
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE src (
         |  ts TIMESTAMP(3),
         |  a INT,

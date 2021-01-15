@@ -49,12 +49,9 @@ class CorrelateTest extends TableTestBase {
         term("invocation", s"${function.functionIdentifier}($$2)"),
         term("correlate", s"table(${function.getClass.getSimpleName}(c))"),
         term("select", "a", "b", "c", "s"),
-        term("rowType",
-             "RecordType(INTEGER a, BIGINT b, VARCHAR(65536) c, VARCHAR(65536) s)"),
-        term("joinType", "INNER")
-      ),
-      term("select", "c", "s")
-    )
+        term("rowType", "RecordType(INTEGER a, BIGINT b, VARCHAR(65536) c, VARCHAR(65536) s)"),
+        term("joinType", "INNER")),
+      term("select", "c", "s"))
 
     util.verifyTable(result1, expected1)
 
@@ -70,12 +67,9 @@ class CorrelateTest extends TableTestBase {
         term("invocation", s"${function.functionIdentifier}($$2, '$$')"),
         term("correlate", s"table(${function.getClass.getSimpleName}(c, '$$'))"),
         term("select", "a", "b", "c", "s"),
-        term("rowType",
-             "RecordType(INTEGER a, BIGINT b, VARCHAR(65536) c, VARCHAR(65536) s)"),
-        term("joinType", "INNER")
-      ),
-      term("select", "c", "s")
-    )
+        term("rowType", "RecordType(INTEGER a, BIGINT b, VARCHAR(65536) c, VARCHAR(65536) s)"),
+        term("joinType", "INNER")),
+      term("select", "c", "s"))
 
     util.verifyTable(result2, expected2)
   }
@@ -96,13 +90,10 @@ class CorrelateTest extends TableTestBase {
         term("invocation", s"${function.functionIdentifier}($$2)"),
         term("correlate", s"table(${function.getClass.getSimpleName}(c))"),
         term("select", "a", "b", "c", "s"),
-        term("rowType",
-          "RecordType(INTEGER a, BIGINT b, VARCHAR(65536) c, VARCHAR(65536) s)"),
-        term("joinType", "LEFT")
-      ),
+        term("rowType", "RecordType(INTEGER a, BIGINT b, VARCHAR(65536) c, VARCHAR(65536) s)"),
+        term("joinType", "LEFT")),
       term("select", "c", "s"),
-      term("where", ">(s, '')")
-    )
+      term("where", ">(s, '')"))
 
     util.verifyTable(result, expected)
   }
@@ -123,10 +114,8 @@ class CorrelateTest extends TableTestBase {
         term("invocation", s"${function.functionIdentifier}($$2)"),
         term("correlate", s"table(${function.getClass.getSimpleName}(c))"),
         term("select", "a", "b", "c", "s"),
-        term("rowType",
-          "RecordType(INTEGER a, BIGINT b, VARCHAR(65536) c, VARCHAR(65536) s)"),
-        term("joinType", "LEFT")
-      ),
+        term("rowType", "RecordType(INTEGER a, BIGINT b, VARCHAR(65536) c, VARCHAR(65536) s)"),
+        term("joinType", "LEFT")),
       term("select", "c", "s"))
 
     util.verifyTable(result, expected)
@@ -138,8 +127,9 @@ class CorrelateTest extends TableTestBase {
     val sourceTable = util.addTable[(Int, Long, String)]("MyTable", 'a, 'b, 'c)
     val function = util.addFunction("func1", new TableFunc0)
 
-    val result = sourceTable.select('a, 'b, 'c)
-      .joinLateral(function('c) as('d, 'e))
+    val result = sourceTable
+      .select('a, 'b, 'c)
+      .joinLateral(function('c) as ('d, 'e))
       .select('c, 'd, 'e)
       .where('e > 10)
       .where('e > 20)
@@ -153,14 +143,13 @@ class CorrelateTest extends TableTestBase {
         term("invocation", s"${function.functionIdentifier}($$2)"),
         term("correlate", s"table(${function.getClass.getSimpleName}(c))"),
         term("select", "a", "b", "c", "d", "e"),
-        term("rowType",
-             "RecordType(INTEGER a, BIGINT b, VARCHAR(65536) c, " +
-               "VARCHAR(65536) d, INTEGER e)"),
+        term(
+          "rowType",
+          "RecordType(INTEGER a, BIGINT b, VARCHAR(65536) c, " +
+            "VARCHAR(65536) d, INTEGER e)"),
         term("joinType", "INNER"),
-        term("condition", "AND(>($1, 10), >($1, 20))")
-      ),
-      term("select", "c", "d")
-    )
+        term("condition", "AND(>($1, 10), >($1, 20))")),
+      term("select", "c", "d"))
 
     util.verifyTable(result, expected)
   }
@@ -170,11 +159,11 @@ class CorrelateTest extends TableTestBase {
     val util = batchTestUtil()
 
     val logicalRuleSet = FlinkRuleSets.LOGICAL_OPT_RULES.filter {
-        case CoreRules.CALC_MERGE => false
-        case CoreRules.FILTER_CALC_MERGE => false
-        case CoreRules.PROJECT_CALC_MERGE => false
-        case _ => true
-      }
+      case CoreRules.CALC_MERGE         => false
+      case CoreRules.FILTER_CALC_MERGE  => false
+      case CoreRules.PROJECT_CALC_MERGE => false
+      case _                            => true
+    }
 
     val cc: PlannerConfig = new CalciteConfigBuilder()
       .replaceLogicalOptRuleSet(RuleSets.ofList(logicalRuleSet.toList))
@@ -185,8 +174,9 @@ class CorrelateTest extends TableTestBase {
     val sourceTable = util.addTable[(Int, Long, String)]("MyTable", 'a, 'b, 'c)
     val function = util.addFunction("func1", new TableFunc0)
 
-    val result = sourceTable.select('a, 'b, 'c)
-      .joinLateral(function('c) as('d, 'e))
+    val result = sourceTable
+      .select('a, 'b, 'c)
+      .joinLateral(function('c) as ('d, 'e))
       .select('c, 'd, 'e)
       .where('e > 10)
       .where('e > 20)
@@ -200,14 +190,13 @@ class CorrelateTest extends TableTestBase {
         term("invocation", s"${function.functionIdentifier}($$2)"),
         term("correlate", s"table(${function.getClass.getSimpleName}(c))"),
         term("select", "a", "b", "c", "d", "e"),
-        term("rowType",
-             "RecordType(INTEGER a, BIGINT b, VARCHAR(65536) c, " +
-               "VARCHAR(65536) d, INTEGER e)"),
+        term(
+          "rowType",
+          "RecordType(INTEGER a, BIGINT b, VARCHAR(65536) c, " +
+            "VARCHAR(65536) d, INTEGER e)"),
         term("joinType", "INNER"),
-        term("condition", "AND(>($1, 10), >($1, 20))")
-      ),
-      term("select", "c", "d")
-    )
+        term("condition", "AND(>($1, 10), >($1, 20))")),
+      term("select", "c", "d"))
 
     util.verifyTable(result, expected)
   }

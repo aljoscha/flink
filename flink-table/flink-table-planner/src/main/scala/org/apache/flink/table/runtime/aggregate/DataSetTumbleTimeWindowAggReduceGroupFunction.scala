@@ -27,18 +27,18 @@ import org.apache.flink.types.Row
 import org.apache.flink.util.Collector
 
 /**
-  * It wraps the aggregate logic inside of
-  * [[org.apache.flink.api.java.operators.GroupReduceOperator]]. It is used for tumbling time-window
-  * on batch.
-  *
-  * @param genAggregations  Code-generated [[GeneratedAggregations]]
-  * @param windowSize       Tumbling time window size
-  * @param windowStartPos   The relative window-start field position to the last field of output row
-  * @param windowEndPos     The relative window-end field position to the last field of output row
-  * @param windowRowtimePos The relative window-rowtime field position to the last field of
-  *                         output row
-  * @param keysAndAggregatesArity    The total arity of keys and aggregates
-  */
+ * It wraps the aggregate logic inside of
+ * [[org.apache.flink.api.java.operators.GroupReduceOperator]]. It is used for tumbling time-window
+ * on batch.
+ *
+ * @param genAggregations  Code-generated [[GeneratedAggregations]]
+ * @param windowSize       Tumbling time window size
+ * @param windowStartPos   The relative window-start field position to the last field of output row
+ * @param windowEndPos     The relative window-end field position to the last field of output row
+ * @param windowRowtimePos The relative window-rowtime field position to the last field of
+ *                         output row
+ * @param keysAndAggregatesArity    The total arity of keys and aggregates
+ */
 class DataSetTumbleTimeWindowAggReduceGroupFunction(
     genAggregations: GeneratedAggregationsFunction,
     windowSize: Long,
@@ -46,7 +46,7 @@ class DataSetTumbleTimeWindowAggReduceGroupFunction(
     windowEndPos: Option[Int],
     windowRowtimePos: Option[Int],
     keysAndAggregatesArity: Int)
-  extends RichGroupReduceFunction[Row, Row]
+    extends RichGroupReduceFunction[Row, Row]
     with Compiler[GeneratedAggregations]
     with Logging {
 
@@ -59,21 +59,18 @@ class DataSetTumbleTimeWindowAggReduceGroupFunction(
   protected var function: GeneratedAggregations = _
 
   override def open(config: Configuration) {
-    LOG.debug(s"Compiling AggregateHelper: $genAggregations.name \n\n " +
-                s"Code:\n$genAggregations.code")
-    val clazz = compile(
-      getRuntimeContext.getUserCodeClassLoader,
-      genAggregations.name,
-      genAggregations.code)
+    LOG.debug(
+      s"Compiling AggregateHelper: $genAggregations.name \n\n " +
+        s"Code:\n$genAggregations.code")
+    val clazz =
+      compile(getRuntimeContext.getUserCodeClassLoader, genAggregations.name, genAggregations.code)
     LOG.debug("Instantiating AggregateHelper.")
     function = clazz.newInstance()
 
     output = function.createOutputRow()
     accumulators = function.createAccumulators()
-    collector = new DataSetTimeWindowPropertyCollector(
-      windowStartPos,
-      windowEndPos,
-      windowRowtimePos)
+    collector =
+      new DataSetTimeWindowPropertyCollector(windowStartPos, windowEndPos, windowRowtimePos)
   }
 
   override def reduce(records: Iterable[Row], out: Collector[Row]): Unit = {

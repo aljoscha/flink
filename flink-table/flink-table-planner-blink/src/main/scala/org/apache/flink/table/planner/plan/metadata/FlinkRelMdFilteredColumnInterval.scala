@@ -20,7 +20,14 @@ package org.apache.flink.table.planner.plan.metadata
 import org.apache.flink.table.planner.plan.metadata.FlinkMetadata.FilteredColumnInterval
 import org.apache.flink.table.planner.plan.nodes.calcite.TableAggregate
 import org.apache.flink.table.planner.plan.nodes.physical.batch.BatchPhysicalGroupAggregateBase
-import org.apache.flink.table.planner.plan.nodes.physical.stream.{StreamPhysicalGlobalGroupAggregate, StreamPhysicalGroupAggregate, StreamPhysicalGroupTableAggregate, StreamPhysicalGroupWindowAggregate, StreamPhysicalGroupWindowTableAggregate, StreamPhysicalLocalGroupAggregate}
+import org.apache.flink.table.planner.plan.nodes.physical.stream.{
+  StreamPhysicalGlobalGroupAggregate,
+  StreamPhysicalGroupAggregate,
+  StreamPhysicalGroupTableAggregate,
+  StreamPhysicalGroupWindowAggregate,
+  StreamPhysicalGroupWindowTableAggregate,
+  StreamPhysicalLocalGroupAggregate
+}
 import org.apache.flink.table.planner.plan.stats.ValueInterval
 import org.apache.flink.table.planner.plan.utils.ColumnIntervalUtil
 import org.apache.flink.util.Preconditions.checkArgument
@@ -35,26 +42,26 @@ import org.apache.calcite.util.Util
 import scala.collection.JavaConversions._
 
 /**
-  * [[FlinkRelMdFilteredColumnInterval]] supplies a default implementation of
-  * [[FlinkRelMetadataQuery.getFilteredColumnInterval()]] for the standard logical algebra.
-  *
-  * The [[FlinkRelMdFilteredColumnInterval]] is almost depend on the implementation of
-  * [[FlinkRelMdColumnInterval]], except to handle filter argument in Calc RelNode.
-  */
+ * [[FlinkRelMdFilteredColumnInterval]] supplies a default implementation of
+ * [[FlinkRelMetadataQuery.getFilteredColumnInterval()]] for the standard logical algebra.
+ *
+ * The [[FlinkRelMdFilteredColumnInterval]] is almost depend on the implementation of
+ * [[FlinkRelMdColumnInterval]], except to handle filter argument in Calc RelNode.
+ */
 class FlinkRelMdFilteredColumnInterval private extends MetadataHandler[FilteredColumnInterval] {
 
   override def getDef: MetadataDef[FilteredColumnInterval] =
     FlinkMetadata.FilteredColumnInterval.DEF
 
   /**
-    * Gets the column interval of the given column with filter argument on Project
-    *
-    * @param project Project RelNode
-    * @param mq RelMetadataQuery instance
-    * @param columnIndex  the index of the given column
-    * @param filterArg  the filter argument
-    * @return interval of the given column after filtered in Calc
-    */
+   * Gets the column interval of the given column with filter argument on Project
+   *
+   * @param project Project RelNode
+   * @param mq RelMetadataQuery instance
+   * @param columnIndex  the index of the given column
+   * @param filterArg  the filter argument
+   * @return interval of the given column after filtered in Calc
+   */
   def getFilteredColumnInterval(
       project: Project,
       mq: RelMetadataQuery,
@@ -76,14 +83,14 @@ class FlinkRelMdFilteredColumnInterval private extends MetadataHandler[FilteredC
   }
 
   /**
-    * Gets the column interval of the given column with filter argument on Filter
-    *
-    * @param filter Filter RelNode
-    * @param mq RelMetadataQuery instance
-    * @param columnIndex  the index of the given column
-    * @param filterArg  the filter argument
-    * @return interval of the given column after filtered in Calc
-    */
+   * Gets the column interval of the given column with filter argument on Filter
+   *
+   * @param filter Filter RelNode
+   * @param mq RelMetadataQuery instance
+   * @param columnIndex  the index of the given column
+   * @param filterArg  the filter argument
+   * @return interval of the given column after filtered in Calc
+   */
   def getFilteredColumnInterval(
       filter: Filter,
       mq: RelMetadataQuery,
@@ -95,8 +102,8 @@ class FlinkRelMdFilteredColumnInterval private extends MetadataHandler[FilteredC
       columnInterval
     } else {
       // the filter expression is not hold by Filter Node, delegate is to its input
-      val filteredColumnInterval = fmq.getFilteredColumnInterval(
-        filter.getInput, columnIndex, filterArg)
+      val filteredColumnInterval =
+        fmq.getFilteredColumnInterval(filter.getInput, columnIndex, filterArg)
       // combine filteredInterval and originInterval
       if (filteredColumnInterval == null) {
         columnInterval
@@ -112,14 +119,14 @@ class FlinkRelMdFilteredColumnInterval private extends MetadataHandler[FilteredC
   }
 
   /**
-    * Gets the column interval of the given column with filter argument on Calc
-    *
-    * @param calc Calc RelNode
-    * @param mq RelMetadataQuery instance
-    * @param columnIndex  the index of the given column
-    * @param filterArg  the filter argument
-    * @return interval of the given column after filtered in Calc
-    */
+   * Gets the column interval of the given column with filter argument on Calc
+   *
+   * @param calc Calc RelNode
+   * @param mq RelMetadataQuery instance
+   * @param columnIndex  the index of the given column
+   * @param filterArg  the filter argument
+   * @return interval of the given column after filtered in Calc
+   */
   def getFilteredColumnInterval(
       calc: Calc,
       mq: RelMetadataQuery,
@@ -142,14 +149,14 @@ class FlinkRelMdFilteredColumnInterval private extends MetadataHandler[FilteredC
   }
 
   /**
-    * Gets the column interval of the given column with filter argument on Exchange
-    *
-    * @param exchange Exchange RelNode
-    * @param mq RelMetadataQuery instance
-    * @param columnIndex  the index of the given column
-    * @param filterArg  the filter argument
-    * @return interval of the given column after filtered in Calc
-    */
+   * Gets the column interval of the given column with filter argument on Exchange
+   *
+   * @param exchange Exchange RelNode
+   * @param mq RelMetadataQuery instance
+   * @param columnIndex  the index of the given column
+   * @param filterArg  the filter argument
+   * @return interval of the given column after filtered in Calc
+   */
   def getFilteredColumnInterval(
       exchange: Exchange,
       mq: RelMetadataQuery,
@@ -168,10 +175,10 @@ class FlinkRelMdFilteredColumnInterval private extends MetadataHandler[FilteredC
   }
 
   def getFilteredColumnInterval(
-    aggregate: TableAggregate,
-    mq: RelMetadataQuery,
-    columnIndex: Int,
-    filterArg: Int): ValueInterval = {
+      aggregate: TableAggregate,
+      mq: RelMetadataQuery,
+      columnIndex: Int,
+      filterArg: Int): ValueInterval = {
     estimateFilteredColumnIntervalOfAggregate(aggregate, mq, columnIndex, filterArg)
   }
 
@@ -192,10 +199,10 @@ class FlinkRelMdFilteredColumnInterval private extends MetadataHandler[FilteredC
   }
 
   def getFilteredColumnInterval(
-    aggregate: StreamPhysicalGroupTableAggregate,
-    mq: RelMetadataQuery,
-    columnIndex: Int,
-    filterArg: Int): ValueInterval = {
+      aggregate: StreamPhysicalGroupTableAggregate,
+      mq: RelMetadataQuery,
+      columnIndex: Int,
+      filterArg: Int): ValueInterval = {
     estimateFilteredColumnIntervalOfAggregate(aggregate, mq, columnIndex, filterArg)
   }
 
@@ -224,10 +231,10 @@ class FlinkRelMdFilteredColumnInterval private extends MetadataHandler[FilteredC
   }
 
   def getFilteredColumnInterval(
-    aggregate: StreamPhysicalGroupWindowTableAggregate,
-    mq: RelMetadataQuery,
-    columnIndex: Int,
-    filterArg: Int): ValueInterval = {
+      aggregate: StreamPhysicalGroupWindowTableAggregate,
+      mq: RelMetadataQuery,
+      columnIndex: Int,
+      filterArg: Int): ValueInterval = {
     estimateFilteredColumnIntervalOfAggregate(aggregate, mq, columnIndex, filterArg)
   }
 
@@ -242,22 +249,21 @@ class FlinkRelMdFilteredColumnInterval private extends MetadataHandler[FilteredC
   }
 
   /**
-    * Gets the column interval of the given column with filter argument in Union
-    *
-    * @param union Union RelNode
-    * @param mq RelMetadataQuery instance
-    * @param columnIndex  the index of the given column
-    * @param filterArg  the filter argument
-    * @return interval of the given column after filtered in Calc
-    */
+   * Gets the column interval of the given column with filter argument in Union
+   *
+   * @param union Union RelNode
+   * @param mq RelMetadataQuery instance
+   * @param columnIndex  the index of the given column
+   * @param filterArg  the filter argument
+   * @return interval of the given column after filtered in Calc
+   */
   def getFilteredColumnInterval(
       union: Union,
       mq: RelMetadataQuery,
       columnIndex: Int,
       filterArg: Int): ValueInterval = {
     val fmq = FlinkRelMetadataQuery.reuseOrCreate(mq)
-    val subIntervals = union
-      .getInputs
+    val subIntervals = union.getInputs
       .map(fmq.getFilteredColumnInterval(_, columnIndex, filterArg))
     subIntervals.reduceLeft(ValueInterval.union)
   }
@@ -285,5 +291,6 @@ object FlinkRelMdFilteredColumnInterval {
   private val INSTANCE = new FlinkRelMdFilteredColumnInterval
 
   val SOURCE: RelMetadataProvider = ReflectiveRelMetadataProvider.reflectiveSource(
-    FlinkMetadata.FilteredColumnInterval.METHOD, INSTANCE)
+    FlinkMetadata.FilteredColumnInterval.METHOD,
+    INSTANCE)
 }

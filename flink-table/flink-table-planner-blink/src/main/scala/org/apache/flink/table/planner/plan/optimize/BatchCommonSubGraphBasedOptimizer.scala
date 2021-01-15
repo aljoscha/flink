@@ -23,7 +23,10 @@ import org.apache.flink.table.catalog.{CatalogManager, FunctionCatalog}
 import org.apache.flink.table.planner.calcite.{FlinkContext, SqlExprToRexConverterFactory}
 import org.apache.flink.table.planner.delegation.BatchPlanner
 import org.apache.flink.table.planner.plan.nodes.physical.batch.BatchExecLegacySink
-import org.apache.flink.table.planner.plan.optimize.program.{BatchOptimizeContext, FlinkBatchProgram}
+import org.apache.flink.table.planner.plan.optimize.program.{
+  BatchOptimizeContext,
+  FlinkBatchProgram
+}
 import org.apache.flink.table.planner.plan.schema.IntermediateRelTable
 import org.apache.flink.table.planner.utils.TableConfigUtils
 import org.apache.flink.util.Preconditions
@@ -33,10 +36,10 @@ import org.apache.calcite.rel.RelNode
 import java.util.Collections
 
 /**
-  * A [[CommonSubGraphBasedOptimizer]] for Batch.
-  */
+ * A [[CommonSubGraphBasedOptimizer]] for Batch.
+ */
 class BatchCommonSubGraphBasedOptimizer(planner: BatchPlanner)
-  extends CommonSubGraphBasedOptimizer {
+    extends CommonSubGraphBasedOptimizer {
 
   override protected def doOptimize(roots: Seq[RelNode]): Seq[RelNodeBlock] = {
     // build RelNodeBlock plan
@@ -60,8 +63,8 @@ class BatchCommonSubGraphBasedOptimizer(planner: BatchPlanner)
       case _: BatchExecLegacySink[_] => // ignore
       case _ =>
         val name = createUniqueIntermediateRelTableName
-        val intermediateRelTable =  new IntermediateRelTable(Collections.singletonList(name),
-          optimizedTree)
+        val intermediateRelTable =
+          new IntermediateRelTable(Collections.singletonList(name), optimizedTree)
         val newTableScan = wrapIntermediateRelTableToTableScan(intermediateRelTable, name)
         block.setNewOutputNode(newTableScan)
         block.setOutputTableName(name)
@@ -70,29 +73,33 @@ class BatchCommonSubGraphBasedOptimizer(planner: BatchPlanner)
   }
 
   /**
-    * Generates the optimized [[RelNode]] tree from the original relational node tree.
-    *
-    * @param relNode The original [[RelNode]] tree
-    * @return The optimized [[RelNode]] tree
-    */
+   * Generates the optimized [[RelNode]] tree from the original relational node tree.
+   *
+   * @param relNode The original [[RelNode]] tree
+   * @return The optimized [[RelNode]] tree
+   */
   private def optimizeTree(relNode: RelNode): RelNode = {
     val config = planner.getTableConfig
-    val programs = TableConfigUtils.getCalciteConfig(config).getBatchProgram
+    val programs = TableConfigUtils
+      .getCalciteConfig(config)
+      .getBatchProgram
       .getOrElse(FlinkBatchProgram.buildProgram(config.getConfiguration))
     Preconditions.checkNotNull(programs)
 
     val context = relNode.getCluster.getPlanner.getContext.unwrap(classOf[FlinkContext])
 
-    programs.optimize(relNode, new BatchOptimizeContext {
-      override def getTableConfig: TableConfig = config
+    programs.optimize(
+      relNode,
+      new BatchOptimizeContext {
+        override def getTableConfig: TableConfig = config
 
-      override def getFunctionCatalog: FunctionCatalog = planner.functionCatalog
+        override def getFunctionCatalog: FunctionCatalog = planner.functionCatalog
 
-      override def getCatalogManager: CatalogManager = planner.catalogManager
+        override def getCatalogManager: CatalogManager = planner.catalogManager
 
-      override def getSqlExprToRexConverterFactory: SqlExprToRexConverterFactory =
-        context.getSqlExprToRexConverterFactory
-    })
+        override def getSqlExprToRexConverterFactory: SqlExprToRexConverterFactory =
+          context.getSqlExprToRexConverterFactory
+      })
   }
 
 }

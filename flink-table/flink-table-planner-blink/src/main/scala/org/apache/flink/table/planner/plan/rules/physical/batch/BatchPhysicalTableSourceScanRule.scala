@@ -31,14 +31,14 @@ import org.apache.calcite.rel.convert.ConverterRule
 import org.apache.calcite.rel.core.TableScan
 
 /**
-  * Rule that converts [[FlinkLogicalTableSourceScan]] to [[BatchPhysicalTableSourceScan]].
-  */
+ * Rule that converts [[FlinkLogicalTableSourceScan]] to [[BatchPhysicalTableSourceScan]].
+ */
 class BatchPhysicalTableSourceScanRule
-  extends ConverterRule(
-    classOf[FlinkLogicalTableSourceScan],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.BATCH_PHYSICAL,
-    "BatchPhysicalTableSourceScanRule") {
+    extends ConverterRule(
+      classOf[FlinkLogicalTableSourceScan],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.BATCH_PHYSICAL,
+      "BatchPhysicalTableSourceScanRule") {
 
   /** Rule must only match if TableScan targets a bounded [[ScanTableSource]] */
   override def matches(call: RelOptRuleCall): Boolean = {
@@ -61,8 +61,7 @@ class BatchPhysicalTableSourceScanRule
     new BatchPhysicalTableSourceScan(
       rel.getCluster,
       newTrait,
-      scan.getTable.asInstanceOf[TableSourceTable]
-    )
+      scan.getTable.asInstanceOf[TableSourceTable])
   }
 }
 

@@ -24,13 +24,13 @@ import org.apache.flink.table.utils.{TableFunc1, TableTestBase}
 
 import org.junit.Test
 
-class CorrelateValidationTest extends TableTestBase{
+class CorrelateValidationTest extends TableTestBase {
 
   /**
-    * Due to the improper translation of TableFunction left outer join (see CALCITE-2004), the
-    * join predicate can only be empty or literal true (the restriction should be removed in
-    * FLINK-7865).
-    */
+   * Due to the improper translation of TableFunction left outer join (see CALCITE-2004), the
+   * join predicate can only be empty or literal true (the restriction should be removed in
+   * FLINK-7865).
+   */
   @Test(expected = classOf[ValidationException])
   def testLeftOuterJoinWithPredicates(): Unit = {
     val util = streamTestUtil()

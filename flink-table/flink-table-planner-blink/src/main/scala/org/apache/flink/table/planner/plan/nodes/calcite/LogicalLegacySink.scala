@@ -29,10 +29,10 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
-  * Sub-class of [[LegacySink]] that is a relational expression
-  * which writes out data of input node into a [[TableSink]].
-  * This class corresponds to Calcite logical rel.
-  */
+ * Sub-class of [[LegacySink]] that is a relational expression
+ * which writes out data of input node into a [[TableSink]].
+ * This class corresponds to Calcite logical rel.
+ */
 final class LogicalLegacySink(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -41,24 +41,37 @@ final class LogicalLegacySink(
     sinkName: String,
     val catalogTable: CatalogTable,
     val staticPartitions: Map[String, String])
-  extends LegacySink(cluster, traitSet, input, sink, sinkName) {
+    extends LegacySink(cluster, traitSet, input, sink, sinkName) {
 
   override def copy(traitSet: RelTraitSet, inputs: util.List[RelNode]): RelNode = {
     new LogicalLegacySink(
-      cluster, traitSet, inputs.head, sink, sinkName, catalogTable, staticPartitions)
+      cluster,
+      traitSet,
+      inputs.head,
+      sink,
+      sinkName,
+      catalogTable,
+      staticPartitions)
   }
 
 }
 
 object LogicalLegacySink {
 
-  def create(input: RelNode,
+  def create(
+      input: RelNode,
       sink: TableSink[_],
       sinkName: String,
       catalogTable: CatalogTable = null,
       staticPartitions: Map[String, String] = Map()): LogicalLegacySink = {
     val traits = input.getCluster.traitSetOf(Convention.NONE)
     new LogicalLegacySink(
-      input.getCluster, traits, input, sink, sinkName, catalogTable, staticPartitions)
+      input.getCluster,
+      traits,
+      input,
+      sink,
+      sinkName,
+      catalogTable,
+      staticPartitions)
   }
 }

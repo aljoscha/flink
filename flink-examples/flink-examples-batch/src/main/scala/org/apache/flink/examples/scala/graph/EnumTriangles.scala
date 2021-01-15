@@ -32,12 +32,12 @@ import scala.collection.mutable
 /**
  * Triangle enumeration is a pre-processing step to find closely connected parts in graphs.
  * A triangle consists of three edges that connect three vertices with each other.
- * 
+ *
  * The algorithm works as follows:
- * It groups all edges that share a common vertex and builds triads, i.e., triples of vertices 
- * that are connected by two edges. Finally, all triads are filtered for which no third edge exists 
+ * It groups all edges that share a common vertex and builds triads, i.e., triples of vertices
+ * that are connected by two edges. Finally, all triads are filtered for which no third edge exists
  * that closes the triangle.
- *  
+ *
  * Input files are plain text files and must be formatted as follows:
  *
  *  - Edges are represented as pairs for vertex IDs which are separated by space
@@ -50,20 +50,19 @@ import scala.collection.mutable
  *     /  \
  *   (2)-(12)
  * </pre>
- * 
- * Usage: 
+ *
+ * Usage:
  * {{{
  * EnumTriangleBasic <edge path> <result path>
  * }}}
  * <br>
- * If no parameters are provided, the program is run with default data from 
+ * If no parameters are provided, the program is run with default data from
  * [[org.apache.flink.examples.java.graph.util.EnumTrianglesData]]
- * 
+ *
  * This example shows how to use:
  *
  *  - Custom Java objects which extend Tuple
  *  - Group Sorting
- *
  */
 object EnumTriangles {
 
@@ -87,22 +86,26 @@ object EnumTriangles {
       } else {
         println("Executing EnumTriangles example with default edges data set.")
         println("Use --edges to specify file input.")
-        val edges = EnumTrianglesData.EDGES.map {
-          case Array(v1, v2) => new Edge(v1.asInstanceOf[Int], v2.asInstanceOf[Int])
+        val edges = EnumTrianglesData.EDGES.map { case Array(v1, v2) =>
+          new Edge(v1.asInstanceOf[Int], v2.asInstanceOf[Int])
         }
         env.fromCollection(edges)
       }
-    
+
     // project edges by vertex id
-    val edgesById = edges map(e => if (e.v1 < e.v2) e else Edge(e.v2, e.v1) )
-    
+    val edgesById = edges map (e => if (e.v1 < e.v2) e else Edge(e.v2, e.v1))
+
     val triangles = edgesById
-            // build triads
-            .groupBy("v1").sortGroup("v2", Order.ASCENDING).reduceGroup(new TriadBuilder())
-            // filter triads
-            .join(edgesById).where("v2", "v3").equalTo("v1", "v2") { (t, _) => t }
-              .withForwardedFieldsFirst("*")
-    
+      // build triads
+      .groupBy("v1")
+      .sortGroup("v2", Order.ASCENDING)
+      .reduceGroup(new TriadBuilder())
+      // filter triads
+      .join(edgesById)
+      .where("v2", "v3")
+      .equalTo("v1", "v2") { (t, _) => t }
+      .withForwardedFieldsFirst("*")
+
     // emit result
     if (params.has("output")) {
       triangles.writeAsCsv(params.get("output"), "\n", ",")
@@ -112,7 +115,6 @@ object EnumTriangles {
       println("Printing result to stdout. Use --output to specify output path.")
       triangles.print()
     }
-    
 
   }
 
@@ -122,8 +124,7 @@ object EnumTriangles {
 
   case class Edge(v1: Int, v2: Int) extends Serializable
   case class Triad(v1: Int, v2: Int, v3: Int) extends Serializable
-  
-    
+
   // *************************************************************************
   //     USER FUNCTIONS
   // *************************************************************************
@@ -137,17 +138,17 @@ object EnumTriangles {
   class TriadBuilder extends GroupReduceFunction[Edge, Triad] {
 
     val vertices = mutable.MutableList[Integer]()
-    
+
     override def reduce(edges: java.lang.Iterable[Edge], out: Collector[Triad]) = {
-      
+
       // clear vertex list
       vertices.clear()
 
       // build and emit triads
-      for(e <- edges.asScala) {
-      
+      for (e <- edges.asScala) {
+
         // combine vertex with all previously read vertices
-        for(v <- vertices) {
+        for (v <- vertices) {
           out.collect(Triad(e.v1, v, e.v2))
         }
         vertices += e.v2

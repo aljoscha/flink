@@ -96,7 +96,10 @@ class TableEnvironmentTest {
     TestTableSourceSinks.createPersonCsvTemporaryTable(tEnv, "MyTable")
 
     TestTableSourceSinks.createCsvTemporarySinkTable(
-      tEnv, new TableSchema(Array("first"), Array(STRING)), "MySink", -1)
+      tEnv,
+      new TableSchema(Array("first"), Array(STRING)),
+      "MySink",
+      -1)
 
     val expected = TableTestUtil.readFromResource("/explain/testStreamTableEnvironmentExplain.out")
     val actual = tEnv.explainSql("insert into MySink select first from MyTable")
@@ -113,14 +116,19 @@ class TableEnvironmentTest {
     TestTableSourceSinks.createPersonCsvTemporaryTable(tEnv, "MyTable")
 
     TestTableSourceSinks.createCsvTemporarySinkTable(
-      tEnv, new TableSchema(Array("first"), Array(STRING)), "MySink", -1)
+      tEnv,
+      new TableSchema(Array("first"), Array(STRING)),
+      "MySink",
+      -1)
 
     val expected =
       TableTestUtil.readFromResource("/explain/testStreamTableEnvironmentExecutionExplain.out")
-    val actual = tEnv.explainSql("insert into MySink select first from MyTable",
+    val actual = tEnv.explainSql(
+      "insert into MySink select first from MyTable",
       ExplainDetail.JSON_EXECUTION_PLAN)
 
-    assertEquals(TableTestUtil.replaceStreamNodeId(expected),
+    assertEquals(
+      TableTestUtil.replaceStreamNodeId(expected),
       TableTestUtil.replaceStreamNodeId(actual))
   }
 
@@ -134,7 +142,10 @@ class TableEnvironmentTest {
     TestTableSourceSinks.createPersonCsvTemporaryTable(tEnv, "MyTable")
 
     TestTableSourceSinks.createCsvTemporarySinkTable(
-      tEnv, new TableSchema(Array("first"), Array(STRING)), "MySink", -1)
+      tEnv,
+      new TableSchema(Array("first"), Array(STRING)),
+      "MySink",
+      -1)
 
     val expected =
       TableTestUtil.readFromResource("/explain/testStatementSetExecutionExplain.out")
@@ -142,7 +153,8 @@ class TableEnvironmentTest {
     statementSet.addInsertSql("insert into MySink select last from MyTable")
     val actual = statementSet.explain(ExplainDetail.JSON_EXECUTION_PLAN)
 
-    assertEquals(TableTestUtil.replaceStreamNodeId(expected),
+    assertEquals(
+      TableTestUtil.replaceStreamNodeId(expected),
       TableTestUtil.replaceStreamNodeId(actual))
   }
 
@@ -161,20 +173,29 @@ class TableEnvironmentTest {
       """.stripMargin
     val tableResult1 = tableEnv.executeSql(createTableStmt)
     assertEquals(ResultKind.SUCCESS, tableResult1.getResultKind)
-    assertTrue(tableEnv.getCatalog(tableEnv.getCurrentCatalog).get()
-      .tableExists(ObjectPath.fromString(s"${tableEnv.getCurrentDatabase}.tbl1")))
+    assertTrue(
+      tableEnv
+        .getCatalog(tableEnv.getCurrentCatalog)
+        .get()
+        .tableExists(ObjectPath.fromString(s"${tableEnv.getCurrentDatabase}.tbl1")))
 
     val tableResult2 = tableEnv.executeSql("ALTER TABLE tbl1 SET ('k1' = 'a', 'k2' = 'b')")
     assertEquals(ResultKind.SUCCESS, tableResult2.getResultKind)
     assertEquals(
       Map("connector" -> "COLLECTION", "is-bounded" -> "false", "k1" -> "a", "k2" -> "b").asJava,
-      tableEnv.getCatalog(tableEnv.getCurrentCatalog).get()
-        .getTable(ObjectPath.fromString(s"${tableEnv.getCurrentDatabase}.tbl1")).getProperties)
+      tableEnv
+        .getCatalog(tableEnv.getCurrentCatalog)
+        .get()
+        .getTable(ObjectPath.fromString(s"${tableEnv.getCurrentDatabase}.tbl1"))
+        .getProperties)
 
     val tableResult3 = tableEnv.executeSql("DROP TABLE tbl1")
     assertEquals(ResultKind.SUCCESS, tableResult3.getResultKind)
-    assertFalse(tableEnv.getCatalog(tableEnv.getCurrentCatalog).get()
-      .tableExists(ObjectPath.fromString(s"${tableEnv.getCurrentDatabase}.tbl1")))
+    assertFalse(
+      tableEnv
+        .getCatalog(tableEnv.getCurrentCatalog)
+        .get()
+        .tableExists(ObjectPath.fromString(s"${tableEnv.getCurrentDatabase}.tbl1")))
   }
 
   @Test
@@ -195,13 +216,19 @@ class TableEnvironmentTest {
     assertEquals(ResultKind.SUCCESS, tableResult1.getResultKind)
     val tableResult2 = tableEnv.executeSql(createTableStmt)
     assertEquals(ResultKind.SUCCESS, tableResult2.getResultKind)
-    assertTrue(tableEnv.getCatalog(tableEnv.getCurrentCatalog).get()
-      .tableExists(ObjectPath.fromString(s"${tableEnv.getCurrentDatabase}.tbl1")))
+    assertTrue(
+      tableEnv
+        .getCatalog(tableEnv.getCurrentCatalog)
+        .get()
+        .tableExists(ObjectPath.fromString(s"${tableEnv.getCurrentDatabase}.tbl1")))
 
     val tableResult3 = tableEnv.executeSql("DROP TABLE IF EXISTS tbl1")
     assertEquals(ResultKind.SUCCESS, tableResult3.getResultKind)
-    assertFalse(tableEnv.getCatalog(tableEnv.getCurrentCatalog).get()
-      .tableExists(ObjectPath.fromString(s"${tableEnv.getCurrentDatabase}.tbl1")))
+    assertFalse(
+      tableEnv
+        .getCatalog(tableEnv.getCurrentCatalog)
+        .get()
+        .tableExists(ObjectPath.fromString(s"${tableEnv.getCurrentDatabase}.tbl1")))
   }
 
   @Test
@@ -319,8 +346,8 @@ class TableEnvironmentTest {
     assertEquals(ResultKind.SUCCESS, tableResult1.getResultKind)
     assert(tableEnv.listTables().sameElements(Array[String]("tbl1")))
 
-    val tableResult2 = tableEnv.executeSql(
-      "DROP TEMPORARY TABLE default_catalog.default_database.tbl1")
+    val tableResult2 =
+      tableEnv.executeSql("DROP TEMPORARY TABLE default_catalog.default_database.tbl1")
     assertEquals(ResultKind.SUCCESS, tableResult2.getResultKind)
     assert(tableEnv.listTables().sameElements(Array.empty[String]))
   }
@@ -343,8 +370,7 @@ class TableEnvironmentTest {
     assert(tableEnv.listTables().sameElements(Array[String]("tbl1")))
 
     // fail the case
-    tableEnv.executeSql(
-      "DROP TEMPORARY TABLE invalid_catalog.invalid_database.tbl1")
+    tableEnv.executeSql("DROP TEMPORARY TABLE invalid_catalog.invalid_database.tbl1")
   }
 
   @Test
@@ -371,21 +397,29 @@ class TableEnvironmentTest {
 
     val tableResult1 = tableEnv.executeSql(s"CREATE FUNCTION default_database.f1 AS '$funcName'")
     assertEquals(ResultKind.SUCCESS, tableResult1.getResultKind)
-    assertTrue(tableEnv.getCatalog(tableEnv.getCurrentCatalog).get()
-      .functionExists(ObjectPath.fromString("default_database.f1")))
+    assertTrue(
+      tableEnv
+        .getCatalog(tableEnv.getCurrentCatalog)
+        .get()
+        .functionExists(ObjectPath.fromString("default_database.f1")))
 
     val tableResult2 = tableEnv.executeSql(s"ALTER FUNCTION default_database.f1 AS '$funcName2'")
     assertEquals(ResultKind.SUCCESS, tableResult2.getResultKind)
-    assertTrue(tableEnv.getCatalog(tableEnv.getCurrentCatalog).get()
-      .functionExists(ObjectPath.fromString("default_database.f1")))
+    assertTrue(
+      tableEnv
+        .getCatalog(tableEnv.getCurrentCatalog)
+        .get()
+        .functionExists(ObjectPath.fromString("default_database.f1")))
 
     val tableResult3 = tableEnv.executeSql("DROP FUNCTION default_database.f1")
     assertEquals(ResultKind.SUCCESS, tableResult3.getResultKind)
-    assertFalse(tableEnv.getCatalog(tableEnv.getCurrentCatalog).get()
-      .functionExists(ObjectPath.fromString("default_database.f1")))
+    assertFalse(
+      tableEnv
+        .getCatalog(tableEnv.getCurrentCatalog)
+        .get()
+        .functionExists(ObjectPath.fromString("default_database.f1")))
 
-    val tableResult4 = tableEnv.executeSql(
-      s"CREATE TEMPORARY SYSTEM FUNCTION f2 AS '$funcName'")
+    val tableResult4 = tableEnv.executeSql(s"CREATE TEMPORARY SYSTEM FUNCTION f2 AS '$funcName'")
     assertEquals(ResultKind.SUCCESS, tableResult4.getResultKind)
     assertTrue(tableEnv.listUserDefinedFunctions().contains("f2"))
 
@@ -396,8 +430,8 @@ class TableEnvironmentTest {
 
   @Test
   def testExecuteSqlWithCreateUseDropCatalog(): Unit = {
-    val tableResult1 = tableEnv.executeSql(
-      "CREATE CATALOG my_catalog WITH('type'='generic_in_memory')")
+    val tableResult1 =
+      tableEnv.executeSql("CREATE CATALOG my_catalog WITH('type'='generic_in_memory')")
     assertEquals(ResultKind.SUCCESS, tableResult1.getResultKind)
     assertTrue(tableEnv.getCatalog("my_catalog").isPresent)
 
@@ -471,9 +505,7 @@ class TableEnvironmentTest {
     assertEquals(
       TableSchema.builder().field("table name", DataTypes.STRING()).build(),
       tableResult2.getTableSchema)
-    checkData(
-      util.Arrays.asList(Row.of("tbl1")).iterator(),
-      tableResult2.collect())
+    checkData(util.Arrays.asList(Row.of("tbl1")).iterator(), tableResult2.collect())
   }
 
   @Test
@@ -505,13 +537,19 @@ class TableEnvironmentTest {
 
     val viewResult1 = tableEnv.executeSql("CREATE VIEW IF NOT EXISTS v1 AS SELECT * FROM tbl1")
     assertEquals(ResultKind.SUCCESS, viewResult1.getResultKind)
-    assertTrue(tableEnv.getCatalog(tableEnv.getCurrentCatalog).get()
-      .tableExists(ObjectPath.fromString(s"${tableEnv.getCurrentDatabase}.v1")))
+    assertTrue(
+      tableEnv
+        .getCatalog(tableEnv.getCurrentCatalog)
+        .get()
+        .tableExists(ObjectPath.fromString(s"${tableEnv.getCurrentDatabase}.v1")))
 
     val viewResult2 = tableEnv.executeSql("DROP VIEW IF EXISTS v1")
     assertEquals(ResultKind.SUCCESS, viewResult2.getResultKind)
-    assertFalse(tableEnv.getCatalog(tableEnv.getCurrentCatalog).get()
-      .tableExists(ObjectPath.fromString(s"${tableEnv.getCurrentDatabase}.v1")))
+    assertFalse(
+      tableEnv
+        .getCatalog(tableEnv.getCurrentCatalog)
+        .get()
+        .tableExists(ObjectPath.fromString(s"${tableEnv.getCurrentDatabase}.v1")))
   }
 
   @Test
@@ -529,8 +567,8 @@ class TableEnvironmentTest {
       """.stripMargin
     tableEnv.executeSql(createTableStmt)
 
-    val viewResult1 = tableEnv.executeSql(
-      "CREATE TEMPORARY VIEW IF NOT EXISTS v1 AS SELECT * FROM tbl1")
+    val viewResult1 =
+      tableEnv.executeSql("CREATE TEMPORARY VIEW IF NOT EXISTS v1 AS SELECT * FROM tbl1")
     assertEquals(ResultKind.SUCCESS, viewResult1.getResultKind)
     assert(tableEnv.listTables().sameElements(Array[String]("tbl1", "v1")))
 
@@ -542,9 +580,10 @@ class TableEnvironmentTest {
   @Test
   def testCreateViewWithWrongFieldList(): Unit = {
     thrown.expect(classOf[ValidationException])
-    thrown.expectMessage("VIEW definition and input fields not match:\n" +
-      "\tDef fields: [d].\n" +
-      "\tInput fields: [a, b, c].")
+    thrown.expectMessage(
+      "VIEW definition and input fields not match:\n" +
+        "\tDef fields: [d].\n" +
+        "\tInput fields: [a, b, c].")
     val sourceDDL =
       """
         |CREATE TABLE T1(
@@ -709,7 +748,6 @@ class TableEnvironmentTest {
       """
         |CREATE VIEW T2(d, e, f) AS SELECT a, b, c FROM T1
       """.stripMargin
-
 
     tableEnv.executeSql(sourceDDL)
     tableEnv.executeSql(viewDDL)
@@ -886,9 +924,7 @@ class TableEnvironmentTest {
     assertEquals(
       TableSchema.builder().field("view name", DataTypes.STRING()).build(),
       tableResult3.getTableSchema)
-    checkData(
-      util.Arrays.asList(Row.of("view1")).iterator(),
-      tableResult3.collect())
+    checkData(util.Arrays.asList(Row.of("view1")).iterator(), tableResult3.collect())
 
     val tableResult4 = tableEnv.executeSql("CREATE TEMPORARY VIEW view2 AS SELECT * FROM tbl1")
     assertEquals(ResultKind.SUCCESS, tableResult4.getResultKind)
@@ -1012,8 +1048,8 @@ class TableEnvironmentTest {
     val tableResult1 = tableEnv.executeSql(createTableStmt)
     assertEquals(ResultKind.SUCCESS, tableResult1.getResultKind)
 
-    val actual = tableEnv.explainSql(
-      "select * from MyTable where a > 10", ExplainDetail.CHANGELOG_MODE)
+    val actual =
+      tableEnv.explainSql("select * from MyTable where a > 10", ExplainDetail.CHANGELOG_MODE)
     val expected = TableTestUtil.readFromResource("/explain/testExplainSqlWithSelect.out")
     assertEquals(replaceStageId(expected), replaceStageId(actual))
   }
@@ -1047,8 +1083,7 @@ class TableEnvironmentTest {
     val tableResult2 = tableEnv.executeSql(createTableStmt2)
     assertEquals(ResultKind.SUCCESS, tableResult2.getResultKind)
 
-    val actual = tableEnv.explainSql(
-      "insert into MySink select a, b from MyTable where a > 10")
+    val actual = tableEnv.explainSql("insert into MySink select a, b from MyTable where a > 10")
     val expected = TableTestUtil.readFromResource("/explain/testExplainSqlWithInsert.out")
     assertEquals(replaceStageId(expected), replaceStageId(actual))
   }
@@ -1069,7 +1104,8 @@ class TableEnvironmentTest {
     val tableResult1 = tableEnv.executeSql(createTableStmt)
     assertEquals(ResultKind.SUCCESS, tableResult1.getResultKind)
 
-    val actual = tableEnv.sqlQuery("select * from MyTable where a > 10")
+    val actual = tableEnv
+      .sqlQuery("select * from MyTable where a > 10")
       .explain(ExplainDetail.CHANGELOG_MODE)
     val expected = TableTestUtil.readFromResource("/explain/testExplainSqlWithSelect.out")
     assertEquals(replaceStageId(expected), replaceStageId(actual))
@@ -1137,48 +1173,60 @@ class TableEnvironmentTest {
     val tableResult1 = tableEnv.executeSql("describe T1")
     assertEquals(ResultKind.SUCCESS_WITH_CONTENT, tableResult1.getResultKind)
     checkData(
-      util.Arrays.asList(
-        Row.of("f0", "CHAR(10)", Boolean.box(true), null, null, null),
-        Row.of("f1", "VARCHAR(10)", Boolean.box(true), null, null, null),
-        Row.of("f2", "STRING", Boolean.box(true), null, null, null),
-        Row.of("f3", "BOOLEAN", Boolean.box(true), null, null, null),
-        Row.of("f4", "BINARY(10)", Boolean.box(true), null, null, null),
-        Row.of("f5", "VARBINARY(10)", Boolean.box(true), null, null, null),
-        Row.of("f6", "BYTES", Boolean.box(true), null, null, null),
-        Row.of("f7", "DECIMAL(10, 3)", Boolean.box(true), null, null, null),
-        Row.of("f8", "TINYINT", Boolean.box(true), null, null, null),
-        Row.of("f9", "SMALLINT", Boolean.box(true), null, null, null),
-        Row.of("f10", "INT", Boolean.box(true), null, null, null),
-        Row.of("f11", "BIGINT", Boolean.box(true), null, null, null),
-        Row.of("f12", "FLOAT", Boolean.box(true), null, null, null),
-        Row.of("f13", "DOUBLE", Boolean.box(true), null, null, null),
-        Row.of("f14", "DATE", Boolean.box(true), null, null, null),
-        Row.of("f15", "TIME(0)", Boolean.box(true), null, null, null),
-        Row.of("f16", "TIMESTAMP(6)", Boolean.box(true), null, null, null),
-        Row.of("f17", "TIMESTAMP(3)", Boolean.box(true), null, null, null),
-        Row.of("f18", "TIMESTAMP(6)", Boolean.box(true), null, null, null),
-        Row.of("f19", "TIMESTAMP(3) WITH LOCAL TIME ZONE", Boolean.box(true), null, null, null),
-        Row.of("f20", "TIMESTAMP(6) WITH LOCAL TIME ZONE", Boolean.box(true), null, null, null),
-        Row.of("f21", "ARRAY<INT>", Boolean.box(true), null, null, null),
-        Row.of("f22", "MAP<INT, STRING>", Boolean.box(true), null, null, null),
-        Row.of("f23", "ROW<`f0` INT, `f1` STRING>", Boolean.box(true), null, null, null),
-        Row.of("f24", "INT", Boolean.box(false), "PRI(f24, f26)", null, null),
-        Row.of("f25", "STRING", Boolean.box(false), null, null, null),
-        Row.of("f26", "ROW<`f0` INT NOT NULL, `f1` INT>", Boolean.box(false),
-          "PRI(f24, f26)", null, null),
-        Row.of("ts", "TIMESTAMP(3) *ROWTIME*", Boolean.box(true), null, "AS TO_TIMESTAMP(`f25`)",
-          "`ts` - INTERVAL '1' SECOND")
-      ).iterator(),
+      util.Arrays
+        .asList(
+          Row.of("f0", "CHAR(10)", Boolean.box(true), null, null, null),
+          Row.of("f1", "VARCHAR(10)", Boolean.box(true), null, null, null),
+          Row.of("f2", "STRING", Boolean.box(true), null, null, null),
+          Row.of("f3", "BOOLEAN", Boolean.box(true), null, null, null),
+          Row.of("f4", "BINARY(10)", Boolean.box(true), null, null, null),
+          Row.of("f5", "VARBINARY(10)", Boolean.box(true), null, null, null),
+          Row.of("f6", "BYTES", Boolean.box(true), null, null, null),
+          Row.of("f7", "DECIMAL(10, 3)", Boolean.box(true), null, null, null),
+          Row.of("f8", "TINYINT", Boolean.box(true), null, null, null),
+          Row.of("f9", "SMALLINT", Boolean.box(true), null, null, null),
+          Row.of("f10", "INT", Boolean.box(true), null, null, null),
+          Row.of("f11", "BIGINT", Boolean.box(true), null, null, null),
+          Row.of("f12", "FLOAT", Boolean.box(true), null, null, null),
+          Row.of("f13", "DOUBLE", Boolean.box(true), null, null, null),
+          Row.of("f14", "DATE", Boolean.box(true), null, null, null),
+          Row.of("f15", "TIME(0)", Boolean.box(true), null, null, null),
+          Row.of("f16", "TIMESTAMP(6)", Boolean.box(true), null, null, null),
+          Row.of("f17", "TIMESTAMP(3)", Boolean.box(true), null, null, null),
+          Row.of("f18", "TIMESTAMP(6)", Boolean.box(true), null, null, null),
+          Row.of("f19", "TIMESTAMP(3) WITH LOCAL TIME ZONE", Boolean.box(true), null, null, null),
+          Row.of("f20", "TIMESTAMP(6) WITH LOCAL TIME ZONE", Boolean.box(true), null, null, null),
+          Row.of("f21", "ARRAY<INT>", Boolean.box(true), null, null, null),
+          Row.of("f22", "MAP<INT, STRING>", Boolean.box(true), null, null, null),
+          Row.of("f23", "ROW<`f0` INT, `f1` STRING>", Boolean.box(true), null, null, null),
+          Row.of("f24", "INT", Boolean.box(false), "PRI(f24, f26)", null, null),
+          Row.of("f25", "STRING", Boolean.box(false), null, null, null),
+          Row.of(
+            "f26",
+            "ROW<`f0` INT NOT NULL, `f1` INT>",
+            Boolean.box(false),
+            "PRI(f24, f26)",
+            null,
+            null),
+          Row.of(
+            "ts",
+            "TIMESTAMP(3) *ROWTIME*",
+            Boolean.box(true),
+            null,
+            "AS TO_TIMESTAMP(`f25`)",
+            "`ts` - INTERVAL '1' SECOND"))
+        .iterator(),
       tableResult1.collect())
 
     val tableResult2 = tableEnv.executeSql("describe T2")
     assertEquals(ResultKind.SUCCESS_WITH_CONTENT, tableResult2.getResultKind)
     checkData(
-      util.Arrays.asList(
-        Row.of("d", "INT", Boolean.box(false), null, null, null),
-        Row.of("e", "STRING", Boolean.box(false), null, null, null),
-        Row.of("f", "ROW<`f0` INT NOT NULL, `f1` INT>", Boolean.box(false), null, null, null)
-      ).iterator(),
+      util.Arrays
+        .asList(
+          Row.of("d", "INT", Boolean.box(false), null, null, null),
+          Row.of("e", "STRING", Boolean.box(false), null, null, null),
+          Row.of("f", "ROW<`f0` INT NOT NULL, `f1` INT>", Boolean.box(false), null, null, null))
+        .iterator(),
       tableResult2.collect())
 
     // temporary view T2(x, y) masks permanent view T2(d, e, f)
@@ -1191,9 +1239,11 @@ class TableEnvironmentTest {
     val tableResult3 = tableEnv.executeSql("describe T2")
     assertEquals(ResultKind.SUCCESS_WITH_CONTENT, tableResult3.getResultKind)
     checkData(
-      util.Arrays.asList(
-        Row.of("x", "INT", Boolean.box(false), null, null, null),
-        Row.of("y", "STRING", Boolean.box(false), null, null, null)).iterator(),
+      util.Arrays
+        .asList(
+          Row.of("x", "INT", Boolean.box(false), null, null, null),
+          Row.of("y", "STRING", Boolean.box(false), null, null, null))
+        .iterator(),
       tableResult3.collect())
   }
 

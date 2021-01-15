@@ -29,16 +29,12 @@ class SchemaTest extends DescriptorTestBase {
 
   @Test(expected = classOf[ValidationException])
   def testInvalidType(): Unit = {
-    addPropertyAndVerify(
-      descriptors().get(0),
-      "schema.1.data-type", "dfghj")
+    addPropertyAndVerify(descriptors().get(0), "schema.1.data-type", "dfghj")
   }
 
   @Test(expected = classOf[ValidationException])
   def testBothRowtimeAndProctime(): Unit = {
-    addPropertyAndVerify(
-      descriptors().get(0),
-      "schema.2.rowtime.watermarks.type", "from-source")
+    addPropertyAndVerify(descriptors().get(0), "schema.2.rowtime.watermarks.type", "from-source")
   }
 
   // ----------------------------------------------------------------------------------------------
@@ -46,15 +42,19 @@ class SchemaTest extends DescriptorTestBase {
   override def descriptors(): util.List[Descriptor] = {
     val desc1 = new Schema()
       .field("myField", Types.BOOLEAN)
-      .field("otherField", "VARCHAR").from("csvField")
-      .field("p", Types.SQL_TIMESTAMP).proctime()
-      .field("r", Types.SQL_TIMESTAMP).rowtime(
-      new Rowtime().timestampsFromSource().watermarksFromSource())
+      .field("otherField", "VARCHAR")
+      .from("csvField")
+      .field("p", Types.SQL_TIMESTAMP)
+      .proctime()
+      .field("r", Types.SQL_TIMESTAMP)
+      .rowtime(new Rowtime().timestampsFromSource().watermarksFromSource())
 
     val desc2 = new Schema()
       .field("myField", Types.BOOLEAN)
-      .field("otherField", "VARCHAR").from("csvField")
-      .field("p", Types.SQL_TIMESTAMP).proctime()
+      .field("otherField", "VARCHAR")
+      .from("csvField")
+      .field("p", Types.SQL_TIMESTAMP)
+      .proctime()
       .field("r", Types.SQL_TIMESTAMP)
 
     util.Arrays.asList(desc1, desc2)
@@ -77,8 +77,7 @@ class SchemaTest extends DescriptorTestBase {
       "schema.3.name" -> "r",
       "schema.3.data-type" -> "TIMESTAMP(3)",
       "schema.3.rowtime.watermarks.type" -> "from-source",
-      "schema.3.rowtime.timestamps.type" -> "from-source"
-    )
+      "schema.3.rowtime.timestamps.type" -> "from-source")
 
     val props2 = Map(
       "schema.0.name" -> "myField",
@@ -90,8 +89,7 @@ class SchemaTest extends DescriptorTestBase {
       "schema.2.data-type" -> "TIMESTAMP(3)",
       "schema.2.proctime" -> "true",
       "schema.3.name" -> "r",
-      "schema.3.data-type" -> "TIMESTAMP(3)"
-    )
+      "schema.3.data-type" -> "TIMESTAMP(3)")
 
     util.Arrays.asList(props1.asJava, props2.asJava)
   }

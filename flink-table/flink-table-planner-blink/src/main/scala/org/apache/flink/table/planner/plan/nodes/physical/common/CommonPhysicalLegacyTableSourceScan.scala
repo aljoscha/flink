@@ -30,13 +30,13 @@ import org.apache.calcite.rel.core.TableScan
 import scala.collection.JavaConverters._
 
 /**
-  * Base physical RelNode to read data from an external source defined by a [[TableSource]].
-  */
+ * Base physical RelNode to read data from an external source defined by a [[TableSource]].
+ */
 abstract class CommonPhysicalLegacyTableSourceScan(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
     relOptTable: LegacyTableSourceTable[_])
-  extends TableScan(cluster, traitSet, relOptTable) {
+    extends TableScan(cluster, traitSet, relOptTable) {
 
   // cache table source transformation.
   protected var sourceTransform: Transformation[_] = _
@@ -53,7 +53,8 @@ abstract class CommonPhysicalLegacyTableSourceScan(
   }
 
   override def explainTerms(pw: RelWriter): RelWriter = {
-    super.explainTerms(pw)
+    super
+      .explainTerms(pw)
       .item("fields", getRowType.getFieldNames.asScala.mkString(", "))
   }
 }

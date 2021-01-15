@@ -19,7 +19,12 @@ package org.apache.flink.table.runtime.aggregate
 
 import java.util.{Collections, ArrayList => JArrayList, List => JList}
 
-import org.apache.flink.api.common.state.{MapState, MapStateDescriptor, ValueState, ValueStateDescriptor}
+import org.apache.flink.api.common.state.{
+  MapState,
+  MapStateDescriptor,
+  ValueState,
+  ValueStateDescriptor
+}
 import org.apache.flink.api.common.typeinfo.{BasicTypeInfo, TypeInformation}
 import org.apache.flink.api.java.typeutils.ListTypeInfo
 import org.apache.flink.configuration.Configuration
@@ -32,15 +37,15 @@ import org.apache.flink.util.{Collector, Preconditions}
 /**
  * ProcessFunction to sort on event-time and possibly additional secondary sort attributes.
  *
-  * @param inputRowType The data type of the input data.
-  * @param rowtimeIdx The index of the rowtime field.
-  * @param rowComparator A comparator to sort rows.
+ * @param inputRowType The data type of the input data.
+ * @param rowtimeIdx The index of the rowtime field.
+ * @param rowComparator A comparator to sort rows.
  */
 class RowTimeSortProcessFunction[K](
     private val inputRowType: CRowTypeInfo,
     private val rowtimeIdx: Int,
     private val rowComparator: Option[CollectionRowComparator])
-  extends KeyedProcessFunction[K, CRow, CRow] {
+    extends KeyedProcessFunction[K, CRow, CRow] {
 
   Preconditions.checkNotNull(rowComparator)
 
@@ -51,9 +56,9 @@ class RowTimeSortProcessFunction[K](
   private var lastTriggeringTsState: ValueState[Long] = _
 
   private var outputC: CRow = _
-  
+
   override def open(config: Configuration) {
-     
+
     val keyTypeInformation: TypeInformation[Long] =
       BasicTypeInfo.LONG_TYPE_INFO.asInstanceOf[TypeInformation[Long]]
     val valueTypeInformation: TypeInformation[JList[Row]] =
@@ -66,22 +71,21 @@ class RowTimeSortProcessFunction[K](
         valueTypeInformation)
 
     dataState = getRuntimeContext.getMapState(mapStateDescriptor)
-    
+
     val lastTriggeringTsDescriptor: ValueStateDescriptor[Long] =
       new ValueStateDescriptor[Long]("lastTriggeringTsState", classOf[Long])
     lastTriggeringTsState = getRuntimeContext.getState(lastTriggeringTsDescriptor)
-    
+
     outputC = new CRow()
   }
 
-  
   override def processElement(
-    inputC: CRow,
-    ctx: KeyedProcessFunction[K, CRow, CRow]#Context,
-    out: Collector[CRow]): Unit = {
+      inputC: CRow,
+      ctx: KeyedProcessFunction[K, CRow, CRow]#Context,
+      out: Collector[CRow]): Unit = {
 
     val input = inputC.row
-    
+
     // timestamp of the processed row
     val rowtime = input.getField(rowtimeIdx).asInstanceOf[Long]
 
@@ -106,9 +110,9 @@ class RowTimeSortProcessFunction[K](
   }
 
   override def onTimer(
-    timestamp: Long,
-    ctx: KeyedProcessFunction[K, CRow, CRow]#OnTimerContext,
-    out: Collector[CRow]): Unit = {
+      timestamp: Long,
+      ctx: KeyedProcessFunction[K, CRow, CRow]#OnTimerContext,
+      out: Collector[CRow]): Unit = {
 
     // remove timestamp set outside of ProcessFunction.
     out.asInstanceOf[TimestampedCollector[_]].eraseTimestamp()
@@ -130,11 +134,11 @@ class RowTimeSortProcessFunction[K](
         out.collect(outputC)
         i += 1
       }
-    
+
       // remove emitted rows from state
       dataState.remove(timestamp)
       lastTriggeringTsState.update(timestamp)
     }
   }
-  
+
 }

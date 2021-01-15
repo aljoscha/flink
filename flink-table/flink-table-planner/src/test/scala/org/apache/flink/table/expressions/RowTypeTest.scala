@@ -31,95 +31,55 @@ class RowTypeTest extends RowTypeTestBase {
   def testRowLiteral(): Unit = {
 
     // primitive literal
-    testAllApis(
-      row(1, "foo", true),
-      "row(1, 'foo', true)",
-      "ROW(1, 'foo', true)",
-      "1,foo,true")
+    testAllApis(row(1, "foo", true), "row(1, 'foo', true)", "ROW(1, 'foo', true)", "1,foo,true")
 
     // special literal
     testAllApis(
-      row(Date.valueOf("1985-04-11"),
+      row(
+        Date.valueOf("1985-04-11"),
         BigDecimal("0.1").bigDecimal,
         array(1, 2, 3),
         map("foo", "bar"),
-        row(1, true)
-      ),
+        row(1, true)),
       "row('1985-04-11'.toDate, 0.1p, Array(1, 2, 3), " +
         "Map('foo', 'bar'), row(1, true))",
       "ROW(DATE '1985-04-11', CAST(0.1 AS DECIMAL), ARRAY[1, 2, 3], " +
         "MAP['foo', 'bar'], row(1, true))",
-      "1985-04-11,0.1,[1, 2, 3],{foo=bar},1,true") // string flatten
+      "1985-04-11,0.1,[1, 2, 3],{foo=bar},1,true"
+    ) // string flatten
 
     testAllApis(
       row(1 + 1, 2 * 3, nullOf(Types.STRING)),
       "row(1 + 1, 2 * 3, nullOf(STRING))",
       "ROW(1 + 1, 2 * 3, NULLIF(1,1))",
-      "2,6,null"
-    )
+      "2,6,null")
 
     testSqlApi("(1, 'foo', true)", "1,foo,true")
   }
 
   @Test
   def testRowField(): Unit = {
-    testAllApis(
-      row('f0, 'f1),
-      "row(f0, f1)",
-      "(f0, f1)",
-      "null,1"
-    )
+    testAllApis(row('f0, 'f1), "row(f0, f1)", "(f0, f1)", "null,1")
 
-    testAllApis(
-      'f2,
-      "f2",
-      "f2",
-      "2,foo,true"
-    )
+    testAllApis('f2, "f2", "f2", "2,foo,true")
 
-    testAllApis(
-      row('f2, 'f5),
-      "row(f2, f5)",
-      "(f2, f5)",
-      "2,foo,true,foo,null"
-    )
+    testAllApis(row('f2, 'f5), "row(f2, f5)", "(f2, f5)", "2,foo,true,foo,null")
 
-    testAllApis(
-      'f4,
-      "f4",
-      "f4",
-      "1984-03-12,0E-8,[1, 2, 3]"
-    )
+    testAllApis('f4, "f4", "f4", "1984-03-12,0E-8,[1, 2, 3]")
 
-    testAllApis(
-      row('f1, "foo", true),
-      "row(f1, 'foo', true)",
-      "(f1, 'foo',true)",
-      "1,foo,true"
-    )
+    testAllApis(row('f1, "foo", true), "row(f1, 'foo', true)", "(f1, 'foo',true)", "1,foo,true")
   }
 
   @Test
   def testRowOperations(): Unit = {
-    testAllApis(
-      'f5.get("f0"),
-      "f5.get('f0')",
-      "f5.f0",
-      "foo"
-    )
+    testAllApis('f5.get("f0"), "f5.get('f0')", "f5.f0", "foo")
 
-    testAllApis(
-      'f3.get("f1").get("f2"),
-      "f3.get('f1').get('f2')",
-      "f3.f1.f2",
-      "true"
-    )
+    testAllApis('f3.get("f1").get("f2"), "f3.get('f1').get('f2')", "f3.f1.f2", "true")
 
     // SQL API for row value constructor follow by field access is not supported
     testTableApi(
       row('f1, 'f6, 'f2).get("f1").get("f1"),
       "row(f1, f6, f2).get('f1').get('f1')",
-      "null"
-    )
+      "null")
   }
 }

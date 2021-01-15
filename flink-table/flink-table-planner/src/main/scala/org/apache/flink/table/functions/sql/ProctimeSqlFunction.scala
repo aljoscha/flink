@@ -22,17 +22,17 @@ import org.apache.calcite.sql.`type`._
 import org.apache.calcite.sql.validate.SqlMonotonicity
 
 /**
-  * Function that materializes a processing time attribute.
-  * After materialization the result can be used in regular arithmetical calculations.
-  */
+ * Function that materializes a processing time attribute.
+ * After materialization the result can be used in regular arithmetical calculations.
+ */
 object ProctimeSqlFunction
-  extends SqlFunction(
-    "PROCTIME",
-    SqlKind.OTHER_FUNCTION,
-    ReturnTypes.explicit(SqlTypeName.TIMESTAMP),
-    InferTypes.RETURN_TYPE,
-    OperandTypes.family(SqlTypeFamily.TIMESTAMP),
-    SqlFunctionCategory.SYSTEM) {
+    extends SqlFunction(
+      "PROCTIME",
+      SqlKind.OTHER_FUNCTION,
+      ReturnTypes.explicit(SqlTypeName.TIMESTAMP),
+      InferTypes.RETURN_TYPE,
+      OperandTypes.family(SqlTypeFamily.TIMESTAMP),
+      SqlFunctionCategory.SYSTEM) {
 
   override def getSyntax: SqlSyntax = SqlSyntax.FUNCTION
 

@@ -57,11 +57,10 @@ abstract class RowTypeTestBase extends ExpressionTestBase {
       /* 2 */ Types.ROW(Types.INT, Types.STRING, Types.BOOLEAN),
       /* 3 */ Types.ROW(Types.INT, Types.ROW(Types.INT, Types.STRING, Types.BOOLEAN)),
       /* 4 */ Types.ROW(
-                Types.LOCAL_DATE,
-                DecimalDataTypeInfo.of(9, 8),
-                ObjectArrayTypeInfo.getInfoFor(Types.INT)),
+        Types.LOCAL_DATE,
+        DecimalDataTypeInfo.of(9, 8),
+        ObjectArrayTypeInfo.getInfoFor(Types.INT)),
       /* 5 */ Types.ROW(Types.STRING, Types.BOOLEAN),
-      /* 6 */ Types.ROW(Types.STRING, Types.STRING)
-    )
+      /* 6 */ Types.ROW(Types.STRING, Types.STRING))
   }
 }

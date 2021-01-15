@@ -36,15 +36,20 @@ import org.apache.flink.table.plan.schema.RowSchema
 import org.apache.flink.table.plan.util.UpdatingPlanChecker
 import org.apache.flink.table.planner.StreamPlanner
 import org.apache.flink.table.runtime.CRowKeySelector
-import org.apache.flink.table.runtime.join.{OuterJoinPaddingUtil, ProcTimeBoundedStreamJoin, RowTimeBoundedStreamJoin, WindowJoinUtil}
+import org.apache.flink.table.runtime.join.{
+  OuterJoinPaddingUtil,
+  ProcTimeBoundedStreamJoin,
+  RowTimeBoundedStreamJoin,
+  WindowJoinUtil
+}
 import org.apache.flink.table.runtime.operators.KeyedCoProcessOperatorWithWatermarkDelay
 import org.apache.flink.table.runtime.types.{CRow, CRowTypeInfo}
 import org.apache.flink.table.util.Logging
 import org.apache.flink.util.Collector
 
 /**
-  * RelNode for a time windowed stream join.
-  */
+ * RelNode for a time windowed stream join.
+ */
 class DataStreamWindowJoin(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -62,7 +67,7 @@ class DataStreamWindowJoin(
     rightTimeIdx: Int,
     remainCondition: Option[RexNode],
     ruleDescription: String)
-  extends BiRel(cluster, traitSet, leftNode, rightNode)
+    extends BiRel(cluster, traitSet, leftNode, rightNode)
     with CommonJoin
     with DataStreamRel
     with Logging {
@@ -92,11 +97,7 @@ class DataStreamWindowJoin(
   }
 
   override def toString: String = {
-    joinToString(
-      schema.relDataType,
-      joinCondition,
-      joinType,
-      getExpressionString)
+    joinToString(schema.relDataType, joinCondition, joinType, getExpressionString)
   }
 
   override def explainTerms(pw: RelWriter): RelWriter = {
@@ -115,8 +116,7 @@ class DataStreamWindowJoin(
     val isLeftAppendOnly = UpdatingPlanChecker.isAppendOnly(left)
     val isRightAppendOnly = UpdatingPlanChecker.isAppendOnly(right)
     if (!isLeftAppendOnly || !isRightAppendOnly) {
-      throw new TableException(
-        "Windowed stream join does not support updates.")
+      throw new TableException("Windowed stream join does not support updates.")
     }
 
     val leftDataStream = left.asInstanceOf[DataStreamRel].translateToPlan(planner)
@@ -131,14 +131,14 @@ class DataStreamWindowJoin(
 
     // generate join function
     val joinFunction =
-    WindowJoinUtil.generateJoinFunction(
-      config,
-      joinType,
-      leftSchema.typeInfo,
-      rightSchema.typeInfo,
-      schema,
-      remainCondition,
-      ruleDescription)
+      WindowJoinUtil.generateJoinFunction(
+        config,
+        joinType,
+        leftSchema.typeInfo,
+        rightSchema.typeInfo,
+        schema,
+        remainCondition,
+        ruleDescription)
 
     val joinOpName =
       s"where: (" +
@@ -147,15 +147,16 @@ class DataStreamWindowJoin(
 
     val flinkJoinType = joinType match {
       case JoinRelType.INNER => JoinType.INNER
-      case JoinRelType.FULL => JoinType.FULL_OUTER
-      case JoinRelType.LEFT => JoinType.LEFT_OUTER
+      case JoinRelType.FULL  => JoinType.FULL_OUTER
+      case JoinRelType.LEFT  => JoinType.LEFT_OUTER
       case JoinRelType.RIGHT => JoinType.RIGHT_OUTER
-      case _ => throw new TableException(s"$joinType is not supported.")
+      case _                 => throw new TableException(s"$joinType is not supported.")
     }
 
     if (relativeWindowSize < 0) {
-      LOG.warn(s"The relative window size $relativeWindowSize is negative," +
-        " please check the join conditions.")
+      LOG.warn(
+        s"The relative window size $relativeWindowSize is negative," +
+          " please check the join conditions.")
       createNegativeWindowSizeJoin(
         flinkJoinType,
         leftDataStream,
@@ -174,8 +175,7 @@ class DataStreamWindowJoin(
           joinFunction.name,
           joinFunction.code,
           leftKeys,
-          rightKeys
-        )
+          rightKeys)
       } else {
         createProcTimeJoin(
           flinkJoinType,
@@ -186,8 +186,7 @@ class DataStreamWindowJoin(
           joinFunction.name,
           joinFunction.code,
           leftKeys,
-          rightKeys
-        )
+          rightKeys)
       }
     }
   }
@@ -201,7 +200,7 @@ class DataStreamWindowJoin(
       returnTypeInfo: TypeInformation[CRow]): DataStream[CRow] = {
     // We filter all records instead of adding an empty source to preserve the watermarks.
     val allFilter = new FlatMapFunction[CRow, CRow] with ResultTypeQueryable[CRow] {
-      override def flatMap(value: CRow, out: Collector[CRow]): Unit = { }
+      override def flatMap(value: CRow, out: Collector[CRow]): Unit = {}
       override def getProducedType: TypeInformation[CRow] = returnTypeInfo
     }
 
@@ -222,16 +221,28 @@ class DataStreamWindowJoin(
 
     joinType match {
       case JoinType.INNER =>
-        leftDataStream.flatMap(allFilter).name("Empty Inner Join").setParallelism(leftP)
+        leftDataStream
+          .flatMap(allFilter)
+          .name("Empty Inner Join")
+          .setParallelism(leftP)
           .union(rightDataStream.flatMap(allFilter).name("Empty Inner Join").setParallelism(rightP))
       case JoinType.LEFT_OUTER =>
-        leftDataStream.map(leftPadder).name("Left Outer Join").setParallelism(leftP)
+        leftDataStream
+          .map(leftPadder)
+          .name("Left Outer Join")
+          .setParallelism(leftP)
           .union(rightDataStream.flatMap(allFilter).name("Left Outer Join").setParallelism(rightP))
       case JoinType.RIGHT_OUTER =>
-        leftDataStream.flatMap(allFilter).name("Right Outer Join").setParallelism(leftP)
+        leftDataStream
+          .flatMap(allFilter)
+          .name("Right Outer Join")
+          .setParallelism(leftP)
           .union(rightDataStream.map(rightPadder).name("Right Outer Join").setParallelism(rightP))
       case JoinType.FULL_OUTER =>
-        leftDataStream.map(leftPadder).name("Full Outer Join").setParallelism(leftP)
+        leftDataStream
+          .map(leftPadder)
+          .name("Full Outer Join")
+          .setParallelism(leftP)
           .union(rightDataStream.map(rightPadder).name("Full Outer Join").setParallelism(rightP))
       case _ => throw new TableException(s"$joinType is not supported.")
     }
@@ -258,7 +269,8 @@ class DataStreamWindowJoin(
       joinFunctionCode)
 
     if (!leftKeys.isEmpty) {
-      leftDataStream.connect(rightDataStream)
+      leftDataStream
+        .connect(rightDataStream)
         .keyBy(
           new CRowKeySelector(leftKeys, leftSchema.projectedTypeInfo(leftKeys)),
           new CRowKeySelector(rightKeys, rightSchema.projectedTypeInfo(rightKeys)))
@@ -266,7 +278,8 @@ class DataStreamWindowJoin(
         .name(operatorName)
         .returns(returnTypeInfo)
     } else {
-      leftDataStream.connect(rightDataStream)
+      leftDataStream
+        .connect(rightDataStream)
         .keyBy(new NullByteKeySelector[CRow](), new NullByteKeySelector[CRow]())
         .process(procJoinFunc)
         .setParallelism(1)
@@ -310,18 +323,17 @@ class DataStreamWindowJoin(
           returnTypeInfo,
           new KeyedCoProcessOperatorWithWatermarkDelay[Tuple, CRow, CRow, CRow](
             rowTimeJoinFunc,
-            rowTimeJoinFunc.getMaxOutputDelay)
-        )
+            rowTimeJoinFunc.getMaxOutputDelay))
     } else {
-      leftDataStream.connect(rightDataStream)
+      leftDataStream
+        .connect(rightDataStream)
         .keyBy(new NullByteKeySelector[CRow](), new NullByteKeySelector[CRow])
         .transform(
           operatorName,
           returnTypeInfo,
           new KeyedCoProcessOperatorWithWatermarkDelay[java.lang.Byte, CRow, CRow, CRow](
             rowTimeJoinFunc,
-            rowTimeJoinFunc.getMaxOutputDelay)
-        )
+            rowTimeJoinFunc.getMaxOutputDelay))
         .setParallelism(1)
         .setMaxParallelism(1)
     }

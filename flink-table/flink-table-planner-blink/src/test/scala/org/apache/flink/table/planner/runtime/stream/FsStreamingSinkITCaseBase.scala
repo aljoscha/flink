@@ -41,8 +41,8 @@ import scala.collection.JavaConversions._
 import scala.collection.Seq
 
 /**
-  * Streaming sink ITCase base, test checkpoint.
-  */
+ * Streaming sink ITCase base, test checkpoint.
+ */
 abstract class FsStreamingSinkITCaseBase extends StreamingTestBase {
 
   @Rule
@@ -65,9 +65,10 @@ abstract class FsStreamingSinkITCaseBase extends StreamingTestBase {
     env.setParallelism(1)
     env.enableCheckpointing(100)
 
-    val stream = new DataStream(env.getJavaEnv.addSource(
-      new FiniteTestSource(data),
-      new RowTypeInfo(Types.INT, Types.STRING, Types.STRING, Types.STRING, Types.STRING)))
+    val stream = new DataStream(
+      env.getJavaEnv.addSource(
+        new FiniteTestSource(data),
+        new RowTypeInfo(Types.INT, Types.STRING, Types.STRING, Types.STRING, Types.STRING)))
 
     tEnv.createTemporaryView("my_table", stream, $("a"), $("b"), $("c"), $("d"), $("e"))
   }
@@ -124,7 +125,7 @@ abstract class FsStreamingSinkITCaseBase extends StreamingTestBase {
   def testMetastorePolicy(): Unit = {
     thrown.expectMessage(
       "Can not configure a 'metastore' partition commit policy for a file system table." +
-          " You can only configure 'metastore' partition commit policy for a hive table.")
+        " You can only configure 'metastore' partition commit policy for a hive table.")
     test(partition = true, "metastore")
   }
 
@@ -139,7 +140,9 @@ abstract class FsStreamingSinkITCaseBase extends StreamingTestBase {
   }
 }
 
-class FiniteTestSource(elements: Iterable[Row]) extends SourceFunction[Row] with CheckpointListener{
+class FiniteTestSource(elements: Iterable[Row])
+    extends SourceFunction[Row]
+    with CheckpointListener {
 
   private var running: Boolean = true
 
@@ -151,8 +154,8 @@ class FiniteTestSource(elements: Iterable[Row]) extends SourceFunction[Row] with
     lock.synchronized {
       for (t <- elements) {
         ctx.collect(t)
-        ctx.emitWatermark(new Watermark(
-          toMills(toLocalDateTime(s"${t.getField(3)} ${t.getField(4)}:00:00"))))
+        ctx.emitWatermark(
+          new Watermark(toMills(toLocalDateTime(s"${t.getField(3)} ${t.getField(4)}:00:00"))))
       }
     }
 

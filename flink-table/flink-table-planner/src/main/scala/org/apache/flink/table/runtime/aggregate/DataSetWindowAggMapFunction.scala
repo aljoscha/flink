@@ -30,19 +30,19 @@ import org.apache.flink.table.util.Logging
 import org.apache.flink.types.Row
 
 /**
-  * This map function only works for windows on batch tables.
-  * It appends an (aligned) rowtime field to the end of the output row.
-  *
-  * @param genAggregations      Code-generated [[GeneratedAggregations]]
-  * @param timeFieldPos         Time field position in input row
-  * @param tumbleTimeWindowSize The size of tumble time window
-  */
+ * This map function only works for windows on batch tables.
+ * It appends an (aligned) rowtime field to the end of the output row.
+ *
+ * @param genAggregations      Code-generated [[GeneratedAggregations]]
+ * @param timeFieldPos         Time field position in input row
+ * @param tumbleTimeWindowSize The size of tumble time window
+ */
 class DataSetWindowAggMapFunction(
     private val genAggregations: GeneratedAggregationsFunction,
     private val timeFieldPos: Int,
     private val tumbleTimeWindowSize: Option[Long],
     @transient private val returnType: TypeInformation[Row])
-  extends RichMapFunction[Row, Row]
+    extends RichMapFunction[Row, Row]
     with ResultTypeQueryable[Row]
     with Compiler[GeneratedAggregations]
     with Logging {
@@ -53,12 +53,11 @@ class DataSetWindowAggMapFunction(
   private var function: GeneratedAggregations = _
 
   override def open(config: Configuration) {
-    LOG.debug(s"Compiling AggregateHelper: $genAggregations.name \n\n " +
-                s"Code:\n$genAggregations.code")
-    val clazz = compile(
-      getRuntimeContext.getUserCodeClassLoader,
-      genAggregations.name,
-      genAggregations.code)
+    LOG.debug(
+      s"Compiling AggregateHelper: $genAggregations.name \n\n " +
+        s"Code:\n$genAggregations.code")
+    val clazz =
+      compile(getRuntimeContext.getUserCodeClassLoader, genAggregations.name, genAggregations.code)
     LOG.debug("Instantiating AggregateHelper.")
     function = clazz.newInstance()
 
@@ -94,14 +93,14 @@ class DataSetWindowAggMapFunction(
 
   private def getTimestamp(timeField: Any): Long = {
     timeField match {
-      case b: Byte => b.toLong
+      case b: Byte      => b.toLong
       case t: Character => t.toLong
-      case s: Short => s.toLong
-      case i: Int => i.toLong
-      case l: Long => l
-      case f: Float => f.toLong
-      case d: Double => d.toLong
-      case s: String => s.toLong
+      case s: Short     => s.toLong
+      case i: Int       => i.toLong
+      case l: Long      => l
+      case f: Float     => f.toLong
+      case d: Double    => d.toLong
+      case s: String    => s.toLong
       case t: Timestamp => SqlFunctions.toLong(t)
       case _ =>
         throw new RuntimeException(
@@ -113,4 +112,3 @@ class DataSetWindowAggMapFunction(
     returnType
   }
 }
-

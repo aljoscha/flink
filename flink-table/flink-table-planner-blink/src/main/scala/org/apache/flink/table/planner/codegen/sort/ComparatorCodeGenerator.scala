@@ -27,20 +27,20 @@ import org.apache.flink.table.runtime.generated.{GeneratedRecordComparator, Reco
 import org.apache.flink.table.types.logical.RowType
 
 /**
-  * A code generator for generating [[RecordComparator]].
-  */
+ * A code generator for generating [[RecordComparator]].
+ */
 object ComparatorCodeGenerator {
 
   /**
-    * Generates a [[RecordComparator]] that can be passed to a Java compiler.
-    *
-    * @param tableConfig Table config.
-    * @param name        Class name of the function.
-    *                    Does not need to be unique but has to be a valid Java class identifier.
-    * @param inputType   input type.
-    * @param sortSpec    sort specification.
-    * @return A GeneratedRecordComparator
-    */
+   * Generates a [[RecordComparator]] that can be passed to a Java compiler.
+   *
+   * @param tableConfig Table config.
+   * @param name        Class name of the function.
+   *                    Does not need to be unique but has to be a valid Java class identifier.
+   * @param inputType   input type.
+   * @param sortSpec    sort specification.
+   * @return A GeneratedRecordComparator
+   */
   def gen(
       tableConfig: TableConfig,
       name: String,

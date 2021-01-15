@@ -19,7 +19,11 @@
 package org.apache.flink.table.planner.plan.rules.physical.batch
 
 import org.apache.flink.table.planner.plan.nodes.FlinkConventions
-import org.apache.flink.table.planner.plan.nodes.logical.{FlinkLogicalCalc, FlinkLogicalCorrelate, FlinkLogicalTableFunctionScan}
+import org.apache.flink.table.planner.plan.nodes.logical.{
+  FlinkLogicalCalc,
+  FlinkLogicalCorrelate,
+  FlinkLogicalTableFunctionScan
+}
 import org.apache.flink.table.planner.plan.nodes.physical.batch.BatchPhysicalCorrelate
 import org.apache.flink.table.planner.plan.utils.PythonUtil
 
@@ -29,11 +33,12 @@ import org.apache.calcite.rel.RelNode
 import org.apache.calcite.rel.convert.ConverterRule
 import org.apache.calcite.rex.RexNode
 
-class BatchPhysicalCorrelateRule extends ConverterRule(
-  classOf[FlinkLogicalCorrelate],
-  FlinkConventions.LOGICAL,
-  FlinkConventions.BATCH_PHYSICAL,
-  "BatchPhysicalCorrelateRule") {
+class BatchPhysicalCorrelateRule
+    extends ConverterRule(
+      classOf[FlinkLogicalCorrelate],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.BATCH_PHYSICAL,
+      "BatchPhysicalCorrelateRule") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val join = call.rel(0).asInstanceOf[FlinkLogicalCorrelate]
@@ -48,7 +53,7 @@ class BatchPhysicalCorrelateRule extends ConverterRule(
       case calc: FlinkLogicalCalc =>
         calc.getInput.asInstanceOf[RelSubset].getOriginal match {
           case scan: FlinkLogicalTableFunctionScan => PythonUtil.isNonPythonCall(scan.getCall)
-          case _ => false
+          case _                                   => false
         }
       case _ => false
     }

@@ -33,7 +33,7 @@ import org.apache.flink.table.validate.{ValidationFailure, ValidationResult, Val
 import scala.collection.JavaConversions._
 
 case class Extract(timeIntervalUnit: PlannerExpression, temporal: PlannerExpression)
-  extends PlannerExpression {
+    extends PlannerExpression {
 
   override private[flink] def children: Seq[PlannerExpression] = timeIntervalUnit :: temporal :: Nil
 
@@ -41,51 +41,47 @@ case class Extract(timeIntervalUnit: PlannerExpression, temporal: PlannerExpress
 
   override private[flink] def validateInput(): ValidationResult = {
     if (!TypeCheckUtils.isTemporal(temporal.resultType)) {
-      return ValidationFailure(s"Extract operator requires Temporal input, " +
-        s"but $temporal is of type ${temporal.resultType}")
+      return ValidationFailure(
+        s"Extract operator requires Temporal input, " +
+          s"but $temporal is of type ${temporal.resultType}")
     }
 
     timeIntervalUnit match {
-      case SymbolPlannerExpression(PlannerTimeIntervalUnit.YEAR)
-           | SymbolPlannerExpression(PlannerTimeIntervalUnit.QUARTER)
-           | SymbolPlannerExpression(PlannerTimeIntervalUnit.MONTH)
-           | SymbolPlannerExpression(PlannerTimeIntervalUnit.WEEK)
-           | SymbolPlannerExpression(PlannerTimeIntervalUnit.DAY)
-        if temporal.resultType == SqlTimeTypeInfo.DATE
-          || temporal.resultType == SqlTimeTypeInfo.TIMESTAMP
-          || temporal.resultType == TimeIntervalTypeInfo.INTERVAL_MILLIS
-          || temporal.resultType == TimeIntervalTypeInfo.INTERVAL_MONTHS =>
+      case SymbolPlannerExpression(PlannerTimeIntervalUnit.YEAR) | SymbolPlannerExpression(
+            PlannerTimeIntervalUnit.QUARTER) | SymbolPlannerExpression(
+            PlannerTimeIntervalUnit.MONTH) | SymbolPlannerExpression(PlannerTimeIntervalUnit.WEEK) |
+          SymbolPlannerExpression(PlannerTimeIntervalUnit.DAY)
+          if temporal.resultType == SqlTimeTypeInfo.DATE
+            || temporal.resultType == SqlTimeTypeInfo.TIMESTAMP
+            || temporal.resultType == TimeIntervalTypeInfo.INTERVAL_MILLIS
+            || temporal.resultType == TimeIntervalTypeInfo.INTERVAL_MONTHS =>
         ValidationSuccess
 
-      case SymbolPlannerExpression(PlannerTimeIntervalUnit.HOUR)
-           | SymbolPlannerExpression(PlannerTimeIntervalUnit.MINUTE)
-           | SymbolPlannerExpression(PlannerTimeIntervalUnit.SECOND)
-        if temporal.resultType == SqlTimeTypeInfo.TIME
-          || temporal.resultType == SqlTimeTypeInfo.TIMESTAMP
-          || temporal.resultType == TimeIntervalTypeInfo.INTERVAL_MILLIS =>
+      case SymbolPlannerExpression(PlannerTimeIntervalUnit.HOUR) | SymbolPlannerExpression(
+            PlannerTimeIntervalUnit.MINUTE) | SymbolPlannerExpression(
+            PlannerTimeIntervalUnit.SECOND)
+          if temporal.resultType == SqlTimeTypeInfo.TIME
+            || temporal.resultType == SqlTimeTypeInfo.TIMESTAMP
+            || temporal.resultType == TimeIntervalTypeInfo.INTERVAL_MILLIS =>
         ValidationSuccess
 
       case _ =>
-        ValidationFailure(s"Extract operator does not support unit '$timeIntervalUnit' for input" +
-          s" of type '${temporal.resultType}'.")
+        ValidationFailure(
+          s"Extract operator does not support unit '$timeIntervalUnit' for input" +
+            s" of type '${temporal.resultType}'.")
     }
   }
 
   override def toString: String = s"($temporal).extract($timeIntervalUnit)"
 
   override private[flink] def toRexNode(implicit relBuilder: RelBuilder): RexNode = {
-    relBuilder
-      .getRexBuilder
-      .makeCall(
-        SqlStdOperatorTable.EXTRACT,
-        Seq(timeIntervalUnit.toRexNode, temporal.toRexNode))
+    relBuilder.getRexBuilder
+      .makeCall(SqlStdOperatorTable.EXTRACT, Seq(timeIntervalUnit.toRexNode, temporal.toRexNode))
   }
 }
 
-abstract class TemporalCeilFloor(
-    timeIntervalUnit: PlannerExpression,
-    temporal: PlannerExpression)
-  extends PlannerExpression {
+abstract class TemporalCeilFloor(timeIntervalUnit: PlannerExpression, temporal: PlannerExpression)
+    extends PlannerExpression {
 
   override private[flink] def children: Seq[PlannerExpression] = timeIntervalUnit :: temporal :: Nil
 
@@ -93,40 +89,42 @@ abstract class TemporalCeilFloor(
 
   override private[flink] def validateInput(): ValidationResult = {
     if (!TypeCheckUtils.isTimePoint(temporal.resultType)) {
-      return ValidationFailure(s"Temporal ceil/floor operator requires Time Point input, " +
-        s"but $temporal is of type ${temporal.resultType}")
+      return ValidationFailure(
+        s"Temporal ceil/floor operator requires Time Point input, " +
+          s"but $temporal is of type ${temporal.resultType}")
     }
     val unit = timeIntervalUnit match {
       case SymbolPlannerExpression(u: PlannerTimeIntervalUnit) => Some(u)
-      case _ => None
+      case _                                                   => None
     }
     if (unit.isEmpty) {
-      return ValidationFailure(s"Temporal ceil/floor operator requires Time Interval Unit " +
-        s"input, but $timeIntervalUnit is of type ${timeIntervalUnit.resultType}")
+      return ValidationFailure(
+        s"Temporal ceil/floor operator requires Time Interval Unit " +
+          s"input, but $timeIntervalUnit is of type ${timeIntervalUnit.resultType}")
     }
 
     (unit.get, temporal.resultType) match {
-      case (PlannerTimeIntervalUnit.YEAR | PlannerTimeIntervalUnit.MONTH,
-          SqlTimeTypeInfo.DATE | SqlTimeTypeInfo.TIMESTAMP) =>
+      case (
+            PlannerTimeIntervalUnit.YEAR | PlannerTimeIntervalUnit.MONTH,
+            SqlTimeTypeInfo.DATE | SqlTimeTypeInfo.TIMESTAMP) =>
         ValidationSuccess
       case (PlannerTimeIntervalUnit.DAY, SqlTimeTypeInfo.TIMESTAMP) =>
         ValidationSuccess
-      case (PlannerTimeIntervalUnit.HOUR | PlannerTimeIntervalUnit.MINUTE |
-          PlannerTimeIntervalUnit.SECOND, SqlTimeTypeInfo.TIME | SqlTimeTypeInfo.TIMESTAMP) =>
+      case (
+            PlannerTimeIntervalUnit.HOUR | PlannerTimeIntervalUnit.MINUTE |
+            PlannerTimeIntervalUnit.SECOND,
+            SqlTimeTypeInfo.TIME | SqlTimeTypeInfo.TIMESTAMP) =>
         ValidationSuccess
       case _ =>
-        ValidationFailure(s"Temporal ceil/floor operator does not support " +
-          s"unit '$timeIntervalUnit' for input of type '${temporal.resultType}'.")
+        ValidationFailure(
+          s"Temporal ceil/floor operator does not support " +
+            s"unit '$timeIntervalUnit' for input of type '${temporal.resultType}'.")
     }
   }
 }
 
-case class TemporalFloor(
-    timeIntervalUnit: PlannerExpression,
-    temporal: PlannerExpression)
-  extends TemporalCeilFloor(
-    timeIntervalUnit,
-    temporal) {
+case class TemporalFloor(timeIntervalUnit: PlannerExpression, temporal: PlannerExpression)
+    extends TemporalCeilFloor(timeIntervalUnit, temporal) {
 
   override def toString: String = s"($temporal).floor($timeIntervalUnit)"
 
@@ -135,12 +133,8 @@ case class TemporalFloor(
   }
 }
 
-case class TemporalCeil(
-    timeIntervalUnit: PlannerExpression,
-    temporal: PlannerExpression)
-  extends TemporalCeilFloor(
-    timeIntervalUnit,
-    temporal) {
+case class TemporalCeil(timeIntervalUnit: PlannerExpression, temporal: PlannerExpression)
+    extends TemporalCeilFloor(timeIntervalUnit, temporal) {
 
   override def toString: String = s"($temporal).ceil($timeIntervalUnit)"
 
@@ -149,20 +143,20 @@ case class TemporalCeil(
   }
 }
 
-abstract class CurrentTimePoint(
-    targetType: TypeInformation[_],
-    local: Boolean)
-  extends LeafExpression {
+abstract class CurrentTimePoint(targetType: TypeInformation[_], local: Boolean)
+    extends LeafExpression {
 
   override private[flink] def resultType: TypeInformation[_] = targetType
 
   override private[flink] def validateInput(): ValidationResult = {
     if (!TypeCheckUtils.isTimePoint(targetType)) {
-      ValidationFailure(s"CurrentTimePoint operator requires Time Point target type, " +
-        s"but get $targetType.")
+      ValidationFailure(
+        s"CurrentTimePoint operator requires Time Point target type, " +
+          s"but get $targetType.")
     } else if (local && targetType == SqlTimeTypeInfo.DATE) {
-      ValidationFailure(s"Localized CurrentTimePoint operator requires Time or Timestamp target " +
-        s"type, but get $targetType.")
+      ValidationFailure(
+        s"Localized CurrentTimePoint operator requires Time or Timestamp target " +
+          s"type, but get $targetType.")
     } else {
       ValidationSuccess
     }
@@ -176,11 +170,11 @@ abstract class CurrentTimePoint(
 
   override private[flink] def toRexNode(implicit relBuilder: RelBuilder): RexNode = {
     val operator = targetType match {
-      case SqlTimeTypeInfo.TIME if local => SqlStdOperatorTable.LOCALTIME
+      case SqlTimeTypeInfo.TIME if local      => SqlStdOperatorTable.LOCALTIME
       case SqlTimeTypeInfo.TIMESTAMP if local => SqlStdOperatorTable.LOCALTIMESTAMP
-      case SqlTimeTypeInfo.DATE => SqlStdOperatorTable.CURRENT_DATE
-      case SqlTimeTypeInfo.TIME => SqlStdOperatorTable.CURRENT_TIME
-      case SqlTimeTypeInfo.TIMESTAMP => SqlStdOperatorTable.CURRENT_TIMESTAMP
+      case SqlTimeTypeInfo.DATE               => SqlStdOperatorTable.CURRENT_DATE
+      case SqlTimeTypeInfo.TIME               => SqlStdOperatorTable.CURRENT_TIME
+      case SqlTimeTypeInfo.TIMESTAMP          => SqlStdOperatorTable.CURRENT_TIMESTAMP
     }
     relBuilder.call(operator)
   }
@@ -197,14 +191,14 @@ case class LocalTime() extends CurrentTimePoint(SqlTimeTypeInfo.TIME, local = tr
 case class LocalTimestamp() extends CurrentTimePoint(SqlTimeTypeInfo.TIMESTAMP, local = true)
 
 /**
-  * Determines whether two anchored time intervals overlap.
-  */
+ * Determines whether two anchored time intervals overlap.
+ */
 case class TemporalOverlaps(
     leftTimePoint: PlannerExpression,
     leftTemporal: PlannerExpression,
     rightTimePoint: PlannerExpression,
     rightTemporal: PlannerExpression)
-  extends PlannerExpression {
+    extends PlannerExpression {
 
   override private[flink] def children: Seq[PlannerExpression] =
     Seq(leftTimePoint, leftTemporal, rightTimePoint, rightTemporal)
@@ -213,38 +207,45 @@ case class TemporalOverlaps(
 
   override private[flink] def validateInput(): ValidationResult = {
     if (!TypeCheckUtils.isTimePoint(leftTimePoint.resultType)) {
-      return ValidationFailure(s"TemporalOverlaps operator requires leftTimePoint to be of type " +
-        s"Time Point, but get ${leftTimePoint.resultType}.")
+      return ValidationFailure(
+        s"TemporalOverlaps operator requires leftTimePoint to be of type " +
+          s"Time Point, but get ${leftTimePoint.resultType}.")
     }
     if (!TypeCheckUtils.isTimePoint(rightTimePoint.resultType)) {
-      return ValidationFailure(s"TemporalOverlaps operator requires rightTimePoint to be of " +
-        s"type Time Point, but get ${rightTimePoint.resultType}.")
+      return ValidationFailure(
+        s"TemporalOverlaps operator requires rightTimePoint to be of " +
+          s"type Time Point, but get ${rightTimePoint.resultType}.")
     }
     if (leftTimePoint.resultType != rightTimePoint.resultType) {
-      return ValidationFailure(s"TemporalOverlaps operator requires leftTimePoint and " +
-        s"rightTimePoint to be of same type.")
+      return ValidationFailure(
+        s"TemporalOverlaps operator requires leftTimePoint and " +
+          s"rightTimePoint to be of same type.")
     }
 
     // leftTemporal is point, then it must be comparable with leftTimePoint
     if (TypeCheckUtils.isTimePoint(leftTemporal.resultType)) {
       if (leftTemporal.resultType != leftTimePoint.resultType) {
-        return ValidationFailure(s"TemporalOverlaps operator requires leftTemporal and " +
-          s"leftTimePoint to be of same type if leftTemporal is of type Time Point.")
+        return ValidationFailure(
+          s"TemporalOverlaps operator requires leftTemporal and " +
+            s"leftTimePoint to be of same type if leftTemporal is of type Time Point.")
       }
     } else if (!isTimeInterval(leftTemporal.resultType)) {
-      return ValidationFailure(s"TemporalOverlaps operator requires leftTemporal to be of " +
-        s"type Time Point or Time Interval.")
+      return ValidationFailure(
+        s"TemporalOverlaps operator requires leftTemporal to be of " +
+          s"type Time Point or Time Interval.")
     }
 
     // rightTemporal is point, then it must be comparable with rightTimePoint
     if (TypeCheckUtils.isTimePoint(rightTemporal.resultType)) {
       if (rightTemporal.resultType != rightTimePoint.resultType) {
-        return ValidationFailure(s"TemporalOverlaps operator requires rightTemporal and " +
-          s"rightTimePoint to be of same type if rightTemporal is of type Time Point.")
+        return ValidationFailure(
+          s"TemporalOverlaps operator requires rightTemporal and " +
+            s"rightTimePoint to be of same type if rightTemporal is of type Time Point.")
       }
     } else if (!isTimeInterval(rightTemporal.resultType)) {
-      return ValidationFailure(s"TemporalOverlaps operator requires rightTemporal to be of " +
-        s"type Time Point or Time Interval.")
+      return ValidationFailure(
+        s"TemporalOverlaps operator requires rightTemporal to be of " +
+          s"type Time Point or Time Interval.")
     }
     ValidationSuccess
   }
@@ -261,16 +262,15 @@ case class TemporalOverlaps(
   }
 
   /**
-    * Standard conversion of the OVERLAPS operator.
-    * Source: [[org.apache.calcite.sql2rel.StandardConvertletTable#convertOverlaps()]]
-    */
+   * Standard conversion of the OVERLAPS operator.
+   * Source: [[org.apache.calcite.sql2rel.StandardConvertletTable#convertOverlaps()]]
+   */
   private def convertOverlaps(
       leftP: RexNode,
       leftT: RexNode,
       rightP: RexNode,
       rightT: RexNode,
-      relBuilder: FlinkRelBuilder)
-    : RexNode = {
+      relBuilder: FlinkRelBuilder): RexNode = {
     val convLeftT = convertOverlapsEnd(relBuilder, leftP, leftT, leftTemporal.resultType)
     val convRightT = convertOverlapsEnd(relBuilder, rightP, rightT, rightTemporal.resultType)
 
@@ -286,7 +286,8 @@ case class TemporalOverlaps(
 
   private def convertOverlapsEnd(
       relBuilder: FlinkRelBuilder,
-      start: RexNode, end: RexNode,
+      start: RexNode,
+      end: RexNode,
       endType: TypeInformation[_]) = {
     if (isTimeInterval(endType)) {
       relBuilder.call(SqlStdOperatorTable.DATETIME_PLUS, start, end)
@@ -304,7 +305,7 @@ case class TemporalOverlaps(
 }
 
 case class DateFormat(timestamp: PlannerExpression, format: PlannerExpression)
-  extends PlannerExpression {
+    extends PlannerExpression {
   override private[flink] def children = timestamp :: format :: Nil
 
   override private[flink] def toRexNode(implicit relBuilder: RelBuilder) =
@@ -319,7 +320,7 @@ case class TimestampDiff(
     timePointUnit: PlannerExpression,
     timePoint1: PlannerExpression,
     timePoint2: PlannerExpression)
-  extends PlannerExpression {
+    extends PlannerExpression {
 
   override private[flink] def children: Seq[PlannerExpression] =
     timePointUnit :: timePoint1 :: timePoint2 :: Nil
@@ -328,40 +329,39 @@ case class TimestampDiff(
     if (!TypeCheckUtils.isTimePoint(timePoint1.resultType)) {
       return ValidationFailure(
         s"$this requires an input time point type, " +
-        s"but timePoint1 is of type '${timePoint1.resultType}'.")
+          s"but timePoint1 is of type '${timePoint1.resultType}'.")
     }
 
     if (!TypeCheckUtils.isTimePoint(timePoint2.resultType)) {
       return ValidationFailure(
         s"$this requires an input time point type, " +
-        s"but timePoint2 is of type '${timePoint2.resultType}'.")
+          s"but timePoint2 is of type '${timePoint2.resultType}'.")
     }
 
     timePointUnit match {
-      case SymbolPlannerExpression(PlannerTimePointUnit.YEAR)
-           | SymbolPlannerExpression(PlannerTimePointUnit.QUARTER)
-           | SymbolPlannerExpression(PlannerTimePointUnit.MONTH)
-           | SymbolPlannerExpression(PlannerTimePointUnit.WEEK)
-           | SymbolPlannerExpression(PlannerTimePointUnit.DAY)
-           | SymbolPlannerExpression(PlannerTimePointUnit.HOUR)
-           | SymbolPlannerExpression(PlannerTimePointUnit.MINUTE)
-           | SymbolPlannerExpression(PlannerTimePointUnit.SECOND)
-        if timePoint1.resultType == SqlTimeTypeInfo.DATE
-          || timePoint1.resultType == SqlTimeTypeInfo.TIMESTAMP
-          || timePoint2.resultType == SqlTimeTypeInfo.DATE
-          || timePoint2.resultType == SqlTimeTypeInfo.TIMESTAMP =>
+      case SymbolPlannerExpression(PlannerTimePointUnit.YEAR) | SymbolPlannerExpression(
+            PlannerTimePointUnit.QUARTER) | SymbolPlannerExpression(PlannerTimePointUnit.MONTH) |
+          SymbolPlannerExpression(PlannerTimePointUnit.WEEK) | SymbolPlannerExpression(
+            PlannerTimePointUnit.DAY) | SymbolPlannerExpression(PlannerTimePointUnit.HOUR) |
+          SymbolPlannerExpression(PlannerTimePointUnit.MINUTE) | SymbolPlannerExpression(
+            PlannerTimePointUnit.SECOND)
+          if timePoint1.resultType == SqlTimeTypeInfo.DATE
+            || timePoint1.resultType == SqlTimeTypeInfo.TIMESTAMP
+            || timePoint2.resultType == SqlTimeTypeInfo.DATE
+            || timePoint2.resultType == SqlTimeTypeInfo.TIMESTAMP =>
         ValidationSuccess
 
       case _ =>
-        ValidationFailure(s"$this operator does not support unit '$timePointUnit'" +
+        ValidationFailure(
+          s"$this operator does not support unit '$timePointUnit'" +
             s" for input of type ('${timePoint1.resultType}', '${timePoint2.resultType}').")
     }
   }
   override private[flink] def toRexNode(implicit relBuilder: RelBuilder): RexNode = {
-    relBuilder
-    .getRexBuilder
-    .makeCall(SqlStdOperatorTable.TIMESTAMP_DIFF,
-       Seq(timePointUnit.toRexNode, timePoint2.toRexNode, timePoint1.toRexNode))
+    relBuilder.getRexBuilder
+      .makeCall(
+        SqlStdOperatorTable.TIMESTAMP_DIFF,
+        Seq(timePointUnit.toRexNode, timePoint2.toRexNode, timePoint1.toRexNode))
   }
 
   override def toString: String = s"timestampDiff(${children.mkString(", ")})"

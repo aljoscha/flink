@@ -33,8 +33,8 @@ import org.apache.calcite.rel.RelNode
 import org.apache.calcite.rex.{RexCall, RexNode}
 
 /**
-  * Flink RelNode which matches along with join a Java/Scala user defined table function.
-  */
+ * Flink RelNode which matches along with join a Java/Scala user defined table function.
+ */
 class DataStreamCorrelate(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -46,15 +46,15 @@ class DataStreamCorrelate(
     joinSchema: RowSchema,
     joinType: JoinRelType,
     ruleDescription: String)
-  extends DataStreamCorrelateBase(
-    cluster,
-    traitSet,
-    inputSchema,
-    input,
-    scan,
-    condition,
-    schema,
-    joinType) {
+    extends DataStreamCorrelateBase(
+      cluster,
+      traitSet,
+      inputSchema,
+      input,
+      scan,
+      condition,
+      schema,
+      joinType) {
 
   override def copy(traitSet: RelTraitSet, inputs: java.util.List[RelNode]): RelNode = {
     new DataStreamCorrelate(
@@ -94,13 +94,8 @@ class DataStreamCorrelate(
       ruleDescription,
       classOf[ProcessFunction[CRow, CRow]])
 
-    val collector = generateCollector(
-      config,
-      inputSchema,
-      udtfTypeInfo,
-      schema,
-      condition,
-      pojoFieldMapping)
+    val collector =
+      generateCollector(config, inputSchema, udtfTypeInfo, schema, condition, pojoFieldMapping)
 
     val processFunc = new CRowCorrelateProcessRunner(
       process.name,
@@ -115,13 +110,13 @@ class DataStreamCorrelate(
       .process(processFunc)
       // preserve input parallelism to ensure that acc and retract messages remain in order
       .setParallelism(inputParallelism)
-      .name(correlateOpName(
-        inputSchema.relDataType,
-        rexCall,
-        sqlFunction,
-        schema.relDataType,
-        getExpressionString)
-      )
+      .name(
+        correlateOpName(
+          inputSchema.relDataType,
+          rexCall,
+          sqlFunction,
+          schema.relDataType,
+          getExpressionString))
   }
 
 }

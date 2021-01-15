@@ -33,21 +33,21 @@ import org.apache.calcite.rel.{RelCollations, RelNode}
 import scala.collection.JavaConversions._
 
 /**
-  * Rule that matches [[FlinkLogicalRank]] with rank function and constant rank range,
-  * and converts it to
-  * {{{
-  * BatchPhysicalRank (global)
-  * +- BatchPhysicalExchange (singleton if partition keys is empty, else hash)
-  *    +- BatchPhysicalRank (local)
-  *       +- input of rank
-  * }}}
-  */
+ * Rule that matches [[FlinkLogicalRank]] with rank function and constant rank range,
+ * and converts it to
+ * {{{
+ * BatchPhysicalRank (global)
+ * +- BatchPhysicalExchange (singleton if partition keys is empty, else hash)
+ *    +- BatchPhysicalRank (local)
+ *       +- input of rank
+ * }}}
+ */
 class BatchPhysicalRankRule
-  extends ConverterRule(
-    classOf[FlinkLogicalRank],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.BATCH_PHYSICAL,
-    "BatchPhysicalRankRule") {
+    extends ConverterRule(
+      classOf[FlinkLogicalRank],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.BATCH_PHYSICAL,
+      "BatchPhysicalRankRule") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val rank: FlinkLogicalRank = call.rel(0)
@@ -59,12 +59,13 @@ class BatchPhysicalRankRule
     val rank = rel.asInstanceOf[FlinkLogicalRank]
     val (_, rankEnd) = rank.rankRange match {
       case r: ConstantRankRange => (r.getRankStart, r.getRankEnd)
-      case o => throw new TableException(s"$o is not supported now")
+      case o                    => throw new TableException(s"$o is not supported now")
     }
 
     val cluster = rel.getCluster
     val emptyTraits = cluster.getPlanner.emptyTraitSet().replace(FlinkConventions.BATCH_PHYSICAL)
-    val sortFieldCollations = rank.partitionKey.asList()
+    val sortFieldCollations = rank.partitionKey
+      .asList()
       .map(FlinkRelOptUtil.ofRelFieldCollation(_)) ++ rank.orderKey.getFieldCollations
     val sortCollation = RelCollations.of(sortFieldCollations: _*)
     val localRequiredTraitSet = emptyTraits.replace(sortCollation)
@@ -82,8 +83,7 @@ class BatchPhysicalRankRule
       localRankRange,
       rank.rankNumberType,
       outputRankNumber = false,
-      isGlobal = false
-    )
+      isGlobal = false)
 
     // create local BatchPhysicalRank
     val globalRequiredDistribution = if (rank.partitionKey.isEmpty) {
@@ -108,8 +108,7 @@ class BatchPhysicalRankRule
       rank.rankRange,
       rank.rankNumberType,
       rank.outputRankNumber,
-      isGlobal = true
-    )
+      isGlobal = true)
     globalRank
   }
 }

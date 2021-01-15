@@ -54,7 +54,7 @@ class TypeCheckUtilsTest {
   }
 
   @Test
-  def testPrimitiveWrapper (): Unit = {
+  def testPrimitiveWrapper(): Unit = {
     assertTrue(TypeCheckUtils.isPrimitiveWrapper(classOf[java.lang.Double]))
     assertFalse(TypeCheckUtils.isPrimitiveWrapper(classOf[Double]))
   }
@@ -63,13 +63,14 @@ class TypeCheckUtilsTest {
   def testAssignability(): Unit = {
     assertTrue(TypeCheckUtils.isAssignable(classOf[Double], classOf[Double]))
     assertFalse(TypeCheckUtils.isAssignable(classOf[Boolean], classOf[Double]))
-    assertTrue(TypeCheckUtils.isAssignable(
-      classOf[java.util.HashMap[_, _]], classOf[java.util.Map[_, _]]))
-    assertFalse(TypeCheckUtils.isAssignable(
-      classOf[java.util.Map[_, _]], classOf[java.util.HashMap[_, _]]))
+    assertTrue(
+      TypeCheckUtils.isAssignable(classOf[java.util.HashMap[_, _]], classOf[java.util.Map[_, _]]))
+    assertFalse(
+      TypeCheckUtils.isAssignable(classOf[java.util.Map[_, _]], classOf[java.util.HashMap[_, _]]))
 
-    assertTrue(TypeCheckUtils.isAssignable(
-      Array[Class[_]](classOf[Double], classOf[Double]),
-      Array[Class[_]](classOf[Double], classOf[Double])))
+    assertTrue(
+      TypeCheckUtils.isAssignable(
+        Array[Class[_]](classOf[Double], classOf[Double]),
+        Array[Class[_]](classOf[Double], classOf[Double])))
   }
 }

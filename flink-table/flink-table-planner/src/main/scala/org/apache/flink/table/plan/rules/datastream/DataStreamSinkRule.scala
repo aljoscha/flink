@@ -27,24 +27,18 @@ import org.apache.calcite.rel.RelNode
 import org.apache.calcite.rel.convert.ConverterRule
 
 class DataStreamSinkRule
-  extends ConverterRule(
-    classOf[FlinkLogicalSink],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.DATASTREAM,
-    "DataStreamSinkRule") {
+    extends ConverterRule(
+      classOf[FlinkLogicalSink],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.DATASTREAM,
+      "DataStreamSinkRule") {
 
   def convert(rel: RelNode): RelNode = {
     val sink: FlinkLogicalSink = rel.asInstanceOf[FlinkLogicalSink]
     val traitSet: RelTraitSet = rel.getTraitSet.replace(FlinkConventions.DATASTREAM)
     val convInput: RelNode = RelOptRule.convert(sink.getInput(0), FlinkConventions.DATASTREAM)
 
-    new DataStreamSink(
-      rel.getCluster,
-      traitSet,
-      convInput,
-      sink.sink,
-      sink.sinkName
-    )
+    new DataStreamSink(rel.getCluster, traitSet, convInput, sink.sink, sink.sinkName)
   }
 }
 

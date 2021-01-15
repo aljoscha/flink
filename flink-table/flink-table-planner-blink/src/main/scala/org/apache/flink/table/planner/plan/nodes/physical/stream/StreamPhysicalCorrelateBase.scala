@@ -29,8 +29,8 @@ import org.apache.calcite.rex.{RexCall, RexNode}
 import scala.collection.JavaConversions._
 
 /**
-  * Base Flink RelNode which matches along with join a user defined table function.
-  */
+ * Base Flink RelNode which matches along with join a user defined table function.
+ */
 abstract class StreamPhysicalCorrelateBase(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -39,8 +39,8 @@ abstract class StreamPhysicalCorrelateBase(
     condition: Option[RexNode],
     outputRowType: RelDataType,
     joinType: JoinRelType)
-  extends SingleRel(cluster, traitSet, inputRel)
-  with StreamPhysicalRel {
+    extends SingleRel(cluster, traitSet, inputRel)
+    with StreamPhysicalRel {
 
   require(joinType == JoinRelType.INNER || joinType == JoinRelType.LEFT)
 
@@ -53,19 +53,18 @@ abstract class StreamPhysicalCorrelateBase(
   }
 
   /**
-    * Note: do not passing member 'child' because singleRel.replaceInput may update 'input' rel.
-    */
-  def copy(
-      traitSet: RelTraitSet,
-      newChild: RelNode,
-      outputType: RelDataType): RelNode
+   * Note: do not passing member 'child' because singleRel.replaceInput may update 'input' rel.
+   */
+  def copy(traitSet: RelTraitSet, newChild: RelNode, outputType: RelDataType): RelNode
 
   override def explainTerms(pw: RelWriter): RelWriter = {
     val rexCall = scan.getCall.asInstanceOf[RexCall]
-    super.explainTerms(pw)
+    super
+      .explainTerms(pw)
       .item("invocation", scan.getCall)
-      .item("correlate", RelExplainUtil.correlateToString(
-        inputRel.getRowType, rexCall, getExpressionString))
+      .item(
+        "correlate",
+        RelExplainUtil.correlateToString(inputRel.getRowType, rexCall, getExpressionString))
       .item("select", outputRowType.getFieldNames.mkString(","))
       .item("rowType", outputRowType)
       .item("joinType", joinType)

@@ -19,7 +19,10 @@
 package org.apache.flink.table.planner.plan.nodes.physical.batch
 
 import org.apache.flink.table.planner.calcite.FlinkTypeFactory
-import org.apache.flink.table.planner.plan.`trait`.{FlinkRelDistribution, FlinkRelDistributionTraitDef}
+import org.apache.flink.table.planner.plan.`trait`.{
+  FlinkRelDistribution,
+  FlinkRelDistributionTraitDef
+}
 import org.apache.flink.table.planner.plan.cost.{FlinkCost, FlinkCostFactory}
 import org.apache.flink.table.planner.plan.nodes.FlinkConventions
 import org.apache.flink.table.planner.plan.nodes.exec.{ExecEdge, ExecNode}
@@ -38,8 +41,8 @@ import org.apache.calcite.util.Util
 import scala.collection.JavaConversions._
 
 /**
-  * Batch physical RelNode for hash [[Join]].
-  */
+ * Batch physical RelNode for hash [[Join]].
+ */
 class BatchPhysicalHashJoin(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -52,7 +55,7 @@ class BatchPhysicalHashJoin(
     // true if build side is broadcast, else false
     val isBroadcast: Boolean,
     val tryDistinctBuildRow: Boolean)
-  extends BatchPhysicalJoinBase(cluster, traitSet, leftRel, rightRel, condition, joinType) {
+    extends BatchPhysicalJoinBase(cluster, traitSet, leftRel, rightRel, condition, joinType) {
 
   val hashJoinType: HashJoinType = HashJoinType.of(
     leftIsBuild,
@@ -81,7 +84,8 @@ class BatchPhysicalHashJoin(
   }
 
   override def explainTerms(pw: RelWriter): RelWriter = {
-    super.explainTerms(pw)
+    super
+      .explainTerms(pw)
       .itemIf("isBroadcast", "true", isBroadcast)
       .item("build", if (leftIsBuild) "left" else "right")
       .itemIf("tryDistinctBuildRow", "true", tryDistinctBuildRow)
@@ -99,7 +103,7 @@ class BatchPhysicalHashJoin(
     val (buildRowCount, buildRowSize) = if (leftIsBuild) {
       (leftRowCnt, FlinkRelMdUtil.binaryRowAverageSize(getLeft))
     } else {
-      (rightRowCnt,  FlinkRelMdUtil.binaryRowAverageSize(getRight))
+      (rightRowCnt, FlinkRelMdUtil.binaryRowAverageSize(getRight))
     }
     // We aim for a 200% utilization of the bucket table when all the partition buffers are full.
     // TODO use BinaryHashBucketArea.RECORD_BYTES instead of 8
@@ -140,8 +144,7 @@ class BatchPhysicalHashJoin(
     }
 
     val toRestrictHashDistributionByKeys = (distribution: FlinkRelDistribution) =>
-      getCluster.getPlanner
-        .emptyTraitSet
+      getCluster.getPlanner.emptyTraitSet
         .replace(FlinkConventions.BATCH_PHYSICAL)
         .replace(distribution)
     val leftRequiredTraits = toRestrictHashDistributionByKeys(leftRequiredDistribution)
@@ -166,18 +169,17 @@ class BatchPhysicalHashJoin(
     val rightRowCount = Util.first(mq.getRowCount(right), 200000).toLong
     val (leftEdge, rightEdge) = getInputEdges
     new BatchExecHashJoin(
-        joinSpec,
-        leftRowSize,
-        rightRowSize,
-        leftRowCount,
-        rightRowCount,
-        leftIsBuild,
-        tryDistinctBuildRow,
-        leftEdge,
-        rightEdge,
-        FlinkTypeFactory.toLogicalRowType(getRowType),
-        getRelDetailedDescription
-    )
+      joinSpec,
+      leftRowSize,
+      rightRowSize,
+      leftRowCount,
+      rightRowCount,
+      leftIsBuild,
+      tryDistinctBuildRow,
+      leftEdge,
+      rightEdge,
+      FlinkTypeFactory.toLogicalRowType(getRowType),
+      getRelDetailedDescription)
   }
 
   private def getInputEdges: (ExecEdge, ExecEdge) = {
@@ -195,12 +197,14 @@ class BatchPhysicalHashJoin(
     } else {
       ExecEdge.DamBehavior.PIPELINED
     }
-    val buildEdge = ExecEdge.builder()
+    val buildEdge = ExecEdge
+      .builder()
       .requiredShuffle(buildRequiredShuffle)
       .damBehavior(ExecEdge.DamBehavior.BLOCKING)
       .priority(0)
       .build()
-    val probeEdge = ExecEdge.builder()
+    val probeEdge = ExecEdge
+      .builder()
       .requiredShuffle(probeRequiredShuffle)
       .damBehavior(probeDamBehavior)
       .priority(1)

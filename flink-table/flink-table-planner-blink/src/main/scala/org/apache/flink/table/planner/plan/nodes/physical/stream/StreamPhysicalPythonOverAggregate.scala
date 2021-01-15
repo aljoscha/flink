@@ -30,20 +30,20 @@ import org.apache.calcite.rel.core.Window
 import java.util
 
 /**
-  * Stream physical RelNode for python time-based over [[Window]].
-  */
+ * Stream physical RelNode for python time-based over [[Window]].
+ */
 class StreamPhysicalPythonOverAggregate(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
     inputRel: RelNode,
     outputRowType: RelDataType,
     logicWindow: Window)
-  extends StreamPhysicalOverAggregateBase(
-    cluster,
-    traitSet,
-    inputRel,
-    outputRowType,
-    logicWindow) {
+    extends StreamPhysicalOverAggregateBase(
+      cluster,
+      traitSet,
+      inputRel,
+      outputRowType,
+      logicWindow) {
 
   override def copy(traitSet: RelTraitSet, inputs: util.List[RelNode]): RelNode = {
     new StreamPhysicalPythonOverAggregate(
@@ -59,8 +59,7 @@ class StreamPhysicalPythonOverAggregate(
       OverAggregateUtil.createOverSpec(logicWindow),
       ExecEdge.DEFAULT,
       FlinkTypeFactory.toLogicalRowType(getRowType),
-      getRelDetailedDescription
-    )
+      getRelDetailedDescription)
   }
 
 }

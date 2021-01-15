@@ -39,13 +39,12 @@ class SumMinMaxITCase(mode: TestExecutionMode) extends MultipleProgramsTestBase(
     val env = ExecutionEnvironment.getExecutionEnvironment
     val ds = CollectionDataSets.get3TupleDataSet(env)
 
-    val aggregateDs : DataSet[(Int, Long)] = ds
+    val aggregateDs: DataSet[(Int, Long)] = ds
       .sum(0)
       .andMax(1)
       // Ensure aggregate operator correctly copies other fields
       .filter(_._3 != null)
-      .map{ t => (t._1, t._2) }
-
+      .map { t => (t._1, t._2) }
 
     val result: Seq[(Int, Long)] = aggregateDs.collect()
 
@@ -66,9 +65,9 @@ class SumMinMaxITCase(mode: TestExecutionMode) extends MultipleProgramsTestBase(
       .filter(_._3 != null)
       .map { t => (t._2, t._1) }
 
-    val result : Seq[(Long, Int)] = aggregateDs.collect().sortWith((a, b) => a._1 < b._1)
+    val result: Seq[(Long, Int)] = aggregateDs.collect().sortWith((a, b) => a._1 < b._1)
 
-    val expected : Seq[(Long, Int)] = Seq((1L, 1), (2L, 5), (3L, 15), (4L, 34), (5L, 65), (6L, 111))
+    val expected: Seq[(Long, Int)] = Seq((1L, 1), (2L, 5), (3L, 15), (4L, 34), (5L, 65), (6L, 111))
     assertEquals(expected, result)
   }
 

@@ -23,7 +23,12 @@ import org.apache.flink.table.functions.sql.ScalarSqlFunctions
 
 import org.apache.calcite.rel.`type`.RelDataType
 import org.apache.calcite.sql._
-import org.apache.calcite.sql.`type`.{OperandTypes, ReturnTypes, SqlReturnTypeInference, SqlTypeTransforms}
+import org.apache.calcite.sql.`type`.{
+  OperandTypes,
+  ReturnTypes,
+  SqlReturnTypeInference,
+  SqlTypeTransforms
+}
 import org.apache.calcite.sql.fun.SqlStdOperatorTable
 import org.apache.calcite.sql.util.ReflectiveSqlOperatorTable
 import org.apache.calcite.sql.validate.{SqlNameMatcher, SqlNameMatchers}
@@ -36,10 +41,10 @@ import _root_.scala.collection.JavaConversions._
 class BasicOperatorTable extends ReflectiveSqlOperatorTable {
 
   /**
-    * List of supported SQL operators / functions.
-    *
-    * This list should be kept in sync with [[SqlStdOperatorTable]].
-    */
+   * List of supported SQL operators / functions.
+   *
+   * This list should be kept in sync with [[SqlStdOperatorTable]].
+   */
   private val builtInSqlOperators: Seq[SqlOperator] = Seq(
     // SET OPERATORS
     SqlStdOperatorTable.UNION,
@@ -197,7 +202,6 @@ class BasicOperatorTable extends ReflectiveSqlOperatorTable {
     ScalarSqlFunctions.REPEAT,
     ScalarSqlFunctions.REGEXP_REPLACE,
     SqlStdOperatorTable.TRUNCATE,
-
     // TIME FUNCTIONS
     SqlStdOperatorTable.YEAR,
     SqlStdOperatorTable.QUARTER,
@@ -211,7 +215,6 @@ class BasicOperatorTable extends ReflectiveSqlOperatorTable {
     SqlStdOperatorTable.DAYOFWEEK,
     SqlStdOperatorTable.TIMESTAMP_ADD,
     SqlStdOperatorTable.TIMESTAMP_DIFF,
-
     // MATCH_RECOGNIZE
     SqlStdOperatorTable.FIRST,
     SqlStdOperatorTable.LAST,
@@ -220,7 +223,6 @@ class BasicOperatorTable extends ReflectiveSqlOperatorTable {
     SqlStdOperatorTable.RUNNING,
     BasicOperatorTable.MATCH_PROCTIME,
     BasicOperatorTable.MATCH_ROWTIME,
-
     // EXTENSIONS
     BasicOperatorTable.TUMBLE,
     BasicOperatorTable.HOP,
@@ -236,8 +238,7 @@ class BasicOperatorTable extends ReflectiveSqlOperatorTable {
     BasicOperatorTable.HOP_PROCTIME,
     BasicOperatorTable.HOP_ROWTIME,
     BasicOperatorTable.SESSION_PROCTIME,
-    BasicOperatorTable.SESSION_ROWTIME
-  )
+    BasicOperatorTable.SESSION_ROWTIME)
 
   builtInSqlOperators.foreach(register)
 
@@ -249,15 +250,19 @@ class BasicOperatorTable extends ReflectiveSqlOperatorTable {
       nameMatcher: SqlNameMatcher): Unit = {
     // set caseSensitive=false to make sure the behavior is same with before.
     super.lookupOperatorOverloads(
-      opName, category, syntax, operatorList, SqlNameMatchers.withCaseSensitive(false))
+      opName,
+      category,
+      syntax,
+      operatorList,
+      SqlNameMatchers.withCaseSensitive(false))
   }
 }
 
 object BasicOperatorTable {
 
   /**
-    * We need custom group auxiliary functions in order to support nested windows.
-    */
+   * We need custom group auxiliary functions in order to support nested windows.
+   */
 
   val TUMBLE: SqlGroupedWindowFunction = new SqlGroupedWindowFunction(
     // The TUMBLE group function was hard code to $TUMBLE in CALCITE-3382.
@@ -266,11 +271,7 @@ object BasicOperatorTable {
     null,
     OperandTypes.or(OperandTypes.DATETIME_INTERVAL, OperandTypes.DATETIME_INTERVAL_TIME)) {
     override def getAuxiliaryFunctions: JList[SqlGroupedWindowFunction] =
-      Seq(
-        TUMBLE_START,
-        TUMBLE_END,
-        TUMBLE_ROWTIME,
-        TUMBLE_PROCTIME)
+      Seq(TUMBLE_START, TUMBLE_END, TUMBLE_ROWTIME, TUMBLE_PROCTIME)
   }
   val TUMBLE_START: SqlGroupedWindowFunction = TUMBLE.auxiliary(SqlKind.TUMBLE_START)
   val TUMBLE_END: SqlGroupedWindowFunction = TUMBLE.auxiliary(SqlKind.TUMBLE_END)
@@ -295,11 +296,7 @@ object BasicOperatorTable {
       OperandTypes.DATETIME_INTERVAL_INTERVAL,
       OperandTypes.DATETIME_INTERVAL_INTERVAL_TIME)) {
     override def getAuxiliaryFunctions: _root_.java.util.List[SqlGroupedWindowFunction] =
-      Seq(
-        HOP_START,
-        HOP_END,
-        HOP_ROWTIME,
-        HOP_PROCTIME)
+      Seq(HOP_START, HOP_END, HOP_ROWTIME, HOP_PROCTIME)
   }
   val HOP_START: SqlGroupedWindowFunction = HOP.auxiliary(SqlKind.HOP_START)
   val HOP_END: SqlGroupedWindowFunction = HOP.auxiliary(SqlKind.HOP_END)
@@ -321,11 +318,7 @@ object BasicOperatorTable {
     null,
     OperandTypes.or(OperandTypes.DATETIME_INTERVAL, OperandTypes.DATETIME_INTERVAL_TIME)) {
     override def getAuxiliaryFunctions: _root_.java.util.List[SqlGroupedWindowFunction] =
-      Seq(
-        SESSION_START,
-        SESSION_END,
-        SESSION_ROWTIME,
-        SESSION_PROCTIME)
+      Seq(SESSION_START, SESSION_END, SESSION_ROWTIME, SESSION_PROCTIME)
   }
   val SESSION_START: SqlGroupedWindowFunction = SESSION.auxiliary(SqlKind.SESSION_START)
   val SESSION_END: SqlGroupedWindowFunction = SESSION.auxiliary(SqlKind.SESSION_END)
@@ -364,8 +357,7 @@ object BasicOperatorTable {
       RowTimeTypeInference,
       null,
       OperandTypes.NILADIC,
-      SqlFunctionCategory.MATCH_RECOGNIZE
-    ) {
+      SqlFunctionCategory.MATCH_RECOGNIZE) {
       override def isDeterministic: Boolean = true
     }
 
@@ -376,8 +368,7 @@ object BasicOperatorTable {
       ProcTimeTypeInference,
       null,
       OperandTypes.NILADIC,
-      SqlFunctionCategory.MATCH_RECOGNIZE
-    ) {
+      SqlFunctionCategory.MATCH_RECOGNIZE) {
       override def isDeterministic: Boolean = false
     }
 }

@@ -34,7 +34,8 @@ class StateCleaningCountTriggerHarnessTest {
   @Test
   def testFiringAndFiringWithPurging(): Unit = {
     val testHarness = new TriggerTestHarness[Any, GlobalWindow](
-      StateCleaningCountTrigger.of(config, 10), new GlobalWindow.Serializer)
+      StateCleaningCountTrigger.of(config, 10),
+      new GlobalWindow.Serializer)
 
     // try to trigger onProcessingTime method via 1, but there is non timer is triggered
     assertEquals(0, testHarness.advanceProcessingTime(1).size())
@@ -117,16 +118,14 @@ class StateCleaningCountTriggerHarnessTest {
     // try to trigger onProcessingTime method via 7002, and all states are cleared
     val timesIt = testHarness.advanceProcessingTime(7002).iterator()
 
-    assertEquals(
-      TriggerResult.FIRE_AND_PURGE,
-      timesIt.next().f1)
+    assertEquals(TriggerResult.FIRE_AND_PURGE, timesIt.next().f1)
 
     assertEquals(0, testHarness.numStateEntries)
   }
 
   /**
-    * Verify that clear() does not leak across windows.
-    */
+   * Verify that clear() does not leak across windows.
+   */
   @Test
   def testClear() {
     val testHarness = new TriggerTestHarness[Any, GlobalWindow](

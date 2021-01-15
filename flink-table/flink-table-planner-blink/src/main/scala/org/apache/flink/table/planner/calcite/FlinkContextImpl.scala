@@ -26,7 +26,7 @@ class FlinkContextImpl(
     functionCatalog: FunctionCatalog,
     catalogManager: CatalogManager,
     toRexFactory: SqlExprToRexConverterFactory)
-  extends FlinkContext {
+    extends FlinkContext {
 
   override def getTableConfig: TableConfig = tableConfig
 

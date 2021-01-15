@@ -17,9 +17,21 @@
  */
 package org.apache.flink.table.planner.runtime.utils
 
-import org.apache.flink.table.api.config.ExecutionConfigOptions.{TABLE_EXEC_MINIBATCH_ALLOW_LATENCY, TABLE_EXEC_MINIBATCH_ENABLED, TABLE_EXEC_MINIBATCH_SIZE}
-import org.apache.flink.table.planner.runtime.utils.StreamingWithMiniBatchTestBase.{MiniBatchMode, MiniBatchOff, MiniBatchOn}
-import org.apache.flink.table.planner.runtime.utils.StreamingWithStateTestBase.{HEAP_BACKEND, ROCKSDB_BACKEND, StateBackendMode}
+import org.apache.flink.table.api.config.ExecutionConfigOptions.{
+  TABLE_EXEC_MINIBATCH_ALLOW_LATENCY,
+  TABLE_EXEC_MINIBATCH_ENABLED,
+  TABLE_EXEC_MINIBATCH_SIZE
+}
+import org.apache.flink.table.planner.runtime.utils.StreamingWithMiniBatchTestBase.{
+  MiniBatchMode,
+  MiniBatchOff,
+  MiniBatchOn
+}
+import org.apache.flink.table.planner.runtime.utils.StreamingWithStateTestBase.{
+  HEAP_BACKEND,
+  ROCKSDB_BACKEND,
+  StateBackendMode
+}
 
 import org.junit.runners.Parameterized
 
@@ -28,10 +40,8 @@ import java.util
 
 import scala.collection.JavaConversions._
 
-abstract class StreamingWithMiniBatchTestBase(
-    miniBatch: MiniBatchMode,
-    state: StateBackendMode)
-  extends StreamingWithStateTestBase(state) {
+abstract class StreamingWithMiniBatchTestBase(miniBatch: MiniBatchMode, state: StateBackendMode)
+    extends StreamingWithStateTestBase(state) {
 
   override def before(): Unit = {
     super.before()

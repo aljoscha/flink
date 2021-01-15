@@ -28,8 +28,8 @@ import org.junit.Test
 
 class GroupWindowTest extends TableTestBase {
   private val streamUtil: StreamTableTestUtil = streamTestUtil()
-  private val table = streamUtil.addTable[(Int, String, Long)](
-    "MyTable", 'a, 'b, 'c, 'proctime.proctime, 'rowtime.rowtime)
+  private val table = streamUtil
+    .addTable[(Int, String, Long)]("MyTable", 'a, 'b, 'c, 'proctime.proctime, 'rowtime.rowtime)
 
   @Test
   def testTumbleFunction() = {
@@ -47,22 +47,17 @@ class GroupWindowTest extends TableTestBase {
         "DataStreamCalc",
         unaryNode(
           "DataStreamGroupWindowAggregate",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(table),
-            term("select", "rowtime", "c", "a")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(table), term("select", "rowtime", "c", "a")),
           term("window", "TumblingGroupWindow('w$, 'rowtime, 900000.millis)"),
-          term("select",
+          term(
+            "select",
             "COUNT(*) AS EXPR$0",
-              "weightedAvg(c, a) AS wAvg",
-              "start('w$) AS w$start",
-              "end('w$) AS w$end",
-              "rowtime('w$) AS w$rowtime",
-              "proctime('w$) AS w$proctime")
-        ),
-        term("select", "EXPR$0", "wAvg", "w$start AS EXPR$2", "w$end AS EXPR$3")
-      )
+            "weightedAvg(c, a) AS wAvg",
+            "start('w$) AS w$start",
+            "end('w$) AS w$end",
+            "rowtime('w$) AS w$rowtime",
+            "proctime('w$) AS w$proctime")),
+        term("select", "EXPR$0", "wAvg", "w$start AS EXPR$2", "w$end AS EXPR$3"))
     streamUtil.verifySql(sql, expected)
   }
 
@@ -81,21 +76,16 @@ class GroupWindowTest extends TableTestBase {
         "DataStreamCalc",
         unaryNode(
           "DataStreamGroupWindowAggregate",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(table),
-            term("select", "proctime", "c", "a")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(table), term("select", "proctime", "c", "a")),
           term("window", "SlidingGroupWindow('w$, 'proctime, 3600000.millis, 900000.millis)"),
-          term("select",
+          term(
+            "select",
             "COUNT(*) AS EXPR$0",
-              "weightedAvg(c, a) AS wAvg",
-              "start('w$) AS w$start",
-              "end('w$) AS w$end",
-              "proctime('w$) AS w$proctime")
-        ),
-        term("select", "EXPR$0", "wAvg", "w$start AS EXPR$2", "w$end AS EXPR$3")
-      )
+            "weightedAvg(c, a) AS wAvg",
+            "start('w$) AS w$start",
+            "end('w$) AS w$end",
+            "proctime('w$) AS w$proctime")),
+        term("select", "EXPR$0", "wAvg", "w$start AS EXPR$2", "w$end AS EXPR$3"))
 
     streamUtil.verifySql(sql, expected)
   }
@@ -116,21 +106,16 @@ class GroupWindowTest extends TableTestBase {
         "DataStreamCalc",
         unaryNode(
           "DataStreamGroupWindowAggregate",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(table),
-            term("select", "proctime", "c", "a")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(table), term("select", "proctime", "c", "a")),
           term("window", "SessionGroupWindow('w$, 'proctime, 900000.millis)"),
-          term("select",
+          term(
+            "select",
             "COUNT(*) AS EXPR$0",
             "weightedAvg(c, a) AS wAvg",
             "start('w$) AS w$start",
             "end('w$) AS w$end",
-            "proctime('w$) AS w$proctime")
-        ),
-        term("select", "EXPR$0", "wAvg", "w$start AS EXPR$2", "w$end AS EXPR$3")
-      )
+            "proctime('w$) AS w$proctime")),
+        term("select", "EXPR$0", "wAvg", "w$start AS EXPR$2", "w$end AS EXPR$3"))
 
     streamUtil.verifySql(sql, expected)
   }
@@ -148,21 +133,16 @@ class GroupWindowTest extends TableTestBase {
         "DataStreamCalc",
         unaryNode(
           "DataStreamGroupWindowAggregate",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(table),
-            term("select", "rowtime")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(table), term("select", "rowtime")),
           term("window", "TumblingGroupWindow('w$, 'rowtime, 900000.millis)"),
-          term("select",
+          term(
+            "select",
             "COUNT(*) AS EXPR$0",
             "start('w$) AS w$start",
             "end('w$) AS w$end",
             "rowtime('w$) AS w$rowtime",
-            "proctime('w$) AS w$proctime")
-        ),
-        term("select", "EXPR$0", "+(w$end, 60000:INTERVAL MINUTE) AS EXPR$1")
-      )
+            "proctime('w$) AS w$proctime")),
+        term("select", "EXPR$0", "+(w$end, 60000:INTERVAL MINUTE) AS EXPR$1"))
 
     streamUtil.verifySql(sql, expected)
   }
@@ -184,25 +164,21 @@ class GroupWindowTest extends TableTestBase {
         "DataStreamCalc",
         unaryNode(
           "DataStreamGroupWindowAggregate",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(table),
-            term("select", "rowtime, a")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(table), term("select", "rowtime, a")),
           term("window", "SlidingGroupWindow('w$, 'rowtime, 60000.millis, 900000.millis)"),
-          term("select",
+          term(
+            "select",
             "COUNT(*) AS EXPR$0",
             "SUM(a) AS $f1",
             "start('w$) AS w$start",
             "end('w$) AS w$end",
             "rowtime('w$) AS w$rowtime",
-            "proctime('w$) AS w$proctime")
-        ),
+            "proctime('w$) AS w$proctime")),
         term("select", "EXPR$0", "w$start AS EXPR$1"),
-        term("where",
+        term(
+          "where",
           "AND(>($f1, 0), " +
-            "=(EXTRACT(FLAG(QUARTER), w$start), 1:BIGINT))")
-      )
+            "=(EXTRACT(FLAG(QUARTER), w$start), 1:BIGINT))"))
 
     streamUtil.verifySql(sql, expected)
   }
@@ -232,31 +208,25 @@ class GroupWindowTest extends TableTestBase {
             "DataStreamCalc",
             unaryNode(
               "DataStreamGroupWindowAggregate",
-              unaryNode(
-                "DataStreamCalc",
-                streamTableNode(table),
-                term("select", "rowtime, a")
-              ),
+              unaryNode("DataStreamCalc", streamTableNode(table), term("select", "rowtime, a")),
               term("window", "TumblingGroupWindow('w$, 'rowtime, 2.millis)"),
-              term("select",
+              term(
+                "select",
                 "COUNT(a) AS a",
                 "start('w$) AS w$start",
                 "end('w$) AS w$end",
                 "rowtime('w$) AS w$rowtime",
-                "proctime('w$) AS w$proctime")
-            ),
-            term("select", "w$rowtime AS $f2")
-          ),
+                "proctime('w$) AS w$proctime")),
+            term("select", "w$rowtime AS $f2")),
           term("window", "TumblingGroupWindow('w$, '$f2, 4.millis)"),
-          term("select",
+          term(
+            "select",
             "COUNT(*) AS a",
             "start('w$) AS w$start",
             "end('w$) AS w$end",
             "rowtime('w$) AS w$rowtime",
-            "proctime('w$) AS w$proctime")
-        ),
-        term("select", "w$rowtime AS EXPR$0", "w$end AS EXPR$1", "a")
-      )
+            "proctime('w$) AS w$proctime")),
+        term("select", "w$rowtime AS EXPR$0", "w$end AS EXPR$1", "a"))
 
     streamUtil.verifySql(sql, expected)
   }
@@ -279,27 +249,26 @@ class GroupWindowTest extends TableTestBase {
           unaryNode(
             "DataStreamCalc",
             streamTableNode(table),
-            term("select", "rowtime", "c", "*(c, c) AS $f2")
-          ),
+            term("select", "rowtime", "c", "*(c, c) AS $f2")),
           term("window", "TumblingGroupWindow('w$, 'rowtime, 900000.millis)"),
-          term("select",
+          term(
+            "select",
             "SUM($f2) AS $f0",
             "SUM(c) AS $f1",
             "COUNT(c) AS $f2",
             "start('w$) AS w$start",
             "end('w$) AS w$end",
             "rowtime('w$) AS w$rowtime",
-            "proctime('w$) AS w$proctime")
-        ),
-        term("select",
+            "proctime('w$) AS w$proctime")),
+        term(
+          "select",
           "/(-($f0, /(*($f1, $f1), $f2)), $f2) AS EXPR$0",
           "/(-($f0, /(*($f1, $f1), $f2)), CASE(=($f2, 1), null:BIGINT, -($f2, 1))) AS EXPR$1",
           "CAST(POWER(/(-($f0, /(*($f1, $f1), $f2)), $f2), 0.5:DECIMAL(2, 1))) AS EXPR$2",
           "CAST(POWER(/(-($f0, /(*($f1, $f1), $f2)), CASE(=($f2, 1), null:BIGINT, -($f2, 1))), " +
             "0.5:DECIMAL(2, 1))) AS EXPR$3",
           "w$start AS EXPR$4",
-          "w$end AS EXPR$5")
-      )
+          "w$end AS EXPR$5"))
     streamUtil.verifySql(sql, expected)
   }
 
@@ -330,19 +299,17 @@ class GroupWindowTest extends TableTestBase {
           unaryNode(
             "DataStreamCalc",
             streamTableNode(table),
-            term("select", "rowtime", "CASE(=(a, 1), 1, 99) AS $f1")
-          ),
+            term("select", "rowtime", "CASE(=(a, 1), 1, 99) AS $f1")),
           term("window", "TumblingGroupWindow('w$, 'rowtime, 900000.millis)"),
-          term("select",
+          term(
+            "select",
             "SUM($f1) AS s",
             "AVG($f1) AS a",
             "start('w$) AS w$start",
             "end('w$) AS w$end",
             "rowtime('w$) AS w$rowtime",
-            "proctime('w$) AS w$proctime")
-        ),
-        term("select", "CAST(s) AS s", "CAST(a) AS a", "w$start AS wStart")
-      )
+            "proctime('w$) AS w$proctime")),
+        term("select", "CAST(s) AS s", "CAST(a) AS a", "w$start AS wStart"))
     streamUtil.verifySql(sql, expected)
   }
 
@@ -377,35 +344,22 @@ class GroupWindowTest extends TableTestBase {
           "DataStreamCalc",
           unaryNode(
             "DataStreamGroupWindowAggregate",
-            unaryNode(
-              "DataStreamCalc",
-              streamTableNode(table),
-              term("select", "rowtime")
-            ),
+            unaryNode("DataStreamCalc", streamTableNode(table), term("select", "rowtime")),
             // This window is the 1hr window
             term("window", "SlidingGroupWindow('w$, 'rowtime, 3600000.millis, 3600000.millis)"),
-            term("select")
-          ),
-          term("select", "1 AS EXPR$0")
-        ),
+            term("select")),
+          term("select", "1 AS EXPR$0")),
         unaryNode(
           "DataStreamCalc",
           unaryNode(
             "DataStreamGroupWindowAggregate",
-            unaryNode(
-              "DataStreamCalc",
-              streamTableNode(table),
-              term("select", "rowtime")
-            ),
+            unaryNode("DataStreamCalc", streamTableNode(table), term("select", "rowtime")),
             // This window is the 2hr window
             term("window", "SlidingGroupWindow('w$, 'rowtime, 7200000.millis, 3600000.millis)"),
-            term("select")
-          ),
-          term("select", "1 AS EXPR$0")
-        ),
+            term("select")),
+          term("select", "1 AS EXPR$0")),
         term("all", "true"),
-        term("union all", "EXPR$0")
-      )
+        term("union all", "EXPR$0"))
 
     streamUtil.verifySql(sql, expected)
   }

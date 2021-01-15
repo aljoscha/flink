@@ -43,17 +43,31 @@ class FlinkRelMdPercentageOriginalRowsTest extends FlinkRelMdHandlerTestBase {
 
   @Test
   def testGetPercentageOriginalRowsOnRank(): Unit = {
-    Array(logicalRank, flinkLogicalRank, batchLocalRank, batchGlobalRank, streamRank,
-      logicalRowNumber, flinkLogicalRowNumber, streamRowNumber).foreach { rank =>
+    Array(
+      logicalRank,
+      flinkLogicalRank,
+      batchLocalRank,
+      batchGlobalRank,
+      streamRank,
+      logicalRowNumber,
+      flinkLogicalRowNumber,
+      streamRowNumber).foreach { rank =>
       assertEquals(1.0, mq.getPercentageOriginalRows(rank))
     }
   }
 
   @Test
   def testGetPercentageOriginalRowsOnAggregate(): Unit = {
-    Array(logicalAgg, flinkLogicalAgg, batchGlobalAggWithLocal, batchGlobalAggWithoutLocal,
-      streamGlobalAggWithLocal, streamGlobalAggWithoutLocal, logicalAggWithAuxGroup,
-      flinkLogicalAggWithAuxGroup, batchGlobalAggWithLocalWithAuxGroup,
+    Array(
+      logicalAgg,
+      flinkLogicalAgg,
+      batchGlobalAggWithLocal,
+      batchGlobalAggWithoutLocal,
+      streamGlobalAggWithLocal,
+      streamGlobalAggWithoutLocal,
+      logicalAggWithAuxGroup,
+      flinkLogicalAggWithAuxGroup,
+      batchGlobalAggWithLocalWithAuxGroup,
       batchGlobalAggWithoutLocalWithAuxGroup).foreach { agg =>
       assertEquals(1.0, mq.getPercentageOriginalRows(agg))
     }

@@ -22,8 +22,8 @@ import org.apache.calcite.plan.{RelOptPlanner, RelTraitDef}
 import org.apache.calcite.rel.RelNode
 
 /**
-  * Definition of the [[UpdateAsRetractionTrait]].
-  */
+ * Definition of the [[UpdateAsRetractionTrait]].
+ */
 class UpdateAsRetractionTraitDef extends RelTraitDef[UpdateAsRetractionTrait] {
   override def convert(
       planner: RelOptPlanner,
@@ -51,8 +51,8 @@ object UpdateAsRetractionTraitDef {
 }
 
 /**
-  * Definition of the [[AccModeTrait]].
-  */
+ * Definition of the [[AccModeTrait]].
+ */
 class AccModeTraitDef extends RelTraitDef[AccModeTrait] {
 
   override def convert(

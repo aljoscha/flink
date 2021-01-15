@@ -21,14 +21,23 @@ package org.apache.flink.table.plan.nodes.datastream
 import org.apache.flink.api.common.typeinfo.TypeInformation
 import org.apache.flink.api.dag.Transformation
 import org.apache.flink.api.java.tuple.{Tuple2 => JTuple2}
-import org.apache.flink.streaming.api.datastream.{DataStream, DataStreamSink => StreamingDataStreamSink}
+import org.apache.flink.streaming.api.datastream.{
+  DataStream,
+  DataStreamSink => StreamingDataStreamSink
+}
 import org.apache.flink.table.api.{TableException, TableSchema, ValidationException}
 import org.apache.flink.table.calcite.FlinkTypeFactory
 import org.apache.flink.table.plan.nodes.Sink
 import org.apache.flink.table.plan.util.UpdatingPlanChecker
 import org.apache.flink.table.planner.{DataStreamConversions, StreamPlanner}
 import org.apache.flink.table.runtime.types.CRow
-import org.apache.flink.table.sinks.{AppendStreamTableSink, DataStreamTableSink, RetractStreamTableSink, TableSink, UpsertStreamTableSink}
+import org.apache.flink.table.sinks.{
+  AppendStreamTableSink,
+  DataStreamTableSink,
+  RetractStreamTableSink,
+  TableSink,
+  UpsertStreamTableSink
+}
 import org.apache.flink.table.types.utils.TypeConversions
 
 import org.apache.calcite.plan._
@@ -38,18 +47,17 @@ import _root_.java.lang.{Boolean => JBool}
 
 import _root_.scala.collection.JavaConverters._
 
-
 /**
-  * Stream physical RelNode to to write data into an external sink defined by a [[TableSink]].
-  */
+ * Stream physical RelNode to to write data into an external sink defined by a [[TableSink]].
+ */
 class DataStreamSink(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
     inputRel: RelNode,
     sink: TableSink[_],
     sinkName: String)
-  extends Sink(cluster, traitSet, inputRel, sink, sinkName)
-  with DataStreamRel {
+    extends Sink(cluster, traitSet, inputRel, sink, sinkName)
+    with DataStreamRel {
 
   override def copy(traitSet: RelTraitSet, inputs: java.util.List[RelNode]): RelNode = {
     new DataStreamSink(cluster, traitSet, inputs.get(0), sink, sinkName)
@@ -89,45 +97,40 @@ class DataStreamSink(
         dataStream.getTransformation
 
       case _ =>
-        throw new ValidationException("Stream Tables can only be emitted by AppendStreamTableSink, "
-          + "RetractStreamTableSink, or UpsertStreamTableSink.")
+        throw new ValidationException(
+          "Stream Tables can only be emitted by AppendStreamTableSink, "
+            + "RetractStreamTableSink, or UpsertStreamTableSink.")
     }
   }
 
   private def writeToRetractSink[T](
       sink: RetractStreamTableSink[T],
-      planner: StreamPlanner): StreamingDataStreamSink[_]= {
+      planner: StreamPlanner): StreamingDataStreamSink[_] = {
     // retraction sink can always be used
-    val outputType = TypeConversions.fromDataTypeToLegacyInfo(sink.getConsumedDataType)
+    val outputType = TypeConversions
+      .fromDataTypeToLegacyInfo(sink.getConsumedDataType)
       .asInstanceOf[TypeInformation[JTuple2[JBool, T]]]
     // translate the Table into a DataStream and provide the type that the TableSink expects.
     val result: DataStream[JTuple2[JBool, T]] =
-      translateToType(
-        planner,
-        withChangeFlag = true,
-        outputType)
+      translateToType(planner, withChangeFlag = true, outputType)
     // Give the DataStream to the TableSink to emit it.
     sink.consumeDataStream(result)
   }
 
   private def writeToAppendSink[T](
       sink: AppendStreamTableSink[T],
-      planner: StreamPlanner): StreamingDataStreamSink[_]= {
+      planner: StreamPlanner): StreamingDataStreamSink[_] = {
     // verify table is an insert-only (append-only) table
     if (!UpdatingPlanChecker.isAppendOnly(getInput)) {
-      throw new TableException(
-        "AppendStreamTableSink requires that Table has only insert changes.")
+      throw new TableException("AppendStreamTableSink requires that Table has only insert changes.")
     }
-    val outputType = TypeConversions.fromDataTypeToLegacyInfo(sink.getConsumedDataType)
+    val outputType = TypeConversions
+      .fromDataTypeToLegacyInfo(sink.getConsumedDataType)
       .asInstanceOf[TypeInformation[T]]
     val resultType = getTableSchema
     // translate the Table into a DataStream and provide the type that the TableSink expects.
     val result: DataStream[T] =
-      translateInput(
-        planner,
-        resultType,
-        outputType,
-        withChangeFlag = false)
+      translateInput(planner, resultType, outputType, withChangeFlag = false)
     // Give the DataStream to the TableSink to emit it.
     sink.consumeDataStream(result)
   }
@@ -145,21 +148,19 @@ class DataStreamSink(
       .getUniqueKeyFields(getInput, sinkFieldNames)
     // check that we have keys if the table has changes (is not append-only)
     tableKeys match {
-      case Some(keys) => sink.setKeyFields(keys)
+      case Some(keys)                => sink.setKeyFields(keys)
       case None if isAppendOnlyTable => sink.setKeyFields(null)
-      case None if !isAppendOnlyTable => throw new TableException(
-        "UpsertStreamTableSink requires that Table has full primary keys if it is updated.")
+      case None if !isAppendOnlyTable =>
+        throw new TableException(
+          "UpsertStreamTableSink requires that Table has full primary keys if it is updated.")
     }
-    val outputType = TypeConversions.fromDataTypeToLegacyInfo(sink.getConsumedDataType)
+    val outputType = TypeConversions
+      .fromDataTypeToLegacyInfo(sink.getConsumedDataType)
       .asInstanceOf[TypeInformation[JTuple2[JBool, T]]]
     val resultType = getTableSchema
     // translate the Table into a DataStream and provide the type that the TableSink expects.
     val result: DataStream[JTuple2[JBool, T]] =
-      translateInput(
-        planner,
-        resultType,
-        outputType,
-        withChangeFlag = true)
+      translateInput(planner, resultType, outputType, withChangeFlag = true)
     // Give the DataStream to the TableSink to emit it.
     sink.consumeDataStream(result)
   }
@@ -191,10 +192,11 @@ class DataStreamSink(
   }
 
   /**
-    * Returns the record type of the optimized plan with field names of the logical plan.
-    */
+   * Returns the record type of the optimized plan with field names of the logical plan.
+   */
   private def getTableSchema: TableSchema = {
-    val fieldTypes = getInput.getRowType.getFieldList.asScala.map(_.getType)
+    val fieldTypes = getInput.getRowType.getFieldList.asScala
+      .map(_.getType)
       .map(FlinkTypeFactory.toTypeInfo)
       .map(TypeConversions.fromLegacyInfoToDataType)
       .toArray

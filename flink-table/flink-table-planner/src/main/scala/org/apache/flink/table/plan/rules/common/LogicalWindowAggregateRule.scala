@@ -40,15 +40,16 @@ import _root_.java.util.{ArrayList => JArrayList, Collections, List => JList}
 import _root_.scala.collection.JavaConversions._
 
 abstract class LogicalWindowAggregateRule(ruleName: String)
-  extends RelOptRule(
-    RelOptRule.operand(classOf[LogicalAggregate],
-      RelOptRule.operand(classOf[LogicalProject], RelOptRule.none())),
-    RelBuilder.proto(
-      Contexts.of(
-        RelFactories.DEFAULT_STRUCT,
-        RelBuilder.Config.DEFAULT
-          .withBloat(-1))),
-    ruleName) {
+    extends RelOptRule(
+      RelOptRule.operand(
+        classOf[LogicalAggregate],
+        RelOptRule.operand(classOf[LogicalProject], RelOptRule.none())),
+      RelBuilder.proto(
+        Contexts.of(
+          RelFactories.DEFAULT_STRUCT,
+          RelBuilder.Config.DEFAULT
+            .withBloat(-1))),
+      ruleName) {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val agg = call.rel(0).asInstanceOf[LogicalAggregate]
@@ -64,18 +65,19 @@ abstract class LogicalWindowAggregateRule(ruleName: String)
   }
 
   /**
-    * Transform LogicalAggregate with windowing expression to LogicalProject
-    * + LogicalWindowAggregate + LogicalProject.
-    *
-    * The transformation adds an additional LogicalProject at the top to ensure
-    * that the types are equivalent.
-    */
+   * Transform LogicalAggregate with windowing expression to LogicalProject
+   * + LogicalWindowAggregate + LogicalProject.
+   *
+   * The transformation adds an additional LogicalProject at the top to ensure
+   * that the types are equivalent.
+   */
   override def onMatch(call: RelOptRuleCall): Unit = {
     val agg0 = call.rel[LogicalAggregate](0)
     val project0 = call.rel[LogicalProject](1)
     val project = rewriteWindowCallWithFuncOperands(project0, call.builder())
     val agg = if (project != project0) {
-      agg0.copy(agg0.getTraitSet, Collections.singletonList(project))
+      agg0
+        .copy(agg0.getTraitSet, Collections.singletonList(project))
         .asInstanceOf[LogicalAggregate]
     } else {
       agg0
@@ -105,17 +107,11 @@ abstract class LogicalWindowAggregateRule(ruleName: String)
     val finalCalls = adjustTypes(agg, indexAndTypes)
 
     // we don't use the builder here because it uses RelMetadataQuery which affects the plan
-    val newAgg = LogicalAggregate.create(
-      newProject,
-      newGroupSet,
-      ImmutableList.of(newGroupSet),
-      finalCalls)
+    val newAgg =
+      LogicalAggregate.create(newProject, newGroupSet, ImmutableList.of(newGroupSet), finalCalls)
 
     val transformed = call.builder()
-    val windowAgg = LogicalWindowAggregate.create(
-      window,
-      Seq[NamedWindowProperty](),
-      newAgg)
+    val windowAgg = LogicalWindowAggregate.create(window, Seq[NamedWindowProperty](), newAgg)
     transformed.push(windowAgg)
 
     // The transformation adds an additional LogicalProject at the top to ensure
@@ -123,17 +119,16 @@ abstract class LogicalWindowAggregateRule(ruleName: String)
     // 1. ensure group key types, create an additional project to conform with types
     val outAggGroupExpression = getOutAggregateGroupExpression(rexBuilder, windowExpr)
     val projectsEnsureGroupKeyTypes =
-    transformed.fields.patch(windowExprIdx, Seq(outAggGroupExpression), 0)
+      transformed.fields.patch(windowExprIdx, Seq(outAggGroupExpression), 0)
     // 2. ensure aggCall types
     val projectsEnsureAggCallTypes =
-      projectsEnsureGroupKeyTypes.zipWithIndex.map {
-        case (aggCall, index) =>
-          val aggCallIndex = index - agg.getGroupCount
-          if (indexAndTypes.containsKey(aggCallIndex)) {
-            rexBuilder.makeCast(agg.getAggCallList.get(aggCallIndex).`type`, aggCall, true)
-          } else {
-            aggCall
-          }
+      projectsEnsureGroupKeyTypes.zipWithIndex.map { case (aggCall, index) =>
+        val aggCallIndex = index - agg.getGroupCount
+        if (indexAndTypes.containsKey(aggCallIndex)) {
+          rexBuilder.makeCast(agg.getAggCallList.get(aggCallIndex).`type`, aggCall, true)
+        } else {
+          aggCall
+        }
       }
     transformed.project(projectsEnsureAggCallTypes)
 
@@ -181,30 +176,30 @@ abstract class LogicalWindowAggregateRule(ruleName: String)
     var hasWindowCallWithFuncOperands: Boolean = false
     var lastIdx = projectInput.getRowType.getFieldCount - 1;
     val pushDownCalls = new JArrayList[RexNode]()
-    0 until projectInput.getRowType.getFieldCount foreach {
-      idx => pushDownCalls.add(RexInputRef.of(idx, projectInput.getRowType))
+    0 until projectInput.getRowType.getFieldCount foreach { idx =>
+      pushDownCalls.add(RexInputRef.of(idx, projectInput.getRowType))
     }
     val newProjectExprs = project.getProjects.map {
-      case call: RexCall if isWindowCall(call) &&
-        isTimeAttributeCall(call.getOperands.head, inputProjects) =>
+      case call: RexCall
+          if isWindowCall(call) &&
+            isTimeAttributeCall(call.getOperands.head, inputProjects) =>
         hasWindowCallWithFuncOperands = true
         // Update the window call to reference a RexInputRef instead of a function call.
-        call.accept(
-          new RexShuttle {
-            override def visitCall(call: RexCall): RexNode = {
-              if (isTimeAttributeCall(call, inputProjects)) {
-                lastIdx += 1
-                pushDownCalls.add(call)
-                relBuilder.getRexBuilder.makeInputRef(
-                  call.getType,
-                  // We would project plus an additional function call
-                  // at the end of input projection.
-                  lastIdx)
-              } else {
-                super.visitCall(call)
-              }
+        call.accept(new RexShuttle {
+          override def visitCall(call: RexCall): RexNode = {
+            if (isTimeAttributeCall(call, inputProjects)) {
+              lastIdx += 1
+              pushDownCalls.add(call)
+              relBuilder.getRexBuilder.makeInputRef(
+                call.getType,
+                // We would project plus an additional function call
+                // at the end of input projection.
+                lastIdx)
+            } else {
+              super.visitCall(call)
             }
-          })
+          }
+        })
       case rex: RexNode => rex
     }
 
@@ -221,8 +216,10 @@ abstract class LogicalWindowAggregateRule(ruleName: String)
     }
   }
 
-  /** Decides if the [[RexNode]] is a call whose return type is
-   * a time indicator type. */
+  /**
+   * Decides if the [[RexNode]] is a call whose return type is
+   * a time indicator type.
+   */
   def isTimeAttributeCall(rexNode: RexNode, projects: JList[RexNode]): Boolean = rexNode match {
     case call: RexCall if FlinkTypeFactory.isTimeIndicatorType(call.getType) =>
       call.getOperands.forall { operand =>
@@ -233,37 +230,32 @@ abstract class LogicalWindowAggregateRule(ruleName: String)
 
   /** Decides whether the [[RexCall]] is a window call. */
   def isWindowCall(call: RexCall): Boolean = call.getOperator match {
-    case BasicOperatorTable.SESSION |
-         BasicOperatorTable.HOP |
-         BasicOperatorTable.TUMBLE => true
-    case _ => false
+    case BasicOperatorTable.SESSION | BasicOperatorTable.HOP | BasicOperatorTable.TUMBLE => true
+    case _                                                                               => false
   }
 
   /**
    * Change the types of [[AggregateCall]] to the corresponding inferred types.
    */
-  private def adjustTypes(
-      agg: LogicalAggregate,
-      indexAndTypes: Map[Int, RelDataType]) = {
+  private def adjustTypes(agg: LogicalAggregate, indexAndTypes: Map[Int, RelDataType]) = {
 
-    agg.getAggCallList.zipWithIndex.map {
-      case (aggCall, index) =>
-        if (indexAndTypes.containsKey(index)) {
-          AggregateCall.create(
-            aggCall.getAggregation,
-            aggCall.isDistinct,
-            aggCall.isApproximate,
-            aggCall.ignoreNulls(),
-            aggCall.getArgList,
-            aggCall.filterArg,
-            aggCall.collation,
-            agg.getGroupCount,
-            agg.getInput,
-            indexAndTypes(index),
-            aggCall.name)
-        } else {
-          aggCall
-        }
+    agg.getAggCallList.zipWithIndex.map { case (aggCall, index) =>
+      if (indexAndTypes.containsKey(index)) {
+        AggregateCall.create(
+          aggCall.getAggregation,
+          aggCall.isDistinct,
+          aggCall.isApproximate,
+          aggCall.ignoreNulls(),
+          aggCall.getArgList,
+          aggCall.filterArg,
+          aggCall.collation,
+          agg.getGroupCount,
+          agg.getInput,
+          indexAndTypes(index),
+          aggCall.name)
+      } else {
+        aggCall
+      }
     }
   }
 
@@ -271,26 +263,23 @@ abstract class LogicalWindowAggregateRule(ruleName: String)
    * Check if there are any types of [[AggregateCall]] that need to be changed. Return the
    * [[AggregateCall]] indexes and the corresponding inferred types.
    */
-  private def getIndexAndInferredTypesIfChanged(
-      agg: LogicalAggregate)
-    : Map[Int, RelDataType] = {
+  private def getIndexAndInferredTypesIfChanged(agg: LogicalAggregate): Map[Int, RelDataType] = {
 
-    agg.getAggCallList.zipWithIndex.flatMap {
-      case (aggCall, index) =>
-        val origType = aggCall.`type`
-        val aggCallBinding = new Aggregate.AggCallBinding(
-          agg.getCluster.getTypeFactory,
-          aggCall.getAggregation,
-          SqlTypeUtil.projectTypes(agg.getInput.getRowType, aggCall.getArgList),
-          0,
-          aggCall.hasFilter)
-        val inferredType = aggCall.getAggregation.inferReturnType(aggCallBinding)
+    agg.getAggCallList.zipWithIndex.flatMap { case (aggCall, index) =>
+      val origType = aggCall.`type`
+      val aggCallBinding = new Aggregate.AggCallBinding(
+        agg.getCluster.getTypeFactory,
+        aggCall.getAggregation,
+        SqlTypeUtil.projectTypes(agg.getInput.getRowType, aggCall.getArgList),
+        0,
+        aggCall.hasFilter)
+      val inferredType = aggCall.getAggregation.inferReturnType(aggCallBinding)
 
-        if (origType != inferredType && agg.getGroupCount == 1) {
-          Some(index, inferredType)
-        } else {
-          None
-        }
+      if (origType != inferredType && agg.getGroupCount == 1) {
+        Some(index, inferredType)
+      } else {
+        None
+      }
     }.toMap
   }
 
@@ -303,33 +292,35 @@ abstract class LogicalWindowAggregateRule(ruleName: String)
     val groupExpr = project.getProjects.zipWithIndex.filter(p => groupKeys.get(p._2))
 
     // filter grouping expressions for window expressions
-    groupExpr.filter { g =>
-      g._1 match {
-        case call: RexCall =>
-          call.getOperator match {
-            case BasicOperatorTable.TUMBLE =>
-              if (call.getOperands.size() == 2) {
-                true
-              } else {
-                throw new TableException("TUMBLE window with alignment is not supported yet.")
-              }
-            case BasicOperatorTable.HOP =>
-              if (call.getOperands.size() == 3) {
-                true
-              } else {
-                throw new TableException("HOP window with alignment is not supported yet.")
-              }
-            case BasicOperatorTable.SESSION =>
-              if (call.getOperands.size() == 2) {
-                true
-              } else {
-                throw new TableException("SESSION window with alignment is not supported yet.")
-              }
-            case _ => false
-          }
-        case _ => false
+    groupExpr
+      .filter { g =>
+        g._1 match {
+          case call: RexCall =>
+            call.getOperator match {
+              case BasicOperatorTable.TUMBLE =>
+                if (call.getOperands.size() == 2) {
+                  true
+                } else {
+                  throw new TableException("TUMBLE window with alignment is not supported yet.")
+                }
+              case BasicOperatorTable.HOP =>
+                if (call.getOperands.size() == 3) {
+                  true
+                } else {
+                  throw new TableException("HOP window with alignment is not supported yet.")
+                }
+              case BasicOperatorTable.SESSION =>
+                if (call.getOperands.size() == 2) {
+                  true
+                } else {
+                  throw new TableException("SESSION window with alignment is not supported yet.")
+                }
+              case _ => false
+            }
+          case _ => false
+        }
       }
-    }.map(w => (w._1.asInstanceOf[RexCall], w._2))
+      .map(w => (w._1.asInstanceOf[RexCall], w._2))
   }
 
   /** Returns the expression that replaces the window expression before the aggregation. */
@@ -345,6 +336,5 @@ abstract class LogicalWindowAggregateRule(ruleName: String)
   /** translate the group window expression in to a Flink Table window. */
   private[table] def translateWindowExpression(
       windowExpr: RexCall,
-      rowType: RelDataType)
-    : LogicalWindow
+      rowType: RelDataType): LogicalWindow
 }

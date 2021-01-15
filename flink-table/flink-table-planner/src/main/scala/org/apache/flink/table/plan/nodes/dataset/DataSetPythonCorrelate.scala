@@ -33,8 +33,8 @@ import org.apache.flink.table.types.utils.TypeConversions
 import org.apache.flink.types.Row
 
 /**
-  * Flink RelNode which matches along with join a Python user defined table function.
-  */
+ * Flink RelNode which matches along with join a Python user defined table function.
+ */
 class DataSetPythonCorrelate(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -45,17 +45,17 @@ class DataSetPythonCorrelate(
     joinRowType: RelDataType,
     joinType: JoinRelType,
     ruleDescription: String)
-  extends DataSetCorrelateBase(
-    cluster,
-    traitSet,
-    inputNode,
-    scan,
-    condition,
-    relRowType,
-    joinRowType,
-    joinType,
-    ruleDescription)
-  with CommonPythonCorrelate {
+    extends DataSetCorrelateBase(
+      cluster,
+      traitSet,
+      inputNode,
+      scan,
+      condition,
+      relRowType,
+      joinRowType,
+      joinType,
+      ruleDescription)
+    with CommonPythonCorrelate {
 
   override def copy(traitSet: RelTraitSet, inputs: java.util.List[RelNode]): RelNode = {
     new DataSetPythonCorrelate(
@@ -78,11 +78,15 @@ class DataSetPythonCorrelate(
     val (pythonUdtfInputOffsets, pythonFunctionInfo) =
       extractPythonTableFunctionInfo(pythonTableFuncRexCall)
 
-    val pythonOperatorInputRowType = TypeConversions.fromLegacyInfoToDataType(
-      new RowSchema(getInput.getRowType).typeInfo).getLogicalType.asInstanceOf[RowType]
+    val pythonOperatorInputRowType = TypeConversions
+      .fromLegacyInfoToDataType(new RowSchema(getInput.getRowType).typeInfo)
+      .getLogicalType
+      .asInstanceOf[RowType]
 
-    val pythonOperatorOutputRowType = TypeConversions.fromLegacyInfoToDataType(
-      new RowSchema(getRowType).typeInfo).getLogicalType.asInstanceOf[RowType]
+    val pythonOperatorOutputRowType = TypeConversions
+      .fromLegacyInfoToDataType(new RowSchema(getRowType).typeInfo)
+      .getLogicalType
+      .asInstanceOf[RowType]
 
     val sqlFunction = pythonTableFuncRexCall.getOperator.asInstanceOf[TableSqlFunction]
 
@@ -96,12 +100,12 @@ class DataSetPythonCorrelate(
 
     inputDS
       .flatMap(flatMapFunction)
-      .name(correlateOpName(
-        inputNode.getRowType,
-        pythonTableFuncRexCall,
-        sqlFunction,
-        relRowType,
-        getExpressionString)
-      )
+      .name(
+        correlateOpName(
+          inputNode.getRowType,
+          pythonTableFuncRexCall,
+          sqlFunction,
+          relRowType,
+          getExpressionString))
   }
 }

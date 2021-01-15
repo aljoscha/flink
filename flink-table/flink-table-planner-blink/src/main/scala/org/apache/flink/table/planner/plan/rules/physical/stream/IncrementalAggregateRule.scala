@@ -22,7 +22,12 @@ import org.apache.flink.configuration.ConfigOption
 import org.apache.flink.configuration.ConfigOptions.key
 import org.apache.flink.table.planner.calcite.{FlinkContext, FlinkTypeFactory}
 import org.apache.flink.table.planner.plan.PartialFinalType
-import org.apache.flink.table.planner.plan.nodes.physical.stream.{StreamPhysicalExchange, StreamPhysicalGlobalGroupAggregate, StreamPhysicalIncrementalGroupAggregate, StreamPhysicalLocalGroupAggregate}
+import org.apache.flink.table.planner.plan.nodes.physical.stream.{
+  StreamPhysicalExchange,
+  StreamPhysicalGlobalGroupAggregate,
+  StreamPhysicalIncrementalGroupAggregate,
+  StreamPhysicalLocalGroupAggregate
+}
 import org.apache.flink.table.planner.plan.utils.AggregateUtil
 import org.apache.flink.util.Preconditions
 
@@ -40,12 +45,18 @@ import java.util.Collections
  * [[StreamPhysicalIncrementalGroupAggregate]].
  */
 class IncrementalAggregateRule
-  extends RelOptRule(
-    operand(classOf[StreamPhysicalGlobalGroupAggregate], // final global agg
-      operand(classOf[StreamPhysicalExchange], // key by
-        operand(classOf[StreamPhysicalLocalGroupAggregate], // final local agg
-          operand(classOf[StreamPhysicalGlobalGroupAggregate], any())))), // partial global agg
-    "IncrementalAggregateRule") {
+    extends RelOptRule(
+      operand(
+        classOf[StreamPhysicalGlobalGroupAggregate], // final global agg
+        operand(
+          classOf[StreamPhysicalExchange], // key by
+          operand(
+            classOf[StreamPhysicalLocalGroupAggregate], // final local agg
+            operand(classOf[StreamPhysicalGlobalGroupAggregate], any())
+          )
+        )
+      ), // partial global agg
+      "IncrementalAggregateRule") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val finalGlobalAgg: StreamPhysicalGlobalGroupAggregate = call.rel(0)
@@ -59,9 +70,9 @@ class IncrementalAggregateRule
       IncrementalAggregateRule.TABLE_OPTIMIZER_INCREMENTAL_AGG_ENABLED)
 
     partialGlobalAgg.partialFinalType == PartialFinalType.PARTIAL &&
-      finalLocalAgg.partialFinalType == PartialFinalType.FINAL &&
-      finalGlobalAgg.partialFinalType == PartialFinalType.FINAL &&
-      incrementalAggEnabled
+    finalLocalAgg.partialFinalType == PartialFinalType.FINAL &&
+    finalGlobalAgg.partialFinalType == PartialFinalType.FINAL &&
+    incrementalAggEnabled
   }
 
   override def onMatch(call: RelOptRuleCall): Unit = {
@@ -96,10 +107,8 @@ class IncrementalAggregateRule
 
     val globalAgg = if (partialAggCountStarInserted) {
       val globalAggInputAccType = finalLocalAgg.getRowType
-      Preconditions.checkState(RelOptUtil.areRowTypesEqual(
-        incrAggOutputRowType,
-        globalAggInputAccType,
-        false))
+      Preconditions.checkState(
+        RelOptUtil.areRowTypesEqual(incrAggOutputRowType, globalAggInputAccType, false))
       finalGlobalAgg.copy(finalGlobalAgg.getTraitSet, Collections.singletonList(newExchange))
     } else {
       // an additional count1 is inserted, need to adapt the global agg
@@ -121,10 +130,8 @@ class IncrementalAggregateRule
         finalGlobalAgg.grouping,
         finalGlobalAgg.getCluster.getTypeFactory.asInstanceOf[FlinkTypeFactory])
 
-      Preconditions.checkState(RelOptUtil.areRowTypesEqual(
-        incrAggOutputRowType,
-        globalAggInputAccType,
-        false))
+      Preconditions.checkState(
+        RelOptUtil.areRowTypesEqual(incrAggOutputRowType, globalAggInputAccType, false))
 
       new StreamPhysicalGlobalGroupAggregate(
         finalGlobalAgg.getCluster,
@@ -150,9 +157,10 @@ object IncrementalAggregateRule {
   // It is a experimental config, will may be removed later.
   @Experimental
   val TABLE_OPTIMIZER_INCREMENTAL_AGG_ENABLED: ConfigOption[JBoolean] =
-  key("table.optimizer.incremental-agg-enabled")
+    key("table.optimizer.incremental-agg-enabled")
       .defaultValue(JBoolean.valueOf(true))
-      .withDescription("When both local aggregation and distinct aggregation splitting " +
+      .withDescription(
+        "When both local aggregation and distinct aggregation splitting " +
           "are enabled, a distinct aggregation will be optimized into four aggregations, " +
           "i.e., local-agg1, global-agg1, local-agg2 and global-Agg2. We can combine global-agg1" +
           " and local-agg2 into a single operator (we call it incremental agg because " +

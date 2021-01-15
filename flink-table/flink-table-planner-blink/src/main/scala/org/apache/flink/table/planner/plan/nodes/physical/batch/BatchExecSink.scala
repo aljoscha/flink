@@ -37,9 +37,9 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
-  * Batch physical RelNode to to write data into an external sink defined by a
+ * Batch physical RelNode to to write data into an external sink defined by a
  * [[DynamicTableSink]].
-  */
+ */
 class BatchExecSink(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -47,9 +47,15 @@ class BatchExecSink(
     tableIdentifier: ObjectIdentifier,
     catalogTable: CatalogTable,
     tableSink: DynamicTableSink)
-  extends CommonPhysicalSink(cluster, traitSet, inputRel, tableIdentifier, catalogTable, tableSink)
-  with BatchPhysicalRel
-  with LegacyBatchExecNode[Any] {
+    extends CommonPhysicalSink(
+      cluster,
+      traitSet,
+      inputRel,
+      tableIdentifier,
+      catalogTable,
+      tableSink)
+    with BatchPhysicalRel
+    with LegacyBatchExecNode[Any] {
 
   override def copy(traitSet: RelTraitSet, inputs: util.List[RelNode]): RelNode = {
     new BatchExecSink(cluster, traitSet, inputs.get(0), tableIdentifier, catalogTable, tableSink)
@@ -60,19 +66,20 @@ class BatchExecSink(
   // the input records will not trigger any output of a sink because it has no output,
   // so it's dam behavior is BLOCKING
   override def getInputEdges: util.List[ExecEdge] = List(
-    ExecEdge.builder()
+    ExecEdge
+      .builder()
       .damBehavior(ExecEdge.DamBehavior.BLOCKING)
       .build())
 
-  override protected def translateToPlanInternal(
-      planner: BatchPlanner): Transformation[Any] = {
+  override protected def translateToPlanInternal(planner: BatchPlanner): Transformation[Any] = {
     val inputTransformation = getInputNodes.get(0) match {
       // Sink's input must be LegacyBatchExecNode[RowData] or BatchExecNode[RowData] now.
       case legacyNode: LegacyBatchExecNode[RowData] => legacyNode.translateToPlan(planner)
-      case node: BatchExecNode[RowData] => node.translateToPlan(planner)
+      case node: BatchExecNode[RowData]             => node.translateToPlan(planner)
       case _ =>
-        throw new TableException("Cannot generate BoundedStream due to an invalid logical plan. " +
-          "This is a bug and should not happen. Please file an issue.")
+        throw new TableException(
+          "Cannot generate BoundedStream due to an invalid logical plan. " +
+            "This is a bug and should not happen. Please file an issue.")
     }
 
     // tell sink the ChangelogMode of input, batch only supports INSERT only.

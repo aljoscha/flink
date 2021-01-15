@@ -20,14 +20,37 @@ package org.apache.flink.table.api
 
 import org.apache.flink.annotation.PublicEvolving
 import org.apache.flink.api.common.typeinfo.TypeInformation
-import org.apache.flink.table.expressions.ApiExpressionUtils.{unresolvedCall, unresolvedRef, valueLiteral}
-import org.apache.flink.table.expressions.{ApiExpressionUtils, Expression, TableSymbol, TimePointUnit}
+import org.apache.flink.table.expressions.ApiExpressionUtils.{
+  unresolvedCall,
+  unresolvedRef,
+  valueLiteral
+}
+import org.apache.flink.table.expressions.{
+  ApiExpressionUtils,
+  Expression,
+  TableSymbol,
+  TimePointUnit
+}
 import org.apache.flink.table.functions.BuiltInFunctionDefinitions.{DISTINCT, RANGE_TO}
-import org.apache.flink.table.functions.{ScalarFunction, TableFunction, ImperativeAggregateFunction, UserDefinedFunctionHelper, _}
+import org.apache.flink.table.functions.{
+  ScalarFunction,
+  TableFunction,
+  ImperativeAggregateFunction,
+  UserDefinedFunctionHelper,
+  _
+}
 import org.apache.flink.table.types.DataType
 import org.apache.flink.types.Row
 
-import java.lang.{Boolean => JBoolean, Byte => JByte, Double => JDouble, Float => JFloat, Integer => JInteger, Long => JLong, Short => JShort}
+import java.lang.{
+  Boolean => JBoolean,
+  Byte => JByte,
+  Double => JDouble,
+  Float => JFloat,
+  Integer => JInteger,
+  Long => JLong,
+  Short => JShort
+}
 import java.math.{BigDecimal => JBigDecimal}
 import java.sql.{Date, Time, Timestamp}
 import java.time.{LocalDate, LocalDateTime, LocalTime}
@@ -36,9 +59,9 @@ import java.util.{List => JList, Map => JMap}
 import scala.language.implicitConversions
 
 /**
-  * Implicit conversions from Scala literals to [[Expression]] and from [[Expression]]
-  * to [[ImplicitExpressionOperations]].
-  */
+ * Implicit conversions from Scala literals to [[Expression]] and from [[Expression]]
+ * to [[ImplicitExpressionOperations]].
+ */
 @PublicEvolving
 trait ImplicitExpressionConversions {
 
@@ -47,30 +70,30 @@ trait ImplicitExpressionConversions {
   // ----------------------------------------------------------------------------------------------
 
   /**
-    * Offset constant to be used in the `preceding` clause of unbounded [[Over]] windows. Use this
-    * constant for a time interval. Unbounded over windows start with the first row of a partition.
-    */
+   * Offset constant to be used in the `preceding` clause of unbounded [[Over]] windows. Use this
+   * constant for a time interval. Unbounded over windows start with the first row of a partition.
+   */
   implicit val UNBOUNDED_ROW: Expression = unresolvedCall(BuiltInFunctionDefinitions.UNBOUNDED_ROW)
 
   /**
-    * Offset constant to be used in the `preceding` clause of unbounded [[Over]] windows. Use this
-    * constant for a row-count interval. Unbounded over windows start with the first row of a
-    * partition.
-    */
+   * Offset constant to be used in the `preceding` clause of unbounded [[Over]] windows. Use this
+   * constant for a row-count interval. Unbounded over windows start with the first row of a
+   * partition.
+   */
   implicit val UNBOUNDED_RANGE: Expression =
     unresolvedCall(BuiltInFunctionDefinitions.UNBOUNDED_RANGE)
 
   /**
-    * Offset constant to be used in the `following` clause of [[Over]] windows. Use this for setting
-    * the upper bound of the window to the current row.
-    */
+   * Offset constant to be used in the `following` clause of [[Over]] windows. Use this for setting
+   * the upper bound of the window to the current row.
+   */
   implicit val CURRENT_ROW: Expression = unresolvedCall(BuiltInFunctionDefinitions.CURRENT_ROW)
 
   /**
-    * Offset constant to be used in the `following` clause of [[Over]] windows. Use this for setting
-    * the upper bound of the window to the sort key of the current row, i.e., all rows with the same
-    * sort key as the current row are included in the window.
-    */
+   * Offset constant to be used in the `following` clause of [[Over]] windows. Use this for setting
+   * the upper bound of the window to the sort key of the current row, i.e., all rows with the same
+   * sort key as the current row are included in the window.
+   */
   implicit val CURRENT_RANGE: Expression = unresolvedCall(BuiltInFunctionDefinitions.CURRENT_RANGE)
 
   // ----------------------------------------------------------------------------------------------
@@ -123,35 +146,33 @@ trait ImplicitExpressionConversions {
   }
 
   implicit class LiteralJavaDecimalExpression(javaDecimal: JBigDecimal)
-    extends ImplicitExpressionOperations {
+      extends ImplicitExpressionOperations {
     def expr: Expression = valueLiteral(javaDecimal)
   }
 
   implicit class LiteralScalaDecimalExpression(scalaDecimal: BigDecimal)
-    extends ImplicitExpressionOperations {
+      extends ImplicitExpressionOperations {
     def expr: Expression = valueLiteral(scalaDecimal.bigDecimal)
   }
 
-  implicit class LiteralSqlDateExpression(sqlDate: Date)
-    extends ImplicitExpressionOperations {
+  implicit class LiteralSqlDateExpression(sqlDate: Date) extends ImplicitExpressionOperations {
     def expr: Expression = valueLiteral(sqlDate)
   }
 
-  implicit class LiteralSqlTimeExpression(sqlTime: Time)
-    extends ImplicitExpressionOperations {
+  implicit class LiteralSqlTimeExpression(sqlTime: Time) extends ImplicitExpressionOperations {
     def expr: Expression = valueLiteral(sqlTime)
   }
 
   implicit class LiteralSqlTimestampExpression(sqlTimestamp: Timestamp)
-    extends ImplicitExpressionOperations {
+      extends ImplicitExpressionOperations {
     def expr: Expression = valueLiteral(sqlTimestamp)
   }
 
   implicit class ScalarFunctionCall(val s: ScalarFunction) {
 
     /**
-      * Calls a scalar function for the given parameters.
-      */
+     * Calls a scalar function for the given parameters.
+     */
     def apply(params: Expression*): Expression = {
       unresolvedCall(
         new ScalarFunctionDefinition(s.getClass.getName, s),
@@ -162,8 +183,8 @@ trait ImplicitExpressionConversions {
   implicit class TableFunctionCall[T: TypeInformation](val t: TableFunction[T]) {
 
     /**
-      * Calls a table function for the given parameters.
-      */
+     * Calls a table function for the given parameters.
+     */
     def apply(params: Expression*): Expression = {
       val resultTypeInfo: TypeInformation[T] = UserDefinedFunctionHelper
         .getReturnTypeOfTableFunction(t, implicitly[TypeInformation[T]])
@@ -173,29 +194,31 @@ trait ImplicitExpressionConversions {
     }
   }
 
-  implicit class ImperativeAggregateFunctionCall[T: TypeInformation, ACC: TypeInformation]
-      (val a: ImperativeAggregateFunction[T, ACC]) {
+  implicit class ImperativeAggregateFunctionCall[T: TypeInformation, ACC: TypeInformation](
+      val a: ImperativeAggregateFunction[T, ACC]) {
 
     private def createFunctionDefinition(): FunctionDefinition = {
       val resultTypeInfo: TypeInformation[T] = UserDefinedFunctionHelper
         .getReturnTypeOfAggregateFunction(a, implicitly[TypeInformation[T]])
 
-      val accTypeInfo: TypeInformation[ACC] = UserDefinedFunctionHelper.
-        getAccumulatorTypeOfAggregateFunction(a, implicitly[TypeInformation[ACC]])
+      val accTypeInfo: TypeInformation[ACC] = UserDefinedFunctionHelper
+        .getAccumulatorTypeOfAggregateFunction(a, implicitly[TypeInformation[ACC]])
 
       a match {
         case af: AggregateFunction[_, _] =>
-          new AggregateFunctionDefinition(
-            af.getClass.getName, af, resultTypeInfo, accTypeInfo)
+          new AggregateFunctionDefinition(af.getClass.getName, af, resultTypeInfo, accTypeInfo)
         case taf: TableAggregateFunction[_, _] =>
           new TableAggregateFunctionDefinition(
-            taf.getClass.getName, taf, resultTypeInfo, accTypeInfo)
+            taf.getClass.getName,
+            taf,
+            resultTypeInfo,
+            accTypeInfo)
       }
     }
 
     /**
-      * Calls an aggregate function for the given parameters.
-      */
+     * Calls an aggregate function for the given parameters.
+     */
     def apply(params: Expression*): Expression = {
       unresolvedCall(
         createFunctionDefinition(),
@@ -203,13 +226,12 @@ trait ImplicitExpressionConversions {
     }
 
     /**
-      * Calculates the aggregate results only for distinct values.
-      */
+     * Calculates the aggregate results only for distinct values.
+     */
     def distinct(params: Expression*): Expression = {
       unresolvedCall(DISTINCT, apply(params: _*))
     }
   }
-
 
   /**
    * Extends Scala's StringContext with a method for creating an unresolved reference via
@@ -346,18 +368,15 @@ trait ImplicitExpressionConversions {
    * A call to an unregistered, inline function. For functions that have been registered before and
    * are identified by a name, use [[call(String, Object...)]].
    */
-  def call(function: UserDefinedFunction, params: Expression*): Expression = Expressions.call(
-    function,
-    params: _*)
+  def call(function: UserDefinedFunction, params: Expression*): Expression =
+    Expressions.call(function, params: _*)
 
   /**
    * A call to an unregistered, inline function. For functions that have been registered before and
    * are identified by a name, use [[call(String, Object...)]].
    */
   def call(function: Class[_ <: UserDefinedFunction], params: Expression*): Expression =
-    Expressions.call(
-      function,
-      params: _*)
+    Expressions.call(function, params: _*)
 
   // ----------------------------------------------------------------------------------------------
   // Implicit expressions in prefix notation
@@ -410,186 +429,181 @@ trait ImplicitExpressionConversions {
   }
 
   /**
-    * Returns the current SQL date in UTC time zone.
-    */
+   * Returns the current SQL date in UTC time zone.
+   */
   def currentDate(): Expression = {
     Expressions.currentDate()
   }
 
   /**
-    * Returns the current SQL time in UTC time zone.
-    */
+   * Returns the current SQL time in UTC time zone.
+   */
   def currentTime(): Expression = {
     Expressions.currentTime()
   }
 
   /**
-    * Returns the current SQL timestamp in UTC time zone.
-    */
+   * Returns the current SQL timestamp in UTC time zone.
+   */
   def currentTimestamp(): Expression = {
     Expressions.currentTimestamp()
   }
 
   /**
-    * Returns the current SQL time in local time zone.
-    */
+   * Returns the current SQL time in local time zone.
+   */
   def localTime(): Expression = {
     Expressions.localTime()
   }
 
   /**
-    * Returns the current SQL timestamp in local time zone.
-    */
+   * Returns the current SQL timestamp in local time zone.
+   */
   def localTimestamp(): Expression = {
     Expressions.localTimestamp()
   }
 
   /**
-    * Determines whether two anchored time intervals overlap. Time point and temporal are
-    * transformed into a range defined by two time points (start, end). The function
-    * evaluates <code>leftEnd >= rightStart && rightEnd >= leftStart</code>.
-    *
-    * It evaluates: leftEnd >= rightStart && rightEnd >= leftStart
-    *
-    * e.g. temporalOverlaps("2:55:00".toTime, 1.hour, "3:30:00".toTime, 2.hour) leads to true
-    */
+   * Determines whether two anchored time intervals overlap. Time point and temporal are
+   * transformed into a range defined by two time points (start, end). The function
+   * evaluates <code>leftEnd >= rightStart && rightEnd >= leftStart</code>.
+   *
+   * It evaluates: leftEnd >= rightStart && rightEnd >= leftStart
+   *
+   * e.g. temporalOverlaps("2:55:00".toTime, 1.hour, "3:30:00".toTime, 2.hour) leads to true
+   */
   def temporalOverlaps(
       leftTimePoint: Expression,
       leftTemporal: Expression,
       rightTimePoint: Expression,
-      rightTemporal: Expression)
-    : Expression = {
+      rightTemporal: Expression): Expression = {
     Expressions.temporalOverlaps(leftTimePoint, leftTemporal, rightTimePoint, rightTemporal)
   }
 
   /**
-    * Formats a timestamp as a string using a specified format.
-    * The format must be compatible with MySQL's date formatting syntax as used by the
-    * date_parse function.
-    *
-    * For example dataFormat('time, "%Y, %d %M") results in strings formatted as "2017, 05 May".
-    *
-    * @param timestamp The timestamp to format as string.
-    * @param format The format of the string.
-    * @return The formatted timestamp as string.
-    */
-  def dateFormat(
-      timestamp: Expression,
-      format: Expression)
-    : Expression = {
+   * Formats a timestamp as a string using a specified format.
+   * The format must be compatible with MySQL's date formatting syntax as used by the
+   * date_parse function.
+   *
+   * For example dataFormat('time, "%Y, %d %M") results in strings formatted as "2017, 05 May".
+   *
+   * @param timestamp The timestamp to format as string.
+   * @param format The format of the string.
+   * @return The formatted timestamp as string.
+   */
+  def dateFormat(timestamp: Expression, format: Expression): Expression = {
     Expressions.dateFormat(timestamp, format)
   }
 
   /**
-    * Returns the (signed) number of [[TimePointUnit]] between timePoint1 and timePoint2.
-    *
-    * For example, timestampDiff(TimePointUnit.DAY, '2016-06-15'.toDate, '2016-06-18'.toDate leads
-    * to 3.
-    *
-    * @param timePointUnit The unit to compute diff.
-    * @param timePoint1 The first point in time.
-    * @param timePoint2 The second point in time.
-    * @return The number of intervals as integer value.
-    */
+   * Returns the (signed) number of [[TimePointUnit]] between timePoint1 and timePoint2.
+   *
+   * For example, timestampDiff(TimePointUnit.DAY, '2016-06-15'.toDate, '2016-06-18'.toDate leads
+   * to 3.
+   *
+   * @param timePointUnit The unit to compute diff.
+   * @param timePoint1 The first point in time.
+   * @param timePoint2 The second point in time.
+   * @return The number of intervals as integer value.
+   */
   def timestampDiff(
       timePointUnit: TimePointUnit,
       timePoint1: Expression,
-      timePoint2: Expression)
-    : Expression = {
+      timePoint2: Expression): Expression = {
     Expressions.timestampDiff(timePointUnit, timePoint1, timePoint2)
   }
 
   /**
-    * Creates an array of literals.
-    */
+   * Creates an array of literals.
+   */
   def array(head: Expression, tail: Expression*): Expression = {
     Expressions.array(head, tail: _*)
   }
 
   /**
-    * Creates a row of expressions.
-    */
+   * Creates a row of expressions.
+   */
   def row(head: Expression, tail: Expression*): Expression = {
     Expressions.row(head, tail: _*)
   }
 
   /**
-    * Creates a map of expressions.
-    */
+   * Creates a map of expressions.
+   */
   def map(key: Expression, value: Expression, tail: Expression*): Expression = {
     Expressions.map(key, value, tail: _*)
   }
 
   /**
-    * Returns a value that is closer than any other value to pi.
-    */
+   * Returns a value that is closer than any other value to pi.
+   */
   def pi(): Expression = {
     Expressions.pi()
   }
 
   /**
-    * Returns a value that is closer than any other value to e.
-    */
+   * Returns a value that is closer than any other value to e.
+   */
   def e(): Expression = {
     Expressions.e()
   }
 
   /**
-    * Returns a pseudorandom double value between 0.0 (inclusive) and 1.0 (exclusive).
-    */
+   * Returns a pseudorandom double value between 0.0 (inclusive) and 1.0 (exclusive).
+   */
   def rand(): Expression = {
     Expressions.rand()
   }
 
   /**
-    * Returns a pseudorandom double value between 0.0 (inclusive) and 1.0 (exclusive) with a
-    * initial seed. Two rand() functions will return identical sequences of numbers if they
-    * have same initial seed.
-    */
+   * Returns a pseudorandom double value between 0.0 (inclusive) and 1.0 (exclusive) with a
+   * initial seed. Two rand() functions will return identical sequences of numbers if they
+   * have same initial seed.
+   */
   def rand(seed: Expression): Expression = {
     Expressions.rand(seed)
   }
 
   /**
-    * Returns a pseudorandom integer value between 0.0 (inclusive) and the specified
-    * value (exclusive).
-    */
+   * Returns a pseudorandom integer value between 0.0 (inclusive) and the specified
+   * value (exclusive).
+   */
   def randInteger(bound: Expression): Expression = {
     Expressions.randInteger(bound)
   }
 
   /**
-    * Returns a pseudorandom integer value between 0.0 (inclusive) and the specified value
-    * (exclusive) with a initial seed. Two randInteger() functions will return identical sequences
-    * of numbers if they have same initial seed and same bound.
-    */
+   * Returns a pseudorandom integer value between 0.0 (inclusive) and the specified value
+   * (exclusive) with a initial seed. Two randInteger() functions will return identical sequences
+   * of numbers if they have same initial seed and same bound.
+   */
   def randInteger(seed: Expression, bound: Expression): Expression = {
     Expressions.randInteger(seed, bound)
   }
 
   /**
-    * Returns the string that results from concatenating the arguments.
-    * Returns NULL if any argument is NULL.
-    */
+   * Returns the string that results from concatenating the arguments.
+   * Returns NULL if any argument is NULL.
+   */
   def concat(string: Expression, strings: Expression*): Expression = {
     Expressions.concat(string, strings: _*)
   }
 
   /**
-    * Calculates the arc tangent of a given coordinate.
-    */
+   * Calculates the arc tangent of a given coordinate.
+   */
   def atan2(y: Expression, x: Expression): Expression = {
     Expressions.atan2(y, x)
   }
 
   /**
-    * Returns the string that results from concatenating the arguments and separator.
-    * Returns NULL If the separator is NULL.
-    *
-    * Note: This function does not skip empty strings. However, it does skip any NULL
-    * values after the separator argument.
-    * @deprecated use [[ImplicitExpressionConversions.concatWs()]]
-    **/
+   * Returns the string that results from concatenating the arguments and separator.
+   * Returns NULL If the separator is NULL.
+   *
+   * Note: This function does not skip empty strings. However, it does skip any NULL
+   * values after the separator argument.
+   * @deprecated use [[ImplicitExpressionConversions.concatWs()]]
+   */
   @deprecated
   def concat_ws(separator: Expression, string: Expression, strings: Expression*): Expression = {
     concatWs(separator, string, strings: _*)
@@ -601,92 +615,92 @@ trait ImplicitExpressionConversions {
    *
    * Note: this user-defined function does not skip empty strings. However, it does skip any NULL
    * values after the separator argument.
-   **/
+   */
   def concatWs(separator: Expression, string: Expression, strings: Expression*): Expression = {
     Expressions.concatWs(separator, string, strings: _*)
   }
 
   /**
-    * Returns an UUID (Universally Unique Identifier) string (e.g.,
-    * "3d3c68f7-f608-473f-b60c-b0c44ad4cc4e") according to RFC 4122 type 4 (pseudo randomly
-    * generated) UUID. The UUID is generated using a cryptographically strong pseudo random number
-    * generator.
-    */
+   * Returns an UUID (Universally Unique Identifier) string (e.g.,
+   * "3d3c68f7-f608-473f-b60c-b0c44ad4cc4e") according to RFC 4122 type 4 (pseudo randomly
+   * generated) UUID. The UUID is generated using a cryptographically strong pseudo random number
+   * generator.
+   */
   def uuid(): Expression = {
     Expressions.uuid()
   }
 
   /**
-    * Returns a null literal value of a given data type.
-    *
-    * e.g. nullOf(DataTypes.INT())
-    */
+   * Returns a null literal value of a given data type.
+   *
+   * e.g. nullOf(DataTypes.INT())
+   */
   def nullOf(dataType: DataType): Expression = {
     Expressions.nullOf(dataType)
   }
 
   /**
-    * @deprecated This method will be removed in future versions as it uses the old type system.
-    *             It is recommended to use [[nullOf(DataType)]] instead which uses the new type
-    *             system based on [[DataTypes]]. Please make sure to use either the old or the new
-    *             type system consistently to avoid unintended behavior. See the website
-    *             documentation for more information.
-    */
+   * @deprecated This method will be removed in future versions as it uses the old type system.
+   *             It is recommended to use [[nullOf(DataType)]] instead which uses the new type
+   *             system based on [[DataTypes]]. Please make sure to use either the old or the new
+   *             type system consistently to avoid unintended behavior. See the website
+   *             documentation for more information.
+   */
   def nullOf(typeInfo: TypeInformation[_]): Expression = {
     Expressions.nullOf(typeInfo)
   }
 
   /**
-    * Calculates the logarithm of the given value.
-    */
+   * Calculates the logarithm of the given value.
+   */
   def log(value: Expression): Expression = {
     Expressions.log(value)
   }
 
   /**
-    * Calculates the logarithm of the given value to the given base.
-    */
+   * Calculates the logarithm of the given value to the given base.
+   */
   def log(base: Expression, value: Expression): Expression = {
     Expressions.log(base, value)
   }
 
   /**
-    * Ternary conditional operator that decides which of two other expressions should be evaluated
-    * based on a evaluated boolean condition.
-    *
-    * e.g. ifThenElse(42 > 5, "A", "B") leads to "A"
-    *
-    * @param condition boolean condition
-    * @param ifTrue expression to be evaluated if condition holds
-    * @param ifFalse expression to be evaluated if condition does not hold
-    */
+   * Ternary conditional operator that decides which of two other expressions should be evaluated
+   * based on a evaluated boolean condition.
+   *
+   * e.g. ifThenElse(42 > 5, "A", "B") leads to "A"
+   *
+   * @param condition boolean condition
+   * @param ifTrue expression to be evaluated if condition holds
+   * @param ifFalse expression to be evaluated if condition does not hold
+   */
   def ifThenElse(condition: Expression, ifTrue: Expression, ifFalse: Expression): Expression = {
     Expressions.ifThenElse(condition, ifTrue, ifFalse)
   }
 
   /**
-    * Creates an expression that selects a range of columns. It can be used wherever an array of
-    * expression is accepted such as function calls, projections, or groupings.
-    *
-    * A range can either be index-based or name-based. Indices start at 1 and boundaries are
-    * inclusive.
-    *
-    * e.g. withColumns('b to 'c) or withColumns('*)
-    */
+   * Creates an expression that selects a range of columns. It can be used wherever an array of
+   * expression is accepted such as function calls, projections, or groupings.
+   *
+   * A range can either be index-based or name-based. Indices start at 1 and boundaries are
+   * inclusive.
+   *
+   * e.g. withColumns('b to 'c) or withColumns('*)
+   */
   def withColumns(head: Expression, tail: Expression*): Expression = {
     Expressions.withColumns(head, tail: _*)
   }
 
   /**
-    * Creates an expression that selects all columns except for the given range of columns. It can
-    * be used wherever an array of expression is accepted such as function calls, projections, or
-    * groupings.
-    *
-    * A range can either be index-based or name-based. Indices start at 1 and boundaries are
-    * inclusive.
-    *
-    * e.g. withoutColumns('b to 'c) or withoutColumns('c)
-    */
+   * Creates an expression that selects all columns except for the given range of columns. It can
+   * be used wherever an array of expression is accepted such as function calls, projections, or
+   * groupings.
+   *
+   * A range can either be index-based or name-based. Indices start at 1 and boundaries are
+   * inclusive.
+   *
+   * e.g. withoutColumns('b to 'c) or withoutColumns('c)
+   */
   def withoutColumns(head: Expression, tail: Expression*): Expression = {
     Expressions.withoutColumns(head, tail: _*)
   }

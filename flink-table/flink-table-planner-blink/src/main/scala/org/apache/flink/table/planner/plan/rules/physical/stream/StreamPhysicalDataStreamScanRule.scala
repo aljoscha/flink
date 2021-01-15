@@ -28,14 +28,14 @@ import org.apache.calcite.rel.RelNode
 import org.apache.calcite.rel.convert.ConverterRule
 
 /**
-  * Rule that converts [[FlinkLogicalDataStreamTableScan]] to [[StreamPhysicalDataStreamScan]].
-  */
+ * Rule that converts [[FlinkLogicalDataStreamTableScan]] to [[StreamPhysicalDataStreamScan]].
+ */
 class StreamPhysicalDataStreamScanRule
-  extends ConverterRule(
-    classOf[FlinkLogicalDataStreamTableScan],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.STREAM_PHYSICAL,
-    "StreamPhysicalDataStreamScanRule") {
+    extends ConverterRule(
+      classOf[FlinkLogicalDataStreamTableScan],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.STREAM_PHYSICAL,
+      "StreamPhysicalDataStreamScanRule") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val scan: FlinkLogicalDataStreamTableScan = call.rel(0)
@@ -47,12 +47,7 @@ class StreamPhysicalDataStreamScanRule
     val scan: FlinkLogicalDataStreamTableScan = rel.asInstanceOf[FlinkLogicalDataStreamTableScan]
     val traitSet: RelTraitSet = rel.getTraitSet.replace(FlinkConventions.STREAM_PHYSICAL)
 
-    new StreamPhysicalDataStreamScan(
-      rel.getCluster,
-      traitSet,
-      scan.getTable,
-      rel.getRowType
-    )
+    new StreamPhysicalDataStreamScan(rel.getCluster, traitSet, scan.getTable, rel.getRowType)
   }
 }
 

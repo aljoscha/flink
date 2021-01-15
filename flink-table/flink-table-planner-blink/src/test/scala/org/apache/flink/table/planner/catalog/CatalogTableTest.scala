@@ -24,17 +24,16 @@ import org.junit.Test
 import org.junit.Assert.assertEquals
 
 /**
-  * Unit tests around catalog table and DDL.
-  */
+ * Unit tests around catalog table and DDL.
+ */
 class CatalogTableTest {
 
-  val tEnv: TableEnvironment = TableEnvironmentImpl.create(
-    EnvironmentSettings.newInstance().inStreamingMode().build())
+  val tEnv: TableEnvironment =
+    TableEnvironmentImpl.create(EnvironmentSettings.newInstance().inStreamingMode().build())
 
   @Test
   def testDDLSchema(): Unit = {
-    tEnv.executeSql(
-      """
+    tEnv.executeSql("""
         |CREATE TABLE t1 (
         |  f1 INT,
         |  f2 BIGINT NOT NULL,
@@ -47,11 +46,11 @@ class CatalogTableTest {
         |) WITH (
         |  'connector' = 'COLLECTION'
         |)
-      """.stripMargin
-    )
+      """.stripMargin)
 
     val actual = tEnv.sqlQuery("SELECT * FROM t1").getSchema
-    val expected = TableSchema.builder()
+    val expected = TableSchema
+      .builder()
       .field("f1", DataTypes.INT())
       .field("f2", DataTypes.BIGINT().notNull())
       .field("f3", DataTypes.STRING())

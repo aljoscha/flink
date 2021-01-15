@@ -26,15 +26,15 @@ import org.apache.calcite.rel.RelNode
 import org.apache.calcite.rel.`type`.RelDataType
 
 /**
-  * Batch physical TableScan that wraps [[IntermediateRelTable]]
-  */
+ * Batch physical TableScan that wraps [[IntermediateRelTable]]
+ */
 class BatchExecIntermediateTableScan(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
     table: RelOptTable,
     outputRowType: RelDataType)
-  extends CommonIntermediateTableScan(cluster, traitSet, table)
-  with BatchPhysicalRel {
+    extends CommonIntermediateTableScan(cluster, traitSet, table)
+    with BatchPhysicalRel {
 
   override def deriveRowType(): RelDataType = outputRowType
 

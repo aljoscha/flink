@@ -41,7 +41,11 @@ import org.apache.flink.table.data.util.DataFormatConverters
 import org.apache.flink.table.data.util.DataFormatConverters.DataFormatConverter
 import org.apache.flink.table.expressions.{Expression, ExpressionParser}
 import org.apache.flink.table.functions.ScalarFunction
-import org.apache.flink.table.planner.codegen.{CodeGeneratorContext, ExprCodeGenerator, FunctionCodeGenerator}
+import org.apache.flink.table.planner.codegen.{
+  CodeGeneratorContext,
+  ExprCodeGenerator,
+  FunctionCodeGenerator
+}
 import org.apache.flink.table.planner.delegation.PlannerBase
 import org.apache.flink.table.runtime.types.TypeInfoLogicalTypeConverter.fromTypeInfoToLogicalType
 import org.apache.flink.table.types.AbstractDataType
@@ -65,7 +69,8 @@ abstract class ExpressionTestBase {
   private val setting = EnvironmentSettings.newInstance().inStreamingMode().build()
   // use impl class instead of interface class to avoid
   // "Static methods in interface require -target:jvm-1.8"
-  private val tEnv = StreamTableEnvironmentImpl.create(env, setting, config)
+  private val tEnv = StreamTableEnvironmentImpl
+    .create(env, setting, config)
     .asInstanceOf[StreamTableEnvironmentImpl]
   private val resolvedDataType = if (containsLegacyTypes) {
     TypeConversions.fromLegacyInfoToDataType(typeInfo)
@@ -120,8 +125,8 @@ abstract class ExpressionTestBase {
     val stringTestExprs = testExprs.map(expr => relBuilder.cast(expr._2, VARCHAR))
 
     // generate code
-    val resultType = RowType.of(Seq.fill(testExprs.size)(
-      new VarCharType(VarCharType.MAX_LENGTH)): _*)
+    val resultType =
+      RowType.of(Seq.fill(testExprs.size)(new VarCharType(VarCharType.MAX_LENGTH)): _*)
 
     val exprs = stringTestExprs.map(exprGenerator.generateExpression)
     val genExpr = exprGenerator.generateResultExpression(exprs, resultType, classOf[BinaryRowData])
@@ -178,24 +183,21 @@ abstract class ExpressionTestBase {
     }
 
     // compare
-    testExprs
-      .zipWithIndex
-      .foreach {
-        case ((originalExpr, optimizedExpr, expected), index) =>
+    testExprs.zipWithIndex
+      .foreach { case ((originalExpr, optimizedExpr, expected), index) =>
+        // adapt string result
+        val actual = if (!result.asInstanceOf[BinaryRowData].isNullAt(index)) {
+          result.asInstanceOf[BinaryRowData].getString(index).toString
+        } else {
+          null
+        }
 
-          // adapt string result
-          val actual = if(!result.asInstanceOf[BinaryRowData].isNullAt(index)) {
-            result.asInstanceOf[BinaryRowData].getString(index).toString
-          } else {
-            null
-          }
+        val original = if (originalExpr == null) "" else s"for: [$originalExpr]"
 
-          val original = if (originalExpr == null) "" else s"for: [$originalExpr]"
-
-          assertEquals(
-            s"Wrong result $original optimized to: [$optimizedExpr]",
-            expected,
-            if (actual == null) "null" else actual)
+        assertEquals(
+          s"Wrong result $original optimized to: [$optimizedExpr]",
+          expected,
+          if (actual == null) "null" else actual)
       }
   }
 
@@ -229,17 +231,12 @@ abstract class ExpressionTestBase {
     calcProgram.expandLocalRef(calcProgram.getProjectList.get(0))
   }
 
-  def testAllApis(
-      expr: Expression,
-      sqlExpr: String,
-      expected: String): Unit = {
+  def testAllApis(expr: Expression, sqlExpr: String, expected: String): Unit = {
     addTableApiTestExpr(expr, expected)
     addSqlTestExpr(sqlExpr, expected)
   }
 
-  def testTableApi(
-      expr: Expression,
-      expected: String): Unit = {
+  def testTableApi(expr: Expression, expected: String): Unit = {
     addTableApiTestExpr(expr, expected)
   }
 
@@ -250,14 +247,13 @@ abstract class ExpressionTestBase {
   private def addTableApiTestExpr(tableApiExpr: Expression, expected: String): Unit = {
     // create RelNode from Table API expression
     val relNode = relBuilder
-        .queryOperation(tEnv.from(tableName).select(tableApiExpr).getQueryOperation).build()
+      .queryOperation(tEnv.from(tableName).select(tableApiExpr).getQueryOperation)
+      .build()
 
     addTestExpr(relNode, expected, tableApiExpr.asSummaryString())
   }
 
-  def testSqlApi(
-      sqlExpr: String,
-      expected: String): Unit = {
+  def testSqlApi(sqlExpr: String, expected: String): Unit = {
     addSqlTestExpr(sqlExpr, expected)
   }
 
@@ -282,21 +278,14 @@ abstract class ExpressionTestBase {
     throw new IllegalArgumentException("Implement this if legacy types are expected.")
 
   @deprecated
-  def testAllApis(
-      expr: Expression,
-      exprString: String,
-      sqlExpr: String,
-      expected: String): Unit = {
+  def testAllApis(expr: Expression, exprString: String, sqlExpr: String, expected: String): Unit = {
     addTableApiTestExpr(expr, expected)
     addTableApiTestExpr(exprString, expected)
     addSqlTestExpr(sqlExpr, expected)
   }
 
   @deprecated
-  def testTableApi(
-      expr: Expression,
-      exprString: String,
-      expected: String): Unit = {
+  def testTableApi(expr: Expression, exprString: String, expected: String): Unit = {
     addTableApiTestExpr(expr, expected)
     addTableApiTestExpr(exprString, expected)
   }

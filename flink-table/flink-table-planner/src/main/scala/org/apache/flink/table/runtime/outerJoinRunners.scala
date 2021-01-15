@@ -34,10 +34,10 @@ abstract class OuterJoinRunner(
     name: String,
     code: String,
     @transient var returnType: TypeInformation[Row])
-  extends RichFlatJoinFunction[Row, Row, Row]
-  with ResultTypeQueryable[Row]
-  with Compiler[JoinFunction[Row, Row, JBool]]
-  with Logging {
+    extends RichFlatJoinFunction[Row, Row, Row]
+    with ResultTypeQueryable[Row]
+    with Compiler[JoinFunction[Row, Row, JBool]]
+    with Logging {
 
   protected var function: JoinFunction[Row, Row, JBool] = null
 
@@ -58,15 +58,12 @@ abstract class OuterJoinRunner(
 }
 
 /**
-  * Emits left outer join pairs of left and right rows.
-  * Left rows are always preserved if no matching right row is found (predicate evaluates to false
-  * or right input row is null).
-  */
-class LeftOuterJoinRunner(
-    name: String,
-    code: String,
-    returnType: TypeInformation[Row])
-  extends OuterJoinRunner(name, code, returnType) {
+ * Emits left outer join pairs of left and right rows.
+ * Left rows are always preserved if no matching right row is found (predicate evaluates to false
+ * or right input row is null).
+ */
+class LeftOuterJoinRunner(name: String, code: String, returnType: TypeInformation[Row])
+    extends OuterJoinRunner(name, code, returnType) {
 
   val outRow = new Row(3)
 
@@ -97,15 +94,12 @@ class LeftOuterJoinRunner(
 }
 
 /**
-  * Emits right outer join pairs of left and right rows.
-  * Right rows are always preserved if no matching left row is found (predicate evaluates to false
-  * or left input row is null).
-  */
-class RightOuterJoinRunner(
-  name: String,
-  code: String,
-  returnType: TypeInformation[Row])
-  extends OuterJoinRunner(name, code, returnType) {
+ * Emits right outer join pairs of left and right rows.
+ * Right rows are always preserved if no matching left row is found (predicate evaluates to false
+ * or left input row is null).
+ */
+class RightOuterJoinRunner(name: String, code: String, returnType: TypeInformation[Row])
+    extends OuterJoinRunner(name, code, returnType) {
 
   val outRow = new Row(3)
 
@@ -133,15 +127,12 @@ class RightOuterJoinRunner(
 }
 
 /**
-  * Emits full outer join pairs of left and right rows.
-  * Left and right rows are always preserved if no matching right row is found (predicate evaluates
-  * to false or left or right input row is null).
-  */
-class FullOuterJoinRunner(
-  name: String,
-  code: String,
-  returnType: TypeInformation[Row])
-  extends OuterJoinRunner(name, code, returnType) {
+ * Emits full outer join pairs of left and right rows.
+ * Left and right rows are always preserved if no matching right row is found (predicate evaluates
+ * to false or left or right input row is null).
+ */
+class FullOuterJoinRunner(name: String, code: String, returnType: TypeInformation[Row])
+    extends OuterJoinRunner(name, code, returnType) {
 
   val outRow = new Row(4)
 

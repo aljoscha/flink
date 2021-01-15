@@ -25,19 +25,19 @@ import org.apache.flink.table.planner.plan.nodes.logical.FlinkLogicalWatermarkAs
 import org.apache.flink.table.planner.plan.nodes.physical.stream.StreamPhysicalWatermarkAssigner
 
 /**
-  * Rule that converts [[FlinkLogicalWatermarkAssigner]] to [[StreamPhysicalWatermarkAssigner]].
-  */
+ * Rule that converts [[FlinkLogicalWatermarkAssigner]] to [[StreamPhysicalWatermarkAssigner]].
+ */
 class StreamPhysicalWatermarkAssignerRule
-  extends ConverterRule(
-    classOf[FlinkLogicalWatermarkAssigner],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.STREAM_PHYSICAL,
-    "StreamPhysicalWatermarkAssignerRule") {
+    extends ConverterRule(
+      classOf[FlinkLogicalWatermarkAssigner],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.STREAM_PHYSICAL,
+      "StreamPhysicalWatermarkAssignerRule") {
 
   override def convert(rel: RelNode): RelNode = {
     val watermarkAssigner = rel.asInstanceOf[FlinkLogicalWatermarkAssigner]
-    val convertInput = RelOptRule.convert(
-      watermarkAssigner.getInput, FlinkConventions.STREAM_PHYSICAL)
+    val convertInput =
+      RelOptRule.convert(watermarkAssigner.getInput, FlinkConventions.STREAM_PHYSICAL)
     val traitSet: RelTraitSet = rel.getTraitSet.replace(FlinkConventions.STREAM_PHYSICAL)
 
     new StreamPhysicalWatermarkAssigner(
@@ -45,8 +45,7 @@ class StreamPhysicalWatermarkAssignerRule
       traitSet,
       convertInput,
       watermarkAssigner.rowtimeFieldIndex,
-      watermarkAssigner.watermarkExpr
-    )
+      watermarkAssigner.watermarkExpr)
   }
 }
 

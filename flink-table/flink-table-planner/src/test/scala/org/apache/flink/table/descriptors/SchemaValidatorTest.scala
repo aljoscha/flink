@@ -31,22 +31,25 @@ import java.util.Optional
 import scala.collection.JavaConverters._
 
 /**
-  * Tests for [[SchemaValidator]].
-  */
+ * Tests for [[SchemaValidator]].
+ */
 class SchemaValidatorTest {
 
   @Test
   def testSchemaWithRowtimeFromSource(): Unit = {
-     val desc1 = new Schema()
-      .field("otherField", Types.STRING).from("csvField")
+    val desc1 = new Schema()
+      .field("otherField", Types.STRING)
+      .from("csvField")
       .field("abcField", Types.STRING)
-      .field("p", Types.SQL_TIMESTAMP).proctime()
-      .field("r", Types.SQL_TIMESTAMP).rowtime(
-       new Rowtime().timestampsFromSource().watermarksFromSource())
+      .field("p", Types.SQL_TIMESTAMP)
+      .proctime()
+      .field("r", Types.SQL_TIMESTAMP)
+      .rowtime(new Rowtime().timestampsFromSource().watermarksFromSource())
     val props = new DescriptorProperties()
     props.putProperties(desc1.toProperties)
 
-    val inputSchema = TableSchema.builder()
+    val inputSchema = TableSchema
+      .builder()
       .field("csvField", Types.STRING)
       .field("abcField", Types.STRING)
       .field("myField", Types.BOOLEAN)
@@ -75,11 +78,13 @@ class SchemaValidatorTest {
   @Test(expected = classOf[TableException])
   def testDeriveTableSinkSchemaWithRowtimeFromSource(): Unit = {
     val desc1 = new Schema()
-      .field("otherField", Types.STRING).from("csvField")
+      .field("otherField", Types.STRING)
+      .from("csvField")
       .field("abcField", Types.STRING)
-      .field("p", Types.SQL_TIMESTAMP).proctime()
-      .field("r", Types.SQL_TIMESTAMP).rowtime(
-      new Rowtime().timestampsFromSource().watermarksFromSource())
+      .field("p", Types.SQL_TIMESTAMP)
+      .proctime()
+      .field("r", Types.SQL_TIMESTAMP)
+      .rowtime(new Rowtime().timestampsFromSource().watermarksFromSource())
     val props = new DescriptorProperties()
     props.putProperties(desc1.toProperties)
 
@@ -91,15 +96,18 @@ class SchemaValidatorTest {
     // we have to use DataTypes here because TypeInformation -> properties -> DataType
     // loses information (conversion class)
     val desc1 = new Schema()
-      .field("otherField", DataTypes.STRING()).from("csvField")
+      .field("otherField", DataTypes.STRING())
+      .from("csvField")
       .field("abcField", DataTypes.STRING())
-      .field("p", DataTypes.TIMESTAMP(3)).proctime()
-      .field("r", DataTypes.TIMESTAMP(3)).rowtime(
-      new Rowtime().timestampsFromField("myTime").watermarksFromSource())
+      .field("p", DataTypes.TIMESTAMP(3))
+      .proctime()
+      .field("r", DataTypes.TIMESTAMP(3))
+      .rowtime(new Rowtime().timestampsFromField("myTime").watermarksFromSource())
     val props = new DescriptorProperties()
     props.putProperties(desc1.toProperties)
 
-    val expectedTableSinkSchema = TableSchema.builder()
+    val expectedTableSinkSchema = TableSchema
+      .builder()
       .field("csvField", DataTypes.STRING()) // aliased
       .field("abcField", DataTypes.STRING())
       .field("myTime", DataTypes.TIMESTAMP(3))
@@ -110,16 +118,19 @@ class SchemaValidatorTest {
 
   @Test
   def testSchemaWithRowtimeFromField(): Unit = {
-     val desc1 = new Schema()
-      .field("otherField", Types.STRING).from("csvField")
+    val desc1 = new Schema()
+      .field("otherField", Types.STRING)
+      .from("csvField")
       .field("abcField", Types.STRING)
-      .field("p", Types.SQL_TIMESTAMP).proctime()
-      .field("r", Types.SQL_TIMESTAMP).rowtime(
-       new Rowtime().timestampsFromField("myTime").watermarksFromSource())
+      .field("p", Types.SQL_TIMESTAMP)
+      .proctime()
+      .field("r", Types.SQL_TIMESTAMP)
+      .rowtime(new Rowtime().timestampsFromField("myTime").watermarksFromSource())
     val props = new DescriptorProperties()
     props.putProperties(desc1.toProperties)
 
-    val inputSchema = TableSchema.builder()
+    val inputSchema = TableSchema
+      .builder()
       .field("csvField", Types.STRING)
       .field("abcField", Types.STRING)
       .field("myField", Types.BOOLEAN)
@@ -153,9 +164,10 @@ class SchemaValidatorTest {
       .field("f1", Types.STRING)
       .field("f2", Types.STRING)
       .field("f3", Types.SQL_TIMESTAMP)
-      .field("rt", Types.SQL_TIMESTAMP).rowtime(
-      new Rowtime().timestampsFromExtractor(new CustomExtractor("f3"))
-          .watermarksPeriodicBounded(1000L))
+      .field("rt", Types.SQL_TIMESTAMP)
+      .rowtime(new Rowtime()
+        .timestampsFromExtractor(new CustomExtractor("f3"))
+        .watermarksPeriodicBounded(1000L))
     val properties = new DescriptorProperties()
     properties.putProperties(descriptor.toProperties)
 
@@ -191,7 +203,8 @@ class SchemaValidatorTest {
     properties.putString("schema.watermark.0.strategy.data-type", DataTypes.TIMESTAMP(3).toString)
 
     new SchemaValidator(true, true, false).validate(properties)
-    val expectd = TableSchema.builder()
+    val expectd = TableSchema
+      .builder()
       .field("f1", DataTypes.STRING())
       .field("f2", DataTypes.INT())
       .field("f3", DataTypes.TIMESTAMP(3))
@@ -200,5 +213,5 @@ class SchemaValidatorTest {
       .build()
     val schema = SchemaValidator.deriveTableSinkSchema(properties)
     assertEquals(expectd, schema)
-   }
+  }
 }

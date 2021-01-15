@@ -24,11 +24,10 @@ import org.apache.flink.table.planner.runtime.utils.JavaUserDefinedTableFunction
 
 import org.junit.Test
 
-
 /**
-  * Tests for [[org.apache.flink.table.planner.plan.rules.logical.FlinkSubQueryRemoveRule]],
-  * this class only tests NOT IN and NOT EXISTS queries.
-  */
+ * Tests for [[org.apache.flink.table.planner.plan.rules.logical.FlinkSubQueryRemoveRule]],
+ * this class only tests NOT IN and NOT EXISTS queries.
+ */
 class SubQueryAntiJoinTest extends SubQueryTestBase {
   util.addTableSource[(Int, Long, String)]("l", 'a, 'b, 'c)
   util.addTableSource[(Int, Long, String)]("r", 'd, 'e, 'f)
@@ -771,4 +770,3 @@ class SubQueryAntiJoinTest extends SubQueryTestBase {
   }
 
 }
-

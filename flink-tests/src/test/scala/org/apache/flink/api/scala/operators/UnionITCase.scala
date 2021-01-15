@@ -42,7 +42,6 @@ class UnionITCase(mode: TestExecutionMode) extends MultipleProgramsTestBase(mode
     "(18,6," +
     "Comment#12)\n" + "(19,6,Comment#13)\n" + "(20,6,Comment#14)\n" + "(21,6,Comment#15)\n"
 
-
   @After
   def after(): Unit = {
     import collection.JavaConverters._
@@ -85,7 +84,7 @@ class UnionITCase(mode: TestExecutionMode) extends MultipleProgramsTestBase(mode
      */
     val env = ExecutionEnvironment.getExecutionEnvironment
     // Don't know how to make an empty result in an other way than filtering it
-    val empty = CollectionDataSets.get3TupleDataSet(env).filter( t => false )
+    val empty = CollectionDataSets.get3TupleDataSet(env).filter(t => false)
     val unionDs = CollectionDataSets.get3TupleDataSet(env).union(empty)
     result = unionDs.collect().map(_.toString())
     expected = FULL_TUPLE_3_STRING
@@ -102,6 +101,6 @@ class UnionITCase(mode: TestExecutionMode) extends MultipleProgramsTestBase(mode
     val input2 = env.fromCollection(data)
 
     result = input1.union(input2).collect().map(_.toString())
-    expected = data ++ data mkString("\n")
+    expected = data ++ data mkString ("\n")
   }
 }

@@ -46,19 +46,19 @@ class BatchPhysicalSortWindowAggregate(
     namedWindowProperties: Seq[PlannerNamedWindowProperty],
     enableAssignPane: Boolean = false,
     isMerge: Boolean)
-  extends BatchPhysicalSortWindowAggregateBase(
-    cluster,
-    traitSet,
-    inputRel,
-    outputRowType,
-    grouping,
-    auxGrouping,
-    aggCallToAggFunction,
-    window,
-    namedWindowProperties,
-    enableAssignPane,
-    isMerge,
-    isFinal = true) {
+    extends BatchPhysicalSortWindowAggregateBase(
+      cluster,
+      traitSet,
+      inputRel,
+      outputRowType,
+      grouping,
+      auxGrouping,
+      aggCallToAggFunction,
+      window,
+      namedWindowProperties,
+      enableAssignPane,
+      isMerge,
+      isFinal = true) {
 
   override def copy(traitSet: RelTraitSet, inputs: java.util.List[RelNode]): RelNode = {
     new BatchPhysicalSortWindowAggregate(
@@ -93,7 +93,6 @@ class BatchPhysicalSortWindowAggregate(
       true, // isFinal is always true
       ExecEdge.DEFAULT,
       FlinkTypeFactory.toLogicalRowType(getRowType),
-      getRelDetailedDescription
-    )
+      getRelDetailedDescription)
   }
 }

@@ -32,60 +32,28 @@ class LiteralTest extends ExpressionTestBase {
   @Test
   def testFieldWithBooleanPrefix(): Unit = {
 
-    testTableApi(
-      'trUeX,
-      "trUeX",
-      "trUeX_value"
-    )
+    testTableApi('trUeX, "trUeX", "trUeX_value")
 
-    testTableApi(
-      'FALSE_A,
-      "FALSE_A",
-      "FALSE_A_value"
-    )
+    testTableApi('FALSE_A, "FALSE_A", "FALSE_A_value")
 
-    testTableApi(
-      'FALSE_AB,
-      "FALSE_AB",
-      "FALSE_AB_value"
-    )
+    testTableApi('FALSE_AB, "FALSE_AB", "FALSE_AB_value")
 
-    testTableApi(
-      true,
-      "trUe",
-      "true"
-    )
+    testTableApi(true, "trUe", "true")
 
-    testTableApi(
-      false,
-      "FALSE",
-      "false"
-    )
+    testTableApi(false, "FALSE", "false")
   }
 
   @Test
   def testNonAsciiLiteral(): Unit = {
-    testAllApis(
-      'f4.like("%测试%"),
-      "f4.like('%测试%')",
-      "f4 LIKE '%测试%'",
-      "true")
+    testAllApis('f4.like("%测试%"), "f4.like('%测试%')", "f4 LIKE '%测试%'", "true")
 
-    testAllApis(
-      "Абвгде" + "谢谢",
-      "'Абвгде' + '谢谢'",
-      "'Абвгде' || '谢谢'",
-      "Абвгде谢谢")
+    testAllApis("Абвгде" + "谢谢", "'Абвгде' + '谢谢'", "'Абвгде' || '谢谢'", "Абвгде谢谢")
   }
 
   @Test
   def testDoubleQuote(): Unit = {
     val hello = "\"<hello>\""
-    testAllApis(
-      Func3(42, hello),
-      s"Func3(42, '$hello')",
-      s"Func3(42, '$hello')",
-      s"42 and $hello")
+    testAllApis(Func3(42, hello), s"Func3(42, '$hello')", s"Func3(42, '$hello')", s"42 and $hello")
   }
 
   @Test
@@ -93,70 +61,27 @@ class LiteralTest extends ExpressionTestBase {
 
     // these tests use Java/Scala escaping for non-quoting unicode characters
 
-    testAllApis(
-      ">\n<",
-      "'>\n<'",
-      "'>\n<'",
-      ">\n<")
+    testAllApis(">\n<", "'>\n<'", "'>\n<'", ">\n<")
 
-    testAllApis(
-      ">\u263A<",
-      "'>\u263A<'",
-      "'>\u263A<'",
-      ">\u263A<")
+    testAllApis(">\u263A<", "'>\u263A<'", "'>\u263A<'", ">\u263A<")
 
-    testAllApis(
-      ">\u263A<",
-      "'>\u263A<'",
-      "'>\u263A<'",
-      ">\u263A<")
+    testAllApis(">\u263A<", "'>\u263A<'", "'>\u263A<'", ">\u263A<")
 
-    testAllApis(
-      ">\\<",
-      "'>\\<'",
-      "'>\\<'",
-      ">\\<")
+    testAllApis(">\\<", "'>\\<'", "'>\\<'", ">\\<")
 
-    testAllApis(
-      ">'<",
-      "'>''<'",
-      "'>''<'",
-      ">'<")
+    testAllApis(">'<", "'>''<'", "'>''<'", ">'<")
 
-    testAllApis(
-      " ",
-      "' '",
-      "' '",
-      " ")
+    testAllApis(" ", "' '", "' '", " ")
 
-    testAllApis(
-      "",
-      "''",
-      "''",
-      "")
+    testAllApis("", "''", "''", "")
 
-    testAllApis(
-      ">foo([\\w]+)<",
-      "'>foo([\\w]+)<'",
-      "'>foo([\\w]+)<'",
-      ">foo([\\w]+)<")
+    testAllApis(">foo([\\w]+)<", "'>foo([\\w]+)<'", "'>foo([\\w]+)<'", ">foo([\\w]+)<")
 
-    testAllApis(
-      ">\\'\n<",
-      "\">\\'\n<\"",
-      "'>\\''\n<'",
-      ">\\'\n<")
+    testAllApis(">\\'\n<", "\">\\'\n<\"", "'>\\''\n<'", ">\\'\n<")
 
-    testAllApis(
-      "It's me.",
-      "'It''s me.'",
-      "'It''s me.'",
-      "It's me.")
+    testAllApis("It's me.", "'It''s me.'", "'It''s me.'", "It's me.")
 
-    testTableApi(
-      """I "like" dogs.""",
-      """"I ""like"" dogs."""",
-      """I "like" dogs.""")
+    testTableApi("""I "like" dogs.""", """"I ""like"" dogs."""", """I "like" dogs.""")
 
     // these test use SQL for describing unicode characters
 
@@ -168,9 +93,7 @@ class LiteralTest extends ExpressionTestBase {
       "U&'>#263A<' UESCAPE '#'", // custom escape '#'
       ">\u263A<")
 
-    testSqlApi(
-      """'>\\<'""",
-      ">\\\\<")
+    testSqlApi("""'>\\<'""", ">\\\\<")
   }
 
   def testData: Any = {
@@ -184,17 +107,10 @@ class LiteralTest extends ExpressionTestBase {
 
   def typeInfo: TypeInformation[Any] = {
     new RowTypeInfo(
-      Array(
-        Types.STRING,
-        Types.STRING,
-        Types.STRING,
-        Types.STRING
-      ).asInstanceOf[Array[TypeInformation[_]]],
-      Array("trUeX", "FALSE_A", "FALSE_AB", "f4")
-    ).asInstanceOf[TypeInformation[Any]]
+      Array(Types.STRING, Types.STRING, Types.STRING, Types.STRING)
+        .asInstanceOf[Array[TypeInformation[_]]],
+      Array("trUeX", "FALSE_A", "FALSE_AB", "f4")).asInstanceOf[TypeInformation[Any]]
   }
 
-  override def functions: Map[String, ScalarFunction] = Map(
-    "Func3" -> Func3
-  )
+  override def functions: Map[String, ScalarFunction] = Map("Func3" -> Func3)
 }

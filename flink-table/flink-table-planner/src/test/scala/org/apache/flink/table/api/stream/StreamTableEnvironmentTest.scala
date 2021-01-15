@@ -27,7 +27,9 @@ import org.apache.flink.streaming.api.environment.{StreamExecutionEnvironment =>
 import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
 import org.apache.flink.table.api.Expressions.$
 import org.apache.flink.table.api._
-import org.apache.flink.table.api.bridge.java.internal.{StreamTableEnvironmentImpl => JStreamTableEnvironmentImpl}
+import org.apache.flink.table.api.bridge.java.internal.{
+  StreamTableEnvironmentImpl => JStreamTableEnvironmentImpl
+}
 import org.apache.flink.table.api.bridge.java.{StreamTableEnvironment => JStreamTableEnv}
 import org.apache.flink.table.api.bridge.scala._
 import org.apache.flink.table.catalog.FunctionCatalog
@@ -64,7 +66,8 @@ class StreamTableEnvironmentTest extends TableTestBase {
 
     val table2 = util.addTable[(Long, Int, String)]('d, 'e, 'f)
 
-    val sqlTable2 = util.tableEnv.sqlQuery(s"SELECT d, e, f FROM $table2 " +
+    val sqlTable2 = util.tableEnv.sqlQuery(
+      s"SELECT d, e, f FROM $table2 " +
         s"UNION ALL SELECT a, b, c FROM $table")
 
     val expected2 = binaryNode(
@@ -80,8 +83,9 @@ class StreamTableEnvironmentTest extends TableTestBase {
   @Test
   def testToAppendSinkOnUpdatingTable(): Unit = {
     expectedException.expect(classOf[ValidationException])
-    expectedException.expectMessage("Table is not an append-only table. Use the toRetractStream()" +
-      " in order to handle add and retract messages.")
+    expectedException.expectMessage(
+      "Table is not an append-only table. Use the toRetractStream()" +
+        " in order to handle add and retract messages.")
 
     val env = StreamExecutionEnvironment.getExecutionEnvironment
     val settings = EnvironmentSettings.newInstance().useOldPlanner().build()
@@ -226,8 +230,8 @@ class StreamTableEnvironmentTest extends TableTestBase {
     val tableResult1 = util.tableEnv.executeSql(createTableStmt)
     assertEquals(ResultKind.SUCCESS, tableResult1.getResultKind)
 
-    val tableResult2 = util.tableEnv.executeSql(
-      "explain plan for select * from MyTable where a > 10")
+    val tableResult2 =
+      util.tableEnv.executeSql("explain plan for select * from MyTable where a > 10")
     assertEquals(ResultKind.SUCCESS_WITH_CONTENT, tableResult2.getResultKind)
     val it = tableResult2.collect()
     assertTrue(it.hasNext)
@@ -300,18 +304,18 @@ class StreamTableEnvironmentTest extends TableTestBase {
     assertEquals(ResultKind.SUCCESS, tableResult1.getResultKind)
 
     // TODO we can support them later
-    testUnsupportedExplain(util.tableEnv,
+    testUnsupportedExplain(
+      util.tableEnv,
       "explain plan excluding attributes for select * from MyTable")
-    testUnsupportedExplain(util.tableEnv,
+    testUnsupportedExplain(
+      util.tableEnv,
       "explain plan including all attributes for select * from MyTable")
-    testUnsupportedExplain(util.tableEnv,
-      "explain plan with type for select * from MyTable")
-    testUnsupportedExplain(util.tableEnv,
+    testUnsupportedExplain(util.tableEnv, "explain plan with type for select * from MyTable")
+    testUnsupportedExplain(
+      util.tableEnv,
       "explain plan without implementation for select * from MyTable")
-    testUnsupportedExplain(util.tableEnv,
-      "explain plan as xml for select * from MyTable")
-    testUnsupportedExplain(util.tableEnv,
-      "explain plan as json for select * from MyTable")
+    testUnsupportedExplain(util.tableEnv, "explain plan as xml for select * from MyTable")
+    testUnsupportedExplain(util.tableEnv, "explain plan as json for select * from MyTable")
   }
 
   private def testUnsupportedExplain(tableEnv: StreamTableEnvironment, explain: String): Unit = {
@@ -378,8 +382,8 @@ class StreamTableEnvironmentTest extends TableTestBase {
     val tableResult2 = util.tableEnv.executeSql(createTableStmt2)
     assertEquals(ResultKind.SUCCESS, tableResult2.getResultKind)
 
-    val actual = util.tableEnv.explainSql(
-      "insert into MySink select a, b from MyTable where a > 10")
+    val actual =
+      util.tableEnv.explainSql("insert into MySink select a, b from MyTable where a > 10")
     val expected = readFromResource("testExplainSqlWithInsert0.out")
     assertEquals(replaceStageId(expected), replaceStageId(actual))
   }
@@ -406,8 +410,8 @@ class StreamTableEnvironmentTest extends TableTestBase {
     assertEquals(replaceStageId(expected), replaceStageId(actual))
   }
 
-  private def prepareSchemaExpressionParser:
-    (JStreamTableEnv, DataStream[JTuple5[JLong, JInt, String, JInt, JLong]]) = {
+  private def prepareSchemaExpressionParser
+      : (JStreamTableEnv, DataStream[JTuple5[JLong, JInt, String, JInt, JLong]]) = {
 
     val jStreamExecEnv = mock(classOf[JStreamExecEnv])
     when(jStreamExecEnv.getStreamTimeCharacteristic).thenReturn(TimeCharacteristic.EventTime)

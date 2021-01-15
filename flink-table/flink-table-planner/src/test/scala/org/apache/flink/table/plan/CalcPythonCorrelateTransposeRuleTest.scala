@@ -35,7 +35,7 @@ class CalcPythonCorrelateTransposeRuleTest extends TableTestBase {
     val tableFunc = new MockPythonTableFunction()
 
     val resultTable = table.joinLateral(
-      tableFunc('a * 'a, 'b) as('x, 'y),
+      tableFunc('a * 'a, 'b) as ('x, 'y),
       'x === 'a && scalarFunc('x, 'x) === 2 && 'y + 1 === 'y * 'y)
     val expected = unaryNode(
       "DataStreamCalc",
@@ -47,13 +47,18 @@ class CalcPythonCorrelateTransposeRuleTest extends TableTestBase {
             "DataStreamCalc",
             streamTableNode(table),
             term("select", "a, b, c, *(a, a) AS f0")),
-          term("invocation", s"${tableFunc.functionIdentifier}" +
-            s"($$3, $$1)"),
-          term("correlate", s"table(${tableFunc.getClass.getSimpleName}" +
-            s"(f0, b))"),
+          term(
+            "invocation",
+            s"${tableFunc.functionIdentifier}" +
+              s"($$3, $$1)"),
+          term(
+            "correlate",
+            s"table(${tableFunc.getClass.getSimpleName}" +
+              s"(f0, b))"),
           term("select", "a, b, c, f0, x, y"),
-          term("rowType",
-               "RecordType(INTEGER a, INTEGER b, INTEGER c, INTEGER f0, INTEGER x, INTEGER y)"),
+          term(
+            "rowType",
+            "RecordType(INTEGER a, INTEGER b, INTEGER c, INTEGER f0, INTEGER x, INTEGER y)"),
           term("joinType", "INNER")),
         term("select", "a, b, c, x, y, pyFunc(x, x) AS f0")),
       term("select", "a, b, c, x, y"),

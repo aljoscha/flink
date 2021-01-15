@@ -31,12 +31,11 @@ import org.junit.runners.Parameterized
 import scala.collection.JavaConversions._
 
 @RunWith(classOf[Parameterized])
-class PartitionableSourceITCase(
-  val sourceFetchPartitions: Boolean,
-  val useCatalogFilter: Boolean) extends BatchTestBase{
+class PartitionableSourceITCase(val sourceFetchPartitions: Boolean, val useCatalogFilter: Boolean)
+    extends BatchTestBase {
 
   @Before
-  override def before() : Unit = {
+  override def before(): Unit = {
     super.before()
     env.setParallelism(1) // set sink parallelism to 1
     val data = Seq(
@@ -44,8 +43,7 @@ class PartitionableSourceITCase(
       row(2, "LiSi", "A", 1),
       row(3, "Jack", "A", 2),
       row(4, "Tom", "B", 3),
-      row(5, "Vivi", "C", 1)
-    )
+      row(5, "Vivi", "C", 1))
     val myTableDataId = TestValuesTableFactory.registerData(data)
 
     val ddlTemp =
@@ -78,14 +76,13 @@ class PartitionableSourceITCase(
       val mytablePath = ObjectPath.fromString("test_database.MyTable")
       // partition map
       val partitions = Seq(
-        Map("part1"->"A", "part2"->"1"),
-        Map("part1"->"A", "part2"->"2"),
-        Map("part1"->"B", "part2"->"3"),
-        Map("part1"->"C", "part2"->"1"))
+        Map("part1" -> "A", "part2" -> "1"),
+        Map("part1" -> "A", "part2" -> "2"),
+        Map("part1" -> "B", "part2" -> "3"),
+        Map("part1" -> "C", "part2" -> "1"))
       partitions.foreach(partition => {
         val catalogPartitionSpec = new CatalogPartitionSpec(partition)
-        val catalogPartition = new CatalogPartitionImpl(
-          new java.util.HashMap[String, String](), "")
+        val catalogPartition = new CatalogPartitionImpl(new java.util.HashMap[String, String](), "")
         catalog.createPartition(mytablePath, catalogPartitionSpec, catalogPartition, true)
       })
     }
@@ -93,42 +90,29 @@ class PartitionableSourceITCase(
 
   @Test
   def testSimplePartitionFieldPredicate1(): Unit = {
-    checkResult("SELECT * FROM MyTable WHERE part1 = 'A'",
-      Seq(
-        row(1, "ZhangSan", "A", 1, 2),
-        row(2, "LiSi", "A", 1, 2),
-        row(3, "Jack", "A", 2, 3)
-      )
-    )
+    checkResult(
+      "SELECT * FROM MyTable WHERE part1 = 'A'",
+      Seq(row(1, "ZhangSan", "A", 1, 2), row(2, "LiSi", "A", 1, 2), row(3, "Jack", "A", 2, 3)))
   }
 
   @Test
   def testPartialPartitionFieldPredicatePushDown(): Unit = {
-    checkResult("SELECT * FROM MyTable WHERE (id > 2 OR part1 = 'A') AND part2 > 1",
-      Seq(
-        row(3, "Jack", "A", 2, 3),
-        row(4, "Tom", "B", 3, 4)
-      )
-    )
+    checkResult(
+      "SELECT * FROM MyTable WHERE (id > 2 OR part1 = 'A') AND part2 > 1",
+      Seq(row(3, "Jack", "A", 2, 3), row(4, "Tom", "B", 3, 4)))
   }
 
   @Test
   def testUnconvertedExpression(): Unit = {
-    checkResult("select * from MyTable where trim(part1) = 'A' and part2 > 1",
-      Seq(
-        row(3, "Jack", "A", 2, 3)
-      )
-    )
+    checkResult(
+      "select * from MyTable where trim(part1) = 'A' and part2 > 1",
+      Seq(row(3, "Jack", "A", 2, 3)))
   }
 }
 
 object PartitionableSourceITCase {
   @Parameterized.Parameters(name = "sourceFetchPartitions={0}, useCatalogFilter={1}")
   def parameters(): util.Collection[Array[Any]] = {
-    Seq[Array[Any]](
-      Array(true, false),
-      Array(false, false),
-      Array(false, true)
-    )
+    Seq[Array[Any]](Array(true, false), Array(false, false), Array(false, true))
   }
 }

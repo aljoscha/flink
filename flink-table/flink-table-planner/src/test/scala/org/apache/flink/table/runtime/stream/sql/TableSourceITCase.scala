@@ -48,17 +48,15 @@ class TableSourceITCase extends AbstractTestBase {
 
     tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal("persons", csvTable)
 
-    tEnv.sqlQuery(
-      "SELECT id, `first`, `last`, score FROM persons WHERE id < 4 ")
+    tEnv
+      .sqlQuery("SELECT id, `first`, `last`, score FROM persons WHERE id < 4 ")
       .toAppendStream[Row]
       .addSink(new StreamITCase.StringSink[Row])
 
     env.execute()
 
-    val expected = mutable.MutableList(
-      "1,Mike,Smith,12.3",
-      "2,Bob,Taylor,45.6",
-      "3,Sam,Miller,7.89")
+    val expected =
+      mutable.MutableList("1,Mike,Smith,12.3", "2,Bob,Taylor,45.6", "3,Sam,Miller,7.89")
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
   }
 

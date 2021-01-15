@@ -37,8 +37,8 @@ class FlinkLogicalValues(
     traitSet: RelTraitSet,
     rowRelDataType: RelDataType,
     tuples: ImmutableList[ImmutableList[RexLiteral]])
-  extends Values(cluster, rowRelDataType, tuples, traitSet)
-  with FlinkLogicalRel {
+    extends Values(cluster, rowRelDataType, tuples, traitSet)
+    with FlinkLogicalRel {
 
   override def computeSelfCost(planner: RelOptPlanner, mq: RelMetadataQuery): RelOptCost = {
     val dRows = mq.getRowCount(this)
@@ -50,11 +50,11 @@ class FlinkLogicalValues(
 }
 
 private class FlinkLogicalValuesConverter
-  extends ConverterRule(
-    classOf[LogicalValues],
-    Convention.NONE,
-    FlinkConventions.LOGICAL,
-    "FlinkLogicalValuesConverter") {
+    extends ConverterRule(
+      classOf[LogicalValues],
+      Convention.NONE,
+      FlinkConventions.LOGICAL,
+      "FlinkLogicalValuesConverter") {
 
   override def convert(rel: RelNode): RelNode = {
     val values = rel.asInstanceOf[LogicalValues]
@@ -68,16 +68,18 @@ object FlinkLogicalValues {
 
   val CONVERTER: ConverterRule = new FlinkLogicalValuesConverter()
 
-  def create(cluster: RelOptCluster,
+  def create(
+      cluster: RelOptCluster,
       rowType: RelDataType,
       tuples: ImmutableList[ImmutableList[RexLiteral]]): FlinkLogicalValues = {
     val mq: RelMetadataQuery = RelMetadataQuery.instance
-    val traitSet: RelTraitSet = cluster.traitSetOf(FlinkConventions.LOGICAL)
-        .replaceIfs(
-          RelCollationTraitDef.INSTANCE,
-          new Supplier[JList[RelCollation]]() {
-            def get: JList[RelCollation] = RelMdCollation.values(mq, rowType, tuples)
-          })
+    val traitSet: RelTraitSet = cluster
+      .traitSetOf(FlinkConventions.LOGICAL)
+      .replaceIfs(
+        RelCollationTraitDef.INSTANCE,
+        new Supplier[JList[RelCollation]]() {
+          def get: JList[RelCollation] = RelMdCollation.values(mq, rowType, tuples)
+        })
     new FlinkLogicalValues(cluster, traitSet, rowType, tuples)
   }
 }

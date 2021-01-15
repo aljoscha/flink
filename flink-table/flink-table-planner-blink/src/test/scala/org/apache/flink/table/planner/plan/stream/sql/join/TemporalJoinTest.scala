@@ -31,8 +31,7 @@ class TemporalJoinTest extends TableTestBase {
 
   @Before
   def before(): Unit = {
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE Orders (
         | amount INT,
         | currency STRING,
@@ -44,8 +43,7 @@ class TemporalJoinTest extends TableTestBase {
         |)
       """.stripMargin)
 
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE RatesHistory (
         | currency STRING,
         | rate INT,
@@ -56,8 +54,7 @@ class TemporalJoinTest extends TableTestBase {
         |)
       """.stripMargin)
 
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE RatesHistoryWithPK (
         | currency STRING,
         | rate INT,
@@ -70,8 +67,7 @@ class TemporalJoinTest extends TableTestBase {
         |)
       """.stripMargin)
 
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE RatesBinlogWithComputedColumn (
         | currency STRING,
         | rate INT,
@@ -87,8 +83,7 @@ class TemporalJoinTest extends TableTestBase {
         |)
       """.stripMargin)
 
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE RatesBinlogWithoutWatermark (
         | currency STRING,
         | rate INT,
@@ -103,8 +98,7 @@ class TemporalJoinTest extends TableTestBase {
         |)
       """.stripMargin)
 
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE RatesOnly (
         | currency STRING,
         | rate INT,
@@ -114,8 +108,7 @@ class TemporalJoinTest extends TableTestBase {
         |)
       """.stripMargin)
 
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE RatesHistoryLegacy (
         | currency STRING,
         | rate INT,
@@ -144,9 +137,10 @@ class TemporalJoinTest extends TableTestBase {
         "  ) T " +
         "  WHERE T.rowNum = 1")
 
-    util.addTable("CREATE VIEW rates_last_value AS SELECT currency, LAST_VALUE(rate) AS rate " +
-      "FROM RatesHistory " +
-      "GROUP BY currency ")
+    util.addTable(
+      "CREATE VIEW rates_last_value AS SELECT currency, LAST_VALUE(rate) AS rate " +
+        "FROM RatesHistory " +
+        "GROUP BY currency ")
   }
 
   @Test
@@ -357,8 +351,7 @@ class TemporalJoinTest extends TableTestBase {
 
   @Test
   def testInvalidTemporalTablJoin(): Unit = {
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE leftTableWithoutTimeAttribute (
         | amount INT,
         | currency STRING,
@@ -385,8 +378,7 @@ class TemporalJoinTest extends TableTestBase {
         " condition of temporal join, but current temporal join condition is [amount=rate].",
       classOf[ValidationException])
 
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE versionedTableWithoutPk (
         | currency STRING,
         | rate INT,
@@ -410,8 +402,7 @@ class TemporalJoinTest extends TableTestBase {
         "__TEMPORAL_JOIN_RIGHT_KEY($4)))], joinType=[inner])",
       classOf[ValidationException])
 
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE versionedTableWithoutTimeAttribute (
         | currency STRING,
         | rate INT,
@@ -431,8 +422,7 @@ class TemporalJoinTest extends TableTestBase {
         s"versioned table, but no row time attribute can be found.",
       classOf[ValidationException])
 
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE versionedTableWithoutRowtime (
         | currency STRING,
         | rate INT,
@@ -470,10 +460,9 @@ class TemporalJoinTest extends TableTestBase {
   }
 
   private def expectExceptionThrown(
-    sql: String,
-    keywords: String,
-    clazz: Class[_ <: Throwable] = classOf[ValidationException])
-  : Unit = {
+      sql: String,
+      keywords: String,
+      clazz: Class[_ <: Throwable] = classOf[ValidationException]): Unit = {
     try {
       verifyTranslationSuccess(sql)
       fail(s"Expected a $clazz, but no exception is thrown.")

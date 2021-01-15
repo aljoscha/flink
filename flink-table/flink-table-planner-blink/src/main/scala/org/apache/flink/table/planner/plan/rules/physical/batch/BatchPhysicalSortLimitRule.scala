@@ -30,28 +30,28 @@ import org.apache.calcite.rel.convert.ConverterRule
 import org.apache.calcite.sql.`type`.SqlTypeName
 
 /**
-  * Rule that matches [[FlinkLogicalSort]] with non-empty sort fields and non-null fetch or offset,
-  * and converts it to
-  * {{{
-  * BatchPhysicalSortLimit (global)
-  * +- BatchPhysicalExchange (singleton)
-  *    +- BatchPhysicalSortLimit (local)
-  *       +- input of sort
-  * }}}
-  * when fetch is not null, or
-  * {{{
-  * BatchPhysicalSortLimit (global)
-  * +- BatchPhysicalExchange (singleton)
-  *    +- input of sort
-  * }}}
-  * when fetch is null
-  */
+ * Rule that matches [[FlinkLogicalSort]] with non-empty sort fields and non-null fetch or offset,
+ * and converts it to
+ * {{{
+ * BatchPhysicalSortLimit (global)
+ * +- BatchPhysicalExchange (singleton)
+ *    +- BatchPhysicalSortLimit (local)
+ *       +- input of sort
+ * }}}
+ * when fetch is not null, or
+ * {{{
+ * BatchPhysicalSortLimit (global)
+ * +- BatchPhysicalExchange (singleton)
+ *    +- input of sort
+ * }}}
+ * when fetch is null
+ */
 class BatchPhysicalSortLimitRule
-  extends ConverterRule(
-    classOf[FlinkLogicalSort],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.BATCH_PHYSICAL,
-    "BatchPhysicalSortLimitRule") {
+    extends ConverterRule(
+      classOf[FlinkLogicalSort],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.BATCH_PHYSICAL,
+      "BatchPhysicalSortLimitRule") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val sort: FlinkLogicalSort = call.rel(0)
@@ -85,7 +85,8 @@ class BatchPhysicalSortLimitRule
     }
 
     // require SINGLETON exchange
-    val requiredTrait = rel.getCluster.getPlanner.emptyTraitSet()
+    val requiredTrait = rel.getCluster.getPlanner
+      .emptyTraitSet()
       .replace(FlinkConventions.BATCH_PHYSICAL)
       .replace(FlinkRelDistribution.SINGLETON)
     val newInput = RelOptRule.convert(inputOfExchange, requiredTrait)
@@ -99,8 +100,7 @@ class BatchPhysicalSortLimitRule
       sort.getCollation,
       sort.offset,
       sort.fetch,
-      true
-    )
+      true)
   }
 }
 

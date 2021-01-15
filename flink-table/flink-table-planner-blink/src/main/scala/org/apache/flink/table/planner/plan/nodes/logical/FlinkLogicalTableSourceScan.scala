@@ -40,15 +40,15 @@ import java.util.function.Supplier
 import scala.collection.JavaConversions._
 
 /**
-  * Sub-class of [[TableScan]] that is a relational operator
-  * which returns the contents of a [[DynamicTableSource]] in Flink.
-  */
+ * Sub-class of [[TableScan]] that is a relational operator
+ * which returns the contents of a [[DynamicTableSource]] in Flink.
+ */
 class FlinkLogicalTableSourceScan(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
     relOptTable: TableSourceTable)
-  extends TableScan(cluster, traitSet, Collections.emptyList[RelHint](), relOptTable)
-  with FlinkLogicalRel {
+    extends TableScan(cluster, traitSet, Collections.emptyList[RelHint](), relOptTable)
+    with FlinkLogicalRel {
 
   lazy val tableSource: DynamicTableSource = relOptTable.tableSource
 
@@ -75,18 +75,19 @@ class FlinkLogicalTableSourceScan(
   }
 
   override def explainTerms(pw: RelWriter): RelWriter = {
-    super.explainTerms(pw)
+    super
+      .explainTerms(pw)
       .item("fields", getRowType.getFieldNames.mkString(", "))
   }
 
 }
 
 class FlinkLogicalTableSourceScanConverter
-  extends ConverterRule(
-    classOf[LogicalTableScan],
-    Convention.NONE,
-    FlinkConventions.LOGICAL,
-    "FlinkLogicalTableSourceScanConverter") {
+    extends ConverterRule(
+      classOf[LogicalTableScan],
+      Convention.NONE,
+      FlinkConventions.LOGICAL,
+      "FlinkLogicalTableSourceScanConverter") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val scan: TableScan = call.rel(0)
@@ -109,16 +110,20 @@ object FlinkLogicalTableSourceScan {
   }
 
   def create(cluster: RelOptCluster, table: TableSourceTable): FlinkLogicalTableSourceScan = {
-    val traitSet = cluster.traitSetOf(FlinkConventions.LOGICAL).replaceIfs(
-      RelCollationTraitDef.INSTANCE, new Supplier[util.List[RelCollation]]() {
-        def get: util.List[RelCollation] = {
-          if (table != null) {
-            table.getStatistic.getCollations
-          } else {
-            ImmutableList.of[RelCollation]
+    val traitSet = cluster
+      .traitSetOf(FlinkConventions.LOGICAL)
+      .replaceIfs(
+        RelCollationTraitDef.INSTANCE,
+        new Supplier[util.List[RelCollation]]() {
+          def get: util.List[RelCollation] = {
+            if (table != null) {
+              table.getStatistic.getCollations
+            } else {
+              ImmutableList.of[RelCollation]
+            }
           }
-        }
-      }).simplify()
+        })
+      .simplify()
     new FlinkLogicalTableSourceScan(cluster, traitSet, table)
   }
 }

@@ -38,8 +38,7 @@ trait CommonCalc {
       calcProjection: Seq[RexNode],
       calcCondition: Option[RexNode],
       config: TableConfig,
-      functionClass: Class[T]):
-    GeneratedFunction[T, Row] = {
+      functionClass: Class[T]): GeneratedFunction[T, Row] = {
 
     val projection = generator.generateResultExpression(
       returnSchema.typeInfo,
@@ -52,8 +51,7 @@ trait CommonCalc {
         |${projection.code}
         |${generator.collectorTerm}.collect(${projection.resultTerm});
         |""".stripMargin
-    }
-    else {
+    } else {
       val filterCondition = generator.generateExpression(calcCondition.get)
       // only filter
       if (projection == null) {
@@ -76,11 +74,7 @@ trait CommonCalc {
       }
     }
 
-    generator.generateFunction(
-      ruleDescription,
-      functionClass,
-      body,
-      returnSchema.typeInfo)
+    generator.generateFunction(ruleDescription, functionClass, body, returnSchema.typeInfo)
   }
 
   private[flink] def conditionToString(
@@ -109,13 +103,15 @@ trait CommonCalc {
 
     proj
       .map(expression(_, inFields, Some(localExprs)))
-      .zip(outFields).map { case (e, o) =>
+      .zip(outFields)
+      .map { case (e, o) =>
         if (e != o) {
           e + " AS " + o
         } else {
           e
         }
-    }.mkString(", ")
+      }
+      .mkString(", ")
   }
 
   private[flink] def calcOpName(
@@ -157,9 +153,7 @@ trait CommonCalc {
     planner.getCostFactory.makeCost(newRowCnt, newRowCnt * compCnt, 0)
   }
 
-  private[flink] def estimateRowCount(
-      calcProgram: RexProgram,
-      rowCnt: Double): Double = {
+  private[flink] def estimateRowCount(calcProgram: RexProgram, rowCnt: Double): Double = {
 
     if (calcProgram.getCondition != null) {
       // we reduce the result card to push filters down
@@ -172,15 +166,15 @@ trait CommonCalc {
   }
 
   /**
-    * Return true if the input rexNode do not access a field or literal, i.e. computations,
-    * conditions, etc.
-    */
+   * Return true if the input rexNode do not access a field or literal, i.e. computations,
+   * conditions, etc.
+   */
   private[flink] def isComputation(rexNode: RexNode): Boolean = {
     rexNode match {
-      case _: RexInputRef => false
-      case _: RexLiteral => false
+      case _: RexInputRef                                     => false
+      case _: RexLiteral                                      => false
       case c: RexCall if c.getOperator.getName.equals("CAST") => false
-      case _ => true
+      case _                                                  => true
     }
   }
 }

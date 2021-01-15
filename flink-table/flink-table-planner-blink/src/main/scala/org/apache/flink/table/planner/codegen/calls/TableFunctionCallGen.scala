@@ -49,10 +49,8 @@ import scala.collection.JavaConversions._
  *
  * @param tableFunction user-defined [[TableFunction]] that might be overloaded
  */
-class TableFunctionCallGen(
-    rexCall: RexCall,
-    tableFunction: TableFunction[_])
-  extends CallGenerator {
+class TableFunctionCallGen(rexCall: RexCall, tableFunction: TableFunction[_])
+    extends CallGenerator {
 
   override def generate(
       ctx: CodeGeneratorContext,
@@ -76,11 +74,7 @@ class TableFunctionCallGen(
         |""".stripMargin
 
     // has no result
-    GeneratedExpression(
-      resultCollectorTerm,
-      NEVER_NULL,
-      functionCallCode,
-      returnType)
+    GeneratedExpression(resultCollectorTerm, NEVER_NULL, functionCallCode, returnType)
   }
 
   def prepareUDFArgs(
@@ -96,18 +90,19 @@ class TableFunctionCallGen(
     val sqlFunction = rexCall.getOperator.asInstanceOf[TableSqlFunction]
     val arguments = UserDefinedFunctionUtils.transformRexNodes(rexCall.operands)
     val operandTypes = rexCall.operands
-        .map(_.getType)
-        .map(FlinkTypeFactory.toLogicalType).toArray
+      .map(_.getType)
+      .map(FlinkTypeFactory.toLogicalType)
+      .toArray
     val func = sqlFunction.makeFunction(arguments, operandTypes)
     val argTypes = getEvalMethodSignature(
       func,
       rexCall.operands
         .map(_.getType)
-        .map(FlinkTypeFactory.toLogicalType).toArray)
-    sqlFunction
-        .getFunction
-        .asInstanceOf[FlinkTableFunction]
-        .getExternalResultType(func, arguments, argTypes)
+        .map(FlinkTypeFactory.toLogicalType)
+        .toArray)
+    sqlFunction.getFunction
+      .asInstanceOf[FlinkTableFunction]
+      .getExternalResultType(func, arguments, argTypes)
   }
 
   /**

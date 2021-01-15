@@ -24,7 +24,6 @@ import org.apache.flink.api.scala.runtime.tuple.base.TupleComparatorTestBase
 
 import org.apache.flink.api.scala._
 
-
 class TupleComparatorILD2Test extends TupleComparatorTestBase[(Int, Long, Double)] {
 
   protected def createComparator(ascending: Boolean): TypeComparator[(Int, Long, Double)] = {
@@ -50,7 +49,5 @@ class TupleComparatorILD2Test extends TupleComparatorTestBase[(Int, Long, Double
     (6, 20L, 23.2),
     (6, 29L, 20.0),
     (7, 29L, 20.0),
-    (7, 34L, 23.2)
-  )
+    (7, 34L, 23.2))
 }
-

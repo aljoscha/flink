@@ -20,7 +20,10 @@ package org.apache.flink.table.planner.plan.nodes.physical.batch
 
 import org.apache.flink.table.functions.UserDefinedFunction
 import org.apache.flink.table.planner.calcite.FlinkTypeFactory
-import org.apache.flink.table.planner.plan.`trait`.{FlinkRelDistribution, FlinkRelDistributionTraitDef}
+import org.apache.flink.table.planner.plan.`trait`.{
+  FlinkRelDistribution,
+  FlinkRelDistributionTraitDef
+}
 import org.apache.flink.table.planner.plan.nodes.exec.batch.BatchExecHashAggregate
 import org.apache.flink.table.planner.plan.nodes.exec.{ExecEdge, ExecNode}
 import org.apache.flink.table.planner.plan.rules.physical.batch.BatchExecJoinRuleBase
@@ -38,10 +41,10 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
-  * Batch physical RelNode for (global) hash-based aggregate operator.
-  *
-  * @see [[BatchPhysicalGroupAggregateBase]] for more info.
-  */
+ * Batch physical RelNode for (global) hash-based aggregate operator.
+ *
+ * @see [[BatchPhysicalGroupAggregateBase]] for more info.
+ */
 class BatchPhysicalHashAggregate(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -53,16 +56,16 @@ class BatchPhysicalHashAggregate(
     auxGrouping: Array[Int],
     aggCallToAggFunction: Seq[(AggregateCall, UserDefinedFunction)],
     isMerge: Boolean)
-  extends BatchPhysicalHashAggregateBase(
-    cluster,
-    traitSet,
-    inputRel,
-    outputRowType,
-    grouping,
-    auxGrouping,
-    aggCallToAggFunction,
-    isMerge = isMerge,
-    isFinal = true) {
+    extends BatchPhysicalHashAggregateBase(
+      cluster,
+      traitSet,
+      inputRel,
+      outputRowType,
+      grouping,
+      auxGrouping,
+      aggCallToAggFunction,
+      isMerge = isMerge,
+      isFinal = true) {
 
   override def copy(traitSet: RelTraitSet, inputs: util.List[RelNode]): RelNode = {
     new BatchPhysicalHashAggregate(
@@ -79,19 +82,24 @@ class BatchPhysicalHashAggregate(
   }
 
   override def explainTerms(pw: RelWriter): RelWriter = {
-    super.explainTerms(pw)
+    super
+      .explainTerms(pw)
       .item("isMerge", isMerge)
       .itemIf("groupBy", RelExplainUtil.fieldToString(grouping, inputRowType), grouping.nonEmpty)
-      .itemIf("auxGrouping", RelExplainUtil.fieldToString(auxGrouping, inputRowType),
+      .itemIf(
+        "auxGrouping",
+        RelExplainUtil.fieldToString(auxGrouping, inputRowType),
         auxGrouping.nonEmpty)
-      .item("select", RelExplainUtil.groupAggregationToString(
-        inputRowType,
-        getRowType,
-        grouping,
-        auxGrouping,
-        aggCallToAggFunction,
-        isMerge,
-        isGlobal = true))
+      .item(
+        "select",
+        RelExplainUtil.groupAggregationToString(
+          inputRowType,
+          getRowType,
+          grouping,
+          auxGrouping,
+          aggCallToAggFunction,
+          isMerge,
+          isGlobal = true))
   }
 
   override def satisfyTraits(requiredTraitSet: RelTraitSet): Option[RelNode] = {
@@ -151,7 +159,6 @@ class BatchPhysicalHashAggregate(
       true, // isFinal is always true
       ExecEdge.builder().damBehavior(ExecEdge.DamBehavior.END_INPUT).build(),
       FlinkTypeFactory.toLogicalRowType(getRowType),
-      getRelDetailedDescription
-    )
+      getRelDetailedDescription)
   }
 }

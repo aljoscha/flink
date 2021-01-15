@@ -23,7 +23,10 @@ import org.apache.flink.table.api._
 import org.apache.flink.table.api.config.{ExecutionConfigOptions, OptimizerConfigOptions}
 import org.apache.flink.table.planner.functions.aggfunctions.FirstValueAggFunction
 import org.apache.flink.table.planner.runtime.utils.JavaUserDefinedScalarFunctions.NonDeterministicUdf
-import org.apache.flink.table.planner.runtime.utils.JavaUserDefinedTableFunctions.{NonDeterministicTableFunc, StringSplit}
+import org.apache.flink.table.planner.runtime.utils.JavaUserDefinedTableFunctions.{
+  NonDeterministicTableFunc,
+  StringSplit
+}
 import org.apache.flink.table.planner.utils.TableTestBase
 
 import org.junit.{Before, Test}
@@ -34,18 +37,18 @@ class SubplanReuseTest extends TableTestBase {
 
   @Before
   def before(): Unit = {
-    util.tableEnv.getConfig.getConfiguration.setBoolean(
-      OptimizerConfigOptions.TABLE_OPTIMIZER_REUSE_SUB_PLAN_ENABLED, true)
-    util.tableEnv.getConfig.getConfiguration.setBoolean(
-      OptimizerConfigOptions.TABLE_OPTIMIZER_REUSE_SOURCE_ENABLED, false)
+    util.tableEnv.getConfig.getConfiguration
+      .setBoolean(OptimizerConfigOptions.TABLE_OPTIMIZER_REUSE_SUB_PLAN_ENABLED, true)
+    util.tableEnv.getConfig.getConfiguration
+      .setBoolean(OptimizerConfigOptions.TABLE_OPTIMIZER_REUSE_SOURCE_ENABLED, false)
     util.addTableSource[(Int, Long, String)]("x", 'a, 'b, 'c)
     util.addTableSource[(Int, Long, String)]("y", 'd, 'e, 'f)
   }
 
   @Test
   def testDisableSubplanReuse(): Unit = {
-    util.tableEnv.getConfig.getConfiguration.setBoolean(
-      OptimizerConfigOptions.TABLE_OPTIMIZER_REUSE_SUB_PLAN_ENABLED, false)
+    util.tableEnv.getConfig.getConfiguration
+      .setBoolean(OptimizerConfigOptions.TABLE_OPTIMIZER_REUSE_SUB_PLAN_ENABLED, false)
     val sqlQuery =
       """
         |WITH r AS (
@@ -58,8 +61,8 @@ class SubplanReuseTest extends TableTestBase {
 
   @Test
   def testSubplanReuseWithDifferentRowType(): Unit = {
-    util.tableEnv.getConfig.getConfiguration.setBoolean(
-      OptimizerConfigOptions.TABLE_OPTIMIZER_REUSE_SOURCE_ENABLED, false)
+    util.tableEnv.getConfig.getConfiguration
+      .setBoolean(OptimizerConfigOptions.TABLE_OPTIMIZER_REUSE_SOURCE_ENABLED, false)
     // can not reuse because of different row-type
     val sqlQuery =
       """
@@ -72,8 +75,8 @@ class SubplanReuseTest extends TableTestBase {
 
   @Test
   def testEnableReuseTableSource(): Unit = {
-    util.tableEnv.getConfig.getConfiguration.setBoolean(
-      OptimizerConfigOptions.TABLE_OPTIMIZER_REUSE_SOURCE_ENABLED, true)
+    util.tableEnv.getConfig.getConfiguration
+      .setBoolean(OptimizerConfigOptions.TABLE_OPTIMIZER_REUSE_SOURCE_ENABLED, true)
     val sqlQuery =
       """
         |WITH t AS (SELECT x.a AS a, x.b AS b, y.d AS d, y.e AS e FROM x, y WHERE x.a = y.d)
@@ -84,8 +87,8 @@ class SubplanReuseTest extends TableTestBase {
 
   @Test
   def testDisableReuseTableSource(): Unit = {
-    util.tableEnv.getConfig.getConfiguration.setBoolean(
-      OptimizerConfigOptions.TABLE_OPTIMIZER_REUSE_SOURCE_ENABLED, false)
+    util.tableEnv.getConfig.getConfiguration
+      .setBoolean(OptimizerConfigOptions.TABLE_OPTIMIZER_REUSE_SOURCE_ENABLED, false)
     val sqlQuery =
       """
         |WITH t AS (SELECT * FROM x, y WHERE x.a = y.d)
@@ -184,8 +187,8 @@ class SubplanReuseTest extends TableTestBase {
 
   @Test
   def testSubplanReuseOnLimit(): Unit = {
-    util.tableEnv.getConfig.getConfiguration.setString(
-      ExecutionConfigOptions.TABLE_EXEC_DISABLED_OPERATORS, "HashJoin,SortMergeJoin")
+    util.tableEnv.getConfig.getConfiguration
+      .setString(ExecutionConfigOptions.TABLE_EXEC_DISABLED_OPERATORS, "HashJoin,SortMergeJoin")
     val sqlQuery =
       """
         |WITH r AS (SELECT a, b FROM x LIMIT 10)
@@ -290,8 +293,7 @@ class SubplanReuseTest extends TableTestBase {
 
   @Test
   def testSubplanReuseWithDynamicFunction(): Unit = {
-    val sqlQuery = util.tableEnv.sqlQuery(
-      """
+    val sqlQuery = util.tableEnv.sqlQuery("""
         |(SELECT a AS random FROM x ORDER BY rand() LIMIT 1)
         |INTERSECT
         |(SELECT a AS random FROM x ORDER BY rand() LIMIT 1)
@@ -303,21 +305,20 @@ class SubplanReuseTest extends TableTestBase {
 
   @Test
   def testEnableReuseTableSourceOnNewSource(): Unit = {
-    util.tableEnv.getConfig.getConfiguration.setBoolean(
-      OptimizerConfigOptions.TABLE_OPTIMIZER_REUSE_SOURCE_ENABLED, true)
+    util.tableEnv.getConfig.getConfiguration
+      .setBoolean(OptimizerConfigOptions.TABLE_OPTIMIZER_REUSE_SOURCE_ENABLED, true)
     testReuseOnNewSource()
   }
 
   @Test
   def testDisableReuseTableSourceOnNewSource(): Unit = {
-    util.tableEnv.getConfig.getConfiguration.setBoolean(
-      OptimizerConfigOptions.TABLE_OPTIMIZER_REUSE_SOURCE_ENABLED, false)
+    util.tableEnv.getConfig.getConfiguration
+      .setBoolean(OptimizerConfigOptions.TABLE_OPTIMIZER_REUSE_SOURCE_ENABLED, false)
     testReuseOnNewSource()
   }
 
   private def testReuseOnNewSource(): Unit = {
-    util.addTable(
-      s"""
+    util.addTable(s"""
          |create table newX(
          |  a int,
          |  b bigint,
@@ -326,8 +327,7 @@ class SubplanReuseTest extends TableTestBase {
          |  'connector' = 'values'
          |)
        """.stripMargin)
-    util.addTable(
-      s"""
+    util.addTable(s"""
          |create table newY(
          |  d int,
          |  e bigint,

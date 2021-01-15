@@ -36,8 +36,9 @@ class InsertIntoValidationTest extends TableTestBase {
     val fieldNames = Array("d", "e")
     val fieldTypes: Array[TypeInformation[_]] = Array(Types.INT, Types.LONG)
     val sink = new MemoryTableSourceSinkUtil.UnsafeMemoryAppendTableSink
-    util.tableEnv.asInstanceOf[TableEnvironmentInternal].registerTableSinkInternal(
-      "targetTable", sink.configure(fieldNames, fieldTypes))
+    util.tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSinkInternal("targetTable", sink.configure(fieldNames, fieldTypes))
 
     val sql = "INSERT INTO targetTable SELECT a, b, c FROM sourceTable"
 
@@ -55,8 +56,9 @@ class InsertIntoValidationTest extends TableTestBase {
     val fieldNames = Array("d", "e", "f")
     val fieldTypes: Array[TypeInformation[_]] = Array(Types.STRING, Types.INT, Types.LONG)
     val sink = new MemoryTableSourceSinkUtil.UnsafeMemoryAppendTableSink
-    util.tableEnv.asInstanceOf[TableEnvironmentInternal].registerTableSinkInternal(
-      "targetTable", sink.configure(fieldNames, fieldTypes))
+    util.tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSinkInternal("targetTable", sink.configure(fieldNames, fieldTypes))
 
     val sql = "INSERT INTO targetTable SELECT a, b, c FROM sourceTable"
 
@@ -74,8 +76,9 @@ class InsertIntoValidationTest extends TableTestBase {
     val fieldNames = Array("d", "e", "f")
     val fieldTypes = util.tableEnv.scan("sourceTable").getSchema.getFieldTypes
     val sink = new MemoryTableSourceSinkUtil.UnsafeMemoryAppendTableSink
-    util.tableEnv.asInstanceOf[TableEnvironmentInternal].registerTableSinkInternal(
-      "targetTable", sink.configure(fieldNames, fieldTypes))
+    util.tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSinkInternal("targetTable", sink.configure(fieldNames, fieldTypes))
 
     val sql = "INSERT INTO targetTable (d, f) SELECT a, c FROM sourceTable"
 
@@ -88,16 +91,18 @@ class InsertIntoValidationTest extends TableTestBase {
   @Test
   def testValidationExceptionMessage(): Unit = {
     expectedException.expect(classOf[ValidationException])
-    expectedException.expectMessage("TableSink schema:    [a: Integer, b: Row" +
-      "(f0: Integer, f1: Integer, f2: Integer)]")
+    expectedException.expectMessage(
+      "TableSink schema:    [a: Integer, b: Row" +
+        "(f0: Integer, f1: Integer, f2: Integer)]")
     val util = batchTestUtil()
     util.addTable[(Int, Long, String)]("sourceTable", 'a, 'b, 'c)
     val fieldNames = Array("a", "b")
-    val fieldTypes: Array[TypeInformation[_]] = Array(Types.INT, Types.ROW
-    (Types.INT, Types.INT, Types.INT))
+    val fieldTypes: Array[TypeInformation[_]] =
+      Array(Types.INT, Types.ROW(Types.INT, Types.INT, Types.INT))
     val sink = new MemoryTableSourceSinkUtil.UnsafeMemoryAppendTableSink
-    util.tableEnv.asInstanceOf[TableEnvironmentInternal].registerTableSinkInternal(
-      "targetTable", sink.configure(fieldNames, fieldTypes))
+    util.tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSinkInternal("targetTable", sink.configure(fieldNames, fieldTypes))
 
     val sql = "INSERT INTO targetTable SELECT a, b FROM sourceTable"
 

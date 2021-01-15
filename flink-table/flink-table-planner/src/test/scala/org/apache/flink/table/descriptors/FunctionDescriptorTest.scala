@@ -23,8 +23,8 @@ import java.util.{Arrays => JArrays, List => JList, Map => JMap}
 import scala.collection.JavaConverters._
 
 /**
-  * Tests for [[FunctionDescriptor]].
-  */
+ * Tests for [[FunctionDescriptor]].
+ */
 class FunctionDescriptorTest extends DescriptorTestBase {
 
   override def descriptors(): JList[Descriptor] = {
@@ -33,10 +33,9 @@ class FunctionDescriptorTest extends DescriptorTestBase {
         new ClassInstance()
           .of("my.class")
           .parameter("INT", "1")
-          .parameter(
-            new ClassInstance()
-              .of("my.class2")
-              .parameterString("true")))
+          .parameter(new ClassInstance()
+            .of("my.class2")
+            .parameterString("true")))
 
     JArrays.asList(desc1)
   }
@@ -52,8 +51,7 @@ class FunctionDescriptorTest extends DescriptorTestBase {
       "constructor.0.type" -> "INT",
       "constructor.0.value" -> "1",
       "constructor.1.class" -> "my.class2",
-      "constructor.1.constructor.0" -> "true"
-    )
+      "constructor.1.constructor.0" -> "true")
     JArrays.asList(props1.asJava)
   }
 }

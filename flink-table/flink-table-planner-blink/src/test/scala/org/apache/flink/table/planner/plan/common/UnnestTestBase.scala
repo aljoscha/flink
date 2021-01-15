@@ -28,8 +28,8 @@ import org.junit.Test
 import java.sql.Timestamp
 
 /**
-  * Test for UNNEST queries.
-  */
+ * Test for UNNEST queries.
+ */
 abstract class UnnestTestBase(withExecPlan: Boolean) extends TableTestBase {
 
   protected val util: TableTestUtil = getTableTestUtil
@@ -98,10 +98,9 @@ abstract class UnnestTestBase(withExecPlan: Boolean) extends TableTestBase {
 
   @Test
   def testCrossWithUnnestForMap(): Unit = {
-    util.addTableSource("MyTable",
-      Array[TypeInformation[_]](Types.INT,
-        Types.LONG,
-        Types.MAP(Types.STRING, Types.STRING)),
+    util.addTableSource(
+      "MyTable",
+      Array[TypeInformation[_]](Types.INT, Types.LONG, Types.MAP(Types.STRING, Types.STRING)),
       Array("a", "b", "c"))
     verifyPlan("SELECT a, b, v FROM MyTable CROSS JOIN UNNEST(c) as f(k, v)")
   }

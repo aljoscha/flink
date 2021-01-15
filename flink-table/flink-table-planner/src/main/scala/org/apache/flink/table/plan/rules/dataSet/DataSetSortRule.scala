@@ -26,11 +26,11 @@ import org.apache.flink.table.plan.nodes.dataset.DataSetSort
 import org.apache.flink.table.plan.nodes.logical.FlinkLogicalSort
 
 class DataSetSortRule
-  extends ConverterRule(
-    classOf[FlinkLogicalSort],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.DATASET,
-    "DataSetSortRule") {
+    extends ConverterRule(
+      classOf[FlinkLogicalSort],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.DATASET,
+      "DataSetSortRule") {
 
   override def convert(rel: RelNode): RelNode = {
     val sort: FlinkLogicalSort = rel.asInstanceOf[FlinkLogicalSort]
@@ -44,8 +44,7 @@ class DataSetSortRule
       sort.getCollation,
       rel.getRowType,
       sort.offset,
-      sort.fetch
-    )
+      sort.fetch)
   }
 }
 

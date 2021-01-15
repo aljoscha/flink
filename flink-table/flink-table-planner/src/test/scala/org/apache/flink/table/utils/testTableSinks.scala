@@ -24,25 +24,30 @@ import org.apache.flink.api.java.operators.DataSink
 import org.apache.flink.core.fs.FileSystem
 import org.apache.flink.streaming.api.datastream.{DataStream, DataStreamSink}
 import org.apache.flink.table.api.TableSchema
-import org.apache.flink.table.sinks.{AppendStreamTableSink, BatchTableSink, OverwritableTableSink, TableSink}
+import org.apache.flink.table.sinks.{
+  AppendStreamTableSink,
+  BatchTableSink,
+  OverwritableTableSink,
+  TableSink
+}
 import org.apache.flink.table.types.DataType
 import org.apache.flink.table.types.utils.TypeConversions
 import org.apache.flink.types.Row
 
 /**
-  * An [[OverwritableTableSink]] for testing.
-  */
+ * An [[OverwritableTableSink]] for testing.
+ */
 final class TestingOverwritableTableSink private (
     path: String,
     fieldNames: Array[String],
     fieldTypes: Array[TypeInformation[_]])
-  extends AppendStreamTableSink[Row]
-  with BatchTableSink[Row]
-  with OverwritableTableSink {
+    extends AppendStreamTableSink[Row]
+    with BatchTableSink[Row]
+    with OverwritableTableSink {
 
   var overwrite = false
 
-  def this (path: String) = {
+  def this(path: String) = {
     this(path, null, null)
   }
 

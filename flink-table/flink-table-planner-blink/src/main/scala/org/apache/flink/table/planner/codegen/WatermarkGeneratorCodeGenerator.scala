@@ -37,8 +37,8 @@ import java.io.File
 import java.util
 
 /**
-  * A code generator for generating [[WatermarkGenerator]]s.
-  */
+ * A code generator for generating [[WatermarkGenerator]]s.
+ */
 object WatermarkGeneratorCodeGenerator {
 
   def generateWatermarkGenerator(
@@ -65,20 +65,15 @@ object WatermarkGeneratorCodeGenerator {
     val generatedExpr = generator.generateExpression(watermarkExpr)
 
     if (contextTerm.isDefined) {
-      ctx.addReusableMember(
-        s"""
+      ctx.addReusableMember(s"""
           |private transient ${classOf[WatermarkGeneratorSupplier.Context].getCanonicalName}
           |${contextTerm.get};
-          |""".stripMargin
-      )
-      ctx.addReusableInitStatement(
-        s"""
+          |""".stripMargin)
+      ctx.addReusableInitStatement(s"""
            |int len = references.length;
            |${contextTerm.get} =
            |(${classOf[WatermarkGeneratorSupplier.Context].getCanonicalName}) references[len-1];
-           |""".stripMargin
-
-      )
+           |""".stripMargin)
     }
 
     val funcCode =
@@ -122,25 +117,27 @@ object WatermarkGeneratorCodeGenerator {
 
 class WatermarkGeneratorFunctionContext(
     tableConfig: TableConfig,
-    contextTerm: String = "parameters") extends CodeGeneratorContext(tableConfig) {
+    contextTerm: String = "parameters")
+    extends CodeGeneratorContext(tableConfig) {
 
   override def addReusableFunction(
       function: UserDefinedFunction,
       functionContextClass: Class[_ <: FunctionContext] = classOf[FunctionContext],
       runtimeContextTerm: String = null): String = {
     super.addReusableFunction(
-      function, classOf[WatermarkGeneratorCodeGeneratorFunctionContextWrapper], this.contextTerm)
+      function,
+      classOf[WatermarkGeneratorCodeGeneratorFunctionContextWrapper],
+      this.contextTerm)
   }
 
-  override def addReusableConverter(
-      dataType: DataType,
-      classLoaderTerm: String = null): String = {
+  override def addReusableConverter(dataType: DataType, classLoaderTerm: String = null): String = {
     super.addReusableConverter(dataType, "this.getClass().getClassLoader()")
   }
 }
 
 class WatermarkGeneratorCodeGeneratorFunctionContextWrapper(
-    context: WatermarkGeneratorSupplier.Context) extends FunctionContext(null) {
+    context: WatermarkGeneratorSupplier.Context)
+    extends FunctionContext(null) {
 
   override def getMetricGroup: MetricGroup = context.getMetricGroup
 

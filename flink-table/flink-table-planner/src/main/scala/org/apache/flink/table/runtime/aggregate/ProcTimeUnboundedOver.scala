@@ -29,17 +29,17 @@ import org.apache.flink.types.Row
 import org.apache.flink.util.Collector
 
 /**
-  * Process Function for processing-time unbounded OVER window
-  *
-  * @param genAggregations Generated aggregate helper function
-  * @param aggregationStateType     row type info of aggregation
-  */
+ * Process Function for processing-time unbounded OVER window
+ *
+ * @param genAggregations Generated aggregate helper function
+ * @param aggregationStateType     row type info of aggregation
+ */
 class ProcTimeUnboundedOver[K](
     genAggregations: GeneratedAggregationsFunction,
     aggregationStateType: RowTypeInfo,
     minRetentionTime: Long,
     maxRetentionTime: Long)
-  extends ProcessFunctionWithCleanupState[K, CRow, CRow](minRetentionTime, maxRetentionTime)
+    extends ProcessFunctionWithCleanupState[K, CRow, CRow](minRetentionTime, maxRetentionTime)
     with Compiler[GeneratedAggregations]
     with Logging {
 
@@ -48,12 +48,11 @@ class ProcTimeUnboundedOver[K](
   private var function: GeneratedAggregations = _
 
   override def open(config: Configuration) {
-    LOG.debug(s"Compiling AggregateHelper: ${genAggregations.name} \n\n" +
-                s"Code:\n${genAggregations.code}")
-    val clazz = compile(
-      getRuntimeContext.getUserCodeClassLoader,
-      genAggregations.name,
-      genAggregations.code)
+    LOG.debug(
+      s"Compiling AggregateHelper: ${genAggregations.name} \n\n" +
+        s"Code:\n${genAggregations.code}")
+    val clazz =
+      compile(getRuntimeContext.getUserCodeClassLoader, genAggregations.name, genAggregations.code)
     LOG.debug("Instantiating AggregateHelper.")
     function = clazz.newInstance()
     function.open(getRuntimeContext)
@@ -67,9 +66,9 @@ class ProcTimeUnboundedOver[K](
   }
 
   override def processElement(
-    inputC: CRow,
-    ctx: KeyedProcessFunction[K, CRow, CRow]#Context,
-    out: Collector[CRow]): Unit = {
+      inputC: CRow,
+      ctx: KeyedProcessFunction[K, CRow, CRow]#Context,
+      out: Collector[CRow]): Unit = {
 
     // register state-cleanup timer
     processCleanupTimer(ctx, ctx.timerService().currentProcessingTime())
@@ -92,16 +91,16 @@ class ProcTimeUnboundedOver[K](
   }
 
   override def onTimer(
-    timestamp: Long,
-    ctx: KeyedProcessFunction[K, CRow, CRow]#OnTimerContext,
-    out: Collector[CRow]): Unit = {
+      timestamp: Long,
+      ctx: KeyedProcessFunction[K, CRow, CRow]#OnTimerContext,
+      out: Collector[CRow]): Unit = {
 
     if (stateCleaningEnabled) {
       cleanupState(state)
       function.cleanup()
     }
   }
-  
+
   override def close(): Unit = {
     if (function != null) {
       function.close()

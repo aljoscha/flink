@@ -24,7 +24,10 @@ import org.apache.flink.api.java.typeutils.RowTypeInfo
 import org.apache.flink.table.api.{TableSchema, Types}
 import org.apache.flink.table.planner.runtime.utils.BatchTestBase
 import org.apache.flink.table.planner.runtime.utils.BatchTestBase.row
-import org.apache.flink.table.planner.utils.{TestTableSourceWithTime, WithoutTimeAttributesTableSource}
+import org.apache.flink.table.planner.utils.{
+  TestTableSourceWithTime,
+  WithoutTimeAttributesTableSource
+}
 import org.apache.flink.table.runtime.functions.SqlDateTimeUtils.unixTimestampToLocalDateTime
 import org.junit.Test
 import java.lang.{Integer => JInt}
@@ -37,12 +40,7 @@ class TableScanITCase extends BatchTestBase {
   def testTableSourceWithoutTimeAttribute(): Unit = {
     val tableName = "MyTable"
     WithoutTimeAttributesTableSource.createTemporaryTable(tEnv, tableName)
-    checkResult(
-      s"SELECT * from $tableName",
-      Seq(
-        row("Mary", 1L, 1),
-        row("Bob", 2L, 3))
-    )
+    checkResult(s"SELECT * from $tableName", Seq(row("Mary", 1L, 1), row("Bob", 2L, 3)))
   }
 
   @Test
@@ -57,12 +55,7 @@ class TableScanITCase extends BatchTestBase {
 
     checkResult(
       s"SELECT name FROM $tableName",
-      Seq(
-        row("Mary"),
-        row("Peter"),
-        row("Bob"),
-        row("Liz"))
-    )
+      Seq(row("Mary"), row("Peter"), row("Bob"), row("Liz")))
   }
 
   @Test
@@ -89,8 +82,7 @@ class TableScanITCase extends BatchTestBase {
         row("Mary", unixTimestampToLocalDateTime(1L), new JInt(10)),
         row("Mary", unixTimestampToLocalDateTime(2L), new JInt(30)),
         row("Bob", unixTimestampToLocalDateTime(2L), new JInt(20)),
-        row("Liz", unixTimestampToLocalDateTime(2001L), new JInt(40)))
-    )
+        row("Liz", unixTimestampToLocalDateTime(2001L), new JInt(40))))
   }
 
 }

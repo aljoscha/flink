@@ -22,7 +22,12 @@ import java.util
 
 import org.apache.flink.api.common.accumulators.IntCounter
 import org.apache.flink.api.common.functions.RichFlatMapFunction
-import org.apache.flink.api.common.state.{ListState, ListStateDescriptor, ValueState, ValueStateDescriptor}
+import org.apache.flink.api.common.state.{
+  ListState,
+  ListStateDescriptor,
+  ValueState,
+  ValueStateDescriptor
+}
 import org.apache.flink.api.java.functions.KeySelector
 import org.apache.flink.configuration.Configuration
 import org.apache.flink.runtime.state.memory.MemoryStateBackend
@@ -35,7 +40,11 @@ import org.apache.flink.streaming.api.watermark.Watermark
 import org.apache.flink.test.checkpointing.utils.SavepointMigrationTestBase
 import org.apache.flink.util.Collector
 import org.apache.flink.api.java.tuple.Tuple2
-import org.apache.flink.runtime.state.{FunctionInitializationContext, FunctionSnapshotContext, StateBackendLoader}
+import org.apache.flink.runtime.state.{
+  FunctionInitializationContext,
+  FunctionSnapshotContext,
+  StateBackendLoader
+}
 import org.apache.flink.api.scala._
 import org.apache.flink.api.scala.migration.CustomEnum.CustomEnum
 import org.apache.flink.contrib.streaming.state.RocksDBStateBackend
@@ -83,9 +92,9 @@ object StatefulJobSavepointMigrationITCase {
  * ITCase for migration Scala state types across different Flink versions.
  */
 @RunWith(classOf[Parameterized])
-class StatefulJobSavepointMigrationITCase(
-    migrationVersionAndBackend: (MigrationVersion, String))
-  extends SavepointMigrationTestBase with Serializable {
+class StatefulJobSavepointMigrationITCase(migrationVersionAndBackend: (MigrationVersion, String))
+    extends SavepointMigrationTestBase
+    with Serializable {
 
   @Ignore
   @Test
@@ -107,13 +116,12 @@ class StatefulJobSavepointMigrationITCase(
     env.setMaxParallelism(4)
 
     env
-      .addSource(
-        new CheckpointedSource(4)).setMaxParallelism(1).uid("checkpointedSource")
-      .keyBy(
-        new KeySelector[(Long, Long), Long] {
-          override def getKey(value: (Long, Long)): Long = value._1
-        }
-      )
+      .addSource(new CheckpointedSource(4))
+      .setMaxParallelism(1)
+      .uid("checkpointedSource")
+      .keyBy(new KeySelector[(Long, Long), Long] {
+        override def getKey(value: (Long, Long)): Long = value._1
+      })
       .flatMap(new StatefulFlatMapper)
       .addSink(new AccumulatorCountingSink)
 
@@ -124,9 +132,7 @@ class StatefulJobSavepointMigrationITCase(
         s"-${StatefulJobSavepointMigrationITCase.GENERATE_SAVEPOINT_BACKEND_TYPE}-savepoint",
       new Tuple2(
         AccumulatorCountingSink.NUM_ELEMENTS_ACCUMULATOR,
-        StatefulJobSavepointMigrationITCase.NUM_ELEMENTS
-      )
-    )
+        StatefulJobSavepointMigrationITCase.NUM_ELEMENTS))
   }
 
   @Test
@@ -148,13 +154,12 @@ class StatefulJobSavepointMigrationITCase(
     env.setMaxParallelism(4)
 
     env
-      .addSource(
-        new CheckpointedSource(4)).setMaxParallelism(1).uid("checkpointedSource")
-      .keyBy(
-        new KeySelector[(Long, Long), Long] {
-          override def getKey(value: (Long, Long)): Long = value._1
-        }
-      )
+      .addSource(new CheckpointedSource(4))
+      .setMaxParallelism(1)
+      .uid("checkpointedSource")
+      .keyBy(new KeySelector[(Long, Long), Long] {
+        override def getKey(value: (Long, Long)): Long = value._1
+      })
       .flatMap(new StatefulFlatMapper)
       .addSink(new AccumulatorCountingSink)
 
@@ -166,8 +171,7 @@ class StatefulJobSavepointMigrationITCase(
           s"-${migrationVersionAndBackend._2}-savepoint"),
       new Tuple2(
         AccumulatorCountingSink.NUM_ELEMENTS_ACCUMULATOR,
-        StatefulJobSavepointMigrationITCase.NUM_ELEMENTS)
-    )
+        StatefulJobSavepointMigrationITCase.NUM_ELEMENTS))
   }
 
   @SerialVersionUID(1L)
@@ -177,7 +181,8 @@ class StatefulJobSavepointMigrationITCase(
 
   @SerialVersionUID(1L)
   private class CheckpointedSource(val numElements: Int)
-      extends SourceFunction[(Long, Long)] with CheckpointedFunction {
+      extends SourceFunction[(Long, Long)]
+      with CheckpointedFunction {
 
     private var isRunning = true
     private var state: ListState[CustomCaseClass] = _
@@ -188,8 +193,8 @@ class StatefulJobSavepointMigrationITCase(
       ctx.getCheckpointLock synchronized {
         var i = 0
         while (i < numElements) {
-            ctx.collect(i, i)
-            i += 1
+          ctx.collect(i, i)
+          i += 1
         }
       }
       // don't emit a final watermark so that we don't trigger the registered event-time
@@ -204,7 +209,8 @@ class StatefulJobSavepointMigrationITCase(
     override def initializeState(context: FunctionInitializationContext): Unit = {
       state = context.getOperatorStateStore.getListState(
         new ListStateDescriptor[CustomCaseClass](
-          "sourceState", createTypeInformation[CustomCaseClass]))
+          "sourceState",
+          createTypeInformation[CustomCaseClass]))
     }
 
     override def snapshotState(context: FunctionSnapshotContext): Unit = {
@@ -227,14 +233,14 @@ class StatefulJobSavepointMigrationITCase(
     override def open(parameters: Configuration) {
       super.open(parameters)
       getRuntimeContext.addAccumulator(
-        AccumulatorCountingSink.NUM_ELEMENTS_ACCUMULATOR, new IntCounter)
+        AccumulatorCountingSink.NUM_ELEMENTS_ACCUMULATOR,
+        new IntCounter)
     }
 
     @throws[Exception]
     override def invoke(value: T) {
       count += 1
-      getRuntimeContext.getAccumulator(
-        AccumulatorCountingSink.NUM_ELEMENTS_ACCUMULATOR).add(1)
+      getRuntimeContext.getAccumulator(AccumulatorCountingSink.NUM_ELEMENTS_ACCUMULATOR).add(1)
     }
   }
 
@@ -255,37 +261,44 @@ class StatefulJobSavepointMigrationITCase(
     override def open(parameters: Configuration): Unit = {
       caseClassState = getRuntimeContext.getState(
         new ValueStateDescriptor[CustomCaseClass](
-          "caseClassState", createTypeInformation[CustomCaseClass]))
+          "caseClassState",
+          createTypeInformation[CustomCaseClass]))
       caseClassWithNestingState = getRuntimeContext.getState(
         new ValueStateDescriptor[CustomCaseClassWithNesting](
-          "caseClassWithNestingState", createTypeInformation[CustomCaseClassWithNesting]))
+          "caseClassWithNestingState",
+          createTypeInformation[CustomCaseClassWithNesting]))
       collectionState = getRuntimeContext.getState(
         new ValueStateDescriptor[List[CustomCaseClass]](
-          "collectionState", createTypeInformation[List[CustomCaseClass]]))
+          "collectionState",
+          createTypeInformation[List[CustomCaseClass]]))
       tryState = getRuntimeContext.getState(
         new ValueStateDescriptor[Try[CustomCaseClass]](
-          "tryState", createTypeInformation[Try[CustomCaseClass]]))
+          "tryState",
+          createTypeInformation[Try[CustomCaseClass]]))
       tryFailureState = getRuntimeContext.getState(
         new ValueStateDescriptor[Try[CustomCaseClass]](
-          "tryFailureState", createTypeInformation[Try[CustomCaseClass]]))
+          "tryFailureState",
+          createTypeInformation[Try[CustomCaseClass]]))
       optionState = getRuntimeContext.getState(
         new ValueStateDescriptor[Option[CustomCaseClass]](
-          "optionState", createTypeInformation[Option[CustomCaseClass]]))
+          "optionState",
+          createTypeInformation[Option[CustomCaseClass]]))
       optionNoneState = getRuntimeContext.getState(
         new ValueStateDescriptor[Option[CustomCaseClass]](
-          "optionNoneState", createTypeInformation[Option[CustomCaseClass]]))
+          "optionNoneState",
+          createTypeInformation[Option[CustomCaseClass]]))
       eitherLeftState = getRuntimeContext.getState(
         new ValueStateDescriptor[Either[CustomCaseClass, String]](
-          "eitherLeftState", createTypeInformation[Either[CustomCaseClass, String]]))
+          "eitherLeftState",
+          createTypeInformation[Either[CustomCaseClass, String]]))
       eitherRightState = getRuntimeContext.getState(
         new ValueStateDescriptor[Either[CustomCaseClass, String]](
-          "eitherRightState", createTypeInformation[Either[CustomCaseClass, String]]))
+          "eitherRightState",
+          createTypeInformation[Either[CustomCaseClass, String]]))
       enumOneState = getRuntimeContext.getState(
-        new ValueStateDescriptor[CustomEnum](
-          "enumOneState", createTypeInformation[CustomEnum]))
+        new ValueStateDescriptor[CustomEnum]("enumOneState", createTypeInformation[CustomEnum]))
       enumThreeState = getRuntimeContext.getState(
-        new ValueStateDescriptor[CustomEnum](
-          "enumThreeState", createTypeInformation[CustomEnum]))
+        new ValueStateDescriptor[CustomEnum]("enumThreeState", createTypeInformation[CustomEnum]))
     }
 
     override def flatMap(in: (Long, Long), collector: Collector[(Long, Long)]): Unit = {

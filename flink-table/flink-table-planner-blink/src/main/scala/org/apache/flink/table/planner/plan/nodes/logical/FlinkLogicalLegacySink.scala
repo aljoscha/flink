@@ -32,9 +32,9 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
-  * Sub-class of [[LegacySink]] that is a relational expression
-  * which writes out data of input node into a [[TableSink]].
-  */
+ * Sub-class of [[LegacySink]] that is a relational expression
+ * which writes out data of input node into a [[TableSink]].
+ */
 class FlinkLogicalLegacySink(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -43,22 +43,28 @@ class FlinkLogicalLegacySink(
     sinkName: String,
     val catalogTable: CatalogTable,
     val staticPartitions: Map[String, String])
-  extends LegacySink(cluster, traitSet, input, sink, sinkName)
-          with FlinkLogicalRel {
+    extends LegacySink(cluster, traitSet, input, sink, sinkName)
+    with FlinkLogicalRel {
 
   override def copy(traitSet: RelTraitSet, inputs: util.List[RelNode]): RelNode = {
     new FlinkLogicalLegacySink(
-      cluster, traitSet, inputs.head, sink, sinkName, catalogTable, staticPartitions)
+      cluster,
+      traitSet,
+      inputs.head,
+      sink,
+      sinkName,
+      catalogTable,
+      staticPartitions)
   }
 
 }
 
 private class FlinkLogicalLegacySinkConverter
-  extends ConverterRule(
-    classOf[LogicalLegacySink],
-    Convention.NONE,
-    FlinkConventions.LOGICAL,
-    "FlinkLogicalLegacySinkConverter") {
+    extends ConverterRule(
+      classOf[LogicalLegacySink],
+      Convention.NONE,
+      FlinkConventions.LOGICAL,
+      "FlinkLogicalLegacySinkConverter") {
 
   override def convert(rel: RelNode): RelNode = {
     val sink = rel.asInstanceOf[LogicalLegacySink]
@@ -84,6 +90,12 @@ object FlinkLogicalLegacySink {
     val cluster = input.getCluster
     val traitSet = cluster.traitSetOf(FlinkConventions.LOGICAL).simplify()
     new FlinkLogicalLegacySink(
-      cluster, traitSet, input, sink, sinkName, catalogTable, staticPartitions)
+      cluster,
+      traitSet,
+      input,
+      sink,
+      sinkName,
+      catalogTable,
+      staticPartitions)
   }
 }

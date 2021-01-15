@@ -41,22 +41,12 @@ class JoinTest extends TableTestBase {
       "DataSetCalc",
       binaryNode(
         "DataSetJoin",
-        unaryNode(
-          "DataSetCalc",
-          batchTableNode(t),
-          term("select", "a", "b")
-        ),
-        unaryNode(
-          "DataSetCalc",
-          batchTableNode(s),
-          term("select", "y", "z")
-        ),
+        unaryNode("DataSetCalc", batchTableNode(t), term("select", "a", "b")),
+        unaryNode("DataSetCalc", batchTableNode(s), term("select", "y", "z")),
         term("where", "=(a, z)"),
         term("join", "a", "b", "y", "z"),
-        term("joinType", "LeftOuterJoin")
-      ),
-      term("select", "b", "y")
-    )
+        term("joinType", "LeftOuterJoin")),
+      term("select", "b", "y"))
 
     util.verifyTable(joined, expected)
   }
@@ -73,22 +63,12 @@ class JoinTest extends TableTestBase {
       "DataSetCalc",
       binaryNode(
         "DataSetJoin",
-        unaryNode(
-          "DataSetCalc",
-          batchTableNode(t),
-          term("select", "a", "b")
-        ),
-        unaryNode(
-          "DataSetCalc",
-          batchTableNode(s),
-          term("select", "y", "z")
-        ),
+        unaryNode("DataSetCalc", batchTableNode(t), term("select", "a", "b")),
+        unaryNode("DataSetCalc", batchTableNode(s), term("select", "y", "z")),
         term("where", "AND(=(a, z), <(b, 2))"),
         term("join", "a", "b", "y", "z"),
-        term("joinType", "LeftOuterJoin")
-      ),
-      term("select", "b", "y")
-    )
+        term("joinType", "LeftOuterJoin")),
+      term("select", "b", "y"))
 
     util.verifyTable(joined, expected)
   }
@@ -105,18 +85,12 @@ class JoinTest extends TableTestBase {
       "DataSetCalc",
       binaryNode(
         "DataSetJoin",
-        unaryNode(
-          "DataSetCalc",
-          batchTableNode(t),
-          term("select", "a", "b")
-        ),
+        unaryNode("DataSetCalc", batchTableNode(t), term("select", "a", "b")),
         batchTableNode(s),
         term("where", "AND(=(a, z), <(b, x))"),
         term("join", "a", "b", "x", "y", "z"),
-        term("joinType", "LeftOuterJoin")
-      ),
-      term("select", "b", "y")
-    )
+        term("joinType", "LeftOuterJoin")),
+      term("select", "b", "y"))
 
     util.verifyTable(joined, expected)
   }
@@ -133,22 +107,12 @@ class JoinTest extends TableTestBase {
       "DataSetCalc",
       binaryNode(
         "DataSetJoin",
-        unaryNode(
-          "DataSetCalc",
-          batchTableNode(t),
-          term("select", "a", "b")
-        ),
-        unaryNode(
-          "DataSetCalc",
-          batchTableNode(s),
-          term("select", "y", "z")
-        ),
+        unaryNode("DataSetCalc", batchTableNode(t), term("select", "a", "b")),
+        unaryNode("DataSetCalc", batchTableNode(s), term("select", "y", "z")),
         term("where", "=(a, z)"),
         term("join", "a", "b", "y", "z"),
-        term("joinType", "RightOuterJoin")
-      ),
-      term("select", "b", "y")
-    )
+        term("joinType", "RightOuterJoin")),
+      term("select", "b", "y"))
 
     util.verifyTable(joined, expected)
   }
@@ -165,22 +129,12 @@ class JoinTest extends TableTestBase {
       "DataSetCalc",
       binaryNode(
         "DataSetJoin",
-        unaryNode(
-          "DataSetCalc",
-          batchTableNode(t),
-          term("select", "a", "b")
-        ),
-        unaryNode(
-          "DataSetCalc",
-          batchTableNode(s),
-          term("select", "x", "z")
-        ),
+        unaryNode("DataSetCalc", batchTableNode(t), term("select", "a", "b")),
+        unaryNode("DataSetCalc", batchTableNode(s), term("select", "x", "z")),
         term("where", "AND(=(a, z), <(x, 2))"),
         term("join", "a", "b", "x", "z"),
-        term("joinType", "RightOuterJoin")
-      ),
-      term("select", "b", "x")
-    )
+        term("joinType", "RightOuterJoin")),
+      term("select", "b", "x"))
 
     util.verifyTable(joined, expected)
   }
@@ -197,18 +151,12 @@ class JoinTest extends TableTestBase {
       "DataSetCalc",
       binaryNode(
         "DataSetJoin",
-        unaryNode(
-          "DataSetCalc",
-          batchTableNode(t),
-          term("select", "a", "b")
-        ),
+        unaryNode("DataSetCalc", batchTableNode(t), term("select", "a", "b")),
         batchTableNode(s),
         term("where", "AND(=(a, z), <(b, x))"),
         term("join", "a", "b", "x", "y", "z"),
-        term("joinType", "RightOuterJoin")
-      ),
-      term("select", "b", "y")
-    )
+        term("joinType", "RightOuterJoin")),
+      term("select", "b", "y"))
 
     util.verifyTable(joined, expected)
   }
@@ -225,22 +173,12 @@ class JoinTest extends TableTestBase {
       "DataSetCalc",
       binaryNode(
         "DataSetJoin",
-        unaryNode(
-          "DataSetCalc",
-          batchTableNode(t),
-          term("select", "a", "b")
-        ),
-        unaryNode(
-          "DataSetCalc",
-          batchTableNode(s),
-          term("select", "y", "z")
-        ),
+        unaryNode("DataSetCalc", batchTableNode(t), term("select", "a", "b")),
+        unaryNode("DataSetCalc", batchTableNode(s), term("select", "y", "z")),
         term("where", "=(a, z)"),
         term("join", "a", "b", "y", "z"),
-        term("joinType", "FullOuterJoin")
-      ),
-      term("select", "b", "y")
-    )
+        term("joinType", "FullOuterJoin")),
+      term("select", "b", "y"))
 
     util.verifyTable(joined, expected)
   }
@@ -257,22 +195,12 @@ class JoinTest extends TableTestBase {
       "DataSetCalc",
       binaryNode(
         "DataSetJoin",
-        unaryNode(
-          "DataSetCalc",
-          batchTableNode(t),
-          term("select", "a", "b")
-        ),
-        unaryNode(
-          "DataSetCalc",
-          batchTableNode(s),
-          term("select", "y", "z")
-        ),
+        unaryNode("DataSetCalc", batchTableNode(t), term("select", "a", "b")),
+        unaryNode("DataSetCalc", batchTableNode(s), term("select", "y", "z")),
         term("where", "AND(=(a, z), <(b, 2))"),
         term("join", "a", "b", "y", "z"),
-        term("joinType", "FullOuterJoin")
-      ),
-      term("select", "b", "y")
-    )
+        term("joinType", "FullOuterJoin")),
+      term("select", "b", "y"))
 
     util.verifyTable(joined, expected)
   }
@@ -289,18 +217,12 @@ class JoinTest extends TableTestBase {
       "DataSetCalc",
       binaryNode(
         "DataSetJoin",
-        unaryNode(
-          "DataSetCalc",
-          batchTableNode(t),
-          term("select", "a", "b")
-        ),
+        unaryNode("DataSetCalc", batchTableNode(t), term("select", "a", "b")),
         batchTableNode(s),
         term("where", "AND(=(a, z), <(b, x))"),
         term("join", "a", "b", "x", "y", "z"),
-        term("joinType", "FullOuterJoin")
-      ),
-      term("select", "b", "y")
-    )
+        term("joinType", "FullOuterJoin")),
+      term("select", "b", "y"))
 
     util.verifyTable(joined, expected)
   }
@@ -320,23 +242,13 @@ class JoinTest extends TableTestBase {
       "DataSetCalc",
       binaryNode(
         "DataSetJoin",
-        unaryNode(
-          "DataSetCalc",
-          batchTableNode(t1),
-          term("select", "b", "c")
-        ),
-        unaryNode(
-          "DataSetCalc",
-          batchTableNode(t2),
-          term("select", "e", "f")
-        ),
+        unaryNode("DataSetCalc", batchTableNode(t1), term("select", "b", "c")),
+        unaryNode("DataSetCalc", batchTableNode(t2), term("select", "e", "f")),
         term("where", "=(b, e)"),
         term("join", "b", "c", "e", "f"),
-        term("joinType", "LeftOuterJoin")
-      ),
+        term("joinType", "LeftOuterJoin")),
       term("select", "Merger$(c, Merger$(c, f)) AS c1"),
-      term("where", ">=(Merger$(c, Merger$(c, f)), 0)")
-    )
+      term("where", ">=(Merger$(c, Merger$(c, f)), 0)"))
 
     util.verifyTable(results, expected)
   }

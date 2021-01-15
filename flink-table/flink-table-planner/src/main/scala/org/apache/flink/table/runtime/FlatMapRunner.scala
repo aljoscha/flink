@@ -28,14 +28,11 @@ import org.apache.flink.table.util.Logging
 import org.apache.flink.types.Row
 import org.apache.flink.util.Collector
 
-class FlatMapRunner(
-    name: String,
-    code: String,
-    @transient var returnType: TypeInformation[Row])
-  extends RichFlatMapFunction[Row, Row]
-  with ResultTypeQueryable[Row]
-  with Compiler[FlatMapFunction[Row, Row]]
-  with Logging {
+class FlatMapRunner(name: String, code: String, @transient var returnType: TypeInformation[Row])
+    extends RichFlatMapFunction[Row, Row]
+    with ResultTypeQueryable[Row]
+    with Compiler[FlatMapFunction[Row, Row]]
+    with Logging {
 
   private var function: FlatMapFunction[Row, Row] = _
 

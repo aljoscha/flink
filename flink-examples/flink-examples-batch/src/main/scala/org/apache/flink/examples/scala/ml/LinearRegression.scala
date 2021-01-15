@@ -71,22 +71,23 @@ object LinearRegression {
     // make parameters available in the web interface
     env.getConfig.setGlobalJobParameters(params)
 
-    val parameters = env.fromCollection(LinearRegressionData.PARAMS map {
-      case Array(x, y) => Params(x.asInstanceOf[Double], y.asInstanceOf[Double])
+    val parameters = env.fromCollection(LinearRegressionData.PARAMS map { case Array(x, y) =>
+      Params(x.asInstanceOf[Double], y.asInstanceOf[Double])
     })
 
     val data =
       if (params.has("input")) {
-        env.readCsvFile[(Double, Double)](
-          params.get("input"),
-          fieldDelimiter = " ",
-          includedFields = Array(0, 1))
+        env
+          .readCsvFile[(Double, Double)](
+            params.get("input"),
+            fieldDelimiter = " ",
+            includedFields = Array(0, 1))
           .map { t => new Data(t._1, t._2) }
       } else {
         println("Executing LinearRegression example with default input data set.")
         println("Use --input to specify file input.")
-        val data = LinearRegressionData.DATA map {
-          case Array(x, y) => Data(x.asInstanceOf[Double], y.asInstanceOf[Double])
+        val data = LinearRegressionData.DATA map { case Array(x, y) =>
+          Data(x.asInstanceOf[Double], y.asInstanceOf[Double])
         }
         env.fromCollection(data)
       }
@@ -95,7 +96,8 @@ object LinearRegression {
 
     val result = parameters.iterate(numIterations) { currentParameters =>
       val newParameters = data
-        .map(new SubUpdate).withBroadcastSet(currentParameters, "parameters")
+        .map(new SubUpdate)
+        .withBroadcastSet(currentParameters, "parameters")
         .reduce { (p1, p2) =>
           val result = p1._1 + p2._1
           (result, p1._2 + p2._2)
@@ -126,7 +128,7 @@ object LinearRegression {
       Params(theta0 / a, theta1 / a)
     }
 
-    def + (other: Params) = {
+    def +(other: Params) = {
       Params(theta0 + other.theta0, theta1 + other.theta1)
     }
   }

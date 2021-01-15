@@ -22,7 +22,11 @@ import org.apache.flink.api.scala._
 import org.apache.flink.table.api.Expressions.$
 import org.apache.flink.table.api._
 import org.apache.flink.table.api.bridge.scala._
-import org.apache.flink.table.planner.plan.utils.JavaUserDefinedAggFunctions.{CountDistinct, CountDistinctWithRetractAndReset, WeightedAvg}
+import org.apache.flink.table.planner.plan.utils.JavaUserDefinedAggFunctions.{
+  CountDistinct,
+  CountDistinctWithRetractAndReset,
+  WeightedAvg
+}
 import org.apache.flink.table.planner.runtime.utils.JavaUserDefinedScalarFunctions.JavaFunc0
 import org.apache.flink.table.planner.runtime.utils.StreamingWithStateTestBase.StateBackendMode
 import org.apache.flink.table.planner.runtime.utils.TimeTestUtil.EventTimeProcessOperator
@@ -69,10 +73,10 @@ class OverAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTest
     val weightAvgFun = new WeightedAvg
     val countDist = new CountDistinct
 
-    val windowedTable = table//.select('a, 'b, 'c, proctime() as 'proctime)
-      .window(
-      Over partitionBy 'c orderBy 'proctime preceding UNBOUNDED_ROW as 'w)
-      .select('c,
+    val windowedTable = table //.select('a, 'b, 'c, proctime() as 'proctime)
+      .window(Over partitionBy 'c orderBy 'proctime preceding UNBOUNDED_ROW as 'w)
+      .select(
+        'c,
         countFun('b) over 'w as 'mycount,
         call(weightAvgFun, 'a, 'b) over 'w as 'wAvg,
         countDist('a) over 'w as 'countDist)
@@ -83,8 +87,16 @@ class OverAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTest
     env.execute()
 
     val expected = Seq(
-      "Hello World,1,7,1", "Hello World,2,7,2", "Hello World,3,7,2", "Hello World,4,13,3",
-      "Hello,1,1,1", "Hello,2,1,2", "Hello,3,2,3", "Hello,4,3,4", "Hello,5,3,5", "Hello,6,4,6",
+      "Hello World,1,7,1",
+      "Hello World,2,7,2",
+      "Hello World,3,7,2",
+      "Hello World,4,13,3",
+      "Hello,1,1,1",
+      "Hello,2,1,2",
+      "Hello,3,2,3",
+      "Hello,4,3,4",
+      "Hello,5,3,5",
+      "Hello,6,4,6",
       "null,1,20,1")
     assertEquals(expected.sorted, sink.getAppendResults.sorted)
   }
@@ -109,8 +121,7 @@ class OverAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTest
     val weightAvgFun = new WeightedAvg
 
     val windowedTable = table
-      .window(
-        Over partitionBy 'c orderBy 'proctime preceding UNBOUNDED_ROW as 'w)
+      .window(Over partitionBy 'c orderBy 'proctime preceding UNBOUNDED_ROW as 'w)
       .select('c, weightAvgFun('a, 42, 'b, "2") over 'w as 'wAvg)
 
     val sink = new TestingAppendSink
@@ -118,8 +129,16 @@ class OverAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTest
     env.execute()
 
     val expected = Seq(
-      "Hello World,12", "Hello World,9", "Hello World,9", "Hello World,9", "Hello,3",
-      "Hello,3", "Hello,4", "Hello,4", "Hello,5", "Hello,5")
+      "Hello World,12",
+      "Hello World,9",
+      "Hello World,9",
+      "Hello World,9",
+      "Hello,3",
+      "Hello,3",
+      "Hello,4",
+      "Hello,4",
+      "Hello,5",
+      "Hello,5")
     assertEquals(expected.sorted, sink.getAppendResults.sorted)
   }
 
@@ -140,11 +159,11 @@ class OverAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTest
       Left(14000022L, (1, 7L, "Hello world")),
       Left(14000023L, (2, 4L, "Hello world")),
       Left(14000023L, (2, 5L, "Hello world")),
-      Right(14000030L)
-    )
+      Right(14000030L))
 
     val source = failingDataSource(data)
-    val table = source.transform("TimeAssigner", new EventTimeProcessOperator[(Int, Long, String)])
+    val table = source
+      .transform("TimeAssigner", new EventTimeProcessOperator[(Int, Long, String)])
       .setParallelism(source.parallelism)
       .toTable(tEnv, 'a, 'b, 'c, 'rowtime.rowtime)
     val countFun = new CountAggFunction
@@ -153,10 +172,13 @@ class OverAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTest
     val countDist = new CountDistinct
 
     val windowedTable = table
-      .window(Over partitionBy 'a orderBy 'rowtime preceding UNBOUNDED_RANGE following
-        CURRENT_RANGE as 'w)
+      .window(
+        Over partitionBy 'a orderBy 'rowtime preceding UNBOUNDED_RANGE following
+          CURRENT_RANGE as 'w)
       .select(
-        'a, 'b, 'c,
+        'a,
+        'b,
+        'c,
         'b.sum over 'w,
         "SUM:".toExpr + ('b.sum over 'w),
         countFun('b) over 'w,
@@ -187,8 +209,7 @@ class OverAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTest
       "1,6,Hello world,29,SUM:29,8,9,9,[3, 7],3,7,1,1,3,3",
       "1,7,Hello world,29,SUM:29,8,9,9,[3, 7],3,7,1,1,3,3",
       "2,4,Hello world,15,SUM:15,5,6,6,[3, 5],3,5,1,1,3,2",
-      "2,5,Hello world,15,SUM:15,5,6,6,[3, 5],3,5,1,1,3,2"
-    )
+      "2,5,Hello world,15,SUM:15,5,6,6,[3, 5],3,5,1,1,3,2")
 
     assertEquals(expected.sorted, sink.getAppendResults.sorted)
   }
@@ -217,7 +238,8 @@ class OverAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTest
     val stream = failingDataSource(data)
     val table = stream.toTable(tEnv, 'a, 'b, 'c, 'd, 'e, 'proctime.proctime)
 
-    val windowedTable = table.select('a, 'b, 'c, 'd, 'e, 'proctime)
+    val windowedTable = table
+      .select('a, 'b, 'c, 'd, 'e, 'proctime)
       .window(Over partitionBy 'a orderBy 'proctime preceding 4.rows following CURRENT_ROW as 'w)
       .select('a, 'c.sum over 'w, 'c.min over 'w, countDist('e) over 'w)
 
@@ -269,13 +291,15 @@ class OverAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTest
     val stream = failingDataSource(data)
     val table = stream.toTable(tEnv, 'a, 'b, 'c, 'd, 'e, 'proctime.proctime)
 
-    val windowedTable = table.select($"a", $"b", $"c", $"d", $"e", $"proctime")
-      .window(Over
-        .partitionBy($("a"))
-        .orderBy($("proctime"))
-        .preceding(Expressions.rowInterval(4L))
-        .following(Expressions.CURRENT_ROW)
-        .as("w"))
+    val windowedTable = table
+      .select($"a", $"b", $"c", $"d", $"e", $"proctime")
+      .window(
+        Over
+          .partitionBy($("a"))
+          .orderBy($("proctime"))
+          .preceding(Expressions.rowInterval(4L))
+          .following(Expressions.CURRENT_ROW)
+          .as("w"))
       .select('a, 'c.sum over 'w, 'c.min over 'w, countDist('e) over 'w)
 
     val sink = new TestingAppendSink
@@ -327,7 +351,8 @@ class OverAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTest
 
     val countDist = new CountDistinctWithRetractAndReset
     val source = failingDataSource(data)
-    val table = source.transform("TimeAssigner", new EventTimeProcessOperator[(Long, Int, String)])
+    val table = source
+      .transform("TimeAssigner", new EventTimeProcessOperator[(Long, Int, String)])
       .setParallelism(source.parallelism)
       .toTable(tEnv, 'a, 'b, 'c, 'rowtime.rowtime)
 
@@ -340,12 +365,22 @@ class OverAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTest
     env.execute()
 
     val expected = mutable.MutableList(
-      "Hello,1,1,1,1", "Hello,1,2,2,1", "Hello,1,3,3,1",
-      "Hello,2,3,4,2", "Hello,2,3,5,2", "Hello,2,3,6,1",
-      "Hello,3,3,7,2", "Hello,4,3,9,3", "Hello,5,3,12,3",
+      "Hello,1,1,1,1",
+      "Hello,1,2,2,1",
+      "Hello,1,3,3,1",
+      "Hello,2,3,4,2",
+      "Hello,2,3,5,2",
+      "Hello,2,3,6,1",
+      "Hello,3,3,7,2",
+      "Hello,4,3,9,3",
+      "Hello,5,3,12,3",
       "Hello,6,3,15,3",
-      "Hello World,7,1,7,1", "Hello World,7,2,14,1", "Hello World,7,3,21,1",
-      "Hello World,7,3,21,1", "Hello World,8,3,22,2", "Hello World,20,3,35,3")
+      "Hello World,7,1,7,1",
+      "Hello World,7,2,14,1",
+      "Hello World,7,3,21,1",
+      "Hello World,7,3,21,1",
+      "Hello World,8,3,22,2",
+      "Hello World,20,3,35,3")
 
     assertEquals(expected.sorted, sink.getAppendResults.sorted)
   }
@@ -386,7 +421,8 @@ class OverAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTest
 
     val countDist = new CountDistinctWithRetractAndReset
     val source = failingDataSource(data)
-    val table = source.transform("TimeAssigner", new EventTimeProcessOperator[(Long, Int, String)])
+    val table = source
+      .transform("TimeAssigner", new EventTimeProcessOperator[(Long, Int, String)])
       .setParallelism(source.parallelism)
       .toTable(tEnv, 'a, 'b, 'c, 'rowtime.rowtime)
 
@@ -400,15 +436,24 @@ class OverAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTest
     env.execute()
 
     val expected = mutable.MutableList(
-      "Hello,1,1,1,1", "Hello,15,2,2,1", "Hello,16,3,3,1",
-      "Hello,2,6,9,2", "Hello,3,6,9,2", "Hello,2,6,9,2",
+      "Hello,1,1,1,1",
+      "Hello,15,2,2,1",
+      "Hello,16,3,3,1",
+      "Hello,2,6,9,2",
+      "Hello,3,6,9,2",
+      "Hello,2,6,9,2",
       "Hello,3,4,9,2",
       "Hello,4,2,7,2",
       "Hello,5,2,9,2",
-      "Hello,6,2,11,2", "Hello,65,2,12,1",
-      "Hello,9,2,12,1", "Hello,9,2,12,1", "Hello,18,3,18,1",
-      "Hello World,7,1,7,1", "Hello World,17,3,21,1",
-      "Hello World,77,3,21,1", "Hello World,18,1,7,1",
+      "Hello,6,2,11,2",
+      "Hello,65,2,12,1",
+      "Hello,9,2,12,1",
+      "Hello,9,2,12,1",
+      "Hello,18,3,18,1",
+      "Hello World,7,1,7,1",
+      "Hello World,17,3,21,1",
+      "Hello World,77,3,21,1",
+      "Hello World,18,1,7,1",
       "Hello World,8,2,15,2",
       "Hello World,20,1,20,1")
     assertEquals(expected.sorted, sink.getAppendResults.sorted)
@@ -426,7 +471,8 @@ class OverAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTest
       Right(6L))
 
     val source = failingDataSource(data)
-    val table = source.transform("TimeAssigner", new EventTimeProcessOperator[(Long, Int, String)])
+    val table = source
+      .transform("TimeAssigner", new EventTimeProcessOperator[(Long, Int, String)])
       .setParallelism(source.parallelism)
       .toTable(tEnv, 'a, 'b, 'c, 'rowtime.rowtime)
 
@@ -439,8 +485,11 @@ class OverAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTest
     env.execute()
 
     val expected = mutable.MutableList(
-      "Hello World,20,2,2", "Hello World,7,1,1", "Hello,1,1,1",
-      "Hello,2,2,2", "Hello,6,3,3")
+      "Hello World,20,2,2",
+      "Hello World,7,1,1",
+      "Hello,1,1,1",
+      "Hello,2,2,2",
+      "Hello,6,3,3")
 
     assertEquals(expected.sorted, sink.getAppendResults.sorted)
   }

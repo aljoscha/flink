@@ -29,8 +29,8 @@ import org.apache.calcite.rex.{RexCall, RexNode}
 import org.apache.flink.table.planner.plan.utils.JoinTypeUtil
 
 /**
-  * Flink RelNode which matches along with join a python user defined table function.
-  */
+ * Flink RelNode which matches along with join a python user defined table function.
+ */
 class StreamPhysicalPythonCorrelate(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -39,19 +39,16 @@ class StreamPhysicalPythonCorrelate(
     condition: Option[RexNode],
     outputRowType: RelDataType,
     joinType: JoinRelType)
-  extends StreamPhysicalCorrelateBase(
-    cluster,
-    traitSet,
-    inputRel,
-    scan,
-    condition,
-    outputRowType,
-    joinType) {
+    extends StreamPhysicalCorrelateBase(
+      cluster,
+      traitSet,
+      inputRel,
+      scan,
+      condition,
+      outputRowType,
+      joinType) {
 
-  def copy(
-      traitSet: RelTraitSet,
-      newChild: RelNode,
-      outputType: RelDataType): RelNode = {
+  def copy(traitSet: RelTraitSet, newChild: RelNode, outputType: RelDataType): RelNode = {
     new StreamPhysicalPythonCorrelate(
       cluster,
       traitSet,
@@ -69,7 +66,6 @@ class StreamPhysicalPythonCorrelate(
       condition.orNull,
       ExecEdge.DEFAULT,
       FlinkTypeFactory.toLogicalRowType(getRowType),
-      getRelDetailedDescription
-    )
+      getRelDetailedDescription)
   }
 }

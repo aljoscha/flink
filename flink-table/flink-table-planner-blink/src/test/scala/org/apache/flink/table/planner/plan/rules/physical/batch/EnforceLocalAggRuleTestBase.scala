@@ -24,7 +24,6 @@ import org.apache.flink.table.planner.utils.TableTestBase
 
 import org.junit.{Before, Test}
 
-
 abstract class EnforceLocalAggRuleTestBase extends TableTestBase {
   protected val util = batchTestUtil()
 

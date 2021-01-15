@@ -23,7 +23,11 @@ import org.apache.flink.api.dag.Transformation
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable
 import org.apache.flink.streaming.api.operators.co.KeyedCoProcessOperator
 import org.apache.flink.streaming.api.operators.{StreamFlatMap, StreamMap, TwoInputStreamOperator}
-import org.apache.flink.streaming.api.transformations.{OneInputTransformation, TwoInputTransformation, UnionTransformation}
+import org.apache.flink.streaming.api.transformations.{
+  OneInputTransformation,
+  TwoInputTransformation,
+  UnionTransformation
+}
 import org.apache.flink.table.api.TableException
 import org.apache.flink.table.data.RowData
 import org.apache.flink.table.planner.calcite.FlinkTypeFactory
@@ -33,8 +37,15 @@ import org.apache.flink.table.planner.plan.utils.PythonUtil.containsPythonCall
 import org.apache.flink.table.planner.plan.utils.RelExplainUtil.preferExpressionFormat
 import org.apache.flink.table.planner.plan.utils.{IntervalJoinUtil, JoinTypeUtil, KeySelectorUtil}
 import org.apache.flink.table.runtime.generated.GeneratedFunction
-import org.apache.flink.table.runtime.operators.join.interval.{ProcTimeIntervalJoin, RowTimeIntervalJoin}
-import org.apache.flink.table.runtime.operators.join.{FlinkJoinType, KeyedCoProcessOperatorWithWatermarkDelay, OuterJoinPaddingUtil}
+import org.apache.flink.table.runtime.operators.join.interval.{
+  ProcTimeIntervalJoin,
+  RowTimeIntervalJoin
+}
+import org.apache.flink.table.runtime.operators.join.{
+  FlinkJoinType,
+  KeyedCoProcessOperatorWithWatermarkDelay,
+  OuterJoinPaddingUtil
+}
 import org.apache.flink.table.runtime.typeutils.InternalTypeInfo
 import org.apache.flink.util.Collector
 
@@ -47,8 +58,8 @@ import org.apache.calcite.rex.RexNode
 import scala.collection.JavaConversions._
 
 /**
-  * Stream physical RelNode for a time interval stream join.
-  */
+ * Stream physical RelNode for a time interval stream join.
+ */
 class StreamExecIntervalJoin(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -63,14 +74,15 @@ class StreamExecIntervalJoin(
     leftTimeIndex: Int,
     rightTimeIndex: Int,
     remainCondition: Option[RexNode])
-  extends BiRel(cluster, traitSet, leftRel, rightRel)
-  with StreamPhysicalRel
-  with LegacyStreamExecNode[RowData] {
+    extends BiRel(cluster, traitSet, leftRel, rightRel)
+    with StreamPhysicalRel
+    with LegacyStreamExecNode[RowData] {
 
   if (remainCondition.isDefined && containsPythonCall(remainCondition.get)) {
-    throw new TableException("Only inner join condition with equality predicates supports the " +
-      "Python UDF taking the inputs from the left table and the right table at the same time, " +
-      "e.g., ON T1.id = T2.id && pythonUdf(T1.a, T2.b)")
+    throw new TableException(
+      "Only inner join condition with equality predicates supports the " +
+        "Python UDF taking the inputs from the left table and the right table at the same time, " +
+        "e.g., ON T1.id = T2.id && pythonUdf(T1.a, T2.b)")
   }
 
   // TODO remove FlinkJoinType
@@ -101,11 +113,17 @@ class StreamExecIntervalJoin(
     val windowBounds = s"isRowTime=$isRowTime, leftLowerBound=$leftLowerBound, " +
       s"leftUpperBound=$leftUpperBound, leftTimeIndex=$leftTimeIndex, " +
       s"rightTimeIndex=$rightTimeIndex"
-    super.explainTerms(pw)
+    super
+      .explainTerms(pw)
       .item("joinType", flinkJoinType.toString)
       .item("windowBounds", windowBounds)
-      .item("where", getExpressionString(
-        joinCondition, outputRowType.getFieldNames.toList, None, preferExpressionFormat(pw)))
+      .item(
+        "where",
+        getExpressionString(
+          joinCondition,
+          outputRowType.getFieldNames.toList,
+          None,
+          preferExpressionFormat(pw)))
       .item("select", getRowType.getFieldNames.mkString(", "))
   }
 
@@ -113,25 +131,26 @@ class StreamExecIntervalJoin(
 
   override protected def translateToPlanInternal(
       planner: StreamPlanner): Transformation[RowData] = {
-    val leftPlan = getInputNodes.get(0).translateToPlan(planner)
+    val leftPlan = getInputNodes
+      .get(0)
+      .translateToPlan(planner)
       .asInstanceOf[Transformation[RowData]]
-    val rightPlan = getInputNodes.get(1).translateToPlan(planner)
+    val rightPlan = getInputNodes
+      .get(1)
+      .translateToPlan(planner)
       .asInstanceOf[Transformation[RowData]]
 
     flinkJoinType match {
-      case FlinkJoinType.INNER |
-           FlinkJoinType.LEFT |
-           FlinkJoinType.RIGHT |
-           FlinkJoinType.FULL =>
+      case FlinkJoinType.INNER | FlinkJoinType.LEFT | FlinkJoinType.RIGHT | FlinkJoinType.FULL =>
         val leftRowType = FlinkTypeFactory.toLogicalRowType(getLeft.getRowType)
         val rightRowType = FlinkTypeFactory.toLogicalRowType(getRight.getRowType)
-        val returnType = InternalTypeInfo.of(
-          FlinkTypeFactory.toLogicalRowType(getRowType))
+        val returnType = InternalTypeInfo.of(FlinkTypeFactory.toLogicalRowType(getRowType))
 
         val relativeWindowSize = leftUpperBound - leftLowerBound
         if (relativeWindowSize < 0) {
-          LOG.warn(s"The relative time interval size $relativeWindowSize is negative," +
-            " please check the join conditions.")
+          LOG.warn(
+            s"The relative time interval size $relativeWindowSize is negative," +
+              " please check the join conditions.")
           createNegativeWindowSizeJoin(
             leftPlan,
             rightPlan,
@@ -155,21 +174,9 @@ class StreamExecIntervalJoin(
             "IntervalJoinFunction")
 
           if (isRowTime) {
-            createRowTimeJoin(
-              leftPlan,
-              rightPlan,
-              returnType,
-              joinFunction,
-              leftKeys,
-              rightKeys)
+            createRowTimeJoin(leftPlan, rightPlan, returnType, joinFunction, leftKeys, rightKeys)
           } else {
-            createProcTimeJoin(
-              leftPlan,
-              rightPlan,
-              returnType,
-              joinFunction,
-              leftKeys,
-              rightKeys)
+            createProcTimeJoin(leftPlan, rightPlan, returnType, joinFunction, leftKeys, rightKeys)
           }
         }
       case FlinkJoinType.ANTI =>
@@ -234,16 +241,14 @@ class StreamExecIntervalJoin(
       "pad left input transformation",
       new StreamMap[RowData, RowData](leftPadder),
       returnTypeInfo,
-      leftParallelism
-    )
+      leftParallelism)
 
     val padRightStream = new OneInputTransformation[RowData, RowData](
       rightPlan,
       "pad right input transformation",
       new StreamMap[RowData, RowData](rightPadder),
       returnTypeInfo,
-      rightParallelism
-    )
+      rightParallelism)
     flinkJoinType match {
       case FlinkJoinType.INNER =>
         new UnionTransformation(List(filterAllLeftStream, filterAllRightStream))
@@ -277,11 +282,10 @@ class StreamExecIntervalJoin(
       leftPlan,
       rightPlan,
       getRelDetailedDescription,
-      new KeyedCoProcessOperator(procJoinFunc).
-        asInstanceOf[TwoInputStreamOperator[RowData,RowData,RowData]],
+      new KeyedCoProcessOperator(procJoinFunc)
+        .asInstanceOf[TwoInputStreamOperator[RowData, RowData, RowData]],
       returnTypeInfo,
-      leftPlan.getParallelism
-    )
+      leftPlan.getParallelism)
 
     if (leftKeys.isEmpty) {
       ret.setParallelism(1)
@@ -302,8 +306,7 @@ class StreamExecIntervalJoin(
       returnTypeInfo: InternalTypeInfo[RowData],
       joinFunction: GeneratedFunction[FlatJoinFunction[RowData, RowData, RowData]],
       leftKeys: Array[Int],
-      rightKeys: Array[Int]
-  ): Transformation[RowData] = {
+      rightKeys: Array[Int]): Transformation[RowData] = {
     val leftTypeInfo = leftPlan.getOutputType.asInstanceOf[InternalTypeInfo[RowData]]
     val rightTypeInfo = rightPlan.getOutputType.asInstanceOf[InternalTypeInfo[RowData]]
     val rowJoinFunc = new RowTimeIntervalJoin(
@@ -322,10 +325,9 @@ class StreamExecIntervalJoin(
       rightPlan,
       getRelDetailedDescription,
       new KeyedCoProcessOperatorWithWatermarkDelay(rowJoinFunc, rowJoinFunc.getMaxOutputDelay)
-        .asInstanceOf[TwoInputStreamOperator[RowData,RowData,RowData]],
+        .asInstanceOf[TwoInputStreamOperator[RowData, RowData, RowData]],
       returnTypeInfo,
-      leftPlan.getParallelism
-    )
+      leftPlan.getParallelism)
 
     if (inputsContainSingleton()) {
       ret.setParallelism(1)

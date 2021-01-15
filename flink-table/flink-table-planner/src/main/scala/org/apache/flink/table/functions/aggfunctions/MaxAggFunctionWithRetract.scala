@@ -34,12 +34,12 @@ class MaxWithRetractAccumulator[T] {
 }
 
 /**
-  * Base class for built-in Max with retraction aggregate function
-  *
-  * @tparam T the type for the aggregation result
-  */
+ * Base class for built-in Max with retraction aggregate function
+ *
+ * @tparam T the type for the aggregation result
+ */
 abstract class MaxWithRetractAggFunction[T](implicit ord: Ordering[T])
-  extends AggregateFunction[T, MaxWithRetractAccumulator[T]] {
+    extends AggregateFunction[T, MaxWithRetractAccumulator[T]] {
 
   override def createAccumulator(): MaxWithRetractAccumulator[T] = {
     val acc = new MaxWithRetractAccumulator[T]
@@ -117,7 +117,8 @@ abstract class MaxWithRetractAggFunction[T](implicit ord: Ordering[T])
     }
   }
 
-  def merge(acc: MaxWithRetractAccumulator[T],
+  def merge(
+      acc: MaxWithRetractAccumulator[T],
       its: JIterable[MaxWithRetractAccumulator[T]]): Unit = {
     val iter = its.iterator()
     while (iter.hasNext) {
@@ -157,96 +158,96 @@ abstract class MaxWithRetractAggFunction[T](implicit ord: Ordering[T])
 }
 
 /**
-  * Built-in Byte Max with retraction aggregate function
-  */
+ * Built-in Byte Max with retraction aggregate function
+ */
 class ByteMaxWithRetractAggFunction extends MaxWithRetractAggFunction[Byte] {
   override def getInitValue: Byte = 0.toByte
   override def getValueTypeInfo = BasicTypeInfo.BYTE_TYPE_INFO
 }
 
 /**
-  * Built-in Short Max with retraction aggregate function
-  */
+ * Built-in Short Max with retraction aggregate function
+ */
 class ShortMaxWithRetractAggFunction extends MaxWithRetractAggFunction[Short] {
   override def getInitValue: Short = 0.toShort
   override def getValueTypeInfo = BasicTypeInfo.SHORT_TYPE_INFO
 }
 
 /**
-  * Built-in Int Max with retraction aggregate function
-  */
+ * Built-in Int Max with retraction aggregate function
+ */
 class IntMaxWithRetractAggFunction extends MaxWithRetractAggFunction[Int] {
   override def getInitValue: Int = 0
   override def getValueTypeInfo = BasicTypeInfo.INT_TYPE_INFO
 }
 
 /**
-  * Built-in Long Max with retraction aggregate function
-  */
+ * Built-in Long Max with retraction aggregate function
+ */
 class LongMaxWithRetractAggFunction extends MaxWithRetractAggFunction[Long] {
   override def getInitValue: Long = 0L
   override def getValueTypeInfo = BasicTypeInfo.LONG_TYPE_INFO
 }
 
 /**
-  * Built-in Float Max with retraction aggregate function
-  */
+ * Built-in Float Max with retraction aggregate function
+ */
 class FloatMaxWithRetractAggFunction extends MaxWithRetractAggFunction[Float] {
   override def getInitValue: Float = 0.0f
   override def getValueTypeInfo = BasicTypeInfo.FLOAT_TYPE_INFO
 }
 
 /**
-  * Built-in Double Max with retraction aggregate function
-  */
+ * Built-in Double Max with retraction aggregate function
+ */
 class DoubleMaxWithRetractAggFunction extends MaxWithRetractAggFunction[Double] {
   override def getInitValue: Double = 0.0d
   override def getValueTypeInfo = BasicTypeInfo.DOUBLE_TYPE_INFO
 }
 
 /**
-  * Built-in Boolean Max with retraction aggregate function
-  */
+ * Built-in Boolean Max with retraction aggregate function
+ */
 class BooleanMaxWithRetractAggFunction extends MaxWithRetractAggFunction[Boolean] {
   override def getInitValue: Boolean = false
   override def getValueTypeInfo = BasicTypeInfo.BOOLEAN_TYPE_INFO
 }
 
 /**
-  * Built-in Big Decimal Max with retraction aggregate function
-  */
+ * Built-in Big Decimal Max with retraction aggregate function
+ */
 class DecimalMaxWithRetractAggFunction extends MaxWithRetractAggFunction[BigDecimal] {
   override def getInitValue: BigDecimal = BigDecimal.ZERO
   override def getValueTypeInfo = BasicTypeInfo.BIG_DEC_TYPE_INFO
 }
 
 /**
-  * Built-in String Max with retraction aggregate function
-  */
+ * Built-in String Max with retraction aggregate function
+ */
 class StringMaxWithRetractAggFunction extends MaxWithRetractAggFunction[String] {
   override def getInitValue: String = ""
   override def getValueTypeInfo = BasicTypeInfo.STRING_TYPE_INFO
 }
 
 /**
-  * Built-in Timestamp Max with retraction aggregate function
-  */
+ * Built-in Timestamp Max with retraction aggregate function
+ */
 class TimestampMaxWithRetractAggFunction extends MaxWithRetractAggFunction[Timestamp] {
   override def getInitValue: Timestamp = new Timestamp(0)
   override def getValueTypeInfo = Types.SQL_TIMESTAMP
 }
 
 /**
-  * Built-in Date Max with retraction aggregate function
-  */
+ * Built-in Date Max with retraction aggregate function
+ */
 class DateMaxWithRetractAggFunction extends MaxWithRetractAggFunction[Date] {
   override def getInitValue: Date = new Date(0)
   override def getValueTypeInfo = Types.SQL_DATE
 }
 
 /**
-  * Built-in Time Max with retraction aggregate function
-  */
+ * Built-in Time Max with retraction aggregate function
+ */
 class TimeMaxWithRetractAggFunction extends MaxWithRetractAggFunction[Time] {
   override def getInitValue: Time = new Time(0)
   override def getValueTypeInfo = Types.SQL_TIME

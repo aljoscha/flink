@@ -32,16 +32,15 @@ import org.apache.flink.table.runtime.types.CRow
 import scala.collection.JavaConverters._
 
 /**
-  * Flink RelNode which matches along with Union.
-  *
-  */
+ * Flink RelNode which matches along with Union.
+ */
 class DataStreamUnion(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
     inputs: JList[RelNode],
     schema: RowSchema)
-  extends Union(cluster, traitSet, inputs, true)
-  with DataStreamRel {
+    extends Union(cluster, traitSet, inputs, true)
+    with DataStreamRel {
 
   override def deriveRowType() = schema.relDataType
 
@@ -51,11 +50,7 @@ class DataStreamUnion(
       throw new TableException("DataStreamUnion only supports UNION ALL.")
     }
 
-    new DataStreamUnion(
-      cluster,
-      traitSet,
-      inputs,
-      schema)
+    new DataStreamUnion(cluster, traitSet, inputs, schema)
   }
 
   override def explainTerms(pw: RelWriter): RelWriter = {
@@ -68,8 +63,7 @@ class DataStreamUnion(
 
   override def translateToPlan(planner: StreamPlanner): DataStream[CRow] = {
 
-    getInputs
-      .asScala
+    getInputs.asScala
       .map(_.asInstanceOf[DataStreamRel].translateToPlan(planner))
       .reduce((dataSetLeft, dataSetRight) => dataSetLeft.union(dataSetRight))
   }

@@ -28,15 +28,13 @@ import java.util
 import java.util.Collections
 
 /**
-  * A [[FlinkTableFunction]] is an implementation of  [[org.apache.calcite.schema.TableFunction]].
-  * It is also an abstraction and instance holder of Table Function in Flink's Table API & SQL.
-  * We can create different kinds of [[FlinkTableFunction]] for different usages.
-  *
-  * @param tableFunction The Table Function instance
-  */
-abstract class FlinkTableFunction(
-    tableFunction: functions.TableFunction[_])
-  extends TableFunction {
+ * A [[FlinkTableFunction]] is an implementation of  [[org.apache.calcite.schema.TableFunction]].
+ * It is also an abstraction and instance holder of Table Function in Flink's Table API & SQL.
+ * We can create different kinds of [[FlinkTableFunction]] for different usages.
+ *
+ * @param tableFunction The Table Function instance
+ */
+abstract class FlinkTableFunction(tableFunction: functions.TableFunction[_]) extends TableFunction {
 
   override def getElementType(arguments: util.List[AnyRef]): Type = classOf[Array[Object]]
 
@@ -48,8 +46,8 @@ abstract class FlinkTableFunction(
       arguments: util.List[AnyRef]): RelDataType = null
 
   /**
-    * Returns the Type for usage, i.e. code generation.
-    */
+   * Returns the Type for usage, i.e. code generation.
+   */
   def getExternalResultType(
       tableFunction: functions.TableFunction[_],
       arguments: Array[AnyRef],

@@ -28,17 +28,19 @@ import org.apache.flink.util.{Collector, TestLogger}
 import org.junit.Test
 
 /**
-  * Tests [[KeyedCoProcessOperatorWithWatermarkDelay]].
-  */
+ * Tests [[KeyedCoProcessOperatorWithWatermarkDelay]].
+ */
 class KeyedCoProcessOperatorWithWatermarkDelayTest extends TestLogger {
 
   @Test
   def testHoldingBackWatermarks(): Unit = {
     val operator = new KeyedCoProcessOperatorWithWatermarkDelay[String, Integer, String, String](
-      new EmptyCoProcessFunction, 100)
+      new EmptyCoProcessFunction,
+      100)
     val testHarness = new KeyedTwoInputStreamOperatorTestHarness[String, Integer, String, String](
       operator,
-      new IntToStringKeySelector, new CoIdentityKeySelector[String],
+      new IntToStringKeySelector,
+      new CoIdentityKeySelector[String],
       BasicTypeInfo.STRING_TYPE_INFO)
 
     testHarness.setup()
@@ -63,26 +65,26 @@ class KeyedCoProcessOperatorWithWatermarkDelayTest extends TestLogger {
   @Test(expected = classOf[IllegalArgumentException])
   def testDelayParameter(): Unit = {
     new KeyedCoProcessOperatorWithWatermarkDelay[AnyRef, Integer, String, String](
-      new EmptyCoProcessFunction, -1)
+      new EmptyCoProcessFunction,
+      -1)
   }
 }
 
 private class EmptyCoProcessFunction extends CoProcessFunction[Integer, String, String] {
   override def processElement1(
-    value: Integer,
-    ctx: CoProcessFunction[Integer, String, String]#Context,
-    out: Collector[String]): Unit = {
+      value: Integer,
+      ctx: CoProcessFunction[Integer, String, String]#Context,
+      out: Collector[String]): Unit = {
     // do nothing
   }
 
   override def processElement2(
-    value: String,
-    ctx: CoProcessFunction[Integer, String, String]#Context,
-    out: Collector[String]): Unit = {
+      value: String,
+      ctx: CoProcessFunction[Integer, String, String]#Context,
+      out: Collector[String]): Unit = {
     //do nothing
   }
 }
-
 
 private class IntToStringKeySelector extends KeySelector[Integer, String] {
   override def getKey(value: Integer): String = String.valueOf(value)

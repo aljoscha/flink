@@ -58,11 +58,11 @@ class AggregateITCase(mode: TestExecutionMode) extends MultipleProgramsTestBase(
     val ds = CollectionDataSets.get3TupleDataSet(env)
 
     val aggregateDs = ds
-      .aggregate(Aggregations.SUM,0)
+      .aggregate(Aggregations.SUM, 0)
       .and(Aggregations.MAX, 1)
       // Ensure aggregate operator correctly copies other fields
       .filter(_._3 != null)
-      .map{ t => (t._1, t._2) }
+      .map { t => (t._1, t._2) }
 
     aggregateDs.writeAsCsv(resultPath, writeMode = WriteMode.OVERWRITE)
 
@@ -113,4 +113,3 @@ class AggregateITCase(mode: TestExecutionMode) extends MultipleProgramsTestBase(
     expectedResult = "1\n"
   }
 }
-

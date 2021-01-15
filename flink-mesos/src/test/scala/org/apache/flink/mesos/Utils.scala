@@ -31,7 +31,7 @@ object Matchers {
   def contentsMatch[T](plan: Seq[T]): java.util.Collection[T] = {
     org.mockito.ArgumentMatchers.argThat(new ArgumentMatcher[java.util.Collection[T]] {
       def matches(actual: java.util.Collection[T]): Boolean =
-          actual.size() == plan.size && actual.containsAll(plan.asJava)
+        actual.size() == plan.size && actual.containsAll(plan.asJava)
     })
   }
 }
@@ -44,8 +44,9 @@ object TestFSMUtils {
     "$" + akka.util.Helpers.base64(l)
   }
 
-  def testFSMRef[S, D, T <: Actor: ClassTag](factory: => T, supervisor: ActorRef)
-      (implicit ev: T <:< FSM[S, D], system: ActorSystem): TestFSMRef[S, D, T] = {
+  def testFSMRef[S, D, T <: Actor: ClassTag](factory: => T, supervisor: ActorRef)(implicit
+      ev: T <:< FSM[S, D],
+      system: ActorSystem): TestFSMRef[S, D, T] = {
     new TestFSMRef(system, Props(factory), supervisor, TestFSMUtils.randomName)
   }
 }

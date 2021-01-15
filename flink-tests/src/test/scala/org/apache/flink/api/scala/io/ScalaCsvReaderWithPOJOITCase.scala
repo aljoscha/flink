@@ -104,8 +104,8 @@ class ScalaCsvReaderWithPOJOITCase(mode: TestExecutionMode) extends MultipleProg
   def testPOJOTypeWithFieldsOrderAndFieldsSelection(): Unit = {
     val dataPath = createInputData("2.20,3,ABC\n5.1,5,DEF\n3.30,1,DEF\n3.30,10,GHI")
     val env = ExecutionEnvironment.getExecutionEnvironment
-    val data = env.readCsvFile[POJOItem](dataPath, includedFields = Array(1, 2),
-      pojoFields = Array("f3", "f1"))
+    val data = env
+      .readCsvFile[POJOItem](dataPath, includedFields = Array(1, 2), pojoFields = Array("f3", "f1"))
 
     implicit val typeInfo = createTypeInformation[(String, Int)]
     data.writeAsText(resultPath, WriteMode.OVERWRITE)

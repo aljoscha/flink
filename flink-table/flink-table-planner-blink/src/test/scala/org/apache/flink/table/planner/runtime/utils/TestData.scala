@@ -19,7 +19,11 @@
 package org.apache.flink.table.planner.runtime.utils
 
 import org.apache.flink.api.common.typeinfo.BasicTypeInfo._
-import org.apache.flink.api.common.typeinfo.LocalTimeTypeInfo.{LOCAL_DATE, LOCAL_DATE_TIME, LOCAL_TIME}
+import org.apache.flink.api.common.typeinfo.LocalTimeTypeInfo.{
+  LOCAL_DATE,
+  LOCAL_DATE_TIME,
+  LOCAL_TIME
+}
 import org.apache.flink.api.java.tuple.{Tuple2 => JTuple2}
 import org.apache.flink.api.java.typeutils.{RowTypeInfo, TupleTypeInfo}
 import org.apache.flink.table.planner.factories.TestValuesTableFactory.changelogRow
@@ -38,30 +42,47 @@ import scala.collection.{Seq, mutable}
 object TestData {
 
   val type1 = new RowTypeInfo(INT_TYPE_INFO, STRING_TYPE_INFO, INT_TYPE_INFO)
-  val type2 = new RowTypeInfo(
-    INT_TYPE_INFO, LONG_TYPE_INFO, INT_TYPE_INFO, STRING_TYPE_INFO, LONG_TYPE_INFO)
+  val type2 =
+    new RowTypeInfo(INT_TYPE_INFO, LONG_TYPE_INFO, INT_TYPE_INFO, STRING_TYPE_INFO, LONG_TYPE_INFO)
   val type3 = new RowTypeInfo(INT_TYPE_INFO, LONG_TYPE_INFO, STRING_TYPE_INFO)
   val type4 = new RowTypeInfo(STRING_TYPE_INFO, INT_TYPE_INFO, INT_TYPE_INFO)
-  val type5 = new RowTypeInfo(INT_TYPE_INFO, LONG_TYPE_INFO, INT_TYPE_INFO, STRING_TYPE_INFO,
-    LONG_TYPE_INFO)
-  val type6 = new RowTypeInfo(INT_TYPE_INFO, DOUBLE_TYPE_INFO, STRING_TYPE_INFO, LOCAL_DATE,
-    LOCAL_TIME, LOCAL_DATE_TIME)
+  val type5 =
+    new RowTypeInfo(INT_TYPE_INFO, LONG_TYPE_INFO, INT_TYPE_INFO, STRING_TYPE_INFO, LONG_TYPE_INFO)
+  val type6 = new RowTypeInfo(
+    INT_TYPE_INFO,
+    DOUBLE_TYPE_INFO,
+    STRING_TYPE_INFO,
+    LOCAL_DATE,
+    LOCAL_TIME,
+    LOCAL_DATE_TIME)
 
   val simpleType2 = new RowTypeInfo(INT_TYPE_INFO, DOUBLE_TYPE_INFO)
 
-  val buildInType = new RowTypeInfo(BOOLEAN_TYPE_INFO, BYTE_TYPE_INFO, INT_TYPE_INFO,
-    LONG_TYPE_INFO, DOUBLE_TYPE_INFO, STRING_TYPE_INFO, STRING_TYPE_INFO, LOCAL_DATE, LOCAL_TIME,
+  val buildInType = new RowTypeInfo(
+    BOOLEAN_TYPE_INFO,
+    BYTE_TYPE_INFO,
+    INT_TYPE_INFO,
+    LONG_TYPE_INFO,
+    DOUBLE_TYPE_INFO,
+    STRING_TYPE_INFO,
+    STRING_TYPE_INFO,
+    LOCAL_DATE,
+    LOCAL_TIME,
     LOCAL_DATE_TIME)
-  val numericType = new RowTypeInfo(INT_TYPE_INFO, LONG_TYPE_INFO, FLOAT_TYPE_INFO,
-    DOUBLE_TYPE_INFO, BIG_DEC_TYPE_INFO)
+  val numericType = new RowTypeInfo(
+    INT_TYPE_INFO,
+    LONG_TYPE_INFO,
+    FLOAT_TYPE_INFO,
+    DOUBLE_TYPE_INFO,
+    BIG_DEC_TYPE_INFO)
 
   val tupleIntInt = new TupleTypeInfo(INT_TYPE_INFO, INT_TYPE_INFO)
   val tupleStringInt = new TupleTypeInfo(STRING_TYPE_INFO, INT_TYPE_INFO)
   val genericType3 = new RowTypeInfo(tupleStringInt, tupleIntInt, INT_TYPE_INFO)
-  val genericType5 = new RowTypeInfo(tupleIntInt, LONG_TYPE_INFO, INT_TYPE_INFO, STRING_TYPE_INFO,
-    LONG_TYPE_INFO)
-  val type3WithTimestamp = new RowTypeInfo(INT_TYPE_INFO, LONG_TYPE_INFO, STRING_TYPE_INFO,
-    LOCAL_DATE_TIME)
+  val genericType5 =
+    new RowTypeInfo(tupleIntInt, LONG_TYPE_INFO, INT_TYPE_INFO, STRING_TYPE_INFO, LONG_TYPE_INFO)
+  val type3WithTimestamp =
+    new RowTypeInfo(INT_TYPE_INFO, LONG_TYPE_INFO, STRING_TYPE_INFO, LOCAL_DATE_TIME)
 
   val nullablesOfData1 = Array(true, true, true)
 
@@ -77,8 +98,7 @@ object TestData {
     row(6, "c", 10),
     row(1, "a", 5),
     row(3, "b", 7),
-    row(5, "c", 9)
-  )
+    row(5, "c", 9))
 
   lazy val data2 = Seq(
     row(2, 3L, 2, "Hallo Welt wie", 1L),
@@ -95,8 +115,7 @@ object TestData {
     row(5, 12L, 11, "HIJ", 3L),
     row(4, 8L, 7, "DEF", 1L),
     row(5, 13L, 12, "IJK", 3L),
-    row(3, 6L, 5, "BCD", 3L)
-  )
+    row(3, 6L, 5, "BCD", 3L))
 
   lazy val data4 = Seq(
     row("book", 1, 12),
@@ -104,8 +123,7 @@ object TestData {
     row("book", 4, 11),
     row("fruit", 4, 33),
     row("fruit", 3, 44),
-    row("fruit", 5, 22)
-  )
+    row("fruit", 5, 22))
 
   lazy val nullData4: Seq[Row] = Seq(
     row("book", 1, 12),
@@ -113,32 +131,22 @@ object TestData {
     row("book", 4, 11),
     row("fruit", 4, null),
     row("fruit", 3, 44),
-    row("fruit", 5, null)
-  )
+    row("fruit", 5, null))
 
-  lazy val nullData2: Seq[Row] = data2 ++ Seq(
-    row(null, 3L, 3, "NullTuple", 3L),
-    row(null, 3L, 3, "NullTuple", 3L)
-  )
+  lazy val nullData2: Seq[Row] =
+    data2 ++ Seq(row(null, 3L, 3, "NullTuple", 3L), row(null, 3L, 3, "NullTuple", 3L))
 
-  lazy val nullData3: Seq[Row] = data3 ++ Seq(
-    row(null, 999L, "NullTuple"),
-    row(null, 999L, "NullTuple")
-  )
+  lazy val nullData3: Seq[Row] =
+    data3 ++ Seq(row(null, 999L, "NullTuple"), row(null, 999L, "NullTuple"))
 
-  lazy val allNullData3: Seq[Row] = Seq(
-    row(null, null, null),
-    row(null, null, null)
-  )
+  lazy val allNullData3: Seq[Row] = Seq(row(null, null, null), row(null, null, null))
 
   val allNullablesOfNullData3 = Array(true, true, true)
 
   val nullablesOfNullData3 = Array(true, true, true)
 
-  lazy val nullData5: Seq[Row] = data5 ++ Seq(
-    row(null, 999L, 999, "NullTuple", 999L),
-    row(null, 999L, 999, "NullTuple", 999L)
-  )
+  lazy val nullData5: Seq[Row] =
+    data5 ++ Seq(row(null, 999L, 999, "NullTuple", 999L), row(null, 999L, 999, "NullTuple", 999L))
 
   val nullablesOfNullData5 = Array(true, true, true, true, true)
 
@@ -167,15 +175,39 @@ object TestData {
   val nullablesOfSmallData5 = Array(true, true, true, true, true)
 
   lazy val buildInData: Seq[Row] = Seq(
-    row(false, 1.toByte, 2, 3L, 2.56, "abcd", "f%g", localDate("2017-12-12"),
-      localTime("10:08:09"), localDateTime("2017-11-11 20:32:19")),
-
-    row(null, 2.toByte, -3, -4L, 90.08, null, "hij_k", localDate("2017-12-12"),
-      localTime("10:08:09"), localDateTime("2017-11-11 20:32:19")),
-
-    row(true, 3.toByte, -4, -5L, -0.8, "e fg", null, null,
-      localTime("10:08:09"), localDateTime("2015-05-20 10:00:00.887"))
-  )
+    row(
+      false,
+      1.toByte,
+      2,
+      3L,
+      2.56,
+      "abcd",
+      "f%g",
+      localDate("2017-12-12"),
+      localTime("10:08:09"),
+      localDateTime("2017-11-11 20:32:19")),
+    row(
+      null,
+      2.toByte,
+      -3,
+      -4L,
+      90.08,
+      null,
+      "hij_k",
+      localDate("2017-12-12"),
+      localTime("10:08:09"),
+      localDateTime("2017-11-11 20:32:19")),
+    row(
+      true,
+      3.toByte,
+      -4,
+      -5L,
+      -0.8,
+      "e fg",
+      null,
+      null,
+      localTime("10:08:09"),
+      localDateTime("2015-05-20 10:00:00.887")))
 
   lazy val simpleData2 = Seq(
     row(1, 0.1),
@@ -192,8 +224,7 @@ object TestData {
     row(5, 0.7),
     row(5, 0.8),
     row(5, 0.8),
-    row(5, 0.9)
-  )
+    row(5, 0.9))
 
   lazy val tupleData3: Seq[(Int, Long, String)] = {
     val data = new mutable.MutableList[(Int, Long, String)]
@@ -233,8 +264,7 @@ object TestData {
     row(new JTuple2("1", 1), new JTuple2(1, 1), 1),
     row(new JTuple2("2", 1), new JTuple2(1, 1), 2),
     row(new JTuple2("1", 1), new JTuple2(1, 1), 1),
-    row(new JTuple2("1", 1), new JTuple2(10, 1), 3)
-  )
+    row(new JTuple2("1", 1), new JTuple2(10, 1), 3))
 
   val nullablesOfData3WithTimestamp = Array(true, true, true, true)
 
@@ -259,38 +289,31 @@ object TestData {
     row(18, 6L, "Comment#12", unixTimestampToLocalDateTime(18000L)),
     row(19, 6L, "Comment#13", unixTimestampToLocalDateTime(19000L)),
     row(20, 6L, "Comment#14", unixTimestampToLocalDateTime(20000L)),
-    row(21, 6L, "Comment#15", unixTimestampToLocalDateTime(21000L))
-  )
+    row(21, 6L, "Comment#15", unixTimestampToLocalDateTime(21000L)))
 
   lazy val smallNestedTupleData: Seq[((Int, Int), String)] = {
-      val data = new mutable.MutableList[((Int, Int), String)]
-      data.+=(((1, 1), "one"))
-      data.+=(((2, 2), "two"))
-      data.+=(((3, 3), "three"))
+    val data = new mutable.MutableList[((Int, Int), String)]
+    data.+=(((1, 1), "one"))
+    data.+=(((2, 2), "two"))
+    data.+=(((3, 3), "three"))
     data
   }
 
   lazy val deepNestedRow: Seq[Row] = {
     Seq(
-      Row.of(new JLong(1),
-        Row.of(
-          Row.of("Sarah", new JInt(100)),
-          Row.of(new JInt(1000), new JBool(true))
-        ),
+      Row.of(
+        new JLong(1),
+        Row.of(Row.of("Sarah", new JInt(100)), Row.of(new JInt(1000), new JBool(true))),
         Row.of("Peter", new JInt(10000)),
         "Mary"),
-      Row.of(new JLong(2),
-        Row.of(
-          Row.of("Rob", new JInt(200)),
-          Row.of(new JInt(2000), new JBool(false))
-        ),
+      Row.of(
+        new JLong(2),
+        Row.of(Row.of("Rob", new JInt(200)), Row.of(new JInt(2000), new JBool(false))),
         Row.of("Lucy", new JInt(20000)),
         "Bob"),
-      Row.of(new JLong(3),
-        Row.of(
-          Row.of("Mike", new JInt(300)),
-          Row.of(new JInt(3000), new JBool(true))
-        ),
+      Row.of(
+        new JLong(3),
+        Row.of(Row.of("Mike", new JInt(300)), Row.of(new JInt(3000), new JBool(true))),
         Row.of("Betty", new JInt(30000)),
         "Liz"))
   }
@@ -320,37 +343,111 @@ object TestData {
   val nullablesOfData5 = Array(true, true, true, true, true)
 
   lazy val data6: Seq[Row] = Seq(
-    row(1,   1.1, "a",    localDate("2017-04-08"), localTime("12:00:59"),
+    row(
+      1,
+      1.1,
+      "a",
+      localDate("2017-04-08"),
+      localTime("12:00:59"),
       localDateTime("2015-05-20 10:00:00")),
-    row(2,   2.5, "abc",  localDate("2017-04-09"), localTime("12:00:59"),
+    row(
+      2,
+      2.5,
+      "abc",
+      localDate("2017-04-09"),
+      localTime("12:00:59"),
       localDateTime("2019-09-19 08:03:09")),
-    row(2,  -2.4, "abcd", localDate("2017-04-08"), localTime("00:00:00"),
+    row(
+      2,
+      -2.4,
+      "abcd",
+      localDate("2017-04-08"),
+      localTime("00:00:00"),
       localDateTime("2016-09-01 23:07:06")),
-    row(3,   0.0, "abc?", localDate("2017-10-11"), localTime("23:59:59"),
+    row(
+      3,
+      0.0,
+      "abc?",
+      localDate("2017-10-11"),
+      localTime("23:59:59"),
       localDateTime("1999-12-12 10:00:00")),
-    row(3, -9.77, "ABC",  localDate("2016-08-08"), localTime("04:15:00"),
+    row(
+      3,
+      -9.77,
+      "ABC",
+      localDate("2016-08-08"),
+      localTime("04:15:00"),
       localDateTime("1999-12-12 10:00:02")),
-    row(3,  0.08, "BCD",  localDate("2017-04-10"), localTime("02:30:00"),
+    row(
+      3,
+      0.08,
+      "BCD",
+      localDate("2017-04-10"),
+      localTime("02:30:00"),
       localDateTime("1999-12-12 10:03:00")),
-    row(4,  3.14, "CDE",  localDate("2017-11-11"), localTime("02:30:00"),
+    row(
+      4,
+      3.14,
+      "CDE",
+      localDate("2017-11-11"),
+      localTime("02:30:00"),
       localDateTime("2017-11-20 09:00:00")),
-    row(4,  3.15, "DEF",  localDate("2017-02-06"), localTime("06:00:00"),
+    row(
+      4,
+      3.15,
+      "DEF",
+      localDate("2017-02-06"),
+      localTime("06:00:00"),
       localDateTime("2015-11-19 10:00:00")),
-    row(4,  3.14, "EFG",  localDate("2017-05-20"), localTime("09:45:78"),
+    row(
+      4,
+      3.14,
+      "EFG",
+      localDate("2017-05-20"),
+      localTime("09:45:78"),
       localDateTime("2015-11-19 10:00:01")),
-    row(4,  3.16, "FGH",  localDate("2017-05-19"), localTime("11:11:11"),
+    row(
+      4,
+      3.16,
+      "FGH",
+      localDate("2017-05-19"),
+      localTime("11:11:11"),
       localDateTime("2015-11-20 08:59:59")),
-    row(5,  -5.9, "GHI",  localDate("2017-07-20"), localTime("22:22:22"),
+    row(
+      5,
+      -5.9,
+      "GHI",
+      localDate("2017-07-20"),
+      localTime("22:22:22"),
       localDateTime("1989-06-04 10:00:00.78")),
-    row(5,  2.71, "HIJ",  localDate("2017-09-08"), localTime("20:09:09"),
+    row(
+      5,
+      2.71,
+      "HIJ",
+      localDate("2017-09-08"),
+      localTime("20:09:09"),
       localDateTime("1997-07-01 09:00:00.99")),
-    row(5,   3.9, "IJK",  localDate("2017-02-02"), localTime("03:03:03"),
+    row(
+      5,
+      3.9,
+      "IJK",
+      localDate("2017-02-02"),
+      localTime("03:03:03"),
       localDateTime("2000-01-01 00:00:00.09")),
-    row(5,   0.7, "JKL",  localDate("2017-10-01"), localTime("19:00:00"),
+    row(
+      5,
+      0.7,
+      "JKL",
+      localDate("2017-10-01"),
+      localTime("19:00:00"),
       localDateTime("2010-06-01 10:00:00.999")),
-    row(5,  -2.8, "KLM",  localDate("2017-07-01"), localTime("12:00:59"),
-      localDateTime("1937-07-07 08:08:08.888"))
-  )
+    row(
+      5,
+      -2.8,
+      "KLM",
+      localDate("2017-07-01"),
+      localTime("12:00:59"),
+      localDateTime("1937-07-07 08:08:08.888")))
 
   val nullablesOfData6 = Array(true, true, true, true, true, true)
 
@@ -369,16 +466,14 @@ object TestData {
     row(5, 12L, 11, "ABC", 3L),
     row(5, 13L, 12, "IJK", 3L),
     row(5, 14L, 13, "EFG", 2L),
-    row(5, 15L, 14, "EFG", 2L)
-  )
+    row(5, 15L, 14, "EFG", 2L))
 
   val nullablesOfDuplicateData5 = Array(true, true, true, true, true)
 
   lazy val numericData: Seq[Row] = Seq(
     row(1, 1L, 1.0f, 1.0d, JBigDecimal.valueOf(1)),
     row(2, 2L, 2.0f, 2.0d, JBigDecimal.valueOf(2)),
-    row(3, 3L, 3.0f, 3.0d, JBigDecimal.valueOf(3))
-  )
+    row(3, 3L, 3.0f, 3.0d, JBigDecimal.valueOf(3)))
 
   val nullablesOfNumericData = Array(true, true, true, true, true)
 
@@ -394,12 +489,11 @@ object TestData {
     row(8, 34, "stef", 170, "m"),
     row(9, 32, "emma", 171, "f"),
     row(10, 28, "benji", 165, "m"),
-    row(11, 20, "eva", 180, "f")
-  )
+    row(11, 20, "eva", 180, "f"))
 
   val nullablesOfPersonData = Array(true, true, true, true, true)
-  val personType = new RowTypeInfo(INT_TYPE_INFO, INT_TYPE_INFO, STRING_TYPE_INFO,
-    INT_TYPE_INFO, STRING_TYPE_INFO)
+  val personType =
+    new RowTypeInfo(INT_TYPE_INFO, INT_TYPE_INFO, STRING_TYPE_INFO, INT_TYPE_INFO, STRING_TYPE_INFO)
 
   val INT_DOUBLE = new RowTypeInfo(INT_TYPE_INFO, DOUBLE_TYPE_INFO)
   val INT_STRING = new RowTypeInfo(INT_TYPE_INFO, STRING_TYPE_INFO)
@@ -414,8 +508,7 @@ object TestData {
     row(3, 3.0),
     row(null, null),
     row(null, 5.0),
-    row(6, null)
-  )
+    row(6, null))
 
   lazy val data2_2: Seq[Row] = Seq(
     row(2, 3.0),
@@ -424,15 +517,9 @@ object TestData {
     row(4, 1.0),
     row(null, null),
     row(null, 5.0),
-    row(6, null)
-  )
+    row(6, null))
 
-  lazy val data2_3: Seq[Row] = Seq(
-    row(2, 3.0),
-    row(2, 3.0),
-    row(3, 2.0),
-    row(4, 1.0)
-  )
+  lazy val data2_3: Seq[Row] = Seq(row(2, 3.0), row(2, 3.0), row(3, 2.0), row(4, 1.0))
 
   val nullablesOfData2_3 = Array(true, true)
 
@@ -448,45 +535,32 @@ object TestData {
 
   lazy val intIntData2: Seq[Row] = {
     row(1, 1) ::
-        row(1, 2) ::
-        row(2, 1) ::
-        row(2, 2) ::
-        row(3, 1) ::
-        row(3, 2) :: Nil
+      row(1, 2) ::
+      row(2, 1) ::
+      row(2, 2) ::
+      row(3, 1) ::
+      row(3, 2) :: Nil
   }
 
   val nullablesOfIntIntData2 = Array(true, true)
 
   lazy val intIntData3: Seq[Row] = {
     row(1, null) ::
-        row(2, 2) :: Nil
+      row(2, 2) :: Nil
   }
 
   val nullablesOfIntIntData3 = Array(true, true)
 
-  lazy val upperCaseData: Seq[Row] = Seq(
-    row(1, "A"),
-    row(2, "B"),
-    row(3, "C"),
-    row(4, "D"),
-    row(5, "E"),
-    row(6, "F"))
+  lazy val upperCaseData: Seq[Row] =
+    Seq(row(1, "A"), row(2, "B"), row(3, "C"), row(4, "D"), row(5, "E"), row(6, "F"))
 
   val nullablesOfUpperCaseData = Array(true, true)
 
-  lazy val lowerCaseData: Seq[Row] = Seq(
-    row(1, "a"),
-    row(2, "b"),
-    row(3, "c"),
-    row(4, "d"))
+  lazy val lowerCaseData: Seq[Row] = Seq(row(1, "a"), row(2, "b"), row(3, "c"), row(4, "d"))
 
   val nullablesOfLowerCaseData = Array(true, true)
 
-  lazy val allNulls: Seq[Row] = Seq(
-    row(null),
-    row(null),
-    row(null),
-    row(null))
+  lazy val allNulls: Seq[Row] = Seq(row(null), row(null), row(null), row(null))
 
   val nullablesOfAllNulls = Array(true)
 
@@ -497,9 +571,14 @@ object TestData {
 
   val projectionTestDataType =
     new RowTypeInfo(
-      INT_TYPE_INFO, INT_TYPE_INFO, INT_TYPE_INFO,
-      STRING_TYPE_INFO, STRING_TYPE_INFO, STRING_TYPE_INFO,
-      INT_TYPE_INFO, STRING_TYPE_INFO)
+      INT_TYPE_INFO,
+      INT_TYPE_INFO,
+      INT_TYPE_INFO,
+      STRING_TYPE_INFO,
+      STRING_TYPE_INFO,
+      STRING_TYPE_INFO,
+      INT_TYPE_INFO,
+      STRING_TYPE_INFO)
 
   val nullablesOfProjectionTestData = Array(true, true, true, true, true, true, true, true)
 
@@ -530,8 +609,7 @@ object TestData {
     row(1L, "US Dollar"),
     row(50L, "Yen"),
     row(3L, "Euro"),
-    row(5L, "US Dollar")
-  )
+    row(5L, "US Dollar"))
 
   // [city, state, population]
   val citiesData: Seq[Row] = Seq(
@@ -556,8 +634,7 @@ object TestData {
     changelogRow("+U", "Euro", JLong.valueOf(116L)),
     changelogRow("-U", "Euro", JLong.valueOf(116L)),
     changelogRow("+U", "Euro", JLong.valueOf(119L)),
-    changelogRow("-D", "Yen", JLong.valueOf(1L))
-  )
+    changelogRow("-D", "Yen", JLong.valueOf(1L)))
 
   val ratesUpsertData: Seq[Row] = Seq(
     changelogRow("+U", "US Dollar", JLong.valueOf(102L)),
@@ -565,8 +642,7 @@ object TestData {
     changelogRow("+U", "Yen", JLong.valueOf(1L)),
     changelogRow("+U", "Euro", JLong.valueOf(116L)),
     changelogRow("+U", "Euro", JLong.valueOf(119L)),
-    changelogRow("-D", "Yen", JLong.valueOf(1L))
-  )
+    changelogRow("-D", "Yen", JLong.valueOf(1L)))
 
   val fullDataTypesData: Seq[Row] = {
     val bools = List(true, false, true, false, null)
@@ -574,11 +650,14 @@ object TestData {
     val shorts = List(Short.MaxValue, Short.MinValue, 0.shortValue(), 4.shortValue(), null)
     val ints = List(Int.MaxValue, Int.MinValue, 0, 123, null)
     val longs = List(Long.MaxValue, Long.MinValue, 0L, 1234L, null)
-    val floats = List(-1.123F, 3.4F, 0.12F, 1.2345F, null)
-    val doubles = List(-1.123D, 3.4D, 0.12D, 1.2345D, null)
+    val floats = List(-1.123f, 3.4f, 0.12f, 1.2345f, null)
+    val doubles = List(-1.123d, 3.4d, 0.12d, 1.2345d, null)
     val decimals = List(
-      new JBigDecimal("5.1"), new JBigDecimal("6.1"), new JBigDecimal("7.1"),
-      new JBigDecimal("8.123"), null)
+      new JBigDecimal("5.1"),
+      new JBigDecimal("6.1"),
+      new JBigDecimal("7.1"),
+      new JBigDecimal("8.123"),
+      null)
     val varchars = List("1", "12", "123", "1234", null)
     val chars = List("1", "12", "123", "1234", null)
     val dates = List(
@@ -608,31 +687,36 @@ object TestData {
         instants += datetimes(i).toInstant(ZoneId.of("UTC").getRules.getOffset(datetimes(i)))
       }
     }
-    val arrays = List(
-      array(1L, 2L, 3L),
-      array(4L, 5L),
-      array(6L, null, 7L),
-      array(8L),
-      null)
+    val arrays = List(array(1L, 2L, 3L), array(4L, 5L), array(6L, null, 7L), array(8L), null)
     val rows = List(
-      row(1L, "a", 2.3D),
-      row(null, "b", 4.56D),
-      row(3L, null, 7.86D),
+      row(1L, "a", 2.3d),
+      row(null, "b", 4.56d),
+      row(3L, null, 7.86d),
       row(4L, "c", null),
       null)
-    val maps = List(
-      map(("k1", 1)),
-      map(("k2", 2), ("k4", 4)),
-      map(("k3", null)),
-      map((null, 3)),
-      null)
+    val maps =
+      List(map(("k1", 1)), map(("k2", 2), ("k4", 4)), map(("k3", null)), map((null, 3)), null)
 
     val data = new mutable.MutableList[Row]
     for (i <- ints.indices) {
       data += row(
-        bools(i), bytes(i), shorts(i), ints(i), longs(i), floats(i), doubles(i),
-        decimals(i), varchars(i), chars(i), dates(i), times(i), datetimes(i), instants(i),
-        arrays(i), rows(i), maps(i))
+        bools(i),
+        bytes(i),
+        shorts(i),
+        ints(i),
+        longs(i),
+        floats(i),
+        doubles(i),
+        decimals(i),
+        varchars(i),
+        chars(i),
+        dates(i),
+        times(i),
+        datetimes(i),
+        instants(i),
+        arrays(i),
+        rows(i),
+        maps(i))
     }
     data
   }

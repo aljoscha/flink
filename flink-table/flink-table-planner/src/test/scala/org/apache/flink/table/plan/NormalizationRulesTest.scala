@@ -36,11 +36,10 @@ class NormalizationRulesTest extends TableTestBase {
 
     // rewrite distinct aggregate
     val cc: PlannerConfig = new CalciteConfigBuilder()
-        .replaceNormRuleSet(
-          RuleSets.ofList(CoreRules.AGGREGATE_EXPAND_DISTINCT_AGGREGATES_TO_JOIN))
-        .replaceLogicalOptRuleSet(RuleSets.ofList())
-        .replacePhysicalOptRuleSet(RuleSets.ofList())
-        .build()
+      .replaceNormRuleSet(RuleSets.ofList(CoreRules.AGGREGATE_EXPAND_DISTINCT_AGGREGATES_TO_JOIN))
+      .replaceLogicalOptRuleSet(RuleSets.ofList())
+      .replacePhysicalOptRuleSet(RuleSets.ofList())
+      .build()
     util.tableEnv.getConfig.setPlannerConfig(cc)
 
     val t = util.addTable[(Int, Long, String)]("MyTable", 'a, 'b, 'c)
@@ -52,17 +51,17 @@ class NormalizationRulesTest extends TableTestBase {
     val streamNode = batchTableNode(t).replace("DataSetScan", "FlinkLogicalDataSetScan")
 
     // expect double aggregate
-    val expected = unaryNode("LogicalProject",
-      unaryNode("LogicalAggregate",
-        unaryNode("LogicalAggregate",
-          unaryNode("LogicalProject",
-            streamNode,
-            term("b", "$1"), term("a", "$0")),
+    val expected = unaryNode(
+      "LogicalProject",
+      unaryNode(
+        "LogicalAggregate",
+        unaryNode(
+          "LogicalAggregate",
+          unaryNode("LogicalProject", streamNode, term("b", "$1"), term("a", "$0")),
           term("group", "{0, 1}")),
-        term("group", "{0}"), term("EXPR$0", "COUNT($1)")
-      ),
-      term("EXPR$0", "$1")
-    )
+        term("group", "{0}"),
+        term("EXPR$0", "COUNT($1)")),
+      term("EXPR$0", "$1"))
 
     util.verifySql(sqlQuery, expected)
   }
@@ -73,11 +72,10 @@ class NormalizationRulesTest extends TableTestBase {
 
     // rewrite distinct aggregate
     val cc: PlannerConfig = new CalciteConfigBuilder()
-        .replaceNormRuleSet(
-          RuleSets.ofList(CoreRules.AGGREGATE_EXPAND_DISTINCT_AGGREGATES_TO_JOIN))
-        .replaceLogicalOptRuleSet(RuleSets.ofList())
-        .replacePhysicalOptRuleSet(RuleSets.ofList())
-        .build()
+      .replaceNormRuleSet(RuleSets.ofList(CoreRules.AGGREGATE_EXPAND_DISTINCT_AGGREGATES_TO_JOIN))
+      .replaceLogicalOptRuleSet(RuleSets.ofList())
+      .replacePhysicalOptRuleSet(RuleSets.ofList())
+      .build()
     util.tableEnv.getConfig.setPlannerConfig(cc)
 
     val t = util.addTable[(Int, Long, String)]("MyTable", 'a, 'b, 'c)
@@ -91,16 +89,15 @@ class NormalizationRulesTest extends TableTestBase {
     // expect double aggregate
     val expected = unaryNode(
       "LogicalProject",
-      unaryNode("LogicalAggregate",
-        unaryNode("LogicalAggregate",
-          unaryNode("LogicalProject",
-            streamNode,
-            term("b", "$1"), term("a", "$0")),
+      unaryNode(
+        "LogicalAggregate",
+        unaryNode(
+          "LogicalAggregate",
+          unaryNode("LogicalProject", streamNode, term("b", "$1"), term("a", "$0")),
           term("group", "{0, 1}")),
-        term("group", "{0}"), term("EXPR$0", "COUNT($1)")
-      ),
-      term("EXPR$0", "$1")
-    )
+        term("group", "{0}"),
+        term("EXPR$0", "COUNT($1)")),
+      term("EXPR$0", "$1"))
 
     util.verifySql(sqlQuery, expected)
   }

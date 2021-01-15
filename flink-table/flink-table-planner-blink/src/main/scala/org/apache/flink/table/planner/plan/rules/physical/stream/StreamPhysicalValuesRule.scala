@@ -27,24 +27,20 @@ import org.apache.calcite.rel.RelNode
 import org.apache.calcite.rel.convert.ConverterRule
 
 /**
-  * Rule that converts [[FlinkLogicalValues]] to [[StreamPhysicalValues]].
-  */
+ * Rule that converts [[FlinkLogicalValues]] to [[StreamPhysicalValues]].
+ */
 class StreamPhysicalValuesRule
-  extends ConverterRule(
-    classOf[FlinkLogicalValues],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.STREAM_PHYSICAL,
-    "StreamPhysicalValuesRule") {
+    extends ConverterRule(
+      classOf[FlinkLogicalValues],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.STREAM_PHYSICAL,
+      "StreamPhysicalValuesRule") {
 
   def convert(rel: RelNode): RelNode = {
     val values: FlinkLogicalValues = rel.asInstanceOf[FlinkLogicalValues]
     val traitSet: RelTraitSet = rel.getTraitSet.replace(FlinkConventions.STREAM_PHYSICAL)
 
-    new StreamPhysicalValues(
-      rel.getCluster,
-      traitSet,
-      values.getTuples,
-      rel.getRowType)
+    new StreamPhysicalValues(rel.getCluster, traitSet, values.getTuples, rel.getRowType)
   }
 }
 

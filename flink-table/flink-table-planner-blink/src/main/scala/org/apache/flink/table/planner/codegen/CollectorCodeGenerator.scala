@@ -26,8 +26,8 @@ import org.apache.flink.table.types.logical.LogicalType
 import org.apache.flink.util.Collector
 
 /**
-  * A code generator for generating [[Collector]]s.
-  */
+ * A code generator for generating [[Collector]]s.
+ */
 object CollectorCodeGenerator {
 
   /**
@@ -51,7 +51,7 @@ object CollectorCodeGenerator {
       collectedType: LogicalType,
       inputTerm: String = CodeGenUtils.DEFAULT_INPUT1_TERM,
       collectedTerm: String = CodeGenUtils.DEFAULT_INPUT2_TERM)
-    : GeneratedCollector[TableFunctionCollector[_]] = {
+      : GeneratedCollector[TableFunctionCollector[_]] = {
 
     val funcName = newName(name)
     val input1TypeClass = boxedTypeTermForType(inputType)
@@ -114,8 +114,7 @@ object CollectorCodeGenerator {
       inputType: LogicalType,
       inputTerm: String,
       inputConversion: (String) => String,
-      bodyCode: String)
-    : GeneratedCollector[WrappingCollector[_]] = {
+      bodyCode: String): GeneratedCollector[WrappingCollector[_]] = {
 
     val funcName = newName(name)
     val inputTypeTerm = boxedTypeTermForType(inputType)
@@ -161,8 +160,7 @@ object CollectorCodeGenerator {
   def addToContext(
       ctx: CodeGeneratorContext,
       collectorTerm: String,
-      generatedCollector: GeneratedCollector[_])
-    : Unit = {
+      generatedCollector: GeneratedCollector[_]): Unit = {
 
     ctx.addReusableMember(s"private ${generatedCollector.getClassName} $collectorTerm = null;")
     ctx.addReusableInnerClass(generatedCollector.getClassName, generatedCollector.getCode)

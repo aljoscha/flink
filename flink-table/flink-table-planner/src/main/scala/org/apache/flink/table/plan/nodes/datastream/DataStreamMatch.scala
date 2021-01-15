@@ -64,8 +64,8 @@ import org.apache.flink.util.MathUtils
 import org.apache.calcite.util.ImmutableBitSet
 
 /**
-  * Flink RelNode which matches along with LogicalMatch.
-  */
+ * Flink RelNode which matches along with LogicalMatch.
+ */
 class DataStreamMatch(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -73,9 +73,9 @@ class DataStreamMatch(
     logicalMatch: MatchRecognize,
     schema: RowSchema,
     inputSchema: RowSchema)
-  extends SingleRel(cluster, traitSet, inputNode)
-  with CommonMatchRecognize
-  with DataStreamRel {
+    extends SingleRel(cluster, traitSet, inputNode)
+    with CommonMatchRecognize
+    with DataStreamRel {
 
   if (logicalMatch.measures.values().exists(containsPythonCall(_)) ||
     logicalMatch.patternDefinitions.values().exists(containsPythonCall(_))) {
@@ -89,13 +89,7 @@ class DataStreamMatch(
   override def deriveRowType(): RelDataType = schema.relDataType
 
   override def copy(traitSet: RelTraitSet, inputs: util.List[RelNode]): RelNode = {
-    new DataStreamMatch(
-      cluster,
-      traitSet,
-      inputs.get(0),
-      logicalMatch,
-      schema,
-      inputSchema)
+    new DataStreamMatch(cluster, traitSet, inputs.get(0), logicalMatch, schema, inputSchema)
   }
 
   override def toString: String = {
@@ -111,16 +105,16 @@ class DataStreamMatch(
       case x: RexLiteral if x.getTypeName.getFamily == SqlTypeFamily.INTERVAL_DAY_TIME =>
         Time.milliseconds(x.getValueAs(classOf[JLong]))
       case _ =>
-        throw new TableException("Only constant intervals with millisecond resolution " +
-          "are supported as time constraints of patterns.")
+        throw new TableException(
+          "Only constant intervals with millisecond resolution " +
+            "are supported as time constraints of patterns.")
     }
   }
 
   @VisibleForTesting
   private[flink] def translatePattern(
-    config: TableConfig,
-    inputTypeInfo: TypeInformation[Row]
-  ): (Pattern[Row, Row], Iterable[String]) = {
+      config: TableConfig,
+      inputTypeInfo: TypeInformation[Row]): (Pattern[Row, Row], Iterable[String]) = {
     val patternVisitor = new PatternVisitor(config, inputTypeInfo, logicalMatch)
     val cepPattern = if (logicalMatch.interval != null) {
       val interval = translateTimeBound(logicalMatch.interval)
@@ -131,9 +125,7 @@ class DataStreamMatch(
     (cepPattern, patternVisitor.names)
   }
 
-  override def translateToPlan(
-      planner: StreamPlanner)
-    : DataStream[CRow] = {
+  override def translateToPlan(planner: StreamPlanner): DataStream[CRow] = {
 
     val inputIsAccRetract = DataStreamRetractionRules.isAccRetract(getInput)
 
@@ -150,9 +142,8 @@ class DataStreamMatch(
           "Note: Match recognize should not follow a non-windowed GroupBy aggregation.")
     }
 
-    val (timestampedInput, rowComparator, timeCharacteristic) = translateOrder(planner,
-      crowInput,
-      logicalMatch.orderKeys)
+    val (timestampedInput, rowComparator, timeCharacteristic) =
+      translateOrder(planner, crowInput, logicalMatch.orderKeys)
 
     val (cepPattern, patternNames) = translatePattern(config, inputTypeInfo)
 
@@ -199,10 +190,8 @@ class DataStreamMatch(
       throw new TableException("All rows per match mode is not supported yet.")
     } else {
       val generator = new MatchCodeGenerator(config, inputTypeInfo, patternNames.toSeq)
-      val patternSelectFunction = generator.generateOneRowPerMatchExpression(
-          schema,
-          partitionKeys,
-          measures)
+      val patternSelectFunction =
+        generator.generateOneRowPerMatchExpression(schema, partitionKeys, measures)
       patternStream.process[CRow](patternSelectFunction, outTypeInfo)
     }
   }
@@ -211,7 +200,7 @@ class DataStreamMatch(
       planner: StreamPlanner,
       crowInput: DataStream[CRow],
       orderKeys: RelCollation)
-    : (DataStream[CRow], Option[RowComparator], TimeCharacteristic.Value) = {
+      : (DataStream[CRow], Option[RowComparator], TimeCharacteristic.Value) = {
 
     if (orderKeys.getFieldCollations.size() == 0) {
       throw new ValidationException("You must specify either rowtime or proctime for order by.")
@@ -232,19 +221,25 @@ class DataStreamMatch(
     }
 
     val rowComparator = if (orderKeys.getFieldCollations.size() > 1) {
-      Some(SortUtil
-        .createRowComparator(inputSchema.relDataType,
-          orderKeys.getFieldCollations.asScala.tail,
-          planner.getExecutionEnvironment.getConfig))
+      Some(
+        SortUtil
+          .createRowComparator(
+            inputSchema.relDataType,
+            orderKeys.getFieldCollations.asScala.tail,
+            planner.getExecutionEnvironment.getConfig))
     } else {
       None
     }
 
     timeOrderField.getType match {
       case _ if FlinkTypeFactory.isRowtimeIndicatorType(timeOrderField.getType) =>
-        (crowInput.process(
-          new RowtimeProcessFunction(timeOrderField.getIndex, CRowTypeInfo(inputSchema.typeInfo))
-        ).setParallelism(crowInput.getParallelism),
+        (
+          crowInput
+            .process(
+              new RowtimeProcessFunction(
+                timeOrderField.getIndex,
+                CRowTypeInfo(inputSchema.typeInfo)))
+            .setParallelism(crowInput.getParallelism),
           rowComparator,
           TimeCharacteristic.EventTime)
       case _ =>
@@ -252,8 +247,9 @@ class DataStreamMatch(
     }
   }
 
-  private def applyPartitioning(partitionKeys: ImmutableBitSet, inputDs: DataStream[Row])
-    : DataStream[Row] = {
+  private def applyPartitioning(
+      partitionKeys: ImmutableBitSet,
+      inputDs: DataStream[Row]): DataStream[Row] = {
     if (partitionKeys.size() > 0) {
       val keys = partitionKeys.toArray
       val keySelector = new RowKeySelector(keys, inputSchema.projectedTypeInfo(keys))
@@ -272,7 +268,7 @@ private class PatternVisitor(
     config: TableConfig,
     inputTypeInfo: TypeInformation[Row],
     logicalMatch: MatchRecognize)
-  extends RexDefaultVisitor[Pattern[Row, Row]] {
+    extends RexDefaultVisitor[Pattern[Row, Row]] {
 
   private var pattern: Pattern[Row, Row] = _
   val names = new collection.mutable.LinkedHashSet[String]()
@@ -305,15 +301,25 @@ private class PatternVisitor(
       case PATTERN_QUANTIFIER =>
         val name = call.operands.get(0) match {
           case c: RexLiteral => c
-          case x => throw new TableException(s"Expression not supported: $x Group patterns are " +
-            s"not supported yet.")
+          case x =>
+            throw new TableException(
+              s"Expression not supported: $x Group patterns are " +
+                s"not supported yet.")
         }
         pattern = name.accept(this)
-        val startNum = MathUtils.checkedDownCast(call.operands.get(1).asInstanceOf[RexLiteral]
-          .getValueAs(classOf[JLong]))
-        val endNum = MathUtils.checkedDownCast(call.operands.get(2).asInstanceOf[RexLiteral]
-          .getValueAs(classOf[JLong]))
-        val isGreedy = !call.operands.get(3).asInstanceOf[RexLiteral]
+        val startNum = MathUtils.checkedDownCast(
+          call.operands
+            .get(1)
+            .asInstanceOf[RexLiteral]
+            .getValueAs(classOf[JLong]))
+        val endNum = MathUtils.checkedDownCast(
+          call.operands
+            .get(2)
+            .asInstanceOf[RexLiteral]
+            .getValueAs(classOf[JLong]))
+        val isGreedy = !call.operands
+          .get(3)
+          .asInstanceOf[RexLiteral]
           .getValueAs(classOf[JBoolean])
 
         applyQuantifier(pattern, startNum, endNum, isGreedy)
@@ -336,28 +342,34 @@ private class PatternVisitor(
     s"Unsupported expression within Pattern: [$rexNode]")
 
   private def translateSkipStrategy = {
-    val getPatternTarget = () => logicalMatch.after.asInstanceOf[RexCall].getOperands.get(0)
-      .asInstanceOf[RexLiteral].getValueAs(classOf[String])
+    val getPatternTarget = () =>
+      logicalMatch.after
+        .asInstanceOf[RexCall]
+        .getOperands
+        .get(0)
+        .asInstanceOf[RexLiteral]
+        .getValueAs(classOf[String])
 
     logicalMatch.after.getKind match {
       case SqlKind.LITERAL =>
         logicalMatch.after.asInstanceOf[RexLiteral].getValueAs(classOf[AfterOption]) match {
           case AfterOption.SKIP_PAST_LAST_ROW => AfterMatchSkipStrategy.skipPastLastEvent()
-          case AfterOption.SKIP_TO_NEXT_ROW => AfterMatchSkipStrategy.skipToNext()
+          case AfterOption.SKIP_TO_NEXT_ROW   => AfterMatchSkipStrategy.skipToNext()
         }
       case SqlKind.SKIP_TO_FIRST =>
         AfterMatchSkipStrategy.skipToFirst(getPatternTarget()).throwExceptionOnMiss()
       case SqlKind.SKIP_TO_LAST =>
         AfterMatchSkipStrategy.skipToLast(getPatternTarget()).throwExceptionOnMiss()
-      case _ => throw new IllegalStateException(s"Corrupted query tree. Unexpected " +
-        s"${logicalMatch.after} for after match strategy.")
+      case _ =>
+        throw new IllegalStateException(
+          s"Corrupted query tree. Unexpected " +
+            s"${logicalMatch.after} for after match strategy.")
     }
   }
 
   private def translateSingleVariable(
       previousPattern: Option[Pattern[Row, Row]],
-      patternName: String)
-    : Pattern[Row, Row] = {
+      patternName: String): Pattern[Row, Row] = {
     if (names.contains(patternName)) {
       throw new TableException("Pattern variables must be unique. That might change in the future.")
     } else {
@@ -375,8 +387,7 @@ private class PatternVisitor(
       pattern: Pattern[Row, Row],
       startNum: Int,
       endNum: Int,
-      greedy: Boolean)
-    : Pattern[Row, Row] = {
+      greedy: Boolean): Pattern[Row, Row] = {
     val isOptional = startNum == 0 && endNum == 1
 
     val newPattern = if (startNum == 0 && endNum == -1) { // zero or more

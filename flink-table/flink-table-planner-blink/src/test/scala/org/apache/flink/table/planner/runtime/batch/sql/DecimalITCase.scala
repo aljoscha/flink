@@ -36,9 +36,9 @@ import java.math.{BigDecimal => JBigDecimal}
 import scala.collection.Seq
 
 /**
-  * Conformance test of SQL type Decimal(p,s).
-  * Served also as documentation of our Decimal behaviors.
-  */
+ * Conformance test of SQL type Decimal(p,s).
+ * Served also as documentation of our Decimal behaviors.
+ */
 class DecimalITCase extends BatchTestBase {
 
   private case class Coll(colTypes: Seq[LogicalType], rows: Seq[Row])
@@ -48,12 +48,11 @@ class DecimalITCase extends BatchTestBase {
       tables: Seq[Coll],
       query: String,
       expected: Coll,
-      isSorted: Boolean = false)
-    : Unit = {
+      isSorted: Boolean = false): Unit = {
 
     var tableId = 0
     var queryX = query
-    tables.foreach{ table =>
+    tables.foreach { table =>
       tableId += 1
       globalTableId += 1
       val tableName = "Table" + tableId
@@ -70,17 +69,15 @@ class DecimalITCase extends BatchTestBase {
     val ts2 = resultTable.getSchema.getFieldDataTypes.map(fromDataTypeToLogicalType)
     Assert.assertEquals(ts1.length, ts2.length)
 
-    Assert.assertTrue(ts1.zip(ts2).forall {
-      case (t1, t2) => isInteroperable(t1, t2)
+    Assert.assertTrue(ts1.zip(ts2).forall { case (t1, t2) =>
+      isInteroperable(t1, t2)
     })
 
     def prepareResult(isSorted: Boolean, seq: Seq[Row]) = {
       if (!isSorted) seq.map(_.toString).sortBy(s => s) else seq.map(_.toString)
     }
     val resultRows = executeQuery(resultTable)
-    Assert.assertEquals(
-      prepareResult(isSorted, expected.rows),
-      prepareResult(isSorted, resultRows))
+    Assert.assertEquals(prepareResult(isSorted, expected.rows), prepareResult(isSorted, resultRows))
   }
 
   private def checkQuery1(
@@ -89,8 +86,7 @@ class DecimalITCase extends BatchTestBase {
       query: String,
       expectedColTypes: Seq[LogicalType],
       expectedRows: Seq[Row],
-      isSorted: Boolean = false)
-    : Unit = {
+      isSorted: Boolean = false): Unit = {
     checkQueryX(
       Seq(Coll(sourceColTypes, sourceRows)),
       query,
@@ -112,7 +108,7 @@ class DecimalITCase extends BatchTestBase {
 
     def isOverflow(ex: Throwable): Boolean = ex match {
       case null => false
-      case _ => ex.getMessage.contains("out of range") || isOverflow(ex.getCause)
+      case _    => ex.getMessage.contains("out of range") || isOverflow(ex.getCause)
     }
 
     if (!isOverflow(ex)) {
@@ -151,7 +147,7 @@ class DecimalITCase extends BatchTestBase {
       s1r(d"3.14"),
       "select log10(f0), ln(f0), log(f0), log2(f0) from Table1",
       Seq(DOUBLE, DOUBLE, DOUBLE, DOUBLE),
-      s1r(log10(3.14), Math.log(3.14), Math.log(3.14), Math.log(3.14)/Math.log(2.0)))
+      s1r(log10(3.14), Math.log(3.14), Math.log(3.14), Math.log(3.14) / Math.log(2.0)))
 
     checkQuery1(
       Seq(DECIMAL(10, 2), DOUBLE),
@@ -179,7 +175,7 @@ class DecimalITCase extends BatchTestBase {
       s1r(d"0.12"),
       "select sin(f0), cos(f0), tan(f0), cot(f0) from Table1",
       Seq(DOUBLE, DOUBLE, DOUBLE, DOUBLE),
-      s1r(sin(0.12), cos(0.12), tan(0.12), 1.0/tan(0.12)))
+      s1r(sin(0.12), cos(0.12), tan(0.12), 1.0 / tan(0.12)))
 
     checkQuery1(
       Seq(DECIMAL(10, 2)),
@@ -248,8 +244,8 @@ class DecimalITCase extends BatchTestBase {
 
   @Test
   def testJoin1(): Unit = {
-    tEnv.getConfig.getConfiguration.setString(
-      ExecutionConfigOptions.TABLE_EXEC_DISABLED_OPERATORS, "HashJoin, NestedLoopJoin")
+    tEnv.getConfig.getConfiguration
+      .setString(ExecutionConfigOptions.TABLE_EXEC_DISABLED_OPERATORS, "HashJoin, NestedLoopJoin")
 
     checkQuery1(
       Seq(DECIMAL(8, 2), DECIMAL(8, 4), INT, DOUBLE),
@@ -261,8 +257,8 @@ class DecimalITCase extends BatchTestBase {
 
   @Test
   def testJoin2(): Unit = {
-    tEnv.getConfig.getConfiguration.setString(
-      ExecutionConfigOptions.TABLE_EXEC_DISABLED_OPERATORS, "HashJoin, NestedLoopJoin")
+    tEnv.getConfig.getConfiguration
+      .setString(ExecutionConfigOptions.TABLE_EXEC_DISABLED_OPERATORS, "HashJoin, NestedLoopJoin")
 
     checkQuery1(
       Seq(DECIMAL(8, 2), DECIMAL(8, 4), INT, DOUBLE),
@@ -274,8 +270,8 @@ class DecimalITCase extends BatchTestBase {
 
   @Test
   def testJoin3(): Unit = {
-    tEnv.getConfig.getConfiguration.setString(
-      ExecutionConfigOptions.TABLE_EXEC_DISABLED_OPERATORS, "HashJoin, NestedLoopJoin")
+    tEnv.getConfig.getConfiguration
+      .setString(ExecutionConfigOptions.TABLE_EXEC_DISABLED_OPERATORS, "HashJoin, NestedLoopJoin")
 
     checkQuery1(
       Seq(DECIMAL(8, 2), DECIMAL(8, 4), INT, DOUBLE),
@@ -288,8 +284,8 @@ class DecimalITCase extends BatchTestBase {
 
   @Test
   def testJoin4(): Unit = {
-    tEnv.getConfig.getConfiguration.setString(
-      ExecutionConfigOptions.TABLE_EXEC_DISABLED_OPERATORS, "HashJoin, NestedLoopJoin")
+    tEnv.getConfig.getConfiguration
+      .setString(ExecutionConfigOptions.TABLE_EXEC_DISABLED_OPERATORS, "HashJoin, NestedLoopJoin")
 
     checkQuery1(
       Seq(DECIMAL(8, 2), DECIMAL(8, 4), INT, DOUBLE),
@@ -301,8 +297,8 @@ class DecimalITCase extends BatchTestBase {
 
   @Test
   def testJoin5(): Unit = {
-    tEnv.getConfig.getConfiguration.setString(
-      ExecutionConfigOptions.TABLE_EXEC_DISABLED_OPERATORS, "HashJoin, NestedLoopJoin")
+    tEnv.getConfig.getConfiguration
+      .setString(ExecutionConfigOptions.TABLE_EXEC_DISABLED_OPERATORS, "HashJoin, NestedLoopJoin")
 
     checkQuery1(
       Seq(DECIMAL(8, 2), DECIMAL(8, 4), INT, DOUBLE),
@@ -314,8 +310,8 @@ class DecimalITCase extends BatchTestBase {
 
   @Test
   def testJoin6(): Unit = {
-    tEnv.getConfig.getConfiguration.setString(
-      ExecutionConfigOptions.TABLE_EXEC_DISABLED_OPERATORS, "HashJoin, NestedLoopJoin")
+    tEnv.getConfig.getConfiguration
+      .setString(ExecutionConfigOptions.TABLE_EXEC_DISABLED_OPERATORS, "HashJoin, NestedLoopJoin")
 
     checkQuery1(
       Seq(DECIMAL(8, 2), DECIMAL(8, 4), INT, DOUBLE),
@@ -327,8 +323,8 @@ class DecimalITCase extends BatchTestBase {
 
   @Test
   def testJoin7(): Unit = {
-    tEnv.getConfig.getConfiguration.setString(
-      ExecutionConfigOptions.TABLE_EXEC_DISABLED_OPERATORS, "HashJoin, NestedLoopJoin")
+    tEnv.getConfig.getConfiguration
+      .setString(ExecutionConfigOptions.TABLE_EXEC_DISABLED_OPERATORS, "HashJoin, NestedLoopJoin")
     checkQuery1(
       Seq(DECIMAL(8, 2), DECIMAL(8, 4), INT, DOUBLE),
       s1r(d"1", d"1", 1, 1.0),
@@ -365,7 +361,7 @@ class DecimalITCase extends BatchTestBase {
       Seq(DECIMAL(6, 3), DECIMAL(6, 3), DECIMAL(20, 10)),
       Seq(row(d"100.000", null, null)),
       "select distinct(f0), f1, f2 from (select t1.f0, t1.f1, t1.f2 from Table1 t1 " +
-          "union all (SELECT * FROM Table1)) order by f0",
+        "union all (SELECT * FROM Table1)) order by f0",
       Seq(DECIMAL(6, 3), DECIMAL(6, 3), DECIMAL(20, 10)),
       s1r(d"100.000", null, null))
   }

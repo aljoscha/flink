@@ -64,13 +64,12 @@ class EqualiserCodeGenerator(fieldTypes: Array[LogicalType]) {
           getFieldTypes(fieldType).asScala.toArray)
         val generatedEqualiser = equaliserGenerator
           .generateRecordEqualiser("field$" + i + "GeneratedEqualiser")
-        val generatedEqualiserTerm = ctx.addReusableObject(
-          generatedEqualiser, "field$" + i + "GeneratedEqualiser")
+        val generatedEqualiserTerm =
+          ctx.addReusableObject(generatedEqualiser, "field$" + i + "GeneratedEqualiser")
         val equaliserTypeTerm = classOf[RecordEqualiser].getCanonicalName
         val equaliserTerm = newName("equaliser")
         ctx.addReusableMember(s"private $equaliserTypeTerm $equaliserTerm = null;")
-        ctx.addReusableInitStatement(
-          s"""
+        ctx.addReusableInitStatement(s"""
              |$equaliserTerm = ($equaliserTypeTerm)
              |  $generatedEqualiserTerm.newInstance(Thread.currentThread().getContextClassLoader());
              |""".stripMargin)

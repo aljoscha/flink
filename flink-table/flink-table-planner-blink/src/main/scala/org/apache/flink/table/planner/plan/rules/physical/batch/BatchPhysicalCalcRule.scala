@@ -29,14 +29,14 @@ import org.apache.flink.table.planner.plan.utils.PythonUtil.containsPythonCall
 import scala.collection.JavaConverters._
 
 /**
-  * Rule that converts [[FlinkLogicalCalc]] to [[BatchPhysicalCalc]].
-  */
+ * Rule that converts [[FlinkLogicalCalc]] to [[BatchPhysicalCalc]].
+ */
 class BatchPhysicalCalcRule
-  extends ConverterRule(
-    classOf[FlinkLogicalCalc],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.BATCH_PHYSICAL,
-    "BatchPhysicalCalcRule") {
+    extends ConverterRule(
+      classOf[FlinkLogicalCalc],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.BATCH_PHYSICAL,
+      "BatchPhysicalCalcRule") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val calc: FlinkLogicalCalc = call.rel(0)
@@ -49,12 +49,7 @@ class BatchPhysicalCalcRule
     val newTrait = rel.getTraitSet.replace(FlinkConventions.BATCH_PHYSICAL)
     val newInput = RelOptRule.convert(calc.getInput, FlinkConventions.BATCH_PHYSICAL)
 
-    new BatchPhysicalCalc(
-      rel.getCluster,
-      newTrait,
-      newInput,
-      calc.getProgram,
-      rel.getRowType)
+    new BatchPhysicalCalc(rel.getCluster, newTrait, newInput, calc.getProgram, rel.getRowType)
   }
 }
 

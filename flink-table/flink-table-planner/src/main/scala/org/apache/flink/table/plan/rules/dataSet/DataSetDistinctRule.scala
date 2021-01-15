@@ -26,35 +26,30 @@ import org.apache.flink.table.plan.nodes.dataset.DataSetDistinct
 import org.apache.flink.table.plan.nodes.logical.FlinkLogicalAggregate
 
 class DataSetDistinctRule
-  extends ConverterRule(
-    classOf[FlinkLogicalAggregate],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.DATASET,
-    "DataSetDistinctRule") {
+    extends ConverterRule(
+      classOf[FlinkLogicalAggregate],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.DATASET,
+      "DataSetDistinctRule") {
 
-    override def matches(call: RelOptRuleCall): Boolean = {
-      val agg: FlinkLogicalAggregate = call.rel(0).asInstanceOf[FlinkLogicalAggregate]
+  override def matches(call: RelOptRuleCall): Boolean = {
+    val agg: FlinkLogicalAggregate = call.rel(0).asInstanceOf[FlinkLogicalAggregate]
 
-      // only accept distinct
-      agg.getAggCallList.isEmpty &&
-        agg.getGroupCount == agg.getRowType.getFieldCount &&
-        agg.getRowType.equals(agg.getInput.getRowType) &&
-        agg.getGroupSets.size() == 1
-    }
-
-    def convert(rel: RelNode): RelNode = {
-      val agg: FlinkLogicalAggregate = rel.asInstanceOf[FlinkLogicalAggregate]
-      val traitSet: RelTraitSet = rel.getTraitSet.replace(FlinkConventions.DATASET)
-      val convInput: RelNode = RelOptRule.convert(agg.getInput, FlinkConventions.DATASET)
-
-      new DataSetDistinct(
-        rel.getCluster,
-        traitSet,
-        convInput,
-        agg.getRowType,
-        "DataSetDistinctRule")
-    }
+    // only accept distinct
+    agg.getAggCallList.isEmpty &&
+    agg.getGroupCount == agg.getRowType.getFieldCount &&
+    agg.getRowType.equals(agg.getInput.getRowType) &&
+    agg.getGroupSets.size() == 1
   }
+
+  def convert(rel: RelNode): RelNode = {
+    val agg: FlinkLogicalAggregate = rel.asInstanceOf[FlinkLogicalAggregate]
+    val traitSet: RelTraitSet = rel.getTraitSet.replace(FlinkConventions.DATASET)
+    val convInput: RelNode = RelOptRule.convert(agg.getInput, FlinkConventions.DATASET)
+
+    new DataSetDistinct(rel.getCluster, traitSet, convInput, agg.getRowType, "DataSetDistinctRule")
+  }
+}
 
 object DataSetDistinctRule {
   val INSTANCE: RelOptRule = new DataSetDistinctRule

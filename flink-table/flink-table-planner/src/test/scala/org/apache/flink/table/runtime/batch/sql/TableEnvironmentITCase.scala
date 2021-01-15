@@ -50,9 +50,8 @@ import scala.collection.JavaConverters._
 import scala.io.Source
 
 @RunWith(classOf[Parameterized])
-class TableEnvironmentITCase(
-    configMode: TableConfigMode)
-  extends TableProgramsCollectionTestBase(configMode) {
+class TableEnvironmentITCase(configMode: TableConfigMode)
+    extends TableProgramsCollectionTestBase(configMode) {
 
   private val _tempFolder = new TemporaryFolder()
 
@@ -148,8 +147,9 @@ class TableEnvironmentITCase(
     val fieldNames = Array("d", "e", "f")
     val fieldTypes = tEnv.scan("sourceTable").getSchema.getFieldTypes
     val sink = new MemoryTableSourceSinkUtil.UnsafeMemoryAppendTableSink
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSinkInternal(
-      "targetTable", sink.configure(fieldNames, fieldTypes))
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSinkInternal("targetTable", sink.configure(fieldNames, fieldTypes))
 
     val sql = "INSERT INTO targetTable SELECT a, b, c FROM sourceTable"
     tEnv.sqlUpdate(sql)
@@ -171,8 +171,9 @@ class TableEnvironmentITCase(
     val fieldNames = Array("d", "e", "f")
     val fieldTypes = tEnv.scan("sourceTable").getSchema.getFieldTypes
     val sink = new MemoryTableSourceSinkUtil.UnsafeMemoryAppendTableSink
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSinkInternal(
-      "targetTable", sink.configure(fieldNames, fieldTypes))
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSinkInternal("targetTable", sink.configure(fieldNames, fieldTypes))
 
     val sql = "INSERT INTO targetTable SELECT a, b, c FROM sourceTable"
     tEnv.sqlUpdate(sql)
@@ -190,8 +191,9 @@ class TableEnvironmentITCase(
     val result = tEnv.sqlQuery("SELECT c, b, a FROM sourceTable").select('a.avg, 'b.sum, 'c.count)
 
     val resultFile = _tempFolder.newFile().getAbsolutePath
-    result.toDataSet[(Integer, Long, Long)]
-      .writeAsCsv(resultFile, writeMode=FileSystem.WriteMode.OVERWRITE)
+    result
+      .toDataSet[(Integer, Long, Long)]
+      .writeAsCsv(resultFile, writeMode = FileSystem.WriteMode.OVERWRITE)
 
     tEnv.execute("job name")
     val expected1 = List("1,1,Hi", "2,2,Hello", "3,2,Hello world")
@@ -212,26 +214,30 @@ class TableEnvironmentITCase(
     val env = ExecutionEnvironment.getExecutionEnvironment
     val tEnv = BatchTableEnvironment.create(env)
     MemoryTableSourceSinkUtil.clear()
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(
-      "sourceTable", TableEnvironmentITCase.getPersonCsvTableSource)
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSourceInternal("sourceTable", TableEnvironmentITCase.getPersonCsvTableSource)
 
     val fieldNames = Array("d", "e", "f", "g")
     val fieldTypes = tEnv.scan("sourceTable").getSchema.getFieldTypes
     val sink = new MemoryTableSourceSinkUtil.UnsafeMemoryAppendTableSink
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSinkInternal(
-      "targetTable", sink.configure(fieldNames, fieldTypes))
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSinkInternal("targetTable", sink.configure(fieldNames, fieldTypes))
 
     val sql = "INSERT INTO targetTable SELECT * FROM sourceTable where id > 7"
     tEnv.sqlUpdate(sql)
 
-    val result = tEnv.sqlQuery("SELECT id as a, score as b FROM sourceTable")
+    val result = tEnv
+      .sqlQuery("SELECT id as a, score as b FROM sourceTable")
       .select('a.count, 'b.avg)
 
     val resultFile = _tempFolder.newFile().getAbsolutePath
-    result.toDataSet[(Long, Double)]
+    result
+      .toDataSet[(Long, Double)]
       // format the double with 5 fractional digits for comparison
       .map(ds => (ds._1.toString, "%.5f".format(ds._2)))
-      .writeAsCsv(resultFile, writeMode=FileSystem.WriteMode.OVERWRITE)
+      .writeAsCsv(resultFile, writeMode = FileSystem.WriteMode.OVERWRITE)
 
     tEnv.execute("job name")
     val expected1 = List("Kelly,8,2.34,Williams")
@@ -259,13 +265,15 @@ class TableEnvironmentITCase(
     val fieldNames = Array("d", "e", "f")
     val fieldTypes = tEnv.scan("sourceTable").getSchema.getFieldTypes
     val sink = new MemoryTableSourceSinkUtil.UnsafeMemoryAppendTableSink
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSinkInternal(
-      "targetTable", sink.configure(fieldNames, fieldTypes))
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSinkInternal("targetTable", sink.configure(fieldNames, fieldTypes))
 
     val result = tEnv.sqlQuery("SELECT c, b, a FROM sourceTable").select('a.avg, 'b.sum, 'c.count)
     val resultFile = _tempFolder.newFile().getAbsolutePath
-    result.toDataSet[(Integer, Long, Long)]
-      .writeAsCsv(resultFile, writeMode=FileSystem.WriteMode.OVERWRITE)
+    result
+      .toDataSet[(Integer, Long, Long)]
+      .writeAsCsv(resultFile, writeMode = FileSystem.WriteMode.OVERWRITE)
 
     val sql = "INSERT INTO targetTable SELECT a, b, c FROM sourceTable"
     tEnv.sqlUpdate(sql)
@@ -294,8 +302,9 @@ class TableEnvironmentITCase(
     val fieldNames = Array("d", "e", "f")
     val fieldTypes = tEnv.scan("sourceTable").getSchema.getFieldTypes
     val sink1 = new MemoryTableSourceSinkUtil.UnsafeMemoryAppendTableSink
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSinkInternal(
-      "targetTable", sink1.configure(fieldNames, fieldTypes))
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSinkInternal("targetTable", sink1.configure(fieldNames, fieldTypes))
 
     val tableResult = tEnv.executeSql("INSERT INTO targetTable SELECT a, b, c FROM sourceTable")
     checkInsertTableResult(tableResult, "default_catalog.default_database.targetTable")
@@ -314,7 +323,7 @@ class TableEnvironmentITCase(
     val resultFile = _tempFolder.newFile()
     val sinkPath = resultFile.getAbsolutePath
     val configuredSink = new TestingOverwritableTableSink(sinkPath)
-      .configure(Array("d"),  Array(STRING))
+      .configure(Array("d"), Array(STRING))
     tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSinkInternal("MySink", configuredSink)
 
     val tableResult1 = tEnv.executeSql("INSERT overwrite MySink SELECT c FROM sourceTable")
@@ -342,8 +351,9 @@ class TableEnvironmentITCase(
     val fieldNames = Array("d", "e", "f")
     val fieldTypes = tEnv.scan("sourceTable").getSchema.getFieldTypes
     val sink1 = new MemoryTableSourceSinkUtil.UnsafeMemoryAppendTableSink
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSinkInternal(
-      "targetTable", sink1.configure(fieldNames, fieldTypes))
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSinkInternal("targetTable", sink1.configure(fieldNames, fieldTypes))
 
     val sink1Path = registerCsvTableSink(tEnv, fieldNames, fieldTypes, "MySink1")
     assertTrue(FileUtils.readFileUtf8(new File(sink1Path)).isEmpty)
@@ -376,13 +386,15 @@ class TableEnvironmentITCase(
     val fieldNames = Array("d", "e", "f")
     val fieldTypes = tEnv.scan("sourceTable").getSchema.getFieldTypes
     val sink = new MemoryTableSourceSinkUtil.UnsafeMemoryAppendTableSink
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSinkInternal(
-      "targetTable", sink.configure(fieldNames, fieldTypes))
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSinkInternal("targetTable", sink.configure(fieldNames, fieldTypes))
 
     val result = tEnv.sqlQuery("SELECT c, b, a FROM sourceTable").select('a.avg, 'b.sum, 'c.count)
     val resultFile = _tempFolder.newFile().getAbsolutePath
-    result.toDataSet[(Integer, Long, Long)]
-      .writeAsCsv(resultFile, writeMode=FileSystem.WriteMode.OVERWRITE)
+    result
+      .toDataSet[(Integer, Long, Long)]
+      .writeAsCsv(resultFile, writeMode = FileSystem.WriteMode.OVERWRITE)
 
     val tableResult = tEnv.executeSql("INSERT INTO targetTable SELECT a, b, c FROM sourceTable")
     checkInsertTableResult(tableResult, "default_catalog.default_database.targetTable")
@@ -411,8 +423,9 @@ class TableEnvironmentITCase(
     val fieldNames = Array("d", "e", "f")
     val fieldTypes = tEnv.scan("sourceTable").getSchema.getFieldTypes
     val sink1 = new MemoryTableSourceSinkUtil.UnsafeMemoryAppendTableSink
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSinkInternal(
-      "targetTable", sink1.configure(fieldNames, fieldTypes))
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSinkInternal("targetTable", sink1.configure(fieldNames, fieldTypes))
 
     val table = tEnv.sqlQuery("SELECT a, b, c FROM sourceTable")
     val tableResult = table.executeInsert("targetTable")
@@ -432,7 +445,7 @@ class TableEnvironmentITCase(
     val resultFile = _tempFolder.newFile()
     val sinkPath = resultFile.getAbsolutePath
     val configuredSink = new TestingOverwritableTableSink(sinkPath)
-      .configure(Array("d"),  Array(STRING))
+      .configure(Array("d"), Array(STRING))
     tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSinkInternal("MySink", configuredSink)
 
     val tableResult1 = tEnv.sqlQuery("SELECT c FROM sourceTable").executeInsert("MySink", true)
@@ -443,7 +456,7 @@ class TableEnvironmentITCase(
     assertEquals(expected1.sorted, actual1.sorted)
 
     val tableResult2 = tEnv.sqlQuery("SELECT c FROM sourceTable").executeInsert("MySink", true)
-    checkInsertTableResult(tableResult2,  "default_catalog.default_database.MySink")
+    checkInsertTableResult(tableResult2, "default_catalog.default_database.MySink")
     val expected2 = List("Hi", "Hello", "Hello world")
     val actual2 = FileUtils.readFileUtf8(resultFile).split("\n").toList
     assertEquals(expected2.sorted, actual2.sorted)
@@ -460,20 +473,23 @@ class TableEnvironmentITCase(
 
     val sink1Path = _tempFolder.newFile().getAbsolutePath
     val configuredSink1 = new TestingOverwritableTableSink(sink1Path)
-      .configure(Array("d", "e", "f"),  Array(INT, LONG, STRING))
-    tEnv.asInstanceOf[TableEnvironmentInternal]
+      .configure(Array("d", "e", "f"), Array(INT, LONG, STRING))
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
       .registerTableSinkInternal("MySink1", configuredSink1)
     assertTrue(FileUtils.readFileUtf8(new File(sink1Path)).isEmpty)
 
     val sink2Path = _tempFolder.newFile().getAbsolutePath
     val configuredSink2 = new TestingOverwritableTableSink(sink2Path)
-      .configure(Array("i", "j", "k"),  Array(INT, LONG, STRING))
-    tEnv.asInstanceOf[TableEnvironmentInternal]
+      .configure(Array("i", "j", "k"), Array(INT, LONG, STRING))
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
       .registerTableSinkInternal("MySink2", configuredSink2)
     assertTrue(FileUtils.readFileUtf8(new File(sink2Path)).isEmpty)
 
     val stmtSet = tEnv.createStatementSet()
-    stmtSet.addInsert("MySink1", tEnv.sqlQuery("select * from MyTable where a > 2"), true)
+    stmtSet
+      .addInsert("MySink1", tEnv.sqlQuery("select * from MyTable where a > 2"), true)
       .addInsertSql("INSERT OVERWRITE MySink2 SELECT a, b, c FROM MyTable where a <= 2")
 
     val actual = stmtSet.explain()
@@ -508,11 +524,13 @@ class TableEnvironmentITCase(
     MemoryTableSourceSinkUtil.clear()
     val configuredSink = new MemoryTableSourceSinkUtil.UnsafeMemoryAppendTableSink()
       .configure(Array("d", "e", "f"), Array(INT, LONG, STRING))
-    tEnv.asInstanceOf[TableEnvironmentInternal]
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
       .registerTableSinkInternal("MySink", configuredSink)
 
     val stmtSet = tEnv.createStatementSet()
-    stmtSet.addInsert("MySink", tEnv.sqlQuery("select * from MyTable where a > 2"))
+    stmtSet
+      .addInsert("MySink", tEnv.sqlQuery("select * from MyTable where a > 2"))
       .addInsertSql("INSERT INTO MySink SELECT a, b, c FROM MyTable where a <= 2")
 
     val tableResult = stmtSet.execute()
@@ -535,7 +553,8 @@ class TableEnvironmentITCase(
     assertTrue(tableResult.getJobClient.isPresent)
     assertEquals(ResultKind.SUCCESS_WITH_CONTENT, tableResult.getResultKind)
     assertEquals(
-      TableSchema.builder()
+      TableSchema
+        .builder()
         .field("a", DataTypes.INT())
         .field("c", DataTypes.STRING())
         .build(),
@@ -562,7 +581,8 @@ class TableEnvironmentITCase(
 
     val configuredSink = new CsvTableSink(path, ",", 1, WriteMode.OVERWRITE)
       .configure(fieldNames, fieldTypes)
-    tEnv.asInstanceOf[TableEnvironmentInternal]
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
       .registerTableSinkInternal(tableName, configuredSink)
 
     path

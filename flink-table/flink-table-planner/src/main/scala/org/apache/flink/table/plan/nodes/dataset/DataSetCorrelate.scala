@@ -34,8 +34,8 @@ import org.apache.calcite.rel.RelNode
 import org.apache.calcite.rex.{RexCall, RexNode}
 
 /**
-  * Flink RelNode which matches along with join a Java/Scala user defined table function.
-  */
+ * Flink RelNode which matches along with join a Java/Scala user defined table function.
+ */
 class DataSetCorrelate(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -46,16 +46,16 @@ class DataSetCorrelate(
     joinRowType: RelDataType,
     joinType: JoinRelType,
     ruleDescription: String)
-  extends DataSetCorrelateBase(
-    cluster,
-    traitSet,
-    inputNode,
-    scan,
-    condition,
-    relRowType,
-    joinRowType,
-    joinType,
-    ruleDescription) {
+    extends DataSetCorrelateBase(
+      cluster,
+      traitSet,
+      inputNode,
+      scan,
+      condition,
+      relRowType,
+      joinRowType,
+      joinType,
+      ruleDescription) {
 
   override def copy(traitSet: RelTraitSet, inputs: java.util.List[RelNode]): RelNode = {
     new DataSetCorrelate(
@@ -69,7 +69,6 @@ class DataSetCorrelate(
       joinType,
       ruleDescription)
   }
-
 
   override def translateToPlan(tableEnv: BatchTableEnvImpl): DataSet[Row] = {
 
@@ -112,12 +111,12 @@ class DataSetCorrelate(
 
     inputDS
       .flatMap(mapFunc)
-      .name(correlateOpName(
-        inputNode.getRowType,
-        rexCall,
-        sqlFunction,
-        relRowType,
-        getExpressionString)
-      )
+      .name(
+        correlateOpName(
+          inputNode.getRowType,
+          rexCall,
+          sqlFunction,
+          relRowType,
+          getExpressionString))
   }
 }

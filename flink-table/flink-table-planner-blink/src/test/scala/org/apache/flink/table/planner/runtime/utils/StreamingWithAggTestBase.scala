@@ -20,8 +20,16 @@ package org.apache.flink.table.planner.runtime.utils
 import org.apache.flink.api.common.time.Time
 import org.apache.flink.table.api.config.OptimizerConfigOptions
 import org.apache.flink.table.planner.runtime.utils.StreamingWithAggTestBase._
-import org.apache.flink.table.planner.runtime.utils.StreamingWithMiniBatchTestBase.{MiniBatchMode, MiniBatchOff, MiniBatchOn}
-import org.apache.flink.table.planner.runtime.utils.StreamingWithStateTestBase.{HEAP_BACKEND, ROCKSDB_BACKEND, StateBackendMode}
+import org.apache.flink.table.planner.runtime.utils.StreamingWithMiniBatchTestBase.{
+  MiniBatchMode,
+  MiniBatchOff,
+  MiniBatchOn
+}
+import org.apache.flink.table.planner.runtime.utils.StreamingWithStateTestBase.{
+  HEAP_BACKEND,
+  ROCKSDB_BACKEND,
+  StateBackendMode
+}
 import org.apache.flink.table.planner.utils.AggregatePhaseStrategy
 
 import org.junit.Before
@@ -32,9 +40,10 @@ import java.util
 import scala.collection.JavaConversions._
 
 class StreamingWithAggTestBase(
-  aggMode: AggMode,
-  miniBatch: MiniBatchMode,
-  backend: StateBackendMode) extends StreamingWithMiniBatchTestBase(miniBatch, backend) {
+    aggMode: AggMode,
+    miniBatch: MiniBatchMode,
+    backend: StateBackendMode)
+    extends StreamingWithMiniBatchTestBase(miniBatch, backend) {
 
   @Before
   override def before(): Unit = {

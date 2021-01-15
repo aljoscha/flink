@@ -24,7 +24,7 @@ import org.apache.flink.examples.java.wordcount.util.WordCountData
 
 /**
  * Implements the "WordCount" program that computes a simple word occurrence histogram
- * over text files. 
+ * over text files.
  *
  * The input is a plain text file with lines separated by newline characters.
  *
@@ -41,7 +41,6 @@ import org.apache.flink.examples.java.wordcount.util.WordCountData
  *   - write a simple Flink program.
  *   - use Tuple data types.
  *   - write and use user-defined functions.
- *
  */
 object WordCount {
 
@@ -63,7 +62,8 @@ object WordCount {
         env.fromCollection(WordCountData.WORDS)
       }
 
-    val counts = text.flatMap { _.toLowerCase.split("\\W+") filter { _.nonEmpty } }
+    val counts = text
+      .flatMap { _.toLowerCase.split("\\W+") filter { _.nonEmpty } }
       .map { (_, 1) }
       .groupBy(0)
       .sum(1)
@@ -78,5 +78,3 @@ object WordCount {
 
   }
 }
-
-

@@ -127,9 +127,10 @@ class AggregateValidationTest extends TableTestBase {
   @Test
   def testInvalidAlias(): Unit = {
     expectedException.expect(classOf[ValidationException])
-    expectedException.expectMessage("List of column aliases must have same degree as " +
-      "table; the returned table of function 'minMax(b)' has 3 columns, " +
-      "whereas alias list has 2 columns")
+    expectedException.expectMessage(
+      "List of column aliases must have same degree as " +
+        "table; the returned table of function 'minMax(b)' has 3 columns, " +
+        "whereas alias list has 2 columns")
 
     val util = streamTestUtil()
     val table = util.addTable[(Long, Int, String)]('a, 'b, 'c)

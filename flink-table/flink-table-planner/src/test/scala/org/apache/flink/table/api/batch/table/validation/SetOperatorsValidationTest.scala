@@ -31,7 +31,7 @@ class SetOperatorsValidationTest extends TableTestBase {
   @Test(expected = classOf[ValidationException])
   def testUnionDifferentColumnSize(): Unit = {
     val util = batchTestUtil()
-    val ds1 = util.addTable[(Int, Long, String)]("Table3",'a, 'b, 'c)
+    val ds1 = util.addTable[(Int, Long, String)]("Table3", 'a, 'b, 'c)
     val ds2 = util.addTable[(Int, Long, Int, String, Long)]("Table5", 'a, 'b, 'd, 'c, 'e)
 
     // must fail. Union inputs have different column size.
@@ -41,8 +41,9 @@ class SetOperatorsValidationTest extends TableTestBase {
   @Test(expected = classOf[ValidationException])
   def testUnionDifferentFieldTypes(): Unit = {
     val util = batchTestUtil()
-    val ds1 = util.addTable[(Int, Long, String)]("Table3",'a, 'b, 'c)
-    val ds2 = util.addTable[(Int, Long, Int, String, Long)]("Table5", 'a, 'b, 'c, 'd, 'e)
+    val ds1 = util.addTable[(Int, Long, String)]("Table3", 'a, 'b, 'c)
+    val ds2 = util
+      .addTable[(Int, Long, Int, String, Long)]("Table5", 'a, 'b, 'c, 'd, 'e)
       .select('a, 'b, 'c)
 
     // must fail. Union inputs have different field types.
@@ -65,8 +66,9 @@ class SetOperatorsValidationTest extends TableTestBase {
   @Test(expected = classOf[ValidationException])
   def testMinusDifferentFieldTypes(): Unit = {
     val util = batchTestUtil()
-    val ds1 = util.addTable[(Int, Long, String)]("Table3",'a, 'b, 'c)
-    val ds2 = util.addTable[(Int, Long, Int, String, Long)]("Table5", 'a, 'b, 'c, 'd, 'e)
+    val ds1 = util.addTable[(Int, Long, String)]("Table3", 'a, 'b, 'c)
+    val ds2 = util
+      .addTable[(Int, Long, Int, String, Long)]("Table5", 'a, 'b, 'c, 'd, 'e)
       .select('a, 'b, 'c)
 
     // must fail. Minus inputs have different field types.
@@ -89,8 +91,9 @@ class SetOperatorsValidationTest extends TableTestBase {
   @Test(expected = classOf[ValidationException])
   def testIntersectWithDifferentFieldTypes(): Unit = {
     val util = batchTestUtil()
-    val ds1 = util.addTable[(Int, Long, String)]("Table3",'a, 'b, 'c)
-    val ds2 = util.addTable[(Int, Long, Int, String, Long)]("Table5", 'a, 'b, 'c, 'd, 'e)
+    val ds1 = util.addTable[(Int, Long, String)]("Table3", 'a, 'b, 'c)
+    val ds2 = util
+      .addTable[(Int, Long, Int, String, Long)]("Table5", 'a, 'b, 'c, 'd, 'e)
       .select('a, 'b, 'c)
 
     // must fail. Intersect inputs have different field types.

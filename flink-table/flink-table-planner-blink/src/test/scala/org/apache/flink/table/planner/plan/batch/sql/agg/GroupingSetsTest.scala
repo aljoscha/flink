@@ -36,9 +36,26 @@ class GroupingSetsTest extends TableTestBase {
   util.addTableSource[(Int, String)]("dept", 'deptno, 'dname)
   util.addTableSource[(Long, String, Int, String, String, Long, Int, Boolean, Boolean, Date)](
     "emps",
-    'empno, 'name, 'deptno, 'gender, 'city, 'empid, 'age, 'slacker, 'manager, 'joinedat)
+    'empno,
+    'name,
+    'deptno,
+    'gender,
+    'city,
+    'empid,
+    'age,
+    'slacker,
+    'manager,
+    'joinedat)
   util.addTableSource[(Int, String, String, Int, Date, Double, Double, Int)](
-    "scott_emp", 'empno, 'ename, 'job, 'mgr, 'hiredate, 'sal, 'comm, 'deptno)
+    "scott_emp",
+    'empno,
+    'ename,
+    'job,
+    'mgr,
+    'hiredate,
+    'sal,
+    'comm,
+    'deptno)
 
   @Test
   def testGroupingSets(): Unit = {

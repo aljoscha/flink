@@ -38,7 +38,7 @@ class LimitTest extends LegacyLimitTest {
   override def setup(): Unit = {
     util.addTableSource[(Int, Long, String)]("MyTable", 'a, 'b, 'c)
     val ddl =
-    s"""
+      s"""
        |CREATE TABLE LimitTable (
        |  a int,
        |  b bigint,

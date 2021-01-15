@@ -37,7 +37,6 @@ import org.apache.flink.streaming.api.scala.{DataStream, StreamExecutionEnvironm
  *  - streaming iterations,
  *  - buffer timeout to enhance latency,
  *  - directed outputs.
- *
  */
 object IterateExample {
 
@@ -56,18 +55,18 @@ object IterateExample {
 
     // create input stream of integer pairs
     val inputStream: DataStream[(Int, Int)] =
-    if (params.has("input")) {
-      // map a list of strings to integer pairs
-      env.readTextFile(params.get("input")).map { value: String =>
-        val record = value.substring(1, value.length - 1)
-        val splitted = record.split(",")
-        (Integer.parseInt(splitted(0)), Integer.parseInt(splitted(1)))
+      if (params.has("input")) {
+        // map a list of strings to integer pairs
+        env.readTextFile(params.get("input")).map { value: String =>
+          val record = value.substring(1, value.length - 1)
+          val splitted = record.split(",")
+          (Integer.parseInt(splitted(0)), Integer.parseInt(splitted(1)))
+        }
+      } else {
+        println("Executing Iterate example with default input data set.")
+        println("Use --input to specify file input.")
+        env.addSource(new RandomFibonacciSource)
       }
-    } else {
-      println("Executing Iterate example with default input data set.")
-      println("Use --input to specify file input.")
-      env.addSource(new RandomFibonacciSource)
-    }
 
     def withinBound(value: (Int, Int)) = value._1 < Bound && value._2 < Bound
 
@@ -91,8 +90,8 @@ object IterateExample {
           (feedback, output)
         }
         // timeout after 5 seconds
-        , 5000L
-      )
+        ,
+        5000L)
 
     if (params.has("output")) {
       numbers.writeAsText(params.get("output"))

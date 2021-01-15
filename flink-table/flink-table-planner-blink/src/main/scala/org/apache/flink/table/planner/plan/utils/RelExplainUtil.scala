@@ -41,8 +41,8 @@ import scala.collection.JavaConversions._
 import scala.collection.mutable
 
 /**
-  * Explain rel utility methods.
-  */
+ * Explain rel utility methods.
+ */
 object RelExplainUtil {
 
   /**
@@ -59,48 +59,50 @@ object RelExplainUtil {
   }
 
   /**
-    * Converts field names corresponding to given indices to String.
-    */
+   * Converts field names corresponding to given indices to String.
+   */
   def fieldToString(fieldIndices: Array[Int], inputType: RelDataType): String = {
     val fieldNames = inputType.getFieldNames
     fieldIndices.map(fieldNames(_)).mkString(", ")
   }
 
   /**
-    * Returns the Java string representation of this literal.
-    */
+   * Returns the Java string representation of this literal.
+   */
   def literalToString(literal: RexLiteral): String = {
     literal.computeDigest(RexDigestIncludeType.NO_TYPE)
   }
 
   /**
-    * Converts [[RelCollation]] to String.
-    *
-    * format sort fields as field name with direction `shortString`.
-    */
-  def collationToString(
-      collation: RelCollation,
-      inputRowType: RelDataType): String = {
+   * Converts [[RelCollation]] to String.
+   *
+   * format sort fields as field name with direction `shortString`.
+   */
+  def collationToString(collation: RelCollation, inputRowType: RelDataType): String = {
     val inputFieldNames = inputRowType.getFieldNames
-    collation.getFieldCollations.map { c =>
-      s"${inputFieldNames(c.getFieldIndex)} ${c.direction.shortString}"
-    }.mkString(", ")
+    collation.getFieldCollations
+      .map { c =>
+        s"${inputFieldNames(c.getFieldIndex)} ${c.direction.shortString}"
+      }
+      .mkString(", ")
   }
 
   /**
-    * Converts [[RelCollation]] to String.
-    *
-    * format sort fields as field index with direction `shortString`.
-    */
+   * Converts [[RelCollation]] to String.
+   *
+   * format sort fields as field index with direction `shortString`.
+   */
   def collationToString(collation: RelCollation): String = {
-    collation.getFieldCollations.map { c =>
-      s"$$${c.getFieldIndex} ${c.direction.shortString}"
-    }.mkString(", ")
+    collation.getFieldCollations
+      .map { c =>
+        s"$$${c.getFieldIndex} ${c.direction.shortString}"
+      }
+      .mkString(", ")
   }
 
   /**
-    * Converts [[RexNode]] to String.
-    */
+   * Converts [[RexNode]] to String.
+   */
   def expressionToString(
       expr: RexNode,
       inputType: RelDataType,
@@ -114,8 +116,8 @@ object RelExplainUtil {
   }
 
   /**
-    * Converts sort fetch to String.
-    */
+   * Converts sort fetch to String.
+   */
   def fetchToString(fetch: RexNode): String = {
     if (fetch != null) {
       s"${RexLiteral.intValue(fetch)}"
@@ -125,8 +127,8 @@ object RelExplainUtil {
   }
 
   /**
-    * Converts group aggregate attributes to String.
-    */
+   * Converts group aggregate attributes to String.
+   */
   def groupAggregationToString(
       inputRowType: RelDataType,
       outputRowType: RelDataType,
@@ -166,61 +168,58 @@ object RelExplainUtil {
     }
 
     val aggToDistinctMapping = mutable.HashMap.empty[Int, String]
-    distinctInfos.zipWithIndex.foreach {
-      case (distinct, index) =>
-        distinct.aggIndexes.foreach {
-          aggIndex =>
-            aggToDistinctMapping += (aggIndex -> distinctFieldNames(index))
-        }
+    distinctInfos.zipWithIndex.foreach { case (distinct, index) =>
+      distinct.aggIndexes.foreach { aggIndex =>
+        aggToDistinctMapping += (aggIndex -> distinctFieldNames(index))
+      }
     }
 
     // agg
     var offset = fullGrouping.length
-    val aggStrings = aggCallToAggFunction.zipWithIndex.map {
-      case ((aggCall, udf), index) =>
-        val distinct = if (aggCall.isDistinct) {
-          if (aggCall.getArgList.size() == 0) {
-            "DISTINCT"
-          } else {
-            "DISTINCT "
-          }
+    val aggStrings = aggCallToAggFunction.zipWithIndex.map { case ((aggCall, udf), index) =>
+      val distinct = if (aggCall.isDistinct) {
+        if (aggCall.getArgList.size() == 0) {
+          "DISTINCT"
         } else {
-          if (isMerge && aggToDistinctMapping.contains(index)) {
-            "DISTINCT "
-          } else {
-            ""
-          }
+          "DISTINCT "
         }
-        var newArgList = aggCall.getArgList.map(_.toInt).toList
-        if (isMerge) {
-          newArgList = udf match {
-            case _: AggregateFunction[_, _] =>
-              val argList = List(offset)
-              offset = offset + 1
-              argList
-            case daf: DeclarativeAggregateFunction =>
-              val aggBufferTypes = daf.getAggBufferTypes.map(_.getLogicalType)
-              val argList = aggBufferTypes.indices.map(offset + _).toList
-              offset = offset + aggBufferTypes.length
-              argList
-            case _ =>
-              throw new TableException(s"Unsupported function: $udf")
-          }
-        }
-        val argListNames = if (aggToDistinctMapping.contains(index)) {
-          aggToDistinctMapping(index)
-        } else if (newArgList.nonEmpty) {
-          newArgList.map(inputFieldNames(_)).mkString(", ")
+      } else {
+        if (isMerge && aggToDistinctMapping.contains(index)) {
+          "DISTINCT "
         } else {
-          "*"
+          ""
         }
+      }
+      var newArgList = aggCall.getArgList.map(_.toInt).toList
+      if (isMerge) {
+        newArgList = udf match {
+          case _: AggregateFunction[_, _] =>
+            val argList = List(offset)
+            offset = offset + 1
+            argList
+          case daf: DeclarativeAggregateFunction =>
+            val aggBufferTypes = daf.getAggBufferTypes.map(_.getLogicalType)
+            val argList = aggBufferTypes.indices.map(offset + _).toList
+            offset = offset + aggBufferTypes.length
+            argList
+          case _ =>
+            throw new TableException(s"Unsupported function: $udf")
+        }
+      }
+      val argListNames = if (aggToDistinctMapping.contains(index)) {
+        aggToDistinctMapping(index)
+      } else if (newArgList.nonEmpty) {
+        newArgList.map(inputFieldNames(_)).mkString(", ")
+      } else {
+        "*"
+      }
 
-        if (aggCall.filterArg >= 0 && aggCall.filterArg < inputFieldNames.size) {
-          s"${aggCall.getAggregation}($distinct$argListNames) FILTER " +
-            s"${inputFieldNames(aggCall.filterArg)}"
-        } else {
-          s"${aggCall.getAggregation}($distinct$argListNames)"
-        }
+      if (aggCall.filterArg >= 0 && aggCall.filterArg < inputFieldNames.size) {
+        s"${aggCall.getAggregation}($distinct$argListNames) FILTER " +
+          s"${inputFieldNames(aggCall.filterArg)}"
+      } else {
+        s"${aggCall.getAggregation}($distinct$argListNames)"
+      }
     }
 
     // output for agg
@@ -251,14 +250,16 @@ object RelExplainUtil {
       outFieldName
     }
 
-    (fullGrouping.map(inputFieldNames(_)) ++ aggStrings ++ distinctStrings).zip(
-      fullGrouping.indices.map(outputFieldNames(_)) ++ outFieldNames ++ distinctFieldNames).map {
-      case (f, o) => if (f == o) {
-        f
-      } else {
-        s"$prefix$f AS $o"
+    (fullGrouping.map(inputFieldNames(_)) ++ aggStrings ++ distinctStrings)
+      .zip(fullGrouping.indices.map(outputFieldNames(_)) ++ outFieldNames ++ distinctFieldNames)
+      .map { case (f, o) =>
+        if (f == o) {
+          f
+        } else {
+          s"$prefix$f AS $o"
+        }
       }
-    }.mkString(", ")
+      .mkString(", ")
   }
 
   def streamGroupAggregationToString(
@@ -292,14 +293,16 @@ object RelExplainUtil {
         s"${call.getAggregation}($distinct$argListNames)"
       }
     }
-    (grouping.map(inputFieldNames(_)) ++ aggStrings).zip(
-      grouping.indices.map(outputFieldNames(_)) ++ outputFieldNames).map {
-      case (f, o) => if (f == o) {
-        f
-      } else {
-        s"$f AS $o"
+    (grouping.map(inputFieldNames(_)) ++ aggStrings)
+      .zip(grouping.indices.map(outputFieldNames(_)) ++ outputFieldNames)
+      .map { case (f, o) =>
+        if (f == o) {
+          f
+        } else {
+          s"$f AS $o"
+        }
       }
-    }.mkString(", ")
+      .mkString(", ")
   }
 
   def streamGroupAggregationToString(
@@ -315,7 +318,8 @@ object RelExplainUtil {
     val distinctInfos = aggInfoList.distinctInfos
     val distinctFieldNames = distinctInfos.indices.map(index => s"distinct$$$index")
     // aggIndex -> distinctFieldName
-    val distinctAggs = distinctInfos.zip(distinctFieldNames)
+    val distinctAggs = distinctInfos
+      .zip(distinctFieldNames)
       .flatMap(f => f._1.aggIndexes.map(i => (i, f._2)))
       .toMap
     val aggFilters = {
@@ -332,7 +336,7 @@ object RelExplainUtil {
     val outFieldNames = outputRowType.getFieldNames.toList.toArray
     val groupingNames = grouping.map(inFieldNames(_))
     val aggOffset = shuffleKey match {
-      case None => grouping.length
+      case None    => grouping.length
       case Some(k) => k.length
     }
     val isIncremental: Boolean = shuffleKey.isDefined
@@ -362,10 +366,13 @@ object RelExplainUtil {
       outFieldNames
     }
 
-    (groupingNames ++ aggStrings).zip(outputFieldNames).map {
-      case (f, o) if f == o => f
-      case (f, o) => s"$f AS $o"
-    }.mkString(", ")
+    (groupingNames ++ aggStrings)
+      .zip(outputFieldNames)
+      .map {
+        case (f, o) if f == o => f
+        case (f, o)           => s"$f AS $o"
+      }
+      .mkString(", ")
   }
 
   private def stringifyGlobalAggregates(
@@ -485,8 +492,8 @@ object RelExplainUtil {
   }
 
   /**
-    * Converts over aggregate attributes to String.
-    */
+   * Converts over aggregate attributes to String.
+   */
   def overAggregationToString(
       inputRowType: RelDataType,
       outputRowType: RelDataType,
@@ -498,70 +505,79 @@ object RelExplainUtil {
     val inputFieldNames = inputRowType.getFieldNames
     val outputFieldNames = outputRowType.getFieldNames
 
-    val aggStrings = namedAggregates.map(_.getKey).map(
-      a => s"${a.getAggregation}(${
-        val prefix = if (a.isDistinct) {
-          "DISTINCT "
-        } else {
-          ""
-        }
-        prefix + (if (a.getArgList.size() > 0) {
-          a.getArgList.map { arg =>
-            // index to constant
-            if (arg >= inputRowType.getFieldCount) {
-              constants(arg - inputRowType.getFieldCount)
-            }
-            // index to input field
-            else {
-              inputFieldNames(arg)
-            }
-          }.mkString(", ")
-        } else {
-          "*"
-        })
-      })")
+    val aggStrings = namedAggregates
+      .map(_.getKey)
+      .map(a =>
+        s"${a.getAggregation}(${
+          val prefix = if (a.isDistinct) {
+            "DISTINCT "
+          } else {
+            ""
+          }
+          prefix + (if (a.getArgList.size() > 0) {
+                      a.getArgList
+                        .map { arg =>
+                          // index to constant
+                          if (arg >= inputRowType.getFieldCount) {
+                            constants(arg - inputRowType.getFieldCount)
+                          }
+                          // index to input field
+                          else {
+                            inputFieldNames(arg)
+                          }
+                        }
+                        .mkString(", ")
+                    } else {
+                      "*"
+                    })
+        })")
 
     val output = if (outputInputName) inputFieldNames ++ aggStrings else aggStrings
-    output.zip(outputFieldNames.drop(rowTypeOffset)).map {
-      case (f, o) => if (f == o) {
-        f
-      } else {
-        s"$f AS $o"
+    output
+      .zip(outputFieldNames.drop(rowTypeOffset))
+      .map { case (f, o) =>
+        if (f == o) {
+          f
+        } else {
+          s"$f AS $o"
+        }
       }
-    }.mkString(", ")
+      .mkString(", ")
   }
 
   /**
-    * Converts project list to String.
-    */
+   * Converts project list to String.
+   */
   def projectsToString(
       projects: util.List[util.List[RexNode]],
       inputRowType: RelDataType,
       outputRowType: RelDataType): String = {
     val inFieldNames = inputRowType.getFieldNames
     val outFieldNames = outputRowType.getFieldNames
-    projects.map { project =>
-      project.zipWithIndex.map {
-        case (r: RexInputRef, i) =>
-          val inputFieldName = inFieldNames.get(r.getIndex)
-          val outputFieldName = outFieldNames.get(i)
-          if (inputFieldName != outputFieldName) {
-            s"$inputFieldName AS $outputFieldName"
-          } else {
-            outputFieldName
+    projects
+      .map { project =>
+        project.zipWithIndex
+          .map {
+            case (r: RexInputRef, i) =>
+              val inputFieldName = inFieldNames.get(r.getIndex)
+              val outputFieldName = outFieldNames.get(i)
+              if (inputFieldName != outputFieldName) {
+                s"$inputFieldName AS $outputFieldName"
+              } else {
+                outputFieldName
+              }
+            case (l: RexLiteral, i) => s"${l.getValue3} AS ${outFieldNames.get(i)}"
+            case (_, i)             => outFieldNames.get(i)
           }
-        case (l: RexLiteral, i) => s"${l.getValue3} AS ${outFieldNames.get(i)}"
-        case (_, i) => outFieldNames.get(i)
-      }.mkString("{", ", ", "}")
-    }.mkString(", ")
+          .mkString("{", ", ", "}")
+      }
+      .mkString(", ")
   }
 
   /**
-    * Converts window range in [[Group]] to String.
-    */
-  def windowRangeToString(
-      logicWindow: Window,
-      groupWindow: Group): String = {
+   * Converts window range in [[Group]] to String.
+   */
+  def windowRangeToString(logicWindow: Window, groupWindow: Group): String = {
 
     def calcOriginInputRows(window: Window): Int = {
       window.getRowType.getFieldCount - window.groups.flatMap(_.aggCalls).size
@@ -623,14 +639,17 @@ object RelExplainUtil {
     val localExprs = calcProgram.getExprList.toList
     val outFields = calcProgram.getOutputRowType.getFieldNames.toList
 
-    proj.map(expression(_, inFields, Some(localExprs), expressionFormat))
-        .zip(outFields).map { case (e, o) =>
-      if (e != o) {
-        e + " AS " + o
-      } else {
-        e
+    proj
+      .map(expression(_, inFields, Some(localExprs), expressionFormat))
+      .zip(outFields)
+      .map { case (e, o) =>
+        if (e != o) {
+          e + " AS " + o
+        } else {
+          e
+        }
       }
-    }.mkString(", ")
+      .mkString(", ")
   }
 
   def correlateToString(
@@ -664,10 +683,10 @@ object RelExplainUtil {
     val outFields = rowType.getFieldNames
 
     /**
-      *  - local window agg input type: grouping keys + aux-grouping keys + agg arg list
-      *  - global window agg input type: grouping keys + timestamp + aux-grouping keys + agg buffer
-      *  agg buffer as agg merge args list
-      */
+     *  - local window agg input type: grouping keys + aux-grouping keys + agg arg list
+     *  - global window agg input type: grouping keys + timestamp + aux-grouping keys + agg buffer
+     *  agg buffer as agg merge args list
+     */
     var offset = if (isMerge) {
       grouping.length + 1 + auxGrouping.length
     } else {
@@ -700,10 +719,10 @@ object RelExplainUtil {
     }
 
     /**
-      * - local window agg output type: grouping keys + timestamp + aux-grouping keys + agg buffer
-      * - global window agg output type:
-      * grouping keys + aux-grouping keys + agg result + window props
-      */
+     * - local window agg output type: grouping keys + timestamp + aux-grouping keys + agg buffer
+     * - global window agg output type:
+     * grouping keys + aux-grouping keys + agg result + window props
+     */
     offset = if (!isGlobal) {
       grouping.length + 1 + auxGrouping.length
     } else {
@@ -721,8 +740,12 @@ object RelExplainUtil {
             offset = offset + 1
             name
           case daf: DeclarativeAggregateFunction =>
-            val name = daf.aggBufferAttributes().zipWithIndex.map(offset + _._2).map(
-              outFields(_)).mkString(", ")
+            val name = daf
+              .aggBufferAttributes()
+              .zipWithIndex
+              .map(offset + _._2)
+              .map(outFields(_))
+              .mkString(", ")
             offset = offset + daf.aggBufferAttributes().length
             if (daf.aggBufferAttributes.length > 1) s"($name)" else name
         }
@@ -732,15 +755,18 @@ object RelExplainUtil {
 
     val inNames = grouping.map(inFields(_)) ++ auxGrouping.map(inFields(_)) ++ aggStrings
     val outNames = grouping.indices.map(outFields(_)) ++
-        (grouping.length + 1 until grouping.length + 1 + auxGrouping.length).map(outFields(_)) ++
-        outFieldNames
-    inNames.zip(outNames).map {
-      case (f, o) => if (f == o) {
-        f
-      } else {
-        s"$prefix$f AS $o"
+      (grouping.length + 1 until grouping.length + 1 + auxGrouping.length).map(outFields(_)) ++
+      outFieldNames
+    inNames
+      .zip(outNames)
+      .map { case (f, o) =>
+        if (f == o) {
+          f
+        } else {
+          s"$prefix$f AS $o"
+        }
       }
-    }.mkString(", ")
+      .mkString(", ")
   }
 
   def streamWindowAggregationToString(
@@ -755,8 +781,10 @@ object RelExplainUtil {
     val outFields: Seq[String] = if (isTableAggregate) {
       val outNames = rowType.getFieldNames
       outNames.slice(0, grouping.length) ++
-        List(s"(${outNames.drop(grouping.length)
-          .dropRight(namedProperties.length).mkString(", ")})") ++
+        List(s"(${outNames
+          .drop(grouping.length)
+          .dropRight(namedProperties.length)
+          .mkString(", ")})") ++
         outNames.slice(outNames.length - namedProperties.length, outNames.length)
     } else {
       rowType.getFieldNames
@@ -782,13 +810,16 @@ object RelExplainUtil {
     })
 
     val propStrings = namedProperties.map(_.property.toString)
-    (groupStrings ++ aggStrings ++ propStrings).zip(outFields).map {
-      case (f, o) => if (f == o) {
-        f
-      } else {
-        if (withOutputFieldNames) s"$f AS $o" else f
+    (groupStrings ++ aggStrings ++ propStrings)
+      .zip(outFields)
+      .map { case (f, o) =>
+        if (f == o) {
+          f
+        } else {
+          if (withOutputFieldNames) s"$f AS $o" else f
+        }
       }
-    }.mkString(", ")
+      .mkString(", ")
   }
 
   // ------------------------------------------------------------------------------------
@@ -796,50 +827,54 @@ object RelExplainUtil {
   // ------------------------------------------------------------------------------------
 
   /**
-    * Converts measures of MatchRecognize to String.
-    */
+   * Converts measures of MatchRecognize to String.
+   */
   def measuresDefineToString(
-    measures: ImmutableMap[String, RexNode],
-    fieldNames: List[String],
-    expression: (RexNode, List[String], Option[List[RexNode]]) => String): String =
-    measures.map {
-      case (k, v) => s"${expression(v, fieldNames, None)} AS $k"
-    }.mkString(", ")
+      measures: ImmutableMap[String, RexNode],
+      fieldNames: List[String],
+      expression: (RexNode, List[String], Option[List[RexNode]]) => String): String =
+    measures
+      .map { case (k, v) =>
+        s"${expression(v, fieldNames, None)} AS $k"
+      }
+      .mkString(", ")
 
   /**
-    * Converts all rows or not of MatchRecognize to ROWS PER MATCH String
-    */
+   * Converts all rows or not of MatchRecognize to ROWS PER MATCH String
+   */
   def rowsPerMatchToString(isAll: Boolean): String =
     if (isAll) "ALL ROWS PER MATCH" else "ONE ROW PER MATCH"
 
   /**
-    * Converts AFTER clause of MatchRecognize to String
-    */
-  def afterMatchToString(
-      after: RexNode,
-      fieldNames: Seq[String]): String =
+   * Converts AFTER clause of MatchRecognize to String
+   */
+  def afterMatchToString(after: RexNode, fieldNames: Seq[String]): String =
     after.getKind match {
-      case SqlKind.SKIP_TO_FIRST => s"SKIP TO FIRST ${
-        after.asInstanceOf[RexCall].operands.get(0).toString
-      }"
-      case SqlKind.SKIP_TO_LAST => s"SKIP TO LAST ${
-        after.asInstanceOf[RexCall].operands.get(0).toString
-      }"
-      case SqlKind.LITERAL => after.asInstanceOf[RexLiteral]
-        .getValueAs(classOf[AfterOption]) match {
-        case AfterOption.SKIP_PAST_LAST_ROW => "SKIP PAST LAST ROW"
-        case AfterOption.SKIP_TO_NEXT_ROW => "SKIP TO NEXT ROW"
-      }
-      case _ => throw new IllegalStateException(s"Corrupted query tree. Unexpected $after for " +
-        s"after match strategy.")
+      case SqlKind.SKIP_TO_FIRST =>
+        s"SKIP TO FIRST ${after.asInstanceOf[RexCall].operands.get(0).toString}"
+      case SqlKind.SKIP_TO_LAST =>
+        s"SKIP TO LAST ${after.asInstanceOf[RexCall].operands.get(0).toString}"
+      case SqlKind.LITERAL =>
+        after
+          .asInstanceOf[RexLiteral]
+          .getValueAs(classOf[AfterOption]) match {
+          case AfterOption.SKIP_PAST_LAST_ROW => "SKIP PAST LAST ROW"
+          case AfterOption.SKIP_TO_NEXT_ROW   => "SKIP TO NEXT ROW"
+        }
+      case _ =>
+        throw new IllegalStateException(
+          s"Corrupted query tree. Unexpected $after for " +
+            s"after match strategy.")
     }
 
   /**
-    * Converts subset clause of MatchRecognize to String
-    */
+   * Converts subset clause of MatchRecognize to String
+   */
   def subsetToString(subset: ImmutableMap[String, JSortedSet[String]]): String =
-    subset.map {
-      case (k, v) => s"$k = (${v.mkString(", ")})"
-    }.mkString(", ")
+    subset
+      .map { case (k, v) =>
+        s"$k = (${v.mkString(", ")})"
+      }
+      .mkString(", ")
 
 }

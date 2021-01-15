@@ -47,9 +47,11 @@ class TableSourceTest extends TableTestBase {
     val util = batchTestUtil()
     val tableEnv = util.tableEnv
 
-    tableEnv.asInstanceOf[TableEnvironmentInternal]
+    tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
       .registerTableSourceInternal("table1", tableSource1)
-    tableEnv.asInstanceOf[TableEnvironmentInternal]
+    tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
       .registerTableSourceInternal("table2", tableSource2)
 
     val table1 = tableEnv.scan("table1").where($"amount" > 2)
@@ -69,8 +71,7 @@ class TableSourceTest extends TableTestBase {
         isPushedDown = true,
         "'amount > 2"),
       term("all", "true"),
-      term("union", "name, id, amount, price")
-    )
+      term("union", "name, id, amount, price"))
     util.verifyTable(result, expected)
   }
 
@@ -82,7 +83,8 @@ class TableSourceTest extends TableTestBase {
     val util = batchTestUtil()
     val tableEnv = util.tableEnv
 
-    tableEnv.asInstanceOf[TableEnvironmentInternal]
+    tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
       .registerTableSourceInternal(tableName, tableSource)
 
     val result = tableEnv
@@ -92,8 +94,7 @@ class TableSourceTest extends TableTestBase {
     val expected = unaryNode(
       "DataSetCalc",
       batchSourceTableNode(tableName, projectedFields),
-      term("select", "UPPER(last) AS _c0", "FLOOR(id) AS _c1", "*(score, 2) AS _c2")
-    )
+      term("select", "UPPER(last) AS _c0", "FLOOR(id) AS _c1", "*(score, 2) AS _c2"))
 
     util.verifyTable(result, expected)
   }
@@ -103,7 +104,8 @@ class TableSourceTest extends TableTestBase {
     val (tableSource, tableName) = csvTable
     val util = batchTestUtil()
 
-    util.tableEnv.asInstanceOf[TableEnvironmentInternal]
+    util.tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
       .registerTableSourceInternal(tableName, tableSource)
 
     val sqlQuery = s"SELECT `last`, floor(id), score * 2 FROM $tableName"
@@ -111,8 +113,7 @@ class TableSourceTest extends TableTestBase {
     val expected = unaryNode(
       "DataSetCalc",
       batchSourceTableNode(tableName, projectedFields),
-      term("select", "last", "FLOOR(id) AS EXPR$1", "*(score, 2) AS EXPR$2")
-    )
+      term("select", "last", "FLOOR(id) AS EXPR$1", "*(score, 2) AS EXPR$2"))
 
     util.verifySql(sqlQuery, expected)
   }
@@ -123,7 +124,8 @@ class TableSourceTest extends TableTestBase {
     val util = batchTestUtil()
     val tableEnv = util.tableEnv
 
-    tableEnv.asInstanceOf[TableEnvironmentInternal]
+    tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
       .registerTableSourceInternal(tableName, tableSource)
 
     val result = tableEnv
@@ -140,7 +142,8 @@ class TableSourceTest extends TableTestBase {
     val util = batchTestUtil()
     val tableEnv = util.tableEnv
 
-    tableEnv.asInstanceOf[TableEnvironmentInternal]
+    tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
       .registerTableSourceInternal(tableName, tableSource)
 
     val result = tableEnv
@@ -152,8 +155,7 @@ class TableSourceTest extends TableTestBase {
       s"BatchTableSourceScan(table=[[default_catalog, default_database, $tableName]], " +
         s"fields=[], " +
         s"source=[CsvTableSource(read fields: )])",
-      term("select", "1 AS _c0")
-    )
+      term("select", "1 AS _c0"))
 
     util.verifyTable(result, expected)
   }
@@ -164,13 +166,14 @@ class TableSourceTest extends TableTestBase {
     val util = batchTestUtil()
     val tableEnv = util.tableEnv
 
-    tableEnv.asInstanceOf[TableEnvironmentInternal]
+    tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
       .registerTableSourceInternal(tableName, tableSource)
 
     val result = tableEnv
-        .scan(tableName)
-        .select('price, 'id, 'amount)
-        .where($"price" * 2 < 32)
+      .scan(tableName)
+      .select('price, 'id, 'amount)
+      .where($"price" * 2 < 32)
 
     val expected = unaryNode(
       "DataSetCalc",
@@ -180,8 +183,7 @@ class TableSourceTest extends TableTestBase {
         isPushedDown = true,
         ""),
       term("select", "price", "id", "amount"),
-      term("where", "<(*(price, 2), 32)")
-    )
+      term("where", "<(*(price, 2), 32)"))
 
     util.verifyTable(result, expected)
   }
@@ -192,7 +194,8 @@ class TableSourceTest extends TableTestBase {
     val util = batchTestUtil()
     val tableEnv = util.tableEnv
 
-    tableEnv.asInstanceOf[TableEnvironmentInternal]
+    tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
       .registerTableSourceInternal(tableName, tableSource)
 
     val result = tableEnv
@@ -208,8 +211,7 @@ class TableSourceTest extends TableTestBase {
         isPushedDown = true,
         "'amount > 2"),
       term("select", "price", "LOWER(name) AS _c1", "amount"),
-      term("where", "<(*(price, 2), 32)")
-    )
+      term("where", "<(*(price, 2), 32)"))
     util.verifyTable(result, expected)
   }
 
@@ -219,13 +221,14 @@ class TableSourceTest extends TableTestBase {
     val util = batchTestUtil()
     val tableEnv = util.tableEnv
 
-    tableEnv.asInstanceOf[TableEnvironmentInternal]
+    tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
       .registerTableSourceInternal(tableName, tableSource)
 
     val result = tableEnv
-        .scan(tableName)
-        .select('price, 'id, 'amount)
-        .where($"amount" > 2 && $"amount" < 32)
+      .scan(tableName)
+      .select('price, 'id, 'amount)
+      .where($"amount" > 2 && $"amount" < 32)
 
     val expected = batchFilterableSourceTableNode(
       tableName,
@@ -241,14 +244,15 @@ class TableSourceTest extends TableTestBase {
     val util = batchTestUtil()
     val tableEnv = util.tableEnv
 
-    tableEnv.asInstanceOf[TableEnvironmentInternal]
+    tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
       .registerTableSourceInternal(tableName, tableSource)
 
     val result = tableEnv
-        .scan(tableName)
-        .select('price, 'id, 'amount)
-        .where($"amount" > 2 && $"id" < 1.2 &&
-          ($"amount" < 32 || $"amount".cast(Types.LONG) > 10)) // cast can not be converted
+      .scan(tableName)
+      .select('price, 'id, 'amount)
+      .where($"amount" > 2 && $"id" < 1.2 &&
+        ($"amount" < 32 || $"amount".cast(Types.LONG) > 10)) // cast can not be converted
 
     val expected = unaryNode(
       "DataSetCalc",
@@ -258,8 +262,7 @@ class TableSourceTest extends TableTestBase {
         isPushedDown = true,
         "'amount > 2"),
       term("select", "price", "id", "amount"),
-      term("where", "AND(<(id, 1.2E0:DOUBLE), OR(<(amount, 32), >(CAST(amount), 10)))")
-    )
+      term("where", "AND(<(id, 1.2E0:DOUBLE), OR(<(amount, 32), >(CAST(amount), 10)))"))
     util.verifyTable(result, expected)
   }
 
@@ -269,15 +272,16 @@ class TableSourceTest extends TableTestBase {
     val util = batchTestUtil()
     val tableEnv = util.tableEnv
 
-    tableEnv.asInstanceOf[TableEnvironmentInternal]
+    tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
       .registerTableSourceInternal(tableName, tableSource)
     val func = Func0
     tableEnv.registerFunction("func0", func)
 
     val result = tableEnv
-        .scan(tableName)
-        .select('price, 'id, 'amount)
-        .where($"amount" > 2 && call("func0", $"amount") < 32)
+      .scan(tableName)
+      .select('price, 'id, 'amount)
+      .where($"amount" > 2 && call("func0", $"amount") < 32)
 
     val expected = unaryNode(
       "DataSetCalc",
@@ -287,8 +291,7 @@ class TableSourceTest extends TableTestBase {
         isPushedDown = true,
         "'amount > 2"),
       term("select", "price", "id", "amount"),
-      term("where", s"<(${Func0.getClass.getSimpleName}(amount), 32)")
-    )
+      term("where", s"<(${Func0.getClass.getSimpleName}(amount), 32)"))
 
     util.verifyTable(result, expected)
   }
@@ -301,7 +304,8 @@ class TableSourceTest extends TableTestBase {
     val util = streamTestUtil()
     val tableEnv = util.tableEnv
 
-    tableEnv.asInstanceOf[TableEnvironmentInternal]
+    tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
       .registerTableSourceInternal(tableName, tableSource)
 
     val result = tableEnv
@@ -311,8 +315,7 @@ class TableSourceTest extends TableTestBase {
     val expected = unaryNode(
       "DataStreamCalc",
       streamSourceTableNode(tableName, projectedFields),
-      term("select", "last", "FLOOR(id) AS _c1", "*(score, 2) AS _c2")
-    )
+      term("select", "last", "FLOOR(id) AS _c1", "*(score, 2) AS _c2"))
 
     util.verifyTable(result, expected)
   }
@@ -322,7 +325,8 @@ class TableSourceTest extends TableTestBase {
     val (tableSource, tableName) = csvTable
     val util = streamTestUtil()
 
-    util.tableEnv.asInstanceOf[TableEnvironmentInternal]
+    util.tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
       .registerTableSourceInternal(tableName, tableSource)
 
     val sqlQuery = s"SELECT `last`, floor(id), score * 2 FROM $tableName"
@@ -330,8 +334,7 @@ class TableSourceTest extends TableTestBase {
     val expected = unaryNode(
       "DataStreamCalc",
       streamSourceTableNode(tableName, projectedFields),
-      term("select", "last", "FLOOR(id) AS EXPR$1", "*(score, 2) AS EXPR$2")
-    )
+      term("select", "last", "FLOOR(id) AS EXPR$1", "*(score, 2) AS EXPR$2"))
 
     util.verifySql(sqlQuery, expected)
   }
@@ -342,7 +345,8 @@ class TableSourceTest extends TableTestBase {
     val util = streamTestUtil()
     val tableEnv = util.tableEnv
 
-    tableEnv.asInstanceOf[TableEnvironmentInternal]
+    tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
       .registerTableSourceInternal(tableName, tableSource)
 
     val result = tableEnv
@@ -359,7 +363,8 @@ class TableSourceTest extends TableTestBase {
     val util = streamTestUtil()
     val tableEnv = util.tableEnv
 
-    tableEnv.asInstanceOf[TableEnvironmentInternal]
+    tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
       .registerTableSourceInternal(tableName, tableSource)
 
     val result = tableEnv
@@ -375,8 +380,7 @@ class TableSourceTest extends TableTestBase {
         isPushedDown = true,
         "'amount > 2"),
       term("select", "price", "id", "amount"),
-      term("where", "<(*(price, 2), 32)")
-    )
+      term("where", "<(*(price, 2), 32)"))
 
     util.verifyTable(result, expected)
   }
@@ -387,19 +391,23 @@ class TableSourceTest extends TableTestBase {
     val tableEnv = util.tableEnv
 
     val path = "cat.db.tab1"
-    tableEnv.connect(new ConnectorDescriptor("COLLECTION", 1, false) {
-      override protected def toConnectorProperties: JMap[String, String] = {
-        val context = new JHashMap[String, String]()
-        context.put(CONNECTOR, "COLLECTION")
-        context
-      }
-    }).withSchema(
+    tableEnv
+      .connect(new ConnectorDescriptor("COLLECTION", 1, false) {
+        override protected def toConnectorProperties: JMap[String, String] = {
+          val context = new JHashMap[String, String]()
+          context.put(CONNECTOR, "COLLECTION")
+          context
+        }
+      })
+      .withSchema(
         new Schema()
-          .schema(TableSchema.builder()
-            .field("id", DataTypes.INT())
-            .field("name", DataTypes.STRING())
-            .build())
-      ).createTemporaryTable(path)
+          .schema(
+            TableSchema
+              .builder()
+              .field("id", DataTypes.INT())
+              .field("name", DataTypes.STRING())
+              .build()))
+      .createTemporaryTable(path)
 
     val result = tableEnv.from(path)
 
@@ -413,7 +421,8 @@ class TableSourceTest extends TableTestBase {
 
   @Test
   def testCsvTableSourceBuilder(): Unit = {
-    val source1 = CsvTableSource.builder()
+    val source1 = CsvTableSource
+      .builder()
       .path("/path/to/csv")
       .field("myfield", Types.STRING)
       .field("myfield2", Types.INT)
@@ -483,7 +492,8 @@ class TableSourceTest extends TableTestBase {
     val util = batchTestUtil()
     val tableEnv = util.tableEnv
 
-    tableEnv.asInstanceOf[TableEnvironmentInternal]
+    tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
       .registerTableSourceInternal(tableName, tableSource)
 
     val sqlQuery =
@@ -498,35 +508,29 @@ class TableSourceTest extends TableTestBase {
     val result = tableEnv.sqlQuery(sqlQuery)
 
     val expectedFilter =
-        "'tv > 14:25:02.toTime && " +
+      "'tv > 14:25:02.toTime && " +
         "'dv > 2017-02-03.toDate && " +
         "'tsv > 2017-02-03 14:25:02.0.toTimestamp"
-    val expected = batchFilterableSourceTableNode(
-      tableName,
-      Array("id"),
-      isPushedDown = true,
-      expectedFilter
-    )
+    val expected =
+      batchFilterableSourceTableNode(tableName, Array("id"), isPushedDown = true, expectedFilter)
     util.verifyTable(result, expected)
   }
 
   // utils
 
-  def filterableTableSource:(TableSource[_], String) = {
+  def filterableTableSource: (TableSource[_], String) = {
     val tableSource = TestFilterableTableSource()
     (tableSource, "filterableTable")
   }
 
-  def filterableTableSourceTimeTypes:(TableSource[_], String) = {
+  def filterableTableSourceTimeTypes: (TableSource[_], String) = {
     val rowTypeInfo = new RowTypeInfo(
       Array[TypeInformation[_]](
         BasicTypeInfo.INT_TYPE_INFO,
         SqlTimeTypeInfo.DATE,
         SqlTimeTypeInfo.TIME,
-        SqlTimeTypeInfo.TIMESTAMP
-      ),
-      Array("id", "dv", "tv", "tsv")
-    )
+        SqlTimeTypeInfo.TIMESTAMP),
+      Array("id", "dv", "tv", "tsv"))
 
     val row = new Row(4)
     row.setField(0, 1)
@@ -550,7 +554,7 @@ class TableSourceTest extends TableTestBase {
       s"source=[CsvTableSource(read fields: ${fields.mkString(", ")})])"
   }
 
-  def streamSourceTableNode(sourceName: String, fields: Array[String] ): String = {
+  def streamSourceTableNode(sourceName: String, fields: Array[String]): String = {
     s"StreamTableSourceScan(table=[[default_catalog, default_database, $sourceName]], " +
       s"fields=[${fields.mkString(", ")}], " +
       s"source=[CsvTableSource(read fields: ${fields.mkString(", ")})])"
@@ -560,26 +564,20 @@ class TableSourceTest extends TableTestBase {
       sourceName: String,
       fields: Array[String],
       isPushedDown: Boolean,
-      exp: String)
-    : String = {
+      exp: String): String = {
     "BatchTableSourceScan(" +
-      s"table=[[default_catalog, default_database, $sourceName]], fields=[${
-        fields
-          .mkString(", ")
-      }], source=[filterPushedDown=[$isPushedDown], filter=[$exp]])"
+      s"table=[[default_catalog, default_database, $sourceName]], fields=[${fields
+        .mkString(", ")}], source=[filterPushedDown=[$isPushedDown], filter=[$exp]])"
   }
 
   def streamFilterableSourceTableNode(
       sourceName: String,
       fields: Array[String],
       isPushedDown: Boolean,
-      exp: String)
-    : String = {
+      exp: String): String = {
     "StreamTableSourceScan(" +
-      s"table=[[default_catalog, default_database, $sourceName]], fields=[${
-        fields
-          .mkString(", ")
-      }], source=[filterPushedDown=[$isPushedDown], filter=[$exp]])"
+      s"table=[[default_catalog, default_database, $sourceName]], fields=[${fields
+        .mkString(", ")}], source=[filterPushedDown=[$isPushedDown], filter=[$exp]])"
   }
 
 }

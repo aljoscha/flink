@@ -33,11 +33,12 @@ import org.apache.calcite.rel.{RelCollations, RelNode}
 
 import scala.collection.JavaConversions._
 
-class BatchExecLegacySinkRule extends ConverterRule(
-    classOf[FlinkLogicalLegacySink],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.BATCH_PHYSICAL,
-    "BatchExecLegacySinkRule") {
+class BatchExecLegacySinkRule
+    extends ConverterRule(
+      classOf[FlinkLogicalLegacySink],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.BATCH_PHYSICAL,
+      "BatchExecLegacySinkRule") {
 
   def convert(rel: RelNode): RelNode = {
     val sinkNode = rel.asInstanceOf[FlinkLogicalLegacySink]
@@ -48,21 +49,21 @@ class BatchExecLegacySinkRule extends ConverterRule(
         case partitionSink: PartitionableTableSink =>
           partitionSink.setStaticPartition(sinkNode.staticPartitions)
           val dynamicPartFields = sinkNode.catalogTable.getPartitionKeys
-              .filter(!sinkNode.staticPartitions.contains(_))
+            .filter(!sinkNode.staticPartitions.contains(_))
 
           if (dynamicPartFields.nonEmpty) {
             val dynamicPartIndices =
               dynamicPartFields.map(partitionSink.getTableSchema.getFieldNames.indexOf(_))
 
-            val shuffleEnable = sinkNode
-                .catalogTable
-                .getProperties
-                .get(FileSystemOptions.SINK_SHUFFLE_BY_PARTITION.key())
+            val shuffleEnable = sinkNode.catalogTable.getProperties
+              .get(FileSystemOptions.SINK_SHUFFLE_BY_PARTITION.key())
 
             if (shuffleEnable != null && shuffleEnable.toBoolean) {
               requiredTraitSet = requiredTraitSet.plus(
-                FlinkRelDistribution.hash(dynamicPartIndices
-                    .map(Integer.valueOf), requireStrict = false))
+                FlinkRelDistribution.hash(
+                  dynamicPartIndices
+                    .map(Integer.valueOf),
+                  requireStrict = false))
             }
 
             if (partitionSink.configurePartitionGrouping(true)) {
@@ -71,19 +72,16 @@ class BatchExecLegacySinkRule extends ConverterRule(
               requiredTraitSet = requiredTraitSet.plus(RelCollations.of(fieldCollations: _*))
             }
           }
-        case _ => throw new TableException("We need PartitionableTableSink to write data to" +
-            s" partitioned table: ${sinkNode.sinkName}")
+        case _ =>
+          throw new TableException(
+            "We need PartitionableTableSink to write data to" +
+              s" partitioned table: ${sinkNode.sinkName}")
       }
     }
 
     val newInput = RelOptRule.convert(sinkNode.getInput, requiredTraitSet)
 
-    new BatchExecLegacySink(
-      rel.getCluster,
-      newTrait,
-      newInput,
-      sinkNode.sink,
-      sinkNode.sinkName)
+    new BatchExecLegacySink(rel.getCluster, newTrait, newInput, sinkNode.sink, sinkNode.sinkName)
   }
 }
 

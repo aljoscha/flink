@@ -39,17 +39,15 @@ import scala.collection.JavaConversions._
 import scala.collection.mutable
 
 /**
-  * Planner rule that filters null values before join if the count null value from join input
-  * is greater than null filter threshold.
-  *
-  * Since the key of the Null value is impossible to match in the inner join, and there is a single
-  * point skew due to too many Null values. We should push down a not-null filter into the child
-  * node of join.
-  */
+ * Planner rule that filters null values before join if the count null value from join input
+ * is greater than null filter threshold.
+ *
+ * Since the key of the Null value is impossible to match in the inner join, and there is a single
+ * point skew due to too many Null values. We should push down a not-null filter into the child
+ * node of join.
+ */
 class JoinDeriveNullFilterRule
-  extends RelOptRule(
-    operand(classOf[LogicalJoin], any()),
-    "JoinDeriveNullFilterRule") {
+    extends RelOptRule(operand(classOf[LogicalJoin], any()), "JoinDeriveNullFilterRule") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val join: Join = call.rel(0)
@@ -72,7 +70,8 @@ class JoinDeriveNullFilterRule
         val nullCount = mq.getColumnNullCount(input, key)
         if (nullCount != null && nullCount > minNullCount) {
           filters += relBuilder.call(
-            SqlStdOperatorTable.IS_NOT_NULL, rexBuilder.makeInputRef(input, key))
+            SqlStdOperatorTable.IS_NOT_NULL,
+            rexBuilder.makeInputRef(input, key))
         }
       }
       if (filters.nonEmpty) {
@@ -100,8 +99,9 @@ object JoinDeriveNullFilterRule {
   @Experimental
   val TABLE_OPTIMIZER_JOIN_NULL_FILTER_THRESHOLD: ConfigOption[JLong] =
     key("table.optimizer.join.null-filter-threshold")
-        .defaultValue(JLong.valueOf(2000000L))
-        .withDescription("To avoid the impact of null values on the single join node, " +
-            "We will add a null filter (possibly be pushed down) before the join to filter" +
-            " null values when the source of InnerJoin has nullCount more than this value.")
+      .defaultValue(JLong.valueOf(2000000L))
+      .withDescription(
+        "To avoid the impact of null values on the single join node, " +
+          "We will add a null filter (possibly be pushed down) before the join to filter" +
+          " null values when the source of InnerJoin has nullCount more than this value.")
 }

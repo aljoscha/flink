@@ -42,14 +42,14 @@ class BatchPhysicalOverAggregate(
     inputRowType: RelDataType,
     windowGroups: Seq[Window.Group],
     logicWindow: Window)
-  extends BatchPhysicalOverAggregateBase(
-    cluster,
-    traitSet,
-    inputRel,
-    outputRowType,
-    inputRowType,
-    windowGroups,
-    logicWindow) {
+    extends BatchPhysicalOverAggregateBase(
+      cluster,
+      traitSet,
+      inputRel,
+      outputRowType,
+      inputRowType,
+      windowGroups,
+      logicWindow) {
 
   override def deriveRowType: RelDataType = outputRowType
 
@@ -73,7 +73,6 @@ class BatchPhysicalOverAggregate(
         OverAggregateUtil.calcOriginalInputFields(logicWindow)),
       ExecEdge.DEFAULT,
       FlinkTypeFactory.toLogicalRowType(getRowType),
-      getRelDetailedDescription
-    )
+      getRelDetailedDescription)
   }
 }

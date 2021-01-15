@@ -35,12 +35,8 @@ class SetOperatorsTest extends TableTestBase {
     val util = batchTestUtil()
     val t = util.addTable[(Long, (Int, String), Array[Boolean])]("MyTable", 'a, 'b, 'c)
 
-    val expected = binaryNode(
-      "DataSetMinus",
-      batchTableNode(t),
-      batchTableNode(t),
-      term("minus", "a", "b", "c")
-    )
+    val expected =
+      binaryNode("DataSetMinus", batchTableNode(t), batchTableNode(t), term("minus", "a", "b", "c"))
 
     val result = t.minus(t)
 
@@ -66,24 +62,18 @@ class SetOperatorsTest extends TableTestBase {
               "DataSetCalc",
               batchTableNode(table1),
               term("select", "b_long", "true AS $f0"),
-              term("where", "IS NOT NULL(b_long)")
-            ),
+              term("where", "IS NOT NULL(b_long)")),
             term("groupBy", "b_long"),
-            term("select", "b_long", "MIN($f0) AS $f1")
-          ),
-          term("select", "b_long")
-        ),
+            term("select", "b_long", "MIN($f0) AS $f1")),
+          term("select", "b_long")),
         term("where", "=(a_long, b_long)"),
         term("join", "a_long", "a_int", "a_string", "b_long"),
-        term("joinType", "InnerJoin")
-      ),
-      term("select", "a_int", "a_string")
-    )
+        term("joinType", "InnerJoin")),
+      term("select", "a_int", "a_string"))
 
     util.verifySql(
       "SELECT a_int, a_string FROM A WHERE EXISTS(SELECT * FROM B WHERE a_long = b_long)",
-      expected
-    )
+      expected)
   }
 
   @Test
@@ -106,39 +96,30 @@ class SetOperatorsTest extends TableTestBase {
                 "DataSetCalc",
                 batchTableNode(table),
                 term("select", "b"),
-                term("where", "SEARCH(b, Sarg[1L:BIGINT, 6L:BIGINT]:BIGINT)")
-              ),
-              term("select", "COUNT(*) AS $f0", "COUNT(b) AS $f1")
-            ),
+                term("where", "SEARCH(b, Sarg[1L:BIGINT, 6L:BIGINT]:BIGINT)")),
+              term("select", "COUNT(*) AS $f0", "COUNT(b) AS $f1")),
             term("where", "true"),
             term("join", "a", "b", "c", "$f0", "$f1"),
-            term("joinType", "NestedLoopInnerJoin")
-          ),
-          term("select", "a", "c", "$f0", "$f1", "b AS b0")
-        ),
+            term("joinType", "NestedLoopInnerJoin")),
+          term("select", "a", "c", "$f0", "$f1", "b AS b0")),
         unaryNode(
           "DataSetAggregate",
           unaryNode(
             "DataSetCalc",
             batchTableNode(table),
             term("select", "b", "true AS $f1"),
-            term("where", "SEARCH(b, Sarg[1L:BIGINT, 6L:BIGINT]:BIGINT)")
-          ),
+            term("where", "SEARCH(b, Sarg[1L:BIGINT, 6L:BIGINT]:BIGINT)")),
           term("groupBy", "b"),
-          term("select", "b", "MIN($f1) AS $f1")
-        ),
+          term("select", "b", "MIN($f1) AS $f1")),
         term("where", "=(b0, b)"),
         term("join", "a", "c", "$f0", "$f1", "b0", "b", "$f10"),
-        term("joinType", "LeftOuterJoin")
-      ),
+        term("joinType", "LeftOuterJoin")),
       term("select", "a", "c"),
-      term("where", "OR(=($f0, 0:BIGINT), AND(IS NULL($f10), >=($f1, $f0), IS NOT NULL(b0)))")
-    )
+      term("where", "OR(=($f0, 0:BIGINT), AND(IS NULL($f10), >=($f1, $f0), IS NOT NULL(b0)))"))
 
     util.verifySql(
       "SELECT a, c FROM A WHERE b NOT IN (SELECT b FROM A WHERE b = 6 OR b = 1)",
-      expected
-    )
+      expected)
   }
 
   @Test
@@ -150,13 +131,9 @@ class SetOperatorsTest extends TableTestBase {
       "DataSetCalc",
       batchTableNode(table),
       term("select", "a", "b", "c", "d", "e"),
-      term("where", "OR(=(a, c), =(a, CAST(b)), =(a, 5))")
-    )
+      term("where", "OR(=(a, c), =(a, CAST(b)), =(a, 5))"))
 
-    util.verifySql(
-      "SELECT a, b, c, d, e FROM A WHERE a IN (c, b, 5)",
-      expected
-    )
+    util.verifySql("SELECT a, b, c, d, e FROM A WHERE a IN (c, b, 5)", expected)
   }
 
   @Test
@@ -177,45 +154,27 @@ class SetOperatorsTest extends TableTestBase {
               "DataSetCalc",
               batchTableNode(tableB),
               term("select", "d"),
-              term("where", "<(CAST(d), 5:BIGINT)")
-            ),
+              term("where", "<(CAST(d), 5:BIGINT)")),
             unaryNode(
               "DataSetAggregate",
-              unaryNode(
-                "DataSetCalc",
-                batchTableNode(tableA),
-                term("select", "a")
-              ),
-              term("select", "COUNT(*) AS $f0, COUNT(a) AS $f1")
-            ),
+              unaryNode("DataSetCalc", batchTableNode(tableA), term("select", "a")),
+              term("select", "COUNT(*) AS $f0, COUNT(a) AS $f1")),
             term("where", "true"),
             term("join", "d, $f0, $f1"),
-            term("joinType", "NestedLoopInnerJoin")
-          ),
-          term("select", "d, $f0, $f1, d AS d0")
-        ),
+            term("joinType", "NestedLoopInnerJoin")),
+          term("select", "d, $f0, $f1, d AS d0")),
         unaryNode(
           "DataSetAggregate",
-          unaryNode(
-            "DataSetCalc",
-            batchTableNode(tableA),
-            term("select", "a, true AS $f1")
-          ),
+          unaryNode("DataSetCalc", batchTableNode(tableA), term("select", "a, true AS $f1")),
           term("groupBy", "a"),
-          term("select", "a, MIN($f1) AS $f1")
-        ),
+          term("select", "a, MIN($f1) AS $f1")),
         term("where", "=(d0, a)"),
         term("join", "d, $f0, $f1, d0, a, $f10"),
-        term("joinType", "LeftOuterJoin")
-      ),
+        term("joinType", "LeftOuterJoin")),
       term("select", "d"),
-      term("where", "OR(=($f0, 0:BIGINT), AND(IS NULL($f10), >=($f1, $f0), IS NOT NULL(d0)))")
-    )
+      term("where", "OR(=($f0, 0:BIGINT), AND(IS NULL($f10), >=($f1, $f0), IS NOT NULL(d0)))"))
 
-    util.verifySql(
-      "SELECT d FROM B WHERE d NOT IN (SELECT a FROM A) AND d < 5",
-      expected
-    )
+    util.verifySql("SELECT d FROM B WHERE d NOT IN (SELECT a FROM A) AND d < 5", expected)
   }
 
   @Test
@@ -225,50 +184,35 @@ class SetOperatorsTest extends TableTestBase {
 
     val expected = binaryNode(
       "DataSetUnion",
+      unaryNode("DataSetCalc", batchTableNode(table), term("select", "a")),
       unaryNode(
         "DataSetCalc",
         batchTableNode(table),
-        term("select", "a")
-      ),
-      unaryNode(
-        "DataSetCalc",
-        batchTableNode(table),
-        term("select", "CASE(>(c, 0), b, null:RecordType:peek_no_expand(INTEGER _1, " +
-          "VARCHAR(65536) _2)) AS EXPR$0")
-      ),
+        term(
+          "select",
+          "CASE(>(c, 0), b, null:RecordType:peek_no_expand(INTEGER _1, " +
+            "VARCHAR(65536) _2)) AS EXPR$0")),
       term("all", "true"),
-      term("union", "a")
-    )
+      term("union", "a"))
 
     util.verifySql(
       "SELECT a FROM A UNION ALL SELECT CASE WHEN c > 0 THEN b ELSE NULL END FROM A",
-      expected
-    )
+      expected)
   }
 
   @Test
   def testUnionAnyType(): Unit = {
     val util = batchTestUtil()
-    val typeInfo = Types.ROW(
-      new GenericTypeInfo(classOf[NonPojo]),
-      new GenericTypeInfo(classOf[NonPojo]))
+    val typeInfo =
+      Types.ROW(new GenericTypeInfo(classOf[NonPojo]), new GenericTypeInfo(classOf[NonPojo]))
     val table = util.addJavaTable(typeInfo, "A", $("a"), $("b"))
 
     val expected = binaryNode(
       "DataSetUnion",
-      unaryNode(
-        "DataSetCalc",
-        batchTableNode(table),
-        term("select", "a")
-      ),
-      unaryNode(
-        "DataSetCalc",
-        batchTableNode(table),
-        term("select", "b")
-      ),
+      unaryNode("DataSetCalc", batchTableNode(table), term("select", "a")),
+      unaryNode("DataSetCalc", batchTableNode(table), term("select", "b")),
       term("all", "true"),
-      term("union", "a")
-    )
+      term("union", "a"))
 
     util.verifyJavaSql("SELECT a FROM A UNION ALL SELECT b FROM A", expected)
   }
@@ -280,29 +224,23 @@ class SetOperatorsTest extends TableTestBase {
     val expected = naryNode(
       "DataSetUnion",
       List(
-        unaryNode("DataSetCalc",
-          values("DataSetValues",
-            tuples(List("0")),
-            "values=[ZERO]"),
+        unaryNode(
+          "DataSetCalc",
+          values("DataSetValues", tuples(List("0")), "values=[ZERO]"),
           term("select", "1 AS EXPR$0, 1:BIGINT AS EXPR$1")),
-        unaryNode("DataSetCalc",
-          values("DataSetValues",
-            tuples(List("0")),
-            "values=[ZERO]"),
+        unaryNode(
+          "DataSetCalc",
+          values("DataSetValues", tuples(List("0")), "values=[ZERO]"),
           term("select", "2 AS EXPR$0, 2:BIGINT AS EXPR$1")),
-        unaryNode("DataSetCalc",
-          values("DataSetValues",
-            tuples(List("0")),
-            "values=[ZERO]"),
-          term("select", "3 AS EXPR$0, 3:BIGINT AS EXPR$1"))
-      ),
+        unaryNode(
+          "DataSetCalc",
+          values("DataSetValues", tuples(List("0")), "values=[ZERO]"),
+          term("select", "3 AS EXPR$0, 3:BIGINT AS EXPR$1"))),
       term("all", "true"),
-      term("union", "EXPR$0, EXPR$1")
-    )
+      term("union", "EXPR$0, EXPR$1"))
 
     util.verifySql(
       "VALUES (1, cast(1 as BIGINT) ),(2, cast(2 as BIGINT)),(3, cast(3 as BIGINT))",
-      expected
-    )
+      expected)
   }
 }

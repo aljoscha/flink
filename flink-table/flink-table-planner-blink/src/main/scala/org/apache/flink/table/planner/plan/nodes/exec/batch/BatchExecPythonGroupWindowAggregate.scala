@@ -29,7 +29,11 @@ import org.apache.flink.table.functions.python.PythonFunctionInfo
 import org.apache.flink.table.planner.calcite.FlinkRelBuilder.PlannerNamedWindowProperty
 import org.apache.flink.table.planner.codegen.agg.batch.WindowCodeGenerator
 import org.apache.flink.table.planner.delegation.PlannerBase
-import org.apache.flink.table.planner.expressions.{PlannerRowtimeAttribute, PlannerWindowEnd, PlannerWindowStart}
+import org.apache.flink.table.planner.expressions.{
+  PlannerRowtimeAttribute,
+  PlannerWindowEnd,
+  PlannerWindowStart
+}
 import org.apache.flink.table.planner.plan.logical.LogicalWindow
 import org.apache.flink.table.planner.plan.nodes.exec.batch.BatchExecPythonGroupWindowAggregate.ARROW_PYTHON_GROUP_WINDOW_AGGREGATE_FUNCTION_OPERATOR_NAME
 import org.apache.flink.table.planner.plan.nodes.exec.common.CommonPythonAggregate
@@ -58,9 +62,9 @@ class BatchExecPythonGroupWindowAggregate(
     inputEdge: ExecEdge,
     outputType: RowType,
     description: String)
-  extends ExecNodeBase[RowData](Collections.singletonList(inputEdge), outputType, description)
-  with BatchExecNode[RowData]
-  with CommonPythonAggregate {
+    extends ExecNodeBase[RowData](Collections.singletonList(inputEdge), outputType, description)
+    with BatchExecNode[RowData]
+    with CommonPythonAggregate {
 
   override protected def translateToPlanInternal(planner: PlannerBase): Transformation[RowData] = {
     val inputNode = getInputNodes.get(0).asInstanceOf[ExecNode[RowData]]
@@ -96,10 +100,10 @@ class BatchExecPythonGroupWindowAggregate(
       windowSize: Long,
       slideSize: Long,
       config: Configuration): OneInputTransformation[RowData, RowData] = {
-    val namePropertyTypeArray = namedWindowProperties.map {
-      case PlannerNamedWindowProperty(_, p) => p match {
-        case PlannerWindowStart(_) => 0
-        case PlannerWindowEnd(_) => 1
+    val namePropertyTypeArray = namedWindowProperties.map { case PlannerNamedWindowProperty(_, p) =>
+      p match {
+        case PlannerWindowStart(_)      => 0
+        case PlannerWindowEnd(_)        => 1
         case PlannerRowtimeAttribute(_) => 2
       }
     }.toArray
@@ -154,19 +158,20 @@ class BatchExecPythonGroupWindowAggregate(
       classOf[Array[Int]],
       classOf[Array[Int]])
 
-    ctor.newInstance(
-      config,
-      pythonFunctionInfos,
-      inputRowType,
-      outputRowType,
-      Integer.valueOf(inputTimeFieldIndex),
-      Integer.valueOf(maxLimitSize),
-      java.lang.Long.valueOf(windowSize),
-      java.lang.Long.valueOf(slideSize),
-      namedWindowProperties,
-      grouping,
-      grouping ++ auxGrouping,
-      udafInputOffsets)
+    ctor
+      .newInstance(
+        config,
+        pythonFunctionInfos,
+        inputRowType,
+        outputRowType,
+        Integer.valueOf(inputTimeFieldIndex),
+        Integer.valueOf(maxLimitSize),
+        java.lang.Long.valueOf(windowSize),
+        java.lang.Long.valueOf(slideSize),
+        namedWindowProperties,
+        grouping,
+        grouping ++ auxGrouping,
+        udafInputOffsets)
       .asInstanceOf[OneInputStreamOperator[RowData, RowData]]
   }
 }

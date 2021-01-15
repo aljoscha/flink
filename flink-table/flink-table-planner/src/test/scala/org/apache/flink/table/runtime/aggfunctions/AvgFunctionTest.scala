@@ -24,10 +24,10 @@ import org.apache.flink.table.functions.AggregateFunction
 import org.apache.flink.table.functions.aggfunctions._
 
 /**
-  * Test case for built-in average aggregate function
-  *
-  * @tparam T the type for the aggregation result
-  */
+ * Test case for built-in average aggregate function
+ *
+ * @tparam T the type for the aggregation result
+ */
 abstract class AvgAggFunctionTestBase[T: Numeric, ACC] extends AggFunctionTestBase[T, ACC] {
 
   private val numeric: Numeric[T] = implicitly[Numeric[T]]
@@ -46,8 +46,7 @@ abstract class AvgAggFunctionTestBase[T: Numeric, ACC] extends AggFunctionTestBa
       null.asInstanceOf[T],
       minVal,
       minVal,
-      minVal
-    ),
+      minVal),
     Seq(
       maxVal,
       maxVal,
@@ -57,8 +56,7 @@ abstract class AvgAggFunctionTestBase[T: Numeric, ACC] extends AggFunctionTestBa
       null.asInstanceOf[T],
       maxVal,
       maxVal,
-      maxVal
-    ),
+      maxVal),
     Seq(
       minVal,
       maxVal,
@@ -66,8 +64,7 @@ abstract class AvgAggFunctionTestBase[T: Numeric, ACC] extends AggFunctionTestBa
       numeric.fromInt(0),
       numeric.negate(maxVal),
       numeric.negate(minVal),
-      null.asInstanceOf[T]
-    ),
+      null.asInstanceOf[T]),
     Seq(
       numeric.fromInt(1),
       numeric.fromInt(2),
@@ -75,25 +72,17 @@ abstract class AvgAggFunctionTestBase[T: Numeric, ACC] extends AggFunctionTestBa
       numeric.fromInt(3),
       numeric.fromInt(4),
       numeric.fromInt(5),
-      null.asInstanceOf[T]
-    ),
+      null.asInstanceOf[T]),
     Seq(
       null.asInstanceOf[T],
       null.asInstanceOf[T],
       null.asInstanceOf[T],
       null.asInstanceOf[T],
       null.asInstanceOf[T],
-      null.asInstanceOf[T]
-    )
-  )
+      null.asInstanceOf[T]))
 
-  override def expectedResults: Seq[T] = Seq(
-    minVal,
-    maxVal,
-    numeric.fromInt(0),
-    numeric.fromInt(3),
-    null.asInstanceOf[T]
-  )
+  override def expectedResults: Seq[T] =
+    Seq(minVal, maxVal, numeric.fromInt(0), numeric.fromInt(3), null.asInstanceOf[T])
 
   override def retractFunc = aggregator.getClass.getMethod("retract", accType, classOf[Any])
 }
@@ -162,8 +151,7 @@ class DecimalAvgAggFunctionTest extends AggFunctionTestBase[BigDecimal, DecimalA
       new BigDecimal("0.000000000012345"),
       new BigDecimal("-987654321000000"),
       null,
-      new BigDecimal("0")
-    ),
+      new BigDecimal("0")),
     Seq(
       new BigDecimal("987654321000000"),
       new BigDecimal("-0.000000000012345"),
@@ -171,27 +159,15 @@ class DecimalAvgAggFunctionTest extends AggFunctionTestBase[BigDecimal, DecimalA
       new BigDecimal("0.000000000012345"),
       new BigDecimal("-987654321000000"),
       null,
-      new BigDecimal("5")
-    ),
-    Seq(
-      null,
-      null,
-      null,
-      null
-    ),
-    Seq(
-      new BigDecimal("0.3"),
-      new BigDecimal("0.3"),
-      new BigDecimal("0.4")
-    )
-  )
+      new BigDecimal("5")),
+    Seq(null, null, null, null),
+    Seq(new BigDecimal("0.3"), new BigDecimal("0.3"), new BigDecimal("0.4")))
 
   override def expectedResults: Seq[BigDecimal] = Seq(
     BigDecimal.ZERO,
     BigDecimal.ONE,
     null,
-    BigDecimal.ONE.divide(new BigDecimal("3"), MathContext.DECIMAL128)
-  )
+    BigDecimal.ONE.divide(new BigDecimal("3"), MathContext.DECIMAL128))
 
   override def aggregator: AggregateFunction[BigDecimal, DecimalAvgAccumulator] =
     new DecimalAvgAggFunction(MathContext.DECIMAL128)

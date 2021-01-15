@@ -20,7 +20,10 @@ package org.apache.flink.table.planner.plan.batch.sql.agg
 import org.apache.flink.api.common.typeinfo.TypeInformation
 import org.apache.flink.api.scala._
 import org.apache.flink.table.api.{TableException, Types, _}
-import org.apache.flink.table.planner.plan.utils.JavaUserDefinedAggFunctions.{VarSum1AggFunction, VarSum2AggFunction}
+import org.apache.flink.table.planner.plan.utils.JavaUserDefinedAggFunctions.{
+  VarSum1AggFunction,
+  VarSum2AggFunction
+}
 import org.apache.flink.table.planner.utils.{BatchTableTestUtil, TableTestBase}
 import org.apache.flink.table.runtime.typeutils.DecimalDataTypeInfo
 
@@ -29,19 +32,41 @@ import org.junit.Test
 abstract class AggregateTestBase extends TableTestBase {
 
   protected val util: BatchTableTestUtil = batchTestUtil()
-  util.addTableSource("MyTable",
+  util.addTableSource(
+    "MyTable",
     Array[TypeInformation[_]](
-      Types.BYTE, Types.SHORT, Types.INT, Types.LONG, Types.FLOAT, Types.DOUBLE, Types.BOOLEAN,
-      Types.STRING, Types.LOCAL_DATE, Types.LOCAL_TIME, Types.LOCAL_DATE_TIME,
-      DecimalDataTypeInfo.of(30, 20), DecimalDataTypeInfo.of(10, 5)),
-    Array("byte", "short", "int", "long", "float", "double", "boolean",
-      "string", "date", "time", "timestamp", "decimal3020", "decimal105"))
+      Types.BYTE,
+      Types.SHORT,
+      Types.INT,
+      Types.LONG,
+      Types.FLOAT,
+      Types.DOUBLE,
+      Types.BOOLEAN,
+      Types.STRING,
+      Types.LOCAL_DATE,
+      Types.LOCAL_TIME,
+      Types.LOCAL_DATE_TIME,
+      DecimalDataTypeInfo.of(30, 20),
+      DecimalDataTypeInfo.of(10, 5)),
+    Array(
+      "byte",
+      "short",
+      "int",
+      "long",
+      "float",
+      "double",
+      "boolean",
+      "string",
+      "date",
+      "time",
+      "timestamp",
+      "decimal3020",
+      "decimal105"))
   util.addTableSource[(Int, Long, String)]("MyTable1", 'a, 'b, 'c)
 
   @Test
   def testAvg(): Unit = {
-    util.verifyRelPlanWithType(
-      """
+    util.verifyRelPlanWithType("""
         |SELECT AVG(`byte`),
         |       AVG(`short`),
         |       AVG(`int`),
@@ -56,8 +81,7 @@ abstract class AggregateTestBase extends TableTestBase {
 
   @Test
   def testSum(): Unit = {
-    util.verifyRelPlanWithType(
-      """
+    util.verifyRelPlanWithType("""
         |SELECT SUM(`byte`),
         |       SUM(`short`),
         |       SUM(`int`),
@@ -72,8 +96,7 @@ abstract class AggregateTestBase extends TableTestBase {
 
   @Test
   def testCount(): Unit = {
-    util.verifyRelPlanWithType(
-      """
+    util.verifyRelPlanWithType("""
         |SELECT COUNT(`byte`),
         |       COUNT(`short`),
         |       COUNT(`int`),
@@ -96,7 +119,6 @@ abstract class AggregateTestBase extends TableTestBase {
     util.verifyRelPlanWithType("SELECT COUNT(*) FROM MyTable")
   }
 
-
   @Test
   def testCannotCountOnMultiFields(): Unit = {
     val sql = "SELECT b, COUNT(a, c) FROM MyTable1 GROUP BY b"
@@ -107,8 +129,7 @@ abstract class AggregateTestBase extends TableTestBase {
 
   @Test
   def testMinWithFixLengthType(): Unit = {
-    util.verifyRelPlanWithType(
-      """
+    util.verifyRelPlanWithType("""
         |SELECT MIN(`byte`),
         |       MIN(`short`),
         |       MIN(`int`),
@@ -132,8 +153,7 @@ abstract class AggregateTestBase extends TableTestBase {
 
   @Test
   def testMaxWithFixLengthType(): Unit = {
-    util.verifyRelPlanWithType(
-      """
+    util.verifyRelPlanWithType("""
         |SELECT MAX(`byte`),
         |       MAX(`short`),
         |       MAX(`int`),

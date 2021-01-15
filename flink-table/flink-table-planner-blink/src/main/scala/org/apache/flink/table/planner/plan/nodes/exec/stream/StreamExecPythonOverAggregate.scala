@@ -18,7 +18,6 @@
 
 package org.apache.flink.table.planner.plan.nodes.exec.stream
 
-
 import org.apache.flink.api.dag.Transformation
 import org.apache.flink.configuration.Configuration
 import org.apache.flink.core.memory.ManagedMemoryUseCase
@@ -29,7 +28,12 @@ import org.apache.flink.table.data.RowData
 import org.apache.flink.table.functions.python.PythonFunctionInfo
 import org.apache.flink.table.planner.delegation.PlannerBase
 import org.apache.flink.table.planner.plan.nodes.exec.common.CommonPythonAggregate
-import org.apache.flink.table.planner.plan.nodes.exec.stream.StreamExecPythonOverAggregate.{ARROW_PYTHON_OVER_WINDOW_RANGE_PROC_TIME_AGGREGATE_FUNCTION_OPERATOR_NAME, ARROW_PYTHON_OVER_WINDOW_RANGE_ROW_TIME_AGGREGATE_FUNCTION_OPERATOR_NAME, ARROW_PYTHON_OVER_WINDOW_ROWS_PROC_TIME_AGGREGATE_FUNCTION_OPERATOR_NAME, ARROW_PYTHON_OVER_WINDOW_ROWS_ROW_TIME_AGGREGATE_FUNCTION_OPERATOR_NAME}
+import org.apache.flink.table.planner.plan.nodes.exec.stream.StreamExecPythonOverAggregate.{
+  ARROW_PYTHON_OVER_WINDOW_RANGE_PROC_TIME_AGGREGATE_FUNCTION_OPERATOR_NAME,
+  ARROW_PYTHON_OVER_WINDOW_RANGE_ROW_TIME_AGGREGATE_FUNCTION_OPERATOR_NAME,
+  ARROW_PYTHON_OVER_WINDOW_ROWS_PROC_TIME_AGGREGATE_FUNCTION_OPERATOR_NAME,
+  ARROW_PYTHON_OVER_WINDOW_ROWS_ROW_TIME_AGGREGATE_FUNCTION_OPERATOR_NAME
+}
 import org.apache.flink.table.planner.plan.nodes.exec.utils.OverSpec
 import org.apache.flink.table.planner.plan.nodes.exec.{ExecEdge, ExecNode, ExecNodeBase}
 import org.apache.flink.table.planner.plan.utils.{KeySelectorUtil, OverAggregateUtil}
@@ -51,14 +55,14 @@ import scala.collection.JavaConversions._
  * FLINK-20924 will port this class to Java.
  */
 class StreamExecPythonOverAggregate(
-    overSpec: OverSpec, inputEdge: ExecEdge, outputType: RowType, description: String)
-  extends ExecNodeBase[RowData](
-    Collections.singletonList(inputEdge),
-    outputType,
-    description)
-  with StreamExecNode[RowData]
-  with CommonPythonAggregate
-  with Logging {
+    overSpec: OverSpec,
+    inputEdge: ExecEdge,
+    outputType: RowType,
+    description: String)
+    extends ExecNodeBase[RowData](Collections.singletonList(inputEdge), outputType, description)
+    with StreamExecNode[RowData]
+    with CommonPythonAggregate
+    with Logging {
 
   override protected def translateToPlanInternal(planner: PlannerBase): Transformation[RowData] = {
     val group = overSpec.getGroups.get(0)
@@ -89,7 +93,7 @@ class StreamExecPythonOverAggregate(
 
     // check time field
     val rowTimeIdx: Option[Int] = orderKeyType match {
-      case t: TimestampType if t.getKind == TimestampKind.ROWTIME => Some(orderKey)
+      case t: TimestampType if t.getKind == TimestampKind.ROWTIME  => Some(orderKey)
       case t: TimestampType if t.getKind == TimestampKind.PROCTIME => None
       case _ =>
         throw new TableException(
@@ -106,8 +110,7 @@ class StreamExecPythonOverAggregate(
 
     val boundValue = OverAggregateUtil.getBoundary(overSpec, group.getLowerBound)
     if (boundValue.isInstanceOf[BigDecimal]) {
-      throw new TableException(
-        "the specific value is decimal which haven not supported yet.")
+      throw new TableException("the specific value is decimal which haven not supported yet.")
     }
     // bounded OVER window
     val precedingOffset = -1 * boundValue.asInstanceOf[Long]
@@ -134,8 +137,8 @@ class StreamExecPythonOverAggregate(
     }
 
     // set KeyType and Selector for state
-    val selector = KeySelectorUtil.getRowDataSelector(
-      partitionKeys, InternalTypeInfo.of(inputRowType))
+    val selector =
+      KeySelectorUtil.getRowDataSelector(partitionKeys, InternalTypeInfo.of(inputRowType))
     transform.setStateKeySelector(selector)
     transform.setStateKeyType(selector.getProducedType)
     transform
@@ -211,17 +214,18 @@ class StreamExecPythonOverAggregate(
         classOf[Long],
         classOf[Array[Int]],
         classOf[Array[Int]])
-      ctor.newInstance(
-        config,
-        minIdleStateRetentionTime.asInstanceOf[AnyRef],
-        maxIdleStateRetentionTime.asInstanceOf[AnyRef],
-        pythonFunctionInfos,
-        inputRowType,
-        outputRowType,
-        inputTimeFieldIndex.asInstanceOf[AnyRef],
-        lowerBinary.asInstanceOf[AnyRef],
-        grouping,
-        udafInputOffsets)
+      ctor
+        .newInstance(
+          config,
+          minIdleStateRetentionTime.asInstanceOf[AnyRef],
+          maxIdleStateRetentionTime.asInstanceOf[AnyRef],
+          pythonFunctionInfos,
+          inputRowType,
+          outputRowType,
+          inputTimeFieldIndex.asInstanceOf[AnyRef],
+          lowerBinary.asInstanceOf[AnyRef],
+          grouping,
+          udafInputOffsets)
         .asInstanceOf[OneInputStreamOperator[RowData, RowData]]
     } else {
       val className = if (rowTimeIdx.isDefined) {
@@ -239,15 +243,16 @@ class StreamExecPythonOverAggregate(
         classOf[Long],
         classOf[Array[Int]],
         classOf[Array[Int]])
-      ctor.newInstance(
-        config,
-        pythonFunctionInfos,
-        inputRowType,
-        outputRowType,
-        inputTimeFieldIndex.asInstanceOf[AnyRef],
-        lowerBinary.asInstanceOf[AnyRef],
-        grouping,
-        udafInputOffsets)
+      ctor
+        .newInstance(
+          config,
+          pythonFunctionInfos,
+          inputRowType,
+          outputRowType,
+          inputTimeFieldIndex.asInstanceOf[AnyRef],
+          lowerBinary.asInstanceOf[AnyRef],
+          grouping,
+          udafInputOffsets)
         .asInstanceOf[OneInputStreamOperator[RowData, RowData]]
     }
   }

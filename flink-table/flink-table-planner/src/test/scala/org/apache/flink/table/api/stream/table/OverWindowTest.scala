@@ -28,8 +28,8 @@ import org.junit.Test
 
 class OverWindowTest extends TableTestBase {
   private val streamUtil: StreamTableTestUtil = streamTestUtil()
-  val table: Table = streamUtil.addTable[(Int, String, Long)]("MyTable",
-    'a, 'b, 'c, 'proctime.proctime, 'rowtime.rowtime)
+  val table: Table = streamUtil
+    .addTable[(Int, String, Long)]("MyTable", 'a, 'b, 'c, 'proctime.proctime, 'rowtime.rowtime)
 
   @Test
   def testScalarFunctionsOnOverWindow() = {
@@ -53,23 +53,26 @@ class OverWindowTest extends TableTestBase {
           unaryNode(
             "DataStreamCalc",
             streamTableNode(table),
-            term("select", "a", "b", "c", "proctime")
-          ),
+            term("select", "a", "b", "c", "proctime")),
           term("partitionBy", "b"),
           term("orderBy", "proctime"),
           term("rows", "BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW"),
-          term("select", "a", "b", "c", "proctime",
-               "SUM(a) AS w0$o0",
-               "COUNT(a) AS w0$o1",
-               "WeightedAvgWithRetract(c, a) AS w0$o2")
-        ),
-        term("select",
-             s"Func1$$(w0$$o0) AS d",
-             "EXP(w0$o1) AS _c1",
-             "+(w0$o2, 1:BIGINT) AS _c2",
-             "||('AVG:', CAST(w0$o2)) AS _c3",
-             "ARRAY(w0$o2, w0$o1) AS _c4")
-      )
+          term(
+            "select",
+            "a",
+            "b",
+            "c",
+            "proctime",
+            "SUM(a) AS w0$o0",
+            "COUNT(a) AS w0$o1",
+            "WeightedAvgWithRetract(c, a) AS w0$o2")),
+        term(
+          "select",
+          s"Func1$$(w0$$o0) AS d",
+          "EXP(w0$o1) AS _c1",
+          "+(w0$o2, 1:BIGINT) AS _c2",
+          "||('AVG:', CAST(w0$o2)) AS _c3",
+          "ARRAY(w0$o2, w0$o1) AS _c4"))
     streamUtil.verifyTable(result, expected)
   }
 
@@ -89,15 +92,12 @@ class OverWindowTest extends TableTestBase {
           unaryNode(
             "DataStreamCalc",
             streamTableNode(table),
-            term("select", "a", "b", "c", "proctime")
-          ),
+            term("select", "a", "b", "c", "proctime")),
           term("partitionBy", "b"),
           term("orderBy", "proctime"),
           term("rows", "BETWEEN 2 PRECEDING AND CURRENT ROW"),
-          term("select", "a", "b", "c", "proctime", "WeightedAvgWithRetract(c, a) AS w0$o0")
-        ),
-        term("select", "c", "w0$o0 AS _c1")
-      )
+          term("select", "a", "b", "c", "proctime", "WeightedAvgWithRetract(c, a) AS w0$o0")),
+        term("select", "c", "w0$o0 AS _c1"))
     streamUtil.verifyTable(result, expected)
   }
 
@@ -106,8 +106,7 @@ class OverWindowTest extends TableTestBase {
     val weightedAvg = new WeightedAvgWithRetract
 
     val result = table
-      .window(
-        Over partitionBy 'a orderBy 'proctime preceding 2.hours following CURRENT_RANGE as 'w)
+      .window(Over partitionBy 'a orderBy 'proctime preceding 2.hours following CURRENT_RANGE as 'w)
       .select('a, weightedAvg('c, 'a) over 'w as 'myAvg)
 
     val expected =
@@ -115,24 +114,12 @@ class OverWindowTest extends TableTestBase {
         "DataStreamCalc",
         unaryNode(
           "DataStreamOverAggregate",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(table),
-            term("select", "a", "c", "proctime")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "c", "proctime")),
           term("partitionBy", "a"),
           term("orderBy", "proctime"),
           term("range", "BETWEEN 7200000 PRECEDING AND CURRENT ROW"),
-          term(
-            "select",
-            "a",
-            "c",
-            "proctime",
-            "WeightedAvgWithRetract(c, a) AS w0$o0"
-          )
-        ),
-        term("select", "a", "w0$o0 AS myAvg")
-      )
+          term("select", "a", "c", "proctime", "WeightedAvgWithRetract(c, a) AS w0$o0")),
+        term("select", "a", "w0$o0 AS myAvg"))
 
     streamUtil.verifyTable(result, expected)
   }
@@ -148,17 +135,11 @@ class OverWindowTest extends TableTestBase {
         "DataStreamCalc",
         unaryNode(
           "DataStreamOverAggregate",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(table),
-            term("select", "a", "c", "proctime")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "c", "proctime")),
           term("orderBy", "proctime"),
           term("range", "BETWEEN 10000 PRECEDING AND CURRENT ROW"),
-          term("select", "a", "c", "proctime", "COUNT(c) AS w0$o0")
-        ),
-        term("select", "a", "w0$o0 AS _c1")
-      )
+          term("select", "a", "c", "proctime", "COUNT(c) AS w0$o0")),
+        term("select", "a", "w0$o0 AS _c1"))
 
     streamUtil.verifyTable(result, expected)
   }
@@ -174,17 +155,11 @@ class OverWindowTest extends TableTestBase {
         "DataStreamCalc",
         unaryNode(
           "DataStreamOverAggregate",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(table),
-            term("select", "a", "c", "proctime")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "c", "proctime")),
           term("orderBy", "proctime"),
           term("rows", "BETWEEN 2 PRECEDING AND CURRENT ROW"),
-          term("select", "a", "c", "proctime", "COUNT(a) AS w0$o0")
-        ),
-        term("select", "c", "w0$o0 AS _c1")
-      )
+          term("select", "a", "c", "proctime", "COUNT(a) AS w0$o0")),
+        term("select", "c", "w0$o0 AS _c1"))
 
     streamUtil.verifyTable(result, expected)
   }
@@ -208,11 +183,7 @@ class OverWindowTest extends TableTestBase {
         "DataStreamCalc",
         unaryNode(
           "DataStreamOverAggregate",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(table),
-            term("select", "a", "c", "proctime")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "c", "proctime")),
           term("partitionBy", "c"),
           term("orderBy", "proctime"),
           term("range", "BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW"),
@@ -222,17 +193,8 @@ class OverWindowTest extends TableTestBase {
             "c",
             "proctime",
             "COUNT(a) AS w0$o0",
-            "WeightedAvgWithRetract(c, a) AS w0$o1"
-          )
-        ),
-        term(
-          "select",
-          "a",
-          "c",
-          "w0$o0 AS _c2",
-          "w0$o1 AS _c3"
-        )
-      )
+            "WeightedAvgWithRetract(c, a) AS w0$o1")),
+        term("select", "a", "c", "w0$o0 AS _c2", "w0$o1 AS _c3"))
     streamUtil.verifyTable(result, expected)
   }
 
@@ -250,20 +212,18 @@ class OverWindowTest extends TableTestBase {
         "DataStreamCalc",
         unaryNode(
           "DataStreamOverAggregate",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(table),
-            term("select", "a", "c", "proctime")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "c", "proctime")),
           term("partitionBy", "c"),
           term("orderBy", "proctime"),
           term("rows", "BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW"),
-          term("select", "a", "c", "proctime",
-               "COUNT(a) AS w0$o0",
-               "WeightedAvgWithRetract(c, a) AS w0$o1")
-        ),
-        term("select", "c", "w0$o0 AS _c1", "w0$o1 AS _c2")
-      )
+          term(
+            "select",
+            "a",
+            "c",
+            "proctime",
+            "COUNT(a) AS w0$o0",
+            "WeightedAvgWithRetract(c, a) AS w0$o1")),
+        term("select", "c", "w0$o0 AS _c1", "w0$o1 AS _c2"))
 
     streamUtil.verifyTable(result, expected)
   }
@@ -271,8 +231,7 @@ class OverWindowTest extends TableTestBase {
   @Test
   def testProcTimeUnboundedNonPartitionedRangeOver() = {
     val result = table
-      .window(
-        Over orderBy 'proctime preceding UNBOUNDED_RANGE as 'w)
+      .window(Over orderBy 'proctime preceding UNBOUNDED_RANGE as 'w)
       .select('a, 'c, 'a.count over 'w, 'a.sum over 'w)
 
     val expected =
@@ -280,30 +239,11 @@ class OverWindowTest extends TableTestBase {
         "DataStreamCalc",
         unaryNode(
           "DataStreamOverAggregate",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(table),
-            term("select", "a", "c", "proctime")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "c", "proctime")),
           term("orderBy", "proctime"),
           term("range", "BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW"),
-          term(
-            "select",
-            "a",
-            "c",
-            "proctime",
-            "COUNT(a) AS w0$o0",
-            "SUM(a) AS w0$o1"
-          )
-        ),
-        term(
-          "select",
-          "a",
-          "c",
-          "w0$o0 AS _c2",
-          "w0$o1 AS _c3"
-        )
-      )
+          term("select", "a", "c", "proctime", "COUNT(a) AS w0$o0", "SUM(a) AS w0$o1")),
+        term("select", "a", "c", "w0$o0 AS _c2", "w0$o1 AS _c3"))
 
     streamUtil.verifyTable(result, expected)
   }
@@ -319,17 +259,11 @@ class OverWindowTest extends TableTestBase {
         "DataStreamCalc",
         unaryNode(
           "DataStreamOverAggregate",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(table),
-            term("select", "a", "c", "proctime")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "c", "proctime")),
           term("orderBy", "proctime"),
           term("rows", "BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW"),
-          term("select", "a", "c", "proctime", "COUNT(a) AS w0$o0")
-        ),
-        term("select", "c", "w0$o0 AS _c1")
-      )
+          term("select", "a", "c", "proctime", "COUNT(a) AS w0$o0")),
+        term("select", "c", "w0$o0 AS _c1"))
 
     streamUtil.verifyTable(result, expected)
   }
@@ -339,8 +273,7 @@ class OverWindowTest extends TableTestBase {
     val weightedAvg = new WeightedAvgWithRetract
 
     val result = table
-      .window(
-        Over partitionBy 'b orderBy 'rowtime preceding 2.rows following CURRENT_ROW as 'w)
+      .window(Over partitionBy 'b orderBy 'rowtime preceding 2.rows following CURRENT_ROW as 'w)
       .select('c, 'b.count over 'w, weightedAvg('c, 'a) over 'w as 'wAvg)
 
     val expected =
@@ -351,17 +284,19 @@ class OverWindowTest extends TableTestBase {
           unaryNode(
             "DataStreamCalc",
             streamTableNode(table),
-            term("select", "a", "b", "c", "rowtime")
-          ),
+            term("select", "a", "b", "c", "rowtime")),
           term("partitionBy", "b"),
           term("orderBy", "rowtime"),
           term("rows", "BETWEEN 2 PRECEDING AND CURRENT ROW"),
-          term("select", "a", "b", "c", "rowtime",
-               "COUNT(b) AS w0$o0",
-               "WeightedAvgWithRetract(c, a) AS w0$o1")
-        ),
-        term("select", "c", "w0$o0 AS _c1", "w0$o1 AS wAvg")
-      )
+          term(
+            "select",
+            "a",
+            "b",
+            "c",
+            "rowtime",
+            "COUNT(b) AS w0$o0",
+            "WeightedAvgWithRetract(c, a) AS w0$o1")),
+        term("select", "c", "w0$o0 AS _c1", "w0$o1 AS wAvg"))
 
     streamUtil.verifyTable(result, expected)
   }
@@ -371,8 +306,7 @@ class OverWindowTest extends TableTestBase {
     val weightedAvg = new WeightedAvgWithRetract
 
     val result = table
-      .window(
-        Over partitionBy 'a orderBy 'rowtime preceding 2.hours following CURRENT_RANGE as 'w)
+      .window(Over partitionBy 'a orderBy 'rowtime preceding 2.hours following CURRENT_RANGE as 'w)
       .select('a, 'c.avg over 'w, weightedAvg('c, 'a) over 'w as 'wAvg)
 
     val expected =
@@ -380,11 +314,7 @@ class OverWindowTest extends TableTestBase {
         "DataStreamCalc",
         unaryNode(
           "DataStreamOverAggregate",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(table),
-            term("select", "a", "c", "rowtime")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "c", "rowtime")),
           term("partitionBy", "a"),
           term("orderBy", "rowtime"),
           term("range", "BETWEEN 7200000 PRECEDING AND CURRENT ROW"),
@@ -394,11 +324,8 @@ class OverWindowTest extends TableTestBase {
             "c",
             "rowtime",
             "AVG(c) AS w0$o0",
-            "WeightedAvgWithRetract(c, a) AS w0$o1"
-          )
-        ),
-        term("select", "a", "w0$o0 AS _c1", "w0$o1 AS wAvg")
-      )
+            "WeightedAvgWithRetract(c, a) AS w0$o1")),
+        term("select", "a", "w0$o0 AS _c1", "w0$o1 AS wAvg"))
 
     streamUtil.verifyTable(result, expected)
   }
@@ -414,17 +341,11 @@ class OverWindowTest extends TableTestBase {
         "DataStreamCalc",
         unaryNode(
           "DataStreamOverAggregate",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(table),
-            term("select", "a", "c", "rowtime")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "c", "rowtime")),
           term("orderBy", "rowtime"),
           term("range", "BETWEEN 10000 PRECEDING AND CURRENT ROW"),
-          term("select", "a", "c", "rowtime", "COUNT(c) AS w0$o0")
-        ),
-        term("select", "a", "w0$o0 AS _c1")
-      )
+          term("select", "a", "c", "rowtime", "COUNT(c) AS w0$o0")),
+        term("select", "a", "w0$o0 AS _c1"))
 
     streamUtil.verifyTable(result, expected)
   }
@@ -440,17 +361,11 @@ class OverWindowTest extends TableTestBase {
         "DataStreamCalc",
         unaryNode(
           "DataStreamOverAggregate",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(table),
-            term("select", "a", "c", "rowtime")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "c", "rowtime")),
           term("orderBy", "rowtime"),
           term("rows", "BETWEEN 2 PRECEDING AND CURRENT ROW"),
-          term("select", "a", "c", "rowtime", "COUNT(a) AS w0$o0")
-        ),
-        term("select", "c", "w0$o0 AS _c1")
-      )
+          term("select", "a", "c", "rowtime", "COUNT(a) AS w0$o0")),
+        term("select", "c", "w0$o0 AS _c1"))
 
     streamUtil.verifyTable(result, expected)
   }
@@ -460,8 +375,9 @@ class OverWindowTest extends TableTestBase {
     val weightedAvg = new WeightedAvgWithRetract
 
     val result = table
-      .window(Over partitionBy 'c orderBy 'rowtime preceding UNBOUNDED_RANGE following
-         CURRENT_RANGE as 'w)
+      .window(
+        Over partitionBy 'c orderBy 'rowtime preceding UNBOUNDED_RANGE following
+          CURRENT_RANGE as 'w)
       .select('a, 'c, 'a.count over 'w, weightedAvg('c, 'a) over 'w as 'wAvg)
 
     val result2 = table
@@ -475,11 +391,7 @@ class OverWindowTest extends TableTestBase {
         "DataStreamCalc",
         unaryNode(
           "DataStreamOverAggregate",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(table),
-            term("select", "a", "c", "rowtime")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "c", "rowtime")),
           term("partitionBy", "c"),
           term("orderBy", "rowtime"),
           term("range", "BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW"),
@@ -489,17 +401,8 @@ class OverWindowTest extends TableTestBase {
             "c",
             "rowtime",
             "COUNT(a) AS w0$o0",
-            "WeightedAvgWithRetract(c, a) AS w0$o1"
-          )
-        ),
-        term(
-          "select",
-          "a",
-          "c",
-          "w0$o0 AS _c2",
-          "w0$o1 AS wAvg"
-        )
-      )
+            "WeightedAvgWithRetract(c, a) AS w0$o1")),
+        term("select", "a", "c", "w0$o0 AS _c2", "w0$o1 AS wAvg"))
 
     streamUtil.verifyTable(result, expected)
   }
@@ -509,8 +412,9 @@ class OverWindowTest extends TableTestBase {
     val weightedAvg = new WeightedAvgWithRetract
 
     val result = table
-      .window(Over partitionBy 'c orderBy 'rowtime preceding UNBOUNDED_ROW following
-         CURRENT_ROW as 'w)
+      .window(
+        Over partitionBy 'c orderBy 'rowtime preceding UNBOUNDED_ROW following
+          CURRENT_ROW as 'w)
       .select('c, 'a.count over 'w, weightedAvg('c, 'a) over 'w as 'wAvg)
 
     val expected =
@@ -518,20 +422,18 @@ class OverWindowTest extends TableTestBase {
         "DataStreamCalc",
         unaryNode(
           "DataStreamOverAggregate",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(table),
-            term("select", "a", "c", "rowtime")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "c", "rowtime")),
           term("partitionBy", "c"),
           term("orderBy", "rowtime"),
           term("rows", "BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW"),
-          term("select", "a", "c", "rowtime",
-               "COUNT(a) AS w0$o0",
-               "WeightedAvgWithRetract(c, a) AS w0$o1")
-        ),
-        term("select", "c", "w0$o0 AS _c1", "w0$o1 AS wAvg")
-      )
+          term(
+            "select",
+            "a",
+            "c",
+            "rowtime",
+            "COUNT(a) AS w0$o0",
+            "WeightedAvgWithRetract(c, a) AS w0$o1")),
+        term("select", "c", "w0$o0 AS _c1", "w0$o1 AS wAvg"))
 
     streamUtil.verifyTable(result, expected)
   }
@@ -539,8 +441,7 @@ class OverWindowTest extends TableTestBase {
   @Test
   def testRowTimeUnboundedNonPartitionedRangeOver() = {
     val result = table
-      .window(
-        Over orderBy 'rowtime preceding UNBOUNDED_RANGE as 'w)
+      .window(Over orderBy 'rowtime preceding UNBOUNDED_RANGE as 'w)
       .select('a, 'c, 'a.count over 'w, 'a.sum over 'w)
 
     val expected =
@@ -548,30 +449,11 @@ class OverWindowTest extends TableTestBase {
         "DataStreamCalc",
         unaryNode(
           "DataStreamOverAggregate",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(table),
-            term("select", "a", "c", "rowtime")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "c", "rowtime")),
           term("orderBy", "rowtime"),
           term("range", "BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW"),
-          term(
-            "select",
-            "a",
-            "c",
-            "rowtime",
-            "COUNT(a) AS w0$o0",
-            "SUM(a) AS w0$o1"
-          )
-        ),
-        term(
-          "select",
-          "a",
-          "c",
-          "w0$o0 AS _c2",
-          "w0$o1 AS _c3"
-        )
-      )
+          term("select", "a", "c", "rowtime", "COUNT(a) AS w0$o0", "SUM(a) AS w0$o1")),
+        term("select", "a", "c", "w0$o0 AS _c2", "w0$o1 AS _c3"))
 
     streamUtil.verifyTable(result, expected)
   }
@@ -587,20 +469,12 @@ class OverWindowTest extends TableTestBase {
         "DataStreamCalc",
         unaryNode(
           "DataStreamOverAggregate",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(table),
-            term("select", "a", "c", "rowtime")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "c", "rowtime")),
           term("orderBy", "rowtime"),
           term("rows", "BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW"),
-          term("select", "a", "c", "rowtime", "COUNT(a) AS w0$o0")
-        ),
-        term("select", "c", "w0$o0 AS _c1")
-      )
+          term("select", "a", "c", "rowtime", "COUNT(a) AS w0$o0")),
+        term("select", "c", "w0$o0 AS _c1"))
 
     streamUtil.verifyTable(result, expected)
   }
 }
-
-

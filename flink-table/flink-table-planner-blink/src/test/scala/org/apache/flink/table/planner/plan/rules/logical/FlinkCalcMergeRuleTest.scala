@@ -20,7 +20,10 @@ package org.apache.flink.table.planner.plan.rules.logical
 import org.apache.flink.api.scala._
 import org.apache.flink.table.api._
 import org.apache.flink.table.planner.plan.nodes.FlinkConventions
-import org.apache.flink.table.planner.plan.nodes.logical.{FlinkLogicalCalc, FlinkLogicalLegacyTableSourceScan}
+import org.apache.flink.table.planner.plan.nodes.logical.{
+  FlinkLogicalCalc,
+  FlinkLogicalLegacyTableSourceScan
+}
 import org.apache.flink.table.planner.plan.optimize.program._
 import org.apache.flink.table.planner.plan.rules.FlinkBatchRuleSets
 import org.apache.flink.table.planner.runtime.utils.JavaUserDefinedScalarFunctions.NonDeterministicUdf
@@ -32,8 +35,8 @@ import org.apache.calcite.tools.RuleSets
 import org.junit.{Before, Test}
 
 /**
-  * Test for [[FlinkCalcMergeRule]].
-  */
+ * Test for [[FlinkCalcMergeRule]].
+ */
 class FlinkCalcMergeRuleTest extends TableTestBase {
   private val util = batchTestUtil()
 
@@ -50,13 +53,13 @@ class FlinkCalcMergeRuleTest extends TableTestBase {
     programs.addLast(
       "logical",
       FlinkVolcanoProgramBuilder.newBuilder
-        .add(RuleSets.ofList(
-          CoreRules.FILTER_TO_CALC,
-          CoreRules.PROJECT_TO_CALC,
-          FlinkCalcMergeRule.INSTANCE,
-          FlinkLogicalCalc.CONVERTER,
-          FlinkLogicalLegacyTableSourceScan.CONVERTER
-        ))
+        .add(
+          RuleSets.ofList(
+            CoreRules.FILTER_TO_CALC,
+            CoreRules.PROJECT_TO_CALC,
+            FlinkCalcMergeRule.INSTANCE,
+            FlinkLogicalCalc.CONVERTER,
+            FlinkLogicalLegacyTableSourceScan.CONVERTER))
         .setRequiredOutputTraits(Array(FlinkConventions.LOGICAL))
         .build())
     util.replaceBatchProgram(programs)

@@ -20,5 +20,4 @@ package org.apache.flink.table.plan.nodes.logical
 
 import org.apache.flink.table.plan.nodes.FlinkRelNode
 
-trait FlinkLogicalRel extends FlinkRelNode {
-}
+trait FlinkLogicalRel extends FlinkRelNode {}

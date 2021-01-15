@@ -22,7 +22,10 @@ import org.apache.flink.api.common.time.Time
 import org.apache.flink.api.scala._
 import org.apache.flink.table.api._
 import org.apache.flink.table.planner.plan.utils.JavaUserDefinedAggFunctions.WeightedAvgWithMerge
-import org.apache.flink.table.planner.plan.utils.WindowEmitStrategy.{TABLE_EXEC_EMIT_LATE_FIRE_DELAY, TABLE_EXEC_EMIT_LATE_FIRE_ENABLED}
+import org.apache.flink.table.planner.plan.utils.WindowEmitStrategy.{
+  TABLE_EXEC_EMIT_LATE_FIRE_DELAY,
+  TABLE_EXEC_EMIT_LATE_FIRE_ENABLED
+}
 import org.apache.flink.table.planner.utils.TableTestBase
 
 import java.time.Duration
@@ -32,11 +35,10 @@ import org.junit.Test
 class WindowAggregateTest extends TableTestBase {
 
   private val util = streamTestUtil()
-  util.addDataStream[(Int, String, Long)](
-    "MyTable", 'a, 'b, 'c, 'proctime.proctime, 'rowtime.rowtime)
+  util
+    .addDataStream[(Int, String, Long)]("MyTable", 'a, 'b, 'c, 'proctime.proctime, 'rowtime.rowtime)
   util.addTemporarySystemFunction("weightedAvg", classOf[WeightedAvgWithMerge])
-  util.tableEnv.executeSql(
-    s"""
+  util.tableEnv.executeSql(s"""
        |create table MyTable1 (
        |  a int,
        |  b bigint,
@@ -88,7 +90,7 @@ class WindowAggregateTest extends TableTestBase {
     // TODO supports group sets
     // currently, the optimized plan is not collect, and an exception will be thrown in code-gen
     val sql =
-    """
+      """
       |SELECT COUNT(*),
       |    TUMBLE_END(rowtime, INTERVAL '15' MINUTE) + INTERVAL '1' MINUTE
       |FROM MyTable
@@ -410,7 +412,7 @@ class WindowAggregateTest extends TableTestBase {
     // This allows the planner to make the distinction between similar aggregations using different
     // windows (see FLINK-15577).
     val sql =
-    """
+      """
       |WITH window_1h AS (
       |    SELECT 1
       |    FROM MyTable

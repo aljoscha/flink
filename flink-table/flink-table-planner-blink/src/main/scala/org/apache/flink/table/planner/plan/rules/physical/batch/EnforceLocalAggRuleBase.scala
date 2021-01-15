@@ -22,7 +22,13 @@ import org.apache.flink.table.api.TableException
 import org.apache.flink.table.planner.calcite.FlinkTypeFactory
 import org.apache.flink.table.planner.plan.`trait`.FlinkRelDistribution
 import org.apache.flink.table.planner.plan.nodes.FlinkConventions
-import org.apache.flink.table.planner.plan.nodes.physical.batch.{BatchPhysicalSortAggregate, BatchPhysicalExchange, BatchPhysicalExpand, BatchPhysicalGroupAggregateBase, BatchPhysicalHashAggregate}
+import org.apache.flink.table.planner.plan.nodes.physical.batch.{
+  BatchPhysicalSortAggregate,
+  BatchPhysicalExchange,
+  BatchPhysicalExpand,
+  BatchPhysicalGroupAggregateBase,
+  BatchPhysicalHashAggregate
+}
 import org.apache.flink.table.planner.plan.utils.{AggregateUtil, FlinkRelOptUtil}
 
 import org.apache.calcite.plan.{RelOptRule, RelOptRuleOperand}
@@ -39,11 +45,9 @@ import scala.collection.JavaConversions._
  * 3. the input is [[BatchPhysicalExpand]] and there is at least one expand row
  * which the columns for grouping are all constant.
  */
-abstract class EnforceLocalAggRuleBase(
-    operand: RelOptRuleOperand,
-    description: String)
-  extends RelOptRule(operand, description)
-  with BatchPhysicalAggRuleBase {
+abstract class EnforceLocalAggRuleBase(operand: RelOptRuleOperand, description: String)
+    extends RelOptRule(operand, description)
+    with BatchPhysicalAggRuleBase {
 
   protected def isTwoPhaseAggEnabled(agg: BatchPhysicalGroupAggregateBase): Boolean = {
     val tableConfig = FlinkRelOptUtil.getTableConfigFromContext(agg)
@@ -57,8 +61,8 @@ abstract class EnforceLocalAggRuleBase(
     // if all shuffle-key columns in a expand row are constant, this row will be shuffled to
     // a single node.
     // add local aggregate to greatly reduce the output data
-    expand.projects.exists {
-      project => shuffleKey.map(i => project.get(i)).forall(RexUtil.isConstant)
+    expand.projects.exists { project =>
+      shuffleKey.map(i => project.get(i)).forall(RexUtil.isConstant)
     }
   }
 
@@ -74,10 +78,10 @@ abstract class EnforceLocalAggRuleBase(
     val aggCallToAggFunction = completeAgg.getAggCallToAggFunction
 
     val (_, aggBufferTypes, _) = AggregateUtil.transformToBatchAggregateFunctions(
-      FlinkTypeFactory.toLogicalRowType(inputRowType), aggCalls)
+      FlinkTypeFactory.toLogicalRowType(inputRowType),
+      aggCalls)
 
-    val traitSet = cluster.getPlanner
-      .emptyTraitSet
+    val traitSet = cluster.getPlanner.emptyTraitSet
       .replace(FlinkConventions.BATCH_PHYSICAL)
 
     val isLocalHashAgg = completeAgg match {
@@ -96,8 +100,7 @@ abstract class EnforceLocalAggRuleBase(
       auxGrouping,
       aggBufferTypes,
       aggCallToAggFunction,
-      isLocalHashAgg
-    )
+      isLocalHashAgg)
   }
 
   protected def createExchange(
@@ -109,8 +112,7 @@ abstract class EnforceLocalAggRuleBase(
     // local aggregate outputs group fields first, and then agg calls
     val distributionFields = grouping.indices.map(Integer.valueOf)
     val newDistribution = FlinkRelDistribution.hash(distributionFields, requireStrict = true)
-    val newTraitSet = completeAgg.getCluster.getPlanner
-      .emptyTraitSet
+    val newTraitSet = completeAgg.getCluster.getPlanner.emptyTraitSet
       .replace(FlinkConventions.BATCH_PHYSICAL)
       .replace(newDistribution)
 

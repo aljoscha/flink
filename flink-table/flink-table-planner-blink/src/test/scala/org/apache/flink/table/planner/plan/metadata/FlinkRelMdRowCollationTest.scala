@@ -43,8 +43,7 @@ class FlinkRelMdRowCollationTest extends FlinkRelMdHandlerTestBase {
     val tupleList = List(
       List("1", "9.0", "true", "2"),
       List("2", "6.0", "false", "3"),
-      List("3", "3.0", "true", "4")
-    ).map(createLiteralList(valuesType, _))
+      List("3", "3.0", "true", "4")).map(createLiteralList(valuesType, _))
     relBuilder.clear()
     relBuilder.values(tupleList, valuesType)
     relBuilder.build().asInstanceOf[LogicalValues]
@@ -69,8 +68,7 @@ class FlinkRelMdRowCollationTest extends FlinkRelMdHandlerTestBase {
         convertToRelCollation(List.range(4, 8)),
         convertToRelCollation(List.range(5, 8)),
         convertToRelCollation(List.range(6, 8)),
-        convertToRelCollation(List.range(7, 8))
-      ),
+        convertToRelCollation(List.range(7, 8))),
       mq.collations(emptyValues))
     assertEquals(
       ImmutableList.of(convertToRelCollation(List.range(0, 4)), RelCollations.of(3)),
@@ -91,8 +89,7 @@ class FlinkRelMdRowCollationTest extends FlinkRelMdHandlerTestBase {
         // d
         relBuilder.field(3),
         // 2
-        rexBuilder.makeLiteral(2L, longType, true)
-      )
+        rexBuilder.makeLiteral(2L, longType, true))
       relBuilder.project(projects).build().asInstanceOf[LogicalProject]
     }
     assertEquals(ImmutableList.of(RelCollations.of(2)), mq.collations(project))
@@ -106,30 +103,35 @@ class FlinkRelMdRowCollationTest extends FlinkRelMdHandlerTestBase {
       .build()
     val tupleList = List(List("3", "2015-07-24 10:00:00")).map(createLiteralList(valuesType, _))
     relBuilder.values(tupleList, valuesType)
-    val project2 = relBuilder.project(
-      // a
-      relBuilder.field(0),
-      // UNIX_TIMESTAMP(ts)
-      relBuilder.call(FlinkSqlOperatorTable.UNIX_TIMESTAMP, relBuilder.field(1))
-    ).build()
+    val project2 = relBuilder
+      .project(
+        // a
+        relBuilder.field(0),
+        // UNIX_TIMESTAMP(ts)
+        relBuilder.call(FlinkSqlOperatorTable.UNIX_TIMESTAMP, relBuilder.field(1)))
+      .build()
     assertTrue(mq.collations(project2).isEmpty)
 
     // SELECT a, UNIX_TIMESTAMP() as ts FROM (VALUES (3, '2015-07-24 10:00:00')) T(a, b)
     relBuilder.clear()
     relBuilder.values(tupleList, valuesType)
-    val project3 = relBuilder.project(
-      relBuilder.field(0), // a
-      relBuilder.call(FlinkSqlOperatorTable.UNIX_TIMESTAMP) // UNIX_TIMESTAMP()
-    ).build()
+    val project3 = relBuilder
+      .project(
+        relBuilder.field(0), // a
+        relBuilder.call(FlinkSqlOperatorTable.UNIX_TIMESTAMP) // UNIX_TIMESTAMP()
+      )
+      .build()
     assertEquals(ImmutableList.of(RelCollations.of(1)), mq.collations(project3))
 
     // SELECT a, UUID() as ts FROM (VALUES (3, '2015-07-24 10:00:00')) T(a, b)
     relBuilder.clear()
     relBuilder.values(tupleList, valuesType)
-    val project4 = relBuilder.project(
-      relBuilder.field(0), // a
-      relBuilder.call(FlinkSqlOperatorTable.UUID) // UUID()
-    ).build()
+    val project4 = relBuilder
+      .project(
+        relBuilder.field(0), // a
+        relBuilder.call(FlinkSqlOperatorTable.UUID) // UUID()
+      )
+      .build()
     assertTrue(mq.collations(project4).isEmpty)
   }
 
@@ -151,33 +153,41 @@ class FlinkRelMdRowCollationTest extends FlinkRelMdHandlerTestBase {
 
   @Test
   def testCollationsOnExpand(): Unit = {
-    Array(logicalExpand, flinkLogicalExpand, batchExpand, streamExpand).foreach {
-      expand => assertEquals(ImmutableList.of(), mq.collations(expand))
+    Array(logicalExpand, flinkLogicalExpand, batchExpand, streamExpand).foreach { expand =>
+      assertEquals(ImmutableList.of(), mq.collations(expand))
     }
   }
 
   @Test
   def testCollationsOnExchange(): Unit = {
-    Array(batchExchange, streamExchange).foreach {
-      exchange => assertEquals(ImmutableList.of(), mq.collations(exchange))
+    Array(batchExchange, streamExchange).foreach { exchange =>
+      assertEquals(ImmutableList.of(), mq.collations(exchange))
     }
   }
 
   @Test
   def testCollationsOnRank(): Unit = {
-    Array(logicalRank, flinkLogicalRank, batchLocalRank, streamRank).foreach {
-      rank => assertEquals(ImmutableList.of(), mq.collations(rank))
+    Array(logicalRank, flinkLogicalRank, batchLocalRank, streamRank).foreach { rank =>
+      assertEquals(ImmutableList.of(), mq.collations(rank))
     }
   }
 
   @Test
   def testCollationsOnSort(): Unit = {
-    Array(logicalSort, flinkLogicalSort, batchSort, streamSort,
-      logicalSortLimit, flinkLogicalSortLimit, batchSortLimit, streamSortLimit).foreach { sort =>
+    Array(
+      logicalSort,
+      flinkLogicalSort,
+      batchSort,
+      streamSort,
+      logicalSortLimit,
+      flinkLogicalSortLimit,
+      batchSortLimit,
+      streamSortLimit).foreach { sort =>
       assertEquals(
-        ImmutableList.of(RelCollations.of(
-          new RelFieldCollation(6),
-          new RelFieldCollation(2, RelFieldCollation.Direction.DESCENDING))),
+        ImmutableList.of(
+          RelCollations.of(
+            new RelFieldCollation(6),
+            new RelFieldCollation(2, RelFieldCollation.Direction.DESCENDING))),
         mq.collations(sort))
     }
 
@@ -193,39 +203,47 @@ class FlinkRelMdRowCollationTest extends FlinkRelMdHandlerTestBase {
 
   @Test
   def testCollationsOnAggregate(): Unit = {
-    Array(logicalAgg, flinkLogicalAgg, batchGlobalAggWithLocal, batchGlobalAggWithoutLocal,
-      batchLocalAgg).foreach {
-      agg => assertEquals(ImmutableList.of(), mq.collations(agg))
+    Array(
+      logicalAgg,
+      flinkLogicalAgg,
+      batchGlobalAggWithLocal,
+      batchGlobalAggWithoutLocal,
+      batchLocalAgg).foreach { agg =>
+      assertEquals(ImmutableList.of(), mq.collations(agg))
     }
   }
 
   @Test
   def testCollationsOnJoin(): Unit = {
-    Array(logicalInnerJoinOnUniqueKeys, logicalLeftJoinNotOnUniqueKeys,
-      logicalRightJoinOnRHSUniqueKeys, logicalFullJoinWithoutEquiCond,
-      logicalSemiJoinOnLHSUniqueKeys, logicalAntiJoinOnRHSUniqueKeys).foreach {
-      join => assertEquals(ImmutableList.of(), mq.collations(join))
+    Array(
+      logicalInnerJoinOnUniqueKeys,
+      logicalLeftJoinNotOnUniqueKeys,
+      logicalRightJoinOnRHSUniqueKeys,
+      logicalFullJoinWithoutEquiCond,
+      logicalSemiJoinOnLHSUniqueKeys,
+      logicalAntiJoinOnRHSUniqueKeys).foreach { join =>
+      assertEquals(ImmutableList.of(), mq.collations(join))
     }
   }
 
   @Test
   def testCollationsOnUnion(): Unit = {
-    Array(logicalUnion, logicalUnionAll).foreach {
-      union => assertEquals(ImmutableList.of(), mq.collations(union))
+    Array(logicalUnion, logicalUnionAll).foreach { union =>
+      assertEquals(ImmutableList.of(), mq.collations(union))
     }
   }
 
   @Test
   def testCollationsOnIntersect(): Unit = {
-    Array(logicalIntersect, logicalIntersectAll).foreach {
-      intersect => assertEquals(ImmutableList.of(), mq.collations(intersect))
+    Array(logicalIntersect, logicalIntersectAll).foreach { intersect =>
+      assertEquals(ImmutableList.of(), mq.collations(intersect))
     }
   }
 
   @Test
   def testCollationsOnMinus(): Unit = {
-    Array(logicalMinus, logicalMinusAll).foreach {
-      minus => assertEquals(ImmutableList.of(), mq.collations(minus))
+    Array(logicalMinus, logicalMinusAll).foreach { minus =>
+      assertEquals(ImmutableList.of(), mq.collations(minus))
     }
   }
 

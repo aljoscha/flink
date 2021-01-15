@@ -41,10 +41,8 @@ class GroupingSetsTest extends TableTestBase {
         "DataSetAggregate",
         batchTableNode(table),
         term("groupBy", "b", "c"),
-        term("select", "b", "c", "AVG(a) AS a")
-      ),
-      term("select", "b", "c", "a", "0:BIGINT AS g")
-    )
+        term("select", "b", "c", "AVG(a) AS a")),
+      term("select", "b", "c", "a", "0:BIGINT AS g"))
 
     util.verifySql(sqlQuery, aggregate)
   }
@@ -67,59 +65,74 @@ class GroupingSetsTest extends TableTestBase {
         "DataSetAggregate",
         batchTableNode(table),
         term("groupBy", "b", "c"),
-        term("select", "b", "c", "AVG(a) AS a")
-      ),
-      term("select", "b", "c", "a", "0:BIGINT AS g", "1:BIGINT AS gb", "1:BIGINT AS gc",
-        "1:BIGINT AS gib", "1:BIGINT AS gic", "3:BIGINT AS gid")
-    )
+        term("select", "b", "c", "AVG(a) AS a")),
+      term(
+        "select",
+        "b",
+        "c",
+        "a",
+        "0:BIGINT AS g",
+        "1:BIGINT AS gb",
+        "1:BIGINT AS gc",
+        "1:BIGINT AS gib",
+        "1:BIGINT AS gic",
+        "3:BIGINT AS gid"))
 
     val group2 = unaryNode(
       "DataSetCalc",
       unaryNode(
         "DataSetAggregate",
-        unaryNode(
-          "DataSetCalc",
-          batchTableNode(table),
-          term("select", "b", "a")
-        ),
+        unaryNode("DataSetCalc", batchTableNode(table), term("select", "b", "a")),
         term("groupBy", "b"),
-        term("select", "b", "AVG(a) AS a")
-      ),
-      term("select", "b", "null:INTEGER AS c", "a", "0:BIGINT AS g", "1:BIGINT AS gb",
-        "0:BIGINT AS gc", "1:BIGINT AS gib", "0:BIGINT AS gic", "2:BIGINT AS gid")
-    )
+        term("select", "b", "AVG(a) AS a")),
+      term(
+        "select",
+        "b",
+        "null:INTEGER AS c",
+        "a",
+        "0:BIGINT AS g",
+        "1:BIGINT AS gb",
+        "0:BIGINT AS gc",
+        "1:BIGINT AS gib",
+        "0:BIGINT AS gic",
+        "2:BIGINT AS gid"))
 
     val group3 = unaryNode(
       "DataSetCalc",
       unaryNode(
         "DataSetAggregate",
-        unaryNode(
-          "DataSetCalc",
-          batchTableNode(table),
-          term("select", "c", "a")
-        ),
+        unaryNode("DataSetCalc", batchTableNode(table), term("select", "c", "a")),
         term("groupBy", "c"),
-        term("select", "c", "AVG(a) AS a")
-      ),
-      term("select", "null:BIGINT AS b", "c", "a", "0:BIGINT AS g", "0:BIGINT AS gb",
-        "1:BIGINT AS gc", "0:BIGINT AS gib", "1:BIGINT AS gic", "1:BIGINT AS gid")
-    )
+        term("select", "c", "AVG(a) AS a")),
+      term(
+        "select",
+        "null:BIGINT AS b",
+        "c",
+        "a",
+        "0:BIGINT AS g",
+        "0:BIGINT AS gb",
+        "1:BIGINT AS gc",
+        "0:BIGINT AS gib",
+        "1:BIGINT AS gic",
+        "1:BIGINT AS gid"))
 
     val group4 = unaryNode(
       "DataSetCalc",
       unaryNode(
         "DataSetAggregate",
-        unaryNode(
-          "DataSetCalc",
-          batchTableNode(table),
-          term("select", "a")
-        ),
-        term("select", "AVG(a) AS a")
-      ),
+        unaryNode("DataSetCalc", batchTableNode(table), term("select", "a")),
+        term("select", "AVG(a) AS a")),
       term(
-        "select", "null:BIGINT AS b", "null:INTEGER AS c", "a", "0:BIGINT AS g", "0:BIGINT AS gb",
-        "0:BIGINT AS gc", "0:BIGINT AS gib", "0:BIGINT AS gic", "0:BIGINT AS gid")
-    )
+        "select",
+        "null:BIGINT AS b",
+        "null:INTEGER AS c",
+        "a",
+        "0:BIGINT AS g",
+        "0:BIGINT AS gb",
+        "0:BIGINT AS gc",
+        "0:BIGINT AS gib",
+        "0:BIGINT AS gic",
+        "0:BIGINT AS gid"))
 
     val union = binaryNode(
       "DataSetUnion",
@@ -130,16 +143,13 @@ class GroupingSetsTest extends TableTestBase {
           group1,
           group2,
           term("all", "true"),
-          term("union", "b", "c", "a", "g", "gb", "gc", "gib", "gic", "gid")
-        ),
+          term("union", "b", "c", "a", "g", "gb", "gc", "gib", "gic", "gid")),
         group3,
         term("all", "true"),
-        term("union", "b", "c", "a", "g", "gb", "gc", "gib", "gic", "gid")
-      ),
+        term("union", "b", "c", "a", "g", "gb", "gc", "gib", "gic", "gid")),
       group4,
       term("all", "true"),
-      term("union", "b", "c", "a", "g", "gb", "gc", "gib", "gic", "gid")
-    )
+      term("union", "b", "c", "a", "g", "gb", "gc", "gib", "gic", "gid"))
 
     util.verifySql(sqlQuery, union)
   }
@@ -150,10 +160,10 @@ class GroupingSetsTest extends TableTestBase {
     val table = util.addTable[(Int, Long, Int)]("MyTable", 'a, 'b, 'c)
 
     val sqlQuery = "SELECT b, c, avg(a) as a, GROUP_ID() as g, " +
-                   "GROUPING(b) as gb, GROUPING(c) as gc, " +
-                   "GROUPING_ID(b) as gib, GROUPING_ID(c) as gic, " +
-                   "GROUPING_ID(b, c) as gid " + " FROM MyTable " +
-                   "GROUP BY ROLLUP (b, c)"
+      "GROUPING(b) as gb, GROUPING(c) as gc, " +
+      "GROUPING_ID(b) as gib, GROUPING_ID(c) as gic, " +
+      "GROUPING_ID(b, c) as gid " + " FROM MyTable " +
+      "GROUP BY ROLLUP (b, c)"
 
     val group1 = unaryNode(
       "DataSetCalc",
@@ -161,43 +171,55 @@ class GroupingSetsTest extends TableTestBase {
         "DataSetAggregate",
         batchTableNode(table),
         term("groupBy", "b", "c"),
-        term("select", "b", "c", "AVG(a) AS a")
-      ),
-      term("select", "b", "c", "a", "0:BIGINT AS g", "1:BIGINT AS gb", "1:BIGINT AS gc",
-        "1:BIGINT AS gib", "1:BIGINT AS gic", "3:BIGINT AS gid")
-    )
+        term("select", "b", "c", "AVG(a) AS a")),
+      term(
+        "select",
+        "b",
+        "c",
+        "a",
+        "0:BIGINT AS g",
+        "1:BIGINT AS gb",
+        "1:BIGINT AS gc",
+        "1:BIGINT AS gib",
+        "1:BIGINT AS gic",
+        "3:BIGINT AS gid"))
 
     val group2 = unaryNode(
       "DataSetCalc",
       unaryNode(
         "DataSetAggregate",
-        unaryNode(
-          "DataSetCalc",
-          batchTableNode(table),
-          term("select", "b", "a")
-        ),
+        unaryNode("DataSetCalc", batchTableNode(table), term("select", "b", "a")),
         term("groupBy", "b"),
-        term("select", "b", "AVG(a) AS a")
-      ),
-      term("select", "b", "null:INTEGER AS c", "a", "0:BIGINT AS g", "1:BIGINT AS gb",
-        "0:BIGINT AS gc", "1:BIGINT AS gib", "0:BIGINT AS gic", "2:BIGINT AS gid")
-    )
+        term("select", "b", "AVG(a) AS a")),
+      term(
+        "select",
+        "b",
+        "null:INTEGER AS c",
+        "a",
+        "0:BIGINT AS g",
+        "1:BIGINT AS gb",
+        "0:BIGINT AS gc",
+        "1:BIGINT AS gib",
+        "0:BIGINT AS gic",
+        "2:BIGINT AS gid"))
 
     val group3 = unaryNode(
       "DataSetCalc",
       unaryNode(
         "DataSetAggregate",
-        unaryNode(
-          "DataSetCalc",
-          batchTableNode(table),
-          term("select", "a")
-        ),
-        term("select", "AVG(a) AS a")
-      ),
+        unaryNode("DataSetCalc", batchTableNode(table), term("select", "a")),
+        term("select", "AVG(a) AS a")),
       term(
-        "select", "null:BIGINT AS b", "null:INTEGER AS c", "a", "0:BIGINT AS g", "0:BIGINT AS gb",
-        "0:BIGINT AS gc", "0:BIGINT AS gib", "0:BIGINT AS gic", "0:BIGINT AS gid")
-    )
+        "select",
+        "null:BIGINT AS b",
+        "null:INTEGER AS c",
+        "a",
+        "0:BIGINT AS g",
+        "0:BIGINT AS gb",
+        "0:BIGINT AS gc",
+        "0:BIGINT AS gib",
+        "0:BIGINT AS gic",
+        "0:BIGINT AS gid"))
 
     val union = binaryNode(
       "DataSetUnion",
@@ -206,12 +228,10 @@ class GroupingSetsTest extends TableTestBase {
         group1,
         group2,
         term("all", "true"),
-        term("union", "b", "c", "a", "g", "gb", "gc", "gib", "gic", "gid")
-      ),
+        term("union", "b", "c", "a", "g", "gb", "gc", "gib", "gic", "gid")),
       group3,
       term("all", "true"),
-      term("union", "b", "c", "a", "g", "gb", "gc", "gib", "gic", "gid")
-    )
+      term("union", "b", "c", "a", "g", "gb", "gc", "gib", "gic", "gid"))
 
     util.verifySql(sqlQuery, union)
   }

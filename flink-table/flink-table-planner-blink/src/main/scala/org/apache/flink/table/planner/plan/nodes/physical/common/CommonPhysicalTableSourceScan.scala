@@ -29,13 +29,13 @@ import org.apache.calcite.rel.core.TableScan
 import scala.collection.JavaConverters._
 
 /**
-  * Base physical RelNode to read data from an external source defined by a [[ScanTableSource]].
-  */
+ * Base physical RelNode to read data from an external source defined by a [[ScanTableSource]].
+ */
 abstract class CommonPhysicalTableSourceScan(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
     relOptTable: TableSourceTable)
-  extends TableScan(cluster, traitSet, relOptTable) {
+    extends TableScan(cluster, traitSet, relOptTable) {
 
   protected val tableSourceTable: TableSourceTable = relOptTable.unwrap(classOf[TableSourceTable])
 

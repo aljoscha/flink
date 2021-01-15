@@ -37,35 +37,15 @@ class UserDefinedScalarFunctionTest extends ExpressionTestBase {
 
   @Test
   def testParameters(): Unit = {
-    testAllApis(
-      Func0('f0),
-      "Func0(f0)",
-      "Func0(f0)",
-      "42")
+    testAllApis(Func0('f0), "Func0(f0)", "Func0(f0)", "42")
 
-    testAllApis(
-      Func1('f0),
-      "Func1(f0)",
-      "Func1(f0)",
-      "43")
+    testAllApis(Func1('f0), "Func1(f0)", "Func1(f0)", "43")
 
-    testAllApis(
-      Func1('f11),
-      "Func1(f11)",
-      "Func1(f11)",
-      "4")
+    testAllApis(Func1('f11), "Func1(f11)", "Func1(f11)", "4")
 
-    testAllApis(
-      Func1('f12),
-      "Func1(f12)",
-      "Func1(f12)",
-      "4")
+    testAllApis(Func1('f12), "Func1(f12)", "Func1(f12)", "4")
 
-    testAllApis(
-      Func1('f13),
-      "Func1(f13)",
-      "Func1(f13)",
-      "4.0")
+    testAllApis(Func1('f13), "Func1(f13)", "Func1(f13)", "4.0")
 
     testAllApis(
       Func2('f0, 'f1, 'f3),
@@ -73,11 +53,7 @@ class UserDefinedScalarFunctionTest extends ExpressionTestBase {
       "Func2(f0, f1, f3)",
       "42 and Test and SimplePojo(Bob,36)")
 
-    testAllApis(
-      Func0(123),
-      "Func0(123)",
-      "Func0(123)",
-      "123")
+    testAllApis(Func0(123), "Func0(123)", "Func0(123)", "123")
 
     // TODO: GenericType with Date/Time/Timestamp -> String would call toString implicitl
     testAllApis(
@@ -87,37 +63,16 @@ class UserDefinedScalarFunctionTest extends ExpressionTestBase {
       "(1990-10-14,12:10:10,1990-10-14 12:10:10.0)")
 
     // function names containing keywords
-    testAllApis(
-      Func0('f0),
-      "getFunc0(f0)",
-      "getFunc0(f0)",
-      "42")
+    testAllApis(Func0('f0), "getFunc0(f0)", "getFunc0(f0)", "42")
 
-    testAllApis(
-      Func0('f0),
-      "asAlways(f0)",
-      "asAlways(f0)",
-      "42")
+    testAllApis(Func0('f0), "asAlways(f0)", "asAlways(f0)", "42")
 
-    testAllApis(
-      Func0('f0),
-      "toWhatever(f0)",
-      "toWhatever(f0)",
-      "42")
+    testAllApis(Func0('f0), "toWhatever(f0)", "toWhatever(f0)", "42")
 
-    testAllApis(
-      Func0('f0),
-      "Nullable(f0)",
-      "Nullable(f0)",
-      "42")
+    testAllApis(Func0('f0), "Nullable(f0)", "Nullable(f0)", "42")
 
     // test row type input
-    testAllApis(
-      Func20('f14),
-      "Func20(f14)",
-      "Func20(f14)",
-      "(12,true,(1,2,3))"
-    )
+    testAllApis(Func20('f14), "Func20(f14)", "Func20(f14)", "(12,true,(1,2,3))")
   }
 
   @Test
@@ -140,11 +95,7 @@ class UserDefinedScalarFunctionTest extends ExpressionTestBase {
       "Func3(42, NULL)",
       "42 and null")
 
-    testAllApis(
-      Func0(nullOf(DataTypes.INT)),
-      "Func0(Null(INT))",
-      "Func0(NULL)",
-      "-1")
+    testAllApis(Func0(nullOf(DataTypes.INT)), "Func0(Null(INT))", "Func0(NULL)", "-1")
 
     val JavaFunc1 = new JavaFunc1()
     testAllApis(
@@ -157,41 +108,21 @@ class UserDefinedScalarFunctionTest extends ExpressionTestBase {
   @Test
   def testDoubleQuoteParameters(): Unit = {
     val hello = "\"<hello>\""
-    testAllApis(
-      Func3(42, hello),
-      s"Func3(42, '$hello')",
-      s"Func3(42, '$hello')",
-      s"42 and $hello")
+    testAllApis(Func3(42, hello), s"Func3(42, '$hello')", s"Func3(42, '$hello')", s"42 and $hello")
   }
 
   @Test
   def testResults(): Unit = {
-    testAllApis(
-      Func4(),
-      "Func4()",
-      "Func4()",
-      "null")
+    testAllApis(Func4(), "Func4()", "Func4()", "null")
 
-    testAllApis(
-      Func5(),
-      "Func5()",
-      "Func5()",
-      "-1")
+    testAllApis(Func5(), "Func5()", "Func5()", "-1")
   }
 
   @Test
   def testNesting(): Unit = {
-    testAllApis(
-      Func0(Func0('f0)),
-      "Func0(Func0(f0))",
-      "Func0(Func0(f0))",
-      "42")
+    testAllApis(Func0(Func0('f0)), "Func0(Func0(f0))", "Func0(Func0(f0))", "42")
 
-    testAllApis(
-      Func0(Func0('f0)),
-      "Func0(Func0(f0))",
-      "Func0(Func0(f0))",
-      "42")
+    testAllApis(Func0(Func0('f0)), "Func0(Func0(f0))", "Func0(Func0(f0))", "42")
 
     testAllApis(
       Func7(Func7(Func7(1, 1), Func7(1, 1)), Func7(Func7(1, 1), Func7(1, 1))),
@@ -202,23 +133,11 @@ class UserDefinedScalarFunctionTest extends ExpressionTestBase {
 
   @Test
   def testOverloadedParameters(): Unit = {
-    testAllApis(
-      Func8(1),
-      "Func8(1)",
-      "Func8(1)",
-      "a")
+    testAllApis(Func8(1), "Func8(1)", "Func8(1)", "a")
 
-    testAllApis(
-      Func8(1, 1),
-      "Func8(1, 1)",
-      "Func8(1, 1)",
-      "b")
+    testAllApis(Func8(1, 1), "Func8(1, 1)", "Func8(1, 1)", "b")
 
-    testAllApis(
-      Func8("a", "a"),
-      "Func8('a', 'a')",
-      "Func8('a', 'a')",
-      "c")
+    testAllApis(Func8("a", "a"), "Func8('a', 'a')", "Func8('a', 'a')", "c")
 
     // TODO fix FLINK-13580 to blink-planner
 //    testAllApis(
@@ -242,17 +161,9 @@ class UserDefinedScalarFunctionTest extends ExpressionTestBase {
       "Func9(f4, f5, f6)",
       "7591 and 43810000 and 655906210000")
 
-    testAllApis(
-      Func10('f6),
-      "Func10(f6)",
-      "Func10(f6)",
-      "1990-10-14 12:10:10.000")
+    testAllApis(Func10('f6), "Func10(f6)", "Func10(f6)", "1990-10-14 12:10:10.000")
 
-    testAllApis(
-      Func26('f6),
-      "Func26(f6)",
-      "Func26(f6)",
-      "1990-10-14 12:10:10.000")
+    testAllApis(Func26('f6), "Func26(f6)", "Func26(f6)", "1990-10-14 12:10:10.000")
   }
 
   @Test
@@ -269,132 +180,69 @@ class UserDefinedScalarFunctionTest extends ExpressionTestBase {
   def testTimePointsOnPrimitivesInShanghai(): Unit = {
     config.setLocalTimeZone(ZoneId.of("Asia/Shanghai"))
 
-    testAllApis(
-      Func27('f17),
-      "Func27(f17)",
-      "Func27(f17)",
-      "1990-10-14 12:10:10.000")
+    testAllApis(Func27('f17), "Func27(f17)", "Func27(f17)", "1990-10-14 12:10:10.000")
 
     // Func28 needs a Long parameter, pass a Instant
-    testAllApis(
-      Func28('f17),
-      "Func28(f17)",
-      "Func28(f17)",
-      "1990-10-14 12:10:10.000")
+    testAllApis(Func28('f17), "Func28(f17)", "Func28(f17)", "1990-10-14 12:10:10.000")
 
-    testAllApis(
-      Func30('f17),
-      "Func30(f17)",
-      "Func30(f17)",
-      "1990-10-14 12:10:10.000"
-    )
+    testAllApis(Func30('f17), "Func30(f17)", "Func30(f17)", "1990-10-14 12:10:10.000")
 
     // Func29 declares return a Instant, but returns a Long actually
     // the framework helps convert Long to Instant
-    testAllApis(
-      Func29('f18),
-      "Func29(f18)",
-      "Func29(f18)",
-      "1970-01-01 08:00:00.000")
+    testAllApis(Func29('f18), "Func29(f18)", "Func29(f18)", "1970-01-01 08:00:00.000")
   }
 
   @Test
   def testTimePointsOnPrimitivesInLosAngeles(): Unit = {
     config.setLocalTimeZone(ZoneId.of("America/Los_Angeles"))
 
-    testAllApis(
-      Func27('f17),
-      "Func27(f17)",
-      "Func27(f17)",
-      "1990-10-14 12:10:10.000")
+    testAllApis(Func27('f17), "Func27(f17)", "Func27(f17)", "1990-10-14 12:10:10.000")
 
     // Func28 needs a Long parameter, pass a Instant
-    testAllApis(
-      Func28('f17),
-      "Func28(f17)",
-      "Func28(f17)",
-      "1990-10-14 12:10:10.000")
+    testAllApis(Func28('f17), "Func28(f17)", "Func28(f17)", "1990-10-14 12:10:10.000")
 
     // Func29 declares return a Instant, but returns a Long actually
     // the framework helps convert Long to Instant
-    testAllApis(
-      Func29('f18),
-      "Func29(f18)",
-      "Func29(f18)",
-      "1969-12-31 16:00:00.000")
+    testAllApis(Func29('f18), "Func29(f18)", "Func29(f18)", "1969-12-31 16:00:00.000")
   }
-
 
   @Test
   def testTimeIntervalsOnPrimitives(): Unit = {
-    testAllApis(
-      Func11('f7, 'f8),
-      "Func11(f7, f8)",
-      "Func11(f7, f8)",
-      "12 and 1000")
+    testAllApis(Func11('f7, 'f8), "Func11(f7, f8)", "Func11(f7, f8)", "12 and 1000")
 
-    testAllApis(
-      Func12('f8),
-      "Func12(f8)",
-      "Func12(f8)",
-      "+0 00:00:01.000")
+    testAllApis(Func12('f8), "Func12(f8)", "Func12(f8)", "+0 00:00:01.000")
   }
-  
+
   @Test
   def testVariableArgs(): Unit = {
-    testAllApis(
-      Func14(1, 2, 3, 4),
-      "Func14(1, 2, 3, 4)",
-      "Func14(1, 2, 3, 4)",
-      "10")
+    testAllApis(Func14(1, 2, 3, 4), "Func14(1, 2, 3, 4)", "Func14(1, 2, 3, 4)", "10")
 
     // Test for empty arguments
-    testAllApis(
-      Func14(),
-      "Func14()",
-      "Func14()",
-      "0")
+    testAllApis(Func14(), "Func14()", "Func14()", "0")
 
     // Test for override
-    testAllApis(
-      Func15("Hello"),
-      "Func15('Hello')",
-      "Func15('Hello')",
-      "Hello"
-    )
+    testAllApis(Func15("Hello"), "Func15('Hello')", "Func15('Hello')", "Hello")
 
-    testAllApis(
-      Func15('f1),
-      "Func15(f1)",
-      "Func15(f1)",
-      "Test"
-    )
+    testAllApis(Func15('f1), "Func15(f1)", "Func15(f1)", "Test")
 
     testAllApis(
       Func15("Hello", 1, 2, 3),
       "Func15('Hello', 1, 2, 3)",
       "Func15('Hello', 1, 2, 3)",
-      "Hello3"
-    )
+      "Hello3")
 
-    testAllApis(
-      Func16('f9),
-      "Func16(f9)",
-      "Func16(f9)",
-      "Hello, World"
-    )
+    testAllApis(Func16('f9), "Func16(f9)", "Func16(f9)", "Hello, World")
 
     try {
       testAllApis(
         Func17("Hello", "World"),
         "Func17('Hello', 'World')",
         "Func17('Hello', 'World')",
-        "Hello, World"
-      )
+        "Hello, World")
       throw new RuntimeException("Shouldn't be reached here!")
     } catch {
       case ex: ValidationException =>
-        // ok
+      // ok
     }
 
     val JavaFunc2 = new JavaFunc2
@@ -406,17 +254,9 @@ class UserDefinedScalarFunctionTest extends ExpressionTestBase {
 
     // test overloading
     val JavaFunc3 = new JavaFunc3
-    testAllApis(
-      JavaFunc3("Hi"),
-      "JavaFunc3('Hi')",
-      "JavaFunc3('Hi')",
-      "Hi")
+    testAllApis(JavaFunc3("Hi"), "JavaFunc3('Hi')", "JavaFunc3('Hi')", "Hi")
 
-    testAllApis(
-      JavaFunc3('f1),
-      "JavaFunc3(f1)",
-      "JavaFunc3(f1)",
-      "Test")
+    testAllApis(JavaFunc3('f1), "JavaFunc3(f1)", "JavaFunc3(f1)", "Test")
   }
 
   @Test
@@ -425,18 +265,9 @@ class UserDefinedScalarFunctionTest extends ExpressionTestBase {
     val JavaFunc1 = new JavaFunc1()
     val JavaFunc4 = new JavaFunc4()
 
-    testAllApis(
-      JavaFunc0('f8),
-      "JavaFunc0(f8)",
-      "JavaFunc0(f8)",
-      "1001"
-    )
+    testAllApis(JavaFunc0('f8), "JavaFunc0(f8)", "JavaFunc0(f8)", "1001")
 
-    testTableApi(
-      JavaFunc0(1000L),
-      "JavaFunc0(1000L)",
-      "1001"
-    )
+    testTableApi(JavaFunc0(1000L), "JavaFunc0(1000L)", "1001")
 
     testAllApis(
       JavaFunc1('f4, 'f5, 'f6),
@@ -454,8 +285,7 @@ class UserDefinedScalarFunctionTest extends ExpressionTestBase {
       JavaFunc4('f10, array("a", "b", "c")),
       "JavaFunc4(f10, array('a', 'b', 'c'))",
       "JavaFunc4(f10, array['a', 'b', 'c'])",
-      "[1, 2, null] and [a, b, c]"
-    )
+      "[1, 2, null] and [a, b, c]")
   }
 
   @Test
@@ -463,23 +293,11 @@ class UserDefinedScalarFunctionTest extends ExpressionTestBase {
     val richFunc0 = new RichFunc0
     val richFunc1 = new RichFunc1
     val richFunc2 = new RichFunc2
-    testAllApis(
-      richFunc0('f0),
-      "RichFunc0(f0)",
-      "RichFunc0(f0)",
-      "43")
+    testAllApis(richFunc0('f0), "RichFunc0(f0)", "RichFunc0(f0)", "43")
 
-    testAllApis(
-      richFunc1('f0),
-      "RichFunc1(f0)",
-      "RichFunc1(f0)",
-      "42")
+    testAllApis(richFunc1('f0), "RichFunc1(f0)", "RichFunc1(f0)", "42")
 
-    testAllApis(
-      richFunc2('f1),
-      "RichFunc2(f1)",
-      "RichFunc2(f1)",
-      "#Test")
+    testAllApis(richFunc2('f1), "RichFunc2(f1)", "RichFunc2(f1)", "#Test")
   }
 
   // ----------------------------------------------------------------------------------------------
@@ -500,15 +318,20 @@ class UserDefinedScalarFunctionTest extends ExpressionTestBase {
     testData.setField(11, 3.toByte)
     testData.setField(12, 3.toShort)
     testData.setField(13, 3.toFloat)
-    testData.setField(14, Row.of(
-      12.asInstanceOf[Integer],
-      true.asInstanceOf[JBoolean],
-      Row.of(1.asInstanceOf[Integer], 2.asInstanceOf[Integer], 3.asInstanceOf[Integer]))
-    )
+    testData.setField(
+      14,
+      Row.of(
+        12.asInstanceOf[Integer],
+        true.asInstanceOf[JBoolean],
+        Row.of(1.asInstanceOf[Integer], 2.asInstanceOf[Integer], 3.asInstanceOf[Integer])))
     testData.setField(15, new GraduatedStudent("Bob"))
     testData.setField(16, Array(new GraduatedStudent("Bob")))
-    testData.setField(17, DateTimeTestUtil.localDateTime("1990-10-14 12:10:10")
-      .atZone(config.getLocalTimeZone).toInstant)
+    testData.setField(
+      17,
+      DateTimeTestUtil
+        .localDateTime("1990-10-14 12:10:10")
+        .atZone(config.getLocalTimeZone)
+        .toInstant)
     testData.setField(18, 0L)
     testData
   }
@@ -533,8 +356,7 @@ class UserDefinedScalarFunctionTest extends ExpressionTestBase {
       TypeInformation.of(classOf[GraduatedStudent]),
       TypeInformation.of(classOf[Array[GraduatedStudent]]),
       BasicTypeInfo.INSTANT_TYPE_INFO,
-      Types.LONG
-    )
+      Types.LONG)
   }
 
   override def functions: Map[String, ScalarFunction] = Map(
@@ -579,7 +401,5 @@ class UserDefinedScalarFunctionTest extends ExpressionTestBase {
     "TimeFunction" -> TimeFunction,
     "LocalTimeFunction" -> LocalTimeFunction,
     "DateTimeFunction" -> DateTimeFunction,
-    "TimestampFunction" -> TimestampFunction
-  )
+    "TimestampFunction" -> TimestampFunction)
 }
-

@@ -21,29 +21,40 @@ package org.apache.flink.table.factories
 import java.util.{HashMap => JHashMap, Map => JMap}
 
 import org.apache.flink.table.api.{AmbiguousTableFactoryException, NoMatchingTableFactoryException}
-import org.apache.flink.table.descriptors.ConnectorDescriptorValidator.{CONNECTOR_PROPERTY_VERSION, CONNECTOR_TYPE}
-import org.apache.flink.table.descriptors.FormatDescriptorValidator.{FORMAT_PROPERTY_VERSION, FORMAT_TYPE}
+import org.apache.flink.table.descriptors.ConnectorDescriptorValidator.{
+  CONNECTOR_PROPERTY_VERSION,
+  CONNECTOR_TYPE
+}
+import org.apache.flink.table.descriptors.FormatDescriptorValidator.{
+  FORMAT_PROPERTY_VERSION,
+  FORMAT_TYPE
+}
 import org.apache.flink.table.factories.TableFormatFactoryServiceTest._
-import org.apache.flink.table.factories.utils.{TestAmbiguousTableFormatFactory, TestTableFormatFactory}
+import org.apache.flink.table.factories.utils.{
+  TestAmbiguousTableFormatFactory,
+  TestTableFormatFactory
+}
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
-  * Tests for testing format discovery using [[TableFactoryService]]. The tests assume the two
-  * format factories [[TestTableFormatFactory]] and [[TestAmbiguousTableFormatFactory]] are
-  * registered.
-  *
-  * The first format does not support SPECIAL_PATH but supports schema derivation. The
-  * latter format does not support UNIQUE_PROPERTY nor schema derivation. Both formats
-  * have the same context and support COMMON_PATH.
-  */
+ * Tests for testing format discovery using [[TableFactoryService]]. The tests assume the two
+ * format factories [[TestTableFormatFactory]] and [[TestAmbiguousTableFormatFactory]] are
+ * registered.
+ *
+ * The first format does not support SPECIAL_PATH but supports schema derivation. The
+ * latter format does not support UNIQUE_PROPERTY nor schema derivation. Both formats
+ * have the same context and support COMMON_PATH.
+ */
 class TableFormatFactoryServiceTest {
 
   @Test
   def testValidProperties(): Unit = {
     val props = properties()
-    assertTrue(TableFactoryService.find(classOf[TableFormatFactory[_]], props)
-      .isInstanceOf[TestTableFormatFactory])
+    assertTrue(
+      TableFactoryService
+        .find(classOf[TableFormatFactory[_]], props)
+        .isInstanceOf[TestTableFormatFactory])
   }
 
   @Test

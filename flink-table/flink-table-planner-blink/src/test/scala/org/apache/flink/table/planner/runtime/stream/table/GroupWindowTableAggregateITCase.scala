@@ -38,7 +38,7 @@ import java.math.BigDecimal
 
 @RunWith(classOf[Parameterized])
 class GroupWindowTableAggregateITCase(mode: StateBackendMode)
-  extends StreamingWithStateTestBase(mode) {
+    extends StreamingWithStateTestBase(mode) {
 
   val data = List(
     (1L, 1, "Hi"),
@@ -75,8 +75,19 @@ class GroupWindowTableAggregateITCase(mode: StateBackendMode)
     windowedTable.toAppendStream[Row].addSink(sink)
     env.execute()
 
-    val expected = Seq("4,8,8", "4,9,9", "4,10,10", "5,12,12", "5,13,13", "5,14,14",
-      "6,17,17", "6,18,18", "6,19,19", "6,19,19", "6,20,20", "6,21,21")
+    val expected = Seq(
+      "4,8,8",
+      "4,9,9",
+      "4,10,10",
+      "5,12,12",
+      "5,13,13",
+      "5,14,14",
+      "6,17,17",
+      "6,18,18",
+      "6,19,19",
+      "6,19,19",
+      "6,20,20",
+      "6,21,21")
     assertEquals(expected.sorted, sink.getAppendResults.sorted)
   }
 

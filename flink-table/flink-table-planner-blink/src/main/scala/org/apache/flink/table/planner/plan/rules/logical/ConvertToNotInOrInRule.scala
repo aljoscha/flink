@@ -33,18 +33,16 @@ import scala.collection.JavaConversions._
 import scala.collection.mutable
 
 /**
-  * Rule for converting a cascade of predicates to [[IN]] or [[NOT_IN]].
-  *
-  * For example,
-  * 1. convert predicate: (x = 1 OR x = 2 OR x = 3 OR x = 4) AND y = 5
-  * to predicate: x IN (1, 2, 3, 4) AND y = 5.
-  * 2. convert predicate: (x <> 1 AND x <> 2 AND x <> 3 AND x <> 4) AND y = 5
-  * to predicate: x NOT IN (1, 2, 3, 4) AND y = 5.
-  */
+ * Rule for converting a cascade of predicates to [[IN]] or [[NOT_IN]].
+ *
+ * For example,
+ * 1. convert predicate: (x = 1 OR x = 2 OR x = 3 OR x = 4) AND y = 5
+ * to predicate: x IN (1, 2, 3, 4) AND y = 5.
+ * 2. convert predicate: (x <> 1 AND x <> 2 AND x <> 3 AND x <> 4) AND y = 5
+ * to predicate: x NOT IN (1, 2, 3, 4) AND y = 5.
+ */
 class ConvertToNotInOrInRule
-  extends RelOptRule(
-    operand(classOf[Filter], any),
-    "ConvertToNotInOrInRule") {
+    extends RelOptRule(operand(classOf[Filter], any), "ConvertToNotInOrInRule") {
 
   // these threshold values are set by OptimizableHashSet benchmark test on different type.
   // threshold for non-float and non-double type
@@ -77,22 +75,22 @@ class ConvertToNotInOrInRule
   }
 
   /**
-    * Returns a condition decomposed by [[AND]] or [[OR]].
-    */
+   * Returns a condition decomposed by [[AND]] or [[OR]].
+   */
   private def decomposedBy(rex: RexNode, operator: SqlBinaryOperator): Seq[RexNode] = {
     operator match {
       case AND => RelOptUtil.conjunctions(rex)
-      case OR => RelOptUtil.disjunctions(rex)
+      case OR  => RelOptUtil.disjunctions(rex)
     }
   }
 
   /**
-    * Convert a cascade predicates to [[IN]] or [[NOT_IN]].
-    *
-    * @param builder The [[RelBuilder]] to build the [[RexNode]].
-    * @param rex     The predicates to be converted.
-    * @return The converted predicates.
-    */
+   * Convert a cascade predicates to [[IN]] or [[NOT_IN]].
+   *
+   * @param builder The [[RelBuilder]] to build the [[RexNode]].
+   * @param rex     The predicates to be converted.
+   * @return The converted predicates.
+   */
   private def convertToNotInOrIn(
       builder: RelBuilder,
       rex: RexNode,
@@ -103,7 +101,7 @@ class ConvertToNotInOrInRule
     // A connect operator is used to connect the fromOperator.
     // A composed operator may contains sub [[IN]] or [[NOT_IN]].
     val (fromOperator, connectOperator, composedOperator) = toOperator match {
-      case IN => (EQUALS, OR, AND)
+      case IN     => (EQUALS, OR, AND)
       case NOT_IN => (NOT_EQUALS, AND, OR)
     }
 
@@ -139,7 +137,7 @@ class ConvertToNotInOrInRule
             }
             composedOperator match {
               case AND => rexBuffer += builder.and(newRex)
-              case OR => rexBuffer += builder.or(newRex)
+              case OR  => rexBuffer += builder.or(newRex)
             }
 
           case _ => rexBuffer += call
@@ -154,14 +152,14 @@ class ConvertToNotInOrInRule
         val values = list.map(_.getOperands.last)
         val call = toOperator match {
           case IN => builder.getRexBuilder.makeIn(inputRef, values)
-          case _ => builder.getRexBuilder.makeCall(toOperator, List(inputRef) ++ values)
+          case _  => builder.getRexBuilder.makeCall(toOperator, List(inputRef) ++ values)
         }
         rexBuffer += call
         beenConverted = true
       } else {
         connectOperator match {
           case AND => rexBuffer += builder.and(list)
-          case OR => rexBuffer += builder.or(list)
+          case OR  => rexBuffer += builder.or(list)
         }
       }
     }
@@ -170,7 +168,7 @@ class ConvertToNotInOrInRule
       // return result if has been converted
       connectOperator match {
         case AND => Some(builder.and(rexBuffer))
-        case OR => Some(builder.or(rexBuffer))
+        case OR  => Some(builder.or(rexBuffer))
       }
     } else {
       None
@@ -181,7 +179,7 @@ class ConvertToNotInOrInRule
     val inputRef = rexNodes.head.getOperands.head
     FlinkTypeFactory.toLogicalType(inputRef.getType).getTypeRoot match {
       case LogicalTypeRoot.FLOAT | LogicalTypeRoot.DOUBLE => rexNodes.size >= FRACTIONAL_THRESHOLD
-      case _ => rexNodes.size >= THRESHOLD
+      case _                                              => rexNodes.size >= THRESHOLD
     }
   }
 }

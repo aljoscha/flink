@@ -28,8 +28,8 @@ import org.apache.flink.graph.scala.utils.Tuple3ToEdgeMap
 
 /**
  * This example shows how to use Gelly's gather-sum-apply iterations.
- * 
- * It is an implementation of the Single-Source-Shortest-Paths algorithm. 
+ *
+ * It is an implementation of the Single-Source-Shortest-Paths algorithm.
  *
  * The input file is a plain text file and must be formatted as follows:
  * Edges are represented by tuples of srcVertexId, trgVertexId, distance which are
@@ -51,8 +51,11 @@ object GSASingleSourceShortestPaths {
     val graph = Graph.fromDataSet[Long, Double, Double](edges, new InitVertices(srcVertexId), env)
 
     // Execute the gather-sum-apply iteration
-    val result = graph.runGatherSumApplyIteration(new CalculateDistances, new ChooseMinDistance,
-      new UpdateDistance, maxIterations)
+    val result = graph.runGatherSumApplyIteration(
+      new CalculateDistances,
+      new ChooseMinDistance,
+      new UpdateDistance,
+      maxIterations)
 
     // Extract the vertices as the result
     val singleSourceShortestPaths = result.getVertices
@@ -112,10 +115,11 @@ object GSASingleSourceShortestPaths {
   private var maxIterations = 5
 
   private def parseParameters(args: Array[String]): Boolean = {
-    if(args.length > 0) {
-      if(args.length != 4) {
-        System.err.println("Usage: SingleSourceShortestPaths <source vertex id>" +
-          " <input edges path> <output path> <num iterations>")
+    if (args.length > 0) {
+      if (args.length != 4) {
+        System.err.println(
+          "Usage: SingleSourceShortestPaths <source vertex id>" +
+            " <input edges path> <output path> <num iterations>")
       }
       fileOutput = true
       srcVertexId = args(0).toLong
@@ -123,26 +127,29 @@ object GSASingleSourceShortestPaths {
       outputPath = args(2)
       maxIterations = 3
     } else {
-      System.out.println("Executing Single Source Shortest Paths example "
-        + "with default parameters and built-in default data.")
+      System.out.println(
+        "Executing Single Source Shortest Paths example "
+          + "with default parameters and built-in default data.")
       System.out.println("  Provide parameters to read input data from files.")
       System.out.println("  See the documentation for the correct format of input files.")
-      System.out.println("Usage: SingleSourceShortestPaths <source vertex id>" +
-        " <input edges path> <output path> <num iterations>")
+      System.out.println(
+        "Usage: SingleSourceShortestPaths <source vertex id>" +
+          " <input edges path> <output path> <num iterations>")
     }
     true
   }
 
   private def getEdgesDataSet(env: ExecutionEnvironment): DataSet[Edge[Long, Double]] = {
     if (fileOutput) {
-      env.readCsvFile[(Long, Long, Double)](edgesInputPath,
-        lineDelimiter = "\n",
-        fieldDelimiter = "\t")
+      env
+        .readCsvFile[(Long, Long, Double)](
+          edgesInputPath,
+          lineDelimiter = "\n",
+          fieldDelimiter = "\t")
         .map(new Tuple3ToEdgeMap[Long, Double]())
     } else {
-      val edgeData = SingleSourceShortestPathsData.DEFAULT_EDGES map {
-        case Array(x, y, z) => (x.asInstanceOf[Long], y.asInstanceOf[Long],
-          z.asInstanceOf[Double])
+      val edgeData = SingleSourceShortestPathsData.DEFAULT_EDGES map { case Array(x, y, z) =>
+        (x.asInstanceOf[Long], y.asInstanceOf[Long], z.asInstanceOf[Double])
       }
       env.fromCollection(edgeData).map(new Tuple3ToEdgeMap[Long, Double]())
     }

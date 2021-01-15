@@ -32,10 +32,11 @@ class JoinValidationTest extends TableTestBase {
   @Test(expected = classOf[ValidationException])
   def testJoinNonExistingKey(): Unit = {
     val util = batchTestUtil()
-    val ds1 = util.addTable[(Int, Long, String)]("Table3",'a, 'b, 'c)
+    val ds1 = util.addTable[(Int, Long, String)]("Table3", 'a, 'b, 'c)
     val ds2 = util.addTable[(Int, Long, Int, String, Long)]("Table5", 'd, 'e, 'f, 'g, 'h)
 
-    ds1.join(ds2)
+    ds1
+      .join(ds2)
       // must fail. Field 'foo does not exist
       .where('foo === 'e)
       .select('c, 'g)
@@ -44,10 +45,11 @@ class JoinValidationTest extends TableTestBase {
   @Test(expected = classOf[ValidationException])
   def testJoinWithNonMatchingKeyTypes(): Unit = {
     val util = batchTestUtil()
-    val ds1 = util.addTable[(Int, Long, String)]("Table3",'a, 'b, 'c)
+    val ds1 = util.addTable[(Int, Long, String)]("Table3", 'a, 'b, 'c)
     val ds2 = util.addTable[(Int, Long, Int, String, Long)]("Table5", 'd, 'e, 'f, 'g, 'h)
 
-    ds1.join(ds2)
+    ds1
+      .join(ds2)
       // must fail. Field 'a is Int, and 'g is String
       .where('a === 'g)
       .select('c, 'g)
@@ -57,10 +59,11 @@ class JoinValidationTest extends TableTestBase {
   @Test(expected = classOf[ValidationException])
   def testJoinWithAmbiguousFields(): Unit = {
     val util = batchTestUtil()
-    val ds1 = util.addTable[(Int, Long, String)]("Table3",'a, 'b, 'c)
+    val ds1 = util.addTable[(Int, Long, String)]("Table3", 'a, 'b, 'c)
     val ds2 = util.addTable[(Int, Long, Int, String, Long)]("Table5", 'd, 'e, 'f, 'g, 'c)
 
-    ds1.join(ds2)
+    ds1
+      .join(ds2)
       // must fail. Both inputs share the same field 'c
       .where('a === 'd)
       .select('c, 'g)
@@ -69,10 +72,11 @@ class JoinValidationTest extends TableTestBase {
   @Test(expected = classOf[TableException])
   def testNoEqualityJoinPredicate1(): Unit = {
     val util = batchTestUtil()
-    val ds1 = util.addTable[(Int, Long, String)]("Table3",'a, 'b, 'c)
+    val ds1 = util.addTable[(Int, Long, String)]("Table3", 'a, 'b, 'c)
     val ds2 = util.addTable[(Int, Long, Int, String, Long)]("Table5", 'd, 'e, 'f, 'g, 'h)
 
-    ds1.join(ds2)
+    ds1
+      .join(ds2)
       // must fail. No equality join predicate
       .where('d === 'f)
       .select('c, 'g)
@@ -82,10 +86,11 @@ class JoinValidationTest extends TableTestBase {
   @Test(expected = classOf[TableException])
   def testNoEqualityJoinPredicate2(): Unit = {
     val util = batchTestUtil()
-    val ds1 = util.addTable[(Int, Long, String)]("Table3",'a, 'b, 'c)
+    val ds1 = util.addTable[(Int, Long, String)]("Table3", 'a, 'b, 'c)
     val ds2 = util.addTable[(Int, Long, Int, String, Long)]("Table5", 'd, 'e, 'f, 'g, 'h)
 
-    ds1.join(ds2)
+    ds1
+      .join(ds2)
       // must fail. No equality join predicate
       .where('a < 'd)
       .select('c, 'g)
@@ -95,7 +100,7 @@ class JoinValidationTest extends TableTestBase {
   @Test(expected = classOf[ValidationException])
   def testLeftJoinNoEquiJoinPredicate(): Unit = {
     val util = batchTestUtil()
-    val ds1 = util.addTable[(Int, Long, String)]("Table3",'a, 'b, 'c)
+    val ds1 = util.addTable[(Int, Long, String)]("Table3", 'a, 'b, 'c)
     val ds2 = util.addTable[(Int, Long, Int, String, Long)]("Table5", 'd, 'e, 'f, 'g, 'h)
 
     ds2.leftOuterJoin(ds1, 'b < 'd).select('c, 'g)
@@ -104,7 +109,7 @@ class JoinValidationTest extends TableTestBase {
   @Test(expected = classOf[ValidationException])
   def testRightJoinNoEquiJoinPredicate(): Unit = {
     val util = batchTestUtil()
-    val ds1 = util.addTable[(Int, Long, String)]("Table3",'a, 'b, 'c)
+    val ds1 = util.addTable[(Int, Long, String)]("Table3", 'a, 'b, 'c)
     val ds2 = util.addTable[(Int, Long, Int, String, Long)]("Table5", 'd, 'e, 'f, 'g, 'h)
 
     ds2.rightOuterJoin(ds1, 'b < 'd).select('c, 'g)
@@ -113,7 +118,7 @@ class JoinValidationTest extends TableTestBase {
   @Test(expected = classOf[ValidationException])
   def testFullJoinNoEquiJoinPredicate(): Unit = {
     val util = batchTestUtil()
-    val ds1 = util.addTable[(Int, Long, String)]("Table3",'a, 'b, 'c)
+    val ds1 = util.addTable[(Int, Long, String)]("Table3", 'a, 'b, 'c)
     val ds2 = util.addTable[(Int, Long, Int, String, Long)]("Table5", 'd, 'e, 'f, 'g, 'h)
 
     ds2.fullOuterJoin(ds1, 'b < 'd).select('c, 'g)

@@ -87,11 +87,15 @@ object KMeans {
 
     val finalCentroids = centroids.iterate(params.getInt("iterations", 10)) { currentCentroids =>
       val newCentroids = points
-        .map(new SelectNearestCenter).withBroadcastSet(currentCentroids, "centroids")
-        .map { x => (x._1, x._2, 1L) }.withForwardedFields("_1; _2")
+        .map(new SelectNearestCenter)
+        .withBroadcastSet(currentCentroids, "centroids")
+        .map { x => (x._1, x._2, 1L) }
+        .withForwardedFields("_1; _2")
         .groupBy(0)
-        .reduce { (p1, p2) => (p1._1, p1._2.add(p2._2), p1._3 + p2._3) }.withForwardedFields("_1")
-        .map { x => new Centroid(x._1, x._2.div(x._3)) }.withForwardedFields("_1->id")
+        .reduce { (p1, p2) => (p1._1, p1._2.add(p2._2), p1._3 + p2._3) }
+        .withForwardedFields("_1")
+        .map { x => new Centroid(x._1, x._2.div(x._3)) }
+        .withForwardedFields("_1->id")
       newCentroids
     }
 
@@ -121,9 +125,8 @@ object KMeans {
     } else {
       println("Executing K-Means example with default centroid data set.")
       println("Use --centroids to specify file input.")
-      env.fromCollection(KMeansData.CENTROIDS map {
-        case Array(id, x, y) =>
-          new Centroid(id.asInstanceOf[Int], x.asInstanceOf[Double], y.asInstanceOf[Double])
+      env.fromCollection(KMeansData.CENTROIDS map { case Array(id, x, y) =>
+        new Centroid(id.asInstanceOf[Int], x.asInstanceOf[Double], y.asInstanceOf[Double])
       })
     }
   }
@@ -137,8 +140,8 @@ object KMeans {
     } else {
       println("Executing K-Means example with default points data set.")
       println("Use --points to specify file input.")
-      env.fromCollection(KMeansData.POINTS map {
-        case Array(x, y) => new Point(x.asInstanceOf[Double], y.asInstanceOf[Double])
+      env.fromCollection(KMeansData.POINTS map { case Array(x, y) =>
+        new Point(x.asInstanceOf[Double], y.asInstanceOf[Double])
       })
     }
   }
@@ -148,9 +151,9 @@ object KMeans {
   // *************************************************************************
 
   /**
-    * Common trait for operations supported by both points and centroids
-    * Note: case class inheritance is not allowed in Scala
-    */
+   * Common trait for operations supported by both points and centroids
+   * Note: case class inheritance is not allowed in Scala
+   */
   trait Coordinate extends Serializable {
 
     var x: Double
@@ -182,13 +185,13 @@ object KMeans {
   }
 
   /**
-    * A simple two-dimensional point.
-    */
+   * A simple two-dimensional point.
+   */
   case class Point(var x: Double = 0, var y: Double = 0) extends Coordinate
 
   /**
-    * A simple two-dimensional centroid, basically a point with an ID.
-    */
+   * A simple two-dimensional centroid, basically a point with an ID.
+   */
   case class Centroid(var id: Int = 0, var x: Double = 0, var y: Double = 0) extends Coordinate {
 
     def this(id: Int, p: Point) {
@@ -225,5 +228,3 @@ object KMeans {
 
   }
 }
-
-

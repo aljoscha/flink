@@ -40,17 +40,17 @@ import java.util.TimeZone
 import scala.collection.JavaConversions._
 
 /**
-  * Planner rule that tries to push a filter into a [[FilterableTableSource]].
-  */
-class PushFilterIntoLegacyTableSourceScanRule extends RelOptRule(
-  operand(classOf[Filter],
-    operand(classOf[LogicalTableScan], none)),
-  "PushFilterIntoLegacyTableSourceScanRule") {
+ * Planner rule that tries to push a filter into a [[FilterableTableSource]].
+ */
+class PushFilterIntoLegacyTableSourceScanRule
+    extends RelOptRule(
+      operand(classOf[Filter], operand(classOf[LogicalTableScan], none)),
+      "PushFilterIntoLegacyTableSourceScanRule") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val config = call.getPlanner.getContext.unwrap(classOf[FlinkContext]).getTableConfig
     if (!config.getConfiguration.getBoolean(
-      OptimizerConfigOptions.TABLE_OPTIMIZER_SOURCE_PREDICATE_PUSHDOWN_ENABLED)) {
+        OptimizerConfigOptions.TABLE_OPTIMIZER_SOURCE_PREDICATE_PUSHDOWN_ENABLED)) {
       return false
     }
 
@@ -64,7 +64,7 @@ class PushFilterIntoLegacyTableSourceScanRule extends RelOptRule(
       case table: LegacyTableSourceTable[_] =>
         table.tableSource match {
           case source: FilterableTableSource[_] => !source.isFilterPushedDown
-          case _ => false
+          case _                                => false
         }
       case _ => false
     }
@@ -94,8 +94,11 @@ class PushFilterIntoLegacyTableSourceScanRule extends RelOptRule(
         relBuilder.getRexBuilder,
         context.getFunctionCatalog,
         context.getCatalogManager,
-        TimeZone.getTimeZone(scan.getCluster.getPlanner.getContext
-            .unwrap(classOf[FlinkContext]).getTableConfig.getLocalTimeZone))
+        TimeZone.getTimeZone(
+          scan.getCluster.getPlanner.getContext
+            .unwrap(classOf[FlinkContext])
+            .getTableConfig
+            .getLocalTimeZone))
 
     if (predicates.isEmpty) {
       // no condition can be translated to expression
@@ -112,9 +115,10 @@ class PushFilterIntoLegacyTableSourceScanRule extends RelOptRule(
 
     if (newTableSource.asInstanceOf[FilterableTableSource[_]].isFilterPushedDown
       && newTableSource.explainSource().equals(oldTableSource.explainSource)) {
-      throw new TableException("Failed to push filter into table source! "
-        + "table source with pushdown capability must override and change "
-        + "explainSource() API to explain the pushdown applied!")
+      throw new TableException(
+        "Failed to push filter into table source! "
+          + "table source with pushdown capability must override and change "
+          + "explainSource() API to explain the pushdown applied!")
     }
 
     val newScan = new LogicalTableScan(scan.getCluster, scan.getTraitSet, newRelOptTable)
@@ -155,7 +159,6 @@ class PushFilterIntoLegacyTableSourceScanRule extends RelOptRule(
   }
 
 }
-
 
 object PushFilterIntoLegacyTableSourceScanRule {
   val INSTANCE: RelOptRule = new PushFilterIntoLegacyTableSourceScanRule

@@ -27,7 +27,10 @@ import org.apache.flink.api.scala.createTuple2TypeInformation
 import org.apache.flink.table.api.{TableConfig, TableException}
 import org.apache.flink.table.data.util.RowDataUtil
 import org.apache.flink.table.data.{GenericRowData, RowData}
-import org.apache.flink.table.planner.codegen.CodeGenUtils.{genToExternalConverter, genToExternalConverterWithLegacy}
+import org.apache.flink.table.planner.codegen.CodeGenUtils.{
+  genToExternalConverter,
+  genToExternalConverterWithLegacy
+}
 import org.apache.flink.table.planner.codegen.GeneratedExpression.NO_CODE
 import org.apache.flink.table.planner.codegen.OperatorCodeGenerator.generateCollect
 import org.apache.flink.table.planner.sinks.TableSinkUtils
@@ -41,7 +44,7 @@ import scala.collection.JavaConverters._
 
 object SinkCodeGenerator {
 
-  /** Code gen a operator to convert internal type rows to external type. **/
+  /** Code gen a operator to convert internal type rows to external type. * */
   def generateRowConverterOperator[OUT](
       ctx: CodeGeneratorContext,
       config: TableConfig,
@@ -80,17 +83,13 @@ object SinkCodeGenerator {
           index
         }
         val resultGenerator = new ExprCodeGenerator(ctx, false)
-          .bindInput(
-            inputRowType,
-            inputTerm,
-            inputFieldMapping = Option(mapping))
+          .bindInput(inputRowType, inputTerm, inputFieldMapping = Option(mapping))
         val outputRowType = RowType.of(
           (0 until pojo.getArity)
             .map(pojo.getTypeAt)
             .map(fromTypeInfoToLogicalType): _*)
-        val conversion = resultGenerator.generateConverterResultExpression(
-          outputRowType,
-          classOf[GenericRowData])
+        val conversion =
+          resultGenerator.generateConverterResultExpression(outputRowType, classOf[GenericRowData])
         afterIndexModify = CodeGenUtils.newName("afterIndexModify")
         s"""
            |${conversion.code}

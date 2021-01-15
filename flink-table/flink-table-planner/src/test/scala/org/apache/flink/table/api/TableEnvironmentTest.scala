@@ -25,7 +25,10 @@ import org.apache.flink.api.scala._
 import org.apache.flink.api.scala.typeutils.UnitTypeInfo
 import org.apache.flink.table.api.TableEnvironmentTest._
 import org.apache.flink.table.api.Types._
-import org.apache.flink.table.typeutils.TimeIndicatorTypeInfo.{PROCTIME_INDICATOR => PROCTIME, ROWTIME_INDICATOR => ROWTIME}
+import org.apache.flink.table.typeutils.TimeIndicatorTypeInfo.{
+  PROCTIME_INDICATOR => PROCTIME,
+  ROWTIME_INDICATOR => ROWTIME
+}
 import org.apache.flink.table.utils.TableTestBase
 import org.apache.flink.types.Row
 
@@ -43,32 +46,23 @@ class TableEnvironmentTest extends TableTestBase {
     val utils = Seq(streamTestUtil(), batchTestUtil())
 
     utils.foreach { util =>
-
       // case class
       util.verifySchema(
         util.addTable[CClass]('a, 'b, 'c),
         Seq("a" -> INT, "b" -> STRING, "c" -> DOUBLE))
 
-      util.verifySchema(
-        util.addTable[CClass]('a, 'b),
-        Seq("a" -> INT, "b" -> STRING))
+      util.verifySchema(util.addTable[CClass]('a, 'b), Seq("a" -> INT, "b" -> STRING))
 
-      util.verifySchema(
-        util.addTable[CClass]('a),
-        Seq("a" -> INT))
+      util.verifySchema(util.addTable[CClass]('a), Seq("a" -> INT))
 
       // row
       util.verifySchema(
         util.addTable('a, 'b, 'c)(TEST_ROW),
         Seq("a" -> INT, "b" -> STRING, "c" -> DOUBLE))
 
-      util.verifySchema(
-        util.addTable('a, 'b)(TEST_ROW),
-        Seq("a" -> INT, "b" -> STRING))
+      util.verifySchema(util.addTable('a, 'b)(TEST_ROW), Seq("a" -> INT, "b" -> STRING))
 
-      util.verifySchema(
-        util.addTable('a)(TEST_ROW),
-        Seq("a" -> INT))
+      util.verifySchema(util.addTable('a)(TEST_ROW), Seq("a" -> INT))
 
       // tuple
       util.verifySchema(
@@ -79,9 +73,7 @@ class TableEnvironmentTest extends TableTestBase {
         util.addTable[JTuple3[Int, String, Double]]('a, 'b),
         Seq("a" -> INT, "b" -> STRING))
 
-      util.verifySchema(
-        util.addTable[JTuple3[Int, String, Double]]('a),
-        Seq("a" -> INT))
+      util.verifySchema(util.addTable[JTuple3[Int, String, Double]]('a), Seq("a" -> INT))
     }
   }
 
@@ -91,7 +83,7 @@ class TableEnvironmentTest extends TableTestBase {
 
     // case class
     util.verifySchema(
-      util.addTable[CClass]('a, 'b, 'c , 'proctime.proctime),
+      util.addTable[CClass]('a, 'b, 'c, 'proctime.proctime),
       Seq("a" -> INT, "b" -> STRING, "c" -> DOUBLE, "proctime" -> PROCTIME))
 
     util.verifySchema(
@@ -170,49 +162,32 @@ class TableEnvironmentTest extends TableTestBase {
     val utils = Seq(streamTestUtil(), batchTestUtil())
 
     utils.foreach { util =>
-
       // atomic
-      util.verifySchema(
-        util.addTable[Int](),
-        Seq("f0" -> INT))
+      util.verifySchema(util.addTable[Int](), Seq("f0" -> INT))
 
-      util.verifySchema(
-        util.addTable[Int]('myint),
-        Seq("myint" -> INT))
+      util.verifySchema(util.addTable[Int]('myint), Seq("myint" -> INT))
 
       // case class
       util.verifySchema(
         util.addTable[CClass](),
         Seq("cf1" -> INT, "cf2" -> STRING, "cf3" -> DOUBLE))
 
-      util.verifySchema(
-        util.addTable[CClass]('cf1, 'cf2),
-        Seq("cf1" -> INT, "cf2" -> STRING))
+      util.verifySchema(util.addTable[CClass]('cf1, 'cf2), Seq("cf1" -> INT, "cf2" -> STRING))
 
-      util.verifySchema(
-        util.addTable[CClass]('cf1, 'cf3),
-        Seq("cf1" -> INT, "cf3" -> DOUBLE))
+      util.verifySchema(util.addTable[CClass]('cf1, 'cf3), Seq("cf1" -> INT, "cf3" -> DOUBLE))
 
-      util.verifySchema(
-        util.addTable[CClass]('cf3, 'cf1),
-        Seq("cf3" -> DOUBLE, "cf1" -> INT))
+      util.verifySchema(util.addTable[CClass]('cf3, 'cf1), Seq("cf3" -> DOUBLE, "cf1" -> INT))
 
       // row
       util.verifySchema(
         util.addTable()(TEST_ROW),
         Seq("rf1" -> INT, "rf2" -> STRING, "rf3" -> DOUBLE))
 
-      util.verifySchema(
-        util.addTable('rf1, 'rf2)(TEST_ROW),
-        Seq("rf1" -> INT, "rf2" -> STRING))
+      util.verifySchema(util.addTable('rf1, 'rf2)(TEST_ROW), Seq("rf1" -> INT, "rf2" -> STRING))
 
-      util.verifySchema(
-        util.addTable('rf1, 'rf3)(TEST_ROW),
-        Seq("rf1" -> INT, "rf3" -> DOUBLE))
+      util.verifySchema(util.addTable('rf1, 'rf3)(TEST_ROW), Seq("rf1" -> INT, "rf3" -> DOUBLE))
 
-      util.verifySchema(
-        util.addTable('rf3, 'rf1)(TEST_ROW),
-        Seq("rf3" -> DOUBLE, "rf1" -> INT))
+      util.verifySchema(util.addTable('rf3, 'rf1)(TEST_ROW), Seq("rf3" -> DOUBLE, "rf1" -> INT))
 
       // tuple
       util.verifySchema(
@@ -236,17 +211,11 @@ class TableEnvironmentTest extends TableTestBase {
         util.addTable[PojoClass](),
         Seq("pf1" -> INT, "pf2" -> STRING, "pf3" -> DOUBLE))
 
-      util.verifySchema(
-        util.addTable[PojoClass]('pf1, 'pf2),
-        Seq("pf1" -> INT, "pf2" -> STRING))
+      util.verifySchema(util.addTable[PojoClass]('pf1, 'pf2), Seq("pf1" -> INT, "pf2" -> STRING))
 
-      util.verifySchema(
-        util.addTable[PojoClass]('pf1, 'pf3),
-        Seq("pf1" -> INT, "pf3" -> DOUBLE))
+      util.verifySchema(util.addTable[PojoClass]('pf1, 'pf3), Seq("pf1" -> INT, "pf3" -> DOUBLE))
 
-      util.verifySchema(
-        util.addTable[PojoClass]('pf3, 'pf1),
-        Seq("pf3" -> DOUBLE, "pf1" -> INT))
+      util.verifySchema(util.addTable[PojoClass]('pf3, 'pf1), Seq("pf3" -> DOUBLE, "pf1" -> INT))
 
       // generic
       util.verifySchema(
@@ -258,13 +227,9 @@ class TableEnvironmentTest extends TableTestBase {
         Seq("f0" -> new GenericTypeInfo[Class[_]](classOf[Class[_]])))
 
       // any type info
-      util.verifySchema(
-        util.addTable[Unit](),
-        Seq("f0" -> new UnitTypeInfo()))
+      util.verifySchema(util.addTable[Unit](), Seq("f0" -> new UnitTypeInfo()))
 
-      util.verifySchema(
-        util.addTable[Unit]('unit),
-        Seq("unit" -> new UnitTypeInfo()))
+      util.verifySchema(util.addTable[Unit]('unit), Seq("unit" -> new UnitTypeInfo()))
     }
   }
 
@@ -331,11 +296,11 @@ class TableEnvironmentTest extends TableTestBase {
       util.addTable('rf3, 'rowtime.rowtime, 'rf1)(TEST_ROW),
       Seq("rf3" -> DOUBLE, "rowtime" -> ROWTIME, "rf1" -> INT))
 
-        util.verifySchema(
+    util.verifySchema(
       util.addTable('rf3, 'rf1, 'proctime.proctime)(TEST_ROW),
       Seq("rf3" -> DOUBLE, "rf1" -> INT, "proctime" -> PROCTIME))
 
-        util.verifySchema(
+    util.verifySchema(
       util.addTable('rf3, 'rf1, 'rowtime.rowtime)(TEST_ROW),
       Seq("rf3" -> DOUBLE, "rf1" -> INT, "rowtime" -> ROWTIME))
 
@@ -429,13 +394,9 @@ class TableEnvironmentTest extends TableTestBase {
     val util = streamTestUtil()
 
     // atomic
-    util.verifySchema(
-      util.addTable[Long]('new.rowtime),
-      Seq("new" -> ROWTIME))
+    util.verifySchema(util.addTable[Long]('new.rowtime), Seq("new" -> ROWTIME))
 
-    util.verifySchema(
-      util.addTable[Int]('new.proctime),
-      Seq("new" -> PROCTIME))
+    util.verifySchema(util.addTable[Int]('new.proctime), Seq("new" -> PROCTIME))
 
     // case class
     util.verifySchema(
@@ -470,7 +431,6 @@ class TableEnvironmentTest extends TableTestBase {
     val utils = Seq(streamTestUtil(), batchTestUtil())
 
     utils.foreach { util =>
-
       // case class
       util.verifySchema(
         util.addTable[CClass]('cf1, 'cf3 as 'new, 'cf2),
@@ -493,9 +453,7 @@ class TableEnvironmentTest extends TableTestBase {
     val util = streamTestUtil()
 
     // atomic
-    util.verifySchema(
-      util.addTable[Int]('new.proctime),
-      Seq("new" -> PROCTIME))
+    util.verifySchema(util.addTable[Int]('new.proctime), Seq("new" -> PROCTIME))
 
     // case class
     util.verifySchema(
@@ -549,16 +507,11 @@ class TableEnvironmentTest extends TableTestBase {
   def testTableSchemaWithDifferentRowTypes(): Unit = {
 
     def createInnerRow(innerFieldName: String): TypeInformation[_] = {
-      Types.ROW(
-        Array[String](innerFieldName),
-        Array[TypeInformation[_]](Types.INT()))
+      Types.ROW(Array[String](innerFieldName), Array[TypeInformation[_]](Types.INT()))
     }
 
     def createRow(innerFieldName: String): TypeInformation[_] = {
-      Types.ROW(
-        Array[String]("field"),
-        Array[TypeInformation[_]](createInnerRow(innerFieldName))
-      )
+      Types.ROW(Array[String]("field"), Array[TypeInformation[_]](createInnerRow(innerFieldName)))
     }
 
     val util = streamTestUtil()
@@ -569,7 +522,8 @@ class TableEnvironmentTest extends TableTestBase {
       .sqlQuery("SELECT MyTableA.field AS a, MyTableB.field AS b FROM MyTableA, MyTableB")
       .getSchema
 
-    val expectedSchema = TableSchema.builder()
+    val expectedSchema = TableSchema
+      .builder()
       .field("a", createInnerRow("A"))
       .field("b", createInnerRow("B"))
       .build()
@@ -592,14 +546,10 @@ object TableEnvironmentTest {
     def this() = this("", 0, 0L)
   }
 
-  val TEST_ROW: TypeInformation[Row] = ROW(
-    Array("rf1", "rf2", "rf3"),
-    Array[TypeInformation[_]](INT, STRING, DOUBLE))
+  val TEST_ROW: TypeInformation[Row] =
+    ROW(Array("rf1", "rf2", "rf3"), Array[TypeInformation[_]](INT, STRING, DOUBLE))
 
-  val TEST_ROW_WITH_TIME: TypeInformation[Row] = ROW(
-    Array("rf1", "rf2", "rf3"),
-    Array[TypeInformation[_]](INT, LONG, STRING))
+  val TEST_ROW_WITH_TIME: TypeInformation[Row] =
+    ROW(Array("rf1", "rf2", "rf3"), Array[TypeInformation[_]](INT, LONG, STRING))
 
 }
-
-

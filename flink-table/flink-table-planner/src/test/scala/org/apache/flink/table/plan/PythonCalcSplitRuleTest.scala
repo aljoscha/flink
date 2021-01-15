@@ -20,7 +20,12 @@ package org.apache.flink.table.plan
 
 import org.apache.flink.api.scala._
 import org.apache.flink.table.api._
-import org.apache.flink.table.runtime.utils.JavaUserDefinedScalarFunctions.{BooleanPandasScalarFunction, BooleanPythonScalarFunction, PandasScalarFunction, PythonScalarFunction}
+import org.apache.flink.table.runtime.utils.JavaUserDefinedScalarFunctions.{
+  BooleanPandasScalarFunction,
+  BooleanPythonScalarFunction,
+  PandasScalarFunction,
+  PythonScalarFunction
+}
 import org.apache.flink.table.utils.TableTestBase
 import org.apache.flink.table.utils.TableTestUtil._
 
@@ -42,10 +47,8 @@ class PythonCalcSplitRuleTest extends TableTestBase {
       unaryNode(
         "DataStreamPythonCalc",
         streamTableNode(table),
-        term("select", "pyFunc1(a, b) AS f0")
-      ),
-      term("select", "+(f0, 1) AS _c0")
-    )
+        term("select", "pyFunc1(a, b) AS f0")),
+      term("select", "+(f0, 1) AS _c0"))
 
     util.verifyTable(resultTable, expected)
   }
@@ -57,17 +60,15 @@ class PythonCalcSplitRuleTest extends TableTestBase {
     util.tableEnv.registerFunction("pyFunc1", new PythonScalarFunction("pyFunc1"))
 
     val resultTable = table
-      .select(call("pyFunc1", $"a", $"b") , $"c" + 1)
+      .select(call("pyFunc1", $"a", $"b"), $"c" + 1)
 
     val expected = unaryNode(
       "DataStreamCalc",
       unaryNode(
         "DataStreamPythonCalc",
         streamTableNode(table),
-        term("select", "c", "pyFunc1(a, b) AS f0")
-      ),
-      term("select", "f0 AS _c0", "+(c, 1) AS _c1")
-    )
+        term("select", "c", "pyFunc1(a, b) AS f0")),
+      term("select", "f0 AS _c0", "+(c, 1) AS _c1"))
 
     util.verifyTable(resultTable, expected)
   }
@@ -92,15 +93,11 @@ class PythonCalcSplitRuleTest extends TableTestBase {
           unaryNode(
             "DataStreamPythonCalc",
             streamTableNode(table),
-            term("select", "a", "b", "c", "pyFunc2(a, c) AS f0")
-          ),
+            term("select", "a", "b", "c", "pyFunc2(a, c) AS f0")),
           term("select", "c", "a", "b"),
-          term("where", ">(f0, 0)")
-        ),
-        term("select", "c", "pyFunc1(a, b) AS f0")
-      ),
-      term("select", "f0 AS _c0", "+(c, 1) AS _c1")
-    )
+          term("where", ">(f0, 0)")),
+        term("select", "c", "pyFunc1(a, b) AS f0")),
+      term("select", "f0 AS _c0", "+(c, 1) AS _c1"))
 
     util.verifyTable(resultTable, expected)
   }
@@ -123,13 +120,10 @@ class PythonCalcSplitRuleTest extends TableTestBase {
         unaryNode(
           "DataStreamPythonCalc",
           streamTableNode(table),
-          term("select", "a", "b", "pyFunc2(a, c) AS f0")
-        ),
+          term("select", "a", "b", "pyFunc2(a, c) AS f0")),
         term("select", "a", "b"),
-        term("where", "f0")
-      ),
-      term("select", "pyFunc1(a, b) AS _c0")
-    )
+        term("where", "f0")),
+      term("select", "pyFunc1(a, b) AS _c0"))
 
     util.verifyTable(resultTable, expected)
   }
@@ -143,18 +137,7 @@ class PythonCalcSplitRuleTest extends TableTestBase {
     util.tableEnv.registerFunction("pyFunc3", new PythonScalarFunction("pyFunc3"))
 
     val resultTable = table
-      .select(
-        call(
-          "pyFunc3",
-          call(
-            "pyFunc2",
-            $"a" + call("pyFunc1", $"a", $"c"
-            ),
-            $"b"
-          ),
-          $"c"
-        )
-      )
+      .select(call("pyFunc3", call("pyFunc2", $"a" + call("pyFunc1", $"a", $"c"), $"b"), $"c"))
 
     val expected = unaryNode(
       "DataStreamPythonCalc",
@@ -163,12 +146,9 @@ class PythonCalcSplitRuleTest extends TableTestBase {
         unaryNode(
           "DataStreamPythonCalc",
           streamTableNode(table),
-          term("select", "b", "c", "a", "pyFunc1(a, c) AS f0")
-        ),
-        term("select", "b", "c", "+(a, f0) AS f0")
-      ),
-      term("select", "pyFunc3(pyFunc2(f0, b), c) AS _c0")
-    )
+          term("select", "b", "c", "a", "pyFunc1(a, c) AS f0")),
+        term("select", "b", "c", "+(a, f0) AS f0")),
+      term("select", "pyFunc3(pyFunc2(f0, b), c) AS _c0"))
 
     util.verifyTable(resultTable, expected)
   }
@@ -185,8 +165,7 @@ class PythonCalcSplitRuleTest extends TableTestBase {
     val expected = unaryNode(
       "DataStreamPythonCalc",
       streamTableNode(table),
-      term("select", "pyFunc1(a, b) AS _c0")
-      )
+      term("select", "pyFunc1(a, b) AS _c0"))
 
     util.verifyTable(resultTable, expected)
   }
@@ -206,11 +185,9 @@ class PythonCalcSplitRuleTest extends TableTestBase {
       unaryNode(
         "DataStreamPythonCalc",
         streamTableNode(table),
-        term("select", "a", "b", "pyFunc1(a, c) AS f0")
-      ),
+        term("select", "a", "b", "pyFunc1(a, c) AS f0")),
       term("select", "a", "b"),
-      term("where", "f0")
-    )
+      term("where", "f0"))
 
     util.verifyTable(resultTable, expected)
   }
@@ -229,10 +206,8 @@ class PythonCalcSplitRuleTest extends TableTestBase {
       unaryNode(
         "DataStreamPythonCalc",
         streamTableNode(table),
-        term("select", "f0", "pyFunc1(f1, f2) AS f00")
-        ),
-      term("select", "f00 AS _c0", "+(f0, 1) AS _c1")
-      )
+        term("select", "f0", "pyFunc1(f1, f2) AS f00")),
+      term("select", "f00 AS _c0", "+(f0, 1) AS _c1"))
 
     util.verifyTable(resultTable, expected)
   }
@@ -250,10 +225,8 @@ class PythonCalcSplitRuleTest extends TableTestBase {
       unaryNode(
         "DataStreamPythonCalc",
         streamTableNode(table),
-        term("select", "a", "b", "pyFunc1(a, c) AS f0")
-      ),
-      term("select", "a", "b", "f0 AS _c2", "1 AS _c3")
-    )
+        term("select", "a", "b", "pyFunc1(a, c) AS f0")),
+      term("select", "a", "b", "f0 AS _c2", "1 AS _c3"))
 
     util.verifyTable(resultTable, expected)
   }
@@ -271,10 +244,8 @@ class PythonCalcSplitRuleTest extends TableTestBase {
       unaryNode(
         "DataStreamPythonCalc",
         streamTableNode(table),
-        term("select", "a", "b", "pyFunc1(a, c) AS f0")
-      ),
-      term("select", "a", "f0 AS _c1", "b")
-    )
+        term("select", "a", "b", "pyFunc1(a, c) AS f0")),
+      term("select", "a", "f0 AS _c1", "b"))
 
     util.verifyTable(resultTable, expected)
   }
@@ -292,10 +263,8 @@ class PythonCalcSplitRuleTest extends TableTestBase {
       unaryNode(
         "DataStreamPythonCalc",
         streamTableNode(table),
-        term("select", "pandasFunc1(a, b) AS f0")
-      ),
-      term("select", "+(f0, 1) AS _c0")
-    )
+        term("select", "pandasFunc1(a, b) AS f0")),
+      term("select", "+(f0, 1) AS _c0"))
 
     util.verifyTable(resultTable, expected)
   }
@@ -313,10 +282,8 @@ class PythonCalcSplitRuleTest extends TableTestBase {
       unaryNode(
         "DataStreamPythonCalc",
         streamTableNode(table),
-        term("select", "c", "pandasFunc1(a, b) AS f0")
-      ),
-      term("select", "f0 AS _c0", "+(c, 1) AS _c1")
-    )
+        term("select", "c", "pandasFunc1(a, b) AS f0")),
+      term("select", "f0 AS _c0", "+(c, 1) AS _c1"))
 
     util.verifyTable(resultTable, expected)
   }
@@ -341,15 +308,11 @@ class PythonCalcSplitRuleTest extends TableTestBase {
           unaryNode(
             "DataStreamPythonCalc",
             streamTableNode(table),
-            term("select", "a", "b", "c", "pandasFunc2(a, c) AS f0")
-          ),
+            term("select", "a", "b", "c", "pandasFunc2(a, c) AS f0")),
           term("select", "c", "a", "b"),
-          term("where", ">(f0, 0)")
-        ),
-        term("select", "c", "pandasFunc1(a, b) AS f0")
-      ),
-      term("select", "f0 AS _c0", "+(c, 1) AS _c1")
-    )
+          term("where", ">(f0, 0)")),
+        term("select", "c", "pandasFunc1(a, b) AS f0")),
+      term("select", "f0 AS _c0", "+(c, 1) AS _c1"))
 
     util.verifyTable(resultTable, expected)
   }
@@ -372,13 +335,10 @@ class PythonCalcSplitRuleTest extends TableTestBase {
         unaryNode(
           "DataStreamPythonCalc",
           streamTableNode(table),
-          term("select", "a", "b", "pandasFunc2(a, c) AS f0")
-        ),
+          term("select", "a", "b", "pandasFunc2(a, c) AS f0")),
         term("select", "a", "b"),
-        term("where", "f0")
-      ),
-      term("select", "pandasFunc1(a, b) AS _c0")
-    )
+        term("where", "f0")),
+      term("select", "pandasFunc1(a, b) AS _c0"))
 
     util.verifyTable(resultTable, expected)
   }
@@ -395,15 +355,8 @@ class PythonCalcSplitRuleTest extends TableTestBase {
       .select(
         call(
           "pandasFunc3",
-          call(
-            "pandasFunc2",
-            $"a" + call("pandasFunc1", $"a", $"c"
-            ),
-            $"b"
-          ),
-          $"c"
-        )
-      )
+          call("pandasFunc2", $"a" + call("pandasFunc1", $"a", $"c"), $"b"),
+          $"c"))
 
     val expected = unaryNode(
       "DataStreamPythonCalc",
@@ -412,12 +365,9 @@ class PythonCalcSplitRuleTest extends TableTestBase {
         unaryNode(
           "DataStreamPythonCalc",
           streamTableNode(table),
-          term("select", "b", "c", "a", "pandasFunc1(a, c) AS f0")
-        ),
-        term("select", "b", "c", "+(a, f0) AS f0")
-      ),
-      term("select", "pandasFunc3(pandasFunc2(f0, b), c) AS _c0")
-    )
+          term("select", "b", "c", "a", "pandasFunc1(a, c) AS f0")),
+        term("select", "b", "c", "+(a, f0) AS f0")),
+      term("select", "pandasFunc3(pandasFunc2(f0, b), c) AS _c0"))
 
     util.verifyTable(resultTable, expected)
   }
@@ -433,8 +383,7 @@ class PythonCalcSplitRuleTest extends TableTestBase {
     val expected = unaryNode(
       "DataStreamPythonCalc",
       streamTableNode(table),
-      term("select", "pandasFunc1(a, b) AS _c0")
-    )
+      term("select", "pandasFunc1(a, b) AS _c0"))
 
     util.verifyTable(resultTable, expected)
   }
@@ -452,11 +401,9 @@ class PythonCalcSplitRuleTest extends TableTestBase {
       unaryNode(
         "DataStreamPythonCalc",
         streamTableNode(table),
-        term("select", "a", "b", "pandasFunc1(a, c) AS f0")
-      ),
+        term("select", "a", "b", "pandasFunc1(a, c) AS f0")),
       term("select", "a", "b"),
-      term("where", "f0")
-    )
+      term("where", "f0"))
 
     util.verifyTable(resultTable, expected)
   }
@@ -468,10 +415,8 @@ class PythonCalcSplitRuleTest extends TableTestBase {
     util.tableEnv.registerFunction("pyFunc1", new PythonScalarFunction("pyFunc1"))
     util.tableEnv.registerFunction("pandasFunc1", new PandasScalarFunction("pandasFunc1"))
 
-    val resultTable = table.select(
-      call("pandasFunc1", $"a", $"b"),
-      call("pyFunc1", $"a", $"c") + 1,
-      $"a" + 1)
+    val resultTable =
+      table.select(call("pandasFunc1", $"a", $"b"), call("pyFunc1", $"a", $"c") + 1, $"a" + 1)
 
     val expected = unaryNode(
       "DataStreamCalc",
@@ -480,12 +425,9 @@ class PythonCalcSplitRuleTest extends TableTestBase {
         unaryNode(
           "DataStreamPythonCalc",
           streamTableNode(table),
-          term("select", "a", "c", "pandasFunc1(a, b) AS f0")
-        ),
-        term("select", "a", "f0", "pyFunc1(a, c) AS f1")
-      ),
-      term("select",  "f0 AS _c0", "+(f1, 1) AS _c1", "+(a, 1) AS _c2")
-    )
+          term("select", "a", "c", "pandasFunc1(a, b) AS f0")),
+        term("select", "a", "f0", "pyFunc1(a, c) AS f1")),
+      term("select", "f0 AS _c0", "+(f1, 1) AS _c1", "+(a, 1) AS _c2"))
 
     util.verifyTable(resultTable, expected)
   }
@@ -498,15 +440,7 @@ class PythonCalcSplitRuleTest extends TableTestBase {
     util.tableEnv.registerFunction("pandasFunc1", new PandasScalarFunction("pandasFunc1"))
 
     val resultTable = table
-      .select(
-        call(
-          "pyFunc1",
-          $"a",
-          call(
-            "pandasFunc1", $"a", $"b"
-          )
-        ) + 1
-      )
+      .select(call("pyFunc1", $"a", call("pandasFunc1", $"a", $"b")) + 1)
 
     val expected = unaryNode(
       "DataStreamCalc",
@@ -515,12 +449,9 @@ class PythonCalcSplitRuleTest extends TableTestBase {
         unaryNode(
           "DataStreamPythonCalc",
           streamTableNode(table),
-          term("select", "a", "pandasFunc1(a, b) AS f0")
-        ),
-        term("select", "pyFunc1(a, f0) AS f0")
-      ),
-      term("select",  "+(f0, 1) AS _c0")
-    )
+          term("select", "a", "pandasFunc1(a, b) AS f0")),
+        term("select", "pyFunc1(a, f0) AS f0")),
+      term("select", "+(f0, 1) AS _c0"))
 
     util.verifyTable(resultTable, expected)
   }
@@ -531,22 +462,17 @@ class PythonCalcSplitRuleTest extends TableTestBase {
     val table = util.addTable[(Int, Int, (Int, Int))]("MyTable", 'a, 'b, 'c)
     util.tableEnv.registerFunction("pyFunc1", new PythonScalarFunction("pyFunc1"))
 
-    val resultTable = table.select('a, 'b, 'c.flatten())
+    val resultTable = table
+      .select('a, 'b, 'c.flatten())
       .select($"a", call("pyFunc1", $"a", $"c$$_1"), $"b")
 
     val expected = unaryNode(
       "DataStreamCalc",
       unaryNode(
         "DataStreamPythonCalc",
-        unaryNode(
-          "DataStreamCalc",
-          streamTableNode(table),
-          term("select", "a", "b", "c._1 AS f0")
-        ),
-        term("select", "a", "b", "pyFunc1(a, f0) AS f0")
-      ),
-      term("select", "a", "f0 AS _c1", "b")
-    )
+        unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "b", "c._1 AS f0")),
+        term("select", "a", "b", "pyFunc1(a, f0) AS f0")),
+      term("select", "a", "f0 AS _c1", "b"))
 
     util.verifyTable(resultTable, expected)
   }
@@ -557,28 +483,17 @@ class PythonCalcSplitRuleTest extends TableTestBase {
     val table = util.addTable[(Int, Int, (Int, Int))]("MyTable", 'a, 'b, 'c)
     util.tableEnv.registerFunction("pyFunc1", new PythonScalarFunction("pyFunc1"))
 
-    val resultTable = table.select('a, 'b, 'c.flatten())
-      .select(
-        $"a",
-        call(
-          "pyFunc1",
-          $"a",
-          call("pyFunc1", $"b", $"c$$_1")),
-        $"b")
+    val resultTable = table
+      .select('a, 'b, 'c.flatten())
+      .select($"a", call("pyFunc1", $"a", call("pyFunc1", $"b", $"c$$_1")), $"b")
 
     val expected = unaryNode(
       "DataStreamCalc",
       unaryNode(
         "DataStreamPythonCalc",
-        unaryNode(
-          "DataStreamCalc",
-          streamTableNode(table),
-          term("select", "a", "b", "c._1 AS f0")
-        ),
-        term("select", "a", "b", "pyFunc1(a, pyFunc1(b, f0)) AS f0")
-      ),
-      term("select", "a", "f0 AS _c1", "b")
-    )
+        unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "b", "c._1 AS f0")),
+        term("select", "a", "b", "pyFunc1(a, pyFunc1(b, f0)) AS f0")),
+      term("select", "a", "f0 AS _c1", "b"))
 
     util.verifyTable(resultTable, expected)
   }
@@ -589,7 +504,8 @@ class PythonCalcSplitRuleTest extends TableTestBase {
     val table = util.addTable[(Int, Int, (Int, Int))]("MyTable", 'a, 'b, 'c)
     util.tableEnv.registerFunction("pyFunc1", new PythonScalarFunction("pyFunc1"))
 
-    val resultTable = table.select('a, 'b, 'c.flatten())
+    val resultTable = table
+      .select('a, 'b, 'c.flatten())
       .select($"a", call("pyFunc1", $"b", $"c$$_1"))
       .where($"a".plus(lit(1)).isGreater(lit(0)))
 
@@ -599,10 +515,8 @@ class PythonCalcSplitRuleTest extends TableTestBase {
         "DataStreamCalc",
         streamTableNode(table),
         term("select", "a", "b", "c._1 AS f0"),
-        term("where", ">(+(a, 1), 0)")
-      ),
-      term("select", "a", "pyFunc1(b, f0) AS _c1")
-    )
+        term("where", ">(+(a, 1), 0)")),
+      term("select", "a", "pyFunc1(b, f0) AS _c1"))
 
     util.verifyTable(resultTable, expected)
   }
@@ -613,18 +527,14 @@ class PythonCalcSplitRuleTest extends TableTestBase {
     val table = util.addTable[(Int, Int, (Int, Int))]("MyTable", 'a, 'b, 'c)
     util.tableEnv.registerFunction("pandasFunc1", new PandasScalarFunction("pandasFunc1"))
 
-    val resultTable = table.select('a, 'b, 'c.flatten())
+    val resultTable = table
+      .select('a, 'b, 'c.flatten())
       .select(call("pandasFunc1", $"a", $"c$$_1"))
 
     val expected = unaryNode(
       "DataStreamPythonCalc",
-      unaryNode(
-        "DataStreamCalc",
-        streamTableNode(table),
-        term("select", "a", "c._1 AS f0")
-      ),
-      term("select", "pandasFunc1(a, f0) AS _c0")
-    )
+      unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "c._1 AS f0")),
+      term("select", "pandasFunc1(a, f0) AS _c0"))
 
     util.verifyTable(resultTable, expected)
   }

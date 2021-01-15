@@ -37,50 +37,35 @@ class UnionTest extends TableTestBase {
 
     val expected = binaryNode(
       "DataStreamUnion",
+      unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a")),
       unaryNode(
         "DataStreamCalc",
         streamTableNode(table),
-        term("select", "a")
-      ),
-      unaryNode(
-        "DataStreamCalc",
-        streamTableNode(table),
-        term("select", "CASE(>(c, 0), b, null:RecordType:peek_no_expand(INTEGER _1, " +
-          "VARCHAR(65536) _2)) AS EXPR$0")
-      ),
+        term(
+          "select",
+          "CASE(>(c, 0), b, null:RecordType:peek_no_expand(INTEGER _1, " +
+            "VARCHAR(65536) _2)) AS EXPR$0")),
       term("all", "true"),
-      term("union all", "a")
-    )
+      term("union all", "a"))
 
     streamUtil.verifySql(
       "SELECT a FROM A UNION ALL SELECT CASE WHEN c > 0 THEN b ELSE NULL END FROM A",
-      expected
-    )
+      expected)
   }
 
   @Test
   def testUnionAnyType(): Unit = {
     val streamUtil = streamTestUtil()
-    val typeInfo = Types.ROW(
-      new GenericTypeInfo(classOf[NonPojo]),
-      new GenericTypeInfo(classOf[NonPojo]))
+    val typeInfo =
+      Types.ROW(new GenericTypeInfo(classOf[NonPojo]), new GenericTypeInfo(classOf[NonPojo]))
     val table = streamUtil.addJavaTable(typeInfo, "A", $("a"), $("b"))
 
     val expected = binaryNode(
       "DataStreamUnion",
-      unaryNode(
-        "DataStreamCalc",
-        streamTableNode(table),
-        term("select", "a")
-      ),
-      unaryNode(
-        "DataStreamCalc",
-        streamTableNode(table),
-        term("select", "b")
-      ),
+      unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a")),
+      unaryNode("DataStreamCalc", streamTableNode(table), term("select", "b")),
       term("all", "true"),
-      term("union all", "a")
-    )
+      term("union all", "a"))
 
     streamUtil.verifyJavaSql("SELECT a FROM A UNION ALL SELECT b FROM A", expected)
   }

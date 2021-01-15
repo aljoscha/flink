@@ -25,20 +25,20 @@ import org.apache.calcite.tools.RuleSets
 import org.junit.Test
 
 /**
-  * Tests for [[FlinkVolcanoProgramTest]].
-  */
+ * Tests for [[FlinkVolcanoProgramTest]].
+ */
 class FlinkVolcanoProgramTest {
 
   @Test
   def testBuildFlinkVolcanoProgram(): Unit = {
     val TEST = new Convention.Impl("TEST", classOf[RelNode])
     FlinkVolcanoProgramBuilder.newBuilder
-      .add(RuleSets.ofList(
-        CoreRules.FILTER_REDUCE_EXPRESSIONS,
-        CoreRules.PROJECT_REDUCE_EXPRESSIONS,
-        CoreRules.CALC_REDUCE_EXPRESSIONS,
-        CoreRules.JOIN_REDUCE_EXPRESSIONS
-      ))
+      .add(
+        RuleSets.ofList(
+          CoreRules.FILTER_REDUCE_EXPRESSIONS,
+          CoreRules.PROJECT_REDUCE_EXPRESSIONS,
+          CoreRules.CALC_REDUCE_EXPRESSIONS,
+          CoreRules.JOIN_REDUCE_EXPRESSIONS))
       .setRequiredOutputTraits(Array(TEST))
       .build()
   }

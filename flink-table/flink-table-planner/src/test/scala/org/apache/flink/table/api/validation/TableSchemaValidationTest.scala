@@ -22,7 +22,6 @@ import org.apache.flink.table.api.{TableSchema, ValidationException}
 import org.apache.flink.table.utils.TableTestBase
 import org.junit.Test
 
-
 class TableSchemaValidationTest extends TableTestBase {
 
   @Test
@@ -35,9 +34,8 @@ class TableSchemaValidationTest extends TableTestBase {
         "List of field data types: [INT, STRING]")
 
     val fieldNames = Array("a", "b", "c")
-    val typeInfos: Array[TypeInformation[_]] = Array(
-      BasicTypeInfo.INT_TYPE_INFO,
-      BasicTypeInfo.STRING_TYPE_INFO)
+    val typeInfos: Array[TypeInformation[_]] =
+      Array(BasicTypeInfo.INT_TYPE_INFO, BasicTypeInfo.STRING_TYPE_INFO)
     new TableSchema(fieldNames, typeInfos)
   }
 

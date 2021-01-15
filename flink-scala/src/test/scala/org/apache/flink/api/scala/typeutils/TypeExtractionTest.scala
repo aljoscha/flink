@@ -22,14 +22,16 @@ import org.apache.flink.api.common.io.FileInputFormat
 import org.apache.flink.api.common.typeinfo.{BasicTypeInfo, TypeInformation}
 import org.apache.flink.api.java.typeutils.{PojoTypeInfo, ResultTypeQueryable}
 import org.apache.flink.api.scala._
-import org.apache.flink.api.scala.typeutils.TypeExtractionTest.{CustomBeanClass, CustomTypeInputFormat}
+import org.apache.flink.api.scala.typeutils.TypeExtractionTest.{
+  CustomBeanClass,
+  CustomTypeInputFormat
+}
 import org.apache.flink.util.TestLogger
 import org.junit.Assert._
 import org.junit.Test
 import org.scalatest.junit.JUnitSuiteLike
 
 import scala.beans.BeanProperty
-
 
 class TypeExtractionTest extends TestLogger with JUnitSuiteLike {
 
@@ -63,9 +65,7 @@ object TypeExtractionTest {
     override def nextRecord(reuse: String): String = throw new UnsupportedOperationException()
   }
 
-  class CustomBeanClass(
-      @BeanProperty var prop: Int,
-      var prop2: Long) {
+  class CustomBeanClass(@BeanProperty var prop: Int, var prop2: Long) {
     def this() = this(0, 0L)
   }
 }

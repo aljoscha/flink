@@ -31,8 +31,8 @@ import org.apache.calcite.rel.`type`.RelDataType
 import org.apache.calcite.rel.core.AggregateCall
 
 /**
-  * Streaming group window aggregate physical node which will be translate to window operator.
-  */
+ * Streaming group window aggregate physical node which will be translate to window operator.
+ */
 class StreamPhysicalGroupWindowAggregate(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -43,16 +43,16 @@ class StreamPhysicalGroupWindowAggregate(
     window: LogicalWindow,
     namedWindowProperties: Seq[PlannerNamedWindowProperty],
     emitStrategy: WindowEmitStrategy)
-  extends StreamPhysicalGroupWindowAggregateBase(
-    cluster,
-    traitSet,
-    inputRel,
-    outputRowType,
-    grouping,
-    aggCalls,
-    window,
-    namedWindowProperties,
-    emitStrategy) {
+    extends StreamPhysicalGroupWindowAggregateBase(
+      cluster,
+      traitSet,
+      inputRel,
+      outputRowType,
+      grouping,
+      aggCalls,
+      window,
+      namedWindowProperties,
+      emitStrategy) {
 
   override def copy(traitSet: RelTraitSet, inputs: java.util.List[RelNode]): RelNode = {
     new StreamPhysicalGroupWindowAggregate(
@@ -78,7 +78,6 @@ class StreamPhysicalGroupWindowAggregate(
       needRetraction,
       ExecEdge.DEFAULT,
       FlinkTypeFactory.toLogicalRowType(getRowType),
-      getRelDetailedDescription
-    )
+      getRelDetailedDescription)
   }
 }

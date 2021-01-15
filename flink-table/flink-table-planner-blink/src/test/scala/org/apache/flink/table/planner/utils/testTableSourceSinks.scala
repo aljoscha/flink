@@ -30,12 +30,33 @@ import org.apache.flink.core.io.InputSplit
 import org.apache.flink.streaming.api.datastream.{DataStream, DataStreamSink}
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment
 import org.apache.flink.table.api.{DataTypes, TableEnvironment, TableSchema}
-import org.apache.flink.table.catalog.{CatalogPartitionImpl, CatalogPartitionSpec, CatalogTableImpl, ObjectPath}
+import org.apache.flink.table.catalog.{
+  CatalogPartitionImpl,
+  CatalogPartitionSpec,
+  CatalogTableImpl,
+  ObjectPath
+}
 import org.apache.flink.table.descriptors.ConnectorDescriptorValidator.{CONNECTOR, CONNECTOR_TYPE}
-import org.apache.flink.table.descriptors.{CustomConnectorDescriptor, DescriptorProperties, FileSystem, OldCsv, Schema, SchemaValidator}
+import org.apache.flink.table.descriptors.{
+  CustomConnectorDescriptor,
+  DescriptorProperties,
+  FileSystem,
+  OldCsv,
+  Schema,
+  SchemaValidator
+}
 import org.apache.flink.table.expressions.ApiExpressionUtils.unresolvedCall
-import org.apache.flink.table.expressions.{CallExpression, Expression, FieldReferenceExpression, ValueLiteralExpression}
-import org.apache.flink.table.factories.{StreamTableSourceFactory, TableSinkFactory, TableSourceFactory}
+import org.apache.flink.table.expressions.{
+  CallExpression,
+  Expression,
+  FieldReferenceExpression,
+  ValueLiteralExpression
+}
+import org.apache.flink.table.factories.{
+  StreamTableSourceFactory,
+  TableSinkFactory,
+  TableSourceFactory
+}
 import org.apache.flink.table.functions.BuiltInFunctionDefinitions
 import org.apache.flink.table.functions.BuiltInFunctionDefinitions.AND
 import org.apache.flink.table.planner.plan.hint.OptionsHintTest.IS_BOUNDED
@@ -63,7 +84,8 @@ import _root_.scala.collection.mutable
 
 object TestTableSourceSinks {
   def createPersonCsvTemporaryTable(tEnv: TableEnvironment, tableName: String): Unit = {
-    tEnv.connect(new FileSystem().path(getPersonCsvPath))
+    tEnv
+      .connect(new FileSystem().path(getPersonCsvPath))
       .withFormat(
         new OldCsv()
           .fieldDelimiter("#")
@@ -80,7 +102,8 @@ object TestTableSourceSinks {
   }
 
   def createOrdersCsvTemporaryTable(tEnv: TableEnvironment, tableName: String): Unit = {
-    tEnv.connect(new FileSystem().path(getOrdersCsvPath))
+    tEnv
+      .connect(new FileSystem().path(getOrdersCsvPath))
       .withFormat(
         new OldCsv()
           .fieldDelimiter(",")
@@ -94,7 +117,8 @@ object TestTableSourceSinks {
   }
 
   def createRatesCsvTemporaryTable(tEnv: TableEnvironment, tableName: String): Unit = {
-    tEnv.connect(new FileSystem().path(getRatesCsvPath))
+    tEnv
+      .connect(new FileSystem().path(getRatesCsvPath))
       .withFormat(
         new OldCsv()
           .fieldDelimiter(",")
@@ -114,13 +138,13 @@ object TestTableSourceSinks {
     val tempFile = File.createTempFile("csv-test", null)
     tempFile.deleteOnExit()
     val path = tempFile.getAbsolutePath
-    tEnv.connect(new FileSystem().path(path))
+    tEnv
+      .connect(new FileSystem().path(path))
       .withFormat(
         new OldCsv()
           .writeMode("OVERWRITE")
           .numFiles(numFiles))
-      .withSchema(
-        new Schema().schema(schema))
+      .withSchema(new Schema().schema(schema))
       .createTemporaryTable(tableName)
     path
   }
@@ -136,41 +160,20 @@ object TestTableSourceSinks {
       "Liz#5#34.5#Williams",
       "Sally#6#6.78#Miller",
       "Alice#7#90.1#Smith",
-      "Kelly#8#2.34#Williams"
-    )
+      "Kelly#8#2.34#Williams")
 
-    writeToTempFile(
-      csvRecords.mkString("$"),
-      "csv-test",
-      "tmp")
+    writeToTempFile(csvRecords.mkString("$"), "csv-test", "tmp")
   }
 
   lazy val getOrdersCsvPath = {
-    val csvRecords = Seq(
-      "2,Euro,2",
-      "1,US Dollar,3",
-      "50,Yen,4",
-      "3,Euro,5",
-      "5,US Dollar,6"
-    )
+    val csvRecords = Seq("2,Euro,2", "1,US Dollar,3", "50,Yen,4", "3,Euro,5", "5,US Dollar,6")
 
-    writeToTempFile(
-      csvRecords.mkString("$"),
-      "csv-order-test",
-      "tmp")
+    writeToTempFile(csvRecords.mkString("$"), "csv-order-test", "tmp")
   }
 
   lazy val getRatesCsvPath = {
-    val csvRecords = Seq(
-      "US Dollar,102",
-      "Yen,1",
-      "Euro,119",
-      "RMB,702"
-    )
-    writeToTempFile(
-      csvRecords.mkString("$"),
-      "csv-rate-test",
-      "tmp")
+    val csvRecords = Seq("US Dollar,102", "Yen,1", "Euro,119", "RMB,702")
+    writeToTempFile(csvRecords.mkString("$"), "csv-rate-test", "tmp")
 
   }
 
@@ -199,10 +202,10 @@ class TestTableSourceWithTime[T](
     proctime: String = null,
     mapping: Map[String, String] = null,
     existingTs: String = null)
-  extends StreamTableSource[T]
-  with DefinedRowtimeAttributes
-  with DefinedProctimeAttribute
-  with DefinedFieldMapping {
+    extends StreamTableSource[T]
+    with DefinedRowtimeAttributes
+    with DefinedProctimeAttribute
+    with DefinedFieldMapping {
 
   override def getDataStream(execEnv: StreamExecutionEnvironment): DataStream[T] = {
     val dataStream = execEnv.fromCollection(values, returnType)
@@ -218,10 +221,11 @@ class TestTableSourceWithTime[T](
       } else {
         rowtime
       }
-      Collections.singletonList(new RowtimeAttributeDescriptor(
-        rowtime,
-        new ExistingField(existingField),
-        new AscendingTimestamps))
+      Collections.singletonList(
+        new RowtimeAttributeDescriptor(
+          rowtime,
+          new ExistingField(existingField),
+          new AscendingTimestamps))
     } else {
       Collections.EMPTY_LIST.asInstanceOf[JList[RowtimeAttributeDescriptor]]
     }
@@ -285,7 +289,14 @@ class TestTableSourceWithTimeFactory[T] extends StreamTableSourceFactory[T] {
     val returnType = tableSchema.toRowType.asInstanceOf[TypeInformation[T]]
 
     new TestTableSourceWithTime[T](
-      isBounded, tableSchema, returnType, data, rowtime, proctime, mapping, existingTs)
+      isBounded,
+      tableSchema,
+      returnType,
+      data,
+      rowtime,
+      proctime,
+      mapping,
+      existingTs)
   }
 
   override def requiredContext(): JMap[String, String] = {
@@ -306,19 +317,23 @@ class TestPreserveWMTableSource[T](
     returnType: TypeInformation[T],
     values: Seq[Either[(Long, T), Long]],
     rowtime: String)
-  extends StreamTableSource[T]
-  with DefinedRowtimeAttributes {
+    extends StreamTableSource[T]
+    with DefinedRowtimeAttributes {
 
   override def getRowtimeAttributeDescriptors: util.List[RowtimeAttributeDescriptor] = {
-    Collections.singletonList(new RowtimeAttributeDescriptor(
-      rowtime,
-      new ExistingField(rowtime),
-      PreserveWatermarks.INSTANCE))
+    Collections.singletonList(
+      new RowtimeAttributeDescriptor(
+        rowtime,
+        new ExistingField(rowtime),
+        PreserveWatermarks.INSTANCE))
   }
 
   override def getDataStream(execEnv: StreamExecutionEnvironment): DataStream[T] = {
-    execEnv.addSource(new EventTimeSourceFunction[T](values)).
-        setParallelism(1).setMaxParallelism(1).returns(returnType)
+    execEnv
+      .addSource(new EventTimeSourceFunction[T](values))
+      .setParallelism(1)
+      .setMaxParallelism(1)
+      .returns(returnType)
   }
 
   override def getReturnType: TypeInformation[T] = returnType
@@ -337,15 +352,15 @@ class TestLegacyProjectableTableSource(
     rowtime: String = null,
     proctime: String = null,
     fieldMapping: Map[String, String] = null)
-  extends TestTableSourceWithTime[Row](
-    isBounded,
-    tableSchema,
-    returnType,
-    values,
-    rowtime,
-    proctime,
-    fieldMapping)
-  with ProjectableTableSource[Row] {
+    extends TestTableSourceWithTime[Row](
+      isBounded,
+      tableSchema,
+      returnType,
+      values,
+      rowtime,
+      proctime,
+      fieldMapping)
+    with ProjectableTableSource[Row] {
 
   override def projectFields(fields: Array[Int]): TableSource[Row] = {
     val rowType = returnType.asInstanceOf[RowTypeInfo]
@@ -357,7 +372,7 @@ class TestLegacyProjectableTableSource(
       val invertedMapping = fieldMapping.map(_.swap)
       val projectedNames = fields.map(rowType.getFieldNames.apply(_))
 
-      val projectedMapping: Map[String, String] = projectedNames.map{ f =>
+      val projectedMapping: Map[String, String] = projectedNames.map { f =>
         val logField = invertedMapping(f)
         logField -> s"remapped-$f"
       }.toMap
@@ -366,13 +381,12 @@ class TestLegacyProjectableTableSource(
     }
 
     val projectedTypes = fields.map(rowType.getFieldTypes.apply(_))
-    val projectedReturnType = new RowTypeInfo(
-      projectedTypes.asInstanceOf[Array[TypeInformation[_]]],
-      projectedNames)
+    val projectedReturnType =
+      new RowTypeInfo(projectedTypes.asInstanceOf[Array[TypeInformation[_]]], projectedNames)
 
     val projectedValues = values.map { fromRow =>
       val pRow = new Row(fields.length)
-      fields.zipWithIndex.foreach{ case (from, to) => pRow.setField(to, fromRow.getField(from)) }
+      fields.zipWithIndex.foreach { case (from, to) => pRow.setField(to, fromRow.getField(from)) }
       pRow
     }
 
@@ -399,15 +413,15 @@ class TestNestedProjectableTableSource(
     values: Seq[Row],
     rowtime: String = null,
     proctime: String = null)
-  extends TestTableSourceWithTime[Row](
-    isBounded,
-    tableSchema,
-    returnType,
-    values,
-    rowtime,
-    proctime,
-    null)
-  with NestedFieldsProjectableTableSource[Row] {
+    extends TestTableSourceWithTime[Row](
+      isBounded,
+      tableSchema,
+      returnType,
+      values,
+      rowtime,
+      proctime,
+      null)
+    with NestedFieldsProjectableTableSource[Row] {
 
   var readNestedFields: Seq[String] = tableSchema.getFieldNames.map(f => s"$f.*")
 
@@ -419,17 +433,17 @@ class TestNestedProjectableTableSource(
     val projectedNames = fields.map(rowType.getFieldNames.apply(_))
     val projectedTypes = fields.map(rowType.getFieldTypes.apply(_))
 
-    val projectedReturnType = new RowTypeInfo(
-      projectedTypes.asInstanceOf[Array[TypeInformation[_]]],
-      projectedNames)
+    val projectedReturnType =
+      new RowTypeInfo(projectedTypes.asInstanceOf[Array[TypeInformation[_]]], projectedNames)
 
     // update read nested fields
-    val newReadNestedFields = projectedNames.zip(nestedFields)
+    val newReadNestedFields = projectedNames
+      .zip(nestedFields)
       .flatMap(f => f._2.map(n => s"${f._1}.$n"))
 
     val projectedValues = values.map { fromRow =>
       val pRow = new Row(fields.length)
-      fields.zipWithIndex.foreach{ case (from, to) => pRow.setField(to, fromRow.getField(from)) }
+      fields.zipWithIndex.foreach { case (from, to) => pRow.setField(to, fromRow.getField(from)) }
       pRow
     }
 
@@ -452,8 +466,7 @@ class TestNestedProjectableTableSource(
 
 /** Table source factory to find and create [[TestLegacyProjectableTableSource]]. */
 class TestLegacyProjectableTableSourceFactory extends StreamTableSourceFactory[Row] {
-  override def createStreamTableSource(properties: JMap[String, String])
-  : StreamTableSource[Row] = {
+  override def createStreamTableSource(properties: JMap[String, String]): StreamTableSource[Row] = {
     val descriptorProps = new DescriptorProperties()
     descriptorProps.putProperties(properties)
     val isBounded = descriptorProps.getBoolean("is-bounded")
@@ -476,19 +489,19 @@ class TestLegacyProjectableTableSourceFactory extends StreamTableSourceFactory[R
 }
 
 /**
-  * A data source that implements some very basic filtering in-memory in order to test
-  * expression push-down logic.
-  *
-  * <p>NOTE: Currently, only `>, >=, &lt;, <=, =, &lt;>` operators and UPPER and LOWER functions
-  * are allowed to be pushed down into this source.
-  *
-  * @param isBounded whether this is a bounded source
-  * @param schema The TableSchema for the source.
-  * @param data The data that filtering is applied to in order to get the final dataset.
-  * @param filterableFields The fields that are allowed to be filtered.
-  * @param filterPredicates The predicates that should be used to filter.
-  * @param filterPushedDown Whether predicates have been pushed down yet.
-  */
+ * A data source that implements some very basic filtering in-memory in order to test
+ * expression push-down logic.
+ *
+ * <p>NOTE: Currently, only `>, >=, &lt;, <=, =, &lt;>` operators and UPPER and LOWER functions
+ * are allowed to be pushed down into this source.
+ *
+ * @param isBounded whether this is a bounded source
+ * @param schema The TableSchema for the source.
+ * @param data The data that filtering is applied to in order to get the final dataset.
+ * @param filterableFields The fields that are allowed to be filtered.
+ * @param filterPredicates The predicates that should be used to filter.
+ * @param filterPushedDown Whether predicates have been pushed down yet.
+ */
 class TestLegacyFilterableTableSource(
     override val isBounded: Boolean,
     schema: TableSchema,
@@ -496,20 +509,22 @@ class TestLegacyFilterableTableSource(
     filterableFields: Set[String] = Set(),
     filterPredicates: Seq[Expression] = Seq(),
     val filterPushedDown: Boolean = false)
-  extends StreamTableSource[Row]
-  with FilterableTableSource[Row] {
+    extends StreamTableSource[Row]
+    with FilterableTableSource[Row] {
 
   override def getDataStream(execEnv: StreamExecutionEnvironment): DataStream[Row] = {
-    execEnv.fromCollection[Row](
+    execEnv
+      .fromCollection[Row](
         applyPredicatesToRows(data).asJava,
         fromDataTypeToTypeInfo(getProducedDataType).asInstanceOf[RowTypeInfo])
-      .setParallelism(1).setMaxParallelism(1)
+      .setParallelism(1)
+      .setMaxParallelism(1)
   }
 
   override def explainSource(): String = {
     if (filterPredicates.nonEmpty) {
       s"filterPushedDown=[$filterPushedDown], " +
-      s"filter=[${filterPredicates.reduce((l, r) => unresolvedCall(AND, l, r)).toString}]"
+        s"filter=[${filterPredicates.reduce((l, r) => unresolvedCall(AND, l, r)).toString}]"
     } else {
       s"filterPushedDown=[$filterPushedDown], filter=[]"
     }
@@ -552,7 +567,7 @@ class TestLegacyFilterableTableSource(
 
   private def shouldPushDownUnaryExpression(expr: Expression): Boolean = expr match {
     case f: FieldReferenceExpression => filterableFields.contains(f.getName)
-    case _: ValueLiteralExpression => true
+    case _: ValueLiteralExpression   => true
     case c: CallExpression if c.getChildren.size() == 1 =>
       c.getFunctionDefinition match {
         case BuiltInFunctionDefinitions.UPPER | BuiltInFunctionDefinitions.LOWER =>
@@ -629,7 +644,8 @@ class TestLegacyFilterableTableSource(
 object TestLegacyFilterableTableSource {
   val defaultFilterableFields = Set("amount")
 
-  val defaultSchema: TableSchema = TableSchema.builder()
+  val defaultSchema: TableSchema = TableSchema
+    .builder()
     .field("name", DataTypes.STRING)
     .field("id", DataTypes.BIGINT)
     .field("amount", DataTypes.INT)
@@ -667,7 +683,8 @@ object TestLegacyFilterableTableSource {
       desc.property("filterable-fields", EncodingUtils.encodeObjectToString(filterableFields))
     }
 
-    tEnv.connect(desc)
+    tEnv
+      .connect(desc)
       .withSchema(new Schema().schema(schema))
       .createTemporaryTable(tableName)
   }
@@ -675,8 +692,7 @@ object TestLegacyFilterableTableSource {
 
 /** Table source factory to find and create [[TestLegacyFilterableTableSource]]. */
 class TestLegacyFilterableTableSourceFactory extends StreamTableSourceFactory[Row] {
-  override def createStreamTableSource(properties: JMap[String, String])
-    : StreamTableSource[Row] = {
+  override def createStreamTableSource(properties: JMap[String, String]): StreamTableSource[Row] = {
     val descriptorProps = new DescriptorProperties()
     descriptorProps.putProperties(properties)
     val isBounded = descriptorProps.getOptionalBoolean("is-bounded").orElse(false)
@@ -710,9 +726,8 @@ class TestLegacyFilterableTableSourceFactory extends StreamTableSourceFactory[Ro
   }
 }
 
-class TestInputFormatTableSource[T](
-    tableSchema: TableSchema,
-    values: Seq[T]) extends InputFormatTableSource[T] {
+class TestInputFormatTableSource[T](tableSchema: TableSchema, values: Seq[T])
+    extends InputFormatTableSource[T] {
 
   override def getInputFormat: InputFormat[T, _ <: InputSplit] = {
     val returnType = tableSchema.toRowType.asInstanceOf[TypeInformation[T]]
@@ -733,9 +748,10 @@ object TestInputFormatTableSource {
       schema: TableSchema,
       data: Seq[_],
       tableName: String): Unit = {
-    tEnv.connect(
-      new CustomConnectorDescriptor("TestInputFormatTableSource", 1, false)
-        .property("data", EncodingUtils.encodeObjectToString(data.toList)))
+    tEnv
+      .connect(
+        new CustomConnectorDescriptor("TestInputFormatTableSource", 1, false)
+          .property("data", EncodingUtils.encodeObjectToString(data.toList)))
       .withSchema(new Schema().schema(schema))
       .createTemporaryTable(tableName)
   }
@@ -768,16 +784,15 @@ class TestInputFormatTableSourceFactory[T] extends StreamTableSourceFactory[T] {
   }
 }
 
-class TestDataTypeTableSource(
-    tableSchema: TableSchema,
-    values: Seq[Row]) extends InputFormatTableSource[Row] {
+class TestDataTypeTableSource(tableSchema: TableSchema, values: Seq[Row])
+    extends InputFormatTableSource[Row] {
 
   override def getInputFormat: InputFormat[Row, _ <: InputSplit] = {
     new CollectionInputFormat[Row](
       values.asJava,
       fromDataTypeToTypeInfo(getProducedDataType)
-          .createSerializer(new ExecutionConfig)
-          .asInstanceOf[TypeSerializer[Row]])
+        .createSerializer(new ExecutionConfig)
+        .asInstanceOf[TypeSerializer[Row]])
   }
 
   override def getReturnType: TypeInformation[Row] =
@@ -793,16 +808,14 @@ class TestDataTypeTableSourceFactory extends TableSourceFactory[Row] {
   override def createTableSource(properties: JMap[String, String]): TableSource[Row] = {
     val descriptorProperties = new DescriptorProperties
     descriptorProperties.putProperties(properties)
-    val tableSchema = getPhysicalSchema(
-      descriptorProperties.getTableSchema(Schema.SCHEMA))
+    val tableSchema = getPhysicalSchema(descriptorProperties.getTableSchema(Schema.SCHEMA))
     val serializedRows = descriptorProperties.getOptionalString("data").orElse(null)
     val data = if (serializedRows != null) {
       EncodingUtils.decodeStringToObject(serializedRows, classOf[List[Row]])
     } else {
       Seq.empty[Row]
     }
-    new TestDataTypeTableSource(
-      tableSchema, data)
+    new TestDataTypeTableSource(tableSchema, data)
   }
 
   override def requiredContext(): JMap[String, String] = {
@@ -824,9 +837,10 @@ object TestDataTypeTableSource {
       schema: TableSchema,
       tableName: String,
       data: Seq[Row]): Unit = {
-    tEnv.connect(
-      new CustomConnectorDescriptor("TestDataTypeTableSource", 1, false)
-        .property("data", EncodingUtils.encodeObjectToString(data.toList)))
+    tEnv
+      .connect(
+        new CustomConnectorDescriptor("TestDataTypeTableSource", 1, false)
+          .property("data", EncodingUtils.encodeObjectToString(data.toList)))
       .withSchema(new Schema().schema(schema))
       .createTemporaryTable(tableName)
   }
@@ -836,8 +850,8 @@ class TestDataTypeTableSourceWithTime(
     tableSchema: TableSchema,
     values: Seq[Row],
     rowtime: String = null)
-  extends InputFormatTableSource[Row]
-  with DefinedRowtimeAttributes {
+    extends InputFormatTableSource[Row]
+    with DefinedRowtimeAttributes {
 
   override def getInputFormat: InputFormat[Row, _ <: InputSplit] = {
     new CollectionInputFormat[Row](
@@ -857,10 +871,11 @@ class TestDataTypeTableSourceWithTime(
   override def getRowtimeAttributeDescriptors: JList[RowtimeAttributeDescriptor] = {
     // return a RowtimeAttributeDescriptor if rowtime attribute is defined
     if (rowtime != null) {
-      Collections.singletonList(new RowtimeAttributeDescriptor(
-        rowtime,
-        new ExistingField(rowtime),
-        new AscendingTimestamps))
+      Collections.singletonList(
+        new RowtimeAttributeDescriptor(
+          rowtime,
+          new ExistingField(rowtime),
+          new AscendingTimestamps))
     } else {
       Collections.EMPTY_LIST.asInstanceOf[JList[RowtimeAttributeDescriptor]]
     }
@@ -872,8 +887,7 @@ class TestDataTypeTableSourceWithTimeFactory extends TableSourceFactory[Row] {
   override def createTableSource(properties: JMap[String, String]): TableSource[Row] = {
     val descriptorProperties = new DescriptorProperties
     descriptorProperties.putProperties(properties)
-    val tableSchema = getPhysicalSchema(
-      descriptorProperties.getTableSchema(Schema.SCHEMA))
+    val tableSchema = getPhysicalSchema(descriptorProperties.getTableSchema(Schema.SCHEMA))
 
     val serializedRows = descriptorProperties.getOptionalString("data").orElse(null)
     val data = if (serializedRows != null) {
@@ -906,7 +920,8 @@ object TestDataTypeTableSourceWithTime {
       tableName: String,
       data: Seq[Row],
       rowTime: String): Unit = {
-    tEnv.connect(
+    tEnv
+      .connect(
         new CustomConnectorDescriptor("TestDataTypeTableSourceWithTime", 1, false)
           .property("data", EncodingUtils.encodeObjectToString(data.toList))
           .property("rowtime", rowTime))
@@ -915,9 +930,8 @@ object TestDataTypeTableSourceWithTime {
   }
 }
 
-class TestStreamTableSource(
-    tableSchema: TableSchema,
-    values: Seq[Row]) extends StreamTableSource[Row] {
+class TestStreamTableSource(tableSchema: TableSchema, values: Seq[Row])
+    extends StreamTableSource[Row] {
 
   override def getDataStream(execEnv: StreamExecutionEnvironment): DataStream[Row] = {
     execEnv.fromCollection(values, tableSchema.toRowType)
@@ -938,7 +952,8 @@ object TestStreamTableSource {
     if (data != null) {
       desc.property("data", EncodingUtils.encodeObjectToString(data.toList))
     }
-    tEnv.connect(desc)
+    tEnv
+      .connect(desc)
       .withSchema(new Schema().schema(schema))
       .createTemporaryTable(tableName)
   }
@@ -971,9 +986,8 @@ class TestStreamTableSourceFactory extends StreamTableSourceFactory[Row] {
   }
 }
 
-class TestFileInputFormatTableSource(
-    paths: Array[String],
-    tableSchema: TableSchema) extends InputFormatTableSource[Row] {
+class TestFileInputFormatTableSource(paths: Array[String], tableSchema: TableSchema)
+    extends InputFormatTableSource[Row] {
 
   override def getInputFormat: InputFormat[Row, _ <: InputSplit] = {
     val format = new RowCsvInputFormat(null, tableSchema.getFieldTypes)
@@ -992,9 +1006,10 @@ object TestFileInputFormatTableSource {
       schema: TableSchema,
       tableName: String,
       path: Array[String]): Unit = {
-    tEnv.connect(
-      new CustomConnectorDescriptor("TestFileInputFormatTableSource", 1, false)
-        .property("path", EncodingUtils.encodeObjectToString(path)))
+    tEnv
+      .connect(
+        new CustomConnectorDescriptor("TestFileInputFormatTableSource", 1, false)
+          .property("path", EncodingUtils.encodeObjectToString(path)))
       .withSchema(new Schema().schema(schema))
       .createTemporaryTable(tableName)
   }
@@ -1030,16 +1045,16 @@ class TestFileInputFormatTableSourceFactory extends StreamTableSourceFactory[Row
 }
 
 /**
-  * A data source that implements some very basic partitionable table source in-memory.
-  *
-  * @param isBounded whether this is a bounded source
-  * @param remainingPartitions remaining partitions after partition pruning
-  */
+ * A data source that implements some very basic partitionable table source in-memory.
+ *
+ * @param isBounded whether this is a bounded source
+ * @param remainingPartitions remaining partitions after partition pruning
+ */
 class TestPartitionableTableSource(
     override val isBounded: Boolean,
     remainingPartitions: JList[JMap[String, String]],
     isCatalogTable: Boolean)
-  extends StreamTableSource[Row]
+    extends StreamTableSource[Row]
     with PartitionableTableSource {
 
   private val fieldTypes: Array[TypeInformation[_]] = Array(
@@ -1055,8 +1070,7 @@ class TestPartitionableTableSource(
     "part1=A,part2=1" -> Seq(row(1, "Anna", "A", 1), row(2, "Jack", "A", 1)),
     "part1=A,part2=2" -> Seq(row(3, "John", "A", 2), row(4, "nosharp", "A", 2)),
     "part1=B,part2=3" -> Seq(row(5, "Peter", "B", 3), row(6, "Lucy", "B", 3)),
-    "part1=C,part2=1" -> Seq(row(7, "He", "C", 1), row(8, "Le", "C", 1))
-  )
+    "part1=C,part2=1" -> Seq(row(7, "He", "C", 1), row(8, "Le", "C", 1)))
 
   override def getPartitions: JList[JMap[String, String]] = {
     if (isCatalogTable) {
@@ -1066,8 +1080,7 @@ class TestPartitionableTableSource(
       Map("part1" -> "A", "part2" -> "1").asJava,
       Map("part1" -> "A", "part2" -> "2").asJava,
       Map("part1" -> "B", "part2" -> "3").asJava,
-      Map("part1" -> "C", "part2" -> "1").asJava
-    ).asJava
+      Map("part1" -> "C", "part2" -> "1").asJava).asJava
   }
 
   override def applyPartitionPruning(
@@ -1077,8 +1090,8 @@ class TestPartitionableTableSource(
 
   override def getDataStream(execEnv: StreamExecutionEnvironment): DataStream[Row] = {
     val remainingData = if (remainingPartitions != null) {
-      val remainingPartitionList = remainingPartitions.map {
-        m => s"part1=${m.get("part1")},part2=${m.get("part2")}"
+      val remainingPartitionList = remainingPartitions.map { m =>
+        s"part1=${m.get("part1")},part2=${m.get("part2")}"
       }
       data.filterKeys(remainingPartitionList.contains).values.flatten
     } else {
@@ -1121,24 +1134,26 @@ class TestPartitionableSourceFactory extends TableSourceFactory[Row] {
 
     val isBounded = dp.getBoolean("is-bounded")
     val sourceFetchPartitions = dp.getBoolean("source-fetch-partitions")
-    val remainingPartitions = dp.getOptionalArray("remaining-partition",
-      new java.util.function.Function[String, util.Map[String, String]] {
-      override def apply(t: String): util.Map[String, String] = {
-        dp.getString(t).split(",")
-            .map(kv => kv.split(":"))
-            .map(a => (a(0), a(1)))
-            .toMap[String, String]
-      }
-    }).orElse(null)
-    new TestPartitionableTableSource(
-      isBounded,
-      remainingPartitions,
-      sourceFetchPartitions)
+    val remainingPartitions = dp
+      .getOptionalArray(
+        "remaining-partition",
+        new java.util.function.Function[String, util.Map[String, String]] {
+          override def apply(t: String): util.Map[String, String] = {
+            dp.getString(t)
+              .split(",")
+              .map(kv => kv.split(":"))
+              .map(a => (a(0), a(1)))
+              .toMap[String, String]
+          }
+        })
+      .orElse(null)
+    new TestPartitionableTableSource(isBounded, remainingPartitions, sourceFetchPartitions)
   }
 }
 
 object TestPartitionableSourceFactory {
-  private val tableSchema: TableSchema = TableSchema.builder()
+  private val tableSchema: TableSchema = TableSchema
+    .builder()
     .field("id", DataTypes.INT())
     .field("name", DataTypes.STRING())
     .field("part1", DataTypes.STRING())
@@ -1146,12 +1161,9 @@ object TestPartitionableSourceFactory {
     .build()
 
   /**
-    * For java invoking.
-    */
-  def createTemporaryTable(
-      tEnv: TableEnvironment,
-      tableName: String,
-      isBounded: Boolean): Unit = {
+   * For java invoking.
+   */
+  def createTemporaryTable(tEnv: TableEnvironment, tableName: String, isBounded: Boolean): Unit = {
     createTemporaryTable(tEnv, tableName, isBounded, tableSchema = tableSchema)
   }
 
@@ -1170,10 +1182,9 @@ object TestPartitionableSourceFactory {
       remainingPartitions.zipWithIndex.foreach { case (part, i) =>
         properties.putString(
           "remaining-partition." + i,
-          part.map {case (k, v) => s"$k:$v"}.reduce {(kv1, kv2) =>
+          part.map { case (k, v) => s"$k:$v" }.reduce { (kv1, kv2) =>
             s"$kv1,:$kv2"
-          }
-        )
+          })
       }
     }
 
@@ -1181,8 +1192,7 @@ object TestPartitionableSourceFactory {
       tableSchema,
       util.Arrays.asList[String]("part1", "part2"),
       properties.asMap(),
-      ""
-    )
+      "")
     val catalog = tEnv.getCatalog(tEnv.getCurrentCatalog).get()
     val path = new ObjectPath(tEnv.getCurrentDatabase, tableName)
     catalog.createTable(path, table, false)
@@ -1191,28 +1201,26 @@ object TestPartitionableSourceFactory {
       Map("part1" -> "A", "part2" -> "1").asJava,
       Map("part1" -> "A", "part2" -> "2").asJava,
       Map("part1" -> "B", "part2" -> "3").asJava,
-      Map("part1" -> "C", "part2" -> "1").asJava
-    )
-    partitions.foreach(spec => catalog.createPartition(
-      path,
-      new CatalogPartitionSpec(new java.util.LinkedHashMap(spec)),
-      new CatalogPartitionImpl(Map[String, String](), ""),
-      true))
+      Map("part1" -> "C", "part2" -> "1").asJava)
+    partitions.foreach(spec =>
+      catalog.createPartition(
+        path,
+        new CatalogPartitionSpec(new java.util.LinkedHashMap(spec)),
+        new CatalogPartitionImpl(Map[String, String](), ""),
+        true))
 
   }
 }
 
 /**
-  * Used for stream/TableScanITCase#testTableSourceWithoutTimeAttribute or
-  * batch/TableScanITCase#testTableSourceWithoutTimeAttribute
-  */
+ * Used for stream/TableScanITCase#testTableSourceWithoutTimeAttribute or
+ * batch/TableScanITCase#testTableSourceWithoutTimeAttribute
+ */
 class WithoutTimeAttributesTableSource(bounded: Boolean) extends StreamTableSource[Row] {
 
   override def getDataStream(execEnv: StreamExecutionEnvironment): DataStream[Row] = {
-    val data = Seq(
-      Row.of("Mary", new JLong(1L), new JInt(1)),
-      Row.of("Bob", new JLong(2L), new JInt(3))
-    )
+    val data =
+      Seq(Row.of("Mary", new JLong(1L), new JInt(1)), Row.of("Bob", new JLong(2L), new JInt(3)))
     val dataStream =
       execEnv
         .fromCollection(data)
@@ -1231,18 +1239,18 @@ class WithoutTimeAttributesTableSource(bounded: Boolean) extends StreamTableSour
 }
 
 object WithoutTimeAttributesTableSource {
-  lazy val tableSchema = TableSchema.builder()
+  lazy val tableSchema = TableSchema
+    .builder()
     .field("name", DataTypes.STRING())
     .field("id", DataTypes.BIGINT())
     .field("value", DataTypes.INT())
     .build()
 
-  def createTemporaryTable(
-      tEnv: TableEnvironment,
-      tableName: String): Unit = {
-    tEnv.connect(
-      new CustomConnectorDescriptor("WithoutTimeAttributesTableSource", 1, false)
-        .property("is-bounded", "true"))
+  def createTemporaryTable(tEnv: TableEnvironment, tableName: String): Unit = {
+    tEnv
+      .connect(
+        new CustomConnectorDescriptor("WithoutTimeAttributesTableSource", 1, false)
+          .property("is-bounded", "true"))
       .withSchema(new Schema().schema(WithoutTimeAttributesTableSource.tableSchema))
       .createTemporaryTable(tableName)
   }
@@ -1270,9 +1278,7 @@ class WithoutTimeAttributesTableSourceFactory extends TableSourceFactory[Row] {
 }
 
 /** Factory for [[OptionsTableSource]]. */
-class TestOptionsTableFactory
-  extends TableSourceFactory[Row]
-    with TableSinkFactory[Row] {
+class TestOptionsTableFactory extends TableSourceFactory[Row] with TableSinkFactory[Row] {
   import TestOptionsTableFactory._
 
   override def requiredContext(): util.Map[String, String] = {
@@ -1297,11 +1303,8 @@ class TestOptionsTableFactory
 }
 
 /** A table source that explains the properties in the plan. */
-class OptionsTableSource(
-    isBounded: Boolean,
-    tableSchema: TableSchema,
-    props: JMap[String, String])
-  extends BatchTableSource[Row]
+class OptionsTableSource(isBounded: Boolean, tableSchema: TableSchema, props: JMap[String, String])
+    extends BatchTableSource[Row]
     with StreamTableSource[Row] {
   override def getDataSet(execEnv: ExecutionEnvironment): DataSet[Row] =
     None.asInstanceOf[DataSet[Row]]
@@ -1320,18 +1323,17 @@ class OptionsTableSource(
 }
 
 /** A table source that explains the properties in the plan. */
-class OptionsTableSink(
-    tableSchema: TableSchema,
-    val props: JMap[String, String])
-  extends BatchTableSink[Row]
+class OptionsTableSink(tableSchema: TableSchema, val props: JMap[String, String])
+    extends BatchTableSink[Row]
     with StreamTableSink[Row] {
 
   override def consumeDataStream(dataStream: DataStream[Row]): DataStreamSink[_] = {
     None.asInstanceOf[DataStreamSink[Row]]
   }
 
-  override def configure(fieldNames: Array[String], fieldTypes: Array[TypeInformation[_]])
-  : TableSink[Row] = this
+  override def configure(
+      fieldNames: Array[String],
+      fieldTypes: Array[TypeInformation[_]]): TableSink[Row] = this
 
   override def getTableSchema: TableSchema = tableSchema
 

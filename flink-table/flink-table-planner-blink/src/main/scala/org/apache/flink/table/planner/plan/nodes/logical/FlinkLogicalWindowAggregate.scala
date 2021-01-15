@@ -44,8 +44,8 @@ class FlinkLogicalWindowAggregate(
     aggCalls: util.List[AggregateCall],
     window: LogicalWindow,
     namedProperties: Seq[PlannerNamedWindowProperty])
-  extends WindowAggregate(cluster, traitSet, child, groupSet, aggCalls, window, namedProperties)
-  with FlinkLogicalRel {
+    extends WindowAggregate(cluster, traitSet, child, groupSet, aggCalls, window, namedProperties)
+    with FlinkLogicalRel {
 
   override def copy(
       traitSet: RelTraitSet,
@@ -76,11 +76,11 @@ class FlinkLogicalWindowAggregate(
 }
 
 class FlinkLogicalWindowAggregateConverter
-  extends ConverterRule(
-    classOf[LogicalWindowAggregate],
-    Convention.NONE,
-    FlinkConventions.LOGICAL,
-    "FlinkLogicalWindowAggregateConverter") {
+    extends ConverterRule(
+      classOf[LogicalWindowAggregate],
+      Convention.NONE,
+      FlinkConventions.LOGICAL,
+      "FlinkLogicalWindowAggregateConverter") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val agg = call.rel(0).asInstanceOf[LogicalWindowAggregate]
@@ -92,7 +92,7 @@ class FlinkLogicalWindowAggregateConverter
       case SqlKind.AVG => true
       // but none of the other AVG agg functions
       case k if SqlKind.AVG_AGG_FUNCTIONS.contains(k) => false
-      case _ => true
+      case _                                          => true
     }
   }
 

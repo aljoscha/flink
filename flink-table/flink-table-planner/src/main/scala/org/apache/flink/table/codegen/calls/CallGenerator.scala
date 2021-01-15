@@ -27,37 +27,33 @@ trait CallGenerator {
 
   def generate(
       codeGenerator: CodeGenerator,
-      operands: Seq[GeneratedExpression])
-    : GeneratedExpression
+      operands: Seq[GeneratedExpression]): GeneratedExpression
 
 }
 
 object CallGenerator {
 
   /**
-    * Generates a call with a single result statement.
-    */
+   * Generates a call with a single result statement.
+   */
   def generateCallIfArgsNotNull(
       nullCheck: Boolean,
       returnType: TypeInformation[_],
-      operands: Seq[GeneratedExpression])
-      (call: (Seq[String]) => String)
-    : GeneratedExpression = {
+      operands: Seq[GeneratedExpression])(call: (Seq[String]) => String): GeneratedExpression = {
 
-    generateCallWithStmtIfArgsNotNull(nullCheck, returnType, operands) {
-      (terms) => (None, call(terms))
+    generateCallWithStmtIfArgsNotNull(nullCheck, returnType, operands) { (terms) =>
+      (None, call(terms))
     }
   }
 
   /**
-    * Generates a call with auxiliary statements and result expression.
-    */
+   * Generates a call with auxiliary statements and result expression.
+   */
   def generateCallWithStmtIfArgsNotNull(
       nullCheck: Boolean,
       returnType: TypeInformation[_],
-      operands: Seq[GeneratedExpression])
-      (call: (Seq[String]) => (Option[String], String))
-    : GeneratedExpression = {
+      operands: Seq[GeneratedExpression])(
+      call: (Seq[String]) => (Option[String], String)): GeneratedExpression = {
     val resultTerm = newName("result")
     val nullTerm = newName("isNull")
     val resultTypeTerm = primitiveTypeTermForTypeInfo(returnType)
@@ -65,16 +61,16 @@ object CallGenerator {
 
     val (auxiliaryStmt, result) = call(operands.map(_.resultTerm))
 
-    val nullTermCode = if (
-      nullCheck &&
-      isReference(returnType) &&
-      !TypeCheckUtils.isTemporal(returnType)) {
-      s"""
+    val nullTermCode =
+      if (nullCheck &&
+        isReference(returnType) &&
+        !TypeCheckUtils.isTemporal(returnType)) {
+        s"""
          |$nullTerm = ($resultTerm == null);
        """.stripMargin
-    } else {
-      ""
-    }
+      } else {
+        ""
+      }
 
     val resultCode = if (nullCheck && operands.nonEmpty) {
       s"""
@@ -95,7 +91,7 @@ object CallGenerator {
         |$resultTypeTerm $resultTerm = $result;
         |$nullTermCode
         |""".stripMargin
-    } else{
+    } else {
       s"""
         |boolean $nullTerm = false;
         |${operands.map(_.code).mkString("\n")}

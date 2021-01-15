@@ -39,8 +39,8 @@ class Top3Accum {
 }
 
 /**
-  * Note: This function suffers performance problem. Only use it in tests.
-  */
+ * Note: This function suffers performance problem. Only use it in tests.
+ */
 class Top3 extends TableAggregateFunction[JTuple2[JInt, JInt], Top3Accum] {
   override def createAccumulator(): Top3Accum = {
     val acc = new Top3Accum
@@ -158,8 +158,7 @@ class Top3WithEmitRetractValue extends Top3 {
 
   def emitUpdateWithRetract(
       acc: Top3Accum,
-      out: RetractableCollector[JTuple2[JInt, JInt]])
-    : Unit = {
+      out: RetractableCollector[JTuple2[JInt, JInt]]): Unit = {
     retract.foreach(e => out.retract(JTuple2.of(e, e)))
     add.foreach(e => out.collect(JTuple2.of(e, e)))
     retract.clear()
@@ -168,8 +167,8 @@ class Top3WithEmitRetractValue extends Top3 {
 }
 
 /**
-  * Note: This function suffers performance problem. Only use it in tests.
-  */
+ * Note: This function suffers performance problem. Only use it in tests.
+ */
 class Top3WithMapView extends TableAggregateFunction[JTuple2[JInt, JInt], Top3WithMapViewAccum] {
 
   @Override
@@ -247,8 +246,8 @@ class Top3WithMapView extends TableAggregateFunction[JTuple2[JInt, JInt], Top3Wi
 }
 
 /**
-  * Test function for plan test.
-  */
+ * Test function for plan test.
+ */
 class EmptyTableAggFuncWithoutEmit extends TableAggregateFunction[JTuple2[JInt, JInt], Top3Accum] {
 
   override def createAccumulator(): Top3Accum = new Top3Accum

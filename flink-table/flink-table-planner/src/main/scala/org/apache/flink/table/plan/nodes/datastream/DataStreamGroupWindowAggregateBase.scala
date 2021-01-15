@@ -22,7 +22,12 @@ import org.apache.calcite.plan.{RelOptCluster, RelTraitSet}
 import org.apache.calcite.rel.`type`.RelDataType
 import org.apache.calcite.rel.core.AggregateCall
 import org.apache.calcite.rel.{RelNode, RelWriter, SingleRel}
-import org.apache.flink.streaming.api.datastream.{AllWindowedStream, DataStream, KeyedStream, WindowedStream}
+import org.apache.flink.streaming.api.datastream.{
+  AllWindowedStream,
+  DataStream,
+  KeyedStream,
+  WindowedStream
+}
 import org.apache.flink.streaming.api.windowing.assigners._
 import org.apache.flink.streaming.api.windowing.triggers.PurgingTrigger
 import org.apache.flink.streaming.api.windowing.windows.{Window => DataStreamWindow}
@@ -46,8 +51,8 @@ import org.apache.flink.table.util.Logging
 import org.apache.flink.types.Row
 
 /**
-  * Base RelNode for data stream group window aggregate and table aggregate.
-  */
+ * Base RelNode for data stream group window aggregate and table aggregate.
+ */
 abstract class DataStreamGroupWindowAggregateBase(
     window: LogicalWindow,
     namedProperties: Seq[NamedWindowProperty],
@@ -59,7 +64,7 @@ abstract class DataStreamGroupWindowAggregateBase(
     inputSchema: RowSchema,
     grouping: Array[Int],
     aggType: String)
-  extends SingleRel(cluster, traitSet, inputNode)
+    extends SingleRel(cluster, traitSet, inputNode)
     with CommonAggregate
     with DataStreamRel
     with Logging {
@@ -75,29 +80,22 @@ abstract class DataStreamGroupWindowAggregateBase(
   def getWindowProperties: Seq[NamedWindowProperty] = namedProperties
 
   override def toString: String = {
-    s"$aggType(${
-      if (!grouping.isEmpty) {
-        s"groupBy: (${groupingToString(inputSchema.relDataType, grouping)}), "
-      } else {
-        ""
-      }
-    }window: ($window), " +
-      s"select: (${
-        aggregationToString(
-          inputSchema.relDataType,
-          grouping,
-          getRowType,
-          namedAggregates,
-          namedProperties)
-      }))"
+    s"$aggType(${if (!grouping.isEmpty) {
+      s"groupBy: (${groupingToString(inputSchema.relDataType, grouping)}), "
+    } else {
+      ""
+    }}window: ($window), " +
+      s"select: (${aggregationToString(inputSchema.relDataType, grouping, getRowType, namedAggregates, namedProperties)}))"
   }
 
   override def explainTerms(pw: RelWriter): RelWriter = {
-    super.explainTerms(pw)
+    super
+      .explainTerms(pw)
       .itemIf("groupBy", groupingToString(inputSchema.relDataType, grouping), grouping.nonEmpty)
       .item("window", window)
       .item(
-        "select", aggregationToString(
+        "select",
+        aggregationToString(
           inputSchema.relDataType,
           grouping,
           schema.relDataType,
@@ -121,14 +119,13 @@ abstract class DataStreamGroupWindowAggregateBase(
     }
 
     val isCountWindow = window match {
-      case TumblingGroupWindow(_, _, size) if isRowCountLiteral(size) => true
+      case TumblingGroupWindow(_, _, size) if isRowCountLiteral(size)   => true
       case SlidingGroupWindow(_, _, size, _) if isRowCountLiteral(size) => true
-      case _ => false
+      case _                                                            => false
     }
 
     if (isCountWindow && grouping.length > 0 && config.getMinIdleStateRetentionTime < 0) {
-      LOG.warn(
-        "No state retention interval configured for a query which accumulates state. " +
+      LOG.warn("No state retention interval configured for a query which accumulates state. " +
         "Please provide a query configuration with valid retention interval to prevent excessive " +
         "state size. You may specify a retention time of 0 to not clean up the state.")
     }
@@ -142,8 +139,7 @@ abstract class DataStreamGroupWindowAggregateBase(
       }
 
       inputDS
-        .process(
-          new RowtimeProcessFunction(timeIdx, CRowTypeInfo(inputSchema.typeInfo)))
+        .process(new RowtimeProcessFunction(timeIdx, CRowTypeInfo(inputSchema.typeInfo)))
         .setParallelism(inputDS.getParallelism)
         .name(s"time attribute: ($timeAttribute)")
     } else {
@@ -166,7 +162,7 @@ abstract class DataStreamGroupWindowAggregateBase(
 
     val needMerge = window match {
       case SessionGroupWindow(_, _, _) => true
-      case _ => false
+      case _                           => false
     }
     // grouped / keyed aggregation
     if (grouping.length > 0) {
@@ -238,115 +234,116 @@ abstract class DataStreamGroupWindowAggregateBase(
   }
 }
 
-
 object DataStreamGroupWindowAggregateBase {
 
   private def createKeyedWindowedStream(
-    config: TableConfig,
-    groupWindow: LogicalWindow,
-    stream: KeyedStream[CRow, Row]):
-  WindowedStream[CRow, Row, _ <: DataStreamWindow] = groupWindow match {
+      config: TableConfig,
+      groupWindow: LogicalWindow,
+      stream: KeyedStream[CRow, Row]): WindowedStream[CRow, Row, _ <: DataStreamWindow] =
+    groupWindow match {
 
-    case TumblingGroupWindow(_, timeField, size)
-      if isProctimeAttribute(timeField) && isTimeIntervalLiteral(size)=>
-      stream.window(TumblingProcessingTimeWindows.of(toTime(size)))
+      case TumblingGroupWindow(_, timeField, size)
+          if isProctimeAttribute(timeField) && isTimeIntervalLiteral(size) =>
+        stream.window(TumblingProcessingTimeWindows.of(toTime(size)))
 
-    case TumblingGroupWindow(_, timeField, size)
-      if isProctimeAttribute(timeField) && isRowCountLiteral(size)=>
-      stream.countWindow(toLong(size))
-        .trigger(PurgingTrigger.of(StateCleaningCountTrigger.of(config, toLong(size))));
+      case TumblingGroupWindow(_, timeField, size)
+          if isProctimeAttribute(timeField) && isRowCountLiteral(size) =>
+        stream
+          .countWindow(toLong(size))
+          .trigger(PurgingTrigger.of(StateCleaningCountTrigger.of(config, toLong(size))));
 
-    case TumblingGroupWindow(_, timeField, size)
-      if isRowtimeAttribute(timeField) && isTimeIntervalLiteral(size) =>
-      stream.window(TumblingEventTimeWindows.of(toTime(size)))
+      case TumblingGroupWindow(_, timeField, size)
+          if isRowtimeAttribute(timeField) && isTimeIntervalLiteral(size) =>
+        stream.window(TumblingEventTimeWindows.of(toTime(size)))
 
-    case TumblingGroupWindow(_, _, size) =>
-      // TODO: EventTimeTumblingGroupWindow should sort the stream on event time
-      // before applying the  windowing logic. Otherwise, this would be the same as a
-      // ProcessingTimeTumblingGroupWindow
-      throw new UnsupportedOperationException(
-        "Event-time grouping windows on row intervals are currently not supported.")
+      case TumblingGroupWindow(_, _, size) =>
+        // TODO: EventTimeTumblingGroupWindow should sort the stream on event time
+        // before applying the  windowing logic. Otherwise, this would be the same as a
+        // ProcessingTimeTumblingGroupWindow
+        throw new UnsupportedOperationException(
+          "Event-time grouping windows on row intervals are currently not supported.")
 
-    case SlidingGroupWindow(_, timeField, size, slide)
-      if isProctimeAttribute(timeField) && isTimeIntervalLiteral(slide) =>
-      stream.window(SlidingProcessingTimeWindows.of(toTime(size), toTime(slide)))
+      case SlidingGroupWindow(_, timeField, size, slide)
+          if isProctimeAttribute(timeField) && isTimeIntervalLiteral(slide) =>
+        stream.window(SlidingProcessingTimeWindows.of(toTime(size), toTime(slide)))
 
-    case SlidingGroupWindow(_, timeField, size, slide)
-      if isProctimeAttribute(timeField) && isRowCountLiteral(size) =>
-      stream.countWindow(toLong(size), toLong(slide))
-        .trigger(StateCleaningCountTrigger.of(config, toLong(slide)));
+      case SlidingGroupWindow(_, timeField, size, slide)
+          if isProctimeAttribute(timeField) && isRowCountLiteral(size) =>
+        stream
+          .countWindow(toLong(size), toLong(slide))
+          .trigger(StateCleaningCountTrigger.of(config, toLong(slide)));
 
-    case SlidingGroupWindow(_, timeField, size, slide)
-      if isRowtimeAttribute(timeField) && isTimeIntervalLiteral(size)=>
-      stream.window(SlidingEventTimeWindows.of(toTime(size), toTime(slide)))
+      case SlidingGroupWindow(_, timeField, size, slide)
+          if isRowtimeAttribute(timeField) && isTimeIntervalLiteral(size) =>
+        stream.window(SlidingEventTimeWindows.of(toTime(size), toTime(slide)))
 
-    case SlidingGroupWindow(_, _, size, slide) =>
-      // TODO: EventTimeTumblingGroupWindow should sort the stream on event time
-      // before applying the  windowing logic. Otherwise, this would be the same as a
-      // ProcessingTimeTumblingGroupWindow
-      throw new UnsupportedOperationException(
-        "Event-time grouping windows on row intervals are currently not supported.")
+      case SlidingGroupWindow(_, _, size, slide) =>
+        // TODO: EventTimeTumblingGroupWindow should sort the stream on event time
+        // before applying the  windowing logic. Otherwise, this would be the same as a
+        // ProcessingTimeTumblingGroupWindow
+        throw new UnsupportedOperationException(
+          "Event-time grouping windows on row intervals are currently not supported.")
 
-    case SessionGroupWindow(_, timeField, gap)
-      if isProctimeAttribute(timeField) =>
-      stream.window(ProcessingTimeSessionWindows.withGap(toTime(gap)))
+      case SessionGroupWindow(_, timeField, gap) if isProctimeAttribute(timeField) =>
+        stream.window(ProcessingTimeSessionWindows.withGap(toTime(gap)))
 
-    case SessionGroupWindow(_, timeField, gap)
-      if isRowtimeAttribute(timeField) =>
-      stream.window(EventTimeSessionWindows.withGap(toTime(gap)))
-  }
+      case SessionGroupWindow(_, timeField, gap) if isRowtimeAttribute(timeField) =>
+        stream.window(EventTimeSessionWindows.withGap(toTime(gap)))
+    }
 
   private def createNonKeyedWindowedStream(
-    config: TableConfig,
-    groupWindow: LogicalWindow,
-    stream: DataStream[CRow]):
-  AllWindowedStream[CRow, _ <: DataStreamWindow] = groupWindow match {
+      config: TableConfig,
+      groupWindow: LogicalWindow,
+      stream: DataStream[CRow]): AllWindowedStream[CRow, _ <: DataStreamWindow] =
+    groupWindow match {
 
-    case TumblingGroupWindow(_, timeField, size)
-      if isProctimeAttribute(timeField) && isTimeIntervalLiteral(size) =>
-      stream.windowAll(TumblingProcessingTimeWindows.of(toTime(size)))
+      case TumblingGroupWindow(_, timeField, size)
+          if isProctimeAttribute(timeField) && isTimeIntervalLiteral(size) =>
+        stream.windowAll(TumblingProcessingTimeWindows.of(toTime(size)))
 
-    case TumblingGroupWindow(_, timeField, size)
-      if isProctimeAttribute(timeField) && isRowCountLiteral(size)=>
-      stream.countWindowAll(toLong(size))
-        .trigger(PurgingTrigger.of(StateCleaningCountTrigger.of(config, toLong(size))));
+      case TumblingGroupWindow(_, timeField, size)
+          if isProctimeAttribute(timeField) && isRowCountLiteral(size) =>
+        stream
+          .countWindowAll(toLong(size))
+          .trigger(PurgingTrigger.of(StateCleaningCountTrigger.of(config, toLong(size))));
 
-    case TumblingGroupWindow(_, _, size) if isTimeInterval(size.resultType) =>
-      stream.windowAll(TumblingEventTimeWindows.of(toTime(size)))
+      case TumblingGroupWindow(_, _, size) if isTimeInterval(size.resultType) =>
+        stream.windowAll(TumblingEventTimeWindows.of(toTime(size)))
 
-    case TumblingGroupWindow(_, _, size) =>
-      // TODO: EventTimeTumblingGroupWindow should sort the stream on event time
-      // before applying the  windowing logic. Otherwise, this would be the same as a
-      // ProcessingTimeTumblingGroupWindow
-      throw new UnsupportedOperationException(
-        "Event-time grouping windows on row intervals are currently not supported.")
+      case TumblingGroupWindow(_, _, size) =>
+        // TODO: EventTimeTumblingGroupWindow should sort the stream on event time
+        // before applying the  windowing logic. Otherwise, this would be the same as a
+        // ProcessingTimeTumblingGroupWindow
+        throw new UnsupportedOperationException(
+          "Event-time grouping windows on row intervals are currently not supported.")
 
-    case SlidingGroupWindow(_, timeField, size, slide)
-      if isProctimeAttribute(timeField) && isTimeIntervalLiteral(size) =>
-      stream.windowAll(SlidingProcessingTimeWindows.of(toTime(size), toTime(slide)))
+      case SlidingGroupWindow(_, timeField, size, slide)
+          if isProctimeAttribute(timeField) && isTimeIntervalLiteral(size) =>
+        stream.windowAll(SlidingProcessingTimeWindows.of(toTime(size), toTime(slide)))
 
-    case SlidingGroupWindow(_, timeField, size, slide)
-      if isProctimeAttribute(timeField) && isRowCountLiteral(size)=>
-      stream.countWindowAll(toLong(size), toLong(slide))
-        .trigger(StateCleaningCountTrigger.of(config, toLong(slide)));
+      case SlidingGroupWindow(_, timeField, size, slide)
+          if isProctimeAttribute(timeField) && isRowCountLiteral(size) =>
+        stream
+          .countWindowAll(toLong(size), toLong(slide))
+          .trigger(StateCleaningCountTrigger.of(config, toLong(slide)));
 
-    case SlidingGroupWindow(_, timeField, size, slide)
-      if isRowtimeAttribute(timeField) && isTimeIntervalLiteral(size)=>
-      stream.windowAll(SlidingEventTimeWindows.of(toTime(size), toTime(slide)))
+      case SlidingGroupWindow(_, timeField, size, slide)
+          if isRowtimeAttribute(timeField) && isTimeIntervalLiteral(size) =>
+        stream.windowAll(SlidingEventTimeWindows.of(toTime(size), toTime(slide)))
 
-    case SlidingGroupWindow(_, _, size, slide) =>
-      // TODO: EventTimeTumblingGroupWindow should sort the stream on event time
-      // before applying the  windowing logic. Otherwise, this would be the same as a
-      // ProcessingTimeTumblingGroupWindow
-      throw new UnsupportedOperationException(
-        "Event-time grouping windows on row intervals are currently not supported.")
+      case SlidingGroupWindow(_, _, size, slide) =>
+        // TODO: EventTimeTumblingGroupWindow should sort the stream on event time
+        // before applying the  windowing logic. Otherwise, this would be the same as a
+        // ProcessingTimeTumblingGroupWindow
+        throw new UnsupportedOperationException(
+          "Event-time grouping windows on row intervals are currently not supported.")
 
-    case SessionGroupWindow(_, timeField, gap)
-      if isProctimeAttribute(timeField) && isTimeIntervalLiteral(gap) =>
-      stream.windowAll(ProcessingTimeSessionWindows.withGap(toTime(gap)))
+      case SessionGroupWindow(_, timeField, gap)
+          if isProctimeAttribute(timeField) && isTimeIntervalLiteral(gap) =>
+        stream.windowAll(ProcessingTimeSessionWindows.withGap(toTime(gap)))
 
-    case SessionGroupWindow(_, timeField, gap)
-      if isRowtimeAttribute(timeField) && isTimeIntervalLiteral(gap) =>
-      stream.windowAll(EventTimeSessionWindows.withGap(toTime(gap)))
-  }
+      case SessionGroupWindow(_, timeField, gap)
+          if isRowtimeAttribute(timeField) && isTimeIntervalLiteral(gap) =>
+        stream.windowAll(EventTimeSessionWindows.withGap(toTime(gap)))
+    }
 }

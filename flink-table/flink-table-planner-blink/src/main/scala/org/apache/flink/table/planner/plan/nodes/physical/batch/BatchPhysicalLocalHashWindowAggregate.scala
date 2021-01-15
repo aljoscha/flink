@@ -49,19 +49,19 @@ class BatchPhysicalLocalHashWindowAggregate(
     inputTimeIsDate: Boolean,
     namedWindowProperties: Seq[PlannerNamedWindowProperty],
     enableAssignPane: Boolean = false)
-  extends BatchPhysicalHashWindowAggregateBase(
-    cluster,
-    traitSet,
-    inputRel,
-    outputRowType,
-    grouping,
-    auxGrouping,
-    aggCallToAggFunction,
-    window,
-    namedWindowProperties,
-    enableAssignPane,
-    isMerge = false,
-    isFinal = false) {
+    extends BatchPhysicalHashWindowAggregateBase(
+      cluster,
+      traitSet,
+      inputRel,
+      outputRowType,
+      grouping,
+      auxGrouping,
+      aggCallToAggFunction,
+      window,
+      namedWindowProperties,
+      enableAssignPane,
+      isMerge = false,
+      isFinal = false) {
 
   override def copy(traitSet: RelTraitSet, inputs: util.List[RelNode]): RelNode = {
     new BatchPhysicalLocalHashWindowAggregate(
@@ -95,7 +95,6 @@ class BatchPhysicalLocalHashWindowAggregate(
       false, // isFinal is always false
       ExecEdge.DEFAULT,
       FlinkTypeFactory.toLogicalRowType(getRowType),
-      getRelDetailedDescription
-    )
+      getRelDetailedDescription)
   }
 }

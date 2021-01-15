@@ -18,9 +18,18 @@
 
 package org.apache.flink.table.api.validation
 
-import org.apache.flink.api.common.typeinfo.BasicTypeInfo.{DOUBLE_TYPE_INFO, INT_TYPE_INFO, STRING_TYPE_INFO}
+import org.apache.flink.api.common.typeinfo.BasicTypeInfo.{
+  DOUBLE_TYPE_INFO,
+  INT_TYPE_INFO,
+  STRING_TYPE_INFO
+}
 import org.apache.flink.api.common.typeinfo.TypeInformation
-import org.apache.flink.api.java.typeutils.{GenericTypeInfo, RowTypeInfo, TupleTypeInfo, TypeExtractor}
+import org.apache.flink.api.java.typeutils.{
+  GenericTypeInfo,
+  RowTypeInfo,
+  TupleTypeInfo,
+  TypeExtractor
+}
 import org.apache.flink.api.scala._
 import org.apache.flink.api.scala.util.CollectionDataSets
 import org.apache.flink.table.api.TableEnvironmentTest.{CClass, PojoClass}
@@ -38,12 +47,9 @@ class TableEnvironmentValidationTest extends TableTestBase {
   private val env = ExecutionEnvironment.getExecutionEnvironment
   private val tEnv = BatchTableEnvironment.create(env)
 
-  val tupleType = new TupleTypeInfo(
-    INT_TYPE_INFO,
-    STRING_TYPE_INFO,
-    DOUBLE_TYPE_INFO)
+  val tupleType = new TupleTypeInfo(INT_TYPE_INFO, STRING_TYPE_INFO, DOUBLE_TYPE_INFO)
 
-  val rowType = new RowTypeInfo(INT_TYPE_INFO, STRING_TYPE_INFO,DOUBLE_TYPE_INFO)
+  val rowType = new RowTypeInfo(INT_TYPE_INFO, STRING_TYPE_INFO, DOUBLE_TYPE_INFO)
 
   val cRowType = new CRowTypeInfo(rowType)
 
@@ -159,7 +165,8 @@ class TableEnvironmentValidationTest extends TableTestBase {
     val env = ExecutionEnvironment.getExecutionEnvironment
     val tEnv = BatchTableEnvironment.create(env)
 
-    CollectionDataSets.get3TupleDataSet(env)
+    CollectionDataSets
+      .get3TupleDataSet(env)
       // Must fail. Number of fields does not match.
       .toTable(tEnv, 'a, 'b, 'c, 'd)
   }
@@ -169,7 +176,8 @@ class TableEnvironmentValidationTest extends TableTestBase {
     val env = ExecutionEnvironment.getExecutionEnvironment
     val tEnv = BatchTableEnvironment.create(env)
 
-    CollectionDataSets.get3TupleDataSet(env)
+    CollectionDataSets
+      .get3TupleDataSet(env)
       // Must fail. Field names not unique.
       .toTable(tEnv, 'a, 'b, 'b)
   }
@@ -180,7 +188,8 @@ class TableEnvironmentValidationTest extends TableTestBase {
     val tEnv = BatchTableEnvironment.create(env)
 
     // Must fail. as() can only have field references
-    CollectionDataSets.get3TupleDataSet(env)
+    CollectionDataSets
+      .get3TupleDataSet(env)
       .toTable(tEnv, 'a + 1, 'b, 'c)
   }
 
@@ -190,7 +199,8 @@ class TableEnvironmentValidationTest extends TableTestBase {
     val tEnv = BatchTableEnvironment.create(env)
 
     // Must fail. as() can only have field references
-    CollectionDataSets.get3TupleDataSet(env)
+    CollectionDataSets
+      .get3TupleDataSet(env)
       .toTable(tEnv, 'a as 'foo, 'b, 'c)
   }
 

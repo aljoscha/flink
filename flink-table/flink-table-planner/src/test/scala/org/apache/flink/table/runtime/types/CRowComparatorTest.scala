@@ -31,18 +31,12 @@ class CRowComparatorTest extends ComparatorTestBase[CRow] {
   val rowType = new RowTypeInfo(
     BasicTypeInfo.INT_TYPE_INFO,
     BasicTypeInfo.STRING_TYPE_INFO,
-    BasicTypeInfo.LONG_TYPE_INFO
-  )
+    BasicTypeInfo.LONG_TYPE_INFO)
 
   val cRowType = new CRowTypeInfo(rowType)
 
   override protected def createComparator(asc: Boolean): TypeComparator[CRow] = {
-    cRowType.createComparator(
-      Array[Int](0, 2),
-      Array[Boolean](asc, asc),
-      0,
-      new ExecutionConfig
-    )
+    cRowType.createComparator(Array[Int](0, 2), Array[Boolean](asc, asc), 0, new ExecutionConfig)
   }
 
   override protected def createSerializer(): TypeSerializer[CRow] =
@@ -56,6 +50,5 @@ class CRowComparatorTest extends ComparatorTestBase[CRow] {
     new CRow(Row.of(new JInt(3), "World", new JLong(0L)), false),
     new CRow(Row.of(new JInt(4), "Hello", new JLong(0L)), true),
     new CRow(Row.of(new JInt(5), "Hello", new JLong(1L)), true),
-    new CRow(Row.of(new JInt(5), "Hello", new JLong(4L)), false)
-  )
+    new CRow(Row.of(new JInt(5), "Hello", new JLong(4L)), false))
 }

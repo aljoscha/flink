@@ -42,8 +42,8 @@ class FlinkLogicalTableSourceScan(
     val tableSchema: TableSchema,
     val tableSource: TableSource[_],
     val selectedFields: Option[Array[Int]])
-  extends TableScan(cluster, traitSet, table)
-  with FlinkLogicalRel {
+    extends TableScan(cluster, traitSet, table)
+    with FlinkLogicalRel {
 
   def copy(
       traitSet: RelTraitSet,
@@ -61,12 +61,14 @@ class FlinkLogicalTableSourceScan(
 
   override def deriveRowType(): RelDataType = {
     val rowType = table.getRowType
-    selectedFields.map(idxs => {
-      val fields = rowType.getFieldList
-      val builder = cluster.getTypeFactory.builder()
-      idxs.map(fields.get).foreach(builder.add)
-      builder.build()
-    }).getOrElse(rowType)
+    selectedFields
+      .map(idxs => {
+        val fields = rowType.getFieldList
+        val builder = cluster.getTypeFactory.builder()
+        idxs.map(fields.get).foreach(builder.add)
+        builder.build()
+      })
+      .getOrElse(rowType)
   }
 
   override def computeSelfCost(planner: RelOptPlanner, metadata: RelMetadataQuery): RelOptCost = {
@@ -87,8 +89,9 @@ class FlinkLogicalTableSourceScan(
   }
 
   override def explainTerms(pw: RelWriter): RelWriter = {
-    val terms = super.explainTerms(pw)
-        .item("fields", tableSchema.getFieldNames.mkString(", "))
+    val terms = super
+      .explainTerms(pw)
+      .item("fields", tableSchema.getFieldNames.mkString(", "))
 
     val sourceDesc = tableSource.explainSource()
     if (sourceDesc.nonEmpty) {
@@ -112,11 +115,11 @@ class FlinkLogicalTableSourceScan(
 }
 
 class FlinkLogicalTableSourceScanConverter
-  extends ConverterRule(
-    classOf[LogicalTableScan],
-    Convention.NONE,
-    FlinkConventions.LOGICAL,
-    "FlinkLogicalTableSourceScanConverter") {
+    extends ConverterRule(
+      classOf[LogicalTableScan],
+      Convention.NONE,
+      FlinkConventions.LOGICAL,
+      "FlinkLogicalTableSourceScanConverter") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val scan = call.rel[TableScan](0)
@@ -134,8 +137,7 @@ class FlinkLogicalTableSourceScanConverter
       scan.getTable,
       tableSourceTable.tableSchema,
       tableSourceTable.tableSource,
-      None
-    )
+      None)
   }
 }
 

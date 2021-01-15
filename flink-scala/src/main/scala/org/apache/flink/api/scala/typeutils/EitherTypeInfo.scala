@@ -32,7 +32,7 @@ class EitherTypeInfo[A, B, T <: Either[A, B]](
     val clazz: Class[T],
     val leftTypeInfo: TypeInformation[A],
     val rightTypeInfo: TypeInformation[B])
-  extends TypeInformation[T] {
+    extends TypeInformation[T] {
 
   @PublicEvolving
   override def isBasicType: Boolean = false
@@ -70,9 +70,9 @@ class EitherTypeInfo[A, B, T <: Either[A, B]](
     obj match {
       case eitherTypeInfo: EitherTypeInfo[_, _, _] =>
         eitherTypeInfo.canEqual(this) &&
-        clazz.equals(eitherTypeInfo.clazz) &&
-        leftTypeInfo.equals(eitherTypeInfo.leftTypeInfo) &&
-        rightTypeInfo.equals(eitherTypeInfo.rightTypeInfo)
+          clazz.equals(eitherTypeInfo.clazz) &&
+          leftTypeInfo.equals(eitherTypeInfo.leftTypeInfo) &&
+          rightTypeInfo.equals(eitherTypeInfo.rightTypeInfo)
       case _ => false
     }
   }

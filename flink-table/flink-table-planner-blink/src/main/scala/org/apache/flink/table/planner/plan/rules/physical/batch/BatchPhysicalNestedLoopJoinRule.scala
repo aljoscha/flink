@@ -29,16 +29,15 @@ import org.apache.calcite.rel.RelNode
 import org.apache.calcite.rel.core.{Join, JoinRelType}
 
 /**
-  * Rule that converts [[FlinkLogicalJoin]] to [[BatchPhysicalNestedLoopJoin]]
-  * if NestedLoopJoin is enabled.
-  */
+ * Rule that converts [[FlinkLogicalJoin]] to [[BatchPhysicalNestedLoopJoin]]
+ * if NestedLoopJoin is enabled.
+ */
 class BatchPhysicalNestedLoopJoinRule
-  extends RelOptRule(
-    operand(classOf[FlinkLogicalJoin],
-      operand(classOf[RelNode], any)),
-    "BatchPhysicalNestedLoopJoinRule")
-  with BatchExecJoinRuleBase
-  with BatchExecNestedLoopJoinRuleBase {
+    extends RelOptRule(
+      operand(classOf[FlinkLogicalJoin], operand(classOf[RelNode], any)),
+      "BatchPhysicalNestedLoopJoinRule")
+    with BatchExecJoinRuleBase
+    with BatchExecNestedLoopJoinRuleBase {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val tableConfig = call.getPlanner.getContext.unwrap(classOf[FlinkContext]).getTableConfig
@@ -67,7 +66,7 @@ class BatchPhysicalNestedLoopJoinRule
 
   private def isLeftBuild(join: Join, left: RelNode, right: RelNode): Boolean = {
     join.getJoinType match {
-      case JoinRelType.LEFT => false
+      case JoinRelType.LEFT  => false
       case JoinRelType.RIGHT => true
       case JoinRelType.INNER | JoinRelType.FULL =>
         val leftSize = binaryRowRelNodeSize(left)

@@ -30,18 +30,18 @@ import org.apache.flink.types.Row
 import org.apache.flink.util.Collector
 
 /**
-  * A CorrelateProcessRunner with [[CRow]] input and [[CRow]] output.
-  */
+ * A CorrelateProcessRunner with [[CRow]] input and [[CRow]] output.
+ */
 class CRowCorrelateProcessRunner(
     processName: String,
     processCode: String,
     collectorName: String,
     collectorCode: String,
     @transient var returnType: TypeInformation[CRow])
-  extends ProcessFunction[CRow, CRow]
-  with ResultTypeQueryable[CRow]
-  with Compiler[Any]
-  with Logging {
+    extends ProcessFunction[CRow, CRow]
+    with ResultTypeQueryable[CRow]
+    with Compiler[Any]
+    with Logging {
 
   private var function: ProcessFunction[Row, Row] = _
   private var collector: TableFunctionCollector[_] = _
@@ -68,8 +68,7 @@ class CRowCorrelateProcessRunner(
   override def processElement(
       in: CRow,
       ctx: ProcessFunction[CRow, CRow]#Context,
-      out: Collector[CRow])
-    : Unit = {
+      out: Collector[CRow]): Unit = {
 
     cRowWrapper.out = out
     cRowWrapper.setChange(in.change)

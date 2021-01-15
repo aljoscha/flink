@@ -39,15 +39,15 @@ import org.apache.flink.types.Row
 import scala.collection.JavaConverters._
 
 /**
-  * The table source which support push-down the limit to the source.
-  */
+ * The table source which support push-down the limit to the source.
+ */
 class TestLegacyLimitableTableSource(
     data: Seq[Row],
     rowType: RowTypeInfo,
     var limit: Long = -1,
     var limitablePushedDown: Boolean = false)
-  extends StreamTableSource[Row]
-  with LimitableTableSource[Row] {
+    extends StreamTableSource[Row]
+    with LimitableTableSource[Row] {
 
   override def isBounded = true
 
@@ -94,7 +94,8 @@ object TestLegacyLimitableTableSource {
     if (data != null && data.nonEmpty) {
       desc.property("data", EncodingUtils.encodeObjectToString(data.toList))
     }
-    tEnv.connect(desc)
+    tEnv
+      .connect(desc)
       .withSchema(new Schema().schema(schema))
       .createTemporaryTable(tableName)
   }
@@ -118,7 +119,10 @@ class TestLegacyLimitableTableSourceFactory extends StreamTableSourceFactory[Row
 
     val limitablePushedDown = dp.getOptionalBoolean("limitable-push-down").orElse(false)
     new TestLegacyLimitableTableSource(
-      data, tableSchema.toRowType.asInstanceOf[RowTypeInfo], limit, limitablePushedDown)
+      data,
+      tableSchema.toRowType.asInstanceOf[RowTypeInfo],
+      limit,
+      limitablePushedDown)
   }
 
   override def requiredContext(): util.Map[String, String] = {
@@ -133,4 +137,3 @@ class TestLegacyLimitableTableSourceFactory extends StreamTableSourceFactory[Row
     supported
   }
 }
-

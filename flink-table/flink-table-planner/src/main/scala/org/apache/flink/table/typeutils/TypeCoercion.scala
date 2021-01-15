@@ -22,8 +22,8 @@ import org.apache.flink.api.common.typeinfo.BasicTypeInfo._
 import org.apache.flink.api.common.typeinfo.{SqlTimeTypeInfo, NumericTypeInfo, TypeInformation}
 
 /**
-  * Utilities for type conversions.
-  */
+ * Utilities for type conversions.
+ */
 object TypeCoercion {
 
   val numericWideningPrecedence: IndexedSeq[TypeInformation[_]] =
@@ -57,8 +57,8 @@ object TypeCoercion {
   }
 
   /**
-    * Test if we can do cast safely without lose of information.
-    */
+   * Test if we can do cast safely without lose of information.
+   */
   def canSafelyCast(from: TypeInformation[_], to: TypeInformation[_]): Boolean = (from, to) match {
     case (_, STRING_TYPE_INFO) => true
 
@@ -75,9 +75,9 @@ object TypeCoercion {
   }
 
   /**
-    * All the supported cast types in flink-table.
-    * Note: This may lose information during the cast.
-    */
+   * All the supported cast types in flink-table.
+   * Note: This may lose information during the cast.
+   */
   def canCast(from: TypeInformation[_], to: TypeInformation[_]): Boolean = (from, to) match {
     case (fromTp, toTp) if fromTp == toTp => true
 
@@ -85,35 +85,35 @@ object TypeCoercion {
 
     case (_, CHAR_TYPE_INFO) => false // Character type not supported.
 
-    case (STRING_TYPE_INFO, _: NumericTypeInfo[_]) => true
-    case (STRING_TYPE_INFO, BOOLEAN_TYPE_INFO) => true
-    case (STRING_TYPE_INFO, BIG_DEC_TYPE_INFO) => true
-    case (STRING_TYPE_INFO, SqlTimeTypeInfo.DATE) => true
-    case (STRING_TYPE_INFO, SqlTimeTypeInfo.TIME) => true
+    case (STRING_TYPE_INFO, _: NumericTypeInfo[_])     => true
+    case (STRING_TYPE_INFO, BOOLEAN_TYPE_INFO)         => true
+    case (STRING_TYPE_INFO, BIG_DEC_TYPE_INFO)         => true
+    case (STRING_TYPE_INFO, SqlTimeTypeInfo.DATE)      => true
+    case (STRING_TYPE_INFO, SqlTimeTypeInfo.TIME)      => true
     case (STRING_TYPE_INFO, SqlTimeTypeInfo.TIMESTAMP) => true
 
     case (BOOLEAN_TYPE_INFO, _: NumericTypeInfo[_]) => true
-    case (BOOLEAN_TYPE_INFO, BIG_DEC_TYPE_INFO) => true
+    case (BOOLEAN_TYPE_INFO, BIG_DEC_TYPE_INFO)     => true
     case (_: NumericTypeInfo[_], BOOLEAN_TYPE_INFO) => true
-    case (BIG_DEC_TYPE_INFO, BOOLEAN_TYPE_INFO) => true
+    case (BIG_DEC_TYPE_INFO, BOOLEAN_TYPE_INFO)     => true
 
-    case (_: NumericTypeInfo[_], _: NumericTypeInfo[_]) => true
-    case (BIG_DEC_TYPE_INFO, _: NumericTypeInfo[_]) => true
-    case (_: NumericTypeInfo[_], BIG_DEC_TYPE_INFO) => true
-    case (INT_TYPE_INFO, SqlTimeTypeInfo.DATE) => true
-    case (INT_TYPE_INFO, SqlTimeTypeInfo.TIME) => true
-    case (LONG_TYPE_INFO, SqlTimeTypeInfo.TIMESTAMP) => true
-    case (INT_TYPE_INFO, TimeIntervalTypeInfo.INTERVAL_MONTHS) => true
+    case (_: NumericTypeInfo[_], _: NumericTypeInfo[_])         => true
+    case (BIG_DEC_TYPE_INFO, _: NumericTypeInfo[_])             => true
+    case (_: NumericTypeInfo[_], BIG_DEC_TYPE_INFO)             => true
+    case (INT_TYPE_INFO, SqlTimeTypeInfo.DATE)                  => true
+    case (INT_TYPE_INFO, SqlTimeTypeInfo.TIME)                  => true
+    case (LONG_TYPE_INFO, SqlTimeTypeInfo.TIMESTAMP)            => true
+    case (INT_TYPE_INFO, TimeIntervalTypeInfo.INTERVAL_MONTHS)  => true
     case (LONG_TYPE_INFO, TimeIntervalTypeInfo.INTERVAL_MILLIS) => true
 
-    case (SqlTimeTypeInfo.DATE, SqlTimeTypeInfo.TIME) => false
-    case (SqlTimeTypeInfo.TIME, SqlTimeTypeInfo.DATE) => false
+    case (SqlTimeTypeInfo.DATE, SqlTimeTypeInfo.TIME)   => false
+    case (SqlTimeTypeInfo.TIME, SqlTimeTypeInfo.DATE)   => false
     case (_: SqlTimeTypeInfo[_], _: SqlTimeTypeInfo[_]) => true
-    case (SqlTimeTypeInfo.DATE, INT_TYPE_INFO) => true
-    case (SqlTimeTypeInfo.TIME, INT_TYPE_INFO) => true
-    case (SqlTimeTypeInfo.TIMESTAMP, LONG_TYPE_INFO) => true
+    case (SqlTimeTypeInfo.DATE, INT_TYPE_INFO)          => true
+    case (SqlTimeTypeInfo.TIME, INT_TYPE_INFO)          => true
+    case (SqlTimeTypeInfo.TIMESTAMP, LONG_TYPE_INFO)    => true
 
-    case (TimeIntervalTypeInfo.INTERVAL_MONTHS, INT_TYPE_INFO) => true
+    case (TimeIntervalTypeInfo.INTERVAL_MONTHS, INT_TYPE_INFO)  => true
     case (TimeIntervalTypeInfo.INTERVAL_MILLIS, LONG_TYPE_INFO) => true
 
     case _ => false

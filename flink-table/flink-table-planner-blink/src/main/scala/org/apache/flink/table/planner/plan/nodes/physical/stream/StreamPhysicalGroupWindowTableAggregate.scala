@@ -44,16 +44,16 @@ class StreamPhysicalGroupWindowTableAggregate(
     window: LogicalWindow,
     namedWindowProperties: Seq[PlannerNamedWindowProperty],
     emitStrategy: WindowEmitStrategy)
-  extends StreamPhysicalGroupWindowAggregateBase(
-    cluster,
-    traitSet,
-    inputRel,
-    outputRowType,
-    grouping,
-    aggCalls,
-    window,
-    namedWindowProperties,
-    emitStrategy) {
+    extends StreamPhysicalGroupWindowAggregateBase(
+      cluster,
+      traitSet,
+      inputRel,
+      outputRowType,
+      grouping,
+      aggCalls,
+      window,
+      namedWindowProperties,
+      emitStrategy) {
 
   if (emitStrategy.produceUpdates) {
     throw new TableException("Emit strategy has not been supported for Table Aggregate!")
@@ -83,7 +83,6 @@ class StreamPhysicalGroupWindowTableAggregate(
       needRetraction,
       ExecEdge.DEFAULT,
       FlinkTypeFactory.toLogicalRowType(getRowType),
-      getRelDetailedDescription
-    )
+      getRelDetailedDescription)
   }
 }

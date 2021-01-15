@@ -28,9 +28,9 @@ import org.junit.Test
 class SortTest extends TableTestBase {
 
   private val streamUtil: StreamTableTestUtil = streamTestUtil()
-  private val table = streamUtil.addTable[(Int, String, Long)]("MyTable", 'a, 'b, 'c,
-      'proctime.proctime, 'rowtime.rowtime)
-  
+  private val table = streamUtil
+    .addTable[(Int, String, Long)]("MyTable", 'a, 'b, 'c, 'proctime.proctime, 'rowtime.rowtime)
+
   @Test
   def testSortProcessingTime(): Unit = {
 
@@ -39,7 +39,8 @@ class SortTest extends TableTestBase {
     val expected =
       unaryNode(
         "DataStreamCalc",
-        unaryNode("DataStreamSort",
+        unaryNode(
+          "DataStreamSort",
           streamTableNode(table),
           term("orderBy", "proctime ASC", "c ASC")),
         term("select", "a", "PROCTIME(proctime) AS proctime", "c"))
@@ -51,13 +52,11 @@ class SortTest extends TableTestBase {
   def testSortRowTime(): Unit = {
 
     val sqlQuery = "SELECT a FROM MyTable ORDER BY rowtime, c"
-      
+
     val expected =
-      unaryNode("DataStreamSort",
-        unaryNode(
-          "DataStreamCalc",
-          streamTableNode(table),
-          term("select", "a", "rowtime", "c")),
+      unaryNode(
+        "DataStreamSort",
+        unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "rowtime", "c")),
         term("orderBy", "rowtime ASC, c ASC"))
 
     streamUtil.verifySql(sqlQuery, expected)

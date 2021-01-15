@@ -26,73 +26,38 @@ class ScalarOperatorsTest extends ScalarOperatorsTestBase {
 
   @Test
   def testIn(): Unit = {
-    testSqlApi(
-      "f2 IN (1, 2, 42)",
-      "true"
-    )
+    testSqlApi("f2 IN (1, 2, 42)", "true")
 
     testSqlApi(
       "CAST (f0 AS DECIMAL) IN (42.0, 2.00, 3.01, 1.000000)", // SQL would downcast otherwise
-      "true"
-    )
+      "true")
 
-    testSqlApi(
-      "f10 IN ('This is a test String.', 'String', 'Hello world', 'Comment#1')",
-      "true"
-    )
+    testSqlApi("f10 IN ('This is a test String.', 'String', 'Hello world', 'Comment#1')", "true")
 
-    testSqlApi(
-      "f14 IN ('This is a test String.', 'String', 'Hello world')",
-      "null"
-    )
+    testSqlApi("f14 IN ('This is a test String.', 'String', 'Hello world')", "null")
 
-    testSqlApi(
-      "f15 IN (DATE '1996-11-10')",
-      "true"
-    )
+    testSqlApi("f15 IN (DATE '1996-11-10')", "true")
 
-    testSqlApi(
-      "f15 IN (DATE '1996-11-10', DATE '1996-11-11')",
-      "true"
-    )
+    testSqlApi("f15 IN (DATE '1996-11-10', DATE '1996-11-11')", "true")
 
-    testSqlApi(
-      "f7 IN (f16, f17)",
-      "true"
-    )
+    testSqlApi("f7 IN (f16, f17)", "true")
   }
 
   @Test
-  def testCompareOperator(): Unit= {
+  def testCompareOperator(): Unit = {
 
     // f18 and f19 have same length.
-    testSqlApi(
-      "f18 > f19",
-      "true")
-    testSqlApi(
-      "f18 >= f19",
-      "true")
-    testSqlApi(
-      "f18 < f19",
-      "false")
-    testSqlApi(
-      "f18 <= f19",
-      "false")
-    testSqlApi(
-      "f18 = f18",
-      "true")
+    testSqlApi("f18 > f19", "true")
+    testSqlApi("f18 >= f19", "true")
+    testSqlApi("f18 < f19", "false")
+    testSqlApi("f18 <= f19", "false")
+    testSqlApi("f18 = f18", "true")
 
     // f20's length is short than f19's, but great than it.
-    testSqlApi(
-      "f19 < f20",
-      "true")
+    testSqlApi("f19 < f20", "true")
 
-    testSqlApi(
-      "x'68656C6C6F20636F6465' < x'68656C6C6F2063617374'",
-      "false")
-    testSqlApi(
-      "x'68656C6C6F20636F6465' > x'68656C6C6F2063617374'",
-      "true")
+    testSqlApi("x'68656C6C6F20636F6465' < x'68656C6C6F2063617374'", "false")
+    testSqlApi("x'68656C6C6F20636F6465' > x'68656C6C6F2063617374'", "true")
 
   }
 
@@ -100,26 +65,16 @@ class ScalarOperatorsTest extends ScalarOperatorsTestBase {
   def testCast(): Unit = {
 
     // binary -> varchar
-    testSqlApi(
-      "CAST (f18 as varchar)",
-      "hello world")
-    testSqlApi(
-      "CAST (CAST (x'68656C6C6F20636F6465' as binary) as varchar)",
-      "hello code")
+    testSqlApi("CAST (f18 as varchar)", "hello world")
+    testSqlApi("CAST (CAST (x'68656C6C6F20636F6465' as binary) as varchar)", "hello code")
 
     // varbinary -> varchar
-    testSqlApi(
-      "CAST (f19 as varchar)",
-      "hello flink")
-    testSqlApi(
-      "CAST (CAST (x'68656C6C6F2063617374' as varbinary) as varchar)",
-      "hello cast")
+    testSqlApi("CAST (f19 as varchar)", "hello flink")
+    testSqlApi("CAST (CAST (x'68656C6C6F2063617374' as varbinary) as varchar)", "hello cast")
 
     // null case
     testSqlApi("CAST (NULL AS INT)", "null")
-    testSqlApi(
-      "CAST (NULL AS VARCHAR) = ''",
-      "null")
+    testSqlApi("CAST (NULL AS VARCHAR) = ''", "null")
   }
 
   @Test
@@ -136,17 +91,11 @@ class ScalarOperatorsTest extends ScalarOperatorsTestBase {
     testSqlApi("f13.f1 IS NOT NULL", "false")
 
     // boolean literals
-    testSqlApi(
-      "true",
-      "true")
+    testSqlApi("true", "true")
 
-    testSqlApi(
-      "fAlse",
-      "false")
+    testSqlApi("fAlse", "false")
 
-    testSqlApi(
-      "tRuE",
-      "true")
+    testSqlApi("tRuE", "true")
 
     // case when
     testSqlApi("CASE 11 WHEN 1 THEN 'a' ELSE 'b' END", "b")
@@ -170,8 +119,10 @@ class ScalarOperatorsTest extends ScalarOperatorsTestBase {
     testSqlApi("CASE WHEN 'a'='a' THEN 1 END", "1")
     testSqlApi("CASE 2 WHEN 1 THEN 'a' WHEN 2 THEN 'bcd' END", "bcd")
     testSqlApi("CASE 1 WHEN 1 THEN 'a' WHEN 2 THEN 'bcd' END", "a")
-    testSqlApi("CASE 1 WHEN 1 THEN CAST ('a' as varchar(1)) WHEN 2 THEN " +
-      "CAST ('bcd' as varchar(3)) END", "a")
+    testSqlApi(
+      "CASE 1 WHEN 1 THEN CAST ('a' as varchar(1)) WHEN 2 THEN " +
+        "CAST ('bcd' as varchar(3)) END",
+      "a")
     testSqlApi("CASE f2 WHEN 1 THEN 11 WHEN 2 THEN 4 ELSE NULL END", "11")
     testSqlApi("CASE f7 WHEN 1 THEN 11 WHEN 2 THEN 4 ELSE NULL END", "null")
     testSqlApi("CASE 42 WHEN 1 THEN 'a' WHEN 2 THEN 'bcd' END", "null")

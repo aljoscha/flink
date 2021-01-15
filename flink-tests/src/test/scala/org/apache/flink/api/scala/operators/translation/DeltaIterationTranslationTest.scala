@@ -17,8 +17,11 @@
  */
 package org.apache.flink.api.scala.operators.translation
 
-import org.apache.flink.api.common.functions.{RichCoGroupFunction, RichMapFunction,
-RichJoinFunction}
+import org.apache.flink.api.common.functions.{
+  RichCoGroupFunction,
+  RichMapFunction,
+  RichJoinFunction
+}
 import org.apache.flink.api.common.operators.GenericDataSinkBase
 import org.apache.flink.api.java.io.DiscardingOutputFormat
 import org.apache.flink.api.java.operators.translation.WrappingFunction
@@ -59,13 +62,17 @@ class DeltaIterationTranslationTest {
 
       val result = initialSolutionSet.iterateDelta(initialWorkSet, NUM_ITERATIONS, ITERATION_KEYS) {
         (s, ws) =>
-          val wsSelfJoin = ws.map(new IdentityMapper[(Double, String)]())
-            .join(ws).where(1).equalTo(1) { (l, r) => l }
+          val wsSelfJoin = ws
+            .map(new IdentityMapper[(Double, String)]())
+            .join(ws)
+            .where(1)
+            .equalTo(1) { (l, r) => l }
 
           val joined = wsSelfJoin.join(s).where(1).equalTo(2).apply(new SolutionWorksetJoin)
           (joined, joined.map(new NextWorksetMapper).name(BEFORE_NEXT_WORKSET_MAP))
       }
-      result.name(ITERATION_NAME)
+      result
+        .name(ITERATION_NAME)
         .setParallelism(ITERATION_PARALLELISM)
         .registerAggregator(AGGREGATOR_NAME, new LongSumAggregator)
 
@@ -82,7 +89,7 @@ class DeltaIterationTranslationTest {
       sink2 = sinks.next
 
       val iteration: DeltaIterationBase[_, _] =
-        sink1.getInput.asInstanceOf[DeltaIterationBase[_,_]]
+        sink1.getInput.asInstanceOf[DeltaIterationBase[_, _]]
 
       assertEquals(iteration, sink2.getInput)
       assertEquals(NUM_ITERATIONS, iteration.getMaximumNumberOfIterations)
@@ -101,28 +108,25 @@ class DeltaIterationTranslationTest {
 
       assertEquals(classOf[IdentityMapper[_]], worksetMapper.getUserCodeWrapper.getUserCodeClass)
 
-
       assertEquals(
         classOf[NextWorksetMapper],
         nextWorksetMapper.getUserCodeWrapper.getUserCodeClass)
 
-
       if (solutionSetJoin.getUserCodeWrapper.getUserCodeObject.isInstanceOf[WrappingFunction[_]]) {
         val wf: WrappingFunction[_] = solutionSetJoin.getUserCodeWrapper.getUserCodeObject
           .asInstanceOf[WrappingFunction[_]]
-        assertEquals(classOf[SolutionWorksetJoin],
-          wf.getWrappedFunction.getClass)
-      }
-      else {
-        assertEquals(classOf[SolutionWorksetJoin],
+        assertEquals(classOf[SolutionWorksetJoin], wf.getWrappedFunction.getClass)
+      } else {
+        assertEquals(
+          classOf[SolutionWorksetJoin],
           solutionSetJoin.getUserCodeWrapper.getUserCodeClass)
       }
 
       assertEquals(BEFORE_NEXT_WORKSET_MAP, nextWorksetMapper.getName)
-      assertEquals(AGGREGATOR_NAME, iteration.getAggregators.getAllRegisteredAggregators.iterator
-        .next.getName)
-    }
-    catch {
+      assertEquals(
+        AGGREGATOR_NAME,
+        iteration.getAggregators.getAllRegisteredAggregators.iterator.next.getName)
+    } catch {
       case e: Exception => {
         System.err.println(e.getMessage)
         e.printStackTrace()
@@ -139,21 +143,20 @@ class DeltaIterationTranslationTest {
       val initialSolutionSet = env.fromElements((3.44, 5L, "abc"))
       val initialWorkSet = env.fromElements((1.23, "abc"))
 
-      val iteration = initialSolutionSet.iterateDelta(initialWorkSet, 10, Array(0)) {
-        (s, ws) =>
-          try {
-            ws.join(s).where(1).equalTo(2)
-            fail("Accepted invalid program.")
-          } catch {
-            case e: InvalidProgramException => // all good
-          }
-          try {
-            s.join(ws).where(2).equalTo(1)
-            fail("Accepted invalid program.")
-          } catch {
-            case e: InvalidProgramException => // all good
-          }
-          (s, ws)
+      val iteration = initialSolutionSet.iterateDelta(initialWorkSet, 10, Array(0)) { (s, ws) =>
+        try {
+          ws.join(s).where(1).equalTo(2)
+          fail("Accepted invalid program.")
+        } catch {
+          case e: InvalidProgramException => // all good
+        }
+        try {
+          s.join(ws).where(2).equalTo(1)
+          fail("Accepted invalid program.")
+        } catch {
+          case e: InvalidProgramException => // all good
+        }
+        (s, ws)
       }
     } catch {
       case e: Exception => {
@@ -172,21 +175,20 @@ class DeltaIterationTranslationTest {
       val initialSolutionSet = env.fromElements((3.44, 5L, "abc"))
       val initialWorkSet = env.fromElements((1.23, "abc"))
 
-      val iteration = initialSolutionSet.iterateDelta(initialWorkSet, 10, Array(0)) {
-        (s, ws) =>
-          try {
-            ws.coGroup(s).where(1).equalTo(2)
-            fail("Accepted invalid program.")
-          } catch {
-            case e: InvalidProgramException => // all good
-          }
-          try {
-            s.coGroup(ws).where(2).equalTo(1)
-            fail("Accepted invalid program.")
-          } catch {
-            case e: InvalidProgramException => // all good
-          }
-          (s, ws)
+      val iteration = initialSolutionSet.iterateDelta(initialWorkSet, 10, Array(0)) { (s, ws) =>
+        try {
+          ws.coGroup(s).where(1).equalTo(2)
+          fail("Accepted invalid program.")
+        } catch {
+          case e: InvalidProgramException => // all good
+        }
+        try {
+          s.coGroup(ws).where(2).equalTo(1)
+          fail("Accepted invalid program.")
+        } catch {
+          case e: InvalidProgramException => // all good
+        }
+        (s, ws)
       }
     } catch {
       case e: Exception => {
@@ -236,7 +238,7 @@ class DeltaIterationTranslationTest {
 }
 
 class SolutionWorksetJoin
-  extends RichJoinFunction[(Double, String), (Double, Long, String), (Double, Long, String)] {
+    extends RichJoinFunction[(Double, String), (Double, Long, String), (Double, Long, String)] {
   def join(first: (Double, String), second: (Double, Long, String)): (Double, Long, String) = {
     null
   }
@@ -253,4 +255,3 @@ class IdentityMapper[T] extends RichMapFunction[T, T] {
     value
   }
 }
-

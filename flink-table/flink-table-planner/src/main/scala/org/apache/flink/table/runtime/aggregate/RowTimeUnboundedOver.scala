@@ -33,14 +33,13 @@ import org.apache.flink.table.util.Logging
 import org.apache.flink.types.Row
 import org.apache.flink.util.Collector
 
-
 /**
-  * A ProcessFunction to support unbounded event-time over-window
-  *
-  * @param genAggregations Generated aggregate helper function
-  * @param intermediateType         the intermediate row tye which the state saved
-  * @param inputType                the input row tye which the state saved
-  */
+ * A ProcessFunction to support unbounded event-time over-window
+ *
+ * @param genAggregations Generated aggregate helper function
+ * @param intermediateType         the intermediate row tye which the state saved
+ * @param inputType                the input row tye which the state saved
+ */
 abstract class RowTimeUnboundedOver[K](
     genAggregations: GeneratedAggregationsFunction,
     intermediateType: TypeInformation[Row],
@@ -48,7 +47,7 @@ abstract class RowTimeUnboundedOver[K](
     rowTimeIdx: Int,
     minRetentionTime: Long,
     maxRetentionTime: Long)
-  extends ProcessFunctionWithCleanupState[K, CRow, CRow](minRetentionTime, maxRetentionTime)
+    extends ProcessFunctionWithCleanupState[K, CRow, CRow](minRetentionTime, maxRetentionTime)
     with Compiler[GeneratedAggregations]
     with Logging {
 
@@ -63,12 +62,11 @@ abstract class RowTimeUnboundedOver[K](
   protected var function: GeneratedAggregations = _
 
   override def open(config: Configuration) {
-    LOG.debug(s"Compiling AggregateHelper: ${genAggregations.name} \n\n" +
-                s"Code:\n${genAggregations.code}")
-    val clazz = compile(
-      getRuntimeContext.getUserCodeClassLoader,
-      genAggregations.name,
-      genAggregations.code)
+    LOG.debug(
+      s"Compiling AggregateHelper: ${genAggregations.name} \n\n" +
+        s"Code:\n${genAggregations.code}")
+    val clazz =
+      compile(getRuntimeContext.getUserCodeClassLoader, genAggregations.name, genAggregations.code)
     LOG.debug("Instantiating AggregateHelper.")
     function = clazz.newInstance()
     function.open(getRuntimeContext)
@@ -85,26 +83,27 @@ abstract class RowTimeUnboundedOver[K](
     val rowListTypeInfo: TypeInformation[JList[Row]] =
       new ListTypeInfo[Row](inputType.asInstanceOf[CRowTypeInfo].rowType)
     val mapStateDescriptor: MapStateDescriptor[Long, JList[Row]] =
-      new MapStateDescriptor[Long, JList[Row]]("rowmapstate",
-        BasicTypeInfo.LONG_TYPE_INFO.asInstanceOf[TypeInformation[Long]], rowListTypeInfo)
+      new MapStateDescriptor[Long, JList[Row]](
+        "rowmapstate",
+        BasicTypeInfo.LONG_TYPE_INFO.asInstanceOf[TypeInformation[Long]],
+        rowListTypeInfo)
     rowMapState = getRuntimeContext.getMapState(mapStateDescriptor)
 
     initCleanupTimeState("RowTimeUnboundedOverCleanupTime")
   }
 
   /**
-    * Puts an element from the input stream into state if it is not late.
-    * Registers a timer for the next watermark.
-    *
-    * @param inputC The input value.
-    * @param ctx   The ctx to register timer or get current time
-    * @param out   The collector for returning result values.
-    *
-    */
+   * Puts an element from the input stream into state if it is not late.
+   * Registers a timer for the next watermark.
+   *
+   * @param inputC The input value.
+   * @param ctx   The ctx to register timer or get current time
+   * @param out   The collector for returning result values.
+   */
   override def processElement(
-     inputC: CRow,
-     ctx:  KeyedProcessFunction[K, CRow, CRow]#Context,
-     out: Collector[CRow]): Unit = {
+      inputC: CRow,
+      ctx: KeyedProcessFunction[K, CRow, CRow]#Context,
+      out: Collector[CRow]): Unit = {
 
     val input = inputC.row
 
@@ -130,14 +129,14 @@ abstract class RowTimeUnboundedOver[K](
   }
 
   /**
-    * Called when a watermark arrived.
-    * Sorts records according the timestamp, computes aggregates, and emits all records with
-    * timestamp smaller than the watermark in timestamp order.
-    *
-    * @param timestamp The timestamp of the firing timer.
-    * @param ctx       The ctx to register timer or get current time
-    * @param out       The collector for returning result values.
-    */
+   * Called when a watermark arrived.
+   * Sorts records according the timestamp, computes aggregates, and emits all records with
+   * timestamp smaller than the watermark in timestamp order.
+   *
+   * @param timestamp The timestamp of the firing timer.
+   * @param ctx       The ctx to register timer or get current time
+   * @param out       The collector for returning result values.
+   */
   override def onTimer(
       timestamp: Long,
       ctx: KeyedProcessFunction[K, CRow, CRow]#OnTimerContext,
@@ -239,9 +238,9 @@ abstract class RowTimeUnboundedOver[K](
    * rows and range window.
    */
   def processElementsWithSameTimestamp(
-    curRowList: JList[Row],
-    lastAccumulator: Row,
-    out: Collector[CRow]): Unit
+      curRowList: JList[Row],
+      lastAccumulator: Row,
+      out: Collector[CRow]): Unit
 
   override def close(): Unit = {
     if (function != null) {
@@ -251,9 +250,9 @@ abstract class RowTimeUnboundedOver[K](
 }
 
 /**
-  * A ProcessFunction to support unbounded ROWS window.
-  * The ROWS clause defines on a physical level how many rows are included in a window frame.
-  */
+ * A ProcessFunction to support unbounded ROWS window.
+ * The ROWS clause defines on a physical level how many rows are included in a window frame.
+ */
 class RowTimeUnboundedRowsOver[K](
     genAggregations: GeneratedAggregationsFunction,
     intermediateType: TypeInformation[Row],
@@ -261,18 +260,18 @@ class RowTimeUnboundedRowsOver[K](
     rowTimeIdx: Int,
     minRetentionTime: Long,
     maxRetentionTime: Long)
-  extends RowTimeUnboundedOver[K](
-    genAggregations: GeneratedAggregationsFunction,
-    intermediateType,
-    inputType,
-    rowTimeIdx,
-    minRetentionTime,
-    maxRetentionTime) {
+    extends RowTimeUnboundedOver[K](
+      genAggregations: GeneratedAggregationsFunction,
+      intermediateType,
+      inputType,
+      rowTimeIdx,
+      minRetentionTime,
+      maxRetentionTime) {
 
   override def processElementsWithSameTimestamp(
-    curRowList: JList[Row],
-    lastAccumulator: Row,
-    out: Collector[CRow]): Unit = {
+      curRowList: JList[Row],
+      lastAccumulator: Row,
+      out: Collector[CRow]): Unit = {
 
     var i = 0
     while (i < curRowList.size) {
@@ -291,12 +290,11 @@ class RowTimeUnboundedRowsOver[K](
   }
 }
 
-
 /**
-  * A ProcessFunction to support unbounded RANGE window.
-  * The RANGE option includes all the rows within the window frame
-  * that have the same ORDER BY values as the current row.
-  */
+ * A ProcessFunction to support unbounded RANGE window.
+ * The RANGE option includes all the rows within the window frame
+ * that have the same ORDER BY values as the current row.
+ */
 class RowTimeUnboundedRangeOver[K](
     genAggregations: GeneratedAggregationsFunction,
     intermediateType: TypeInformation[Row],
@@ -304,18 +302,18 @@ class RowTimeUnboundedRangeOver[K](
     rowTimeIdx: Int,
     minRetentionTime: Long,
     maxRetentionTime: Long)
-  extends RowTimeUnboundedOver[K](
-    genAggregations: GeneratedAggregationsFunction,
-    intermediateType,
-    inputType,
-    rowTimeIdx,
-    minRetentionTime,
-    maxRetentionTime) {
+    extends RowTimeUnboundedOver[K](
+      genAggregations: GeneratedAggregationsFunction,
+      intermediateType,
+      inputType,
+      rowTimeIdx,
+      minRetentionTime,
+      maxRetentionTime) {
 
   override def processElementsWithSameTimestamp(
-    curRowList: JList[Row],
-    lastAccumulator: Row,
-    out: Collector[CRow]): Unit = {
+      curRowList: JList[Row],
+      lastAccumulator: Row,
+      out: Collector[CRow]): Unit = {
 
     var i = 0
     // all same timestamp data should have same aggregation value.

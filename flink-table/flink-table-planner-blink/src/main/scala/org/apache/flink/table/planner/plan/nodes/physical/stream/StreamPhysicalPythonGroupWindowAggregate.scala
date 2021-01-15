@@ -43,16 +43,16 @@ class StreamPhysicalPythonGroupWindowAggregate(
     window: LogicalWindow,
     namedWindowProperties: Seq[PlannerNamedWindowProperty],
     emitStrategy: WindowEmitStrategy)
-  extends StreamPhysicalGroupWindowAggregateBase(
-    cluster,
-    traitSet,
-    inputRel,
-    outputRowType,
-    grouping,
-    aggCalls,
-    window,
-    namedWindowProperties,
-    emitStrategy) {
+    extends StreamPhysicalGroupWindowAggregateBase(
+      cluster,
+      traitSet,
+      inputRel,
+      outputRowType,
+      grouping,
+      aggCalls,
+      window,
+      namedWindowProperties,
+      emitStrategy) {
 
   override def copy(traitSet: RelTraitSet, inputs: java.util.List[RelNode]): RelNode = {
     new StreamPhysicalPythonGroupWindowAggregate(
@@ -76,7 +76,6 @@ class StreamPhysicalPythonGroupWindowAggregate(
       emitStrategy,
       ExecEdge.DEFAULT,
       FlinkTypeFactory.toLogicalRowType(getRowType),
-      getRelDetailedDescription
-    )
+      getRelDetailedDescription)
   }
 }

@@ -38,8 +38,7 @@ import java.time.format.DateTimeParseException
 import scala.collection.JavaConversions._
 
 @RunWith(classOf[Parameterized])
-class TemporalJoinITCase(state: StateBackendMode)
-  extends StreamingWithStateTestBase(state) {
+class TemporalJoinITCase(state: StateBackendMode) extends StreamingWithStateTestBase(state) {
 
   @Rule
   def usesLegacyRows: LegacyRowResource = LegacyRowResource.INSTANCE
@@ -87,9 +86,9 @@ class TemporalJoinITCase(state: StateBackendMode)
     changelogRow("+I", "Yen", "no1", 1L, "2020-08-15T00:00:03"),
     changelogRow("+I", "RMB", "no1", 702L, "2020-08-15T00:00:04"),
     changelogRow("-U", "Euro", "no1", 114L, "2020-08-16T00:01:00"),
-    changelogRow("+U", "Euro",  "no1", 118L, "2020-08-16T00:01:00"),
+    changelogRow("+U", "Euro", "no1", 118L, "2020-08-16T00:01:00"),
     changelogRow("-U", "US Dollar", "no1", 102L, "2020-08-16T00:02:00"),
-    changelogRow("+U", "US Dollar",  "no1", 106L, "2020-08-16T00:02:00"),
+    changelogRow("+U", "US Dollar", "no1", 106L, "2020-08-16T00:02:00"),
     changelogRow("-D", "RMB", "no1", 708L, "2020-08-16T00:02:00"))
 
   val rowTimeCurrencyDataUsingBeforeTime = List(
@@ -98,9 +97,9 @@ class TemporalJoinITCase(state: StateBackendMode)
     changelogRow("+I", "Yen", "no1", 1L, "2020-08-15T00:00:03"),
     changelogRow("+I", "RMB", "no1", 702L, "2020-08-15T00:00:04"),
     changelogRow("-U", "Euro", "no1", 114L, "2020-08-15T00:00:01"),
-    changelogRow("+U", "Euro",  "no1", 118L, "2020-08-16T00:01:00"),
+    changelogRow("+U", "Euro", "no1", 118L, "2020-08-16T00:01:00"),
     changelogRow("-U", "US Dollar", "no1", 102L, "2020-08-15T00:00:02"),
-    changelogRow("+U", "US Dollar",  "no1", 106L, "2020-08-16T00:02:00"),
+    changelogRow("+U", "US Dollar", "no1", 106L, "2020-08-16T00:02:00"),
     changelogRow("-D", "RMB", "no1", 702L, "2020-08-15T00:00:04"))
 
   val upsertSourceCurrencyData = List(
@@ -108,7 +107,7 @@ class TemporalJoinITCase(state: StateBackendMode)
     changelogRow("+U", "US Dollar", "no1", 102L, "2020-08-15T00:00:02"),
     changelogRow("+U", "Yen", "no1", 1L, "2020-08-15T00:00:03"),
     changelogRow("+U", "RMB", "no1", 702L, "2020-08-15T00:00:04"),
-    changelogRow("+U", "Euro",  "no1", 118L, "2020-08-16T00:01:00"),
+    changelogRow("+U", "Euro", "no1", 118L, "2020-08-16T00:01:00"),
     changelogRow("+U", "US Dollar", "no1", 104L, "2020-08-16T00:02:00"),
     changelogRow("-D", "RMB", "no1", 702L, "2020-08-15T00:00:04"))
 
@@ -117,15 +116,14 @@ class TemporalJoinITCase(state: StateBackendMode)
     changelogRow("+I", "US Dollar", "no1", 102L, "2020-08-15T00:00:02"),
     changelogRow("+I", "Yen", "no1", 1L, "2020-08-15T00:00:03"),
     changelogRow("+I", "RMB", "no1", 702L, "2020-08-15T00:00:04"),
-    changelogRow("+I", "Euro",  "no1", 118L, "2020-08-16T00:01:00"),
+    changelogRow("+I", "Euro", "no1", 118L, "2020-08-16T00:01:00"),
     changelogRow("+I", "US Dollar", "no1", 102L, "2020-08-16T00:02:00"),
-    changelogRow("+I", "US Dollar",  "no1", 106L, "2020-08-16T00:02:00"))
+    changelogRow("+I", "US Dollar", "no1", 106L, "2020-08-16T00:02:00"))
 
   @Before
   def prepare(): Unit = {
     val procTimeOrderDataId = registerData(procTimeOrderData)
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE TABLE orders_proctime (
          |  order_id BIGINT,
          |  currency STRING,
@@ -141,8 +139,7 @@ class TemporalJoinITCase(state: StateBackendMode)
 
     // register a non-lookup table
     val procTimeCurrencyDataId = registerData(procTimeCurrencyData)
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE TABLE currency_proctime (
          |  currency STRING,
          |  currency_no STRING,
@@ -158,8 +155,7 @@ class TemporalJoinITCase(state: StateBackendMode)
          |""".stripMargin)
 
     val procTimeCurrencyChangelogDataId = registerData(procTimeCurrencyChangelogData)
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE TABLE changelog_currency_proctime (
          |  currency STRING,
          |  currency_no STRING,
@@ -175,8 +171,7 @@ class TemporalJoinITCase(state: StateBackendMode)
          |)
          |""".stripMargin)
 
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE VIEW latest_rates AS
          |SELECT
          |  currency,
@@ -190,10 +185,8 @@ class TemporalJoinITCase(state: StateBackendMode)
 
     createSinkTable("proctime_default_sink", None)
 
-
     val rowTimeOrderDataId = registerData(rowTimeOrderData)
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE TABLE orders_rowtime (
          |  order_id BIGINT,
          |  currency STRING,
@@ -210,8 +203,7 @@ class TemporalJoinITCase(state: StateBackendMode)
          |""".stripMargin)
 
     val rowTimeCurrencyDataId = registerData(rowTimeCurrencyDataUsingMetaTime)
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE TABLE versioned_currency_with_single_key (
          |  currency STRING,
          |  currency_no STRING,
@@ -226,8 +218,7 @@ class TemporalJoinITCase(state: StateBackendMode)
          |)
          |""".stripMargin)
 
-    tEnv.executeSql(
-    s"""
+    tEnv.executeSql(s"""
        |CREATE TABLE versioned_currency_with_multi_key (
        |  currency STRING,
        |  currency_no STRING,
@@ -246,8 +237,7 @@ class TemporalJoinITCase(state: StateBackendMode)
 
     // set watermark to 2 days which means the late event would be late at most 2 days,
     // the late event will be processed well in tests that uses before time as changelog time
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE TABLE currency_using_update_before_time (
          |  currency STRING,
          |  currency_no STRING,
@@ -263,8 +253,7 @@ class TemporalJoinITCase(state: StateBackendMode)
          |""".stripMargin)
 
     val upsertSourceDataId = registerData(upsertSourceCurrencyData)
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE TABLE upsert_currency (
          |  currency STRING,
          |  currency_no STRING,
@@ -283,8 +272,7 @@ class TemporalJoinITCase(state: StateBackendMode)
 
     val rowTimeInsertOnlyCurrencyDataId = registerData(rowTimeInsertOnlyCurrencyData)
     // insert-only table
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE TABLE currency_history (
          |  currency STRING,
          |  currency_no STRING,
@@ -297,8 +285,7 @@ class TemporalJoinITCase(state: StateBackendMode)
          |  'changelog-mode' = 'I')
          |  """.stripMargin)
 
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE VIEW currency_deduplicated_first_row AS
          |SELECT
          |  currency,
@@ -309,8 +296,7 @@ class TemporalJoinITCase(state: StateBackendMode)
          |       AS rowNum FROM currency_history) T
          | WHERE rowNum = 1""".stripMargin)
 
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE VIEW currency_deduplicated_last_row AS
          |SELECT
          |  currency,
@@ -336,29 +322,28 @@ class TemporalJoinITCase(state: StateBackendMode)
       " ON o.currency = r.currency and o.currency_no = r.currency_no"
 
     expectedException.expect(classOf[TableException])
-    expectedException.expectMessage(
-      "Processing-time temporal join is not supported yet.")
+    expectedException.expectMessage("Processing-time temporal join is not supported yet.")
     tEnv.executeSql(sql).await()
   }
 
   @Test
   def testProcTimeLeftTemporalJoin(): Unit = {
-     val sql = "INSERT INTO proctime_default_sink " +
+    val sql = "INSERT INTO proctime_default_sink " +
       " SELECT o.order_id, o.currency, o.amount, o.proctime, r.rate, r.proctime " +
       " FROM orders_proctime AS o " +
       " LEFT JOIN currency_proctime FOR SYSTEM_TIME AS OF o.proctime as r " +
       " ON o.currency = r.currency and o.currency_no = r.currency_no"
 
     expectedException.expect(classOf[TableException])
-    expectedException.expectMessage(
-      "Processing-time temporal join is not supported yet.")
+    expectedException.expectMessage("Processing-time temporal join is not supported yet.")
     tEnv.executeSql(sql).await()
   }
 
   @Test
   def testProcTimeTemporalJoinChangelogSource(): Unit = {
-    createSinkTable("proctime_sink1", Some(
-      s"""
+    createSinkTable(
+      "proctime_sink1",
+      Some(s"""
       | currency STRING,
       | currency_no STRING,
       | rate BIGINT,
@@ -371,8 +356,7 @@ class TemporalJoinITCase(state: StateBackendMode)
       " ON o.currency = r.currency and o.currency_no = r.currency_no"
 
     expectedException.expect(classOf[TableException])
-    expectedException.expectMessage(
-      "Processing-time temporal join is not supported yet.")
+    expectedException.expectMessage("Processing-time temporal join is not supported yet.")
     tEnv.executeSql(sql).await()
   }
 
@@ -385,8 +369,7 @@ class TemporalJoinITCase(state: StateBackendMode)
       " ON o.currency = r.currency and o.currency_no = r.currency_no"
 
     expectedException.expect(classOf[TableException])
-    expectedException.expectMessage(
-      "Processing-time temporal join is not supported yet.")
+    expectedException.expectMessage("Processing-time temporal join is not supported yet.")
     tEnv.executeSql(sql).await()
   }
 
@@ -399,8 +382,7 @@ class TemporalJoinITCase(state: StateBackendMode)
       " ON o.currency = r.currency and o.currency_no = r.currency_no"
 
     expectedException.expect(classOf[TableException])
-    expectedException.expectMessage(
-      "Processing-time temporal join is not supported yet.")
+    expectedException.expectMessage("Processing-time temporal join is not supported yet.")
     tEnv.executeSql(sql).await()
   }
 
@@ -414,8 +396,7 @@ class TemporalJoinITCase(state: StateBackendMode)
       " AND o.amount > r.rate"
 
     expectedException.expect(classOf[TableException])
-    expectedException.expectMessage(
-      "Processing-time temporal join is not supported yet.")
+    expectedException.expectMessage("Processing-time temporal join is not supported yet.")
     tEnv.executeSql(sql).await()
   }
 
@@ -429,8 +410,7 @@ class TemporalJoinITCase(state: StateBackendMode)
       " AND o.amount > r.rate"
 
     expectedException.expect(classOf[TableException])
-    expectedException.expectMessage(
-      "Processing-time temporal join is not supported yet.")
+    expectedException.expectMessage("Processing-time temporal join is not supported yet.")
     tEnv.executeSql(sql).await()
   }
 
@@ -446,8 +426,7 @@ class TemporalJoinITCase(state: StateBackendMode)
       " ON o.currency = r1.currency and o.currency_no = r1.currency_no"
 
     expectedException.expect(classOf[TableException])
-    expectedException.expectMessage(
-      "Processing-time temporal join is not supported yet.")
+    expectedException.expectMessage("Processing-time temporal join is not supported yet.")
     tEnv.executeSql(sql).await()
   }
 
@@ -487,8 +466,9 @@ class TemporalJoinITCase(state: StateBackendMode)
 
   @Test
   def testEventTimeTemporalJoinWithFilter(): Unit = {
-    tEnv.executeSql("CREATE VIEW v1 AS" +
-      " SELECT * FROM versioned_currency_with_single_key WHERE rate < 115")
+    tEnv.executeSql(
+      "CREATE VIEW v1 AS" +
+        " SELECT * FROM versioned_currency_with_single_key WHERE rate < 115")
     val sql = "INSERT INTO rowtime_default_sink " +
       " SELECT o.order_id, o.currency, o.amount, o.order_time, r.rate, r.currency_time " +
       " FROM orders_rowtime AS o " +
@@ -593,8 +573,9 @@ class TemporalJoinITCase(state: StateBackendMode)
 
   @Test
   def testEventTimeMultiTemporalJoin(): Unit = {
-    createSinkTable("rowtime_sink1", Some(
-      s"""
+    createSinkTable(
+      "rowtime_sink1",
+      Some(s"""
          |  order_id BIGINT,
          |  currency STRING,
          |  amount BIGINT,
@@ -604,8 +585,7 @@ class TemporalJoinITCase(state: StateBackendMode)
          |  r1_rate BIGINT,
          |  r1_time TIMESTAMP(3),
          |  PRIMARY KEY(order_id) NOT ENFORCED
-         |""".stripMargin
-    ))
+         |""".stripMargin))
     val sql = "INSERT INTO rowtime_sink1 " +
       " SELECT o.order_id, o.currency, o.amount, o.order_time, r.rate, r.currency_time," +
       " r1.rate, r1.currency_time FROM orders_rowtime AS o " +
@@ -684,12 +664,11 @@ class TemporalJoinITCase(state: StateBackendMode)
 
   @Test
   def testMiniBatchEventTimeViewTemporalJoin(): Unit = {
-    tEnv.getConfig.getConfiguration.setBoolean(
-      ExecutionConfigOptions.TABLE_EXEC_MINIBATCH_ENABLED, true)
-    tEnv.getConfig.getConfiguration.setString(
-      ExecutionConfigOptions.TABLE_EXEC_MINIBATCH_ALLOW_LATENCY.key(), "10 s")
-    tEnv.getConfig.getConfiguration.setLong(
-      ExecutionConfigOptions.TABLE_EXEC_MINIBATCH_SIZE, 4L)
+    tEnv.getConfig.getConfiguration
+      .setBoolean(ExecutionConfigOptions.TABLE_EXEC_MINIBATCH_ENABLED, true)
+    tEnv.getConfig.getConfiguration
+      .setString(ExecutionConfigOptions.TABLE_EXEC_MINIBATCH_ALLOW_LATENCY.key(), "10 s")
+    tEnv.getConfig.getConfiguration.setLong(ExecutionConfigOptions.TABLE_EXEC_MINIBATCH_SIZE, 4L)
 
     val sql = "INSERT INTO rowtime_default_sink " +
       " SELECT o.order_id, o.currency, o.amount, o.order_time, r.rate, r.currency_time " +
@@ -723,8 +702,7 @@ class TemporalJoinITCase(state: StateBackendMode)
            |""".stripMargin
     }
 
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
         |CREATE TABLE $tableName (
         | $columnsDDL
         |) WITH (
@@ -738,12 +716,13 @@ class TemporalJoinITCase(state: StateBackendMode)
   private def changelogRow(kind: String, values: Any*): Row = {
     val objects = values.map {
       case l: Long => Long.box(l)
-      case i: Int => Int.box(i)
-      case date: String => try {
-        LocalDateTime.parse(date)
-      } catch {
-        case _: DateTimeParseException => date
-      }
+      case i: Int  => Int.box(i)
+      case date: String =>
+        try {
+          LocalDateTime.parse(date)
+        } catch {
+          case _: DateTimeParseException => date
+        }
       case o: Object => o
     }
     TestValuesTableFactory.changelogRow(kind, objects.toArray: _*)

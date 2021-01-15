@@ -38,7 +38,10 @@ import org.apache.flink.table.plan.logical.rel.LogicalTemporalTableJoin.TEMPORAL
 import org.apache.flink.table.plan.nodes.datastream.DataStreamTemporalJoinToCoProcessTranslator
 import org.apache.flink.table.plan.schema.RowSchema
 import org.apache.flink.table.runtime.CRowKeySelector
-import org.apache.flink.table.runtime.harness.HarnessTestBase.{RowResultSortComparator, TestTableConfig}
+import org.apache.flink.table.runtime.harness.HarnessTestBase.{
+  RowResultSortComparator,
+  TestTableConfig
+}
 import org.apache.flink.table.runtime.types.CRow
 import org.apache.flink.table.typeutils.TimeIndicatorTypeInfo
 
@@ -69,31 +72,19 @@ class TemporalJoinHarnessTest extends HarnessTestBase {
   private val RATES_ROWTIME = "r_rowtime"
 
   private val ordersRowtimeType = new RowTypeInfo(
-    Array[TypeInformation[_]](
-      Types.LONG,
-      Types.STRING,
-      TimeIndicatorTypeInfo.ROWTIME_INDICATOR),
+    Array[TypeInformation[_]](Types.LONG, Types.STRING, TimeIndicatorTypeInfo.ROWTIME_INDICATOR),
     Array("o_amount", ORDERS_KEY, ORDERS_ROWTIME))
 
   private val ordersProctimeType = new RowTypeInfo(
-    Array[TypeInformation[_]](
-      Types.LONG,
-      Types.STRING,
-      TimeIndicatorTypeInfo.PROCTIME_INDICATOR),
+    Array[TypeInformation[_]](Types.LONG, Types.STRING, TimeIndicatorTypeInfo.PROCTIME_INDICATOR),
     Array("o_amount", ORDERS_KEY, ORDERS_PROCTIME))
 
   private val ratesRowtimeType = new RowTypeInfo(
-    Array[TypeInformation[_]](
-      Types.STRING,
-      Types.LONG,
-      TimeIndicatorTypeInfo.ROWTIME_INDICATOR),
+    Array[TypeInformation[_]](Types.STRING, Types.LONG, TimeIndicatorTypeInfo.ROWTIME_INDICATOR),
     Array(RATES_KEY, "r_rate", RATES_ROWTIME))
 
   private val ratesProctimeType = new RowTypeInfo(
-    Array[TypeInformation[_]](
-      Types.STRING,
-      Types.LONG,
-      TimeIndicatorTypeInfo.PROCTIME_INDICATOR),
+    Array[TypeInformation[_]](Types.STRING, Types.LONG, TimeIndicatorTypeInfo.PROCTIME_INDICATOR),
     Array(RATES_KEY, "r_rate", "r_proctime"))
 
   private val joinRowtimeType = new RowTypeInfo(
@@ -219,9 +210,9 @@ class TemporalJoinHarnessTest extends HarnessTestBase {
   }
 
   /**
-    * Cleaning up the state when processing watermark exceeding all events should always keep
-    * one latest event in TemporalTable.
-    */
+   * Cleaning up the state when processing watermark exceeding all events should always keep
+   * one latest event in TemporalTable.
+   */
   @Test
   def testRowtimeStateCleanUpShouldAlwaysKeepOneLatestRow() {
     val testHarness = createTestHarness(new OrdersRatesRowtimeTemporalJoinInfo())
@@ -240,13 +231,12 @@ class TemporalJoinHarnessTest extends HarnessTestBase {
 
     expectedOutput += new StreamRecord(CRow(2L, "Euro", 10000L, "Euro", 9L, 9L))
     verify(new util.LinkedList(expectedOutput.asJava), testHarness.getOutput)
-    
+
     testHarness.close()
   }
 
-  def processEuro(
-    testHarness: KeyedTwoInputStreamOperatorTestHarness[String, CRow, CRow, CRow])
-  : ArrayBuffer[Object] = {
+  def processEuro(testHarness: KeyedTwoInputStreamOperatorTestHarness[String, CRow, CRow, CRow])
+      : ArrayBuffer[Object] = {
 
     // process conversion rates
     testHarness.processElement2(new StreamRecord(CRow("Euro", 1L, 1L)))
@@ -340,10 +330,11 @@ class TemporalJoinHarnessTest extends HarnessTestBase {
         ORDERS_KEY,
         RATES_KEY,
         ORDERS_PROCTIME) {
+
         /**
-          * @return [[LogicalTemporalTableJoin.TEMPORAL_JOIN_CONDITION]](...) AND
-          *        leftInputRef(3) > rightInputRef(3)
-          */
+         * @return [[LogicalTemporalTableJoin.TEMPORAL_JOIN_CONDITION]](...) AND
+         *        leftInputRef(3) > rightInputRef(3)
+         */
         override def getRemaining(rexBuilder: RexBuilder): RexNode = {
           rexBuilder.makeCall(
             SqlStdOperatorTable.AND,
@@ -391,16 +382,13 @@ class TemporalJoinHarnessTest extends HarnessTestBase {
     expectedException.expect(classOf[IllegalStateException])
     expectedException.expectMessage(startsWith(s"Missing ${TEMPORAL_JOIN_CONDITION.getName}"))
 
-    translateJoin(new TemporalJoinInfo(
-      ordersProctimeType,
-      ratesProctimeType,
-      ORDERS_KEY,
-      RATES_KEY) {
+    translateJoin(
+      new TemporalJoinInfo(ordersProctimeType, ratesProctimeType, ORDERS_KEY, RATES_KEY) {
 
-      override def isEqui: Boolean = true
+        override def isEqui: Boolean = true
 
-      override def getRemaining(rexBuilder: RexBuilder): RexNode = rexBuilder.makeLiteral(true)
-    })
+        override def getRemaining(rexBuilder: RexBuilder): RexNode = rexBuilder.makeLiteral(true)
+      })
   }
 
   @Test
@@ -408,24 +396,21 @@ class TemporalJoinHarnessTest extends HarnessTestBase {
     expectedException.expect(classOf[IllegalStateException])
     expectedException.expectMessage(startsWith(s"Missing ${TEMPORAL_JOIN_CONDITION.getName}"))
 
-    translateJoin(new TemporalJoinInfo(
-      ordersProctimeType,
-      ratesProctimeType,
-      ORDERS_KEY,
-      RATES_KEY) {
+    translateJoin(
+      new TemporalJoinInfo(ordersProctimeType, ratesProctimeType, ORDERS_KEY, RATES_KEY) {
 
-      override def isEqui: Boolean = true
+        override def isEqui: Boolean = true
 
-      override def getRemaining(rexBuilder: RexBuilder): RexNode = {
-        rexBuilder.makeCall(
-          SqlStdOperatorTable.GREATER_THAN,
+        override def getRemaining(rexBuilder: RexBuilder): RexNode = {
           rexBuilder.makeCall(
-            SqlStdOperatorTable.CONCAT,
-            rexBuilder.makeLiteral("A"),
-            makeLeftInputRef(ORDERS_KEY)),
-          makeRightInputRef(RATES_KEY))
-      }
-    })
+            SqlStdOperatorTable.GREATER_THAN,
+            rexBuilder.makeCall(
+              SqlStdOperatorTable.CONCAT,
+              rexBuilder.makeLiteral("A"),
+              makeLeftInputRef(ORDERS_KEY)),
+            makeRightInputRef(RATES_KEY))
+        }
+      })
   }
 
   @Test
@@ -433,15 +418,14 @@ class TemporalJoinHarnessTest extends HarnessTestBase {
     expectedException.expect(classOf[IllegalStateException])
     expectedException.expectMessage(startsWith(s"Multiple $TEMPORAL_JOIN_CONDITION functions"))
 
-    translateJoin(
-      new OrdersRatesProctimeTemporalJoinInfo() {
-        override def getRemaining(rexBuilder: RexBuilder): RexNode = {
-          rexBuilder.makeCall(
-            SqlStdOperatorTable.OR,
-            super.getRemaining(rexBuilder),
-            super.getRemaining(rexBuilder))
-        }
-      })
+    translateJoin(new OrdersRatesProctimeTemporalJoinInfo() {
+      override def getRemaining(rexBuilder: RexBuilder): RexNode = {
+        rexBuilder.makeCall(
+          SqlStdOperatorTable.OR,
+          super.getRemaining(rexBuilder),
+          super.getRemaining(rexBuilder))
+      }
+    })
   }
 
   @Test
@@ -449,39 +433,36 @@ class TemporalJoinHarnessTest extends HarnessTestBase {
     expectedException.expect(classOf[IllegalStateException])
     expectedException.expectMessage(startsWith(s"Unsupported invocation"))
 
-    translateJoin(
-      new OrdersRatesProctimeTemporalJoinInfo() {
-        override def getRemaining(rexBuilder: RexBuilder): RexNode = {
-          rexBuilder.makeCall(
-            TEMPORAL_JOIN_CONDITION,
-            makeLeftInputRef(leftKey),
-            makeLeftInputRef(leftKey),
-            makeLeftInputRef(leftKey),
-            makeRightInputRef(rightKey))
-        }
-      })
+    translateJoin(new OrdersRatesProctimeTemporalJoinInfo() {
+      override def getRemaining(rexBuilder: RexBuilder): RexNode = {
+        rexBuilder.makeCall(
+          TEMPORAL_JOIN_CONDITION,
+          makeLeftInputRef(leftKey),
+          makeLeftInputRef(leftKey),
+          makeLeftInputRef(leftKey),
+          makeRightInputRef(rightKey))
+      }
+    })
   }
 
   @Test
   def testUnsupportedPrimaryKeyInTemporalJoinCondition() {
     expectedException.expect(classOf[ValidationException])
     expectedException.expectMessage(
-      CoreMatchers.allOf[String](
-        startsWith("Unsupported expression"),
-        endsWith("Expected input reference")))
+      CoreMatchers
+        .allOf[String](startsWith("Unsupported expression"), endsWith("Expected input reference")))
 
-    translateJoin(
-      new OrdersRatesProctimeTemporalJoinInfo() {
-        override def getRemaining(rexBuilder: RexBuilder): RexNode = {
-          LogicalTemporalTableJoin.makeProcTimeTemporalJoinConditionCall(
-            rexBuilder,
-            makeLeftInputRef(leftTimeAttribute),
-            rexBuilder.makeCall(
-              SqlStdOperatorTable.CONCAT,
-              rexBuilder.makeLiteral("A"),
-              makeRightInputRef(RATES_KEY)))
-        }
-      })
+    translateJoin(new OrdersRatesProctimeTemporalJoinInfo() {
+      override def getRemaining(rexBuilder: RexBuilder): RexNode = {
+        LogicalTemporalTableJoin.makeProcTimeTemporalJoinConditionCall(
+          rexBuilder,
+          makeLeftInputRef(leftTimeAttribute),
+          rexBuilder.makeCall(
+            SqlStdOperatorTable.CONCAT,
+            rexBuilder.makeLiteral("A"),
+            makeRightInputRef(RATES_KEY)))
+      }
+    })
   }
 
   @Test
@@ -514,7 +495,7 @@ class TemporalJoinHarnessTest extends HarnessTestBase {
   }
 
   def createTestHarness(temporalJoinInfo: TemporalJoinInfo)
-    : KeyedTwoInputStreamOperatorTestHarness[String, CRow, CRow, CRow] = {
+      : KeyedTwoInputStreamOperatorTestHarness[String, CRow, CRow, CRow] = {
 
     val (leftKeySelector, rightKeySelector, joinOperator) =
       translateJoin(temporalJoinInfo)
@@ -734,7 +715,7 @@ class TemporalJoinHarnessTest extends HarnessTestBase {
   }
 
   def translateJoin(joinInfo: TemporalJoinInfo, joinRelType: JoinRelType = JoinRelType.INNER)
-    : (CRowKeySelector, CRowKeySelector, TwoInputStreamOperator[CRow, CRow, CRow]) = {
+      : (CRowKeySelector, CRowKeySelector, TwoInputStreamOperator[CRow, CRow, CRow]) = {
 
     val leftType = joinInfo.leftRowType
     val rightType = joinInfo.rightRowType
@@ -751,14 +732,10 @@ class TemporalJoinHarnessTest extends HarnessTestBase {
       joinInfo,
       rexBuilder)
 
-    val joinOperator = joinTranslator.getJoinOperator(
-      joinRelType,
-      joinType.getFieldNames,
-      "TemporalJoin")
+    val joinOperator =
+      joinTranslator.getJoinOperator(joinRelType, joinType.getFieldNames, "TemporalJoin")
 
-    (joinTranslator.getLeftKeySelector(),
-      joinTranslator.getRightKeySelector(),
-      joinOperator)
+    (joinTranslator.getLeftKeySelector(), joinTranslator.getRightKeySelector(), joinOperator)
   }
 
   abstract class TemporalJoinInfo(
@@ -766,13 +743,13 @@ class TemporalJoinHarnessTest extends HarnessTestBase {
       val rightRowType: RowTypeInfo,
       leftKeys: ImmutableIntList,
       rightKeys: ImmutableIntList)
-    extends JoinInfo(leftKeys, rightKeys, ImmutableList.of[RexNode]()) {
+      extends JoinInfo(leftKeys, rightKeys, ImmutableList.of[RexNode]()) {
 
     def this(
-      leftRowType: RowTypeInfo,
-      rightRowType: RowTypeInfo,
-      leftKey: String,
-      rightKey: String) =
+        leftRowType: RowTypeInfo,
+        rightRowType: RowTypeInfo,
+        leftKey: String,
+        rightKey: String) =
       this(
         leftRowType,
         rightRowType,
@@ -795,12 +772,12 @@ class TemporalJoinHarnessTest extends HarnessTestBase {
   }
 
   class OrdersRatesProctimeTemporalJoinInfo()
-    extends ProctimeTemporalJoinInfo(
-      ordersProctimeType,
-      ratesProctimeType,
-      ORDERS_KEY,
-      RATES_KEY,
-      ORDERS_PROCTIME)
+      extends ProctimeTemporalJoinInfo(
+        ordersProctimeType,
+        ratesProctimeType,
+        ORDERS_KEY,
+        RATES_KEY,
+        ORDERS_PROCTIME)
 
   class ProctimeTemporalJoinInfo(
       leftRowType: RowTypeInfo,
@@ -808,7 +785,7 @@ class TemporalJoinHarnessTest extends HarnessTestBase {
       val leftKey: String,
       val rightKey: String,
       val leftTimeAttribute: String)
-    extends TemporalJoinInfo(leftRowType, rightRowType, leftKey, rightKey) {
+      extends TemporalJoinInfo(leftRowType, rightRowType, leftKey, rightKey) {
 
     override def getRemaining(rexBuilder: RexBuilder): RexNode = {
       LogicalTemporalTableJoin.makeProcTimeTemporalJoinConditionCall(
@@ -819,13 +796,13 @@ class TemporalJoinHarnessTest extends HarnessTestBase {
   }
 
   class OrdersRatesRowtimeTemporalJoinInfo()
-    extends RowtimeTemporalJoinInfo(
-      ordersRowtimeType,
-      ratesRowtimeType,
-      ORDERS_KEY,
-      RATES_KEY,
-      ORDERS_ROWTIME,
-      RATES_ROWTIME)
+      extends RowtimeTemporalJoinInfo(
+        ordersRowtimeType,
+        ratesRowtimeType,
+        ORDERS_KEY,
+        RATES_KEY,
+        ORDERS_ROWTIME,
+        RATES_ROWTIME)
 
   class RowtimeTemporalJoinInfo(
       leftRowType: RowTypeInfo,
@@ -834,11 +811,7 @@ class TemporalJoinHarnessTest extends HarnessTestBase {
       rightKey: String,
       leftTimeAttribute: String,
       rightTimeAttribute: String)
-    extends TemporalJoinInfo(
-      leftRowType,
-      rightRowType,
-      leftKey,
-      rightKey) {
+      extends TemporalJoinInfo(leftRowType, rightRowType, leftKey, rightKey) {
     override def getRemaining(rexBuilder: RexBuilder): RexNode = {
       LogicalTemporalTableJoin.makeRowTimeTemporalJoinConditionCall(
         rexBuilder,
@@ -854,14 +827,13 @@ class TemporalJoinHarnessTest extends HarnessTestBase {
       leftKey: String,
       rightKey: String,
       isEquiJoin: Boolean)
-    extends TemporalJoinInfo(leftRowType, rightRowType, leftKey, rightKey) {
+      extends TemporalJoinInfo(leftRowType, rightRowType, leftKey, rightKey) {
 
     override def isEqui: Boolean = isEquiJoin
 
     override def getRemaining(rexBuilder: RexBuilder): RexNode = if (isEquiJoin) {
       rexBuilder.makeLiteral(true)
-    }
-    else {
+    } else {
       rexBuilder.makeCall(
         SqlStdOperatorTable.GREATER_THAN,
         rexBuilder.makeCall(

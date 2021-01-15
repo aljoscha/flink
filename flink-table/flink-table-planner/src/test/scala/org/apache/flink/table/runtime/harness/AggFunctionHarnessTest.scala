@@ -44,14 +44,13 @@ class AggFunctionHarnessTest extends HarnessTestBase {
   @Test
   def testCollectAggregate(): Unit = {
     val env = StreamExecutionEnvironment.getExecutionEnvironment
-    val tEnv = StreamTableEnvironment.create(
-      env, EnvironmentSettings.newInstance().useOldPlanner().build())
+    val tEnv =
+      StreamTableEnvironment.create(env, EnvironmentSettings.newInstance().useOldPlanner().build())
 
     val data = new mutable.MutableList[(JInt, String)]
     val t = env.fromCollection(data).toTable(tEnv, 'a, 'b)
     tEnv.registerTable("T", t)
-    val sqlQuery = tEnv.sqlQuery(
-      s"""
+    val sqlQuery = tEnv.sqlQuery(s"""
          |SELECT
          |  b, collect(a)
          |FROM (
@@ -61,18 +60,16 @@ class AggFunctionHarnessTest extends HarnessTestBase {
          |) GROUP BY b
          |""".stripMargin)
 
-    val testHarness = createHarnessTester[String, CRow, CRow](
-      sqlQuery.toRetractStream[Row], "groupBy")
+    val testHarness =
+      createHarnessTester[String, CRow, CRow](sqlQuery.toRetractStream[Row], "groupBy")
 
     testHarness.setStateBackend(getStateBackend)
     testHarness.open()
 
     val operator = getOperator(testHarness)
-    val state = getState(
-      operator,
-      "function",
-      classOf[GroupAggProcessFunction[Row]],
-      "acc0_map_dataview").asInstanceOf[MapView[JInt, JInt]]
+    val state =
+      getState(operator, "function", classOf[GroupAggProcessFunction[Row]], "acc0_map_dataview")
+        .asInstanceOf[MapView[JInt, JInt]]
     assertTrue(state.isInstanceOf[StateMapView[_, _]])
     assertTrue(operator.getKeyedStateBackend.isInstanceOf[RocksDBKeyedStateBackend[_]])
 
@@ -110,14 +107,13 @@ class AggFunctionHarnessTest extends HarnessTestBase {
   @Test
   def testMinMaxAggFunctionWithRetract(): Unit = {
     val env = StreamExecutionEnvironment.getExecutionEnvironment
-    val tEnv = StreamTableEnvironment.create(
-      env, EnvironmentSettings.newInstance().useOldPlanner().build())
+    val tEnv =
+      StreamTableEnvironment.create(env, EnvironmentSettings.newInstance().useOldPlanner().build())
 
     val data = new mutable.MutableList[(JInt, JInt, String)]
     val t = env.fromCollection(data).toTable(tEnv, 'a, 'b, 'c)
     tEnv.registerTable("T", t)
-    val sqlQuery = tEnv.sqlQuery(
-      s"""
+    val sqlQuery = tEnv.sqlQuery(s"""
          |SELECT
          |  c, min(a), max(b)
          |FROM (
@@ -127,23 +123,19 @@ class AggFunctionHarnessTest extends HarnessTestBase {
          |) GROUP BY c
          |""".stripMargin)
 
-    val testHarness = createHarnessTester[String, CRow, CRow](
-      sqlQuery.toRetractStream[Row], "groupBy")
+    val testHarness =
+      createHarnessTester[String, CRow, CRow](sqlQuery.toRetractStream[Row], "groupBy")
 
     testHarness.setStateBackend(getStateBackend)
     testHarness.open()
 
     val operator = getOperator(testHarness)
-    val minState = getState(
-      operator,
-      "function",
-      classOf[GroupAggProcessFunction[Row]],
-      "acc0_map_dataview").asInstanceOf[MapView[JInt, JInt]]
-    val maxState = getState(
-      operator,
-      "function",
-      classOf[GroupAggProcessFunction[Row]],
-      "acc1_map_dataview").asInstanceOf[MapView[JInt, JInt]]
+    val minState =
+      getState(operator, "function", classOf[GroupAggProcessFunction[Row]], "acc0_map_dataview")
+        .asInstanceOf[MapView[JInt, JInt]]
+    val maxState =
+      getState(operator, "function", classOf[GroupAggProcessFunction[Row]], "acc1_map_dataview")
+        .asInstanceOf[MapView[JInt, JInt]]
     assertTrue(minState.isInstanceOf[StateMapView[_, _]])
     assertTrue(maxState.isInstanceOf[StateMapView[_, _]])
     assertTrue(operator.getKeyedStateBackend.isInstanceOf[RocksDBKeyedStateBackend[_]])

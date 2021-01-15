@@ -31,8 +31,8 @@ import org.apache.flink.types.Row
 import org.junit.Test
 
 /**
-  * Tests that check all non-deterministic functions can be executed.
-  */
+ * Tests that check all non-deterministic functions can be executed.
+ */
 class NonDeterministicTests extends ExpressionTestBase {
 
   @Test
@@ -64,9 +64,7 @@ class NonDeterministicTests extends ExpressionTestBase {
 
   @Test
   def testNow(): Unit = {
-    testSqlApi(
-      "NOW() > TIMESTAMP '1970-01-01 00:00:00'",
-      "true")
+    testSqlApi("NOW() > TIMESTAMP '1970-01-01 00:00:00'", "true")
   }
 
   @Test
@@ -74,17 +72,14 @@ class NonDeterministicTests extends ExpressionTestBase {
     config.setLocalTimeZone(ZoneId.of("UTC"))
     val localDateTime = LocalDateTime.now(ZoneId.of("UTC"))
 
-    val formattedLocalTime = localDateTime
-      .toLocalTime
+    val formattedLocalTime = localDateTime.toLocalTime
       .format(DateTimeFormatter.ofPattern("HH:mm:ss"))
     val formattedLocalDateTime = localDateTime
       .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
 
     // the LOCALTIME/LOCALTIMESTAMP functions are not deterministic, thus we
     // use following pattern to check it return SQL timestamp in session time zone UTC
-    testSqlApi(
-      s"TIMESUB(LOCALTIME, TIME '$formattedLocalTime') <= 60000",
-      "true")
+    testSqlApi(s"TIMESUB(LOCALTIME, TIME '$formattedLocalTime') <= 60000", "true")
     testSqlApi(
       s"TIMESTAMPDIFF(SECOND, TIMESTAMP '$formattedLocalDateTime', LOCALTIMESTAMP) <= 60",
       "true")
@@ -95,17 +90,14 @@ class NonDeterministicTests extends ExpressionTestBase {
     config.setLocalTimeZone(ZoneId.of("Asia/Shanghai"))
     val localDateTime = LocalDateTime.now(ZoneId.of("Asia/Shanghai"))
 
-    val formattedLocalTime = localDateTime
-      .toLocalTime
+    val formattedLocalTime = localDateTime.toLocalTime
       .format(DateTimeFormatter.ofPattern("HH:mm:ss"))
     val formattedLocalDateTime = localDateTime
       .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
 
     // the LOCALTIME/LOCALTIMESTAMP functions are not deterministic, thus we
     // use following pattern to check it return SQL timestamp in session time zone Shanghai
-    testSqlApi(
-      s"TIMESUB(LOCALTIME, TIME '$formattedLocalTime') <= 60000",
-      "true")
+    testSqlApi(s"TIMESUB(LOCALTIME, TIME '$formattedLocalTime') <= 60000", "true")
     testSqlApi(
       s"TIMESTAMPDIFF(SECOND, TIMESTAMP '$formattedLocalDateTime', LOCALTIMESTAMP) <= 60",
       "true")
@@ -122,11 +114,7 @@ class NonDeterministicTests extends ExpressionTestBase {
 
   @Test
   def testUUID(): Unit = {
-    testAllApis(
-      uuid().charLength(),
-      "uuid().charLength",
-      "CHARACTER_LENGTH(UUID())",
-      "36")
+    testAllApis(uuid().charLength(), "uuid().charLength", "CHARACTER_LENGTH(UUID())", "36")
   }
 
   // ----------------------------------------------------------------------------------------------
@@ -135,9 +123,7 @@ class NonDeterministicTests extends ExpressionTestBase {
 
   override def typeInfo: RowTypeInfo = new RowTypeInfo()
 
-  override def functions: Map[String, ScalarFunction] = Map(
-    "TIMESUB" -> TimeDiffFun
-  )
+  override def functions: Map[String, ScalarFunction] = Map("TIMESUB" -> TimeDiffFun)
 }
 
 object TimeDiffFun extends ScalarFunction {
@@ -149,9 +135,8 @@ object TimeDiffFun extends ScalarFunction {
     // the t1 may be '00:00:01.001' and the t2 may be '23:59:59.999'
     // we simply assume the two times were produced less than 1 minute
     if (t1.getTime < t2.getTime && millsInDay - Math.abs(t1.getTime - t2.getTime) < 60000) {
-        t1.getTime + millsInDay - t2.getTime
-    }
-    else {
+      t1.getTime + millsInDay - t2.getTime
+    } else {
       t1.getTime - t2.getTime
     }
   }

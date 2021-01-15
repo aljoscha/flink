@@ -34,14 +34,12 @@ import org.apache.flink.table.planner.utils.ShortcutUtils
 import org.apache.flink.table.runtime.functions.SqlUnnestUtils
 
 /**
-  * Planner rule that rewrites UNNEST to explode function.
-  *
-  * Note: This class can only be used in HepPlanner.
-  */
-class LogicalUnnestRule(
-    operand: RelOptRuleOperand,
-    description: String)
-  extends RelOptRule(operand, description) {
+ * Planner rule that rewrites UNNEST to explode function.
+ *
+ * Note: This class can only be used in HepPlanner.
+ */
+class LogicalUnnestRule(operand: RelOptRuleOperand, description: String)
+    extends RelOptRule(operand, description) {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val join: LogicalCorrelate = call.rel(0)
@@ -52,19 +50,20 @@ class LogicalUnnestRule(
       case filter: LogicalFilter =>
         getRel(filter.getInput) match {
           case u: Uncollect => !u.withOrdinality
-          case p: LogicalProject => getRel(p.getInput) match {
-            case u: Uncollect => !u.withOrdinality
-            case _ => false
-          }
+          case p: LogicalProject =>
+            getRel(p.getInput) match {
+              case u: Uncollect => !u.withOrdinality
+              case _            => false
+            }
           case _ => false
         }
       case project: LogicalProject =>
         getRel(project.getInput) match {
           case u: Uncollect => !u.withOrdinality
-          case _ => false
+          case _            => false
         }
       case u: Uncollect => !u.withOrdinality
-      case _ => false
+      case _            => false
     }
   }
 
@@ -93,10 +92,8 @@ class LogicalUnnestRule(
 
           val unnestFunction = SqlUnnestUtils.createUnnestFunction(logicalType)
 
-          val sqlFunction = BridgingSqlFunction.of(
-            cluster,
-            FunctionIdentifier.of("UNNEST"),
-            unnestFunction)
+          val sqlFunction =
+            BridgingSqlFunction.of(cluster, FunctionIdentifier.of("UNNEST"), unnestFunction)
 
           val rexCall = cluster.getRexBuilder.makeCall(
             typeFactory.createFieldTypeFromLogicalType(unnestFunction.getWrappedOutputType),
@@ -125,13 +122,11 @@ class LogicalUnnestRule(
   private def getRel(rel: RelNode): RelNode = {
     rel match {
       case vertex: HepRelVertex => vertex.getCurrentRel
-      case _ => rel
+      case _                    => rel
     }
   }
 }
 
 object LogicalUnnestRule {
-  val INSTANCE = new LogicalUnnestRule(
-    operand(classOf[LogicalCorrelate], any),
-    "LogicalUnnestRule")
+  val INSTANCE = new LogicalUnnestRule(operand(classOf[LogicalCorrelate], any), "LogicalUnnestRule")
 }

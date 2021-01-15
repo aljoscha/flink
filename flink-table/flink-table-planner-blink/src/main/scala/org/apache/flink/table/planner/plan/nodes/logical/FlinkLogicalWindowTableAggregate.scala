@@ -29,12 +29,15 @@ import org.apache.calcite.util.ImmutableBitSet
 import org.apache.flink.table.planner.calcite.FlinkRelBuilder.PlannerNamedWindowProperty
 import org.apache.flink.table.planner.plan.logical.LogicalWindow
 import org.apache.flink.table.planner.plan.nodes.FlinkConventions
-import org.apache.flink.table.planner.plan.nodes.calcite.{LogicalWindowTableAggregate, WindowTableAggregate}
+import org.apache.flink.table.planner.plan.nodes.calcite.{
+  LogicalWindowTableAggregate,
+  WindowTableAggregate
+}
 
 /**
-  * Sub-class of [[WindowTableAggregate]] that is a relational expression which performs window
-  * aggregations but outputs 0 or more records for a group.
-  */
+ * Sub-class of [[WindowTableAggregate]] that is a relational expression which performs window
+ * aggregations but outputs 0 or more records for a group.
+ */
 class FlinkLogicalWindowTableAggregate(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -44,16 +47,16 @@ class FlinkLogicalWindowTableAggregate(
     aggCalls: util.List[AggregateCall],
     window: LogicalWindow,
     namedProperties: Seq[PlannerNamedWindowProperty])
-  extends WindowTableAggregate(
-    cluster,
-    traitSet,
-    child,
-    groupSet,
-    groupSets,
-    aggCalls,
-    window,
-    namedProperties)
-  with FlinkLogicalRel {
+    extends WindowTableAggregate(
+      cluster,
+      traitSet,
+      child,
+      groupSet,
+      groupSets,
+      aggCalls,
+      window,
+      namedProperties)
+    with FlinkLogicalRel {
 
   override def copy(traitSet: RelTraitSet, inputs: util.List[RelNode]): RelNode = {
     new FlinkLogicalWindowTableAggregate(
@@ -79,11 +82,11 @@ class FlinkLogicalWindowTableAggregate(
 }
 
 class FlinkLogicalWindowTableAggregateConverter
-  extends ConverterRule(
-    classOf[LogicalWindowTableAggregate],
-    Convention.NONE,
-    FlinkConventions.LOGICAL,
-    "FlinkLogicalWindowTableAggregateConverter") {
+    extends ConverterRule(
+      classOf[LogicalWindowTableAggregate],
+      Convention.NONE,
+      FlinkConventions.LOGICAL,
+      "FlinkLogicalWindowTableAggregateConverter") {
 
   override def convert(rel: RelNode): RelNode = {
     val agg = rel.asInstanceOf[LogicalWindowTableAggregate]

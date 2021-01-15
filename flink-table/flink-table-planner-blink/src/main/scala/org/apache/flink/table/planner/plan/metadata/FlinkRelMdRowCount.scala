@@ -22,7 +22,11 @@ import org.apache.flink.annotation.Experimental
 import org.apache.flink.configuration.ConfigOption
 import org.apache.flink.configuration.ConfigOptions.key
 import org.apache.flink.table.planner.calcite.FlinkContext
-import org.apache.flink.table.planner.plan.logical.{LogicalWindow, SlidingGroupWindow, TumblingGroupWindow}
+import org.apache.flink.table.planner.plan.logical.{
+  LogicalWindow,
+  SlidingGroupWindow,
+  TumblingGroupWindow
+}
 import org.apache.flink.table.planner.plan.nodes.calcite.{Expand, Rank, WindowAggregate}
 import org.apache.flink.table.planner.plan.nodes.physical.batch._
 import org.apache.flink.table.planner.plan.stats.ValueInterval
@@ -42,9 +46,9 @@ import java.lang.{Double => JDouble, Long => JLong}
 import scala.collection.JavaConversions._
 
 /**
-  * FlinkRelMdRowCount supplies a implementation of
-  * [[RelMetadataQuery#getRowCount]] for the standard logical algebra.
-  */
+ * FlinkRelMdRowCount supplies a implementation of
+ * [[RelMetadataQuery#getRowCount]] for the standard logical algebra.
+ */
 class FlinkRelMdRowCount private extends MetadataHandler[BuiltInMetadata.RowCount] {
 
   def getDef: MetadataDef[BuiltInMetadata.RowCount] = BuiltInMetadata.RowCount.DEF
@@ -85,7 +89,7 @@ class FlinkRelMdRowCount private extends MetadataHandler[BuiltInMetadata.RowCoun
       return null
     }
     val limitStart = SortUtil.getLimitStart(offset)
-    val rowCount = Math.max(inputRowCount - limitStart, 0D)
+    val rowCount = Math.max(inputRowCount - limitStart, 0d)
     if (fetch != null) {
       val limit = RexLiteral.intValue(fetch)
       if (limit < rowCount) {
@@ -101,14 +105,14 @@ class FlinkRelMdRowCount private extends MetadataHandler[BuiltInMetadata.RowCoun
   }
 
   /**
-    * Get output rowCount and input rowCount of agg
-    *
-    * @param rel           agg relNode
-    * @param groupSet      agg groupSet
-    * @param groupSetsSize agg groupSets count
-    * @param mq            metadata query
-    * @return a tuple, the first element is output rowCount, second one is input rowCount
-    */
+   * Get output rowCount and input rowCount of agg
+   *
+   * @param rel           agg relNode
+   * @param groupSet      agg groupSet
+   * @param groupSetsSize agg groupSets count
+   * @param mq            metadata query
+   * @return a tuple, the first element is output rowCount, second one is input rowCount
+   */
   private def getRowCountOfAgg(
       rel: SingleRel,
       groupSet: ImmutableBitSet,
@@ -176,8 +180,8 @@ class FlinkRelMdRowCount private extends MetadataHandler[BuiltInMetadata.RowCoun
       val inputRowCnt = mq.getRowCount(input)
       val config = rel.getCluster.getPlanner.getContext.unwrap(classOf[FlinkContext]).getTableConfig
       val parallelism = (inputRowCnt /
-          config.getConfiguration.getLong(
-            FlinkRelMdRowCount.TABLE_OPTIMIZER_ROWS_PER_LOCALAGG) + 1).toInt
+        config.getConfiguration.getLong(
+          FlinkRelMdRowCount.TABLE_OPTIMIZER_ROWS_PER_LOCALAGG) + 1).toInt
       if (parallelism == 1) {
         ndvOfGroupKeysOnGlobalAgg
       } else if (grouping.isEmpty) {
@@ -216,10 +220,10 @@ class FlinkRelMdRowCount private extends MetadataHandler[BuiltInMetadata.RowCoun
       // SlideWindowWithOverlap is 4.
       // Introduce expand factor here to distinguish output rowCount of normal agg with all kinds of
       // window aggregates.
-      val expandFactorOfTumblingWindow = 2D
-      val expandFactorOfNoOverLapSlidingWindow = 2D
-      val expandFactorOfOverLapSlidingWindow = 4D
-      val expandFactorOfSessionWindow = 2D
+      val expandFactorOfTumblingWindow = 2d
+      val expandFactorOfNoOverLapSlidingWindow = 2d
+      val expandFactorOfOverLapSlidingWindow = 4d
+      val expandFactorOfSessionWindow = 2d
       window match {
         case TumblingGroupWindow(_, _, size) if hasTimeIntervalType(size) =>
           Math.min(expandFactorOfTumblingWindow * ndv, inputRowCount)
@@ -270,7 +274,7 @@ class FlinkRelMdRowCount private extends MetadataHandler[BuiltInMetadata.RowCoun
       // Make sure outputRowCount won't be too small based on join type.
       join.getJoinType match {
         case JoinRelType.INNER => innerJoinRowCount
-        case JoinRelType.LEFT =>
+        case JoinRelType.LEFT  =>
           // All rows from left side should be in the result.
           math.max(leftRowCount, innerJoinRowCount)
         case JoinRelType.RIGHT =>
@@ -303,8 +307,8 @@ class FlinkRelMdRowCount private extends MetadataHandler[BuiltInMetadata.RowCoun
     // the leftKeys length equals to rightKeys, so it's ok to only check leftKeys length
     require(joinInfo.leftKeys.nonEmpty)
 
-    val joinKeyDisjoint = joinInfo.leftKeys.zip(joinInfo.rightKeys).exists {
-      case (leftKey, rightKey) =>
+    val joinKeyDisjoint =
+      joinInfo.leftKeys.zip(joinInfo.rightKeys).exists { case (leftKey, rightKey) =>
         val leftInterval = fmq.getColumnInterval(leftChild, leftKey)
         val rightInterval = fmq.getColumnInterval(rightChild, rightKey)
         if (leftInterval != null && rightInterval != null) {
@@ -312,10 +316,10 @@ class FlinkRelMdRowCount private extends MetadataHandler[BuiltInMetadata.RowCoun
         } else {
           false
         }
-    }
+      }
     // One of the join key pairs is disjoint, thus the two sides of join is disjoint.
     if (joinKeyDisjoint) {
-      return 0D
+      return 0d
     }
 
     val leftKeySet = joinInfo.leftSet()
@@ -324,7 +328,7 @@ class FlinkRelMdRowCount private extends MetadataHandler[BuiltInMetadata.RowCoun
     val rightNdv = fmq.getDistinctRowCount(rightChild, rightKeySet, null)
     // estimate selectivity of non-equi
     val selectivityOfNonEquiPred: JDouble = if (joinInfo.isEqui) {
-      1D
+      1d
     } else {
       val nonEquiPred = joinInfo.getRemaining(rexBuilder)
       val equiPred = RelMdUtil.minusPreds(rexBuilder, condition, nonEquiPred)
@@ -334,7 +338,7 @@ class FlinkRelMdRowCount private extends MetadataHandler[BuiltInMetadata.RowCoun
 
     if (leftNdv != null && rightNdv != null) {
       // selectivity of equi part is 1 / Max(leftNdv, rightNdv)
-      val selectivityOfEquiPred = Math.min(1D, 1D / Math.max(leftNdv, rightNdv))
+      val selectivityOfEquiPred = Math.min(1d, 1d / Math.max(leftNdv, rightNdv))
       return leftRowCount * rightRowCount * selectivityOfEquiPred * selectivityOfNonEquiPred
     }
 
@@ -376,31 +380,29 @@ class FlinkRelMdRowCount private extends MetadataHandler[BuiltInMetadata.RowCoun
     if (rowCounts.contains(null)) {
       null
     } else {
-      rowCounts.foldLeft(0D)(_ + _)
+      rowCounts.foldLeft(0d)(_ + _)
     }
   }
 
   def getRowCount(rel: Intersect, mq: RelMetadataQuery): JDouble = {
-    rel.getInputs.foldLeft(null.asInstanceOf[JDouble]) {
-      (res, input) =>
-        val partialRowCount = mq.getRowCount(input)
-        if (res == null || (partialRowCount != null && partialRowCount < res)) {
-          partialRowCount
-        } else {
-          res
-        }
+    rel.getInputs.foldLeft(null.asInstanceOf[JDouble]) { (res, input) =>
+      val partialRowCount = mq.getRowCount(input)
+      if (res == null || (partialRowCount != null && partialRowCount < res)) {
+        partialRowCount
+      } else {
+        res
+      }
     }
   }
 
   def getRowCount(rel: Minus, mq: RelMetadataQuery): JDouble = {
-    rel.getInputs.foldLeft(null.asInstanceOf[JDouble]) {
-      (res, input) =>
-        val partialRowCount = mq.getRowCount(input)
-        if (res == null || (partialRowCount != null && partialRowCount < res)) {
-          partialRowCount
-        } else {
-          res
-        }
+    rel.getInputs.foldLeft(null.asInstanceOf[JDouble]) { (res, input) =>
+      val partialRowCount = mq.getRowCount(input)
+      if (res == null || (partialRowCount != null && partialRowCount < res)) {
+        partialRowCount
+      } else {
+        res
+      }
     }
   }
 
@@ -410,30 +412,29 @@ class FlinkRelMdRowCount private extends MetadataHandler[BuiltInMetadata.RowCoun
       return mq.getRowCount(rel)
     }
 
-    val v = subset.getRels.foldLeft(null.asInstanceOf[JDouble]) {
-      (min, rel) =>
-        try {
-          val rowCount = mq.getRowCount(rel)
-          NumberUtil.min(min, rowCount)
-        } catch {
-          // ignore this rel; there will be other, non-cyclic ones
-          case e: CyclicMetadataException => min
-          case e: Throwable =>
-            e.printStackTrace()
-            min
-        }
+    val v = subset.getRels.foldLeft(null.asInstanceOf[JDouble]) { (min, rel) =>
+      try {
+        val rowCount = mq.getRowCount(rel)
+        NumberUtil.min(min, rowCount)
+      } catch {
+        // ignore this rel; there will be other, non-cyclic ones
+        case e: CyclicMetadataException => min
+        case e: Throwable =>
+          e.printStackTrace()
+          min
+      }
     }
     // if set is empty, estimate large
     Util.first(v, 1e6d)
   }
 
   /**
-    * Catch-all implementation for
-    * [[BuiltInMetadata.RowCount#getRowCount()]],
-    * invoked using reflection.
-    *
-    * @see org.apache.calcite.rel.metadata.RelMetadataQuery#getRowCount(RelNode)
-    */
+   * Catch-all implementation for
+   * [[BuiltInMetadata.RowCount#getRowCount()]],
+   * invoked using reflection.
+   *
+   * @see org.apache.calcite.rel.metadata.RelMetadataQuery#getRowCount(RelNode)
+   */
   def getRowCount(rel: RelNode, mq: RelMetadataQuery): JDouble = rel.estimateRowCount(mq)
 
 }
@@ -442,15 +443,15 @@ object FlinkRelMdRowCount {
 
   private val INSTANCE = new FlinkRelMdRowCount
 
-  val SOURCE: RelMetadataProvider = ReflectiveRelMetadataProvider.reflectiveSource(
-    BuiltInMethod.ROW_COUNT.method, INSTANCE)
+  val SOURCE: RelMetadataProvider =
+    ReflectiveRelMetadataProvider.reflectiveSource(BuiltInMethod.ROW_COUNT.method, INSTANCE)
 
   // It is a experimental config, will may be removed later.
   @Experimental
   val TABLE_OPTIMIZER_ROWS_PER_LOCALAGG: ConfigOption[JLong] =
     key("table.optimizer.rows-per-local-agg")
-        .defaultValue(JLong.valueOf(1000000L))
-        .withDescription("Sets estimated number of records that one local-agg processes. " +
-            "Optimizer will infer whether to use local/global aggregate according to it.")
+      .defaultValue(JLong.valueOf(1000000L))
+      .withDescription("Sets estimated number of records that one local-agg processes. " +
+        "Optimizer will infer whether to use local/global aggregate according to it.")
 
 }

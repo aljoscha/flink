@@ -39,9 +39,8 @@ class SetOperatorsITCase extends AbstractTestBase {
   def usesLegacyRows: LegacyRowResource = LegacyRowResource.INSTANCE
 
   val env: StreamExecutionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment
-  val tEnv: StreamTableEnvironment = StreamTableEnvironment.create(
-    env,
-    EnvironmentSettings.newInstance().useOldPlanner().build())
+  val tEnv: StreamTableEnvironment =
+    StreamTableEnvironment.create(env, EnvironmentSettings.newInstance().useOldPlanner().build())
 
   @Before
   def setup(): Unit = {
@@ -59,8 +58,7 @@ class SetOperatorsITCase extends AbstractTestBase {
     results.addSink(new StreamITCase.StringSink[Row])
     env.execute()
 
-    val expected = mutable.MutableList(
-        "Hi", "Hello", "Hello world", "Hi", "Hello", "Hello world")
+    val expected = mutable.MutableList("Hi", "Hello", "Hello world", "Hi", "Hello", "Hello world")
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
   }
 
@@ -95,9 +93,11 @@ class SetOperatorsITCase extends AbstractTestBase {
 
   @Test
   def testUnionWithCompositeType(): Unit = {
-    val s1 = env.fromElements((1, (1, "a")), (2, (2, "b")))
+    val s1 = env
+      .fromElements((1, (1, "a")), (2, (2, "b")))
       .toTable(tEnv, 'a, 'b)
-    val s2 = env.fromElements(((3, "c"), 3), ((4, "d"), 4))
+    val s2 = env
+      .fromElements(((3, "c"), 3), ((4, "d"), 4))
       .toTable(tEnv, 'a, 'b)
 
     val result = s1.unionAll(s2.select('b, 'a)).toAppendStream[Row]
@@ -110,18 +110,9 @@ class SetOperatorsITCase extends AbstractTestBase {
 
   @Test
   def testInUncorrelated(): Unit = {
-    val dataA = Seq(
-      (1, 1L, "Hello"),
-      (2, 2L, "Hello"),
-      (3, 3L, "Hello World"),
-      (4, 4L, "Hello")
-    )
+    val dataA = Seq((1, 1L, "Hello"), (2, 2L, "Hello"), (3, 3L, "Hello World"), (4, 4L, "Hello"))
 
-    val dataB = Seq(
-      (1, "hello"),
-      (2, "co-hello"),
-      (4, "hello")
-    )
+    val dataB = Seq((1, "hello"), (2, "co-hello"), (4, "hello"))
 
     val tableA = env.fromCollection(dataA).toTable(tEnv, 'a, 'b, 'c)
 
@@ -133,34 +124,21 @@ class SetOperatorsITCase extends AbstractTestBase {
     results.addSink(new StreamITCase.RetractingSink)
     env.execute()
 
-    val expected = Seq(
-      "1,1,Hello", "2,2,Hello", "4,4,Hello"
-    )
+    val expected = Seq("1,1,Hello", "2,2,Hello", "4,4,Hello")
 
     assertEquals(expected.sorted, StreamITCase.retractedResults.sorted)
   }
 
   @Test
   def testInUncorrelatedWithConditionAndAgg(): Unit = {
-    val dataA = Seq(
-      (1, 1L, "Hello"),
-      (2, 2L, "Hello"),
-      (3, 3L, "Hello World"),
-      (4, 4L, "Hello")
-    )
+    val dataA = Seq((1, 1L, "Hello"), (2, 2L, "Hello"), (3, 3L, "Hello World"), (4, 4L, "Hello"))
 
-    val dataB = Seq(
-      (1, "hello"),
-      (1, "Hanoi"),
-      (1, "Hanoi"),
-      (2, "Hanoi-1"),
-      (2, "Hanoi-1"),
-      (-1, "Hanoi-1")
-    )
+    val dataB =
+      Seq((1, "hello"), (1, "Hanoi"), (1, "Hanoi"), (2, "Hanoi-1"), (2, "Hanoi-1"), (-1, "Hanoi-1"))
 
-    val tableA = env.fromCollection(dataA).toTable(tEnv,'a, 'b, 'c)
+    val tableA = env.fromCollection(dataA).toTable(tEnv, 'a, 'b, 'c)
 
-    val tableB = env.fromCollection(dataB).toTable(tEnv,'x, 'y)
+    val tableB = env.fromCollection(dataB).toTable(tEnv, 'x, 'y)
 
     val result = tableA
       .where('a.in(tableB.where('y.like("%Hanoi%")).groupBy('y).select('x.sum)))
@@ -169,39 +147,24 @@ class SetOperatorsITCase extends AbstractTestBase {
     results.addSink(new StreamITCase.RetractingSink)
     env.execute()
 
-    val expected = Seq(
-      "2,2,Hello", "3,3,Hello World"
-    )
+    val expected = Seq("2,2,Hello", "3,3,Hello World")
 
     assertEquals(expected.sorted, StreamITCase.retractedResults.sorted)
   }
 
   @Test
   def testInWithMultiUncorrelatedCondition(): Unit = {
-    val dataA = Seq(
-      (1, 1L, "Hello"),
-      (2, 2L, "Hello"),
-      (3, 3L, "Hello World"),
-      (4, 4L, "Hello")
-    )
+    val dataA = Seq((1, 1L, "Hello"), (2, 2L, "Hello"), (3, 3L, "Hello World"), (4, 4L, "Hello"))
 
-    val dataB = Seq(
-      (1, "hello"),
-      (2, "co-hello"),
-      (4, "hello")
-    )
+    val dataB = Seq((1, "hello"), (2, "co-hello"), (4, "hello"))
 
-    val dataC = Seq(
-      (1L, "Joker"),
-      (1L, "Sanity"),
-      (2L, "Cool")
-    )
+    val dataC = Seq((1L, "Joker"), (1L, "Sanity"), (2L, "Cool"))
 
-    val tableA = env.fromCollection(dataA).toTable(tEnv,'a, 'b, 'c)
+    val tableA = env.fromCollection(dataA).toTable(tEnv, 'a, 'b, 'c)
 
-    val tableB = env.fromCollection(dataB).toTable(tEnv,'x, 'y)
+    val tableB = env.fromCollection(dataB).toTable(tEnv, 'x, 'y)
 
-    val tableC = env.fromCollection(dataC).toTable(tEnv,'w, 'z)
+    val tableC = env.fromCollection(dataC).toTable(tEnv, 'w, 'z)
 
     val result = tableA
       .where('a.in(tableB.select('x)) && 'b.in(tableC.select('w)))
@@ -210,9 +173,7 @@ class SetOperatorsITCase extends AbstractTestBase {
     results.addSink(new StreamITCase.RetractingSink)
     env.execute()
 
-    val expected = Seq(
-      "1,1,Hello", "2,2,Hello"
-    )
+    val expected = Seq("1,1,Hello", "2,2,Hello")
 
     assertEquals(expected.sorted, StreamITCase.retractedResults.sorted)
   }

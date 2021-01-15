@@ -43,26 +43,18 @@ class DataSetSort(
     rowRelDataType: RelDataType,
     offset: RexNode,
     fetch: RexNode)
-  extends SingleRel(cluster, traitSet, inp)
-  with CommonSort
-  with DataSetRel {
+    extends SingleRel(cluster, traitSet, inp)
+    with CommonSort
+    with DataSetRel {
 
-  private val limitStart: Long =  getFetchLimitStart(offset)
+  private val limitStart: Long = getFetchLimitStart(offset)
 
   private val limitEnd: Long = getFetchLimitEnd(fetch, offset)
 
   override def deriveRowType(): RelDataType = rowRelDataType
 
   override def copy(traitSet: RelTraitSet, inputs: util.List[RelNode]): RelNode = {
-    new DataSetSort(
-      cluster,
-      traitSet,
-      inputs.get(0),
-      collations,
-      getRowType,
-      offset,
-      fetch
-    )
+    new DataSetSort(cluster, traitSet, inputs.get(0), collations, getRowType, offset, fetch)
   }
 
   override def estimateRowCount(metadata: RelMetadataQuery): Double = {
@@ -83,8 +75,9 @@ class DataSetSort(
   override def translateToPlan(tableEnv: BatchTableEnvImpl): DataSet[Row] = {
 
     if (fieldCollations.isEmpty) {
-      throw new TableException("Limiting the result without sorting is not allowed " +
-        "as it could lead to arbitrary results.")
+      throw new TableException(
+        "Limiting the result without sorting is not allowed " +
+          "as it could lead to arbitrary results.")
     }
 
     val config = tableEnv.getConfig
@@ -95,7 +88,8 @@ class DataSetSort(
     var partitionedDs = if (currentParallelism == 1) {
       inputDs
     } else {
-      inputDs.partitionByRange(fieldCollations.map(_._1): _*)
+      inputDs
+        .partitionByRange(fieldCollations.map(_._1): _*)
         .withOrders(fieldCollations.map(_._2): _*)
     }
 
@@ -116,10 +110,7 @@ class DataSetSort(
 
       val broadcastName = "countPartition"
 
-      val limitFunction = new LimitFilterFunction[Row](
-        limitStart,
-        limitEnd,
-        broadcastName)
+      val limitFunction = new LimitFilterFunction[Row](limitStart, limitEnd, broadcastName)
 
       val limitName = s"offset: $$offsetToString(offset), fetch: $$fetchToString(fetch, offset))"
 
@@ -138,11 +129,6 @@ class DataSetSort(
   }
 
   override def explainTerms(pw: RelWriter): RelWriter = {
-    sortExplainTerms(
-      super.explainTerms(pw),
-      getRowType,
-      collations,
-      offset,
-      fetch)
+    sortExplainTerms(super.explainTerms(pw), getRowType, collations, offset, fetch)
   }
 }

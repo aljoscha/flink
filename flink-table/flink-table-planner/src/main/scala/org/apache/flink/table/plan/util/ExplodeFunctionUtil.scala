@@ -20,7 +20,12 @@ package org.apache.flink.table.plan.util
 
 import java.util
 
-import org.apache.flink.api.common.typeinfo.{BasicArrayTypeInfo, BasicTypeInfo, PrimitiveArrayTypeInfo, TypeInformation}
+import org.apache.flink.api.common.typeinfo.{
+  BasicArrayTypeInfo,
+  BasicTypeInfo,
+  PrimitiveArrayTypeInfo,
+  TypeInformation
+}
 import org.apache.flink.api.java.typeutils.{MapTypeInfo, MultisetTypeInfo, ObjectArrayTypeInfo}
 import org.apache.flink.table.api.TableException
 import org.apache.flink.table.functions.TableFunction
@@ -59,7 +64,7 @@ abstract class ExplodeTableFunction[T] extends TableFunction[T] {
 
 class MapExplodeTableFunc extends TableFunction[Row] {
   def eval(map: util.Map[Object, Object]): Unit = {
-    map.asScala.foreach { case (key,value) =>
+    map.asScala.foreach { case (key, value) =>
       collect(Row.of(key, value))
     }
   }
@@ -155,7 +160,7 @@ object ExplodeFunctionUtil {
 
       case mt: MultisetTypeInfo[_] => createTableFuncByType(mt.getElementTypeInfo)
 
-      case mt: MapTypeInfo[_,_] => new MapExplodeTableFunc
+      case mt: MapTypeInfo[_, _] => new MapExplodeTableFunc
 
       case _ => throw new TableException("Unnesting of '" + ti.toString + "' is not supported.")
     }
@@ -163,14 +168,14 @@ object ExplodeFunctionUtil {
 
   def createTableFuncByType(typeInfo: TypeInformation[_]): TableFunction[_] = {
     typeInfo match {
-      case BasicTypeInfo.INT_TYPE_INFO => new IntExplodeTableFunc
-      case BasicTypeInfo.LONG_TYPE_INFO => new LongExplodeTableFunc
-      case BasicTypeInfo.SHORT_TYPE_INFO => new ShortExplodeTableFunc
-      case BasicTypeInfo.FLOAT_TYPE_INFO => new FloatExplodeTableFunc
-      case BasicTypeInfo.DOUBLE_TYPE_INFO => new DoubleExplodeTableFunc
-      case BasicTypeInfo.BYTE_TYPE_INFO => new ByteExplodeTableFunc
+      case BasicTypeInfo.INT_TYPE_INFO     => new IntExplodeTableFunc
+      case BasicTypeInfo.LONG_TYPE_INFO    => new LongExplodeTableFunc
+      case BasicTypeInfo.SHORT_TYPE_INFO   => new ShortExplodeTableFunc
+      case BasicTypeInfo.FLOAT_TYPE_INFO   => new FloatExplodeTableFunc
+      case BasicTypeInfo.DOUBLE_TYPE_INFO  => new DoubleExplodeTableFunc
+      case BasicTypeInfo.BYTE_TYPE_INFO    => new ByteExplodeTableFunc
       case BasicTypeInfo.BOOLEAN_TYPE_INFO => new BooleanExplodeTableFunc
-      case _ => new ObjectExplodeTableFunc
+      case _                               => new ObjectExplodeTableFunc
     }
   }
 }

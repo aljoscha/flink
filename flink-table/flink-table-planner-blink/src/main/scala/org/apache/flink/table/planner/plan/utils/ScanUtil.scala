@@ -23,7 +23,12 @@ import org.apache.flink.table.api.TableException
 import org.apache.flink.table.data.{GenericRowData, RowData}
 import org.apache.flink.table.planner.codegen.CodeGenUtils.{DEFAULT_INPUT1_TERM, GENERIC_ROW}
 import org.apache.flink.table.planner.codegen.OperatorCodeGenerator.generateCollect
-import org.apache.flink.table.planner.codegen.{CodeGenUtils, CodeGeneratorContext, ExprCodeGenerator, OperatorCodeGenerator}
+import org.apache.flink.table.planner.codegen.{
+  CodeGenUtils,
+  CodeGeneratorContext,
+  ExprCodeGenerator,
+  OperatorCodeGenerator
+}
 import org.apache.flink.table.planner.plan.nodes.exec.utils.ExecNodeUtil
 import org.apache.flink.table.runtime.operators.CodeGenOperatorFactory
 import org.apache.flink.table.runtime.types.LogicalTypeDataTypeConverter.fromDataTypeToLogicalType
@@ -41,15 +46,15 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
-  * Util for [[TableScan]]s.
-  */
+ * Util for [[TableScan]]s.
+ */
 object ScanUtil {
 
   def hasTimeAttributeField(indexes: Array[Int]) =
-    indexes.contains(TimeIndicatorTypeInfo.ROWTIME_STREAM_MARKER)||
-        indexes.contains(TimeIndicatorTypeInfo.ROWTIME_BATCH_MARKER)||
-        indexes.contains(TimeIndicatorTypeInfo.PROCTIME_STREAM_MARKER)||
-        indexes.contains(TimeIndicatorTypeInfo.PROCTIME_BATCH_MARKER)
+    indexes.contains(TimeIndicatorTypeInfo.ROWTIME_STREAM_MARKER) ||
+      indexes.contains(TimeIndicatorTypeInfo.ROWTIME_BATCH_MARKER) ||
+      indexes.contains(TimeIndicatorTypeInfo.PROCTIME_STREAM_MARKER) ||
+      indexes.contains(TimeIndicatorTypeInfo.PROCTIME_BATCH_MARKER)
 
   private[flink] def needsConversion(source: TableSource[_]): Boolean = {
     needsConversion(source.getProducedDataType)
@@ -58,7 +63,7 @@ object ScanUtil {
   def needsConversion(dataType: DataType): Boolean =
     fromDataTypeToLogicalType(dataType) match {
       case _: RowType => !CodeGenUtils.isInternalClass(dataType)
-      case _ => true
+      case _          => true
     }
 
   def convertToInternalRow(
@@ -80,23 +85,27 @@ object ScanUtil {
       val convertFunc = CodeGenUtils.genToInternalConverter(ctx, inputType)
       internalInType match {
         case rt: RowType => (convertFunc, rt)
-        case _ => ((record: String) => s"$GENERIC_ROW.of(${convertFunc(record)})",
+        case _ =>
+          (
+            (record: String) => s"$GENERIC_ROW.of(${convertFunc(record)})",
             RowType.of(internalInType))
       }
     }
 
     val processCode =
       if ((inputRowType.getChildren == outputRowType.getChildren) &&
-          (inputRowType.getFieldNames == outputRowType.getFieldNames) &&
-          !hasTimeAttributeField(fieldIndexes)) {
+        (inputRowType.getFieldNames == outputRowType.getFieldNames) &&
+        !hasTimeAttributeField(fieldIndexes)) {
         s"${generateCollect(inputTerm)}"
       } else {
 
         // field index change (pojo) or has time attribute field
         val conversion = new ExprCodeGenerator(ctx, false)
-            .bindInput(inputRowType, inputTerm = inputTerm, inputFieldMapping = Some(fieldIndexes))
-            .generateConverterResultExpression(
-              outputRowType, classOf[GenericRowData], rowtimeExpression = rowtimeExpr)
+          .bindInput(inputRowType, inputTerm = inputTerm, inputFieldMapping = Some(fieldIndexes))
+          .generateConverterResultExpression(
+            outputRowType,
+            classOf[GenericRowData],
+            rowtimeExpression = rowtimeExpr)
 
         s"""
            |$beforeConvert
@@ -125,8 +134,8 @@ object ScanUtil {
   }
 
   /**
-    * @param qualifiedName qualified name for table
-    */
+   * @param qualifiedName qualified name for table
+   */
   private[flink] def getOperatorName(qualifiedName: Seq[String], rowType: RowType): String = {
     val tableQualifiedName = qualifiedName.mkString(".")
     val fieldNames = rowType.getFieldNames.mkString(", ")

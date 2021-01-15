@@ -29,14 +29,14 @@ import org.apache.flink.table.planner.plan.utils.PythonUtil.containsPythonCall
 import scala.collection.JavaConverters._
 
 /**
-  * Rule that converts [[FlinkLogicalCalc]] to [[StreamPhysicalPythonCalc]].
-  */
+ * Rule that converts [[FlinkLogicalCalc]] to [[StreamPhysicalPythonCalc]].
+ */
 class StreamPhysicalPythonCalcRule
-  extends ConverterRule(
-    classOf[FlinkLogicalCalc],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.STREAM_PHYSICAL,
-    "StreamPhysicalPythonCalcRule") {
+    extends ConverterRule(
+      classOf[FlinkLogicalCalc],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.STREAM_PHYSICAL,
+      "StreamPhysicalPythonCalcRule") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val calc: FlinkLogicalCalc = call.rel(0)

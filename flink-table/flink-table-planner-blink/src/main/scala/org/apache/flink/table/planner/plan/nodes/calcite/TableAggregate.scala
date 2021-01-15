@@ -33,9 +33,9 @@ import scala.collection.JavaConversions._
 import scala.collection.mutable.ListBuffer
 
 /**
-  * Relational operator that represents a table aggregate. A TableAggregate is similar to the
-  * [[org.apache.calcite.rel.core.Aggregate]] but may output 0 or more records for a group.
-  */
+ * Relational operator that represents a table aggregate. A TableAggregate is similar to the
+ * [[org.apache.calcite.rel.core.Aggregate]] but may output 0 or more records for a group.
+ */
 abstract class TableAggregate(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -43,7 +43,7 @@ abstract class TableAggregate(
     groupSet: ImmutableBitSet,
     groupSets: util.List[ImmutableBitSet],
     val aggCalls: util.List[AggregateCall])
-  extends SingleRel(cluster, traitSet, input) {
+    extends SingleRel(cluster, traitSet, input) {
 
   private[flink] def getGroupSet: ImmutableBitSet = groupSet
 
@@ -70,11 +70,13 @@ abstract class TableAggregate(
     val groupNames = new ListBuffer[String]
 
     // group key fields
-    groupSet.asList().foreach(e => {
-      val field = child.getRowType.getFieldList.get(e)
-      groupNames.append(field.getName)
-      builder.add(field)
-    })
+    groupSet
+      .asList()
+      .foreach(e => {
+        val field = child.getRowType.getFieldList.get(e)
+        groupNames.append(field.getName)
+        builder.add(field)
+      })
 
     // agg fields
     val aggCall = aggCalls.get(0)
@@ -96,7 +98,8 @@ abstract class TableAggregate(
   }
 
   override def explainTerms(pw: RelWriter): RelWriter = {
-    super.explainTerms(pw)
+    super
+      .explainTerms(pw)
       .item("group", groupSet)
       .item("tableAggregate", aggCalls)
   }

@@ -21,9 +21,9 @@ package org.apache.flink.table.runtime.join
 import org.apache.flink.types.Row
 
 /**
-  * An utility to generate reusable padding results for outer joins.
-  */
-class OuterJoinPaddingUtil(leftArity: Int, rightArity: Int) extends java.io.Serializable{
+ * An utility to generate reusable padding results for outer joins.
+ */
+class OuterJoinPaddingUtil(leftArity: Int, rightArity: Int) extends java.io.Serializable {
 
   private val resultArity = leftArity + rightArity
   private val leftNullPaddingResult = new Row(resultArity)
@@ -42,10 +42,10 @@ class OuterJoinPaddingUtil(leftArity: Int, rightArity: Int) extends java.io.Seri
   }
 
   /**
-    * Returns a padding result with the given right row.
-    * @param rightRow the right row to pad
-    * @return the reusable null padding result
-    */
+   * Returns a padding result with the given right row.
+   * @param rightRow the right row to pad
+   * @return the reusable null padding result
+   */
   final def padRight(rightRow: Row): Row = {
     var i = 0
     while (i < rightArity) {
@@ -56,10 +56,10 @@ class OuterJoinPaddingUtil(leftArity: Int, rightArity: Int) extends java.io.Seri
   }
 
   /**
-    * Returns a padding result with the given left row.
-    * @param leftRow the left row to pad
-    * @return the reusable null padding result
-    */
+   * Returns a padding result with the given left row.
+   * @param leftRow the left row to pad
+   * @return the reusable null padding result
+   */
   final def padLeft(leftRow: Row): Row = {
     var i = 0
     while (i < leftArity) {

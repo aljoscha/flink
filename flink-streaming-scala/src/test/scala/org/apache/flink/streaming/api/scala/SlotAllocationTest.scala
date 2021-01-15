@@ -22,7 +22,6 @@ import org.apache.flink.runtime.jobgraph.JobGraph
 import org.junit.Assert._
 import org.junit.Test
 
-
 /**
  * This verifies that slot sharing groups are correctly forwarded from user job to JobGraph.
  *
@@ -40,22 +39,34 @@ class SlotAllocationTest {
       }
     }
 
-    env.generateSequence(1, 10)
-      .filter(dummyFilter).slotSharingGroup("isolated")
-      .filter(dummyFilter).slotSharingGroup("default").disableChaining()
-      .filter(dummyFilter).slotSharingGroup("group 1")
+    env
+      .generateSequence(1, 10)
+      .filter(dummyFilter)
+      .slotSharingGroup("isolated")
+      .filter(dummyFilter)
+      .slotSharingGroup("default")
+      .disableChaining()
+      .filter(dummyFilter)
+      .slotSharingGroup("group 1")
       .filter(dummyFilter)
       .startNewChain()
-      .print().disableChaining()
+      .print()
+      .disableChaining()
 
     // verify that a second pipeline does not inherit the groups from the first pipeline
-    env.generateSequence(1, 10)
-      .filter(dummyFilter).slotSharingGroup("isolated-2")
-      .filter(dummyFilter).slotSharingGroup("default").disableChaining()
-      .filter(dummyFilter).slotSharingGroup("group 2")
+    env
+      .generateSequence(1, 10)
+      .filter(dummyFilter)
+      .slotSharingGroup("isolated-2")
+      .filter(dummyFilter)
+      .slotSharingGroup("default")
+      .disableChaining()
+      .filter(dummyFilter)
+      .slotSharingGroup("group 2")
       .filter(dummyFilter)
       .startNewChain()
-      .print().disableChaining()
+      .print()
+      .disableChaining()
 
     val jobGraph: JobGraph = env.getStreamGraph.getJobGraph
 

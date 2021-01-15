@@ -27,17 +27,17 @@ import org.apache.flink.types.Row
 import org.apache.flink.util.Collector
 
 /**
-  * [[GroupCombineFunction]] and [[MapPartitionFunction]] to compute pre-aggregates for batch
-  * (DataSet) queries.
-  *
-  * @param genAggregations Code-generated [[GeneratedAggregations]]
-  */
+ * [[GroupCombineFunction]] and [[MapPartitionFunction]] to compute pre-aggregates for batch
+ * (DataSet) queries.
+ *
+ * @param genAggregations Code-generated [[GeneratedAggregations]]
+ */
 class DataSetPreAggFunction(genAggregations: GeneratedAggregationsFunction)
-  extends AbstractRichFunction
-  with GroupCombineFunction[Row, Row]
-  with MapPartitionFunction[Row, Row]
-  with Compiler[GeneratedAggregations]
-  with Logging {
+    extends AbstractRichFunction
+    with GroupCombineFunction[Row, Row]
+    with MapPartitionFunction[Row, Row]
+    with Compiler[GeneratedAggregations]
+    with Logging {
 
   private var output: Row = _
   private var accumulators: Row = _
@@ -45,12 +45,11 @@ class DataSetPreAggFunction(genAggregations: GeneratedAggregationsFunction)
   private var function: GeneratedAggregations = _
 
   override def open(config: Configuration) {
-    LOG.debug(s"Compiling AggregateHelper: $genAggregations.name \n\n " +
-                s"Code:\n$genAggregations.code")
-    val clazz = compile(
-      getRuntimeContext.getUserCodeClassLoader,
-      genAggregations.name,
-      genAggregations.code)
+    LOG.debug(
+      s"Compiling AggregateHelper: $genAggregations.name \n\n " +
+        s"Code:\n$genAggregations.code")
+    val clazz =
+      compile(getRuntimeContext.getUserCodeClassLoader, genAggregations.name, genAggregations.code)
     LOG.debug("Instantiating AggregateHelper.")
     function = clazz.newInstance()
 

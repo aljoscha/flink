@@ -31,11 +31,11 @@ class CRowValuesInputFormat(
     name: String,
     code: String,
     @transient var returnType: TypeInformation[CRow])
-  extends GenericInputFormat[CRow]
-  with NonParallelInput
-  with ResultTypeQueryable[CRow]
-  with Compiler[GenericInputFormat[Row]]
-  with Logging {
+    extends GenericInputFormat[CRow]
+    with NonParallelInput
+    with ResultTypeQueryable[CRow]
+    with Compiler[GenericInputFormat[Row]]
+    with Logging {
 
   private var format: GenericInputFormat[Row] = _
 

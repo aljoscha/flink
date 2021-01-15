@@ -27,8 +27,15 @@ import org.apache.flink.table.data.binary.BinaryRawValueData
 import org.apache.flink.table.data.{GenericRowData, RowData}
 import org.apache.flink.table.dataview.{ListViewTypeInfo, MapViewTypeInfo}
 import org.apache.flink.table.functions.ImperativeAggregateFunction
-import org.apache.flink.table.planner.typeutils.DataViewUtils.{DataViewSpec, ListViewSpec, MapViewSpec}
-import org.apache.flink.table.runtime.types.TypeInfoLogicalTypeConverter.{fromLogicalTypeToTypeInfo, fromTypeInfoToLogicalType}
+import org.apache.flink.table.planner.typeutils.DataViewUtils.{
+  DataViewSpec,
+  ListViewSpec,
+  MapViewSpec
+}
+import org.apache.flink.table.runtime.types.TypeInfoLogicalTypeConverter.{
+  fromLogicalTypeToTypeInfo,
+  fromTypeInfoToLogicalType
+}
 import org.apache.flink.table.runtime.typeutils.InternalTypeInfo
 import org.apache.flink.table.types.DataType
 import org.apache.flink.table.types.logical.LegacyTypeInformationType
@@ -41,21 +48,20 @@ import scala.collection.mutable
 object LegacyDataViewUtils {
 
   /**
-    * Use NullSerializer for StateView fields from accumulator type information.
-    *
-    * @param index index of aggregate function
-    * @param aggFun aggregate or table aggregate function
-    * @param externalAccType accumulator type information, only support pojo type
-    * @param isStateBackedDataViews is data views use state backend
-    * @return mapping of accumulator type information and data view config which contains id,
-    *         field name and state descriptor
-    */
+   * Use NullSerializer for StateView fields from accumulator type information.
+   *
+   * @param index index of aggregate function
+   * @param aggFun aggregate or table aggregate function
+   * @param externalAccType accumulator type information, only support pojo type
+   * @param isStateBackedDataViews is data views use state backend
+   * @return mapping of accumulator type information and data view config which contains id,
+   *         field name and state descriptor
+   */
   def useNullSerializerForStateViewFieldsFromAccType(
       index: Int,
       aggFun: ImperativeAggregateFunction[_, _],
       externalAccType: DataType,
-      isStateBackedDataViews: Boolean)
-    : (DataType, Array[DataViewSpec]) = {
+      isStateBackedDataViews: Boolean): (DataType, Array[DataViewSpec]) = {
 
     val acc = aggFun.createAccumulator()
     val accumulatorSpecs = new mutable.ArrayBuffer[DataViewSpec]
@@ -93,10 +99,8 @@ object LegacyDataViewUtils {
           // so we add another check => acc.isInstanceOf[GenericRowData]
           case t: InternalTypeInfo[RowData] if acc.isInstanceOf[GenericRowData] =>
             val accInstance = acc.asInstanceOf[GenericRowData]
-            val (arity, fieldNames, fieldTypes) = (
-              t.toRowSize,
-              t.toRowFieldNames,
-              t.toRowFieldTypes)
+            val (arity, fieldNames, fieldTypes) =
+              (t.toRowSize, t.toRowFieldNames, t.toRowFieldTypes)
             val newFieldTypes = for (i <- 0 until arity) yield {
               val fieldName = fieldNames(i)
               val fieldInstance = accInstance.getField(i)
@@ -130,14 +134,13 @@ object LegacyDataViewUtils {
   def includesDataView(ct: CompositeType[_]): Boolean = {
     (0 until ct.getArity).exists(i =>
       ct.getTypeAt(i) match {
-        case nestedCT: CompositeType[_] => includesDataView(nestedCT)
-        case t: TypeInformation[_] if t.getTypeClass == classOf[ListView[_]] => true
+        case nestedCT: CompositeType[_]                                        => includesDataView(nestedCT)
+        case t: TypeInformation[_] if t.getTypeClass == classOf[ListView[_]]   => true
         case t: TypeInformation[_] if t.getTypeClass == classOf[MapView[_, _]] => true
         // TODO supports SortedMapView
         // case t: TypeInformation[_] if t.getTypeClass == classOf[SortedMapView[_, _]] => true
         case _ => false
-      }
-    )
+      })
   }
 
   /** Analyse dataview element types and decorate the dataview typeinfos */
@@ -184,8 +187,7 @@ object LegacyDataViewUtils {
             fromLegacyInfoToDataType(newTypeInfo),
             false,
             newTypeInfo.getKeyType.createSerializer(new ExecutionConfig),
-            newTypeInfo.getValueType.createSerializer(new ExecutionConfig)
-          )
+            newTypeInfo.getValueType.createSerializer(new ExecutionConfig))
           spec = Some(mapViewSpec)
         }
         newTypeInfo
@@ -215,8 +217,7 @@ object LegacyDataViewUtils {
             "agg" + aggIndex + "$" + fieldName,
             fieldIndex, // dataview field index in pojo
             fromLegacyInfoToDataType(newTypeInfo),
-            newTypeInfo.getElementType.createSerializer(new ExecutionConfig)
-          )
+            newTypeInfo.getElementType.createSerializer(new ExecutionConfig))
           spec = Some(listViewSpec)
         }
         newTypeInfo

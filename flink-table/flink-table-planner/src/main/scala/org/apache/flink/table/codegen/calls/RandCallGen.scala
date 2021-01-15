@@ -23,15 +23,14 @@ import org.apache.flink.table.codegen.calls.CallGenerator.generateCallIfArgsNotN
 import org.apache.flink.table.codegen.{CodeGenerator, GeneratedExpression}
 
 /**
-  * Generates a random function call.
-  * Supports: RAND([seed]) and RAND_INTEGER([seed, ] bound)
-  */
+ * Generates a random function call.
+ * Supports: RAND([seed]) and RAND_INTEGER([seed, ] bound)
+ */
 class RandCallGen(isRandInteger: Boolean, hasSeed: Boolean) extends CallGenerator {
 
   override def generate(
       codeGenerator: CodeGenerator,
-      operands: Seq[GeneratedExpression])
-    : GeneratedExpression = {
+      operands: Seq[GeneratedExpression]): GeneratedExpression = {
 
     val randField = if (hasSeed) {
       if (operands.head.literal) {

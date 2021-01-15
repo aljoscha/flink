@@ -19,7 +19,11 @@ package org.apache.flink.table.planner.plan.rules.logical
 
 import org.apache.flink.api.scala._
 import org.apache.flink.table.api._
-import org.apache.flink.table.planner.plan.optimize.program.{FlinkBatchProgram, FlinkHepRuleSetProgramBuilder, HEP_RULES_EXECUTION_TYPE}
+import org.apache.flink.table.planner.plan.optimize.program.{
+  FlinkBatchProgram,
+  FlinkHepRuleSetProgramBuilder,
+  HEP_RULES_EXECUTION_TYPE
+}
 import org.apache.flink.table.planner.utils.{TableConfigUtils, TableTestBase}
 
 import org.apache.calcite.plan.hep.HepMatchOrder
@@ -28,8 +32,8 @@ import org.apache.calcite.tools.RuleSets
 import org.junit.{Before, Test}
 
 /**
-  * Tests for [[org.apache.calcite.rel.rules.JoinToMultiJoinRule]].
-  */
+ * Tests for [[org.apache.calcite.rel.rules.JoinToMultiJoinRule]].
+ */
 class FlinkJoinToMultiJoinRuleTest extends TableTestBase {
   private val util = batchTestUtil()
 
@@ -42,11 +46,8 @@ class FlinkJoinToMultiJoinRuleTest extends TableTestBase {
       FlinkHepRuleSetProgramBuilder.newBuilder
         .setHepRulesExecutionType(HEP_RULES_EXECUTION_TYPE.RULE_COLLECTION)
         .setHepMatchOrder(HepMatchOrder.BOTTOM_UP)
-        .add(RuleSets.ofList(
-          CoreRules.JOIN_TO_MULTI_JOIN,
-          CoreRules.PROJECT_MULTI_JOIN_MERGE))
-        .build()
-    )
+        .add(RuleSets.ofList(CoreRules.JOIN_TO_MULTI_JOIN, CoreRules.PROJECT_MULTI_JOIN_MERGE))
+        .build())
 
     util.addTableSource[(Int, Long)]("T1", 'a, 'b)
     util.addTableSource[(Int, Long)]("T2", 'c, 'd)

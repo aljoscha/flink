@@ -21,9 +21,9 @@ package org.apache.flink.table.plan.util
 import org.apache.calcite.rex._
 
 /**
-  * Implementation of [[RexVisitor]] that redirects all calls into generic
-  * [[RexDefaultVisitor#visitNode(org.apache.calcite.rex.RexNode)]] method.
-  */
+ * Implementation of [[RexVisitor]] that redirects all calls into generic
+ * [[RexDefaultVisitor#visitNode(org.apache.calcite.rex.RexNode)]] method.
+ */
 abstract class RexDefaultVisitor[R] extends RexVisitor[R] {
 
   override def visitFieldAccess(fieldAccess: RexFieldAccess): R =

@@ -26,12 +26,11 @@ import org.apache.flink.table.plan.nodes.datastream.DataStreamScan
 import org.apache.flink.table.plan.nodes.logical.FlinkLogicalDataStreamScan
 
 class DataStreamScanRule
-  extends ConverterRule(
-    classOf[FlinkLogicalDataStreamScan],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.DATASTREAM,
-    "DataStreamScanRule")
-{
+    extends ConverterRule(
+      classOf[FlinkLogicalDataStreamScan],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.DATASTREAM,
+      "DataStreamScanRule") {
 
   def convert(rel: RelNode): RelNode = {
     val scan: FlinkLogicalDataStreamScan = rel.asInstanceOf[FlinkLogicalDataStreamScan]
@@ -43,13 +42,10 @@ class DataStreamScanRule
       scan.catalog,
       scan.dataStream,
       scan.fieldIdxs,
-      scan.schema
-    )
+      scan.schema)
   }
 }
 
 object DataStreamScanRule {
   val INSTANCE = new DataStreamScanRule
 }
-
-

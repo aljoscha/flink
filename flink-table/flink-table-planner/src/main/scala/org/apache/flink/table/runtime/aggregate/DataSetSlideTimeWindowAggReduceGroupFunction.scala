@@ -30,31 +30,31 @@ import org.apache.flink.types.Row
 import org.apache.flink.util.Collector
 
 /**
-  * It is used for sliding windows on batch for time-windows. It takes a prepared input row (with
-  * aligned rowtime for pre-tumbling), pre-aggregates (pre-tumbles) rows, aligns the window start,
-  * and replicates or omits records for different panes of a sliding window.
-  *
-  * This function is similar to [[DataSetTumbleCountWindowAggReduceGroupFunction]], however,
-  * it does no final aggregate evaluation. It also includes the logic of
-  * [[DataSetSlideTimeWindowAggFlatMapFunction]].
-  *
-  * @param genAggregations Code-generated [[GeneratedAggregations]]
-  * @param keysAndAggregatesArity The total arity of keys and aggregates
-  * @param windowSize window size of the sliding window
-  * @param windowSlide window slide of the sliding window
-  * @param returnType return type of this function
-  */
+ * It is used for sliding windows on batch for time-windows. It takes a prepared input row (with
+ * aligned rowtime for pre-tumbling), pre-aggregates (pre-tumbles) rows, aligns the window start,
+ * and replicates or omits records for different panes of a sliding window.
+ *
+ * This function is similar to [[DataSetTumbleCountWindowAggReduceGroupFunction]], however,
+ * it does no final aggregate evaluation. It also includes the logic of
+ * [[DataSetSlideTimeWindowAggFlatMapFunction]].
+ *
+ * @param genAggregations Code-generated [[GeneratedAggregations]]
+ * @param keysAndAggregatesArity The total arity of keys and aggregates
+ * @param windowSize window size of the sliding window
+ * @param windowSlide window slide of the sliding window
+ * @param returnType return type of this function
+ */
 class DataSetSlideTimeWindowAggReduceGroupFunction(
     private val genAggregations: GeneratedAggregationsFunction,
     private val keysAndAggregatesArity: Int,
     private val windowSize: Long,
     private val windowSlide: Long,
     @transient private val returnType: TypeInformation[Row])
-  extends RichGroupReduceFunction[Row, Row]
-  with CombineFunction[Row, Row]
-  with ResultTypeQueryable[Row]
-  with Compiler[GeneratedAggregations]
-  with Logging {
+    extends RichGroupReduceFunction[Row, Row]
+    with CombineFunction[Row, Row]
+    with ResultTypeQueryable[Row]
+    with Compiler[GeneratedAggregations]
+    with Logging {
 
   private val timeFieldPos = returnType.getArity - 1
   private val intermediateWindowStartPos = keysAndAggregatesArity
@@ -65,12 +65,11 @@ class DataSetSlideTimeWindowAggReduceGroupFunction(
   private var function: GeneratedAggregations = _
 
   override def open(config: Configuration) {
-    LOG.debug(s"Compiling AggregateHelper: $genAggregations.name \n\n " +
-                s"Code:\n$genAggregations.code")
-    val clazz = compile(
-      getRuntimeContext.getUserCodeClassLoader,
-      genAggregations.name,
-      genAggregations.code)
+    LOG.debug(
+      s"Compiling AggregateHelper: $genAggregations.name \n\n " +
+        s"Code:\n$genAggregations.code")
+    val clazz =
+      compile(getRuntimeContext.getUserCodeClassLoader, genAggregations.name, genAggregations.code)
     LOG.debug("Instantiating AggregateHelper.")
     function = clazz.newInstance()
 

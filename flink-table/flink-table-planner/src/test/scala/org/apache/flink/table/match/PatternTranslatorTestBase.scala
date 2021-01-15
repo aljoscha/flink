@@ -37,7 +37,7 @@ import org.junit.rules.ExpectedException
 import org.junit.{ComparisonFailure, Rule}
 import org.mockito.Mockito.{mock, when}
 
-abstract class PatternTranslatorTestBase extends TestLogger{
+abstract class PatternTranslatorTestBase extends TestLogger {
 
   private val expectedException = ExpectedException.none()
 
@@ -50,7 +50,7 @@ abstract class PatternTranslatorTestBase extends TestLogger{
   private val context = prepareContext(testTableTypeInfo)
 
   private def prepareContext(typeInfo: TypeInformation[Row])
-  : (StreamTableEnvironment, StreamExecutionEnvironment, StreamPlanner) = {
+      : (StreamTableEnvironment, StreamExecutionEnvironment, StreamPlanner) = {
     // create DataStreamTable
     val dataStreamMock = mock(classOf[DataStream[Row]])
     val jDataStreamMock = mock(classOf[JDataStream[Row]])
@@ -70,8 +70,7 @@ abstract class PatternTranslatorTestBase extends TestLogger{
 
   def verifyPattern(matchRecognize: String, expected: Pattern[Row, _ <: Row]): Unit = {
     // create RelNode from SQL expression
-    val parsed = context._3.getParser.parse(
-      s"""
+    val parsed = context._3.getParser.parse(s"""
          |SELECT *
          |FROM $tableName
          |$matchRecognize
@@ -81,10 +80,7 @@ abstract class PatternTranslatorTestBase extends TestLogger{
     val relNode = context._3.getRelBuilder.tableOperation(queryOperation).build()
 
     val optimized = context._3.optimizer
-      .optimize(
-        relNode,
-        updatesAsRetraction = false,
-        context._3.getRelBuilder)
+      .optimize(relNode, updatesAsRetraction = false, context._3.getRelBuilder)
 
     // throw exception if plan contains more than a match
     if (!optimized.getInput(0).isInstanceOf[DataStreamScan]) {
@@ -117,7 +113,8 @@ abstract class PatternTranslatorTestBase extends TestLogger{
       currentRight = currentRight.getPrevious
 
       if (!sameName || !sameQuantifier || !sameTimes || !sameSkipStrategy || !sameTimeWindow) {
-        throw new ComparisonFailure("Compiled different pattern.",
+        throw new ComparisonFailure(
+          "Compiled different pattern.",
           expected.toString,
           actual.toString)
       }

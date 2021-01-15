@@ -52,8 +52,7 @@ class LookupJoinTest(legacyTableSource: Boolean) extends TableTestBase {
     if (legacyTableSource) {
       TestTemporalTable.createTemporaryTable(testUtil.tableEnv, "LookupTable", isBounded = true)
     } else {
-      testUtil.addTable(
-        """
+      testUtil.addTable("""
           |CREATE TABLE LookupTable (
           |  `id` INT,
           |  `name` STRING,
@@ -64,8 +63,7 @@ class LookupJoinTest(legacyTableSource: Boolean) extends TableTestBase {
           |)
           |""".stripMargin)
 
-      testUtil.addTable(
-        """
+      testUtil.addTable("""
           |CREATE TABLE LookupTableWithComputedColumn (
           |  `id` INT,
           |  `name` STRING,
@@ -94,8 +92,7 @@ class LookupJoinTest(legacyTableSource: Boolean) extends TableTestBase {
         "'FOR SYSTEM_TIME AS OF' left table's time attribute field.\n" +
         "Querying a temporal table using 'FOR SYSTEM TIME AS OF' syntax with a constant " +
         "timestamp '2017-08-09 14:36:11' is not supported yet",
-      classOf[AssertionError]
-    )
+      classOf[AssertionError])
 
     // only support left or inner join
     // Calcite does not allow FOR SYSTEM_TIME AS OF non-nullable left table field to Right Join.
@@ -113,8 +110,7 @@ class LookupJoinTest(legacyTableSource: Boolean) extends TableTestBase {
       "SELECT * FROM MyTable AS T RIGHT JOIN LookupTable " +
         "FOR SYSTEM_TIME AS OF T.proctime AS D ON T.a = D.id",
       null,
-      classOf[AssertionError]
-    )
+      classOf[AssertionError])
 
     // only support join on raw key of right table
     expectExceptionThrown(
@@ -122,8 +118,7 @@ class LookupJoinTest(legacyTableSource: Boolean) extends TableTestBase {
         "FOR SYSTEM_TIME AS OF T.proctime AS D ON T.a + 1 = D.id + 1",
       "Temporal table join requires an equality condition on fields of table " +
         "[default_catalog.default_database.LookupTable].",
-      classOf[TableException]
-    )
+      classOf[TableException])
   }
 
   @Test
@@ -135,8 +130,7 @@ class LookupJoinTest(legacyTableSource: Boolean) extends TableTestBase {
         "FOR SYSTEM_TIME AS OF T.proctime AS D ON T.a IS NOT  DISTINCT FROM D.id",
       "LookupJoin doesn't support join condition contains 'a IS NOT DISTINCT FROM b' (or " +
         "alternative '(a = b) or (a IS NULL AND b IS NULL)')",
-      classOf[TableException]
-    )
+      classOf[TableException])
 
     // does not support join condition contains `IS NOT  DISTINCT` and similar syntax
     expectExceptionThrown(
@@ -144,16 +138,16 @@ class LookupJoinTest(legacyTableSource: Boolean) extends TableTestBase {
         "FOR SYSTEM_TIME AS OF T.proctime AS D ON T.a = D.id OR (T.a IS NULL AND D.id IS NULL)",
       "LookupJoin doesn't support join condition contains 'a IS NOT DISTINCT FROM b' (or " +
         "alternative '(a = b) or (a IS NULL AND b IS NULL)')",
-      classOf[TableException]
-    )
+      classOf[TableException])
   }
 
   @Test
   def testPythonUDFInJoinCondition(): Unit = {
     thrown.expect(classOf[TableException])
-    thrown.expectMessage("Only inner join condition with equality predicates supports the " +
-      "Python UDF taking the inputs from the left table and the right table at the same time, " +
-      "e.g., ON T1.id = T2.id && pythonUdf(T1.a, T2.b)")
+    thrown.expectMessage(
+      "Only inner join condition with equality predicates supports the " +
+        "Python UDF taking the inputs from the left table and the right table at the same time, " +
+        "e.g., ON T1.id = T2.id && pythonUdf(T1.a, T2.b)")
     testUtil.addFunction("pyFunc", new PythonScalarFunction("pyFunc"))
     val sql =
       """
@@ -202,8 +196,9 @@ class LookupJoinTest(legacyTableSource: Boolean) extends TableTestBase {
     thrown.expect(classOf[TableException])
     thrown.expectMessage("VARCHAR(2147483647) and INTEGER does not have common type now")
 
-    testUtil.verifyRelPlan("SELECT * FROM MyTable AS T JOIN LookupTable "
-      + "FOR SYSTEM_TIME AS OF T.proctime AS D ON T.b = D.id")
+    testUtil.verifyRelPlan(
+      "SELECT * FROM MyTable AS T JOIN LookupTable "
+        + "FOR SYSTEM_TIME AS OF T.proctime AS D ON T.b = D.id")
   }
 
   @Test
@@ -323,8 +318,8 @@ class LookupJoinTest(legacyTableSource: Boolean) extends TableTestBase {
 
   @Test
   def testReusing(): Unit = {
-    testUtil.tableEnv.getConfig.getConfiguration.setBoolean(
-      OptimizerConfigOptions.TABLE_OPTIMIZER_REUSE_SUB_PLAN_ENABLED, true)
+    testUtil.tableEnv.getConfig.getConfiguration
+      .setBoolean(OptimizerConfigOptions.TABLE_OPTIMIZER_REUSE_SUB_PLAN_ENABLED, true)
     val sql1 =
       """
         |SELECT b, a, sum(c) c, sum(d) d, PROCTIME() as proctime
@@ -359,9 +354,9 @@ class LookupJoinTest(legacyTableSource: Boolean) extends TableTestBase {
   // ==========================================================================================
 
   private def expectExceptionThrown(
-    sql: String,
-    keywords: String,
-    clazz: Class[_ <: Throwable] = classOf[ValidationException]): Unit = {
+      sql: String,
+      keywords: String,
+      clazz: Class[_ <: Throwable] = classOf[ValidationException]): Unit = {
     try {
       testUtil.verifyExplain(sql)
       fail(s"Expected a $clazz, but no exception is thrown.")

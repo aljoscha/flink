@@ -26,10 +26,8 @@ import org.apache.flink.test.util.MultipleProgramsTestBase.TestExecutionMode
 
 import org.junit.Rule
 
-class TableProgramsTestBase(
-    mode: TestExecutionMode,
-    tableConfigMode: TableConfigMode)
-  extends MultipleProgramsTestBase(mode) {
+class TableProgramsTestBase(mode: TestExecutionMode, tableConfigMode: TableConfigMode)
+    extends MultipleProgramsTestBase(mode) {
 
   @Rule
   def usesLegacyRows: LegacyRowResource = LegacyRowResource.INSTANCE

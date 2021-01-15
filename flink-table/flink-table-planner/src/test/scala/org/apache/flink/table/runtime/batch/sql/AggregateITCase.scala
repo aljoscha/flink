@@ -38,9 +38,8 @@ import org.junit.runners.Parameterized
 import scala.collection.JavaConverters._
 
 @RunWith(classOf[Parameterized])
-class AggregateITCase(
-    configMode: TableConfigMode)
-  extends TableProgramsCollectionTestBase(configMode) {
+class AggregateITCase(configMode: TableConfigMode)
+    extends TableProgramsCollectionTestBase(configMode) {
 
   @Test
   def testAggregationTypes(): Unit = {
@@ -105,9 +104,11 @@ class AggregateITCase(
     val sqlQuery = "SELECT avg(a), avg(b), avg(c), avg(d), avg(e), avg(f), count(g), " +
       "min(g), min('Ciao'), max(g), max('Ciao'), sum(CAST(f AS DECIMAL)) FROM MyTable"
 
-    val ds = env.fromElements(
-      (1: Byte, 1: Short, 1, 1L, 1.0f, 1.0d, "Hello"),
-      (2: Byte, 2: Short, 2, 2L, 2.0f, 2.0d, "Ciao")).toTable(tEnv, 'a, 'b, 'c, 'd, 'e, 'f, 'g)
+    val ds = env
+      .fromElements(
+        (1: Byte, 1: Short, 1, 1L, 1.0f, 1.0d, "Hello"),
+        (2: Byte, 2: Short, 2, 2L, 2.0f, 2.0d, "Ciao"))
+      .toTable(tEnv, 'a, 'b, 'c, 'd, 'e, 'f, 'g)
     tEnv.registerTable("MyTable", ds)
 
     val result = tEnv.sqlQuery(sqlQuery)
@@ -173,7 +174,6 @@ class AggregateITCase(
     TestBaseUtils.compareResultAsText(results.asJava, expected)
   }
 
-
   @Test
   def testAggregationAfterProjection(): Unit = {
 
@@ -183,9 +183,11 @@ class AggregateITCase(
     val sqlQuery = "SELECT avg(a), sum(b), count(c) FROM " +
       "(SELECT _1 as a, _2 as b, _3 as c FROM MyTable)"
 
-    val ds = env.fromElements(
-      (1: Byte, 1: Short, 1, 1L, 1.0f, 1.0d, "Hello"),
-      (2: Byte, 2: Short, 2, 2L, 2.0f, 2.0d, "Ciao")).toTable(tEnv)
+    val ds = env
+      .fromElements(
+        (1: Byte, 1: Short, 1, 1L, 1.0f, 1.0d, "Hello"),
+        (2: Byte, 2: Short, 2, 2L, 2.0f, 2.0d, "Ciao"))
+      .toTable(tEnv)
     tEnv.registerTable("MyTable", ds)
 
     val result = tEnv.sqlQuery(sqlQuery)
@@ -291,9 +293,8 @@ class AggregateITCase(
     val sqlQuery4 = "SELECT avg(a), sum(a), count(b), myAgg(b)" +
       "FROM MyTable where a = 4"
 
-    val ds = env.fromElements(
-      (1: Byte, 1: Short),
-      (2: Byte, 2: Short))
+    val ds = env
+      .fromElements((1: Byte, 1: Short), (2: Byte, 2: Short))
       .toTable(tEnv, 'a, 'b)
 
     tEnv.registerTable("MyTable", ds)
@@ -305,14 +306,15 @@ class AggregateITCase(
 
     val results = result.toDataSet[Row].collect()
     val expected = Seq.empty
-    val results2 =  result2.toDataSet[Row].collect()
+    val results2 = result2.toDataSet[Row].collect()
     val expected2 = "null,null,0"
     val results3 = result3.toDataSet[Row].collect()
     val expected3 = "1,3,2"
-    val results4 =  result4.toDataSet[Row].collect()
+    val results4 = result4.toDataSet[Row].collect()
     val expected4 = "null,null,0,0"
 
-    assert(results.equals(expected),
+    assert(
+      results.equals(expected),
       "Empty result is expected for grouped set, but actual: " + results)
     TestBaseUtils.compareResultAsText(results2.asJava, expected2)
     TestBaseUtils.compareResultAsText(results3.asJava, expected3)
@@ -332,7 +334,8 @@ class AggregateITCase(
         "FROM T " +
         "GROUP BY b, TUMBLE(ts, INTERVAL '3' SECOND)"
 
-    val ds = CollectionDataSets.get3TupleDataSet(env)
+    val ds = CollectionDataSets
+      .get3TupleDataSet(env)
       // create timestamps
       .map(x => (x._1, x._2, x._3, toTimestamp(x._1 * 1000)))
     tEnv.createTemporaryView("T", ds, 'a, 'b, 'c, 'ts)
@@ -340,12 +343,18 @@ class AggregateITCase(
     val result = tEnv.sqlQuery(sqlQuery).toDataSet[Row].collect()
     val expected = Seq(
       "1,1,1,1,1",
-      "2,2,1,2,2", "2,3,1,2,3",
-      "3,9,2,3,4", "3,6,1,3,6",
-      "4,15,2,4,7", "4,19,2,4,9",
-      "5,11,1,5,11", "5,39,3,5,13", "5,15,1,5,15",
-      "6,33,2,6,16", "6,57,3,6,19", "6,21,1,6,21"
-    ).mkString("\n")
+      "2,2,1,2,2",
+      "2,3,1,2,3",
+      "3,9,2,3,4",
+      "3,6,1,3,6",
+      "4,15,2,4,7",
+      "4,19,2,4,9",
+      "5,11,1,5,11",
+      "5,39,3,5,13",
+      "5,15,1,5,15",
+      "6,33,2,6,16",
+      "6,57,3,6,19",
+      "6,21,1,6,21").mkString("\n")
 
     TestBaseUtils.compareResultAsText(result.asJava, expected)
   }
@@ -361,7 +370,8 @@ class AggregateITCase(
         "FROM T " +
         "GROUP BY b, TUMBLE(ts, INTERVAL '3' SECOND)"
 
-    val ds = CollectionDataSets.get3TupleDataSet(env)
+    val ds = CollectionDataSets
+      .get3TupleDataSet(env)
       // create timestamps
       .map(x => (x._1, x._2, x._3, toTimestamp(x._1 * 1000)))
     tEnv.createTemporaryView("T", ds, 'a, 'b, 'c, 'ts)
@@ -369,12 +379,18 @@ class AggregateITCase(
     val result = tEnv.sqlQuery(sqlQuery).toDataSet[Row].collect()
     val expected = Seq(
       "1,{1=1}",
-      "2,{2=1}", "2,{2=1}",
-      "3,{3=1}", "3,{3=2}",
-      "4,{4=2}", "4,{4=2}",
-      "5,{5=1}", "5,{5=1}", "5,{5=3}",
-      "6,{6=1}", "6,{6=2}", "6,{6=3}"
-    ).mkString("\n")
+      "2,{2=1}",
+      "2,{2=1}",
+      "3,{3=1}",
+      "3,{3=2}",
+      "4,{4=2}",
+      "4,{4=2}",
+      "5,{5=1}",
+      "5,{5=1}",
+      "5,{5=3}",
+      "6,{6=1}",
+      "6,{6=2}",
+      "6,{6=3}").mkString("\n")
 
     TestBaseUtils.compareResultAsText(result.asJava, expected)
   }
@@ -384,25 +400,24 @@ class AggregateITCase(
     val env = ExecutionEnvironment.getExecutionEnvironment
     val tEnv = BatchTableEnvironment.create(env, config)
 
-    val ds = CollectionDataSets.get3TupleDataSet(env)
+    val ds = CollectionDataSets
+      .get3TupleDataSet(env)
       // create timestamps
       .map(x => (x._1, x._2, x._3, toTimestamp(x._1 * 1000)))
     tEnv.createTemporaryView("t1", ds, 'a, 'b, 'c, 'ts)
 
-    val t2 = tEnv.sqlQuery("SELECT b, COLLECT(b) as `set`" +
+    val t2 = tEnv.sqlQuery(
+      "SELECT b, COLLECT(b) as `set`" +
         "FROM t1 " +
         "GROUP BY b, TUMBLE(ts, INTERVAL '3' SECOND)")
     tEnv.registerTable("t2", t2)
 
-    val result = tEnv.sqlQuery("SELECT b, s FROM t2, UNNEST(t2.`set`) AS A(s) where b < 3")
+    val result = tEnv
+      .sqlQuery("SELECT b, s FROM t2, UNNEST(t2.`set`) AS A(s) where b < 3")
       .toDataSet[Row]
       .collect()
 
-    val expected = Seq(
-      "1,1",
-      "2,2",
-      "2,2"
-    ).mkString("\n")
+    val expected = Seq("1,1", "2,2", "2,2").mkString("\n")
 
     TestBaseUtils.compareResultAsText(result.asJava, expected)
   }
@@ -417,10 +432,11 @@ class AggregateITCase(
         "TUMBLE_START(ts, INTERVAL '5' SECOND), " +
         "TUMBLE_END(ts, INTERVAL '5' SECOND), " +
         "TUMBLE_ROWTIME(ts, INTERVAL '5' SECOND)" +
-      "FROM T " +
-      "GROUP BY b, TUMBLE(ts, INTERVAL '5' SECOND)"
+        "FROM T " +
+        "GROUP BY b, TUMBLE(ts, INTERVAL '5' SECOND)"
 
-    val ds = CollectionDataSets.get3TupleDataSet(env)
+    val ds = CollectionDataSets
+      .get3TupleDataSet(env)
       // min time unit is seconds
       .map(x => (x._1, x._2, x._3, toTimestamp(x._1 * 1000)))
     tEnv.createTemporaryView("T", ds, 'a, 'b, 'c, 'ts)
@@ -436,8 +452,7 @@ class AggregateITCase(
       "5,4,1970-01-01 00:00:10.0,1970-01-01 00:00:15.0,1970-01-01 00:00:14.999",
       "5,1,1970-01-01 00:00:15.0,1970-01-01 00:00:20.0,1970-01-01 00:00:19.999",
       "6,4,1970-01-01 00:00:15.0,1970-01-01 00:00:20.0,1970-01-01 00:00:19.999",
-      "6,2,1970-01-01 00:00:20.0,1970-01-01 00:00:25.0,1970-01-01 00:00:24.999"
-    ).mkString("\n")
+      "6,2,1970-01-01 00:00:20.0,1970-01-01 00:00:25.0,1970-01-01 00:00:24.999").mkString("\n")
 
     TestBaseUtils.compareResultAsText(result.asJava, expected)
   }
@@ -455,20 +470,33 @@ class AggregateITCase(
         "FROM T " +
         "GROUP BY b, HOP(ts, INTERVAL '2' SECOND, INTERVAL '4' SECOND)"
 
-    val ds = CollectionDataSets.get3TupleDataSet(env)
+    val ds = CollectionDataSets
+      .get3TupleDataSet(env)
       // create timestamps
       .map(x => (x._1, x._2, x._3, toTimestamp(x._1 * 1000)))
     tEnv.createTemporaryView("T", ds, 'a, 'b, 'c, 'ts)
 
     val result = tEnv.sqlQuery(sqlQuery).toDataSet[Row].collect()
     val expected = Seq(
-      "1,1,1,1,1","1,1,1,1,1",
-      "2,5,2,2,2","2,5,2,2,2",
-      "3,9,2,3,4", "3,15,3,3,5", "3,6,1,3,6",
-      "4,7,1,4,7", "4,24,3,4,8", "4,27,3,4,9", "4,10,1,4,10",
-      "5,11,1,5,11", "5,36,3,5,12", "5,54,4,5,13", "5,29,2,5,14",
-      "6,33,2,6,16", "6,70,4,6,17", "6,78,4,6,19", "6,41,2,6,20"
-    ).mkString("\n")
+      "1,1,1,1,1",
+      "1,1,1,1,1",
+      "2,5,2,2,2",
+      "2,5,2,2,2",
+      "3,9,2,3,4",
+      "3,15,3,3,5",
+      "3,6,1,3,6",
+      "4,7,1,4,7",
+      "4,24,3,4,8",
+      "4,27,3,4,9",
+      "4,10,1,4,10",
+      "5,11,1,5,11",
+      "5,36,3,5,12",
+      "5,54,4,5,13",
+      "5,29,2,5,14",
+      "6,33,2,6,16",
+      "6,70,4,6,17",
+      "6,78,4,6,19",
+      "6,41,2,6,20").mkString("\n")
 
     TestBaseUtils.compareResultAsText(result.asJava, expected)
   }
@@ -484,10 +512,11 @@ class AggregateITCase(
         "HOP_START(ts, INTERVAL '5' SECOND, INTERVAL '10' SECOND), " +
         "HOP_END(ts, INTERVAL '5' SECOND, INTERVAL '10' SECOND), " +
         "HOP_ROWTIME(ts, INTERVAL '5' SECOND, INTERVAL '10' SECOND) " +
-      "FROM T " +
-      "GROUP BY b, HOP(ts, INTERVAL '5' SECOND, INTERVAL '10' SECOND)"
+        "FROM T " +
+        "GROUP BY b, HOP(ts, INTERVAL '5' SECOND, INTERVAL '10' SECOND)"
 
-    val ds = CollectionDataSets.get3TupleDataSet(env)
+    val ds = CollectionDataSets
+      .get3TupleDataSet(env)
       // create timestamps
       .map(x => (x._1, x._2, x._3, toTimestamp(x._1 * 1000)))
     tEnv.createTemporaryView("T", ds, 'a, 'b, 'c, 'ts)
@@ -509,8 +538,7 @@ class AggregateITCase(
       "6,4,1970-01-01 00:00:10.0,1970-01-01 00:00:20.0,1970-01-01 00:00:19.999",
       "5,1,1970-01-01 00:00:15.0,1970-01-01 00:00:25.0,1970-01-01 00:00:24.999",
       "6,6,1970-01-01 00:00:15.0,1970-01-01 00:00:25.0,1970-01-01 00:00:24.999",
-      "6,2,1970-01-01 00:00:20.0,1970-01-01 00:00:30.0,1970-01-01 00:00:29.999"
-    ).mkString("\n")
+      "6,2,1970-01-01 00:00:20.0,1970-01-01 00:00:30.0,1970-01-01 00:00:29.999").mkString("\n")
 
     TestBaseUtils.compareResultAsText(result.asJava, expected)
   }
@@ -529,17 +557,15 @@ class AggregateITCase(
         "FROM T " +
         "GROUP BY SESSION(ts, INTERVAL '4' SECOND)"
 
-    val ds = CollectionDataSets.get3TupleDataSet(env)
+    val ds = CollectionDataSets
+      .get3TupleDataSet(env)
       // create timestamps
       .filter(x => (x._2 % 2) == 0)
       .map(x => (x._1, x._2, x._3, toTimestamp(x._1 * 1000)))
     tEnv.createTemporaryView("T", ds, 'a, 'b, 'c, 'ts)
 
     val result = tEnv.sqlQuery(sqlQuery).toDataSet[Row].collect()
-    val expected = Seq(
-      "2,10,39,6,3,7",
-      "16,21,111,6,6,18"
-    ).mkString("\n")
+    val expected = Seq("2,10,39,6,3,7", "16,21,111,6,6,18").mkString("\n")
 
     TestBaseUtils.compareResultAsText(result.asJava, expected)
   }
@@ -555,10 +581,11 @@ class AggregateITCase(
         "SESSION_START(ts, INTERVAL '4' SECOND), " +
         "SESSION_END(ts, INTERVAL '4' SECOND), " +
         "SESSION_ROWTIME(ts, INTERVAL '4' SECOND) " +
-      "FROM T " +
-      "GROUP BY SESSION(ts, INTERVAL '4' SECOND)"
+        "FROM T " +
+        "GROUP BY SESSION(ts, INTERVAL '4' SECOND)"
 
-    val ds = CollectionDataSets.get3TupleDataSet(env)
+    val ds = CollectionDataSets
+      .get3TupleDataSet(env)
       // create timestamps
       .filter(x => (x._2 % 2) == 0)
       .map(x => (x._1, x._2, x._3, toTimestamp(x._1 * 1000)))
@@ -567,8 +594,7 @@ class AggregateITCase(
     val result = tEnv.sqlQuery(sqlQuery).toDataSet[Row].collect()
     val expected = Seq(
       "6,1970-01-01 00:00:02.0,1970-01-01 00:00:14.0,1970-01-01 00:00:13.999",
-      "6,1970-01-01 00:00:16.0,1970-01-01 00:00:25.0,1970-01-01 00:00:24.999"
-    ).mkString("\n")
+      "6,1970-01-01 00:00:16.0,1970-01-01 00:00:25.0,1970-01-01 00:00:24.999").mkString("\n")
 
     TestBaseUtils.compareResultAsText(result.asJava, expected)
   }
@@ -584,28 +610,23 @@ class AggregateITCase(
 
     val sqlQuery =
       "SELECT b, " +
-      "  COUNT(DISTINCT b), " +
-      "  SUM(DISTINCT (a / 3)), " +
-      "  COUNT(DISTINCT SUBSTRING(c FROM 1 FOR 2))," +
-      "  COUNT(DISTINCT c) " +
-      "FROM (" +
-      sqlWithNull +
-      ") GROUP BY b " +
-      "ORDER BY b"
+        "  COUNT(DISTINCT b), " +
+        "  SUM(DISTINCT (a / 3)), " +
+        "  COUNT(DISTINCT SUBSTRING(c FROM 1 FOR 2))," +
+        "  COUNT(DISTINCT c) " +
+        "FROM (" +
+        sqlWithNull +
+        ") GROUP BY b " +
+        "ORDER BY b"
 
     val t = CollectionDataSets.get3TupleDataSet(env).toTable(tEnv).as("a", "b", "c")
     tEnv.registerTable("MyTable", t)
 
     val result = tEnv.sqlQuery(sqlQuery).toDataSet[Row].collect()
 
-    val expected = Seq(
-      "1,1,0,1,1",
-      "3,1,3,3,3",
-      "4,1,5,1,4",
-      "5,1,12,1,5",
-      "6,1,18,1,6",
-      "null,0,1,1,2"
-    ).mkString("\n")
+    val expected =
+      Seq("1,1,0,1,1", "3,1,3,3,3", "4,1,5,1,4", "5,1,12,1,5", "6,1,18,1,6", "null,0,1,1,2")
+        .mkString("\n")
 
     TestBaseUtils.compareResultAsText(result.asJava, expected)
   }

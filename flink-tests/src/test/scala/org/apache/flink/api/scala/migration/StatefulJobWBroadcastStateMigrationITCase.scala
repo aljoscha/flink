@@ -31,7 +31,11 @@ import org.apache.flink.api.scala.migration.CustomEnum.CustomEnum
 import org.apache.flink.configuration.Configuration
 import org.apache.flink.contrib.streaming.state.RocksDBStateBackend
 import org.apache.flink.runtime.state.memory.MemoryStateBackend
-import org.apache.flink.runtime.state.{FunctionInitializationContext, FunctionSnapshotContext, StateBackendLoader}
+import org.apache.flink.runtime.state.{
+  FunctionInitializationContext,
+  FunctionSnapshotContext,
+  StateBackendLoader
+}
 import org.apache.flink.streaming.api.TimeCharacteristic
 import org.apache.flink.streaming.api.checkpoint.CheckpointedFunction
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment
@@ -80,12 +84,13 @@ object StatefulJobWBroadcastStateMigrationITCase {
 }
 
 /**
-  * ITCase for migration Scala state types across different Flink versions.
-  */
+ * ITCase for migration Scala state types across different Flink versions.
+ */
 @RunWith(classOf[Parameterized])
 class StatefulJobWBroadcastStateMigrationITCase(
-                                        migrationVersionAndBackend: (MigrationVersion, String))
-  extends SavepointMigrationTestBase with Serializable {
+    migrationVersionAndBackend: (MigrationVersion, String))
+    extends SavepointMigrationTestBase
+    with Serializable {
 
   @Test
   @Ignore
@@ -117,23 +122,21 @@ class StatefulJobWBroadcastStateMigrationITCase(
     env.setMaxParallelism(4)
 
     val stream = env
-      .addSource(
-        new CheckpointedSource(4)).setMaxParallelism(1).uid("checkpointedSource")
-      .keyBy(
-        new KeySelector[(Long, Long), Long] {
-          override def getKey(value: (Long, Long)): Long = value._1
-        }
-      )
+      .addSource(new CheckpointedSource(4))
+      .setMaxParallelism(1)
+      .uid("checkpointedSource")
+      .keyBy(new KeySelector[(Long, Long), Long] {
+        override def getKey(value: (Long, Long)): Long = value._1
+      })
       .flatMap(new StatefulFlatMapper)
-      .keyBy(
-        new KeySelector[(Long, Long), Long] {
-          override def getKey(value: (Long, Long)): Long = value._1
-        }
-      )
+      .keyBy(new KeySelector[(Long, Long), Long] {
+        override def getKey(value: (Long, Long)): Long = value._1
+      })
 
     val broadcastStream = env
-      .addSource(
-        new CheckpointedSource(4)).setMaxParallelism(1).uid("checkpointedBroadcastSource")
+      .addSource(new CheckpointedSource(4))
+      .setMaxParallelism(1)
+      .uid("checkpointedBroadcastSource")
       .broadcast(firstBroadcastStateDesc, secondBroadcastStateDesc)
 
     stream
@@ -149,9 +152,7 @@ class StatefulJobWBroadcastStateMigrationITCase(
         s"-${StatefulJobWBroadcastStateMigrationITCase.GENERATE_SAVEPOINT_BACKEND_TYPE}-savepoint",
       new Tuple2(
         AccumulatorCountingSink.NUM_ELEMENTS_ACCUMULATOR,
-        StatefulJobWBroadcastStateMigrationITCase.NUM_ELEMENTS
-      )
-    )
+        StatefulJobWBroadcastStateMigrationITCase.NUM_ELEMENTS))
   }
 
   @Test
@@ -184,23 +185,21 @@ class StatefulJobWBroadcastStateMigrationITCase(
     env.setMaxParallelism(4)
 
     val stream = env
-      .addSource(
-        new CheckpointedSource(4)).setMaxParallelism(1).uid("checkpointedSource")
-      .keyBy(
-        new KeySelector[(Long, Long), Long] {
-          override def getKey(value: (Long, Long)): Long = value._1
-        }
-      )
+      .addSource(new CheckpointedSource(4))
+      .setMaxParallelism(1)
+      .uid("checkpointedSource")
+      .keyBy(new KeySelector[(Long, Long), Long] {
+        override def getKey(value: (Long, Long)): Long = value._1
+      })
       .flatMap(new StatefulFlatMapper)
-      .keyBy(
-        new KeySelector[(Long, Long), Long] {
-          override def getKey(value: (Long, Long)): Long = value._1
-        }
-      )
+      .keyBy(new KeySelector[(Long, Long), Long] {
+        override def getKey(value: (Long, Long)): Long = value._1
+      })
 
     val broadcastStream = env
-      .addSource(
-        new CheckpointedSource(4)).setMaxParallelism(1).uid("checkpointedBroadcastSource")
+      .addSource(new CheckpointedSource(4))
+      .setMaxParallelism(1)
+      .uid("checkpointedBroadcastSource")
       .broadcast(firstBroadcastStateDesc, secondBroadcastStateDesc)
 
     val expectedFirstState: Map[Long, Long] =
@@ -221,14 +220,12 @@ class StatefulJobWBroadcastStateMigrationITCase(
           s"-${migrationVersionAndBackend._2}-savepoint"),
       new Tuple2(
         AccumulatorCountingSink.NUM_ELEMENTS_ACCUMULATOR,
-        StatefulJobWBroadcastStateMigrationITCase.NUM_ELEMENTS)
-    )
+        StatefulJobWBroadcastStateMigrationITCase.NUM_ELEMENTS))
   }
 }
 
 class TestBroadcastProcessFunction
-  extends KeyedBroadcastProcessFunction
-    [Long, (Long, Long), (Long, Long), (Long, Long)] {
+    extends KeyedBroadcastProcessFunction[Long, (Long, Long), (Long, Long), (Long, Long)] {
 
   lazy val firstBroadcastStateDesc = new MapStateDescriptor[Long, Long](
     "broadcast-state-1",
@@ -242,20 +239,22 @@ class TestBroadcastProcessFunction
 
   @throws[Exception]
   override def processElement(
-                               value: (Long, Long),
-                               ctx: KeyedBroadcastProcessFunction
-                                 [Long, (Long, Long), (Long, Long), (Long, Long)]#ReadOnlyContext,
-                               out: Collector[(Long, Long)]): Unit = {
+      value: (Long, Long),
+      ctx: KeyedBroadcastProcessFunction[
+        Long,
+        (Long, Long),
+        (Long, Long),
+        (Long, Long)]#ReadOnlyContext,
+      out: Collector[(Long, Long)]): Unit = {
 
     out.collect(value)
   }
 
   @throws[Exception]
   override def processBroadcastElement(
-                                        value: (Long, Long),
-                                        ctx: KeyedBroadcastProcessFunction
-                                          [Long, (Long, Long), (Long, Long), (Long, Long)]#Context,
-                                        out: Collector[(Long, Long)]): Unit = {
+      value: (Long, Long),
+      ctx: KeyedBroadcastProcessFunction[Long, (Long, Long), (Long, Long), (Long, Long)]#Context,
+      out: Collector[(Long, Long)]): Unit = {
 
     ctx.getBroadcastState(firstBroadcastStateDesc).put(value._1, value._2)
     ctx.getBroadcastState(secondBroadcastStateDesc).put(value._1.toString, value._2.toString)
@@ -269,7 +268,8 @@ private object CheckpointedSource {
 
 @SerialVersionUID(1L)
 private class CheckpointedSource(val numElements: Int)
-  extends SourceFunction[(Long, Long)] with CheckpointedFunction {
+    extends SourceFunction[(Long, Long)]
+    with CheckpointedFunction {
 
   private var isRunning = true
   private var state: ListState[CustomCaseClass] = _
@@ -296,7 +296,8 @@ private class CheckpointedSource(val numElements: Int)
   override def initializeState(context: FunctionInitializationContext): Unit = {
     state = context.getOperatorStateStore.getListState(
       new ListStateDescriptor[CustomCaseClass](
-        "sourceState", createTypeInformation[CustomCaseClass]))
+        "sourceState",
+        createTypeInformation[CustomCaseClass]))
   }
 
   override def snapshotState(context: FunctionSnapshotContext): Unit = {
@@ -319,14 +320,14 @@ private class AccumulatorCountingSink[T] extends RichSinkFunction[T] {
   override def open(parameters: Configuration) {
     super.open(parameters)
     getRuntimeContext.addAccumulator(
-      AccumulatorCountingSink.NUM_ELEMENTS_ACCUMULATOR, new IntCounter)
+      AccumulatorCountingSink.NUM_ELEMENTS_ACCUMULATOR,
+      new IntCounter)
   }
 
   @throws[Exception]
   override def invoke(value: T) {
     count += 1
-    getRuntimeContext.getAccumulator(
-      AccumulatorCountingSink.NUM_ELEMENTS_ACCUMULATOR).add(1)
+    getRuntimeContext.getAccumulator(AccumulatorCountingSink.NUM_ELEMENTS_ACCUMULATOR).add(1)
   }
 }
 
@@ -347,37 +348,44 @@ class StatefulFlatMapper extends RichFlatMapFunction[(Long, Long), (Long, Long)]
   override def open(parameters: Configuration): Unit = {
     caseClassState = getRuntimeContext.getState(
       new ValueStateDescriptor[CustomCaseClass](
-        "caseClassState", createTypeInformation[CustomCaseClass]))
+        "caseClassState",
+        createTypeInformation[CustomCaseClass]))
     caseClassWithNestingState = getRuntimeContext.getState(
       new ValueStateDescriptor[CustomCaseClassWithNesting](
-        "caseClassWithNestingState", createTypeInformation[CustomCaseClassWithNesting]))
+        "caseClassWithNestingState",
+        createTypeInformation[CustomCaseClassWithNesting]))
     collectionState = getRuntimeContext.getState(
       new ValueStateDescriptor[List[CustomCaseClass]](
-        "collectionState", createTypeInformation[List[CustomCaseClass]]))
+        "collectionState",
+        createTypeInformation[List[CustomCaseClass]]))
     tryState = getRuntimeContext.getState(
       new ValueStateDescriptor[Try[CustomCaseClass]](
-        "tryState", createTypeInformation[Try[CustomCaseClass]]))
+        "tryState",
+        createTypeInformation[Try[CustomCaseClass]]))
     tryFailureState = getRuntimeContext.getState(
       new ValueStateDescriptor[Try[CustomCaseClass]](
-        "tryFailureState", createTypeInformation[Try[CustomCaseClass]]))
+        "tryFailureState",
+        createTypeInformation[Try[CustomCaseClass]]))
     optionState = getRuntimeContext.getState(
       new ValueStateDescriptor[Option[CustomCaseClass]](
-        "optionState", createTypeInformation[Option[CustomCaseClass]]))
+        "optionState",
+        createTypeInformation[Option[CustomCaseClass]]))
     optionNoneState = getRuntimeContext.getState(
       new ValueStateDescriptor[Option[CustomCaseClass]](
-        "optionNoneState", createTypeInformation[Option[CustomCaseClass]]))
+        "optionNoneState",
+        createTypeInformation[Option[CustomCaseClass]]))
     eitherLeftState = getRuntimeContext.getState(
       new ValueStateDescriptor[Either[CustomCaseClass, String]](
-        "eitherLeftState", createTypeInformation[Either[CustomCaseClass, String]]))
+        "eitherLeftState",
+        createTypeInformation[Either[CustomCaseClass, String]]))
     eitherRightState = getRuntimeContext.getState(
       new ValueStateDescriptor[Either[CustomCaseClass, String]](
-        "eitherRightState", createTypeInformation[Either[CustomCaseClass, String]]))
+        "eitherRightState",
+        createTypeInformation[Either[CustomCaseClass, String]]))
     enumOneState = getRuntimeContext.getState(
-      new ValueStateDescriptor[CustomEnum](
-        "enumOneState", createTypeInformation[CustomEnum]))
+      new ValueStateDescriptor[CustomEnum]("enumOneState", createTypeInformation[CustomEnum]))
     enumThreeState = getRuntimeContext.getState(
-      new ValueStateDescriptor[CustomEnum](
-        "enumThreeState", createTypeInformation[CustomEnum]))
+      new ValueStateDescriptor[CustomEnum]("enumThreeState", createTypeInformation[CustomEnum]))
   }
 
   override def flatMap(in: (Long, Long), collector: Collector[(Long, Long)]): Unit = {
@@ -399,10 +407,9 @@ class StatefulFlatMapper extends RichFlatMapFunction[(Long, Long), (Long, Long)]
 }
 
 class VerifyingBroadcastProcessFunction(
-                                         firstExpectedBroadcastState: Map[Long, Long],
-                                         secondExpectedBroadcastState: Map[String, String])
-  extends KeyedBroadcastProcessFunction
-    [Long, (Long, Long), (Long, Long), (Long, Long)] {
+    firstExpectedBroadcastState: Map[Long, Long],
+    secondExpectedBroadcastState: Map[String, String])
+    extends KeyedBroadcastProcessFunction[Long, (Long, Long), (Long, Long), (Long, Long)] {
 
   lazy val firstBroadcastStateDesc = new MapStateDescriptor[Long, Long](
     "broadcast-state-1",
@@ -416,10 +423,13 @@ class VerifyingBroadcastProcessFunction(
 
   @throws[Exception]
   override def processElement(
-                               value: (Long, Long),
-                               ctx: KeyedBroadcastProcessFunction
-                                 [Long, (Long, Long), (Long, Long), (Long, Long)]#ReadOnlyContext,
-                               out: Collector[(Long, Long)]): Unit = {
+      value: (Long, Long),
+      ctx: KeyedBroadcastProcessFunction[
+        Long,
+        (Long, Long),
+        (Long, Long),
+        (Long, Long)]#ReadOnlyContext,
+      out: Collector[(Long, Long)]): Unit = {
 
     var actualFirstState = Map[Long, Long]()
 
@@ -447,10 +457,9 @@ class VerifyingBroadcastProcessFunction(
 
   @throws[Exception]
   override def processBroadcastElement(
-                                        value: (Long, Long),
-                                        ctx: KeyedBroadcastProcessFunction
-                                          [Long, (Long, Long), (Long, Long), (Long, Long)]#Context,
-                                        out: Collector[(Long, Long)]): Unit = {
+      value: (Long, Long),
+      ctx: KeyedBroadcastProcessFunction[Long, (Long, Long), (Long, Long), (Long, Long)]#Context,
+      out: Collector[(Long, Long)]): Unit = {
 
     // do nothing
   }

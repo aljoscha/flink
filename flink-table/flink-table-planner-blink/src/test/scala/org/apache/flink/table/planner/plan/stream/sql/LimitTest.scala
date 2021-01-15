@@ -31,7 +31,12 @@ class LimitTest extends TableTestBase {
   @Before
   def setup(): Unit = {
     util.addDataStream[(Int, String, Long)](
-      "MyTable", 'a, 'b, 'c, 'proctime.proctime, 'rowtime.rowtime)
+      "MyTable",
+      'a,
+      'b,
+      'c,
+      'proctime.proctime,
+      'rowtime.rowtime)
   }
 
   @Test

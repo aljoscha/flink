@@ -31,18 +31,18 @@ import org.apache.flink.types.Row
 import org.apache.flink.util.Collector
 
 /**
-  * Aggregate Function used for the groupby (without window) aggregate
-  *
-  * @param genAggregations      Generated aggregate helper function
-  * @param aggregationStateType The row type info of aggregation
-  */
+ * Aggregate Function used for the groupby (without window) aggregate
+ *
+ * @param genAggregations      Generated aggregate helper function
+ * @param aggregationStateType The row type info of aggregation
+ */
 class GroupAggProcessFunction[K](
     genAggregations: GeneratedAggregationsFunction,
     aggregationStateType: RowTypeInfo,
     generateRetraction: Boolean,
     minRetentionTime: Long,
     maxRetentionTime: Long)
-  extends ProcessFunctionWithCleanupState[K, CRow, CRow](minRetentionTime, maxRetentionTime)
+    extends ProcessFunctionWithCleanupState[K, CRow, CRow](minRetentionTime, maxRetentionTime)
     with Compiler[GeneratedAggregations]
     with Logging {
 
@@ -57,12 +57,11 @@ class GroupAggProcessFunction[K](
   private var cntState: ValueState[JLong] = _
 
   override def open(config: Configuration) {
-    LOG.debug(s"Compiling AggregateHelper: $genAggregations.name \n\n " +
-      s"Code:\n$genAggregations.code")
-    val clazz = compile(
-      getRuntimeContext.getUserCodeClassLoader,
-      genAggregations.name,
-      genAggregations.code)
+    LOG.debug(
+      s"Compiling AggregateHelper: $genAggregations.name \n\n " +
+        s"Code:\n$genAggregations.code")
+    val clazz =
+      compile(getRuntimeContext.getUserCodeClassLoader, genAggregations.name, genAggregations.code)
     LOG.debug("Instantiating AggregateHelper.")
     function = clazz.newInstance()
     function.open(getRuntimeContext)

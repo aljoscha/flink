@@ -29,18 +29,18 @@ import org.apache.calcite.util.{ImmutableBitSet, Pair}
 import org.apache.flink.table.plan.nodes.CommonTableAggregate
 
 /**
-  * Relational operator that represents a table aggregate. A TableAggregate is similar to the
-  * [[org.apache.calcite.rel.core.Aggregate]] but may output 0 or more records for a group.
-  */
+ * Relational operator that represents a table aggregate. A TableAggregate is similar to the
+ * [[org.apache.calcite.rel.core.Aggregate]] but may output 0 or more records for a group.
+ */
 abstract class TableAggregate(
-  cluster: RelOptCluster,
-  traitSet: RelTraitSet,
-  input: RelNode,
-  indicator: Boolean,
-  groupSet: ImmutableBitSet,
-  groupSets: util.List[ImmutableBitSet],
-  val aggCalls: util.List[AggregateCall])
-  extends SingleRel(cluster, traitSet, input)
+    cluster: RelOptCluster,
+    traitSet: RelTraitSet,
+    input: RelNode,
+    indicator: Boolean,
+    groupSet: ImmutableBitSet,
+    groupSets: util.List[ImmutableBitSet],
+    val aggCalls: util.List[AggregateCall])
+    extends SingleRel(cluster, traitSet, input)
     with CommonTableAggregate {
 
   private[flink] def getIndicator: Boolean = indicator
@@ -60,19 +60,12 @@ abstract class TableAggregate(
   }
 
   private[flink] def getCorrespondingAggregate: Aggregate = {
-    new LogicalAggregate(
-      cluster,
-      traitSet,
-      getInput,
-      indicator,
-      groupSet,
-      groupSets,
-      aggCalls
-    )
+    new LogicalAggregate(cluster, traitSet, getInput, indicator, groupSet, groupSets, aggCalls)
   }
 
   override def explainTerms(pw: RelWriter): RelWriter = {
-    super.explainTerms(pw)
+    super
+      .explainTerms(pw)
       .item("group", groupSet)
       .item("tableAggregate", aggCalls)
   }

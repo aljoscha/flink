@@ -27,18 +27,16 @@ import org.junit.runners.Parameterized
 import scala.collection.JavaConversions._
 
 /**
-  * This test base provides lightweight integration tests for batch programs. However, it does
-  * not test everything (e.g. combiners). Runtime operator tests should
-  * use [[TableProgramsClusterTestBase]].
-  *
-  * It does not use the COLLECTION execution mode any longer as the CollectionEnvironment is
-  * deprecated. Because of the plans of removing the legacy planner we do not refactor the class
-  * too much.
-  */
-class TableProgramsCollectionTestBase(
-    tableConfigMode: TableConfigMode)
-    extends TableProgramsTestBase(TestExecutionMode.CLUSTER, tableConfigMode) {
-}
+ * This test base provides lightweight integration tests for batch programs. However, it does
+ * not test everything (e.g. combiners). Runtime operator tests should
+ * use [[TableProgramsClusterTestBase]].
+ *
+ * It does not use the COLLECTION execution mode any longer as the CollectionEnvironment is
+ * deprecated. Because of the plans of removing the legacy planner we do not refactor the class
+ * too much.
+ */
+class TableProgramsCollectionTestBase(tableConfigMode: TableConfigMode)
+    extends TableProgramsTestBase(TestExecutionMode.CLUSTER, tableConfigMode) {}
 
 object TableProgramsCollectionTestBase {
 

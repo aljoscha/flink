@@ -62,17 +62,12 @@ class ArrayTypeValidationTest extends ArrayTypeTestBase {
 
   @Test(expected = classOf[ValidationException])
   def testElementNonArray(): Unit = {
-    testTableApi(
-      'f0.element(),
-      "FAIL",
-      "FAIL")
+    testTableApi('f0.element(), "FAIL", "FAIL")
   }
 
   @Test(expected = classOf[ValidationException])
   def testElementNonArraySql(): Unit = {
-    testSqlApi(
-      "ELEMENT(f0)",
-      "FAIL")
+    testSqlApi("ELEMENT(f0)", "FAIL")
   }
 
   @Test(expected = classOf[ValidationException])

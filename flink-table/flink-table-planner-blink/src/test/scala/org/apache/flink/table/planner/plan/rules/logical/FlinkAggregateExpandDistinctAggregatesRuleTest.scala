@@ -23,8 +23,8 @@ import org.apache.flink.table.planner.plan.optimize.program.FlinkBatchProgram
 import org.junit.{Before, Test}
 
 /**
-  * Test for [[FlinkAggregateExpandDistinctAggregatesRule]].
-  */
+ * Test for [[FlinkAggregateExpandDistinctAggregatesRule]].
+ */
 class FlinkAggregateExpandDistinctAggregatesRuleTest extends DistinctAggregateTestBase(false) {
 
   @Before

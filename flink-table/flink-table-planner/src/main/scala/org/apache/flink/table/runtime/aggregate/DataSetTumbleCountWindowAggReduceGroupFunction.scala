@@ -27,17 +27,17 @@ import org.apache.flink.types.Row
 import org.apache.flink.util.Collector
 
 /**
-  * It wraps the aggregate logic inside of
-  * [[org.apache.flink.api.java.operators.GroupReduceOperator]].
-  * It is only used for tumbling count-window on batch.
-  *
-  * @param genAggregations  Code-generated [[GeneratedAggregations]]
-  * @param windowSize       Tumble count window size
-  */
+ * It wraps the aggregate logic inside of
+ * [[org.apache.flink.api.java.operators.GroupReduceOperator]].
+ * It is only used for tumbling count-window on batch.
+ *
+ * @param genAggregations  Code-generated [[GeneratedAggregations]]
+ * @param windowSize       Tumble count window size
+ */
 class DataSetTumbleCountWindowAggReduceGroupFunction(
     private val genAggregations: GeneratedAggregationsFunction,
     private val windowSize: Long)
-  extends RichGroupReduceFunction[Row, Row]
+    extends RichGroupReduceFunction[Row, Row]
     with Compiler[GeneratedAggregations]
     with Logging {
 
@@ -47,12 +47,11 @@ class DataSetTumbleCountWindowAggReduceGroupFunction(
   private var function: GeneratedAggregations = _
 
   override def open(config: Configuration) {
-    LOG.debug(s"Compiling AggregateHelper: $genAggregations.name \n\n " +
-                s"Code:\n$genAggregations.code")
-    val clazz = compile(
-      getRuntimeContext.getUserCodeClassLoader,
-      genAggregations.name,
-      genAggregations.code)
+    LOG.debug(
+      s"Compiling AggregateHelper: $genAggregations.name \n\n " +
+        s"Code:\n$genAggregations.code")
+    val clazz =
+      compile(getRuntimeContext.getUserCodeClassLoader, genAggregations.name, genAggregations.code)
     LOG.debug("Instantiating AggregateHelper.")
     function = clazz.newInstance()
 

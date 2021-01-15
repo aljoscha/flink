@@ -269,7 +269,6 @@ class UpdatingPlanCheckerTest {
     util.verifyTableUniqueKey(resultTable, Seq("leftpk", "lefta"))
   }
 
-
   @Test
   def testNonKeysJoin(): Unit = {
     val util = new UpdatePlanCheckerUtil()
@@ -307,7 +306,6 @@ class UpdatingPlanCheckerTest {
     util.verifyTableUniqueKey(resultTable, Nil)
   }
 }
-
 
 class UpdatePlanCheckerUtil extends StreamTableTestUtil {
 

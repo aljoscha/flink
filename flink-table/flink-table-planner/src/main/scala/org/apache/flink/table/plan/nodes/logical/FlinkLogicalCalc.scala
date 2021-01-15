@@ -32,9 +32,9 @@ class FlinkLogicalCalc(
     traitSet: RelTraitSet,
     input: RelNode,
     calcProgram: RexProgram)
-  extends Calc(cluster, traitSet, input, calcProgram)
-  with FlinkLogicalRel
-  with CommonCalc {
+    extends Calc(cluster, traitSet, input, calcProgram)
+    with FlinkLogicalRel
+    with CommonCalc {
 
   override def copy(traitSet: RelTraitSet, child: RelNode, program: RexProgram): Calc = {
     new FlinkLogicalCalc(cluster, traitSet, child, program)
@@ -54,11 +54,11 @@ class FlinkLogicalCalc(
 }
 
 private class FlinkLogicalCalcConverter
-  extends ConverterRule(
-    classOf[LogicalCalc],
-    Convention.NONE,
-    FlinkConventions.LOGICAL,
-    "FlinkLogicalCalcConverter") {
+    extends ConverterRule(
+      classOf[LogicalCalc],
+      Convention.NONE,
+      FlinkConventions.LOGICAL,
+      "FlinkLogicalCalcConverter") {
 
   override def convert(rel: RelNode): RelNode = {
     val calc = rel.asInstanceOf[LogicalCalc]

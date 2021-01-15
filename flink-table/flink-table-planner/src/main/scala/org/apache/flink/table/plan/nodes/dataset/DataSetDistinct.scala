@@ -31,28 +31,21 @@ import org.apache.flink.types.Row
 import scala.collection.JavaConverters._
 
 /**
-  * DataSet RelNode for a Distinct (LogicalAggregate without aggregation functions).
-  *
-  */
+ * DataSet RelNode for a Distinct (LogicalAggregate without aggregation functions).
+ */
 class DataSetDistinct(
-   cluster: RelOptCluster,
-   traitSet: RelTraitSet,
-   input: RelNode,
-   rowRelDataType: RelDataType,
-   ruleDescription: String)
-  extends SingleRel(cluster, traitSet, input)
-  with DataSetRel {
+    cluster: RelOptCluster,
+    traitSet: RelTraitSet,
+    input: RelNode,
+    rowRelDataType: RelDataType,
+    ruleDescription: String)
+    extends SingleRel(cluster, traitSet, input)
+    with DataSetRel {
 
   override def deriveRowType() = rowRelDataType
 
   override def copy(traitSet: RelTraitSet, inputs: java.util.List[RelNode]): RelNode = {
-    new DataSetDistinct(
-      cluster,
-      traitSet,
-      inputs.get(0),
-      rowRelDataType,
-      ruleDescription
-    )
+    new DataSetDistinct(cluster, traitSet, inputs.get(0), rowRelDataType, ruleDescription)
   }
 
   override def computeSelfCost(planner: RelOptPlanner, metadata: RelMetadataQuery): RelOptCost = {
@@ -90,5 +83,3 @@ class DataSetDistinct(
   }
 
 }
-
-

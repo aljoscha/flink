@@ -49,8 +49,8 @@ class ScalarOperatorsTestBase extends ExpressionTestBase {
     testData.setField(15, Date.valueOf("1996-11-10"))
     testData.setField(16, BigDecimal("0.00000000").bigDecimal)
     testData.setField(17, BigDecimal("10.0").bigDecimal)
-    testData.setField(18, Array[Integer](1,2))
-    testData.setField(19, Array[(Int, String)]((1,"a"), (2, "b")))
+    testData.setField(18, Array[Integer](1, 2))
+    testData.setField(19, Array[(Int, String)]((1, "a"), (2, "b")))
     testData.setField(20, BigDecimal("1514356320000").bigDecimal)
     testData
   }
@@ -77,11 +77,9 @@ class ScalarOperatorsTestBase extends ExpressionTestBase {
       Types.DECIMAL,
       Types.OBJECT_ARRAY(Types.INT),
       Types.OBJECT_ARRAY(createTypeInformation[(Int, String)]),
-      Types.DECIMAL
-      ).asInstanceOf[TypeInformation[Any]]
+      Types.DECIMAL).asInstanceOf[TypeInformation[Any]]
   }
 
   override def functions: Map[String, ScalarFunction] = Map(
-    "shouldNotExecuteFunc" -> ShouldNotExecuteFunc
-  )
+    "shouldNotExecuteFunc" -> ShouldNotExecuteFunc)
 }

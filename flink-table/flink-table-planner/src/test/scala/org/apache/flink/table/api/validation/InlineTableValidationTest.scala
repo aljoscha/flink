@@ -29,9 +29,10 @@ class InlineTableValidationTest extends TableTestBase {
   def testFieldNamesDuplicate() {
 
     thrown.expect(classOf[ValidationException])
-    thrown.expectMessage("Field names must be unique.\n" +
-      "List of duplicate fields: [a].\n" +
-      "List of all fields: [a, a, b].")
+    thrown.expectMessage(
+      "Field names must be unique.\n" +
+        "List of duplicate fields: [a].\n" +
+        "List of all fields: [a, a, b].")
 
     val util = batchTestUtil()
     util.addTable[(Int, Int, String)]("MyTable", 'a, 'a, 'b)

@@ -30,20 +30,15 @@ import org.apache.calcite.rel.core.Calc
 import org.apache.calcite.rex.RexProgram
 
 /**
-  * Batch physical RelNode for Python ScalarFunctions.
-  */
+ * Batch physical RelNode for Python ScalarFunctions.
+ */
 class BatchPhysicalPythonCalc(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
     inputRel: RelNode,
     calcProgram: RexProgram,
     outputRowType: RelDataType)
-  extends BatchPhysicalCalcBase(
-    cluster,
-    traitSet,
-    inputRel,
-    calcProgram,
-    outputRowType) {
+    extends BatchPhysicalCalcBase(cluster, traitSet, inputRel, calcProgram, outputRowType) {
 
   override def copy(traitSet: RelTraitSet, child: RelNode, program: RexProgram): Calc = {
     new BatchPhysicalPythonCalc(cluster, traitSet, child, program, outputRowType)

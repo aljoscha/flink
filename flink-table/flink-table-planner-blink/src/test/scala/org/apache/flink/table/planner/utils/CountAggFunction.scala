@@ -31,8 +31,8 @@ class CountAccumulator extends JTuple1[JLong] {
 }
 
 /**
-  * built-in count aggregate function
-  */
+ * built-in count aggregate function
+ */
 class CountAggFunction extends AggregateFunction[JLong, CountAccumulator] {
 
   def accumulate(acc: CountAccumulator, value: Any): Unit = {

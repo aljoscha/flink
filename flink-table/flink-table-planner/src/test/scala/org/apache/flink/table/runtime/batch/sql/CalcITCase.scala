@@ -41,9 +41,7 @@ import java.util
 import scala.collection.JavaConverters._
 
 @RunWith(classOf[Parameterized])
-class CalcITCase(
-    configMode: TableConfigMode)
-  extends TableProgramsCollectionTestBase(configMode) {
+class CalcITCase(configMode: TableConfigMode) extends TableProgramsCollectionTestBase(configMode) {
 
   @Test
   def testSelectStarFromTable(): Unit = {
@@ -77,7 +75,7 @@ class CalcITCase(
 
     val sqlQuery = "SELECT * FROM MyTable"
 
-    val ds = CollectionDataSets.getSmallNestedTupleDataSet(env).toTable(tEnv)as("a", "b")
+    val ds = CollectionDataSets.getSmallNestedTupleDataSet(env).toTable(tEnv) as ("a", "b")
     tEnv.registerTable("MyTable", ds)
 
     val result = tEnv.sqlQuery(sqlQuery)
@@ -297,10 +295,11 @@ class CalcITCase(
     val sqlQuery = "SELECT a, b, c, DATE '1984-07-12', TIME '14:34:24', " +
       "TIMESTAMP '1984-07-12 14:34:24' FROM MyTable"
 
-    val ds = env.fromElements((
-      Date.valueOf("1984-07-12"),
-      Time.valueOf("14:34:24"),
-      Timestamp.valueOf("1984-07-12 14:34:24")))
+    val ds = env.fromElements(
+      (
+        Date.valueOf("1984-07-12"),
+        Time.valueOf("14:34:24"),
+        Timestamp.valueOf("1984-07-12 14:34:24")))
     tEnv.createTemporaryView("MyTable", ds, 'a, 'b, 'c)
 
     val result = tEnv.sqlQuery(sqlQuery)
@@ -333,7 +332,8 @@ class CalcITCase(
     val resultRow = results.asJava.get(0)
     assertEquals(rowValue._1, resultRow.getField(0).asInstanceOf[Row].getField(0))
     assertEquals(rowValue._2, resultRow.getField(1).asInstanceOf[Array[Integer]](1))
-    assertEquals(rowValue._3,
+    assertEquals(
+      rowValue._3,
       resultRow.getField(2).asInstanceOf[util.Map[String, Timestamp]].get(rowValue._1))
   }
 
@@ -359,8 +359,7 @@ class CalcITCase(
   def testFunctionWithUnicodeParameters(): Unit = {
     val data = List(
       ("a\u0001b", "c\"d", "e\\\"\u0004f"), // uses Java/Scala escaping
-      ("x\u0001y", "y\"z", "z\\\"\u0004z")
-    )
+      ("x\u0001y", "y\"z", "z\\\"\u0004z"))
 
     val env = ExecutionEnvironment.getExecutionEnvironment
 

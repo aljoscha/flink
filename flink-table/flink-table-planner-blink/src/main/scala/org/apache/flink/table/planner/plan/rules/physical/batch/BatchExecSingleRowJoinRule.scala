@@ -29,42 +29,42 @@ import org.apache.calcite.rel.convert.ConverterRule
 import org.apache.calcite.rel.core._
 
 /**
-  * Rule that converts [[FlinkLogicalJoin]] to [[BatchPhysicalNestedLoopJoin]]
-  * if one of join input sides returns at most a single row.
-  */
+ * Rule that converts [[FlinkLogicalJoin]] to [[BatchPhysicalNestedLoopJoin]]
+ * if one of join input sides returns at most a single row.
+ */
 class BatchExecSingleRowJoinRule
-  extends ConverterRule(
-    classOf[FlinkLogicalJoin],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.BATCH_PHYSICAL,
-    "BatchExecSingleRowJoinRule")
-  with BatchExecJoinRuleBase
-  with BatchExecNestedLoopJoinRuleBase {
+    extends ConverterRule(
+      classOf[FlinkLogicalJoin],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.BATCH_PHYSICAL,
+      "BatchExecSingleRowJoinRule")
+    with BatchExecJoinRuleBase
+    with BatchExecNestedLoopJoinRuleBase {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val join: Join = call.rel(0)
     join.getJoinType match {
       case JoinRelType.INNER | JoinRelType.FULL =>
         isSingleRow(join.getLeft) || isSingleRow(join.getRight)
-      case JoinRelType.LEFT => isSingleRow(join.getRight)
-      case JoinRelType.RIGHT => isSingleRow(join.getLeft)
+      case JoinRelType.LEFT                    => isSingleRow(join.getRight)
+      case JoinRelType.RIGHT                   => isSingleRow(join.getLeft)
       case JoinRelType.SEMI | JoinRelType.ANTI => isSingleRow(join.getRight)
-      case _ => false
+      case _                                   => false
     }
   }
 
   /**
-    * Recursively checks if a [[RelNode]] returns at most a single row.
-    * Input must be a global aggregation possibly followed by projections or filters.
-    */
+   * Recursively checks if a [[RelNode]] returns at most a single row.
+   * Input must be a global aggregation possibly followed by projections or filters.
+   */
   private def isSingleRow(node: RelNode): Boolean = {
     node match {
       case ss: RelSubset => isSingleRow(ss.getOriginal)
-      case lp: Project => isSingleRow(lp.getInput)
-      case lf: Filter => isSingleRow(lf.getInput)
-      case lc: Calc => isSingleRow(lc.getInput)
+      case lp: Project   => isSingleRow(lp.getInput)
+      case lf: Filter    => isSingleRow(lf.getInput)
+      case lc: Calc      => isSingleRow(lc.getInput)
       case la: Aggregate => la.getGroupSet.isEmpty
-      case _ => false
+      case _             => false
     }
   }
 
@@ -72,12 +72,7 @@ class BatchExecSingleRowJoinRule
     val join = rel.asInstanceOf[Join]
     val left = join.getLeft
     val leftIsBuild = isSingleRow(left)
-    createNestedLoopJoin(
-      join,
-      left,
-      join.getRight,
-      leftIsBuild,
-      singleRowJoin = true)
+    createNestedLoopJoin(join, left, join.getRight, leftIsBuild, singleRowJoin = true)
   }
 }
 

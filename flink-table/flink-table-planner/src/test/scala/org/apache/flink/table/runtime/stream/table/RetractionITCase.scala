@@ -30,8 +30,8 @@ import org.junit.Assert._
 import org.junit.{Before, Test}
 
 /**
-  * tests for retraction
-  */
+ * tests for retraction
+ */
 class RetractionITCase extends StreamingWithStateTestBase {
   // input data
   val data = List(
@@ -44,8 +44,7 @@ class RetractionITCase extends StreamingWithStateTestBase {
     ("bark", 1),
     ("bark", 1),
     ("bark", 1),
-    ("flink", 1)
-  )
+    ("flink", 1))
 
   var env: StreamExecutionEnvironment = _
   var tEnv: StreamTableEnvironment = _
@@ -134,8 +133,7 @@ class RetractionITCase extends StreamingWithStateTestBase {
       (6, 6L),
       (6, 6L),
       (6, 6L),
-      (7, 8L)
-    )
+      (7, 8L))
     val env = StreamExecutionEnvironment.getExecutionEnvironment
     val settings = EnvironmentSettings.newInstance().useOldPlanner().build()
     val tEnv = StreamTableEnvironment.create(env, settings)
@@ -155,8 +153,23 @@ class RetractionITCase extends StreamingWithStateTestBase {
     env.execute()
 
     val expected = Seq(
-      "+1,1", "+2,1", "+3,1", "-3,1", "+6,1", "-1,1", "+1,2", "-1,2", "+1,3", "-6,1", "+6,2",
-      "-6,2", "+6,1", "+12,1", "-12,1", "+18,1", "+8,1")
+      "+1,1",
+      "+2,1",
+      "+3,1",
+      "-3,1",
+      "+6,1",
+      "-1,1",
+      "+1,2",
+      "-1,2",
+      "+1,3",
+      "-6,1",
+      "+6,2",
+      "-6,2",
+      "+6,1",
+      "+12,1",
+      "-12,1",
+      "+18,1",
+      "+8,1")
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
   }
 

@@ -26,8 +26,8 @@ import org.apache.flink.table.utils.TableTestUtil._
 import org.junit.Test
 
 /**
-  * Test for testing aggregate plans.
-  */
+ * Test for testing aggregate plans.
+ */
 class AggregateTest extends TableTestBase {
 
   @Test
@@ -36,7 +36,8 @@ class AggregateTest extends TableTestBase {
     val util = batchTestUtil()
     val sourceTable = util.addTable[(Int, Long, Int)]("MyTable", 'a, 'b, 'c)
 
-    val resultTable = sourceTable.groupBy('a)
+    val resultTable = sourceTable
+      .groupBy('a)
       .select('a, 'a.avg, 'b.sum, 'c.count)
       .where('a === 1)
 
@@ -44,37 +45,27 @@ class AggregateTest extends TableTestBase {
       "DataSetCalc",
       batchTableNode(sourceTable),
       term("select", "a", "b", "c"),
-      term("where", "=(a, 1)")
-    )
+      term("where", "=(a, 1)"))
 
     val expected = unaryNode(
       "DataSetAggregate",
       calcNode,
       term("groupBy", "a"),
-      term("select",
-        "a",
-        "AVG(a) AS EXPR$0",
-        "SUM(b) AS EXPR$1",
-        "COUNT(c) AS EXPR$2")
-    )
+      term("select", "a", "AVG(a) AS EXPR$0", "SUM(b) AS EXPR$1", "COUNT(c) AS EXPR$2"))
 
-    util.verifyTable(resultTable,expected)
+    util.verifyTable(resultTable, expected)
   }
 
   @Test
   def testAggregate(): Unit = {
     val util = batchTestUtil()
     val sourceTable = util.addTable[(Int, Long, Int)]("MyTable", 'a, 'b, 'c)
-    val resultTable = sourceTable.select('a.avg,'b.sum,'c.count)
+    val resultTable = sourceTable.select('a.avg, 'b.sum, 'c.count)
 
     val expected = unaryNode(
       "DataSetAggregate",
       batchTableNode(sourceTable),
-      term("select",
-        "AVG(a) AS EXPR$0",
-        "SUM(b) AS EXPR$1",
-        "COUNT(c) AS EXPR$2")
-    )
+      term("select", "AVG(a) AS EXPR$0", "SUM(b) AS EXPR$1", "COUNT(c) AS EXPR$2"))
     util.verifyTable(resultTable, expected)
   }
 
@@ -83,8 +74,10 @@ class AggregateTest extends TableTestBase {
     val util = batchTestUtil()
     val sourceTable = util.addTable[(Int, Long, Int)]("MyTable", 'a, 'b, 'c)
 
-    val resultTable = sourceTable.select('a,'b,'c).where('a === 1)
-      .select('a.avg,'b.sum,'c.count)
+    val resultTable = sourceTable
+      .select('a, 'b, 'c)
+      .where('a === 1)
+      .select('a.avg, 'b.sum, 'c.count)
 
     val calcNode = unaryNode(
       "DataSetCalc",
@@ -92,17 +85,12 @@ class AggregateTest extends TableTestBase {
       // ReduceExpressionsRule will add cast for Project node by force
       // if the input of the Project node has constant expression.
       term("select", "CAST(1) AS a", "b", "c"),
-      term("where", "=(a, 1)")
-    )
+      term("where", "=(a, 1)"))
 
     val expected = unaryNode(
       "DataSetAggregate",
       calcNode,
-      term("select",
-        "AVG(a) AS EXPR$0",
-        "SUM(b) AS EXPR$1",
-        "COUNT(c) AS EXPR$2")
-    )
+      term("select", "AVG(a) AS EXPR$0", "SUM(b) AS EXPR$1", "COUNT(c) AS EXPR$2"))
 
     util.verifyTable(resultTable, expected)
   }
@@ -112,8 +100,10 @@ class AggregateTest extends TableTestBase {
     val util = batchTestUtil()
     val sourceTable = util.addTable[(Int, Long, (Int, Long))]("MyTable", 'a, 'b, 'c)
 
-    val resultTable = sourceTable.select('a,'b,'c).where('a === 1)
-      .select('a.avg,'b.sum,'c.count, 'c.get("_1").sum)
+    val resultTable = sourceTable
+      .select('a, 'b, 'c)
+      .where('a === 1)
+      .select('a.avg, 'b.sum, 'c.count, 'c.get("_1").sum)
 
     val calcNode = unaryNode(
       "DataSetCalc",
@@ -121,8 +111,7 @@ class AggregateTest extends TableTestBase {
       // ReduceExpressionsRule will add cast for Project node by force
       // if the input of the Project node has constant expression.
       term("select", "CAST(1) AS a", "b", "c", "c._1 AS $f3"),
-      term("where", "=(a, 1)")
-    )
+      term("where", "=(a, 1)"))
 
     val expected = unaryNode(
       "DataSetAggregate",
@@ -132,8 +121,7 @@ class AggregateTest extends TableTestBase {
         "AVG(a) AS EXPR$0",
         "SUM(b) AS EXPR$1",
         "COUNT(c) AS EXPR$2",
-        "SUM($f3) AS EXPR$3")
-    )
+        "SUM($f3) AS EXPR$3"))
     util.verifyTable(resultTable, expected)
   }
 }

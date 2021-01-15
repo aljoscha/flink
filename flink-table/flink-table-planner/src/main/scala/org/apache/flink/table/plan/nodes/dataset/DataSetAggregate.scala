@@ -30,12 +30,17 @@ import org.apache.flink.table.api.internal.BatchTableEnvImpl
 import org.apache.flink.table.calcite.FlinkTypeFactory
 import org.apache.flink.table.plan.nodes.CommonAggregate
 import org.apache.flink.table.runtime.aggregate.AggregateUtil.CalcitePair
-import org.apache.flink.table.runtime.aggregate.{AggregateUtil, DataSetAggFunction, DataSetFinalAggFunction, DataSetPreAggFunction}
+import org.apache.flink.table.runtime.aggregate.{
+  AggregateUtil,
+  DataSetAggFunction,
+  DataSetFinalAggFunction,
+  DataSetPreAggFunction
+}
 import org.apache.flink.types.Row
 
 /**
-  * Flink RelNode which matches along with a LogicalAggregate.
-  */
+ * Flink RelNode which matches along with a LogicalAggregate.
+ */
 class DataSetAggregate(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -44,7 +49,9 @@ class DataSetAggregate(
     rowRelDataType: RelDataType,
     inputType: RelDataType,
     grouping: Array[Int])
-  extends SingleRel(cluster, traitSet, inputNode) with CommonAggregate with DataSetRel {
+    extends SingleRel(cluster, traitSet, inputNode)
+    with CommonAggregate
+    with DataSetRel {
 
   override def deriveRowType(): RelDataType = rowRelDataType
 
@@ -60,17 +67,16 @@ class DataSetAggregate(
   }
 
   override def toString: String = {
-    s"Aggregate(${
-      if (!grouping.isEmpty) {
-        s"groupBy: (${groupingToString(inputType, grouping)}), "
-      } else {
-        ""
-      }
-    }select: (${aggregationToString(inputType, grouping, getRowType, namedAggregates, Nil)}))"
+    s"Aggregate(${if (!grouping.isEmpty) {
+      s"groupBy: (${groupingToString(inputType, grouping)}), "
+    } else {
+      ""
+    }}select: (${aggregationToString(inputType, grouping, getRowType, namedAggregates, Nil)}))"
   }
 
   override def explainTerms(pw: RelWriter): RelWriter = {
-    super.explainTerms(pw)
+    super
+      .explainTerms(pw)
       .itemIf("groupBy", groupingToString(inputType, grouping), !grouping.isEmpty)
       .item("select", aggregationToString(inputType, grouping, getRowType, namedAggregates, Nil))
   }
@@ -94,8 +100,8 @@ class DataSetAggregate(
     val (
       preAgg: Option[DataSetPreAggFunction],
       preAggType: Option[TypeInformation[Row]],
-      finalAgg: Either[DataSetAggFunction, DataSetFinalAggFunction]
-      ) = AggregateUtil.createDataSetAggregateFunctions(
+      finalAgg: Either[DataSetAggFunction, DataSetFinalAggFunction]) =
+      AggregateUtil.createDataSetAggregateFunctions(
         tableEnv.getConfig,
         false,
         inputDS.getType,
@@ -133,8 +139,7 @@ class DataSetAggregate(
           .returns(rowTypeInfo)
           .name(aggOpName)
       }
-    }
-    else {
+    } else {
       // global aggregation
       val aggOpName = s"select:($aggString)"
 
@@ -150,7 +155,8 @@ class DataSetAggregate(
           .name(aggOpName)
       } else {
         inputDS
-          .mapPartition(finalAgg.left.get).setParallelism(1)
+          .mapPartition(finalAgg.left.get)
+          .setParallelism(1)
           .returns(rowTypeInfo)
           .name(aggOpName)
       }

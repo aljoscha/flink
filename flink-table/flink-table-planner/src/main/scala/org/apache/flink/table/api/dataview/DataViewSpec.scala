@@ -19,35 +19,34 @@
 package org.apache.flink.table.api.dataview
 
 import java.lang.reflect.Field
-import org.apache.flink.api.common.state.{ListStateDescriptor, MapStateDescriptor, State, StateDescriptor}
+import org.apache.flink.api.common.state.{
+  ListStateDescriptor,
+  MapStateDescriptor,
+  State,
+  StateDescriptor
+}
 import org.apache.flink.table.dataview.{ListViewTypeInfo, MapViewTypeInfo}
 
 /**
-  * Data view specification.
-  *
-  * @tparam ACC type extends [[DataView]]
-  */
+ * Data view specification.
+ *
+ * @tparam ACC type extends [[DataView]]
+ */
 trait DataViewSpec[ACC <: DataView] {
   def stateId: String
   def field: Field
   def toStateDescriptor: StateDescriptor[_ <: State, _]
 }
 
-case class ListViewSpec[T](
-    stateId: String,
-    field: Field,
-    listViewTypeInfo: ListViewTypeInfo[T])
-  extends DataViewSpec[ListView[T]] {
+case class ListViewSpec[T](stateId: String, field: Field, listViewTypeInfo: ListViewTypeInfo[T])
+    extends DataViewSpec[ListView[T]] {
 
   override def toStateDescriptor: StateDescriptor[_ <: State, _] =
     new ListStateDescriptor[T](stateId, listViewTypeInfo.getElementType)
 }
 
-case class MapViewSpec[K, V](
-    stateId: String,
-    field: Field,
-    mapViewTypeInfo: MapViewTypeInfo[K, V])
-  extends DataViewSpec[MapView[K, V]] {
+case class MapViewSpec[K, V](stateId: String, field: Field, mapViewTypeInfo: MapViewTypeInfo[K, V])
+    extends DataViewSpec[MapView[K, V]] {
 
   override def toStateDescriptor: StateDescriptor[_ <: State, _] =
     new MapStateDescriptor[K, V](stateId, mapViewTypeInfo.getKeyType, mapViewTypeInfo.getValueType)

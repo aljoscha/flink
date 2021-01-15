@@ -29,16 +29,19 @@ import org.apache.flink.util.{Collector, TestLogger}
 import org.junit.Test
 
 /**
-  * Tests [[KeyedProcessOperatorWithWatermarkDelay]].
-  */
+ * Tests [[KeyedProcessOperatorWithWatermarkDelay]].
+ */
 class KeyedProcessOperatorWithWatermarkDelayTest extends TestLogger {
 
   @Test
   def testHoldingBackWatermarks(): Unit = {
     val operator = new KeyedProcessOperatorWithWatermarkDelay[Integer, Integer, String](
-      new EmptyProcessFunction, 100)
+      new EmptyProcessFunction,
+      100)
     val testHarness = new KeyedOneInputStreamOperatorTestHarness[Integer, Integer, String](
-      operator, new IdentityKeySelector[Integer], BasicTypeInfo.INT_TYPE_INFO)
+      operator,
+      new IdentityKeySelector[Integer],
+      BasicTypeInfo.INT_TYPE_INFO)
 
     testHarness.setup()
     testHarness.open()
@@ -60,15 +63,16 @@ class KeyedProcessOperatorWithWatermarkDelayTest extends TestLogger {
   @Test(expected = classOf[IllegalArgumentException])
   def testDelayParameter(): Unit = {
     new KeyedProcessOperatorWithWatermarkDelay[Integer, Integer, String](
-      new EmptyProcessFunction, -1)
+      new EmptyProcessFunction,
+      -1)
   }
 }
 
 private class EmptyProcessFunction extends ProcessFunction[Integer, String] {
   override def processElement(
-    value: Integer,
-    ctx: ProcessFunction[Integer, String]#Context,
-    out: Collector[String]): Unit = {
+      value: Integer,
+      ctx: ProcessFunction[Integer, String]#Context,
+      out: Collector[String]): Unit = {
     // do nothing
   }
 }

@@ -23,8 +23,11 @@ import org.apache.flink.table.planner.typeutils.TypeCoercion
 import org.apache.flink.table.planner.validate._
 import org.apache.flink.table.runtime.types.TypeInfoLogicalTypeConverter.fromTypeInfoToLogicalType
 
-case class Reinterpret(child: PlannerExpression, resultType: TypeInformation[_],
-                       checkOverflow: Boolean) extends UnaryExpression {
+case class Reinterpret(
+    child: PlannerExpression,
+    resultType: TypeInformation[_],
+    checkOverflow: Boolean)
+    extends UnaryExpression {
 
   override def toString = s"$child.reinterpret($resultType)"
 
@@ -35,11 +38,11 @@ case class Reinterpret(child: PlannerExpression, resultType: TypeInformation[_],
 
   override private[flink] def validateInput(): ValidationResult = {
     if (TypeCoercion.canReinterpret(
-      fromTypeInfoToLogicalType(child.resultType), fromTypeInfoToLogicalType(resultType))) {
+        fromTypeInfoToLogicalType(child.resultType),
+        fromTypeInfoToLogicalType(resultType))) {
       ValidationSuccess
     } else {
       ValidationFailure(s"Unsupported reinterpret from ${child.resultType} to $resultType")
     }
   }
 }
-

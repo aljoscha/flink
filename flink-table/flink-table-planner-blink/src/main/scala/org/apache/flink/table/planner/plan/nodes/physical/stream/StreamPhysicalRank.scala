@@ -33,7 +33,6 @@ import org.apache.flink.table.planner.plan.nodes.exec.utils.PartitionSpec
 
 import scala.collection.JavaConversions._
 
-
 /**
  * Stream physical RelNode for [[Rank]].
  */
@@ -48,17 +47,17 @@ class StreamPhysicalRank(
     rankNumberType: RelDataTypeField,
     outputRankNumber: Boolean,
     rankStrategy: RankProcessStrategy)
-  extends Rank(
-    cluster,
-    traitSet,
-    inputRel,
-    partitionKey,
-    orderKey,
-    rankType,
-    rankRange,
-    rankNumberType,
-    outputRankNumber)
-  with StreamPhysicalRel {
+    extends Rank(
+      cluster,
+      traitSet,
+      inputRel,
+      partitionKey,
+      orderKey,
+      rankType,
+      rankRange,
+      rankNumberType,
+      outputRankNumber)
+    with StreamPhysicalRel {
 
   override def requireWatermark: Boolean = false
 
@@ -114,7 +113,6 @@ class StreamPhysicalRank(
       generateUpdateBefore,
       ExecEdge.DEFAULT,
       FlinkTypeFactory.toLogicalRowType(getRowType),
-      getRelDetailedDescription
-    )
+      getRelDetailedDescription)
   }
 }

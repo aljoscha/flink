@@ -20,7 +20,11 @@ package org.apache.flink.table.planner.codegen.calls
 
 import org.apache.flink.table.planner.codegen.CodeGenUtils.DECIMAL_UTIL
 import org.apache.flink.table.planner.codegen.GenerateUtils.generateCallIfArgsNotNull
-import org.apache.flink.table.planner.codegen.{CodeGenUtils, CodeGeneratorContext, GeneratedExpression}
+import org.apache.flink.table.planner.codegen.{
+  CodeGenUtils,
+  CodeGeneratorContext,
+  GeneratedExpression
+}
 import org.apache.flink.table.runtime.typeutils.TypeCheckUtils.isNumeric
 import org.apache.flink.table.types.logical.{DecimalType, LogicalType}
 

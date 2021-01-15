@@ -32,7 +32,7 @@ class JoinValidationTest extends TableTestBase {
   streamUtil.addTable[(Int, String, Long)]("MyTable", 'a, 'b, 'c.rowtime, 'proctime.proctime)
   streamUtil.addTable[(Int, String, Long)]("MyTable2", 'a, 'b, 'c.rowtime, 'proctime.proctime)
 
-  /** Both time attributes in a join condition must be of the same type **/
+  /** Both time attributes in a join condition must be of the same type * */
   @Test(expected = classOf[TableException])
   def testWindowJoinDiffTimeIndicator() = {
     val sql =
@@ -45,7 +45,7 @@ class JoinValidationTest extends TableTestBase {
     streamUtil.verifySql(sql, "n/a")
   }
 
-  /** The time conditions should be an And condition **/
+  /** The time conditions should be an And condition * */
   @Test(expected = classOf[TableException])
   def testWindowJoinNotCnfCondition() = {
     val sql =
@@ -58,7 +58,7 @@ class JoinValidationTest extends TableTestBase {
     streamUtil.verifySql(sql, "n/a")
   }
 
-  /** Validates that no rowtime attribute is in the output schema **/
+  /** Validates that no rowtime attribute is in the output schema * */
   @Test(expected = classOf[TableException])
   def testNoRowtimeAttributeInResult(): Unit = {
     val sql =
@@ -72,7 +72,7 @@ class JoinValidationTest extends TableTestBase {
     streamUtil.verifySql(sql, "n/a")
   }
 
-  /** Validates that range and equality predicate are not accepted **/
+  /** Validates that range and equality predicate are not accepted * */
   @Test(expected = classOf[TableException])
   def testRangeAndEqualityPredicates(): Unit = {
     val sql =
@@ -87,7 +87,7 @@ class JoinValidationTest extends TableTestBase {
     streamUtil.verifySql(sql, "n/a")
   }
 
-  /** Validates that equality predicate with offset are not accepted **/
+  /** Validates that equality predicate with offset are not accepted * */
   @Test(expected = classOf[TableException])
   def testEqualityPredicateWithOffset(): Unit = {
     val sql =
@@ -101,7 +101,7 @@ class JoinValidationTest extends TableTestBase {
     streamUtil.verifySql(sql, "n/a")
   }
 
-  /** Validates that no rowtime attribute is in the output schema for non-window inner join **/
+  /** Validates that no rowtime attribute is in the output schema for non-window inner join * */
   @Test(expected = classOf[TableException])
   def testNoRowtimeAttributeInResultForNonWindowInnerJoin(): Unit = {
     val sql =
@@ -114,7 +114,7 @@ class JoinValidationTest extends TableTestBase {
     streamUtil.verifySql(sql, "n/a")
   }
 
-  /** Validates that no proctime attribute is in remaining predicate for non-window inner join **/
+  /** Validates that no proctime attribute is in remaining predicate for non-window inner join * */
   @Test(expected = classOf[TableException])
   def testNoProctimeAttributeInResultForNonWindowInnerJoin(): Unit = {
     val sql =
@@ -202,9 +202,9 @@ class JoinValidationTest extends TableTestBase {
   }
 
   /**
-    * Currently only the inner join condition can support the Python UDF taking the inputs from
-    * the left table and the right table at the same time.
-    */
+   * Currently only the inner join condition can support the Python UDF taking the inputs from
+   * the left table and the right table at the same time.
+   */
   @Test
   def testOuterJoinWithPythonFunctionInCondition(): Unit = {
     expectedException.expectCause(Matchers.isA(classOf[TableException]))

@@ -34,13 +34,7 @@ class FlinkLogicalJoin(
     right: RelNode,
     condition: RexNode,
     joinType: JoinRelType)
-  extends FlinkLogicalJoinBase(
-    cluster,
-    traitSet,
-    left,
-    right,
-    condition,
-    joinType) {
+    extends FlinkLogicalJoinBase(cluster, traitSet, left, right, condition, joinType) {
 
   override def copy(
       traitSet: RelTraitSet,
@@ -55,11 +49,11 @@ class FlinkLogicalJoin(
 }
 
 private class FlinkLogicalJoinConverter
-  extends ConverterRule(
-    classOf[LogicalJoin],
-    Convention.NONE,
-    FlinkConventions.LOGICAL,
-    "FlinkLogicalJoinConverter") {
+    extends ConverterRule(
+      classOf[LogicalJoin],
+      Convention.NONE,
+      FlinkConventions.LOGICAL,
+      "FlinkLogicalJoinConverter") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val join: LogicalJoin = call.rel(0).asInstanceOf[LogicalJoin]
@@ -91,24 +85,24 @@ private class FlinkLogicalJoinConverter
   private def isSingleRowJoin(join: LogicalJoin): Boolean = {
     join.getJoinType match {
       case JoinRelType.INNER if isSingleRow(join.getRight) || isSingleRow(join.getLeft) => true
-      case JoinRelType.LEFT if isSingleRow(join.getRight) => true
-      case JoinRelType.RIGHT if isSingleRow(join.getLeft) => true
-      case _ => false
+      case JoinRelType.LEFT if isSingleRow(join.getRight)                               => true
+      case JoinRelType.RIGHT if isSingleRow(join.getLeft)                               => true
+      case _                                                                            => false
     }
   }
 
   /**
-    * Recursively checks if a [[RelNode]] returns at most a single row.
-    * Input must be a global aggregation possibly followed by projections or filters.
-    */
+   * Recursively checks if a [[RelNode]] returns at most a single row.
+   * Input must be a global aggregation possibly followed by projections or filters.
+   */
   private def isSingleRow(node: RelNode): Boolean = {
     node match {
       case ss: RelSubset => isSingleRow(ss.getOriginal)
-      case lp: Project => isSingleRow(lp.getInput)
-      case lf: Filter => isSingleRow(lf.getInput)
-      case lc: Calc => isSingleRow(lc.getInput)
+      case lp: Project   => isSingleRow(lp.getInput)
+      case lf: Filter    => isSingleRow(lf.getInput)
+      case lc: Calc      => isSingleRow(lc.getInput)
       case la: Aggregate => la.getGroupSet.isEmpty
-      case _ => false
+      case _             => false
     }
   }
 }

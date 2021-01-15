@@ -31,10 +31,9 @@ class CountAccumulator extends JTuple1[Long] {
 }
 
 /**
-  * built-in count aggregate function
-  */
-class CountAggFunction
-  extends AggregateFunction[JLong, CountAccumulator] {
+ * built-in count aggregate function
+ */
+class CountAggFunction extends AggregateFunction[JLong, CountAccumulator] {
 
   // process argument is optimized by Calcite.
   // For instance count(42) or count(*) will be optimized to count().

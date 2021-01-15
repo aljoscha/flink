@@ -31,15 +31,15 @@ import org.apache.calcite.rel.metadata.RelMetadataQuery
 import java.util
 
 /**
-  * Batch physical RelNode to read data from an external source defined by a
-  * bounded [[org.apache.flink.table.connector.source.ScanTableSource]].
-  */
+ * Batch physical RelNode to read data from an external source defined by a
+ * bounded [[org.apache.flink.table.connector.source.ScanTableSource]].
+ */
 class BatchPhysicalTableSourceScan(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
     tableSourceTable: TableSourceTable)
-  extends CommonPhysicalTableSourceScan(cluster, traitSet, tableSourceTable)
-  with BatchPhysicalRel {
+    extends CommonPhysicalTableSourceScan(cluster, traitSet, tableSourceTable)
+    with BatchPhysicalRel {
 
   override def copy(traitSet: RelTraitSet, inputs: util.List[RelNode]): RelNode = {
     new BatchPhysicalTableSourceScan(cluster, traitSet, tableSourceTable)

@@ -29,11 +29,7 @@ class CompositeAccessTest extends CompositeTypeTestBase {
   def testGetField(): Unit = {
 
     // single field by string key
-    testAllApis(
-      'f0.get("intField"),
-      "f0.get('intField')",
-      "testTable.f0.intField",
-      "42")
+    testAllApis('f0.get("intField"), "f0.get('intField')", "testTable.f0.intField", "42")
     testSqlApi("f0.intField", "42")
 
     testSqlApi("testTable.f0.stringField", "Bob")
@@ -43,10 +39,7 @@ class CompositeAccessTest extends CompositeTypeTestBase {
     testSqlApi("f0.booleanField", "true")
 
     // single field by int key
-    testTableApi(
-      'f0.get(0),
-      "f0.get(0)",
-      "42")
+    testTableApi('f0.get(0), "f0.get(0)", "42")
 
     // nested single field
     testAllApis(
@@ -62,11 +55,7 @@ class CompositeAccessTest extends CompositeTypeTestBase {
     testSqlApi("testTable.f1.objectField.booleanField", "false")
     testSqlApi("f1.objectField.booleanField", "false")
 
-    testAllApis(
-      'f2.get(0),
-      "f2.get(0)",
-      "testTable.f2._1",
-      "a")
+    testAllApis('f2.get(0), "f2.get(0)", "testTable.f2._1", "a")
     testSqlApi("f2._1", "a")
 
     testSqlApi("testTable.f3.f1", "b")
@@ -78,11 +67,7 @@ class CompositeAccessTest extends CompositeTypeTestBase {
     testSqlApi("testTable.f5", "13")
     testSqlApi("f5", "13")
 
-    testAllApis(
-      'f7.get("_1"),
-      "get(f7, '_1')",
-      "testTable.f7._1",
-      "true")
+    testAllApis('f7.get("_1"), "get(f7, '_1')", "testTable.f7._1", "true")
 
     // composite field return type
     testSqlApi("testTable.f6", "MyCaseClass2(null)")
@@ -95,11 +80,7 @@ class CompositeAccessTest extends CompositeTypeTestBase {
       "(25,Timo,false)")
     testSqlApi("f1.objectField", "(25,Timo,false)")
 
-    testAllApis(
-      'f0,
-      "f0",
-      "testTable.f0",
-      "(42,Bob,true)")
+    testAllApis('f0, "f0", "testTable.f0", "(42,Bob,true)")
     testSqlApi("f0", "(42,Bob,true)")
 
     // flattening (test base only returns first column)
@@ -110,11 +91,7 @@ class CompositeAccessTest extends CompositeTypeTestBase {
       "25")
     testSqlApi("f1.objectField.*", "25")
 
-    testAllApis(
-      'f0.flatten(),
-      "flatten(f0)",
-      "testTable.f0.*",
-      "42")
+    testAllApis('f0.flatten(), "flatten(f0)", "testTable.f0.*", "42")
     testSqlApi("f0.*", "42")
 
     testTableApi(12.flatten(), "12.flatten()", "12")
@@ -122,48 +99,25 @@ class CompositeAccessTest extends CompositeTypeTestBase {
     testTableApi('f5.flatten(), "f5.flatten()", "13")
 
     // array of composites
-    testAllApis(
-      'f8.at(1).get("_1"),
-      "f8.at(1).get('_1')",
-      "f8[1]._1",
-      "true"
-    )
-    testAllApis(
-      'f8.at(1).get("_2"),
-      "f8.at(1).get('_2')",
-      "f8[1]._2",
-      "23"
-    )
-    testAllApis(
-      'f9.at(2).get("_1"),
-      "f9.at(2).get('_1')",
-      "f9[2]._1",
-      "null"
-    )
+    testAllApis('f8.at(1).get("_1"), "f8.at(1).get('_1')", "f8[1]._1", "true")
+    testAllApis('f8.at(1).get("_2"), "f8.at(1).get('_2')", "f8[1]._2", "23")
+    testAllApis('f9.at(2).get("_1"), "f9.at(2).get('_1')", "f9[2]._1", "null")
     testAllApis(
       'f10.at(1).get("stringField"),
       "f10.at(1).get('stringField')",
       "f10[1].stringField",
-      "Bob"
-    )
-    testAllApis(
-      'f11.at(1).get("myString"),
-      "f11.at(1).get('myString')",
-      "f11[1].myString",
-      "Hello"
-    )
+      "Bob")
+    testAllApis('f11.at(1).get("myString"), "f11.at(1).get('myString')", "f11[1].myString", "Hello")
     testAllApis(
       'f12.at(1).get("arrayField").at(1).get("stringField"),
       "f12.at(1).get('arrayField').at(1).get('stringField')",
       "f12[1].arrayField[1].stringField",
-      "Alice"
-    )
+      "Alice")
 
     testAllApis(
       'f13.at(1).get("objectField").get("stringField"),
       "f13.at(1).get('objectField').get('stringField')",
       "f13[1].objectField.stringField",
-      "Bob"
-    )
+      "Bob")
   }
 }

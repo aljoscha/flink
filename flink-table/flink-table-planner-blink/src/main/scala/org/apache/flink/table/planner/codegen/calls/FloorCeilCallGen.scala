@@ -18,7 +18,12 @@
 
 package org.apache.flink.table.planner.codegen.calls
 
-import org.apache.flink.table.planner.codegen.CodeGenUtils.{getEnum, primitiveTypeTermForType, qualifyMethod, TIMESTAMP_DATA}
+import org.apache.flink.table.planner.codegen.CodeGenUtils.{
+  getEnum,
+  primitiveTypeTermForType,
+  qualifyMethod,
+  TIMESTAMP_DATA
+}
 import org.apache.flink.table.planner.codegen.GenerateUtils.generateCallIfArgsNotNull
 import org.apache.flink.table.planner.codegen.{CodeGeneratorContext, GeneratedExpression}
 import org.apache.flink.table.types.logical.{LogicalType, LogicalTypeRoot}
@@ -30,12 +35,10 @@ import java.lang.reflect.Method
 import java.util.TimeZone
 
 /**
-  * Generates floor/ceil function calls.
-  */
-class FloorCeilCallGen(
-    arithmeticMethod: Method,
-    temporalMethod: Option[Method] = None)
-  extends MethodCallGen(arithmeticMethod) {
+ * Generates floor/ceil function calls.
+ */
+class FloorCeilCallGen(arithmeticMethod: Method, temporalMethod: Option[Method] = None)
+    extends MethodCallGen(arithmeticMethod) {
 
   override def generate(
       ctx: CodeGeneratorContext,
@@ -47,9 +50,8 @@ class FloorCeilCallGen(
         case LogicalTypeRoot.FLOAT | LogicalTypeRoot.DOUBLE =>
           super.generate(ctx, operands, returnType)
         case LogicalTypeRoot.DECIMAL =>
-          generateCallIfArgsNotNull(ctx, returnType, operands) {
-            operandResultTerms =>
-              s"${qualifyMethod(arithmeticMethod)}(${operandResultTerms.mkString(", ")})"
+          generateCallIfArgsNotNull(ctx, returnType, operands) { operandResultTerms =>
+            s"${qualifyMethod(arithmeticMethod)}(${operandResultTerms.mkString(", ")})"
           }
         case _ =>
           operands.head // no floor/ceil necessary
@@ -62,55 +64,54 @@ class FloorCeilCallGen(
       val internalType = primitiveTypeTermForType(operand.resultType)
       val method = temporalMethod.getOrElse(arithmeticMethod)
 
-      generateCallIfArgsNotNull(ctx, operand.resultType, operands) {
-        terms =>
-          unit match {
-            // for Timestamp with timezone info
-            case YEAR | QUARTER | MONTH | DAY | HOUR
+      generateCallIfArgsNotNull(ctx, operand.resultType, operands) { terms =>
+        unit match {
+          // for Timestamp with timezone info
+          case YEAR | QUARTER | MONTH | DAY | HOUR
               if terms.length + 1 == method.getParameterCount &&
                 method.getParameterTypes()(terms.length) == classOf[TimeZone] =>
-              val timeZone = ctx.addReusableSessionTimeZone()
-              val longTerm = s"${terms.head}.getMillisecond()"
-              s"""
+            val timeZone = ctx.addReusableSessionTimeZone()
+            val longTerm = s"${terms.head}.getMillisecond()"
+            s"""
                  |$TIMESTAMP_DATA.fromEpochMillis(
                  |  ${qualifyMethod(temporalMethod.get)}(${terms(1)},
                  |  $longTerm,
                  |  $timeZone))
                  |""".stripMargin
 
-            // for Unix Date / Unix Time
-            case YEAR | MONTH =>
-              operand.resultType.getTypeRoot match {
-                case LogicalTypeRoot.TIMESTAMP_WITHOUT_TIME_ZONE =>
-                  val longTerm = s"${terms.head}.getMillisecond()"
-                  s"""
+          // for Unix Date / Unix Time
+          case YEAR | MONTH =>
+            operand.resultType.getTypeRoot match {
+              case LogicalTypeRoot.TIMESTAMP_WITHOUT_TIME_ZONE =>
+                val longTerm = s"${terms.head}.getMillisecond()"
+                s"""
                      |$TIMESTAMP_DATA.fromEpochMillis(
                      |  ${qualifyMethod(temporalMethod.get)}(${terms(1)}, $longTerm))
                    """.stripMargin
-                case _ =>
-                  s"""
+              case _ =>
+                s"""
                      |($internalType) ${qualifyMethod(temporalMethod.get)}(
                      |  ${terms(1)}, ${terms.head})
                      |""".stripMargin
-              }
-            case _ =>
-              operand.resultType.getTypeRoot match {
-                case LogicalTypeRoot.TIMESTAMP_WITHOUT_TIME_ZONE =>
-                  val longTerm = s"${terms.head}.getMillisecond()"
-                  s"""
+            }
+          case _ =>
+            operand.resultType.getTypeRoot match {
+              case LogicalTypeRoot.TIMESTAMP_WITHOUT_TIME_ZONE =>
+                val longTerm = s"${terms.head}.getMillisecond()"
+                s"""
                      |$TIMESTAMP_DATA.fromEpochMillis(${qualifyMethod(arithmeticMethod)}(
                      |  $longTerm,
                      |  (long) ${unit.startUnit.multiplier.intValue()}))
                    """.stripMargin
-                case _ =>
-                  s"""
+              case _ =>
+                s"""
                      |${qualifyMethod(arithmeticMethod)}(
                      |  ($internalType) ${terms.head},
                      |  ($internalType) ${unit.startUnit.multiplier.intValue()})
                      |""".stripMargin
-              }
+            }
 
-          }
+        }
       }
   }
 }

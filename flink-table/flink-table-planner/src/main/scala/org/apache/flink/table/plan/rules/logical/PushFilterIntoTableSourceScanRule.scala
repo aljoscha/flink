@@ -34,15 +34,16 @@ import org.apache.flink.util.Preconditions
 
 import scala.collection.JavaConverters._
 
-class PushFilterIntoTableSourceScanRule extends RelOptRule(
-  operand(classOf[FlinkLogicalCalc],
-    operand(classOf[FlinkLogicalTableSourceScan], none)),
-  "PushFilterIntoTableSourceScanRule") {
+class PushFilterIntoTableSourceScanRule
+    extends RelOptRule(
+      operand(classOf[FlinkLogicalCalc], operand(classOf[FlinkLogicalTableSourceScan], none)),
+      "PushFilterIntoTableSourceScanRule") {
 
   // we don't offer a context for the legacy planner
   private val tableConfig = TableConfig.getDefault
   private val defaultCatalog = "default_catalog"
-  private val catalogManager = CatalogManager.newBuilder()
+  private val catalogManager = CatalogManager
+    .newBuilder()
     .classLoader(Thread.currentThread().getContextClassLoader)
     .config(tableConfig.getConfiguration)
     .defaultCatalog(defaultCatalog, new GenericInMemoryCatalog(defaultCatalog, "default_database"))
@@ -92,9 +93,10 @@ class PushFilterIntoTableSourceScanRule extends RelOptRule(
 
     if (newTableSource.asInstanceOf[FilterableTableSource[_]].isFilterPushedDown
       && newTableSource.explainSource().equals(scan.tableSource.explainSource())) {
-      throw new TableException("Failed to push filter into table source! "
-        + "table source with pushdown capability must override and change "
-        + "explainSource() API to explain the pushdown applied!")
+      throw new TableException(
+        "Failed to push filter into table source! "
+          + "table source with pushdown capability must override and change "
+          + "explainSource() API to explain the pushdown applied!")
     }
 
     // check whether framework still need to do a filter
@@ -104,12 +106,11 @@ class PushFilterIntoTableSourceScanRule extends RelOptRule(
         relBuilder.push(scan)
 
         // TODO we cast to planner expressions as a temporary solution to keep the old interfaces
-        val remainingPrecidatesAsExpr = remainingPredicates
-          .asScala
+        val remainingPrecidatesAsExpr = remainingPredicates.asScala
           .map(_.asInstanceOf[PlannerExpression])
 
         val remainingConditions = (remainingPrecidatesAsExpr.map(_.toRexNode(relBuilder))
-              ++ unconvertedRexNodes)
+          ++ unconvertedRexNodes)
         remainingConditions.reduce((l, r) => relBuilder.and(l, r))
       } else {
         null
@@ -122,7 +123,8 @@ class PushFilterIntoTableSourceScanRule extends RelOptRule(
     val newRexProgram = {
       if (remainingCondition != null || !program.projectsOnlyIdentity) {
         val expandedProjectList = program.getProjectList.asScala
-            .map(ref => program.expandLocalRef(ref)).asJava
+          .map(ref => program.expandLocalRef(ref))
+          .asJava
         RexProgram.create(
           program.getInputRowType,
           expandedProjectList,

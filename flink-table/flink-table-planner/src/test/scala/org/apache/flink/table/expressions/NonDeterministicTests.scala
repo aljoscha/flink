@@ -27,28 +27,20 @@ import org.apache.flink.types.Row
 import org.junit.{Ignore, Test}
 
 /**
-  * Tests that can only be checked manually as they are non-deterministic.
-  */
+ * Tests that can only be checked manually as they are non-deterministic.
+ */
 class NonDeterministicTests extends ExpressionTestBase {
 
   @Ignore
   @Test
   def testCurrentDate(): Unit = {
-    testAllApis(
-      currentDate(),
-      "currentDate()",
-      "CURRENT_DATE",
-      "PLEASE CHECK MANUALLY")
+    testAllApis(currentDate(), "currentDate()", "CURRENT_DATE", "PLEASE CHECK MANUALLY")
   }
 
   @Ignore
   @Test
   def testCurrentTime(): Unit = {
-    testAllApis(
-      currentTime(),
-      "currentTime()",
-      "CURRENT_TIME",
-      "PLEASE CHECK MANUALLY")
+    testAllApis(currentTime(), "currentTime()", "CURRENT_TIME", "PLEASE CHECK MANUALLY")
   }
 
   @Ignore
@@ -64,31 +56,19 @@ class NonDeterministicTests extends ExpressionTestBase {
   @Ignore
   @Test
   def testLocalTimestamp(): Unit = {
-    testAllApis(
-      localTimestamp(),
-      "localTimestamp()",
-      "LOCALTIMESTAMP",
-      "PLEASE CHECK MANUALLY")
+    testAllApis(localTimestamp(), "localTimestamp()", "LOCALTIMESTAMP", "PLEASE CHECK MANUALLY")
   }
 
   @Ignore
   @Test
   def testLocalTime(): Unit = {
-    testAllApis(
-      localTime(),
-      "localTime()",
-      "LOCALTIME",
-      "PLEASE CHECK MANUALLY")
+    testAllApis(localTime(), "localTime()", "LOCALTIME", "PLEASE CHECK MANUALLY")
   }
 
   @Ignore
   @Test
   def testUUID(): Unit = {
-    testAllApis(
-      uuid(),
-      "uuid()",
-      "UUID()",
-      "PLEASE CHECK MANUALLY")
+    testAllApis(uuid(), "uuid()", "UUID()", "PLEASE CHECK MANUALLY")
   }
   // ----------------------------------------------------------------------------------------------
 

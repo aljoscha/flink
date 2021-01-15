@@ -34,8 +34,7 @@ class TableSourceITCase extends BatchTestBase {
     super.before()
     env.setParallelism(1) // set sink parallelism to 1
     val myTableDataId = TestValuesTableFactory.registerData(TestData.smallData3)
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
         |CREATE TABLE MyTable (
         |  `a` INT,
         |  `b` BIGINT,
@@ -47,10 +46,9 @@ class TableSourceITCase extends BatchTestBase {
         |)
         |""".stripMargin)
 
-    val filterableTableDataId = TestValuesTableFactory.registerData(
-      TestLegacyFilterableTableSource.defaultRows)
-    tEnv.executeSql(
-      s"""
+    val filterableTableDataId =
+      TestValuesTableFactory.registerData(TestLegacyFilterableTableSource.defaultRows)
+    tEnv.executeSql(s"""
          |CREATE TABLE FilterableTable (
          |  name STRING,
          |  id BIGINT,
@@ -64,8 +62,7 @@ class TableSourceITCase extends BatchTestBase {
          |)
          |""".stripMargin)
     val nestedTableDataId = TestValuesTableFactory.registerData(TestData.deepNestedRow)
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE TABLE NestedTable (
          |  id BIGINT,
          |  deepNested ROW<
@@ -81,27 +78,19 @@ class TableSourceITCase extends BatchTestBase {
          |  'data-id' = '$nestedTableDataId',
          |  'bounded' = 'true'
          |)
-         |""".stripMargin
-    )
+         |""".stripMargin)
   }
 
   @Test
   def testSimpleProject(): Unit = {
     checkResult(
       "SELECT a, c FROM MyTable",
-      Seq(
-        row(1, "Hi"),
-        row(2, "Hello"),
-        row(3, "Hello world"))
-    )
+      Seq(row(1, "Hi"), row(2, "Hello"), row(3, "Hello world")))
   }
 
   @Test
   def testProjectWithoutInputRef(): Unit = {
-    checkResult(
-      "SELECT COUNT(*) FROM MyTable",
-      Seq(row(3))
-    )
+    checkResult("SELECT COUNT(*) FROM MyTable", Seq(row(3)))
   }
 
   @Test
@@ -116,11 +105,10 @@ class TableSourceITCase extends BatchTestBase {
         |    lower_name
         |FROM NestedTable
       """.stripMargin,
-      Seq(row(1, "Sarah", 10000, true, 1100, "mary"),
+      Seq(
+        row(1, "Sarah", 10000, true, 1100, "mary"),
         row(2, "Rob", 20000, false, 2200, "bob"),
-        row(3, "Mike", 30000, true, 3300, "liz")
-      )
-    )
+        row(3, "Mike", 30000, true, 3300, "liz")))
   }
 
   @Test
@@ -131,8 +119,7 @@ class TableSourceITCase extends BatchTestBase {
         row(5, 5, "Record_5"),
         row(6, 6, "Record_6"),
         row(7, 7, "Record_7"),
-        row(8, 8, "Record_8"))
-    )
+        row(8, 8, "Record_8")))
   }
 
   @Test
@@ -140,16 +127,13 @@ class TableSourceITCase extends BatchTestBase {
     checkResult(
       "SELECT id, amount, name FROM FilterableTable " +
         "WHERE amount > 4 AND price < 9 AND upper(name) = 'RECORD_5'",
-      Seq(
-        row(5, 5, "Record_5"))
-    )
+      Seq(row(5, 5, "Record_5")))
   }
 
   @Test
   def testInputFormatSource(): Unit = {
     val dataId = TestValuesTableFactory.registerData(TestData.smallData3)
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE TABLE MyInputFormatTable (
          |  `a` INT,
          |  `b` BIGINT,
@@ -160,23 +144,17 @@ class TableSourceITCase extends BatchTestBase {
          |  'bounded' = 'true',
          |  'runtime-source' = 'InputFormat'
          |)
-         |""".stripMargin
-    )
+         |""".stripMargin)
 
     checkResult(
       "SELECT a, c FROM MyInputFormatTable",
-      Seq(
-        row(1, "Hi"),
-        row(2, "Hello"),
-        row(3, "Hello world"))
-    )
+      Seq(row(1, "Hi"), row(2, "Hello"), row(3, "Hello world")))
   }
 
   @Test
   def testDataStreamSource(): Unit = {
     val dataId = TestValuesTableFactory.registerData(TestData.smallData3)
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE TABLE MyDataStreamTable (
          |  `a` INT,
          |  `b` BIGINT,
@@ -187,23 +165,17 @@ class TableSourceITCase extends BatchTestBase {
          |  'bounded' = 'true',
          |  'runtime-source' = 'DataStream'
          |)
-         |""".stripMargin
-    )
+         |""".stripMargin)
 
     checkResult(
       "SELECT a, c FROM MyDataStreamTable",
-      Seq(
-        row(1, "Hi"),
-        row(2, "Hello"),
-        row(3, "Hello world"))
-    )
+      Seq(row(1, "Hi"), row(2, "Hello"), row(3, "Hello world")))
   }
 
   @Test
   def testAllDataTypes(): Unit = {
     val dataId = TestValuesTableFactory.registerData(TestData.fullDataTypesData)
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE TABLE T (
          |  `a` BOOLEAN,
          |  `b` TINYINT,
@@ -227,33 +199,85 @@ class TableSourceITCase extends BatchTestBase {
          |  'data-id' = '$dataId',
          |  'bounded' = 'true'
          |)
-         |""".stripMargin
-    )
+         |""".stripMargin)
 
     checkResult(
       "SELECT * FROM T",
       Seq(
         row(
-          true, 127, 32767, 2147483647, 9223372036854775807L, "-1.123", "-1.123", "5.10",
-          1, 1, "1969-01-01", "00:00:00.123", "1969-01-01T00:00:00.123456789",
-          "1969-01-01T00:00:00.123456789Z", "[1, 2, 3]", row(1, "a", "2.3"), "{k1=1}"),
+          true,
+          127,
+          32767,
+          2147483647,
+          9223372036854775807L,
+          "-1.123",
+          "-1.123",
+          "5.10",
+          1,
+          1,
+          "1969-01-01",
+          "00:00:00.123",
+          "1969-01-01T00:00:00.123456789",
+          "1969-01-01T00:00:00.123456789Z",
+          "[1, 2, 3]",
+          row(1, "a", "2.3"),
+          "{k1=1}"),
         row(
-          false, -128, -32768, -2147483648, -9223372036854775808L, "3.4", "3.4", "6.10",
-          12, 12, "1970-09-30", "01:01:01.123", "1970-09-30T01:01:01.123456",
-          "1970-09-30T01:01:01.123456Z", "[4, 5]", row(null, "b", "4.56"), "{k2=2, k4=4}"),
+          false,
+          -128,
+          -32768,
+          -2147483648,
+          -9223372036854775808L,
+          "3.4",
+          "3.4",
+          "6.10",
+          12,
+          12,
+          "1970-09-30",
+          "01:01:01.123",
+          "1970-09-30T01:01:01.123456",
+          "1970-09-30T01:01:01.123456Z",
+          "[4, 5]",
+          row(null, "b", "4.56"),
+          "{k2=2, k4=4}"),
         row(
-          true, 0, 0, 0, 0, "0.12", "0.12", "7.10",
-          123, 123, "1990-12-24", "08:10:24.123", "1990-12-24T08:10:24.123",
-          "1990-12-24T08:10:24.123Z", "[6, null, 7]", row(3, null, "7.86"), "{k3=null}"),
+          true,
+          0,
+          0,
+          0,
+          0,
+          "0.12",
+          "0.12",
+          "7.10",
+          123,
+          123,
+          "1990-12-24",
+          "08:10:24.123",
+          "1990-12-24T08:10:24.123",
+          "1990-12-24T08:10:24.123Z",
+          "[6, null, 7]",
+          row(3, null, "7.86"),
+          "{k3=null}"),
         row(
-          false, 5, 4, 123, 1234, "1.2345", "1.2345", "8.12",
-          1234, 1234, "2020-05-01", "23:23:23", "2020-05-01T23:23:23",
-          "2020-05-01T23:23:23Z", "[8]", row(4, "c", null), "{null=3}"),
-        row(
-          null, null, null, null, null, null, null, null, null, null, null, null, null,
-          null, null, null, null)
-      )
-    )
+          false,
+          5,
+          4,
+          123,
+          1234,
+          "1.2345",
+          "1.2345",
+          "8.12",
+          1234,
+          1234,
+          "2020-05-01",
+          "23:23:23",
+          "2020-05-01T23:23:23",
+          "2020-05-01T23:23:23Z",
+          "[8]",
+          row(4, "c", null),
+          "{null=3}"),
+        row(null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+          null, null, null)))
   }
 
   @Test
@@ -262,23 +286,15 @@ class TableSourceITCase extends BatchTestBase {
     file.delete()
     file.createNewFile()
     FileUtils.writeFileUtf8(file, "1\n5\n6")
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE TABLE MyFileSourceTable (
          |  `a` STRING
          |) WITH (
          |  'connector' = 'filesource',
          |  'path' = '${file.toURI}'
          |)
-         |""".stripMargin
-    )
+         |""".stripMargin)
 
-    checkResult(
-      "SELECT a FROM MyFileSourceTable",
-      Seq(
-        row("1"),
-        row("5"),
-        row("6"))
-    )
+    checkResult("SELECT a FROM MyFileSourceTable", Seq(row("1"), row("5"), row("6")))
   }
 }

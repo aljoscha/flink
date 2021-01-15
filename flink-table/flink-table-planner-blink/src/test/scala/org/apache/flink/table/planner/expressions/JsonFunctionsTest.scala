@@ -44,15 +44,15 @@ class JsonFunctionsTest extends ExpressionTestBase {
 
   override def typeInfo: RowTypeInfo = {
     new RowTypeInfo(
-      /* 0 */  Types.STRING,
-      /* 1 */  Types.BOOLEAN,
-      /* 2 */  Types.BYTE,
-      /* 3 */  Types.SHORT,
-      /* 4 */  Types.LONG,
-      /* 5 */  Types.FLOAT,
-      /* 6 */  Types.DOUBLE,
-      /* 7 */  Types.INT,
-      /* 8 */  Types.STRING)
+      /* 0 */ Types.STRING,
+      /* 1 */ Types.BOOLEAN,
+      /* 2 */ Types.BYTE,
+      /* 3 */ Types.SHORT,
+      /* 4 */ Types.LONG,
+      /* 5 */ Types.FLOAT,
+      /* 6 */ Types.DOUBLE,
+      /* 7 */ Types.INT,
+      /* 8 */ Types.STRING)
   }
 
   @Test
@@ -103,9 +103,8 @@ class JsonFunctionsTest extends ExpressionTestBase {
   }
 
   private def verifyException[T <: Exception](
-    candidate: String,
-    expectedException: Class[T]
-  ): Unit = {
+      candidate: String,
+      expectedException: Class[T]): Unit = {
     val sqlCandidates = Array(
       s"$candidate is json value",
       s"$candidate is not json value",

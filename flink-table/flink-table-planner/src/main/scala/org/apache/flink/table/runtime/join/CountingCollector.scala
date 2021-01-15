@@ -22,9 +22,9 @@ import org.apache.flink.types.Row
 import org.apache.flink.util.Collector
 
 /**
-  * This collector is used to count how many rows have been collected. It will not collect data
-  * actually.
-  */
+ * This collector is used to count how many rows have been collected. It will not collect data
+ * actually.
+ */
 class CountingCollector extends Collector[Row] {
   // count how many records may be emitted
   private var emitCnt: Long = 0L

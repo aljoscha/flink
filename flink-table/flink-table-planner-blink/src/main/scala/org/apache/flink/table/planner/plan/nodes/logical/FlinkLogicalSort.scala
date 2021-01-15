@@ -34,9 +34,9 @@ import org.apache.calcite.rex.{RexLiteral, RexNode}
 import org.apache.calcite.sql.`type`.SqlTypeName
 
 /**
-  * Sub-class of [[Sort]] that is a relational expression which imposes
-  * a particular sort order on its input without otherwise changing its content in Flink.
-  */
+ * Sub-class of [[Sort]] that is a relational expression which imposes
+ * a particular sort order on its input without otherwise changing its content in Flink.
+ */
 class FlinkLogicalSort(
     cluster: RelOptCluster,
     traits: RelTraitSet,
@@ -44,8 +44,8 @@ class FlinkLogicalSort(
     collation: RelCollation,
     sortOffset: RexNode,
     sortFetch: RexNode)
-  extends Sort(cluster, traits, child, collation, sortOffset, sortFetch)
-  with FlinkLogicalRel {
+    extends Sort(cluster, traits, child, collation, sortOffset, sortFetch)
+    with FlinkLogicalRel {
 
   private lazy val limitStart: Long = SortUtil.getLimitStart(offset)
 
@@ -82,11 +82,11 @@ class FlinkLogicalSort(
 }
 
 class FlinkLogicalSortStreamConverter
-  extends ConverterRule(
-    classOf[LogicalSort],
-    Convention.NONE,
-    FlinkConventions.LOGICAL,
-    "FlinkLogicalSortStreamConverter") {
+    extends ConverterRule(
+      classOf[LogicalSort],
+      Convention.NONE,
+      FlinkConventions.LOGICAL,
+      "FlinkLogicalSortStreamConverter") {
 
   override def convert(rel: RelNode): RelNode = {
     val sort = rel.asInstanceOf[LogicalSort]
@@ -95,11 +95,12 @@ class FlinkLogicalSortStreamConverter
   }
 }
 
-class FlinkLogicalSortBatchConverter extends ConverterRule(
-  classOf[LogicalSort],
-  Convention.NONE,
-  FlinkConventions.LOGICAL,
-  "FlinkLogicalSortBatchConverter") {
+class FlinkLogicalSortBatchConverter
+    extends ConverterRule(
+      classOf[LogicalSort],
+      Convention.NONE,
+      FlinkConventions.LOGICAL,
+      "FlinkLogicalSortBatchConverter") {
 
   override def convert(rel: RelNode): RelNode = {
     val sort = rel.asInstanceOf[LogicalSort]
@@ -107,17 +108,18 @@ class FlinkLogicalSortBatchConverter extends ConverterRule(
     val config = sort.getCluster.getPlanner.getContext.unwrap(classOf[FlinkContext]).getTableConfig
     val enableRangeSort = config.getConfiguration.getBoolean(TABLE_EXEC_RANGE_SORT_ENABLED)
     val limitValue = config.getConfiguration.getInteger(TABLE_EXEC_SORT_DEFAULT_LIMIT)
-    val (offset, fetch) = if (sort.fetch == null && sort.offset == null
-      && !enableRangeSort && limitValue > 0) {
-      //force the sort add limit
-      val rexBuilder = rel.getCluster.getRexBuilder
-      val intType = rexBuilder.getTypeFactory.createSqlType(SqlTypeName.INTEGER)
-      val offset = rexBuilder.makeLiteral(0, intType, true)
-      val fetch = rexBuilder.makeLiteral(limitValue, intType, true)
-      (offset, fetch)
-    } else {
-      (sort.offset, sort.fetch)
-    }
+    val (offset, fetch) =
+      if (sort.fetch == null && sort.offset == null
+        && !enableRangeSort && limitValue > 0) {
+        //force the sort add limit
+        val rexBuilder = rel.getCluster.getRexBuilder
+        val intType = rexBuilder.getTypeFactory.createSqlType(SqlTypeName.INTEGER)
+        val offset = rexBuilder.makeLiteral(0, intType, true)
+        val fetch = rexBuilder.makeLiteral(limitValue, intType, true)
+        (offset, fetch)
+      } else {
+        (sort.offset, sort.fetch)
+      }
     FlinkLogicalSort.create(newInput, sort.getCollation, offset, fetch)
   }
 }
@@ -134,6 +136,6 @@ object FlinkLogicalSort {
     val cluster = input.getCluster
     val collationTrait = RelCollationTraitDef.INSTANCE.canonize(collation)
     val traitSet = cluster.traitSetOf(FlinkConventions.LOGICAL).replace(collationTrait)
-    new FlinkLogicalSort(cluster,  traitSet, input, collation, sortOffset, sortFetch)
+    new FlinkLogicalSort(cluster, traitSet, input, collation, sortOffset, sortFetch)
   }
 }

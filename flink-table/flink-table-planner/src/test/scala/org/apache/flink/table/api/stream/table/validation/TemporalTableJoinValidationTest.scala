@@ -30,20 +30,26 @@ class TemporalTableJoinValidationTest extends TableTestBase {
 
   val util: TableTestUtil = streamTestUtil()
 
-  val orders = util.addTable[(Long, String, Timestamp)](
-    "Orders", 'o_amount, 'o_currency, 'o_rowtime.rowtime)
+  val orders =
+    util.addTable[(Long, String, Timestamp)]("Orders", 'o_amount, 'o_currency, 'o_rowtime.rowtime)
 
-  val ordersProctime = util.addTable[(Long, String)](
-    "OrdersProctime", 'o_amount, 'o_currency, 'o_rowtime.proctime)
+  val ordersProctime =
+    util.addTable[(Long, String)]("OrdersProctime", 'o_amount, 'o_currency, 'o_rowtime.proctime)
 
   val ordersWithoutTimeAttribute = util.addTable[(Long, String, Timestamp)](
-    "OrdersWithoutTimeAttribute", 'o_amount, 'o_currency, 'o_rowtime)
+    "OrdersWithoutTimeAttribute",
+    'o_amount,
+    'o_currency,
+    'o_rowtime)
 
-  val ratesHistory = util.addTable[(String, Int, Timestamp)](
-    "RatesHistory", 'currency, 'rate, 'rowtime.rowtime)
+  val ratesHistory =
+    util.addTable[(String, Int, Timestamp)]("RatesHistory", 'currency, 'rate, 'rowtime.rowtime)
 
   val ratesHistoryWithoutTimeAttribute = util.addTable[(String, Int, Timestamp)](
-    "ratesHistoryWithoutTimeAttribute", 'currency, 'rate, 'rowtime)
+    "ratesHistoryWithoutTimeAttribute",
+    'currency,
+    'rate,
+    'rowtime)
 
   @Test
   def testInvalidFieldReference(): Unit = {
@@ -71,7 +77,8 @@ class TemporalTableJoinValidationTest extends TableTestBase {
 
     val result = orders
       .joinLateral(rates('o_rowtime), 'currency === 'o_currency)
-      .select($"o_amount" * $"rate").as("rate")
+      .select($"o_amount" * $"rate")
+      .as("rate")
 
     util.explain(result)
   }
@@ -86,7 +93,8 @@ class TemporalTableJoinValidationTest extends TableTestBase {
 
     val result = ordersWithoutTimeAttribute
       .joinLateral(rates('o_rowtime), 'currency === 'o_currency)
-      .select($"o_amount" * $"rate").as("rate")
+      .select($"o_amount" * $"rate")
+      .as("rate")
 
     util.explain(result)
   }
@@ -102,7 +110,8 @@ class TemporalTableJoinValidationTest extends TableTestBase {
 
     val result = ordersProctime
       .joinLateral(rates('o_rowtime), 'currency === 'o_currency)
-      .select($"o_amount" * $"rate").as("rate")
+      .select($"o_amount" * $"rate")
+      .as("rate")
 
     util.explain(result)
   }

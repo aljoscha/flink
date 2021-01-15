@@ -21,8 +21,8 @@ package org.apache.flink.table.planner.runtime.stream.sql
 import scala.collection.Seq
 
 /**
-  * Test csv [[StreamFileSystemITCaseBase]].
-  */
+ * Test csv [[StreamFileSystemITCaseBase]].
+ */
 class StreamFileSystemTestCsvITCase extends StreamFileSystemITCaseBase {
 
   override def formatProperties(): Array[String] = {

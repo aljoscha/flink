@@ -26,7 +26,11 @@ import org.apache.flink.table.descriptors.{CustomConnectorDescriptor, Descriptor
 import org.apache.flink.table.descriptors.Schema.SCHEMA
 import org.apache.flink.table.factories.TableSourceFactory
 import org.apache.flink.table.functions.{AsyncTableFunction, FunctionContext, TableFunction}
-import org.apache.flink.table.planner.runtime.utils.InMemoryLookupableTableSource.{InMemoryAsyncLookupFunction, InMemoryLookupFunction, RESOURCE_COUNTER}
+import org.apache.flink.table.planner.runtime.utils.InMemoryLookupableTableSource.{
+  InMemoryAsyncLookupFunction,
+  InMemoryLookupFunction,
+  RESOURCE_COUNTER
+}
 import org.apache.flink.table.sources._
 import org.apache.flink.table.types.DataType
 import org.apache.flink.table.utils.EncodingUtils
@@ -44,15 +48,15 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 /**
-  * A [[LookupableTableSource]] which stores table in memory, this is mainly used for testing.
-  */
+ * A [[LookupableTableSource]] which stores table in memory, this is mainly used for testing.
+ */
 class InMemoryLookupableTableSource(
     schema: TableSchema,
     data: List[Row],
     asyncEnabled: Boolean,
     bounded: Boolean = false)
-  extends LookupableTableSource[Row]
-  with StreamTableSource[Row] {
+    extends LookupableTableSource[Row]
+    with StreamTableSource[Row] {
 
   override def getLookupFunction(lookupKeys: Array[String]): TableFunction[Row] = {
     new InMemoryLookupFunction(convertDataToMap(lookupKeys), RESOURCE_COUNTER)
@@ -86,7 +90,6 @@ class InMemoryLookupableTableSource(
   override def getProducedDataType: DataType = schema.toRowDataType
 
   override def getTableSchema: TableSchema = schema
-
 
   override def isBounded: Boolean = bounded
 
@@ -133,22 +136,21 @@ object InMemoryLookupableTableSource {
       schema: TableSchema,
       tableName: String,
       isBounded: Boolean = false): Unit = {
-    tEnv.connect(
-      new CustomConnectorDescriptor("InMemoryLookupableTable", 1, false)
-        .property("is-async", if (isAsync) "true" else "false")
-        .property("is-bounded", if (isBounded) "true" else "false")
-        .property("data", EncodingUtils.encodeObjectToString(data)))
+    tEnv
+      .connect(
+        new CustomConnectorDescriptor("InMemoryLookupableTable", 1, false)
+          .property("is-async", if (isAsync) "true" else "false")
+          .property("is-bounded", if (isBounded) "true" else "false")
+          .property("data", EncodingUtils.encodeObjectToString(data)))
       .withSchema(new Schema().schema(schema))
       .createTemporaryTable(tableName)
   }
 
   /**
-    * A lookup function which find matched rows with the given fields.
-    */
-  private class InMemoryLookupFunction(
-      data: Map[Row, List[Row]],
-      resourceCounter: AtomicInteger)
-    extends TableFunction[Row] {
+   * A lookup function which find matched rows with the given fields.
+   */
+  private class InMemoryLookupFunction(data: Map[Row, List[Row]], resourceCounter: AtomicInteger)
+      extends TableFunction[Row] {
 
     override def open(context: FunctionContext): Unit = {
       resourceCounter.incrementAndGet()
@@ -157,11 +159,13 @@ object InMemoryLookupableTableSource {
     @varargs
     def eval(inputs: AnyRef*): Unit = {
       val key = Row.of(inputs: _*)
-      Preconditions.checkArgument(!inputs.contains(null),
-        s"Lookup key %s contains null value, which would not happen.", key)
+      Preconditions.checkArgument(
+        !inputs.contains(null),
+        s"Lookup key %s contains null value, which would not happen.",
+        key)
       data.get(key) match {
         case Some(list) => list.foreach(result => collect(result))
-        case None => // do nothing
+        case None       => // do nothing
       }
     }
 
@@ -171,14 +175,14 @@ object InMemoryLookupableTableSource {
   }
 
   /**
-    * An async lookup function which find matched rows with the given fields.
-    */
+   * An async lookup function which find matched rows with the given fields.
+   */
   @SerialVersionUID(1L)
   private class InMemoryAsyncLookupFunction(
       data: Map[Row, List[Row]],
       resourceCounter: AtomicInteger,
       delayedReturn: Int = 0)
-    extends AsyncTableFunction[Row] {
+      extends AsyncTableFunction[Row] {
 
     @transient
     var executor: ExecutorService = _
@@ -191,8 +195,10 @@ object InMemoryLookupableTableSource {
     @varargs
     def eval(resultFuture: CompletableFuture[util.Collection[Row]], inputs: AnyRef*): Unit = {
       val key = Row.of(inputs: _*)
-      Preconditions.checkArgument(!inputs.contains(null),
-        s"Lookup key %s contains null value, which would not happen.", key)
+      Preconditions.checkArgument(
+        !inputs.contains(null),
+        s"Lookup key %s contains null value, which would not happen.",
+        key)
       CompletableFuture
         .supplyAsync(new CollectionSupplier(data, key), executor)
         .thenAccept(new CollectionConsumer(resultFuture))

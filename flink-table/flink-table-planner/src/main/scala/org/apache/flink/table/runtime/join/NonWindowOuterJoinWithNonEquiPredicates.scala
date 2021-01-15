@@ -26,17 +26,17 @@ import org.apache.flink.table.runtime.types.CRow
 import org.apache.flink.types.Row
 
 /**
-  * Connect data for left stream and right stream. Base class for stream non-window outer Join
-  * with non-equal predicates.
-  *
-  * @param leftType        the input type of left stream
-  * @param rightType       the input type of right stream
-  * @param genJoinFuncName the function code of other non-equi condition
-  * @param genJoinFuncCode the function name of other non-equi condition
-  * @param isLeftJoin      the type of join, whether it is the type of left join
-  * @param config          configuration that determines runtime behavior
-  */
-  abstract class NonWindowOuterJoinWithNonEquiPredicates(
+ * Connect data for left stream and right stream. Base class for stream non-window outer Join
+ * with non-equal predicates.
+ *
+ * @param leftType        the input type of left stream
+ * @param rightType       the input type of right stream
+ * @param genJoinFuncName the function code of other non-equi condition
+ * @param genJoinFuncCode the function name of other non-equi condition
+ * @param isLeftJoin      the type of join, whether it is the type of left join
+ * @param config          configuration that determines runtime behavior
+ */
+abstract class NonWindowOuterJoinWithNonEquiPredicates(
     leftType: TypeInformation[Row],
     rightType: TypeInformation[Row],
     genJoinFuncName: String,
@@ -44,14 +44,14 @@ import org.apache.flink.types.Row
     isLeftJoin: Boolean,
     minRetentionTime: Long,
     maxRetentionTime: Long)
-  extends NonWindowOuterJoin(
-    leftType,
-    rightType,
-    genJoinFuncName,
-    genJoinFuncCode,
-    isLeftJoin,
-    minRetentionTime,
-    maxRetentionTime) {
+    extends NonWindowOuterJoin(
+      leftType,
+      rightType,
+      genJoinFuncName,
+      genJoinFuncCode,
+      isLeftJoin,
+      minRetentionTime,
+      maxRetentionTime) {
 
   // how many matched rows from the right table for each left row. Index 0 is used for left
   // stream, index 1 is used for right stream.
@@ -68,10 +68,14 @@ import org.apache.flink.types.Row
 
     joinCntState = new Array[MapState[Row, Long]](2)
     val leftJoinCntStateDescriptor = new MapStateDescriptor[Row, Long](
-      "leftJoinCnt", leftType, Types.LONG.asInstanceOf[TypeInformation[Long]])
+      "leftJoinCnt",
+      leftType,
+      Types.LONG.asInstanceOf[TypeInformation[Long]])
     joinCntState(0) = getRuntimeContext.getMapState(leftJoinCntStateDescriptor)
     val rightJoinCntStateDescriptor = new MapStateDescriptor[Row, Long](
-      "rightJoinCnt", rightType, Types.LONG.asInstanceOf[TypeInformation[Long]])
+      "rightJoinCnt",
+      rightType,
+      Types.LONG.asInstanceOf[TypeInformation[Long]])
     joinCntState(1) = getRuntimeContext.getMapState(rightJoinCntStateDescriptor)
 
     countingCollector = new CountingCollector()
@@ -79,11 +83,11 @@ import org.apache.flink.types.Row
   }
 
   /**
-    * Join current row with other side rows when contains non-equal predicates. Retract previous
-    * output row if matched condition changed, i.e, matched condition is changed from matched to
-    * unmatched or vice versa. The RowWrapper has been reset before we call retractJoin and we
-    * also assume that the current change of cRowWrapper is equal to value.change.
-    */
+   * Join current row with other side rows when contains non-equal predicates. Retract previous
+   * output row if matched condition changed, i.e, matched condition is changed from matched to
+   * unmatched or vice versa. The RowWrapper has been reset before we call retractJoin and we
+   * also assume that the current change of cRowWrapper is equal to value.change.
+   */
   protected def retractJoinWithNonEquiPreds(
       value: CRow,
       inputRowFromLeft: Boolean,
@@ -133,17 +137,16 @@ import org.apache.flink.types.Row
   }
 
   /**
-    * Get left or right join cnt state.
-    *
-    * @param joinCntState    the join cnt state array, index 0 is left join cnt state, index 1
-    *                        is right
-    * @param isLeftCntState the flag whether get the left join cnt state
-    * @return the corresponding join cnt state
-    */
+   * Get left or right join cnt state.
+   *
+   * @param joinCntState    the join cnt state array, index 0 is left join cnt state, index 1
+   *                        is right
+   * @param isLeftCntState the flag whether get the left join cnt state
+   * @return the corresponding join cnt state
+   */
   protected def getJoinCntState(
       joinCntState: Array[MapState[Row, Long]],
-      isLeftCntState: Boolean)
-    : MapState[Row, Long] = {
+      isLeftCntState: Boolean): MapState[Row, Long] = {
 
     if (isLeftCntState) {
       joinCntState(0)

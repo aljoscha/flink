@@ -32,9 +32,10 @@ class LegacyTableSourceTest extends TableTestBase {
 
   private val util = streamTestUtil()
 
-  private val tableSchema = TableSchema.builder().fields(
-    Array("a", "b", "c"),
-    Array(DataTypes.INT(), DataTypes.BIGINT(), DataTypes.STRING())).build()
+  private val tableSchema = TableSchema
+    .builder()
+    .fields(Array("a", "b", "c"), Array(DataTypes.INT(), DataTypes.BIGINT(), DataTypes.STRING()))
+    .build()
 
   @Before
   def setup(): Unit = {
@@ -68,9 +69,16 @@ class LegacyTableSourceTest extends TableTestBase {
         .asInstanceOf[Array[TypeInformation[_]]],
       Array("id", "rowtime", "val", "name"))
 
-    util.tableEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(
-      "rowTimeT",
-      new TestTableSourceWithTime[Row](false, tableSchema, returnType, Seq(), rowtime = "rowtime"))
+    util.tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSourceInternal(
+        "rowTimeT",
+        new TestTableSourceWithTime[Row](
+          false,
+          tableSchema,
+          returnType,
+          Seq(),
+          rowtime = "rowtime"))
 
     util.verifyExecPlan("SELECT rowtime, id, name, val FROM rowTimeT")
   }
@@ -85,9 +93,16 @@ class LegacyTableSourceTest extends TableTestBase {
         .asInstanceOf[Array[TypeInformation[_]]],
       Array("id", "rowtime", "val", "name"))
 
-    util.tableEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(
-      "rowTimeT",
-      new TestTableSourceWithTime[Row](false, tableSchema, returnType, Seq(), rowtime = "rowtime"))
+    util.tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSourceInternal(
+        "rowTimeT",
+        new TestTableSourceWithTime[Row](
+          false,
+          tableSchema,
+          returnType,
+          Seq(),
+          rowtime = "rowtime"))
 
     util.verifyExecPlan("SELECT rowtime, id, name, val FROM rowTimeT")
   }
@@ -102,9 +117,16 @@ class LegacyTableSourceTest extends TableTestBase {
         .asInstanceOf[Array[TypeInformation[_]]],
       Array("id", "rowtime", "val", "name"))
 
-    util.tableEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(
-      "rowTimeT",
-      new TestTableSourceWithTime[Row](false, tableSchema, returnType, Seq(), rowtime = "rowtime"))
+    util.tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSourceInternal(
+        "rowTimeT",
+        new TestTableSourceWithTime[Row](
+          false,
+          tableSchema,
+          returnType,
+          Seq(),
+          rowtime = "rowtime"))
 
     val sqlQuery =
       """
@@ -118,19 +140,18 @@ class LegacyTableSourceTest extends TableTestBase {
     util.verifyExecPlan(sqlQuery)
   }
 
-
   @Test
   def testLegacyRowTimeTableGroupWindow(): Unit = {
-    util.tableEnv.connect(
-      new CustomConnectorDescriptor("TestTableSourceWithTime", 1, false)
-    ).withSchema(
-      new Schema()
-        .field("id", DataTypes.INT())
-        .field("val", DataTypes.BIGINT())
-        .field("name", DataTypes.STRING())
-        .field("rowtime", DataTypes.TIMESTAMP(3))
-        .rowtime(new Rowtime().timestampsFromField("rowtime").watermarksPeriodicBounded(1000))
-    ).createTemporaryTable("rowTimeT")
+    util.tableEnv
+      .connect(new CustomConnectorDescriptor("TestTableSourceWithTime", 1, false))
+      .withSchema(
+        new Schema()
+          .field("id", DataTypes.INT())
+          .field("val", DataTypes.BIGINT())
+          .field("name", DataTypes.STRING())
+          .field("rowtime", DataTypes.TIMESTAMP(3))
+          .rowtime(new Rowtime().timestampsFromField("rowtime").watermarksPeriodicBounded(1000)))
+      .createTemporaryTable("rowTimeT")
 
     val sql =
       """
@@ -146,15 +167,16 @@ class LegacyTableSourceTest extends TableTestBase {
 
   @Test
   def testLegacyProcTimeTableGroupWindow(): Unit = {
-    util.tableEnv.connect(
-      new CustomConnectorDescriptor("TestTableSourceWithTime", 1, false)
-    ).withSchema(
-      new Schema()
-        .field("id", DataTypes.INT())
-        .field("val", DataTypes.BIGINT())
-        .field("name", DataTypes.STRING())
-        .field("proctime", DataTypes.TIMESTAMP(3)).proctime()
-    ).createTemporaryTable("procTimeT")
+    util.tableEnv
+      .connect(new CustomConnectorDescriptor("TestTableSourceWithTime", 1, false))
+      .withSchema(
+        new Schema()
+          .field("id", DataTypes.INT())
+          .field("val", DataTypes.BIGINT())
+          .field("name", DataTypes.STRING())
+          .field("proctime", DataTypes.TIMESTAMP(3))
+          .proctime())
+      .createTemporaryTable("procTimeT")
 
     val sql =
       """
@@ -177,9 +199,11 @@ class LegacyTableSourceTest extends TableTestBase {
       Array(Types.INT, Types.LONG, Types.STRING).asInstanceOf[Array[TypeInformation[_]]],
       Array("id", "val", "name"))
 
-    util.tableEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(
-      "procTimeT",
-      new TestTableSourceWithTime[Row](false, tableSchema, returnType, Seq(), proctime = "pTime"))
+    util.tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSourceInternal(
+        "procTimeT",
+        new TestTableSourceWithTime[Row](false, tableSchema, returnType, Seq(), proctime = "pTime"))
 
     util.verifyExecPlan("SELECT pTime, id, name, val FROM procTimeT")
   }
@@ -194,9 +218,17 @@ class LegacyTableSourceTest extends TableTestBase {
         .asInstanceOf[Array[TypeInformation[_]]],
       Array("id", "name", "val", "rtime"))
 
-    util.tableEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(
-      "T",
-      new TestLegacyProjectableTableSource(false, tableSchema, returnType, Seq(), "rtime", "ptime"))
+    util.tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSourceInternal(
+        "T",
+        new TestLegacyProjectableTableSource(
+          false,
+          tableSchema,
+          returnType,
+          Seq(),
+          "rtime",
+          "ptime"))
 
     util.verifyExecPlan("SELECT name, val, id FROM T")
   }
@@ -211,9 +243,17 @@ class LegacyTableSourceTest extends TableTestBase {
         .asInstanceOf[Array[TypeInformation[_]]],
       Array("id", "name", "val", "rtime"))
 
-    util.tableEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(
-      "T",
-      new TestLegacyProjectableTableSource(false, tableSchema, returnType, Seq(), "rtime", "ptime"))
+    util.tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSourceInternal(
+        "T",
+        new TestLegacyProjectableTableSource(
+          false,
+          tableSchema,
+          returnType,
+          Seq(),
+          "rtime",
+          "ptime"))
 
     util.verifyExecPlan("SELECT ptime, name, val, id FROM T")
   }
@@ -228,9 +268,17 @@ class LegacyTableSourceTest extends TableTestBase {
       Array("id", "rtime", "val", "name"))
 
     val util = streamTestUtil()
-    util.tableEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(
-      "T",
-      new TestLegacyProjectableTableSource(false, tableSchema, returnType, Seq(), "rtime", "ptime"))
+    util.tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSourceInternal(
+        "T",
+        new TestLegacyProjectableTableSource(
+          false,
+          tableSchema,
+          returnType,
+          Seq(),
+          "rtime",
+          "ptime"))
 
     util.verifyExecPlan("select name, val, rtime, id from T")
   }
@@ -244,9 +292,17 @@ class LegacyTableSourceTest extends TableTestBase {
         .asInstanceOf[Array[TypeInformation[_]]],
       Array("id", "rtime", "val", "name"))
 
-    util.tableEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(
-      "T",
-      new TestLegacyProjectableTableSource(false, tableSchema, returnType, Seq(), "rtime", "ptime"))
+    util.tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSourceInternal(
+        "T",
+        new TestLegacyProjectableTableSource(
+          false,
+          tableSchema,
+          returnType,
+          Seq(),
+          "rtime",
+          "ptime"))
 
     util.verifyExecPlan("SELECT ptime FROM T")
   }
@@ -260,9 +316,17 @@ class LegacyTableSourceTest extends TableTestBase {
         .asInstanceOf[Array[TypeInformation[_]]],
       Array("id", "rtime", "val", "name"))
 
-    util.tableEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(
-      "T",
-      new TestLegacyProjectableTableSource(false, tableSchema, returnType, Seq(), "rtime", "ptime"))
+    util.tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSourceInternal(
+        "T",
+        new TestLegacyProjectableTableSource(
+          false,
+          tableSchema,
+          returnType,
+          Seq(),
+          "rtime",
+          "ptime"))
 
     util.verifyExecPlan("SELECT rtime FROM T")
   }
@@ -278,10 +342,18 @@ class LegacyTableSourceTest extends TableTestBase {
       Array("p-rtime", "p-id", "p-name", "p-val"))
     val mapping = Map("rtime" -> "p-rtime", "id" -> "p-id", "val" -> "p-val", "name" -> "p-name")
 
-    util.tableEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(
-      "T",
-      new TestLegacyProjectableTableSource(
-        false, tableSchema, returnType, Seq(), "rtime", "ptime", mapping))
+    util.tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSourceInternal(
+        "T",
+        new TestLegacyProjectableTableSource(
+          false,
+          tableSchema,
+          returnType,
+          Seq(),
+          "rtime",
+          "ptime",
+          mapping))
 
     util.verifyExecPlan("SELECT name, rtime, val FROM T")
   }
@@ -290,18 +362,15 @@ class LegacyTableSourceTest extends TableTestBase {
   def testNestedProject(): Unit = {
     val nested1 = new RowTypeInfo(
       Array(Types.STRING, Types.INT).asInstanceOf[Array[TypeInformation[_]]],
-      Array("name", "value")
-    )
+      Array("name", "value"))
 
     val nested2 = new RowTypeInfo(
       Array(Types.INT, Types.BOOLEAN).asInstanceOf[Array[TypeInformation[_]]],
-      Array("num", "flag")
-    )
+      Array("num", "flag"))
 
     val deepNested = new RowTypeInfo(
       Array(nested1, nested2).asInstanceOf[Array[TypeInformation[_]]],
-      Array("nested1", "nested2")
-    )
+      Array("nested1", "nested2"))
 
     val tableSchema = new TableSchema(
       Array("id", "deepNested", "nested", "name"),
@@ -311,9 +380,11 @@ class LegacyTableSourceTest extends TableTestBase {
       Array(Types.INT, deepNested, nested1, Types.STRING).asInstanceOf[Array[TypeInformation[_]]],
       Array("id", "deepNested", "nested", "name"))
 
-    util.tableEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(
-      "T",
-      new TestNestedProjectableTableSource(false, tableSchema, returnType, Seq()))
+    util.tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSourceInternal(
+        "T",
+        new TestNestedProjectableTableSource(false, tableSchema, returnType, Seq()))
 
     val sqlQuery =
       """
@@ -334,9 +405,11 @@ class LegacyTableSourceTest extends TableTestBase {
       Array(Types.INT, Types.STRING).asInstanceOf[Array[TypeInformation[_]]],
       Array("id", "name"))
 
-    util.tableEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(
-      "T",
-      new TestLegacyProjectableTableSource(false, tableSchema, returnType, Seq(), null, null))
+    util.tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSourceInternal(
+        "T",
+        new TestLegacyProjectableTableSource(false, tableSchema, returnType, Seq(), null, null))
 
     util.verifyExecPlan("SELECT COUNT(1) FROM T")
   }
@@ -402,7 +475,8 @@ class LegacyTableSourceTest extends TableTestBase {
 
   @Test
   def testTimeLiteralExpressionPushDown(): Unit = {
-    val schema = TableSchema.builder()
+    val schema = TableSchema
+      .builder()
       .field("id", DataTypes.INT)
       .field("dv", DataTypes.DATE)
       .field("tv", DataTypes.TIME)

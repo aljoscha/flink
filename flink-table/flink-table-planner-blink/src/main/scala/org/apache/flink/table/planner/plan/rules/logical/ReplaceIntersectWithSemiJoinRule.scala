@@ -27,15 +27,16 @@ import org.apache.calcite.rel.core.{Aggregate, Intersect, Join, JoinRelType, Rel
 import scala.collection.JavaConversions._
 
 /**
-  * Planner rule that replaces distinct [[Intersect]] with
-  * a distinct [[Aggregate]] on a SEMI [[Join]].
-  *
-  * Only handle the case of input size 2.
-  */
-class ReplaceIntersectWithSemiJoinRule extends RelOptRule(
-  operand(classOf[Intersect], any),
-  RelFactories.LOGICAL_BUILDER,
-  "ReplaceIntersectWithSemiJoinRule") {
+ * Planner rule that replaces distinct [[Intersect]] with
+ * a distinct [[Aggregate]] on a SEMI [[Join]].
+ *
+ * Only handle the case of input size 2.
+ */
+class ReplaceIntersectWithSemiJoinRule
+    extends RelOptRule(
+      operand(classOf[Intersect], any),
+      RelFactories.LOGICAL_BUILDER,
+      "ReplaceIntersectWithSemiJoinRule") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val intersect: Intersect = call.rel(0)

@@ -44,4 +44,3 @@ class MinusCoGroupFunction[T](all: Boolean) extends CoGroupFunction[T, T, T] {
     }
   }
 }
-

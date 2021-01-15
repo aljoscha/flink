@@ -26,13 +26,11 @@ import org.apache.flink.table.typeutils.TypeCheckUtils.validateEqualsHashCode
 import org.apache.flink.types.Row
 
 /**
-  * Null-aware key selector.
-  */
-class CRowKeySelector(
-    val keyFields: Array[Int],
-    @transient var returnType: TypeInformation[Row])
-  extends KeySelector[CRow, Row]
-  with ResultTypeQueryable[Row] {
+ * Null-aware key selector.
+ */
+class CRowKeySelector(val keyFields: Array[Int], @transient var returnType: TypeInformation[Row])
+    extends KeySelector[CRow, Row]
+    with ResultTypeQueryable[Row] {
 
   // check if type implements proper equals/hashCode
   validateEqualsHashCode("grouping", returnType)

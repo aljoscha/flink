@@ -18,7 +18,6 @@
 
 package org.apache.flink.streaming.scala.examples.windowing
 
-
 import java.beans.Transient
 import java.util.concurrent.TimeUnit
 
@@ -37,11 +36,11 @@ import scala.language.postfixOps
 import scala.util.Random
 
 /**
- * An example of grouped stream windowing where different eviction and 
- * trigger policies can be used. A source fetches events from cars 
+ * An example of grouped stream windowing where different eviction and
+ * trigger policies can be used. A source fetches events from cars
  * every 100 msec containing their id, their current speed (kmh),
  * overall elapsed distance (m) and a timestamp. The streaming
- * example triggers the top speed of each car every x meters elapsed 
+ * example triggers the top speed of each car every x meters elapsed
  * for the last y seconds.
  */
 object TopSpeedWindowing {
@@ -67,7 +66,8 @@ object TopSpeedWindowing {
 
     val cars =
       if (params.has("input")) {
-        env.readTextFile(params.get("input"))
+        env
+          .readTextFile(params.get("input"))
           .map(parseMap(_))
           .map(x => CarEvent(x._1, x._2, x._3, x._4))
       } else {
@@ -79,7 +79,7 @@ object TopSpeedWindowing {
           val distances = Array.fill[Double](numOfCars)(0d)
           @Transient lazy val rand = new Random()
 
-          var isRunning:Boolean = true
+          var isRunning: Boolean = true
 
           override def run(ctx: SourceContext[CarEvent]) = {
             while (isRunning) {
@@ -90,8 +90,8 @@ object TopSpeedWindowing {
                 else speeds(carId) = Math.max(0, speeds(carId) - 5)
 
                 distances(carId) += speeds(carId) / 3.6d
-                val record = CarEvent(carId, speeds(carId),
-                  distances(carId), System.currentTimeMillis)
+                val record =
+                  CarEvent(carId, speeds(carId), distances(carId), System.currentTimeMillis)
                 ctx.collect(record)
               }
             }
@@ -102,13 +102,16 @@ object TopSpeedWindowing {
       }
 
     val topSpeeds = cars
-      .assignAscendingTimestamps( _.time )
+      .assignAscendingTimestamps(_.time)
       .keyBy(_.carId)
       .window(GlobalWindows.create)
       .evictor(TimeEvictor.of(Time.of(evictionSec * 1000, TimeUnit.MILLISECONDS)))
-      .trigger(DeltaTrigger.of(triggerMeters, new DeltaFunction[CarEvent] {
-        def getDelta(oldSp: CarEvent, newSp: CarEvent): Double = newSp.distance - oldSp.distance
-      }, cars.getType().createSerializer(env.getConfig)))
+      .trigger(DeltaTrigger.of(
+        triggerMeters,
+        new DeltaFunction[CarEvent] {
+          def getDelta(oldSp: CarEvent, newSp: CarEvent): Double = newSp.distance - oldSp.distance
+        },
+        cars.getType().createSerializer(env.getConfig)))
 //      .window(Time.of(evictionSec * 1000, (car : CarEvent) => car.time))
 //      .every(Delta.of[CarEvent](triggerMeters,
 //          (oldSp,newSp) => newSp.distance-oldSp.distance, CarEvent(0,0,0,0)))
@@ -129,7 +132,7 @@ object TopSpeedWindowing {
   // USER FUNCTIONS
   // *************************************************************************
 
-  def parseMap(line : String): (Int, Int, Double, Long) = {
+  def parseMap(line: String): (Int, Int, Double, Long) = {
     val record = line.substring(1, line.length - 1).split(",")
     (record(0).toInt, record(1).toInt, record(2).toDouble, record(3).toLong)
   }

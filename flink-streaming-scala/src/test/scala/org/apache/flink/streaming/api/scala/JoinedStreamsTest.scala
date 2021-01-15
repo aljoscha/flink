@@ -23,8 +23,8 @@ import org.apache.flink.streaming.api.windowing.time.Time
 import org.junit.{Assert, Test}
 
 /**
-  * Unit test for [[org.apache.flink.streaming.api.scala.JoinedStreams]]
-  */
+ * Unit test for [[org.apache.flink.streaming.api.scala.JoinedStreams]]
+ */
 class JoinedStreamsTest {
   private val env = StreamExecutionEnvironment.getExecutionEnvironment
 
@@ -36,7 +36,8 @@ class JoinedStreamsTest {
   @Test
   def testSetAllowedLateness(): Unit = {
     val lateness = Time.milliseconds(42)
-    val withLateness = dataStream1.join(dataStream2)
+    val withLateness = dataStream1
+      .join(dataStream2)
       .where(keySelector)
       .equalTo(keySelector)
       .window(tsAssigner)

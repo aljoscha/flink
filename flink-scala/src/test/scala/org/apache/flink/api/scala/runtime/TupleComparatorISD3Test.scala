@@ -52,7 +52,5 @@ class TupleComparatorISD3Test extends TupleComparatorTestBase[(Int, String, Doub
     (5, "hello", 23.2),
     (5, "world", 20.0),
     (6, "hello", 20.0),
-    (6, "hello", 23.2)
-  )
+    (6, "hello", 23.2))
 }
-

@@ -34,8 +34,7 @@ class TableScanTest extends TableTestBase {
   def before(): Unit = {
     util.tableEnv.registerFunction("my_udf", Func0)
 
-    util.addTable(
-      s"""
+    util.addTable(s"""
          |create table computed_column_t(
          |  a int,
          |  b varchar,
@@ -48,8 +47,7 @@ class TableScanTest extends TableTestBase {
          |)
        """.stripMargin)
 
-    util.addTable(
-      s"""
+    util.addTable(s"""
          |create table c_watermark_t(
          |  a int,
          |  b varchar,
@@ -72,8 +70,7 @@ class TableScanTest extends TableTestBase {
 
   @Test
   def testDDLTableScan(): Unit = {
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE src (
         |  ts TIMESTAMP(3),
         |  a INT,
@@ -89,8 +86,7 @@ class TableScanTest extends TableTestBase {
 
   @Test
   def testScanOnUnboundedSource(): Unit = {
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE src (
         |  ts TIMESTAMP(3),
         |  a INT,
@@ -104,14 +100,13 @@ class TableScanTest extends TableTestBase {
     thrown.expect(classOf[ValidationException])
     thrown.expectMessage(
       "Querying an unbounded table 'default_catalog.default_database.src' in batch mode is not " +
-      "allowed. The table source is unbounded.")
+        "allowed. The table source is unbounded.")
     util.verifyExecPlan("SELECT * FROM src WHERE a > 1")
   }
 
   @Test
   def testScanOnChangelogSource(): Unit = {
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE src (
         |  ts TIMESTAMP(3),
         |  a INT,
@@ -125,15 +120,14 @@ class TableScanTest extends TableTestBase {
     thrown.expect(classOf[TableException])
     thrown.expectMessage(
       "Querying a table in batch mode is currently only possible for INSERT-only table sources. " +
-       "But the source for table 'default_catalog.default_database.src' produces other changelog " +
-       "messages than just INSERT.")
+        "But the source for table 'default_catalog.default_database.src' produces other changelog " +
+        "messages than just INSERT.")
     util.verifyExecPlan("SELECT * FROM src WHERE a > 1")
   }
 
   @Test
   def testScanOnUpsertSource(): Unit = {
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE src (
         |  id STRING,
         |  a INT,
@@ -148,8 +142,8 @@ class TableScanTest extends TableTestBase {
     thrown.expect(classOf[TableException])
     thrown.expectMessage(
       "Querying a table in batch mode is currently only possible for INSERT-only table sources. " +
-      "But the source for table 'default_catalog.default_database.src' produces other changelog " +
-      "messages than just INSERT.")
+        "But the source for table 'default_catalog.default_database.src' produces other changelog " +
+        "messages than just INSERT.")
     util.verifyExecPlan("SELECT * FROM src WHERE a > 1")
   }
 
@@ -175,8 +169,7 @@ class TableScanTest extends TableTestBase {
 
   @Test
   def testTableApiScanWithDDL(): Unit = {
-    util.addTable(
-      s"""
+    util.addTable(s"""
          |create table t1(
          |  a int,
          |  b varchar
@@ -190,10 +183,11 @@ class TableScanTest extends TableTestBase {
 
   @Test
   def testTableApiScanWithTemporaryTable(): Unit = {
-    util.tableEnv.connect(new FileSystem().path(tempFolder.newFile.getPath))
-        .withFormat(new OldCsv())
-        .withSchema(new Schema().field("word", DataTypes.STRING()))
-        .createTemporaryTable("t1")
+    util.tableEnv
+      .connect(new FileSystem().path(tempFolder.newFile.getPath))
+      .withFormat(new OldCsv())
+      .withSchema(new Schema().field("word", DataTypes.STRING()))
+      .createTemporaryTable("t1")
     util.verifyExecPlan(util.tableEnv.from("t1"))
   }
 }

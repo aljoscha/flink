@@ -26,12 +26,12 @@ import org.apache.calcite.rel.`type`.{RelDataType, RelDataTypeFactory}
 import org.apache.calcite.schema.impl.AbstractTable
 
 /**
-  * Class which implements the logic to convert a [[TableSink]] to Calcite Table
-  */
+ * Class which implements the logic to convert a [[TableSink]] to Calcite Table
+ */
 class TableSinkTable[T](
-  val tableSink: TableSink[T],
-  val statistic: FlinkStatistic = FlinkStatistic.UNKNOWN)
-  extends AbstractTable {
+    val tableSink: TableSink[T],
+    val statistic: FlinkStatistic = FlinkStatistic.UNKNOWN)
+    extends AbstractTable {
 
   override def getRowType(typeFactory: RelDataTypeFactory): RelDataType = {
     val flinkTypeFactory = typeFactory.asInstanceOf[FlinkTypeFactory]
@@ -39,9 +39,9 @@ class TableSinkTable[T](
   }
 
   /**
-    * Returns statistics of current table
-    *
-    * @return statistics of current table
-    */
+   * Returns statistics of current table
+   *
+   * @return statistics of current table
+   */
   override def getStatistic: FlinkStatistic = statistic
 }

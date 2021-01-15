@@ -66,7 +66,6 @@ case class Exp(child: PlannerExpression) extends UnaryExpression with InputTypeS
   }
 }
 
-
 case class Floor(child: PlannerExpression) extends UnaryExpression {
   override private[flink] def resultType: TypeInformation[_] = LONG_TYPE_INFO
 
@@ -119,7 +118,8 @@ case class Cosh(child: PlannerExpression) extends UnaryExpression {
 }
 
 case class Log(base: PlannerExpression, antilogarithm: PlannerExpression)
-  extends PlannerExpression with InputTypeSpec {
+    extends PlannerExpression
+    with InputTypeSpec {
   def this(antilogarithm: PlannerExpression) = this(E(), antilogarithm)
 
   override private[flink] def resultType: TypeInformation[_] = DOUBLE_TYPE_INFO
@@ -154,7 +154,8 @@ case class Ln(child: PlannerExpression) extends UnaryExpression with InputTypeSp
 }
 
 case class Power(left: PlannerExpression, right: PlannerExpression)
-  extends BinaryExpression with InputTypeSpec {
+    extends BinaryExpression
+    with InputTypeSpec {
   override private[flink] def resultType: TypeInformation[_] = DOUBLE_TYPE_INFO
 
   override private[flink] def expectedTypes: Seq[TypeInformation[_]] =
@@ -358,14 +359,14 @@ case class Sign(child: PlannerExpression) extends UnaryExpression {
   }
 }
 
-case class Round(left: PlannerExpression, right: PlannerExpression)
-  extends BinaryExpression {
+case class Round(left: PlannerExpression, right: PlannerExpression) extends BinaryExpression {
   override private[flink] def resultType: TypeInformation[_] = left.resultType
 
   override private[flink] def validateInput(): ValidationResult = {
     if (!TypeCheckUtils.isInteger(right.resultType)) {
-      ValidationFailure(s"round right requires int, get " +
-        s"$right : ${right.resultType}")
+      ValidationFailure(
+        s"round right requires int, get " +
+          s"$right : ${right.resultType}")
     }
     TypeCheckUtils.assertNumericExpr(left.resultType, s"round left :$left")
   }
@@ -427,7 +428,8 @@ case class Rand(seed: PlannerExpression) extends PlannerExpression with InputTyp
 }
 
 case class RandInteger(seed: PlannerExpression, bound: PlannerExpression)
-  extends PlannerExpression with InputTypeSpec {
+    extends PlannerExpression
+    with InputTypeSpec {
 
   def this(bound: PlannerExpression) = this(null, bound)
 
@@ -474,7 +476,7 @@ case class Hex(child: PlannerExpression) extends UnaryExpression {
 
   override private[flink] def validateInput(): ValidationResult = {
     if (TypeCheckUtils.isIntegerFamily(child.resultType) ||
-        TypeCheckUtils.isString(child.resultType)) {
+      TypeCheckUtils.isString(child.resultType)) {
       ValidationSuccess
     } else {
       ValidationFailure(s"hex() requires an integer or string input but was '${child.resultType}'.")
@@ -499,7 +501,8 @@ case class UUID() extends LeafExpression {
 }
 
 case class Truncate(base: PlannerExpression, num: PlannerExpression)
-    extends PlannerExpression with InputTypeSpec {
+    extends PlannerExpression
+    with InputTypeSpec {
   def this(base: PlannerExpression) = this(base, null)
 
   override private[flink] def resultType: TypeInformation[_] = base.resultType
@@ -519,8 +522,9 @@ case class Truncate(base: PlannerExpression, num: PlannerExpression)
   override private[flink] def validateInput(): ValidationResult = {
     if (num != null) {
       if (!TypeCheckUtils.isInteger(num.resultType)) {
-        ValidationFailure(s"truncate num requires int, get " +
-          s"$num : ${num.resultType}")
+        ValidationFailure(
+          s"truncate num requires int, get " +
+            s"$num : ${num.resultType}")
       }
     }
     TypeCheckUtils.assertNumericExpr(base.resultType, s"truncate base :$base")
@@ -530,4 +534,3 @@ case class Truncate(base: PlannerExpression, num: PlannerExpression)
 object Truncate {
   def apply(base: PlannerExpression): Truncate = Truncate(base, null)
 }
-

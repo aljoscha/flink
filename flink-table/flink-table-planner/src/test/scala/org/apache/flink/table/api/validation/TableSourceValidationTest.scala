@@ -35,7 +35,7 @@ import org.junit.Test
 import java.util
 import java.util.Collections
 
-class TableSourceValidationTest extends TableTestBase{
+class TableSourceValidationTest extends TableTestBase {
 
   val env: StreamExecutionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment
   val settings: EnvironmentSettings = EnvironmentSettings.newInstance().useOldPlanner().build()
@@ -57,9 +57,8 @@ class TableSourceValidationTest extends TableTestBase{
 
   @Test(expected = classOf[ValidationException])
   def testNonMatchingFieldTypes(): Unit = {
-    val schema = new TableSchema(
-      Array("id", "name", "amount"),
-      Array(Types.LONG, Types.INT, Types.INT))
+    val schema =
+      new TableSchema(Array("id", "name", "amount"), Array(Types.LONG, Types.INT, Types.INT))
     val rowType = new RowTypeInfo(
       Array(Types.LONG, Types.STRING, Types.INT).asInstanceOf[Array[TypeInformation[_]]],
       Array("id", "name", "amount"))
@@ -71,9 +70,8 @@ class TableSourceValidationTest extends TableTestBase{
 
   @Test(expected = classOf[ValidationException])
   def testMappingToUnknownField(): Unit = {
-    val schema = new TableSchema(
-      Array("id", "name", "amount"),
-      Array(Types.LONG, Types.STRING, Types.DOUBLE))
+    val schema =
+      new TableSchema(Array("id", "name", "amount"), Array(Types.LONG, Types.STRING, Types.DOUBLE))
     val rowType = new RowTypeInfo(Types.LONG, Types.STRING, Types.DOUBLE)
     val mapping = Map("id" -> "f3", "name" -> "f1", "amount" -> "f2")
     val ts = new TestTableSourceWithTime(schema, rowType, Seq[Row](), mapping = mapping)
@@ -84,9 +82,8 @@ class TableSourceValidationTest extends TableTestBase{
 
   @Test(expected = classOf[ValidationException])
   def testMappingWithInvalidFieldType(): Unit = {
-    val schema = new TableSchema(
-      Array("id", "name", "amount"),
-      Array(Types.LONG, Types.STRING, Types.DOUBLE))
+    val schema =
+      new TableSchema(Array("id", "name", "amount"), Array(Types.LONG, Types.STRING, Types.DOUBLE))
     val rowType = new RowTypeInfo(Types.LONG, Types.STRING, Types.INT)
     val mapping = Map("id" -> "f0", "name" -> "f1", "amount" -> "f2")
     val ts = new TestTableSourceWithTime(schema, rowType, Seq[Row](), mapping = mapping)
@@ -116,9 +113,8 @@ class TableSourceValidationTest extends TableTestBase{
       .expectMessage(
         "Found a rowtime attribute for field 'rowtime' but it does not exist in the Table")
 
-    val schema = new TableSchema(
-      Array("id", "name", "amount"),
-      Array(Types.LONG, Types.STRING, Types.INT))
+    val schema =
+      new TableSchema(Array("id", "name", "amount"), Array(Types.LONG, Types.STRING, Types.INT))
 
     val rowType = new RowTypeInfo(
       Array(Types.LONG, Types.STRING, Types.SQL_TIMESTAMP(), Types.INT)
@@ -138,9 +134,8 @@ class TableSourceValidationTest extends TableTestBase{
       .expectMessage(
         "Found a proctime attribute for field 'proctime' but it does not exist in the Table")
 
-    val schema = new TableSchema(
-      Array("id", "name", "amount"),
-      Array(Types.LONG, Types.STRING, Types.INT))
+    val schema =
+      new TableSchema(Array("id", "name", "amount"), Array(Types.LONG, Types.STRING, Types.INT))
 
     val rowType = new RowTypeInfo(
       Array(Types.LONG, Types.STRING, Types.SQL_TIMESTAMP(), Types.INT)
@@ -197,12 +192,13 @@ class TableSourceValidationTest extends TableTestBase{
       new TestTableSourceWithTime(schema, rowType, Seq[Row]()) {
 
         override def getRowtimeAttributeDescriptors: util.List[RowtimeAttributeDescriptor] = {
-          Collections.singletonList(new RowtimeAttributeDescriptor(
-            "rtime",
-            new ExistingField("doesNotExist"),
-            new AscendingTimestamps))
+          Collections.singletonList(
+            new RowtimeAttributeDescriptor(
+              "rtime",
+              new ExistingField("doesNotExist"),
+              new AscendingTimestamps))
         }
-    }
+      }
 
     // should fail because timestamp extractor argument field does not exist
     tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal("testTable", ts)
@@ -214,9 +210,7 @@ class TableSourceValidationTest extends TableTestBase{
     val rowType = new RowTypeInfo(
       Array(Types.LONG, Types.STRING, Types.INT).asInstanceOf[Array[TypeInformation[_]]],
       fieldNames)
-    val schema = new TableSchema(
-      fieldNames,
-      Array(Types.LONG, Types.SQL_TIMESTAMP, Types.INT))
+    val schema = new TableSchema(fieldNames, Array(Types.LONG, Types.SQL_TIMESTAMP, Types.INT))
     val ts = new TestTableSourceWithTime(schema, rowType, Seq[Row](), rowtime = "amount")
 
     // should fail because configured rowtime field is not of type Long or Timestamp
@@ -227,7 +221,8 @@ class TableSourceValidationTest extends TableTestBase{
 
   @Test(expected = classOf[IllegalArgumentException])
   def testCsvTableSourceBuilderWithNullPath(): Unit = {
-    CsvTableSource.builder()
+    CsvTableSource
+      .builder()
       .field("myfield", Types.STRING)
       // should fail, path is not defined
       .build()
@@ -235,7 +230,8 @@ class TableSourceValidationTest extends TableTestBase{
 
   @Test(expected = classOf[IllegalArgumentException])
   def testCsvTableSourceBuilderWithDuplicateFieldName(): Unit = {
-    CsvTableSource.builder()
+    CsvTableSource
+      .builder()
       .path("/path/to/csv")
       .field("myfield", Types.STRING)
       // should fail, field name must no be duplicate
@@ -244,7 +240,8 @@ class TableSourceValidationTest extends TableTestBase{
 
   @Test(expected = classOf[IllegalArgumentException])
   def testCsvTableSourceBuilderWithEmptyField(): Unit = {
-    CsvTableSource.builder()
+    CsvTableSource
+      .builder()
       .path("/path/to/csv")
       // should fail, field can be empty
       .build()

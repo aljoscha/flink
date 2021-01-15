@@ -22,7 +22,12 @@ import org.apache.flink.api.scala._
 import org.apache.flink.table.api._
 import org.apache.flink.table.api.bridge.scala._
 import org.apache.flink.table.planner.codegen.CodeGenException
-import org.apache.flink.table.planner.plan.optimize.program.{BatchOptimizeContext, FlinkChainedProgram, FlinkHepRuleSetProgramBuilder, HEP_RULES_EXECUTION_TYPE}
+import org.apache.flink.table.planner.plan.optimize.program.{
+  BatchOptimizeContext,
+  FlinkChainedProgram,
+  FlinkHepRuleSetProgramBuilder,
+  HEP_RULES_EXECUTION_TYPE
+}
 import org.apache.flink.table.planner.plan.rules.FlinkBatchRuleSets
 import org.apache.flink.table.planner.utils.TableTestBase
 
@@ -32,8 +37,8 @@ import org.junit.{Before, Test}
 import java.sql.Date
 
 /**
-  * Test for [[RewriteCoalesceRule]].
-  */
+ * Test for [[RewriteCoalesceRule]].
+ */
 class RewriteCoalesceRuleTest extends TableTestBase {
   private val util = batchTestUtil()
 
@@ -50,7 +55,15 @@ class RewriteCoalesceRuleTest extends TableTestBase {
     util.replaceBatchProgram(programs)
 
     util.addTableSource[(Int, String, String, Int, Date, Double, Double, Int)](
-      "scott_emp", 'empno, 'ename, 'job, 'mgr, 'hiredate, 'sal, 'comm, 'deptno)
+      "scott_emp",
+      'empno,
+      'ename,
+      'job,
+      'mgr,
+      'hiredate,
+      'sal,
+      'comm,
+      'deptno)
     util.addTableSource[(Int, String, String)]("scott_dept", 'deptno, 'dname, 'loc)
   }
 

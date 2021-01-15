@@ -40,16 +40,15 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
-  * Rule that converts [[FlinkLogicalJoin]] to [[BatchPhysicalHashJoin]]
-  * if there exists at least one equal-join condition and
-  * ShuffleHashJoin or BroadcastHashJoin are enabled.
-  */
+ * Rule that converts [[FlinkLogicalJoin]] to [[BatchPhysicalHashJoin]]
+ * if there exists at least one equal-join condition and
+ * ShuffleHashJoin or BroadcastHashJoin are enabled.
+ */
 class BatchPhysicalHashJoinRule
-  extends RelOptRule(
-    operand(classOf[FlinkLogicalJoin],
-      operand(classOf[RelNode], any)),
-    "BatchPhysicalHashJoinRule")
-  with BatchExecJoinRuleBase {
+    extends RelOptRule(
+      operand(classOf[FlinkLogicalJoin], operand(classOf[RelNode], any)),
+      "BatchPhysicalHashJoinRule")
+    with BatchExecJoinRuleBase {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val join: Join = call.rel(0)
@@ -61,8 +60,8 @@ class BatchPhysicalHashJoinRule
 
     val tableConfig = call.getPlanner.getContext.unwrap(classOf[FlinkContext]).getTableConfig
     val isShuffleHashJoinEnabled = !isOperatorDisabled(tableConfig, OperatorType.ShuffleHashJoin)
-    val isBroadcastHashJoinEnabled = !isOperatorDisabled(
-      tableConfig, OperatorType.BroadcastHashJoin)
+    val isBroadcastHashJoinEnabled =
+      !isOperatorDisabled(tableConfig, OperatorType.BroadcastHashJoin)
 
     val leftSize = binaryRowRelNodeSize(join.getLeft)
     val rightSize = binaryRowRelNodeSize(join.getRight)
@@ -128,7 +127,8 @@ class BatchPhysicalHashJoinRule
 
     if (isBroadcast) {
       val probeTrait = join.getTraitSet.replace(FlinkConventions.BATCH_PHYSICAL)
-      val buildTrait = join.getTraitSet.replace(FlinkConventions.BATCH_PHYSICAL)
+      val buildTrait = join.getTraitSet
+        .replace(FlinkConventions.BATCH_PHYSICAL)
         .replace(FlinkRelDistribution.BROADCAST_DISTRIBUTED)
       if (leftIsBroadcast) {
         transformToEquiv(buildTrait, probeTrait)
@@ -137,9 +137,9 @@ class BatchPhysicalHashJoinRule
       }
     } else {
       val toHashTraitByColumns = (columns: util.Collection[_ <: Number]) =>
-        join.getCluster.getPlanner.emptyTraitSet.
-          replace(FlinkConventions.BATCH_PHYSICAL).
-          replace(FlinkRelDistribution.hash(columns))
+        join.getCluster.getPlanner.emptyTraitSet
+          .replace(FlinkConventions.BATCH_PHYSICAL)
+          .replace(FlinkRelDistribution.hash(columns))
       transformToEquiv(
         toHashTraitByColumns(joinInfo.leftKeys),
         toHashTraitByColumns(joinInfo.rightKeys))
@@ -159,15 +159,15 @@ class BatchPhysicalHashJoinRule
   }
 
   /**
-    * Decides whether the join can convert to BroadcastHashJoin.
-    *
-    * @param joinType  flink join type
-    * @param leftSize  size of join left child
-    * @param rightSize size of join right child
-    * @return an Tuple2 instance. The first element of tuple is true if join can convert to
-    *         broadcast hash join, false else. The second element of tuple is true if left side used
-    *         as broadcast side, false else.
-    */
+   * Decides whether the join can convert to BroadcastHashJoin.
+   *
+   * @param joinType  flink join type
+   * @param leftSize  size of join left child
+   * @param rightSize size of join right child
+   * @return an Tuple2 instance. The first element of tuple is true if join can convert to
+   *         broadcast hash join, false else. The second element of tuple is true if left side used
+   *         as broadcast side, false else.
+   */
   private def canBroadcast(
       joinType: JoinRelType,
       leftSize: JDouble,
@@ -180,9 +180,9 @@ class BatchPhysicalHashJoinRule
     val threshold = tableConfig.getConfiguration.getLong(
       OptimizerConfigOptions.TABLE_OPTIMIZER_BROADCAST_JOIN_THRESHOLD)
     joinType match {
-      case JoinRelType.LEFT => (rightSize <= threshold, false)
+      case JoinRelType.LEFT  => (rightSize <= threshold, false)
       case JoinRelType.RIGHT => (leftSize <= threshold, true)
-      case JoinRelType.FULL => (false, false)
+      case JoinRelType.FULL  => (false, false)
       case JoinRelType.INNER =>
         (leftSize <= threshold || rightSize <= threshold, leftSize < rightSize)
       // left side cannot be used as build side in SEMI/ANTI join.

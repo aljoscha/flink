@@ -23,7 +23,11 @@ import org.apache.flink.table.functions.{ImperativeAggregateFunction, UserDefine
 import org.apache.flink.table.planner.codegen.CodeGenUtils._
 import org.apache.flink.table.planner.codegen.GenerateUtils.generateFieldAccess
 import org.apache.flink.table.planner.codegen.agg.AggsHandlerCodeGenerator._
-import org.apache.flink.table.planner.codegen.{CodeGeneratorContext, ExprCodeGenerator, GeneratedExpression}
+import org.apache.flink.table.planner.codegen.{
+  CodeGeneratorContext,
+  ExprCodeGenerator,
+  GeneratedExpression
+}
 import org.apache.flink.table.planner.expressions.DeclarativeExpressionResolver
 import org.apache.flink.table.planner.expressions.DeclarativeExpressionResolver.toRexInputRef
 import org.apache.flink.table.planner.expressions.converter.ExpressionConverter
@@ -43,23 +47,23 @@ import java.lang.{Iterable => JIterable}
 import scala.collection.mutable.ArrayBuffer
 
 /**
-  * It is for code generate aggregation functions that are specified in terms of
-  * accumulate(), retract() and merge() functions. The aggregate accumulator is
-  * embedded inside of a larger shared aggregation buffer.
-  *
-  * @param ctx the code gen context
-  * @param aggInfo  the aggregate information
-  * @param filterExpression filter argument access expression, none if no filter
-  * @param mergedAccOffset the mergedAcc may come from local aggregate,
-  *                        this is the first buffer offset in the row
-  * @param aggBufferOffset  the offset in the buffers of this aggregate
-  * @param aggBufferSize  the total size of aggregate buffers
-  * @param inputTypes   the input field type infos
-  * @param constantExprs  the constant expressions
-  * @param relBuilder  the rel builder to translate expressions to calcite rex nodes
-  * @param hasNamespace  whether the accumulators state has namespace
-  * @param inputFieldCopy    copy input field element if true (only mutable type will be copied)
-  */
+ * It is for code generate aggregation functions that are specified in terms of
+ * accumulate(), retract() and merge() functions. The aggregate accumulator is
+ * embedded inside of a larger shared aggregation buffer.
+ *
+ * @param ctx the code gen context
+ * @param aggInfo  the aggregate information
+ * @param filterExpression filter argument access expression, none if no filter
+ * @param mergedAccOffset the mergedAcc may come from local aggregate,
+ *                        this is the first buffer offset in the row
+ * @param aggBufferOffset  the offset in the buffers of this aggregate
+ * @param aggBufferSize  the total size of aggregate buffers
+ * @param inputTypes   the input field type infos
+ * @param constantExprs  the constant expressions
+ * @param relBuilder  the rel builder to translate expressions to calcite rex nodes
+ * @param hasNamespace  whether the accumulators state has namespace
+ * @param inputFieldCopy    copy input field element if true (only mutable type will be copied)
+ */
 class ImperativeAggCodeGen(
     ctx: CodeGeneratorContext,
     aggInfo: AggregateInfo,
@@ -74,22 +78,23 @@ class ImperativeAggCodeGen(
     mergedAccOnHeap: Boolean,
     mergedAccExternalType: DataType,
     inputFieldCopy: Boolean)
-  extends AggCodeGen {
+    extends AggCodeGen {
 
   private val SINGLE_ITERABLE = className[SingleElementIterator[_]]
   private val UPDATABLE_ROW = className[UpdatableRowData]
 
   val function = aggInfo.function.asInstanceOf[ImperativeAggregateFunction[_, _]]
-  val functionTerm: String = ctx.addReusableFunction(
-    function,
-    contextTerm = s"$STORE_TERM.getRuntimeContext()")
+  val functionTerm: String =
+    ctx.addReusableFunction(function, contextTerm = s"$STORE_TERM.getRuntimeContext()")
   val aggIndex: Int = aggInfo.aggIndex
 
   val externalAccType = aggInfo.externalAccTypes(0)
   private val internalAccType = fromDataTypeToLogicalType(externalAccType)
 
-  /** whether the acc type is an internal type.
-    * Currently we only support GenericRowData as internal acc type */
+  /**
+   * whether the acc type is an internal type.
+   * Currently we only support GenericRowData as internal acc type
+   */
   val isAccTypeInternal: Boolean =
     classOf[RowData].isAssignableFrom(externalAccType.getConversionClass)
 
@@ -232,8 +237,10 @@ class ImperativeAggCodeGen(
     } else {
       val otherAccExternal = newName("other_acc_external")
       s"""
-         |$accTypeExternalTerm $otherAccExternal = ${
-            genToExternalConverter(ctx, mergedAccExternalType, expr.resultTerm)};
+         |$accTypeExternalTerm $otherAccExternal = ${genToExternalConverter(
+        ctx,
+        mergedAccExternalType,
+        expr.resultTerm)};
          |$accIterTerm.set($otherAccExternal);
          |$functionTerm.merge($accExternalTerm, $accIterTerm);
       """.stripMargin
@@ -273,7 +280,9 @@ class ImperativeAggCodeGen(
           if (externalInputTypes.length == 1) {
             // called from distinct merge and the inputTerm is the only argument
             DeclarativeExpressionResolver.toRexDistinctKey(
-              relBuilder, generator.input1Term, inputTypes(f))
+              relBuilder,
+              generator.input1Term,
+              inputTypes(f))
           } else {
             // called from distinct merge call and the inputTerm is RowData type
             toRexInputRef(relBuilder, index, inputTypes(f))
@@ -297,17 +306,17 @@ class ImperativeAggCodeGen(
   }
 
   /**
-    * This method is mainly the same as CodeGenUtils.generateFieldAccess(), the only difference is
-    * that this method using UpdatableRowData to wrap RowData to handle DataViews.
-    */
+   * This method is mainly the same as CodeGenUtils.generateFieldAccess(), the only difference is
+   * that this method using UpdatableRowData to wrap RowData to handle DataViews.
+   */
   def generateAccumulatorAccess(
-    ctx: CodeGeneratorContext,
-    inputType: LogicalType,
-    inputTerm: String,
-    index: Int,
-    viewSpecs: Array[DataViewSpec],
-    useStateDataView: Boolean,
-    useBackupDataView: Boolean): GeneratedExpression = {
+      ctx: CodeGeneratorContext,
+      inputType: LogicalType,
+      inputTerm: String,
+      index: Int,
+      viewSpecs: Array[DataViewSpec],
+      useStateDataView: Boolean,
+      useBackupDataView: Boolean): GeneratedExpression = {
 
     // if input has been used before, we can reuse the code that
     // has already been generated
@@ -385,11 +394,11 @@ class ImperativeAggCodeGen(
   }
 
   /**
-    * Generate statements to set data view field when use state backend.
-    *
-    * @param accTerm aggregation term
-    * @return data view field set statements
-    */
+   * Generate statements to set data view field when use state backend.
+   *
+   * @param accTerm aggregation term
+   * @return data view field set statements
+   */
   private def generateDataViewFieldSetter(
       accTerm: String,
       viewSpecs: Array[DataViewSpec],
@@ -446,8 +455,7 @@ class ImperativeAggCodeGen(
         UserDefinedFunctionHelper.AGGREGATE_ACCUMULATE,
         accumulatorClass ++ argumentClasses,
         classOf[Unit],
-        functionName
-      )
+        functionName)
     }
 
     if (needRetract) {
@@ -456,8 +464,7 @@ class ImperativeAggCodeGen(
         UserDefinedFunctionHelper.AGGREGATE_RETRACT,
         accumulatorClass ++ argumentClasses,
         classOf[Unit],
-        functionName
-      )
+        functionName)
     }
 
     if (needMerge) {
@@ -466,8 +473,7 @@ class ImperativeAggCodeGen(
         UserDefinedFunctionHelper.AGGREGATE_MERGE,
         accumulatorClass ++ Array(classOf[JIterable[Any]]),
         classOf[Unit],
-        functionName
-      )
+        functionName)
     }
 
     if (needEmitValue) {
@@ -476,8 +482,7 @@ class ImperativeAggCodeGen(
         UserDefinedFunctionHelper.TABLE_AGGREGATE_EMIT,
         accumulatorClass ++ Array(classOf[Collector[_]]),
         classOf[Unit],
-        functionName
-      )
+        functionName)
     }
   }
 

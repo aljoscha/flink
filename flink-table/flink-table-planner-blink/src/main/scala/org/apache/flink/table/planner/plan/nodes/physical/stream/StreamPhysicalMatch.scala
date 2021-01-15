@@ -44,8 +44,8 @@ class StreamPhysicalMatch(
     inputNode: RelNode,
     val logicalMatch: MatchRecognize,
     outputRowType: RelDataType)
-  extends SingleRel(cluster, traitSet, inputNode)
-  with StreamPhysicalRel {
+    extends SingleRel(cluster, traitSet, inputNode)
+    with StreamPhysicalRel {
 
   if (logicalMatch.measures.values().exists(containsPythonCall(_)) ||
     logicalMatch.patternDefinitions.values().exists(containsPythonCall(_))) {
@@ -61,33 +61,30 @@ class StreamPhysicalMatch(
   override def deriveRowType(): RelDataType = outputRowType
 
   override def copy(traitSet: RelTraitSet, inputs: util.List[RelNode]): RelNode = {
-    new StreamPhysicalMatch(
-      cluster,
-      traitSet,
-      inputs.get(0),
-      logicalMatch,
-      outputRowType)
+    new StreamPhysicalMatch(cluster, traitSet, inputs.get(0), logicalMatch, outputRowType)
   }
 
   override def explainTerms(pw: RelWriter): RelWriter = {
     val inputRowType = getInput.getRowType
     val fieldNames = inputRowType.getFieldNames.toList
-    super.explainTerms(pw)
-      .itemIf("partitionBy",
+    super
+      .explainTerms(pw)
+      .itemIf(
+        "partitionBy",
         fieldToString(logicalMatch.partitionKeys.toArray, inputRowType),
         !logicalMatch.partitionKeys.isEmpty)
-      .itemIf("orderBy",
+      .itemIf(
+        "orderBy",
         collationToString(logicalMatch.orderKeys, inputRowType),
         !logicalMatch.orderKeys.getFieldCollations.isEmpty)
-      .itemIf("measures",
+      .itemIf(
+        "measures",
         measuresDefineToString(logicalMatch.measures, fieldNames, getExpressionString),
         !logicalMatch.measures.isEmpty)
       .item("rowsPerMatch", rowsPerMatchToString(logicalMatch.allRows))
       .item("after", afterMatchToString(logicalMatch.after, fieldNames))
       .item("pattern", logicalMatch.pattern.toString)
-      .itemIf("subset",
-        subsetToString(logicalMatch.subsets),
-        !logicalMatch.subsets.isEmpty)
+      .itemIf("subset", subsetToString(logicalMatch.subsets), !logicalMatch.subsets.isEmpty)
       .item("define", logicalMatch.patternDefinitions)
   }
 
@@ -96,7 +93,6 @@ class StreamPhysicalMatch(
       MatchUtil.createMatchSpec(logicalMatch),
       ExecEdge.DEFAULT,
       FlinkTypeFactory.toLogicalRowType(getRowType),
-      getRelDetailedDescription
-    )
+      getRelDetailedDescription)
   }
 }

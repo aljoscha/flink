@@ -32,17 +32,17 @@ import org.apache.calcite.rel.{RelNode, RelWriter}
 import scala.collection.JavaConverters._
 
 /**
-  * Flink RelNode which matches along with DataStreamSource.
-  * It ensures that types without deterministic field order (e.g. POJOs) are not part of
-  * the plan translation.
-  */
+ * Flink RelNode which matches along with DataStreamSource.
+ * It ensures that types without deterministic field order (e.g. POJOs) are not part of
+ * the plan translation.
+ */
 class StreamPhysicalDataStreamScan(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
     table: RelOptTable,
     outputRowType: RelDataType)
-  extends TableScan(cluster, traitSet, table)
-  with StreamPhysicalRel {
+    extends TableScan(cluster, traitSet, table)
+    with StreamPhysicalRel {
 
   val dataStreamTable: DataStreamTable[Any] = getTable.unwrap(classOf[DataStreamTable[Any]])
 
@@ -61,7 +61,8 @@ class StreamPhysicalDataStreamScan(
   }
 
   override def explainTerms(pw: RelWriter): RelWriter = {
-    super.explainTerms(pw)
+    super
+      .explainTerms(pw)
       .item("fields", getRowType.getFieldNames.asScala.mkString(", "))
   }
 

@@ -24,8 +24,8 @@ import org.apache.flink.util.Preconditions
 import org.apache.calcite.rel.RelNode
 
 /**
-  * A FlinkOptimizeProgram that deals with time.
-  */
+ * A FlinkOptimizeProgram that deals with time.
+ */
 class FlinkRelTimeIndicatorProgram extends FlinkOptimizeProgram[StreamOptimizeContext] {
 
   override def optimize(input: RelNode, context: StreamOptimizeContext): RelNode = {

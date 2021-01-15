@@ -33,16 +33,18 @@ import scala.collection.JavaConversions._
 object ValuesCodeGenerator {
 
   def generatorInputFormat(
-    config: TableConfig,
-    outputType: RowType,
-    tuples: util.List[util.List[RexLiteral]],
-    description: String): ValuesInputFormat = {
+      config: TableConfig,
+      outputType: RowType,
+      tuples: util.List[util.List[RexLiteral]],
+      description: String): ValuesInputFormat = {
     val ctx = CodeGeneratorContext(config)
     val exprGenerator = new ExprCodeGenerator(ctx, false)
     // generate code for every record
     val generatedRecords = tuples.map { r =>
       exprGenerator.generateResultExpression(
-        r.map(exprGenerator.generateExpression), outputType, classOf[GenericRowData])
+        r.map(exprGenerator.generateExpression),
+        outputType,
+        classOf[GenericRowData])
     }
 
     // generate input format

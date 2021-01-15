@@ -29,11 +29,11 @@ import org.apache.flink.table.plan.util.PythonUtil.containsPythonCall
 import scala.collection.JavaConverters._
 
 class DataSetCalcRule
-  extends ConverterRule(
-    classOf[FlinkLogicalCalc],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.DATASET,
-    "DataSetCalcRule") {
+    extends ConverterRule(
+      classOf[FlinkLogicalCalc],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.DATASET,
+      "DataSetCalcRule") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val calc: FlinkLogicalCalc = call.rel(0).asInstanceOf[FlinkLogicalCalc]

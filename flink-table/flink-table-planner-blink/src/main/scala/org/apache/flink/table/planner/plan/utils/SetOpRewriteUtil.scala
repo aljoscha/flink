@@ -43,14 +43,14 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
-  * Util class that rewrite [[SetOp]].
-  */
+ * Util class that rewrite [[SetOp]].
+ */
 object SetOpRewriteUtil {
 
   /**
-    * Generate equals condition by keys (The index on both sides is the same) to
-    * join left relNode and right relNode.
-    */
+   * Generate equals condition by keys (The index on both sides is the same) to
+   * join left relNode and right relNode.
+   */
   def generateEqualsCondition(
       relBuilder: RelBuilder,
       left: RelNode,
@@ -71,11 +71,13 @@ object SetOpRewriteUtil {
   }
 
   /**
-    * Use table function to replicate the row N times. First field is long type,
-    * and the rest are the row fields.
-    */
+   * Use table function to replicate the row N times. First field is long type,
+   * and the rest are the row fields.
+   */
   def replicateRows(
-      builder: RelBuilder, outputType: RelDataType, fields: util.List[Integer]): RelNode = {
+      builder: RelBuilder,
+      outputType: RelDataType,
+      fields: util.List[Integer]): RelNode = {
     // construct LogicalTableFunctionScan
     val logicalType = toLogicalRowType(outputType)
     val fieldNames = outputType.getFieldNames.toSeq.toArray
@@ -114,9 +116,9 @@ object SetOpRewriteUtil {
     // correlated join
     val corSet = Set(cluster.createCorrel())
     val output = builder
-        .join(JoinRelType.INNER, builder.literal(true), corSet)
-        .project(builder.fields(Util.range(fields.size() + 1, fields.size() * 2 + 1)))
-        .build()
+      .join(JoinRelType.INNER, builder.literal(true), corSet)
+      .project(builder.fields(Util.range(fields.size() + 1, fields.size() * 2 + 1)))
+      .build()
     output
   }
 }

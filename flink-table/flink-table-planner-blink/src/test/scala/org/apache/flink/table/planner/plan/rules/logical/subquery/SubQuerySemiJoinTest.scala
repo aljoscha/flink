@@ -25,9 +25,9 @@ import org.apache.flink.table.planner.runtime.utils.JavaUserDefinedTableFunction
 import org.junit.Test
 
 /**
-  * Tests for [[org.apache.flink.table.planner.plan.rules.logical.FlinkSubQueryRemoveRule]],
-  * this class only tests IN and EXISTS queries.
-  */
+ * Tests for [[org.apache.flink.table.planner.plan.rules.logical.FlinkSubQueryRemoveRule]],
+ * this class only tests IN and EXISTS queries.
+ */
 class SubQuerySemiJoinTest extends SubQueryTestBase {
   util.addTableSource[(Int, Long, String)]("l", 'a, 'b, 'c)
   util.addTableSource[(Int, Long, String)]("r", 'd, 'e, 'f)
@@ -1501,7 +1501,7 @@ class SubQuerySemiJoinTest extends SubQueryTestBase {
     // SQL from Calcite Test
     // however, parse result is not correct
     val sqlQuery =
-    """
+      """
       |SELECT * FROM (SELECT 2 + a d2, 3 + b d3 FROM l) e
       |    WHERE EXISTS (SELECT 1 FROM (SELECT d + 1 d1 FROM r) d
       |    WHERE d1 = e.d2 AND EXISTS (SELECT 2 FROM (SELECT i + 4 d4, i + 5 d5, i + 6 d6 FROM t)

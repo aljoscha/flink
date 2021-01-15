@@ -42,9 +42,7 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 @RunWith(classOf[Parameterized])
-class CorrelateITCase(
-    mode: TestExecutionMode,
-    configMode: TableConfigMode)
+class CorrelateITCase(mode: TestExecutionMode, configMode: TableConfigMode)
     extends TableProgramsClusterTestBase(mode, configMode) {
 
   @Test
@@ -98,9 +96,9 @@ class CorrelateITCase(
   }
 
   /**
-    * Common join predicates are temporarily forbidden (see FLINK-7865).
-    */
-  @Test (expected = classOf[ValidationException])
+   * Common join predicates are temporarily forbidden (see FLINK-7865).
+   */
+  @Test(expected = classOf[ValidationException])
   def testLeftOuterJoinWithPredicates(): Unit = {
     val env = ExecutionEnvironment.getExecutionEnvironment
     val tableEnv = BatchTableEnvironment.create(env, config)
@@ -232,13 +230,14 @@ class CorrelateITCase(
     val func0 = new JavaTableFunc0
 
     val result = in
-        .where('a === 1)
-        .select(Date.valueOf("1990-10-14") as 'x,
-                1000L as 'y,
-                Timestamp.valueOf("1990-10-14 12:10:10") as 'z)
-        .joinLateral(func0('x, 'y, 'z) as 's)
-        .select('s)
-        .toDataSet[Row]
+      .where('a === 1)
+      .select(
+        Date.valueOf("1990-10-14") as 'x,
+        1000L as 'y,
+        Timestamp.valueOf("1990-10-14 12:10:10") as 'z)
+      .joinLateral(func0('x, 'y, 'z) as 's)
+      .select('s)
+      .toDataSet[Row]
 
     val results = result.collect()
     val expected = "1000\n" + "655906210000\n" + "7591\n"
@@ -296,7 +295,8 @@ class CorrelateITCase(
       env,
       Map("word_separator" -> "#", "string.value" -> "test"))
 
-    val result = CollectionDataSets.getSmall3TupleDataSet(env)
+    val result = CollectionDataSets
+      .getSmall3TupleDataSet(env)
       .toTable(tEnv, 'a, 'b, 'c)
       .joinLateral(richTableFunc1(richFunc2('c)) as 's)
       .select('a, 's)
@@ -316,7 +316,7 @@ class CorrelateITCase(
     val func32 = new TableFunc3("TwoConf_")
 
     val result = in
-      .joinLateral(func30('c) as('d, 'e))
+      .joinLateral(func30('c) as ('d, 'e))
       .select('c, 'd, 'e)
       .joinLateral(func31('c) as ('f, 'g))
       .select('c, 'd, 'e, 'f, 'g)
@@ -377,27 +377,18 @@ class CorrelateITCase(
     val func20 = new Func20
 
     val result = t
-      .joinLateral(func0('c) as('d, 'e))
+      .joinLateral(func0('c) as ('d, 'e))
       .where(func20('e))
       .select('c, 'd, 'e)
 
     val results = result.toDataSet[Row].collect()
 
-    val expected = Seq (
-      "Jack#22,Jack,22",
-      "John#19,John,19",
-      "Anna#44,Anna,44"
-    )
+    val expected = Seq("Jack#22,Jack,22", "John#19,John,19", "Anna#44,Anna,44")
 
-    TestBaseUtils.compareResultAsText(
-      results.asJava,
-      expected.sorted.mkString("\n")
-    )
+    TestBaseUtils.compareResultAsText(results.asJava, expected.sorted.mkString("\n"))
   }
 
-  private def testData(
-      env: ExecutionEnvironment)
-    : DataSet[(Int, Long, String)] = {
+  private def testData(env: ExecutionEnvironment): DataSet[(Int, Long, String)] = {
 
     val data = new mutable.MutableList[(Int, Long, String)]
     data.+=((1, 1L, "Jack#22"))

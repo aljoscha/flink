@@ -34,11 +34,11 @@ import org.apache.calcite.rel.core.TableScan
  * [[BatchPhysicalLegacyTableSourceScan]].
  */
 class BatchPhysicalLegacyTableSourceScanRule
-  extends ConverterRule(
-    classOf[FlinkLogicalLegacyTableSourceScan],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.BATCH_PHYSICAL,
-    "BatchPhysicalLegacyTableSourceScan") {
+    extends ConverterRule(
+      classOf[FlinkLogicalLegacyTableSourceScan],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.BATCH_PHYSICAL,
+      "BatchPhysicalLegacyTableSourceScan") {
 
   /** Rule must only match if TableScan targets a bounded [[StreamTableSource]] */
   override def matches(call: RelOptRuleCall): Boolean = {
@@ -48,7 +48,7 @@ class BatchPhysicalLegacyTableSourceScanRule
       case tst: LegacyTableSourceTable[_] =>
         tst.tableSource match {
           case sts: StreamTableSource[_] => sts.isBounded
-          case _ => false
+          case _                         => false
         }
       case _ => false
     }
@@ -60,8 +60,7 @@ class BatchPhysicalLegacyTableSourceScanRule
     new BatchPhysicalLegacyTableSourceScan(
       rel.getCluster,
       newTrait,
-      scan.getTable.asInstanceOf[LegacyTableSourceTable[_]]
-    )
+      scan.getTable.asInstanceOf[LegacyTableSourceTable[_]])
   }
 }
 

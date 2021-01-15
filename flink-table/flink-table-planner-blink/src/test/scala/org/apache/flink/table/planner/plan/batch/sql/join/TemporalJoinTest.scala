@@ -32,8 +32,7 @@ class TemporalJoinTest extends TableTestBase {
 
   @Before
   def before(): Unit = {
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE Orders (
         | o_amount INT,
         | o_currency STRING,
@@ -46,8 +45,7 @@ class TemporalJoinTest extends TableTestBase {
         |)
       """.stripMargin)
 
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE RatesHistory (
         | currency STRING,
         | rate INT,
@@ -59,8 +57,7 @@ class TemporalJoinTest extends TableTestBase {
         |)
       """.stripMargin)
 
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE RatesHistoryWithPK (
         | currency STRING,
         | rate INT,
@@ -73,8 +70,7 @@ class TemporalJoinTest extends TableTestBase {
         |)
       """.stripMargin)
 
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE RatesOnly (
         | currency STRING,
         | rate INT,
@@ -101,9 +97,10 @@ class TemporalJoinTest extends TableTestBase {
         "  ) T" +
         "  WHERE rowNum = 1")
 
-    util.addTable("CREATE VIEW rates_last_value AS SELECT currency, LAST_VALUE(rate) AS rate " +
-      "FROM RatesHistory " +
-      "GROUP BY currency ")
+    util.addTable(
+      "CREATE VIEW rates_last_value AS SELECT currency, LAST_VALUE(rate) AS rate " +
+        "FROM RatesHistory " +
+        "GROUP BY currency ")
   }
 
   @Test(expected = classOf[TableException])

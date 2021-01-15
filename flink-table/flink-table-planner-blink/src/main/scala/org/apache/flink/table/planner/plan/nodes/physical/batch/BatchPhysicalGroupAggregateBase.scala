@@ -54,8 +54,8 @@ abstract class BatchPhysicalGroupAggregateBase(
     aggCallToAggFunction: Seq[(AggregateCall, UserDefinedFunction)],
     val isMerge: Boolean,
     val isFinal: Boolean)
-  extends SingleRel(cluster, traitSet, inputRel)
-  with BatchPhysicalRel {
+    extends SingleRel(cluster, traitSet, inputRel)
+    with BatchPhysicalRel {
 
   if (grouping.isEmpty && auxGrouping.nonEmpty) {
     throw new TableException("auxGrouping should be empty if grouping is empty.")

@@ -23,16 +23,21 @@ import java.math.BigDecimal
 import java.util.{ArrayList => JArrayList, List => JList}
 
 import org.apache.flink.table.functions.AggregateFunction
-import org.apache.flink.table.functions.aggfunctions.{DecimalAvgAccumulator, DecimalSumWithRetractAccumulator, MaxWithRetractAccumulator, MinWithRetractAccumulator}
+import org.apache.flink.table.functions.aggfunctions.{
+  DecimalAvgAccumulator,
+  DecimalSumWithRetractAccumulator,
+  MaxWithRetractAccumulator,
+  MinWithRetractAccumulator
+}
 import org.apache.flink.table.functions.utils.UserDefinedFunctionUtils._
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
 /**
-  * Base class for aggregate function test
-  *
-  * @tparam T the type for the aggregation result
-  */
+ * Base class for aggregate function test
+ *
+ * @tparam T the type for the aggregation result
+ */
 abstract class AggFunctionTestBase[T, ACC] {
   def inputValueSets: Seq[Seq[_]]
 
@@ -150,33 +155,23 @@ abstract class AggFunctionTestBase[T, ACC] {
 
   private def accumulateVals(vals: Seq[_]): ACC = {
     val accumulator = aggregator.createAccumulator()
-    vals.foreach(
-      v =>
-        if (accumulateFunc.getParameterCount == 1) {
-          this.accumulateFunc.invoke(aggregator, accumulator.asInstanceOf[Object])
-        } else {
-          this.accumulateFunc.invoke(
-            aggregator,
-            accumulator.asInstanceOf[Object],
-            v.asInstanceOf[Object])
-        }
-    )
+    vals.foreach(v =>
+      if (accumulateFunc.getParameterCount == 1) {
+        this.accumulateFunc.invoke(aggregator, accumulator.asInstanceOf[Object])
+      } else {
+        this.accumulateFunc
+          .invoke(aggregator, accumulator.asInstanceOf[Object], v.asInstanceOf[Object])
+      })
     accumulator
   }
 
   private def retractVals(accumulator: ACC, vals: Seq[_]) = {
-    vals.foreach(
-      v =>
-        if (retractFunc.getParameterCount == 1) {
-          this.retractFunc.invoke(
-            aggregator,
-            accumulator.asInstanceOf[Object])
-        } else {
-          this.retractFunc.invoke(
-            aggregator,
-            accumulator.asInstanceOf[Object],
-            v.asInstanceOf[Object])
-        }
-    )
+    vals.foreach(v =>
+      if (retractFunc.getParameterCount == 1) {
+        this.retractFunc.invoke(aggregator, accumulator.asInstanceOf[Object])
+      } else {
+        this.retractFunc
+          .invoke(aggregator, accumulator.asInstanceOf[Object], v.asInstanceOf[Object])
+      })
   }
 }

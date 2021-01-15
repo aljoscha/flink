@@ -22,7 +22,11 @@ import org.apache.flink.api.scala._
 import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
 import org.apache.flink.table.api._
 import org.apache.flink.table.api.bridge.scala._
-import org.apache.flink.table.runtime.utils.{StreamITCase, StreamTestData, StreamingWithStateTestBase}
+import org.apache.flink.table.runtime.utils.{
+  StreamITCase,
+  StreamTestData,
+  StreamingWithStateTestBase
+}
 import org.apache.flink.table.utils.{Top3, Top3WithEmitRetractValue, Top3WithMapView}
 import org.apache.flink.types.Row
 
@@ -30,8 +34,8 @@ import org.junit.Assert.assertEquals
 import org.junit.{Before, Test}
 
 /**
-  * Tests of groupby (without window) table aggregations
-  */
+ * Tests of groupby (without window) table aggregations
+ */
 class TableAggregateITCase extends StreamingWithStateTestBase {
 
   @Before
@@ -48,7 +52,8 @@ class TableAggregateITCase extends StreamingWithStateTestBase {
 
     val top3 = new Top3
     val source = StreamTestData.get3TupleDataStream(env).toTable(tEnv, 'a, 'b, 'c)
-    val resultTable = source.groupBy('b)
+    val resultTable = source
+      .groupBy('b)
       .flatAggregate(top3('a))
       .select('b, 'f0, 'f1)
       .as("category", "v1", "v2")
@@ -72,8 +77,7 @@ class TableAggregateITCase extends StreamingWithStateTestBase {
       "5,13,13",
       "6,21,21",
       "6,20,20",
-      "6,19,19"
-    ).sorted
+      "6,19,19").sorted
     assertEquals(expected, StreamITCase.retractedResults.sorted)
   }
 
@@ -86,7 +90,8 @@ class TableAggregateITCase extends StreamingWithStateTestBase {
 
     val top3 = new Top3WithEmitRetractValue
     val source = StreamTestData.get3TupleDataStream(env).toTable(tEnv, 'a, 'b, 'c)
-    val resultTable = source.groupBy('b)
+    val resultTable = source
+      .groupBy('b)
       .flatAggregate(top3('a))
       .select('b, 'f0, 'f1)
       .as("category", "v1", "v2")
@@ -110,8 +115,7 @@ class TableAggregateITCase extends StreamingWithStateTestBase {
       "5,13,13",
       "6,21,21",
       "6,20,20",
-      "6,19,19"
-    ).sorted
+      "6,19,19").sorted
     assertEquals(expected, StreamITCase.retractedResults.sorted)
   }
 
@@ -133,11 +137,7 @@ class TableAggregateITCase extends StreamingWithStateTestBase {
     results.addSink(new StreamITCase.RetractingSink).setParallelism(1)
     env.execute()
 
-    val expected = List(
-      "19,19",
-      "20,20",
-      "21,21"
-    ).sorted
+    val expected = List("19,19", "20,20", "21,21").sorted
     assertEquals(expected, StreamITCase.retractedResults.sorted)
   }
 
@@ -160,11 +160,7 @@ class TableAggregateITCase extends StreamingWithStateTestBase {
     results.addSink(new StreamITCase.RetractingSink).setParallelism(1)
     env.execute()
 
-    val expected = List(
-      "111,111",
-      "65,65",
-      "34,34"
-    ).sorted
+    val expected = List("111,111", "65,65", "34,34").sorted
     assertEquals(expected, StreamITCase.retractedResults.sorted)
   }
 

@@ -50,7 +50,7 @@ class AggregateOperatorTest {
       Assert.fail()
     } catch {
       case iae: IllegalArgumentException =>
-      case e: Exception => Assert.fail()
+      case e: Exception                  => Assert.fail()
     }
 
     val longDs = env.fromCollection(emptyLongData)
@@ -61,7 +61,7 @@ class AggregateOperatorTest {
       Assert.fail()
     } catch {
       case uoe: InvalidProgramException =>
-      case e: Exception => Assert.fail()
+      case e: Exception                 => Assert.fail()
     }
   }
 
@@ -84,7 +84,7 @@ class AggregateOperatorTest {
       Assert.fail()
     } catch {
       case iae: IllegalArgumentException =>
-      case e: Exception => Assert.fail()
+      case e: Exception                  => Assert.fail()
     }
 
     val longDs = env.fromCollection(emptyLongData)
@@ -94,9 +94,9 @@ class AggregateOperatorTest {
       longDs.aggregate(Aggregations.MIN, "_1")
       Assert.fail()
     } catch {
-      case uoe: InvalidProgramException =>
+      case uoe: InvalidProgramException       =>
       case uoe: UnsupportedOperationException =>
-      case e: Exception => Assert.fail()
+      case e: Exception                       => Assert.fail()
     }
   }
 
@@ -130,4 +130,3 @@ class AggregateOperatorTest {
   }
 
 }
-

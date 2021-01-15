@@ -20,7 +20,10 @@ package org.apache.flink.table.planner.plan.stream.table.stringexpr
 
 import org.apache.flink.api.scala._
 import org.apache.flink.table.api._
-import org.apache.flink.table.planner.plan.utils.JavaUserDefinedAggFunctions.{WeightedAvg, WeightedAvgWithMergeAndReset}
+import org.apache.flink.table.planner.plan.utils.JavaUserDefinedAggFunctions.{
+  WeightedAvg,
+  WeightedAvgWithMergeAndReset
+}
 import org.apache.flink.table.planner.utils.{CountAggFunction, CountMinMax, TableTestBase}
 
 import org.junit.Test
@@ -62,10 +65,8 @@ class AggregateStringExpressionTest extends TableTestBase {
     util.addFunction("myCnt", myCnt)
     util.addTemporarySystemFunction("myWeightedAvg", classOf[WeightedAvgWithMergeAndReset])
 
-    val t1 = t.select(
-      myCnt.distinct('a) as 'aCnt,
-      call("myWeightedAvg", 'b, 'a).distinct() as 'wAvg
-    )
+    val t1 =
+      t.select(myCnt.distinct('a) as 'aCnt, call("myWeightedAvg", 'b, 'a).distinct() as 'wAvg)
     val t2 = t.select("myCnt.distinct(a) as aCnt, myWeightedAvg.distinct(b, a) as wAvg")
 
     verifyTableEquals(t1, t2)
@@ -80,15 +81,19 @@ class AggregateStringExpressionTest extends TableTestBase {
     util.addFunction("myCnt", myCnt)
     util.addTemporarySystemFunction("myWeightedAvg", classOf[WeightedAvgWithMergeAndReset])
 
-    val t1 = t.groupBy('b)
-      .select('b,
+    val t1 = t
+      .groupBy('b)
+      .select(
+        'b,
         myCnt.distinct('a) + 9 as 'aCnt,
         call("myWeightedAvg", 'b, 'a).distinct() * 2 as 'wAvg,
         call("myWeightedAvg", 'a, 'a).distinct() as 'distAgg,
         call("myWeightedAvg", 'a, 'a) as 'agg)
-    val t2 = t.groupBy("b")
-      .select("b, myCnt.distinct(a) + 9 as aCnt, myWeightedAvg.distinct(b, a) * 2 as wAvg, " +
-        "myWeightedAvg.distinct(a, a) as distAgg, myWeightedAvg(a, a) as agg")
+    val t2 = t
+      .groupBy("b")
+      .select(
+        "b, myCnt.distinct(a) + 9 as aCnt, myWeightedAvg.distinct(b, a) * 2 as wAvg, " +
+          "myWeightedAvg.distinct(a, a) as distAgg, myWeightedAvg(a, a) as agg")
 
     verifyTableEquals(t1, t2)
   }
@@ -130,8 +135,7 @@ class AggregateStringExpressionTest extends TableTestBase {
   @Test
   def testProctimeRename(): Unit = {
     val util = streamTestUtil()
-    val t = util.addDataStream[(Int, Long, String)](
-      "T1", 'int, 'long, 'string, 'proctime.proctime)
+    val t = util.addDataStream[(Int, Long, String)]("T1", 'int, 'long, 'string, 'proctime.proctime)
 
     // Expression / Scala API
     val resScala = t
@@ -151,8 +155,7 @@ class AggregateStringExpressionTest extends TableTestBase {
   @Test
   def testRowtimeRename(): Unit = {
     val util = streamTestUtil()
-    val t = util.addDataStream[TestPojo](
-      "T1",'int, 'rowtime.rowtime, 'string)
+    val t = util.addDataStream[TestPojo]("T1", 'int, 'rowtime.rowtime, 'string)
 
     // Expression / Scala API
     val resScala = t
@@ -174,7 +177,7 @@ class AggregateStringExpressionTest extends TableTestBase {
     val t = util.addTableSource[(Int, Long, String)]('a, 'b, 'c)
 
     val testAgg = new CountMinMax
-   util.addFunction("testAgg", testAgg)
+    util.addFunction("testAgg", testAgg)
 
     // Expression / Scala API
     val resScala = t
@@ -195,7 +198,7 @@ class AggregateStringExpressionTest extends TableTestBase {
     val t = util.addTableSource[(Int, Long, String)]('a, 'b, 'c)
 
     val testAgg = new CountMinMax
-   util.addFunction("testAgg", testAgg)
+    util.addFunction("testAgg", testAgg)
 
     // Expression / Scala API
     val resScala = t
@@ -218,7 +221,7 @@ class AggregateStringExpressionTest extends TableTestBase {
     val t = util.addTableSource[(Int, Long, String)]('a, 'b, 'c)
 
     val testAgg = new CountMinMax
-   util.addFunction("testAgg", testAgg)
+    util.addFunction("testAgg", testAgg)
 
     // Expression / Scala API
     val resScala = t

@@ -22,8 +22,8 @@ import org.apache.calcite.sql.{SqlFunction, SqlFunctionCategory, SqlKind}
 import org.apache.calcite.sql.`type`._
 
 /**
-  * All built-in scalar SQL functions.
-  */
+ * All built-in scalar SQL functions.
+ */
 object ScalarSqlFunctions {
 
   val E = new SqlFunction(
@@ -63,7 +63,8 @@ object ScalarSqlFunctions {
     SqlKind.OTHER_FUNCTION,
     ReturnTypes.cascade(ReturnTypes.explicit(SqlTypeName.VARCHAR), SqlTypeTransforms.TO_NULLABLE),
     InferTypes.RETURN_TYPE,
-    OperandTypes.or(OperandTypes.family(SqlTypeFamily.INTEGER),
+    OperandTypes.or(
+      OperandTypes.family(SqlTypeFamily.INTEGER),
       OperandTypes.family(SqlTypeFamily.STRING)),
     SqlFunctionCategory.NUMERIC)
 
@@ -88,7 +89,8 @@ object ScalarSqlFunctions {
     SqlKind.OTHER_FUNCTION,
     ReturnTypes.DOUBLE_NULLABLE,
     null,
-    OperandTypes.or(OperandTypes.NUMERIC,
+    OperandTypes.or(
+      OperandTypes.NUMERIC,
       OperandTypes.family(SqlTypeFamily.NUMERIC, SqlTypeFamily.NUMERIC)),
     SqlFunctionCategory.NUMERIC)
 
@@ -98,8 +100,7 @@ object ScalarSqlFunctions {
     ReturnTypes.DOUBLE_NULLABLE,
     null,
     OperandTypes.NUMERIC,
-    SqlFunctionCategory.NUMERIC
-  )
+    SqlFunctionCategory.NUMERIC)
 
   val COSH = new SqlFunction(
     "COSH",
@@ -113,7 +114,8 @@ object ScalarSqlFunctions {
     "LPAD",
     SqlKind.OTHER_FUNCTION,
     ReturnTypes.cascade(
-      ReturnTypes.explicit(SqlTypeName.VARCHAR), SqlTypeTransforms.FORCE_NULLABLE),
+      ReturnTypes.explicit(SqlTypeName.VARCHAR),
+      SqlTypeTransforms.FORCE_NULLABLE),
     null,
     OperandTypes.family(SqlTypeFamily.CHARACTER, SqlTypeFamily.INTEGER, SqlTypeFamily.CHARACTER),
     SqlFunctionCategory.STRING)
@@ -122,7 +124,8 @@ object ScalarSqlFunctions {
     "RPAD",
     SqlKind.OTHER_FUNCTION,
     ReturnTypes.cascade(
-      ReturnTypes.explicit(SqlTypeName.VARCHAR), SqlTypeTransforms.FORCE_NULLABLE),
+      ReturnTypes.explicit(SqlTypeName.VARCHAR),
+      SqlTypeTransforms.FORCE_NULLABLE),
     null,
     OperandTypes.family(SqlTypeFamily.CHARACTER, SqlTypeFamily.INTEGER, SqlTypeFamily.CHARACTER),
     SqlFunctionCategory.STRING)
@@ -133,8 +136,7 @@ object ScalarSqlFunctions {
     ReturnTypes.ARG0_NULLABLE,
     InferTypes.RETURN_TYPE,
     OperandTypes.STRING,
-    SqlFunctionCategory.STRING
-  )
+    SqlFunctionCategory.STRING)
 
   val SHA1 = new SqlFunction(
     "SHA1",
@@ -142,8 +144,7 @@ object ScalarSqlFunctions {
     ReturnTypes.ARG0_NULLABLE,
     InferTypes.RETURN_TYPE,
     OperandTypes.STRING,
-    SqlFunctionCategory.STRING
-  )
+    SqlFunctionCategory.STRING)
 
   val SHA224 = new SqlFunction(
     "SHA224",
@@ -151,8 +152,7 @@ object ScalarSqlFunctions {
     ReturnTypes.ARG0_NULLABLE,
     InferTypes.RETURN_TYPE,
     OperandTypes.STRING,
-    SqlFunctionCategory.STRING
-  )
+    SqlFunctionCategory.STRING)
 
   val SHA256 = new SqlFunction(
     "SHA256",
@@ -160,8 +160,7 @@ object ScalarSqlFunctions {
     ReturnTypes.ARG0_NULLABLE,
     InferTypes.RETURN_TYPE,
     OperandTypes.STRING,
-    SqlFunctionCategory.STRING
-  )
+    SqlFunctionCategory.STRING)
 
   val SHA384 = new SqlFunction(
     "SHA384",
@@ -169,8 +168,7 @@ object ScalarSqlFunctions {
     ReturnTypes.ARG0_NULLABLE,
     InferTypes.RETURN_TYPE,
     OperandTypes.STRING,
-    SqlFunctionCategory.STRING
-  )
+    SqlFunctionCategory.STRING)
 
   val SHA512 = new SqlFunction(
     "SHA512",
@@ -178,18 +176,18 @@ object ScalarSqlFunctions {
     ReturnTypes.ARG0_NULLABLE,
     InferTypes.RETURN_TYPE,
     OperandTypes.STRING,
-    SqlFunctionCategory.STRING
-  )
+    SqlFunctionCategory.STRING)
 
   val SHA2 = new SqlFunction(
     "SHA2",
     SqlKind.OTHER_FUNCTION,
     ReturnTypes.ARG0_NULLABLE,
     InferTypes.RETURN_TYPE,
-    OperandTypes.sequence("'(DATA, HASH_LENGTH)'",
-      OperandTypes.STRING,  OperandTypes.NUMERIC_INTEGER),
-    SqlFunctionCategory.STRING
-  )
+    OperandTypes.sequence(
+      "'(DATA, HASH_LENGTH)'",
+      OperandTypes.STRING,
+      OperandTypes.NUMERIC_INTEGER),
+    SqlFunctionCategory.STRING)
 
   val UUID: SqlFunction = new SqlFunction(
     "UUID",
@@ -197,8 +195,7 @@ object ScalarSqlFunctions {
     ReturnTypes.VARCHAR_2000,
     null,
     OperandTypes.NILADIC,
-    SqlFunctionCategory.STRING
-  ) {
+    SqlFunctionCategory.STRING) {
     override def isDeterministic: Boolean = false
   }
 
@@ -208,40 +205,33 @@ object ScalarSqlFunctions {
     ReturnTypes.ARG0_NULLABLE,
     InferTypes.RETURN_TYPE,
     OperandTypes.sequence("'(TIMESTAMP, FORMAT)'", OperandTypes.DATETIME, OperandTypes.STRING),
-    SqlFunctionCategory.TIMEDATE
-  )
+    SqlFunctionCategory.TIMEDATE)
 
   val REGEXP_REPLACE = new SqlFunction(
     "REGEXP_REPLACE",
     SqlKind.OTHER_FUNCTION,
-    ReturnTypes.cascade(
-      ReturnTypes.explicit(SqlTypeName.VARCHAR), SqlTypeTransforms.TO_NULLABLE),
+    ReturnTypes.cascade(ReturnTypes.explicit(SqlTypeName.VARCHAR), SqlTypeTransforms.TO_NULLABLE),
     InferTypes.RETURN_TYPE,
     OperandTypes.STRING_STRING_STRING,
-    SqlFunctionCategory.STRING
-  )
+    SqlFunctionCategory.STRING)
 
   val REGEXP_EXTRACT = new SqlFunction(
     "REGEXP_EXTRACT",
     SqlKind.OTHER_FUNCTION,
     ReturnTypes.cascade(
-      ReturnTypes.explicit(SqlTypeName.VARCHAR), SqlTypeTransforms.FORCE_NULLABLE),
+      ReturnTypes.explicit(SqlTypeName.VARCHAR),
+      SqlTypeTransforms.FORCE_NULLABLE),
     InferTypes.RETURN_TYPE,
-    OperandTypes.or(OperandTypes.STRING_STRING_INTEGER,
-      OperandTypes.STRING_STRING
-    ),
-    SqlFunctionCategory.STRING
-  )
+    OperandTypes.or(OperandTypes.STRING_STRING_INTEGER, OperandTypes.STRING_STRING),
+    SqlFunctionCategory.STRING)
 
   val FROM_BASE64 = new SqlFunction(
     "FROM_BASE64",
     SqlKind.OTHER_FUNCTION,
-    ReturnTypes.cascade(
-      ReturnTypes.explicit(SqlTypeName.VARCHAR), SqlTypeTransforms.TO_NULLABLE),
+    ReturnTypes.cascade(ReturnTypes.explicit(SqlTypeName.VARCHAR), SqlTypeTransforms.TO_NULLABLE),
     InferTypes.RETURN_TYPE,
     OperandTypes.family(SqlTypeFamily.STRING),
-    SqlFunctionCategory.STRING
-  )
+    SqlFunctionCategory.STRING)
 
   val TO_BASE64 = new SqlFunction(
     "TO_BASE64",
@@ -249,8 +239,7 @@ object ScalarSqlFunctions {
     ReturnTypes.cascade(ReturnTypes.explicit(SqlTypeName.VARCHAR), SqlTypeTransforms.TO_NULLABLE),
     InferTypes.RETURN_TYPE,
     OperandTypes.STRING,
-    SqlFunctionCategory.STRING
-  )
+    SqlFunctionCategory.STRING)
 
   val LTRIM = new SqlFunction(
     "LTRIM",

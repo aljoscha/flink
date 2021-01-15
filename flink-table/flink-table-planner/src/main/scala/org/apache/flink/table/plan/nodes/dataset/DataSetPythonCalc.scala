@@ -31,7 +31,10 @@ import org.apache.flink.table.api.internal.BatchTableEnvImpl
 import org.apache.flink.table.calcite.FlinkTypeFactory
 import org.apache.flink.table.functions.python.{PythonFunctionInfo, PythonFunctionKind}
 import org.apache.flink.table.plan.nodes.CommonPythonCalc
-import org.apache.flink.table.plan.nodes.dataset.DataSetPythonCalc.{ARROW_PYTHON_SCALAR_FUNCTION_FLAT_MAP_NAME, PYTHON_SCALAR_FUNCTION_FLAT_MAP_NAME}
+import org.apache.flink.table.plan.nodes.dataset.DataSetPythonCalc.{
+  ARROW_PYTHON_SCALAR_FUNCTION_FLAT_MAP_NAME,
+  PYTHON_SCALAR_FUNCTION_FLAT_MAP_NAME
+}
 import org.apache.flink.table.plan.schema.RowSchema
 import org.apache.flink.table.plan.util.PythonUtil.containsPythonCall
 import org.apache.flink.table.types.logical.RowType
@@ -42,8 +45,8 @@ import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 
 /**
-  * Flink RelNode for Python ScalarFunctions.
-  */
+ * Flink RelNode for Python ScalarFunctions.
+ */
 class DataSetPythonCalc(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -51,13 +54,7 @@ class DataSetPythonCalc(
     rowRelDataType: RelDataType,
     calcProgram: RexProgram,
     ruleDescription: String)
-  extends DataSetCalcBase(
-    cluster,
-    traitSet,
-    input,
-    rowRelDataType,
-    calcProgram,
-    ruleDescription)
+    extends DataSetCalcBase(cluster, traitSet, input, rowRelDataType, calcProgram, ruleDescription)
     with CommonPythonCalc {
 
   private lazy val inputSchema = new RowSchema(input.getRowType)
@@ -75,10 +72,14 @@ class DataSetPythonCalc(
         getPythonRexCalls(calcProgram).map(node => FlinkTypeFactory.toTypeInfo(node.getType)): _*)
 
     // construct the Python ScalarFunction flatMap function
-    val flatMapFunctionInputRowType = TypeConversions.fromLegacyInfoToDataType(
-      inputSchema.typeInfo).getLogicalType.asInstanceOf[RowType]
-    val flatMapFunctionOutputRowType = TypeConversions.fromLegacyInfoToDataType(
-      flatMapFunctionResultTypeInfo).getLogicalType.asInstanceOf[RowType]
+    val flatMapFunctionInputRowType = TypeConversions
+      .fromLegacyInfoToDataType(inputSchema.typeInfo)
+      .getLogicalType
+      .asInstanceOf[RowType]
+    val flatMapFunctionOutputRowType = TypeConversions
+      .fromLegacyInfoToDataType(flatMapFunctionResultTypeInfo)
+      .getLogicalType
+      .asInstanceOf[RowType]
     val flatMapFunction = getPythonScalarFunctionFlatMap(
       getConfig(tableEnv.execEnv, tableEnv.getConfig),
       flatMapFunctionInputRowType,
@@ -89,16 +90,17 @@ class DataSetPythonCalc(
   }
 
   private[flink] def getPythonScalarFunctionFlatMap(
-    config: Configuration,
-    inputRowType: RowType,
-    outputRowType: RowType,
-    calcProgram: RexProgram) = {
-    val clazz = if (calcProgram.getExprList.asScala.exists(
-      containsPythonCall(_, PythonFunctionKind.PANDAS))) {
-      loadClass(ARROW_PYTHON_SCALAR_FUNCTION_FLAT_MAP_NAME)
-    } else {
-      loadClass(PYTHON_SCALAR_FUNCTION_FLAT_MAP_NAME)
-    }
+      config: Configuration,
+      inputRowType: RowType,
+      outputRowType: RowType,
+      calcProgram: RexProgram) = {
+    val clazz =
+      if (calcProgram.getExprList.asScala.exists(
+          containsPythonCall(_, PythonFunctionKind.PANDAS))) {
+        loadClass(ARROW_PYTHON_SCALAR_FUNCTION_FLAT_MAP_NAME)
+      } else {
+        loadClass(PYTHON_SCALAR_FUNCTION_FLAT_MAP_NAME)
+      }
     val ctor = clazz.getConstructor(
       classOf[Configuration],
       classOf[Array[PythonFunctionInfo]],
@@ -108,13 +110,14 @@ class DataSetPythonCalc(
       classOf[Array[Int]])
     val (udfInputOffsets, pythonFunctionInfos) =
       extractPythonScalarFunctionInfos(getPythonRexCalls(calcProgram))
-    ctor.newInstance(
-      config,
-      pythonFunctionInfos,
-      inputRowType,
-      outputRowType,
-      udfInputOffsets,
-      getForwardedFields(calcProgram))
+    ctor
+      .newInstance(
+        config,
+        pythonFunctionInfos,
+        inputRowType,
+        outputRowType,
+        udfInputOffsets,
+        getForwardedFields(calcProgram))
       .asInstanceOf[RichFlatMapFunction[Row, Row]]
   }
 }

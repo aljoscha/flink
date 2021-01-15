@@ -23,8 +23,16 @@ import org.apache.flink.table.api._
 import org.apache.flink.table.api.bridge.scala._
 import org.apache.flink.table.planner.runtime.utils.StreamingWithStateTestBase.StateBackendMode
 import org.apache.flink.table.planner.runtime.utils.TimeTestUtil.EventTimeProcessOperator
-import org.apache.flink.table.planner.runtime.utils.UserDefinedFunctionTestUtils.{CountNullNonNull, CountPairs, LargerThanCount}
-import org.apache.flink.table.planner.runtime.utils.{StreamingWithStateTestBase, TestData, TestingAppendSink}
+import org.apache.flink.table.planner.runtime.utils.UserDefinedFunctionTestUtils.{
+  CountNullNonNull,
+  CountPairs,
+  LargerThanCount
+}
+import org.apache.flink.table.planner.runtime.utils.{
+  StreamingWithStateTestBase,
+  TestData,
+  TestingAppendSink
+}
 import org.apache.flink.types.Row
 
 import org.junit.Assert._
@@ -220,8 +228,14 @@ class OverAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTest
     env.execute()
 
     val expected = List(
-      "Hello World,7,7,1,7", "Hello World,7,8,2,15", "Hello World,7,20,3,35",
-      "Hello,1,1,1,1", "Hello,1,2,2,3", "Hello,1,3,3,6", "Hello,1,4,4,10", "Hello,1,5,5,15",
+      "Hello World,7,7,1,7",
+      "Hello World,7,8,2,15",
+      "Hello World,7,20,3,35",
+      "Hello,1,1,1,1",
+      "Hello,1,2,2,3",
+      "Hello,1,3,3,6",
+      "Hello,1,4,4,10",
+      "Hello,1,5,5,15",
       "Hello,1,6,6,21")
     assertEquals(expected.sorted, sink.getAppendResults.sorted)
   }
@@ -252,9 +266,15 @@ class OverAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTest
     env.execute()
 
     val expected = List(
-      "Hello World,1,null", "Hello World,2,null", "Hello World,3,null",
-      "Hello,1,null", "Hello,2,null", "Hello,3,null", "Hello,4,null",
-      "Hello,5,null", "Hello,6,null")
+      "Hello World,1,null",
+      "Hello World,2,null",
+      "Hello World,3,null",
+      "Hello,1,null",
+      "Hello,2,null",
+      "Hello,3,null",
+      "Hello,4,null",
+      "Hello,5,null",
+      "Hello,6,null")
     assertEquals(expected.sorted, sink.getAppendResults.sorted)
 
   }
@@ -276,8 +296,15 @@ class OverAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTest
     env.execute()
 
     val expected = List(
-      "Hello World,7,28", "Hello World,8,36", "Hello World,9,56",
-      "Hello,1,1", "Hello,2,3", "Hello,3,6", "Hello,4,10", "Hello,5,15", "Hello,6,21")
+      "Hello World,7,28",
+      "Hello World,8,36",
+      "Hello World,9,56",
+      "Hello,1,1",
+      "Hello,2,3",
+      "Hello,3,6",
+      "Hello,4,10",
+      "Hello,5,15",
+      "Hello,6,21")
     assertEquals(expected.sorted, sink.getAppendResults.sorted)
   }
 
@@ -298,8 +325,16 @@ class OverAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTest
     tEnv.sqlQuery(sqlQuery).toAppendStream[Row].addSink(sink)
     env.execute()
 
-    val expected = List("Hello,1", "Hello,2", "Hello,3", "Hello,4", "Hello,5", "Hello,6",
-      "Hello|Hello World,7", "Hello|Hello World,8", "Hello|Hello World,9")
+    val expected = List(
+      "Hello,1",
+      "Hello,2",
+      "Hello,3",
+      "Hello,4",
+      "Hello,5",
+      "Hello,6",
+      "Hello|Hello World,7",
+      "Hello|Hello World,8",
+      "Hello|Hello World,9")
     assertEquals(expected.sorted, sink.getAppendResults.sorted)
   }
 
@@ -338,7 +373,8 @@ class OverAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTest
       Right(19000L))
 
     val source = failingDataSource(data)
-    val t1 = source.transform("TimeAssigner", new EventTimeProcessOperator[(Long, Int, String)])
+    val t1 = source
+      .transform("TimeAssigner", new EventTimeProcessOperator[(Long, Int, String)])
       .setParallelism(source.parallelism)
       .toTable(tEnv, 'a, 'b, 'c, 'rowtime.rowtime)
 
@@ -407,7 +443,8 @@ class OverAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTest
       Right(20L))
 
     val source = failingDataSource(data)
-    val t1 = source.transform("TimeAssigner", new EventTimeProcessOperator[(Long, Int, String)])
+    val t1 = source
+      .transform("TimeAssigner", new EventTimeProcessOperator[(Long, Int, String)])
       .setParallelism(source.parallelism)
       .toTable(tEnv, 'a, 'b, 'c, 'rowtime.rowtime)
 
@@ -429,12 +466,22 @@ class OverAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTest
     env.execute()
 
     val expected = List(
-      "Hello,1,0,1,1", "Hello,1,0,2,2", "Hello,1,0,3,3",
-      "Hello,2,0,3,4", "Hello,2,0,3,5", "Hello,2,0,3,6",
-      "Hello,3,0,3,7", "Hello,4,0,3,9", "Hello,5,1,3,12",
+      "Hello,1,0,1,1",
+      "Hello,1,0,2,2",
+      "Hello,1,0,3,3",
+      "Hello,2,0,3,4",
+      "Hello,2,0,3,5",
+      "Hello,2,0,3,6",
+      "Hello,3,0,3,7",
+      "Hello,4,0,3,9",
+      "Hello,5,1,3,12",
       "Hello,6,2,3,15",
-      "Hello World,7,1,1,7", "Hello World,7,2,2,14", "Hello World,7,3,3,21",
-      "Hello World,7,3,3,21", "Hello World,8,3,3,22", "Hello World,20,3,3,35")
+      "Hello World,7,1,1,7",
+      "Hello World,7,2,2,14",
+      "Hello World,7,3,3,21",
+      "Hello World,7,3,3,21",
+      "Hello World,8,3,3,22",
+      "Hello World,20,3,3,35")
     assertEquals(expected.sorted, sink.getAppendResults.sorted)
   }
 
@@ -473,7 +520,8 @@ class OverAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTest
       Right(19000L))
 
     val source = failingDataSource(data)
-    val t1 = source.transform("TimeAssigner", new EventTimeProcessOperator[(Long, Int, String)])
+    val t1 = source
+      .transform("TimeAssigner", new EventTimeProcessOperator[(Long, Int, String)])
       .setParallelism(source.parallelism)
       .toTable(tEnv, 'a, 'b, 'c, 'rowtime.rowtime)
 
@@ -492,14 +540,24 @@ class OverAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTest
     env.execute()
 
     val expected = List(
-      "Hello,1,1,1", "Hello,15,2,2", "Hello,16,3,3",
-      "Hello,2,6,9", "Hello,3,6,9", "Hello,2,6,9",
+      "Hello,1,1,1",
+      "Hello,15,2,2",
+      "Hello,16,3,3",
+      "Hello,2,6,9",
+      "Hello,3,6,9",
+      "Hello,2,6,9",
       "Hello,3,4,9",
       "Hello,4,2,7",
       "Hello,5,2,9",
-      "Hello,6,2,11", "Hello,65,2,12",
-      "Hello,9,2,12", "Hello,9,2,12", "Hello,18,3,18",
-      "Hello World,7,4,25", "Hello World,17,3,21", "Hello World,77,3,21", "Hello World,18,1,7",
+      "Hello,6,2,11",
+      "Hello,65,2,12",
+      "Hello,9,2,12",
+      "Hello,9,2,12",
+      "Hello,18,3,18",
+      "Hello World,7,4,25",
+      "Hello World,17,3,21",
+      "Hello World,77,3,21",
+      "Hello World,18,1,7",
       "Hello World,8,2,15",
       "Hello World,20,1,20")
     assertEquals(expected.sorted, sink.getAppendResults.sorted)
@@ -529,7 +587,8 @@ class OverAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTest
       Right(20L))
 
     val source = failingDataSource(data)
-    val t1 = source.transform("TimeAssigner", new EventTimeProcessOperator[(Long, Int, String)])
+    val t1 = source
+      .transform("TimeAssigner", new EventTimeProcessOperator[(Long, Int, String)])
       .setParallelism(source.parallelism)
       .toTable(tEnv, 'a, 'b, 'c, 'rowtime.rowtime)
 
@@ -546,12 +605,19 @@ class OverAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTest
     env.execute()
 
     val expected = List(
-      "Hello,1,1,1", "Hello,1,2,2", "Hello,1,3,3",
-      "Hello,2,3,4", "Hello,2,3,5", "Hello,2,3,6",
+      "Hello,1,1,1",
+      "Hello,1,2,2",
+      "Hello,1,3,3",
+      "Hello,2,3,4",
+      "Hello,2,3,5",
+      "Hello,2,3,6",
       "Hello,3,3,7",
-      "Hello,4,3,9", "Hello,5,3,12",
-      "Hello,6,3,15", "Hello World,7,3,18",
-      "Hello World,8,3,21", "Hello World,8,3,23",
+      "Hello,4,3,9",
+      "Hello,5,3,12",
+      "Hello,6,3,15",
+      "Hello World,7,3,18",
+      "Hello World,8,3,21",
+      "Hello World,8,3,23",
       "Hello World,9,3,25",
       "Hello World,20,3,37")
     assertEquals(expected.sorted, sink.getAppendResults.sorted)
@@ -592,7 +658,8 @@ class OverAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTest
       Right(14000030L))
 
     val source = failingDataSource(data)
-    val t1 = source.transform("TimeAssigner", new EventTimeProcessOperator[(Int, Long, String)])
+    val t1 = source
+      .transform("TimeAssigner", new EventTimeProcessOperator[(Int, Long, String)])
       .setParallelism(source.parallelism)
       .toTable(tEnv, 'a, 'b, 'c, 'rowtime.rowtime)
 
@@ -604,19 +671,19 @@ class OverAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTest
     env.execute()
 
     val expected = List(
-      s"1,1,Hello,0,6,3,${6/3},3,1",
-      s"1,2,Hello,0,6,3,${6/3},3,1",
-      s"1,3,Hello world,0,6,3,${6/3},3,1",
-      s"1,1,Hi,0,7,4,${7/4},3,1",
-      s"2,1,Hello,0,1,1,${1/1},1,1",
-      s"2,2,Hello world,0,6,3,${6/3},3,1",
-      s"2,3,Hello world,0,6,3,${6/3},3,1",
-      s"1,4,Hello world,0,11,5,${11/5},4,1",
-      s"1,5,Hello world,3,29,8,${29/8},7,1",
-      s"1,6,Hello world,3,29,8,${29/8},7,1",
-      s"1,7,Hello world,3,29,8,${29/8},7,1",
-      s"2,4,Hello world,1,15,5,${15/5},5,1",
-      s"2,5,Hello world,1,15,5,${15/5},5,1")
+      s"1,1,Hello,0,6,3,${6 / 3},3,1",
+      s"1,2,Hello,0,6,3,${6 / 3},3,1",
+      s"1,3,Hello world,0,6,3,${6 / 3},3,1",
+      s"1,1,Hi,0,7,4,${7 / 4},3,1",
+      s"2,1,Hello,0,1,1,${1 / 1},1,1",
+      s"2,2,Hello world,0,6,3,${6 / 3},3,1",
+      s"2,3,Hello world,0,6,3,${6 / 3},3,1",
+      s"1,4,Hello world,0,11,5,${11 / 5},4,1",
+      s"1,5,Hello world,3,29,8,${29 / 8},7,1",
+      s"1,6,Hello world,3,29,8,${29 / 8},7,1",
+      s"1,7,Hello world,3,29,8,${29 / 8},7,1",
+      s"2,4,Hello world,1,15,5,${15 / 5},5,1",
+      s"2,5,Hello world,1,15,5,${15 / 5},5,1")
     assertEquals(expected.sorted, sink.getAppendResults.sorted)
   }
 
@@ -657,7 +724,8 @@ class OverAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTest
       Right(14000030L))
 
     val source = failingDataSource(data)
-    val t1 = source.transform("TimeAssigner", new EventTimeProcessOperator[(Int, Long, String)])
+    val t1 = source
+      .transform("TimeAssigner", new EventTimeProcessOperator[(Int, Long, String)])
       .setParallelism(source.parallelism)
       .toTable(tEnv, 'a, 'b, 'c, 'rowtime.rowtime)
 
@@ -669,20 +737,20 @@ class OverAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTest
     env.execute()
 
     val expected = mutable.MutableList(
-      s"1,2,Hello,0,2,1,${2/1},2,2",
-      s"1,3,Hello world,0,5,2,${5/2},3,2",
-      s"1,1,Hi,0,6,3,${6/3},3,1",
-      s"2,1,Hello,0,1,1,${1/1},1,1",
-      s"2,2,Hello world,0,3,2,${3/2},2,1",
-      s"3,1,Hello,0,1,1,${1/1},1,1",
-      s"3,2,Hello world,0,3,2,${3/2},2,1",
-      s"1,5,Hello world,1,11,4,${11/4},5,1",
-      s"1,6,Hello world,2,17,5,${17/5},6,1",
-      s"1,9,Hello world,3,26,6,${26/6},9,1",
-      s"1,8,Hello world,4,34,7,${34/7},9,1",
-      s"1,7,Hello world,5,41,8,${41/8},9,1",
-      s"2,5,Hello world,1,8,3,${8/3},5,1",
-      s"3,5,Hello world,1,8,3,${8/3},5,1")
+      s"1,2,Hello,0,2,1,${2 / 1},2,2",
+      s"1,3,Hello world,0,5,2,${5 / 2},3,2",
+      s"1,1,Hi,0,6,3,${6 / 3},3,1",
+      s"2,1,Hello,0,1,1,${1 / 1},1,1",
+      s"2,2,Hello world,0,3,2,${3 / 2},2,1",
+      s"3,1,Hello,0,1,1,${1 / 1},1,1",
+      s"3,2,Hello world,0,3,2,${3 / 2},2,1",
+      s"1,5,Hello world,1,11,4,${11 / 4},5,1",
+      s"1,6,Hello world,2,17,5,${17 / 5},6,1",
+      s"1,9,Hello world,3,26,6,${26 / 6},9,1",
+      s"1,8,Hello world,4,34,7,${34 / 7},9,1",
+      s"1,7,Hello world,5,41,8,${41 / 8},9,1",
+      s"2,5,Hello world,1,8,3,${8 / 3},5,1",
+      s"3,5,Hello world,1,8,3,${8 / 3},5,1")
     assertEquals(expected.sorted, sink.getAppendResults.sorted)
   }
 
@@ -714,7 +782,8 @@ class OverAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTest
       Right(14000030L))
 
     val source = failingDataSource(data)
-    val t1 = source.transform("TimeAssigner", new EventTimeProcessOperator[(Int, Long, String)])
+    val t1 = source
+      .transform("TimeAssigner", new EventTimeProcessOperator[(Int, Long, String)])
       .setParallelism(source.parallelism)
       .toTable(tEnv, 'a, 'b, 'c, 'rowtime.rowtime)
 
@@ -725,19 +794,19 @@ class OverAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTest
     env.execute()
 
     val expected = List(
-      s"2,1,Hello,1,1,${1/1},1,1",
-      s"1,1,Hello,7,4,${7/4},3,1",
-      s"1,2,Hello,7,4,${7/4},3,1",
-      s"1,3,Hello world,7,4,${7/4},3,1",
-      s"2,2,Hello world,12,6,${12/6},3,1",
-      s"2,3,Hello world,12,6,${12/6},3,1",
-      s"1,1,Hi,13,7,${13/7},3,1",
-      s"1,4,Hello world,17,8,${17/8},4,1",
-      s"1,5,Hello world,35,11,${35/11},7,1",
-      s"1,6,Hello world,35,11,${35/11},7,1",
-      s"1,7,Hello world,35,11,${35/11},7,1",
-      s"2,4,Hello world,44,13,${44/13},7,1",
-      s"2,5,Hello world,44,13,${44/13},7,1")
+      s"2,1,Hello,1,1,${1 / 1},1,1",
+      s"1,1,Hello,7,4,${7 / 4},3,1",
+      s"1,2,Hello,7,4,${7 / 4},3,1",
+      s"1,3,Hello world,7,4,${7 / 4},3,1",
+      s"2,2,Hello world,12,6,${12 / 6},3,1",
+      s"2,3,Hello world,12,6,${12 / 6},3,1",
+      s"1,1,Hi,13,7,${13 / 7},3,1",
+      s"1,4,Hello world,17,8,${17 / 8},4,1",
+      s"1,5,Hello world,35,11,${35 / 11},7,1",
+      s"1,6,Hello world,35,11,${35 / 11},7,1",
+      s"1,7,Hello world,35,11,${35 / 11},7,1",
+      s"2,4,Hello world,44,13,${44 / 13},7,1",
+      s"2,5,Hello world,44,13,${44 / 13},7,1")
 
     assertEquals(expected.sorted, sink.getAppendResults.sorted)
   }
@@ -765,11 +834,11 @@ class OverAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTest
       Left(14000008L, (6, 8L, "Hello world")),
       Right(14000020L),
       Left(14000021L, (6, 8L, "Hello world")),
-      Right(14000030L)
-    )
+      Right(14000030L))
 
     val source = failingDataSource(data)
-    val t1 = source.transform("TimeAssigner", new EventTimeProcessOperator[(Int, Long, String)])
+    val t1 = source
+      .transform("TimeAssigner", new EventTimeProcessOperator[(Int, Long, String)])
       .setParallelism(source.parallelism)
       .toTable(tEnv, 'a, 'b, 'c, 'rowtime.rowtime)
 
@@ -780,18 +849,18 @@ class OverAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTest
     env.execute()
 
     val expected = mutable.MutableList(
-      s"2,2,Hello,2,1,${2/1},2,2",
-      s"3,5,Hello,7,2,${7/2},5,2",
-      s"1,3,Hello,10,3,${10/3},5,2",
-      s"3,7,Hello world,17,4,${17/4},7,2",
-      s"1,1,Hi,18,5,${18/5},7,1",
-      s"4,9,Hello world,27,6,${27/6},9,1",
-      s"5,8,Hello world,35,7,${35/7},9,1",
-      s"6,8,Hello world,43,8,${43/8},9,1")
+      s"2,2,Hello,2,1,${2 / 1},2,2",
+      s"3,5,Hello,7,2,${7 / 2},5,2",
+      s"1,3,Hello,10,3,${10 / 3},5,2",
+      s"3,7,Hello world,17,4,${17 / 4},7,2",
+      s"1,1,Hi,18,5,${18 / 5},7,1",
+      s"4,9,Hello world,27,6,${27 / 6},9,1",
+      s"5,8,Hello world,35,7,${35 / 7},9,1",
+      s"6,8,Hello world,43,8,${43 / 8},9,1")
     assertEquals(expected.sorted, sink.getAppendResults.sorted)
   }
 
-  /** test sliding event-time unbounded window with partition by **/
+  /** test sliding event-time unbounded window with partition by * */
   @Test
   def testRowTimeUnBoundedPartitionedRowsOver2(): Unit = {
     val sqlQuery = "SELECT a, b, c, " +
@@ -832,11 +901,11 @@ class OverAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTest
       Left(14000024L, (1, 7L, "Hello world")),
       Left(14000023L, (1, 8L, "Hello world")),
       Left(14000021L, (1, 9L, "Hello world")),
-      Right(14000030L)
-    )
+      Right(14000030L))
 
     val source = failingDataSource(data)
-    val t1 = source.transform("TimeAssigner", new EventTimeProcessOperator[(Int, Long, String)])
+    val t1 = source
+      .transform("TimeAssigner", new EventTimeProcessOperator[(Int, Long, String)])
       .setParallelism(source.parallelism)
       .toTable(tEnv, 'a, 'b, 'c, 'rowtime.rowtime)
 
@@ -847,21 +916,20 @@ class OverAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTest
     env.execute()
 
     val expected = List(
-      s"1,2,Hello,2,1,${2/1},2,2",
-      s"1,3,Hello world,5,2,${5/2},3,2",
-      s"1,1,Hi,6,3,${6/3},3,1",
-      s"2,1,Hello,1,1,${1/1},1,1",
-      s"2,2,Hello world,3,2,${3/2},2,1",
-      s"3,1,Hello,1,1,${1/1},1,1",
-      s"3,2,Hello world,3,2,${3/2},2,1",
-      s"1,5,Hello world,11,4,${11/4},5,1",
-      s"1,6,Hello world,17,5,${17/5},6,1",
-      s"1,9,Hello world,26,6,${26/6},9,1",
-      s"1,8,Hello world,34,7,${34/7},9,1",
-      s"1,7,Hello world,41,8,${41/8},9,1",
-      s"2,5,Hello world,8,3,${8/3},5,1",
-      s"3,5,Hello world,8,3,${8/3},5,1"
-    )
+      s"1,2,Hello,2,1,${2 / 1},2,2",
+      s"1,3,Hello world,5,2,${5 / 2},3,2",
+      s"1,1,Hi,6,3,${6 / 3},3,1",
+      s"2,1,Hello,1,1,${1 / 1},1,1",
+      s"2,2,Hello world,3,2,${3 / 2},2,1",
+      s"3,1,Hello,1,1,${1 / 1},1,1",
+      s"3,2,Hello world,3,2,${3 / 2},2,1",
+      s"1,5,Hello world,11,4,${11 / 4},5,1",
+      s"1,6,Hello world,17,5,${17 / 5},6,1",
+      s"1,9,Hello world,26,6,${26 / 6},9,1",
+      s"1,8,Hello world,34,7,${34 / 7},9,1",
+      s"1,7,Hello world,41,8,${41 / 8},9,1",
+      s"2,5,Hello world,8,3,${8 / 3},5,1",
+      s"3,5,Hello world,8,3,${8 / 3},5,1")
     assertEquals(expected.sorted, sink.getAppendResults.sorted)
   }
 
@@ -944,9 +1012,16 @@ class OverAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTest
     env.execute()
 
     val expected = List(
-      "null,1,0,0|1", "null,1,0,0|1", "null,2,0,0|1", "null,1,2,2|1",
-      "Hello,1,1,1|1", "Hello,1,1,1|1", "Hello,2,1,1|1",
-      "Hello World,1,2,2|1", "Hello World,2,2,2|1", "Hello World,2,2,2|1")
+      "null,1,0,0|1",
+      "null,1,0,0|1",
+      "null,2,0,0|1",
+      "null,1,2,2|1",
+      "Hello,1,1,1|1",
+      "Hello,1,1,1|1",
+      "Hello,2,1,1|1",
+      "Hello World,1,2,2|1",
+      "Hello World,2,2,2|1",
+      "Hello World,2,2,2|1")
     assertEquals(expected.sorted, sink.getAppendResults.sorted)
   }
 

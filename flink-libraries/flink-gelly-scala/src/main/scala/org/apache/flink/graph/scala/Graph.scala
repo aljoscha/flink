@@ -24,9 +24,18 @@ import org.apache.flink.api.java.{tuple => jtuple}
 import org.apache.flink.api.scala._
 import org.apache.flink.graph._
 import org.apache.flink.graph.asm.translate.TranslateFunction
-import org.apache.flink.graph.gsa.{ApplyFunction, GSAConfiguration, SumFunction, GatherFunction => GSAGatherFunction}
+import org.apache.flink.graph.gsa.{
+  ApplyFunction,
+  GSAConfiguration,
+  SumFunction,
+  GatherFunction => GSAGatherFunction
+}
 import org.apache.flink.graph.pregel.{ComputeFunction, MessageCombiner, VertexCentricConfiguration}
-import org.apache.flink.graph.spargel.{ScatterFunction, ScatterGatherConfiguration, GatherFunction => SpargelGatherFunction}
+import org.apache.flink.graph.spargel.{
+  ScatterFunction,
+  ScatterGatherConfiguration,
+  GatherFunction => SpargelGatherFunction
+}
 import org.apache.flink.graph.validation.GraphValidator
 import org.apache.flink.types.{LongValue, NullValue}
 import org.apache.flink.util.Preconditions
@@ -40,9 +49,13 @@ object Graph {
   /**
    * Creates a Graph from a DataSet of vertices and a DataSet of edges.
    */
-  def fromDataSet[K: TypeInformation : ClassTag, VV: TypeInformation : ClassTag, EV:
-  TypeInformation : ClassTag](vertices: DataSet[Vertex[K, VV]], edges: DataSet[Edge[K, EV]],
-                              env: ExecutionEnvironment): Graph[K, VV, EV] = {
+  def fromDataSet[
+      K: TypeInformation: ClassTag,
+      VV: TypeInformation: ClassTag,
+      EV: TypeInformation: ClassTag](
+      vertices: DataSet[Vertex[K, VV]],
+      edges: DataSet[Edge[K, EV]],
+      env: ExecutionEnvironment): Graph[K, VV, EV] = {
     wrapGraph(jg.Graph.fromDataSet[K, VV, EV](vertices.javaSet, edges.javaSet, env.getJavaEnv))
   }
 
@@ -50,8 +63,9 @@ object Graph {
    * Creates a Graph from a DataSet of edges.
    * Vertices are created automatically and their values are set to NullValue.
    */
-  def fromDataSet[K: TypeInformation : ClassTag, EV: TypeInformation : ClassTag]
-  (edges: DataSet[Edge[K, EV]], env: ExecutionEnvironment): Graph[K, NullValue, EV] = {
+  def fromDataSet[K: TypeInformation: ClassTag, EV: TypeInformation: ClassTag](
+      edges: DataSet[Edge[K, EV]],
+      env: ExecutionEnvironment): Graph[K, NullValue, EV] = {
     wrapGraph(jg.Graph.fromDataSet[K, EV](edges.javaSet, env.getJavaEnv))
   }
 
@@ -60,29 +74,38 @@ object Graph {
    * Vertices are created automatically and their values are set by applying the provided
    * vertexValueInitializer map function to the vertex ids.
    */
-  def fromDataSet[K: TypeInformation : ClassTag, VV: TypeInformation : ClassTag, EV:
-  TypeInformation : ClassTag](edges: DataSet[Edge[K, EV]],
-  vertexValueInitializer: MapFunction[K, VV], env: ExecutionEnvironment): Graph[K, VV, EV] = {
-    wrapGraph(jg.Graph.fromDataSet[K, VV, EV](edges.javaSet, vertexValueInitializer,
-      env.getJavaEnv))
+  def fromDataSet[
+      K: TypeInformation: ClassTag,
+      VV: TypeInformation: ClassTag,
+      EV: TypeInformation: ClassTag](
+      edges: DataSet[Edge[K, EV]],
+      vertexValueInitializer: MapFunction[K, VV],
+      env: ExecutionEnvironment): Graph[K, VV, EV] = {
+    wrapGraph(
+      jg.Graph.fromDataSet[K, VV, EV](edges.javaSet, vertexValueInitializer, env.getJavaEnv))
   }
 
   /**
    * Creates a Graph from a Seq of vertices and a Seq of edges.
    */
-  def fromCollection[K: TypeInformation : ClassTag, VV: TypeInformation : ClassTag, EV:
-  TypeInformation : ClassTag](vertices: Seq[Vertex[K, VV]], edges: Seq[Edge[K, EV]], env:
-  ExecutionEnvironment): Graph[K, VV, EV] = {
-    wrapGraph(jg.Graph.fromCollection[K, VV, EV](vertices.asJavaCollection, edges
-      .asJavaCollection, env.getJavaEnv))
+  def fromCollection[
+      K: TypeInformation: ClassTag,
+      VV: TypeInformation: ClassTag,
+      EV: TypeInformation: ClassTag](
+      vertices: Seq[Vertex[K, VV]],
+      edges: Seq[Edge[K, EV]],
+      env: ExecutionEnvironment): Graph[K, VV, EV] = {
+    wrapGraph(jg.Graph
+      .fromCollection[K, VV, EV](vertices.asJavaCollection, edges.asJavaCollection, env.getJavaEnv))
   }
 
   /**
    * Creates a Graph from a Seq of edges.
    * Vertices are created automatically and their values are set to NullValue.
    */
-  def fromCollection[K: TypeInformation : ClassTag, EV: TypeInformation : ClassTag]
-  (edges: Seq[Edge[K, EV]], env: ExecutionEnvironment): Graph[K, NullValue, EV] = {
+  def fromCollection[K: TypeInformation: ClassTag, EV: TypeInformation: ClassTag](
+      edges: Seq[Edge[K, EV]],
+      env: ExecutionEnvironment): Graph[K, NullValue, EV] = {
     wrapGraph(jg.Graph.fromCollection[K, EV](edges.asJavaCollection, env.getJavaEnv))
   }
 
@@ -91,11 +114,16 @@ object Graph {
    * Vertices are created automatically and their values are set by applying the provided
    * vertexValueInitializer map function to the vertex ids.
    */
-  def fromCollection[K: TypeInformation : ClassTag, VV: TypeInformation : ClassTag, EV:
-  TypeInformation : ClassTag](edges: Seq[Edge[K, EV]], vertexValueInitializer: MapFunction[K, VV],
-  env: ExecutionEnvironment): Graph[K, VV, EV] = {
-    wrapGraph(jg.Graph.fromCollection[K, VV, EV](edges.asJavaCollection, vertexValueInitializer,
-      env.getJavaEnv))
+  def fromCollection[
+      K: TypeInformation: ClassTag,
+      VV: TypeInformation: ClassTag,
+      EV: TypeInformation: ClassTag](
+      edges: Seq[Edge[K, EV]],
+      vertexValueInitializer: MapFunction[K, VV],
+      env: ExecutionEnvironment): Graph[K, VV, EV] = {
+    wrapGraph(
+      jg.Graph
+        .fromCollection[K, VV, EV](edges.asJavaCollection, vertexValueInitializer, env.getJavaEnv))
   }
 
   /**
@@ -104,15 +132,19 @@ object Graph {
    * and the second field will become the vertex value.
    * The first field of the Tuple3 object for edges will become the source ID,
    * the second field will become the target ID, and the third field will become
-   * the edge value. 
+   * the edge value.
    */
-  def fromTupleDataSet[K: TypeInformation : ClassTag, VV: TypeInformation : ClassTag, EV:
-  TypeInformation : ClassTag](vertices: DataSet[(K, VV)], edges: DataSet[(K, K, EV)],
-                              env: ExecutionEnvironment): Graph[K, VV, EV] = {
+  def fromTupleDataSet[
+      K: TypeInformation: ClassTag,
+      VV: TypeInformation: ClassTag,
+      EV: TypeInformation: ClassTag](
+      vertices: DataSet[(K, VV)],
+      edges: DataSet[(K, K, EV)],
+      env: ExecutionEnvironment): Graph[K, VV, EV] = {
     val javaTupleVertices = vertices.map((v: (K, VV)) => new jtuple.Tuple2(v._1, v._2)).javaSet
     val javaTupleEdges = edges.map((v: (K, K, EV)) => new jtuple.Tuple3(v._1, v._2, v._3)).javaSet
-    wrapGraph(jg.Graph.fromTupleDataSet[K, VV, EV](javaTupleVertices, javaTupleEdges,
-      env.getJavaEnv))
+    wrapGraph(
+      jg.Graph.fromTupleDataSet[K, VV, EV](javaTupleVertices, javaTupleEdges, env.getJavaEnv))
   }
 
   /**
@@ -122,8 +154,9 @@ object Graph {
    * the edge value.
    * Vertices are created automatically and their values are set to NullValue.
    */
-  def fromTupleDataSet[K: TypeInformation : ClassTag, EV: TypeInformation : ClassTag]
-  (edges: DataSet[(K, K, EV)], env: ExecutionEnvironment): Graph[K, NullValue, EV] = {
+  def fromTupleDataSet[K: TypeInformation: ClassTag, EV: TypeInformation: ClassTag](
+      edges: DataSet[(K, K, EV)],
+      env: ExecutionEnvironment): Graph[K, NullValue, EV] = {
     val javaTupleEdges = edges.map((v: (K, K, EV)) => new jtuple.Tuple3(v._1, v._2, v._3)).javaSet
     wrapGraph(jg.Graph.fromTupleDataSet[K, EV](javaTupleEdges, env.getJavaEnv))
   }
@@ -136,12 +169,16 @@ object Graph {
    * Vertices are created automatically and their values are set by applying the provided
    * vertexValueInitializer map function to the vertex ids.
    */
-  def fromTupleDataSet[K: TypeInformation : ClassTag, VV: TypeInformation : ClassTag, EV:
-  TypeInformation : ClassTag](edges: DataSet[(K, K, EV)],
-  vertexValueInitializer: MapFunction[K, VV], env: ExecutionEnvironment): Graph[K, VV, EV] = {
+  def fromTupleDataSet[
+      K: TypeInformation: ClassTag,
+      VV: TypeInformation: ClassTag,
+      EV: TypeInformation: ClassTag](
+      edges: DataSet[(K, K, EV)],
+      vertexValueInitializer: MapFunction[K, VV],
+      env: ExecutionEnvironment): Graph[K, VV, EV] = {
     val javaTupleEdges = edges.map((v: (K, K, EV)) => new jtuple.Tuple3(v._1, v._2, v._3)).javaSet
-    wrapGraph(jg.Graph.fromTupleDataSet[K, VV, EV](javaTupleEdges, vertexValueInitializer,
-      env.getJavaEnv))
+    wrapGraph(
+      jg.Graph.fromTupleDataSet[K, VV, EV](javaTupleEdges, vertexValueInitializer, env.getJavaEnv))
   }
 
   /**
@@ -150,8 +187,9 @@ object Graph {
    * the second field will become the target ID. The edge value will be set to NullValue.
    * Vertices are created automatically and their values are set to NullValue.
    */
-  def fromTuple2DataSet[K: TypeInformation : ClassTag](edges: DataSet[(K, K)],
-  env: ExecutionEnvironment): Graph[K, NullValue, NullValue] = {
+  def fromTuple2DataSet[K: TypeInformation: ClassTag](
+      edges: DataSet[(K, K)],
+      env: ExecutionEnvironment): Graph[K, NullValue, NullValue] = {
     val javaTupleEdges = edges.map((v: (K, K)) => new jtuple.Tuple2(v._1, v._2)).javaSet
     wrapGraph(jg.Graph.fromTuple2DataSet[K](javaTupleEdges, env.getJavaEnv))
   }
@@ -163,15 +201,17 @@ object Graph {
    * Vertices are created automatically and their values are set by applying the provided
    * vertexValueInitializer map function to the vertex IDs.
    */
-  def fromTuple2DataSet[K: TypeInformation : ClassTag, VV: TypeInformation : ClassTag]
-  (edges: DataSet[(K, K)], vertexValueInitializer: MapFunction[K, VV],
-  env: ExecutionEnvironment): Graph[K, VV, NullValue] = {
+  def fromTuple2DataSet[K: TypeInformation: ClassTag, VV: TypeInformation: ClassTag](
+      edges: DataSet[(K, K)],
+      vertexValueInitializer: MapFunction[K, VV],
+      env: ExecutionEnvironment): Graph[K, VV, NullValue] = {
     val javaTupleEdges = edges.map((v: (K, K)) => new jtuple.Tuple2(v._1, v._2)).javaSet
-    wrapGraph(jg.Graph.fromTuple2DataSet[K, VV](javaTupleEdges, vertexValueInitializer,
-      env.getJavaEnv))
+    wrapGraph(
+      jg.Graph.fromTuple2DataSet[K, VV](javaTupleEdges, vertexValueInitializer, env.getJavaEnv))
   }
 
-  /** Creates a Graph from a CSV file of edges.
+  /**
+   * Creates a Graph from a CSV file of edges.
    *
    * The edge value is read from the CSV file if [[EV]] is not of type [[NullValue]]. Otherwise the
    * edge value is set to [[NullValue]].
@@ -219,11 +259,11 @@ object Graph {
    * @return Graph with vertices and edges read from the given files.
    */
   // scalastyle:off
-  // This method exceeds the max allowed number of parameters -->  
+  // This method exceeds the max allowed number of parameters -->
   def fromCsvReader[
-      K: TypeInformation : ClassTag,
-      VV: TypeInformation : ClassTag,
-      EV: TypeInformation : ClassTag](
+      K: TypeInformation: ClassTag,
+      VV: TypeInformation: ClassTag,
+      EV: TypeInformation: ClassTag](
       env: ExecutionEnvironment,
       pathEdges: String,
       pathVertices: String = null,
@@ -241,8 +281,7 @@ object Graph {
       ignoreCommentsEdges: String = null,
       lenientEdges: Boolean = false,
       includedFieldsEdges: Array[Int] = null,
-      vertexValueInitializer: MapFunction[K, VV] = null)
-    : Graph[K, VV, EV] = {
+      vertexValueInitializer: MapFunction[K, VV] = null): Graph[K, VV, EV] = {
 
     Preconditions.checkNotNull(pathEdges)
 
@@ -250,15 +289,16 @@ object Graph {
     val vvClassTag = implicitly[ClassTag[VV]]
 
     val edges = if (evClassTag.runtimeClass.equals(classOf[NullValue])) {
-      env.readCsvFile[(K, K)](
-        pathEdges,
-        lineDelimiterEdges,
-        fieldDelimiterEdges,
-        quoteCharacterEdges,
-        ignoreFirstLineEdges,
-        ignoreCommentsEdges,
-        lenientEdges,
-        includedFieldsEdges)
+      env
+        .readCsvFile[(K, K)](
+          pathEdges,
+          lineDelimiterEdges,
+          fieldDelimiterEdges,
+          quoteCharacterEdges,
+          ignoreFirstLineEdges,
+          ignoreCommentsEdges,
+          lenientEdges,
+          includedFieldsEdges)
         .map((edge: (K, K)) => (edge._1, edge._2, NullValue.getInstance))
         .asInstanceOf[DataSet[(K, K, EV)]]
     } else {
@@ -277,16 +317,23 @@ object Graph {
       fromTupleDataSet[K, EV](edges, env).asInstanceOf[Graph[K, VV, EV]]
     } else {
       if (pathVertices != null) {
-        val vertices = env.readCsvFile[(K, VV)](pathVertices, lineDelimiterVertices,
-          fieldDelimiterVertices, quoteCharacterVertices, ignoreFirstLineVertices,
-          ignoreCommentsVertices, lenientVertices, includedFieldsVertices)
+        val vertices = env.readCsvFile[(K, VV)](
+          pathVertices,
+          lineDelimiterVertices,
+          fieldDelimiterVertices,
+          quoteCharacterVertices,
+          ignoreFirstLineVertices,
+          ignoreCommentsVertices,
+          lenientVertices,
+          includedFieldsVertices)
 
         fromTupleDataSet[K, VV, EV](vertices, edges, env)
       } else if (vertexValueInitializer != null) {
         fromTupleDataSet[K, VV, EV](edges, vertexValueInitializer, env)
       } else {
-        throw new IllegalArgumentException("Path vertices path and vertex value initialzier must" +
-          "not be null if the vertex value type is not NullValue.")
+        throw new IllegalArgumentException(
+          "Path vertices path and vertex value initialzier must" +
+            "not be null if the vertex value type is not NullValue.")
       }
     }
   }
@@ -303,11 +350,12 @@ object Graph {
  * @see org.apache.flink.graph.Edge
  * @see org.apache.flink.graph.Vertex
  */
-final class Graph[K: TypeInformation : ClassTag, VV: TypeInformation : ClassTag, EV:
-TypeInformation : ClassTag](jgraph: jg.Graph[K, VV, EV]) {
+final class Graph[
+    K: TypeInformation: ClassTag,
+    VV: TypeInformation: ClassTag,
+    EV: TypeInformation: ClassTag](jgraph: jg.Graph[K, VV, EV]) {
 
   private[flink] def getWrappedGraph = jgraph
-
 
   private[flink] def clean[F <: AnyRef](f: F, checkSerializable: Boolean = true): F = {
     if (jgraph.getContext.getConfig.isClosureCleanerEnabled) {
@@ -331,17 +379,14 @@ TypeInformation : ClassTag](jgraph: jg.Graph[K, VV, EV]) {
    * @return the vertex DataSet as Tuple2.
    */
   def getVerticesAsTuple2(): DataSet[(K, VV)] = {
-    wrap(jgraph.getVerticesAsTuple2).map(
-      (v: jtuple.Tuple2[K, VV]) => (v.f0, v.f1))
+    wrap(jgraph.getVerticesAsTuple2).map((v: jtuple.Tuple2[K, VV]) => (v.f0, v.f1))
   }
 
   /**
    * @return the edge DataSet as Tuple3.
    */
   def getEdgesAsTuple3(): DataSet[(K, K, EV)] = {
-    wrap(jgraph.getEdgesAsTuple3).map(
-      (e: jtuple.Tuple3[K, K, EV]) =>
-        (e.f0, e.f1, e.f2))
+    wrap(jgraph.getEdgesAsTuple3).map((e: jtuple.Tuple3[K, K, EV]) => (e.f0, e.f1, e.f2))
   }
 
   /**
@@ -358,12 +403,9 @@ TypeInformation : ClassTag](jgraph: jg.Graph[K, VV, EV]) {
    * @param mapper the map function to apply.
    * @return a new graph
    */
-  def mapVertices[NV: TypeInformation : ClassTag](mapper: MapFunction[Vertex[K, VV], NV]):
-  Graph[K, NV, EV] = {
-    new Graph[K, NV, EV](jgraph.mapVertices[NV](
-      mapper,
-      createTypeInformation[Vertex[K, NV]]
-    ))
+  def mapVertices[NV: TypeInformation: ClassTag](
+      mapper: MapFunction[Vertex[K, VV], NV]): Graph[K, NV, EV] = {
+    new Graph[K, NV, EV](jgraph.mapVertices[NV](mapper, createTypeInformation[Vertex[K, NV]]))
   }
 
   /**
@@ -372,7 +414,7 @@ TypeInformation : ClassTag](jgraph: jg.Graph[K, VV, EV]) {
    * @param fun the map function to apply.
    * @return a new graph
    */
-  def mapVertices[NV: TypeInformation : ClassTag](fun: Vertex[K, VV] => NV): Graph[K, NV, EV] = {
+  def mapVertices[NV: TypeInformation: ClassTag](fun: Vertex[K, VV] => NV): Graph[K, NV, EV] = {
     val mapper: MapFunction[Vertex[K, VV], NV] = new MapFunction[Vertex[K, VV], NV] {
       val cleanFun = clean(fun)
 
@@ -387,12 +429,9 @@ TypeInformation : ClassTag](jgraph: jg.Graph[K, VV, EV]) {
    * @param mapper the map function to apply.
    * @return a new graph
    */
-  def mapEdges[NV: TypeInformation : ClassTag](mapper: MapFunction[Edge[K, EV], NV]): Graph[K,
-    VV, NV] = {
-    new Graph[K, VV, NV](jgraph.mapEdges[NV](
-      mapper,
-      createTypeInformation[Edge[K, NV]]
-    ))
+  def mapEdges[NV: TypeInformation: ClassTag](
+      mapper: MapFunction[Edge[K, EV], NV]): Graph[K, VV, NV] = {
+    new Graph[K, VV, NV](jgraph.mapEdges[NV](mapper, createTypeInformation[Edge[K, NV]]))
   }
 
   /**
@@ -401,7 +440,7 @@ TypeInformation : ClassTag](jgraph: jg.Graph[K, VV, EV]) {
    * @param fun the map function to apply.
    * @return a new graph
    */
-  def mapEdges[NV: TypeInformation : ClassTag](fun: Edge[K, EV] => NV): Graph[K, VV, NV] = {
+  def mapEdges[NV: TypeInformation: ClassTag](fun: Edge[K, EV] => NV): Graph[K, VV, NV] = {
     val mapper: MapFunction[Edge[K, EV], NV] = new MapFunction[Edge[K, EV], NV] {
       val cleanFun = clean(fun)
 
@@ -416,8 +455,8 @@ TypeInformation : ClassTag](jgraph: jg.Graph[K, VV, EV]) {
    * @param translator implements conversion from K to NEW
    * @return graph with translated vertex and edge IDs
    */
-  def translateGraphIds[NEW: TypeInformation : ClassTag](translator: TranslateFunction[K, NEW]):
-  Graph[NEW, VV, EV] = {
+  def translateGraphIds[NEW: TypeInformation: ClassTag](
+      translator: TranslateFunction[K, NEW]): Graph[NEW, VV, EV] = {
     new Graph[NEW, VV, EV](jgraph.translateGraphIds(translator))
   }
 
@@ -427,8 +466,8 @@ TypeInformation : ClassTag](jgraph: jg.Graph[K, VV, EV]) {
    * @param fun implements conversion from K to NEW
    * @return graph with translated vertex and edge IDs
    */
-  def translateGraphIds[NEW: TypeInformation : ClassTag](fun: (K, NEW) => NEW):
-  Graph[NEW, VV, EV] = {
+  def translateGraphIds[NEW: TypeInformation: ClassTag](
+      fun: (K, NEW) => NEW): Graph[NEW, VV, EV] = {
     val translator: TranslateFunction[K, NEW] = new TranslateFunction[K, NEW] {
       val cleanFun = clean(fun)
 
@@ -444,8 +483,8 @@ TypeInformation : ClassTag](jgraph: jg.Graph[K, VV, EV]) {
    * @param translator implements conversion from VV to NEW
    * @return graph with translated vertex values
    */
-  def translateVertexValues[NEW: TypeInformation : ClassTag](translator:
-  TranslateFunction[VV, NEW]): Graph[K, NEW, EV] = {
+  def translateVertexValues[NEW: TypeInformation: ClassTag](
+      translator: TranslateFunction[VV, NEW]): Graph[K, NEW, EV] = {
     new Graph[K, NEW, EV](jgraph.translateVertexValues(translator))
   }
 
@@ -455,8 +494,8 @@ TypeInformation : ClassTag](jgraph: jg.Graph[K, VV, EV]) {
    * @param fun implements conversion from VV to NEW
    * @return graph with translated vertex values
    */
-  def translateVertexValues[NEW: TypeInformation : ClassTag](fun: (VV, NEW) => NEW):
-  Graph[K, NEW, EV] = {
+  def translateVertexValues[NEW: TypeInformation: ClassTag](
+      fun: (VV, NEW) => NEW): Graph[K, NEW, EV] = {
     val translator: TranslateFunction[VV, NEW] = new TranslateFunction[VV, NEW] {
       val cleanFun = clean(fun)
 
@@ -472,8 +511,8 @@ TypeInformation : ClassTag](jgraph: jg.Graph[K, VV, EV]) {
    * @param translator implements conversion from EV to NEW
    * @return graph with translated edge values
    */
-  def translateEdgeValues[NEW: TypeInformation : ClassTag](translator: TranslateFunction[EV, NEW]):
-  Graph[K, VV, NEW] = {
+  def translateEdgeValues[NEW: TypeInformation: ClassTag](
+      translator: TranslateFunction[EV, NEW]): Graph[K, VV, NEW] = {
     new Graph[K, VV, NEW](jgraph.translateEdgeValues(translator))
   }
 
@@ -483,8 +522,8 @@ TypeInformation : ClassTag](jgraph: jg.Graph[K, VV, EV]) {
    * @param fun implements conversion from EV to NEW
    * @return graph with translated edge values
    */
-  def translateEdgeValues[NEW: TypeInformation : ClassTag](fun: (EV, NEW) => NEW):
-  Graph[K, VV, NEW] = {
+  def translateEdgeValues[NEW: TypeInformation: ClassTag](
+      fun: (EV, NEW) => NEW): Graph[K, VV, NEW] = {
     val translator: TranslateFunction[EV, NEW] = new TranslateFunction[EV, NEW] {
       val cleanFun = clean(fun)
 
@@ -498,7 +537,7 @@ TypeInformation : ClassTag](jgraph: jg.Graph[K, VV, EV]) {
    * Joins the vertex DataSet of this graph with an input Tuple2 DataSet and applies
    * a user-defined transformation on the values of the matched records.
    * The vertex ID and the first field of the Tuple2 DataSet are used as the join keys.
-   * 
+   *
    * @param inputDataSet the Tuple2 DataSet to join with.
    * The first field of the Tuple2 is used as the join key and the second field is passed
    * as a parameter to the transformation function.
@@ -509,10 +548,10 @@ TypeInformation : ClassTag](jgraph: jg.Graph[K, VV, EV]) {
    * result of the vertexJoinFunction.
    * @tparam T the type of the second field of the input Tuple2 DataSet.
    */
-  def joinWithVertices[T: TypeInformation](inputDataSet: DataSet[(K, T)],
-  vertexJoinFunction: VertexJoinFunction[VV, T]): Graph[K, VV, EV] = {
-    val javaTupleSet = inputDataSet.map(
-      (i: (K, T)) => new jtuple.Tuple2(i._1, i._2)).javaSet
+  def joinWithVertices[T: TypeInformation](
+      inputDataSet: DataSet[(K, T)],
+      vertexJoinFunction: VertexJoinFunction[VV, T]): Graph[K, VV, EV] = {
+    val javaTupleSet = inputDataSet.map((i: (K, T)) => new jtuple.Tuple2(i._1, i._2)).javaSet
     wrapGraph(jgraph.joinWithVertices[T](javaTupleSet, vertexJoinFunction))
   }
 
@@ -520,7 +559,7 @@ TypeInformation : ClassTag](jgraph: jg.Graph[K, VV, EV]) {
    * Joins the vertex DataSet of this graph with an input Tuple2 DataSet and applies
    * a user-defined transformation on the values of the matched records.
    * The vertex ID and the first field of the Tuple2 DataSet are used as the join keys.
-   * 
+   *
    * @param inputDataSet the Tuple2 DataSet to join with.
    * The first field of the Tuple2 is used as the join key and the second field is passed
    * as a parameter to the transformation function.
@@ -531,8 +570,9 @@ TypeInformation : ClassTag](jgraph: jg.Graph[K, VV, EV]) {
    * result of the vertexJoinFunction.
    * @tparam T the type of the second field of the input Tuple2 DataSet.
    */
-  def joinWithVertices[T: TypeInformation](inputDataSet: DataSet[(K, T)], fun: (VV, T) => VV):
-  Graph[K, VV, EV] = {
+  def joinWithVertices[T: TypeInformation](
+      inputDataSet: DataSet[(K, T)],
+      fun: (VV, T) => VV): Graph[K, VV, EV] = {
     val newVertexJoin = new VertexJoinFunction[VV, T]() {
       val cleanFun = clean(fun)
 
@@ -540,8 +580,7 @@ TypeInformation : ClassTag](jgraph: jg.Graph[K, VV, EV]) {
         cleanFun(vertexValue, inputValue)
       }
     }
-    val javaTupleSet = inputDataSet.map(
-      (i: (K, T)) => new jtuple.Tuple2(i._1, i._2)).javaSet
+    val javaTupleSet = inputDataSet.map((i: (K, T)) => new jtuple.Tuple2(i._1, i._2)).javaSet
     wrapGraph(jgraph.joinWithVertices[T](javaTupleSet, newVertexJoin))
   }
 
@@ -549,7 +588,7 @@ TypeInformation : ClassTag](jgraph: jg.Graph[K, VV, EV]) {
    * Joins the edge DataSet with an input DataSet on the composite key of both
    * source and target IDs and applies a user-defined transformation on the values
    * of the matched records. The first two fields of the input DataSet are used as join keys.
-   * 
+   *
    * @param inputDataSet the DataSet to join with.
    * The first two fields of the Tuple3 are used as the composite join key
    * and the third field is passed as a parameter to the transformation function.
@@ -560,10 +599,11 @@ TypeInformation : ClassTag](jgraph: jg.Graph[K, VV, EV]) {
    * @return a new Graph, where the edge values have been updated according to the
    * result of the edgeJoinFunction.
    */
-  def joinWithEdges[T: TypeInformation](inputDataSet: DataSet[(K, K, T)],
-  edgeJoinFunction: EdgeJoinFunction[EV, T]): Graph[K, VV, EV] = {
-    val javaTupleSet = inputDataSet.map(
-      (i: (K, K, T)) => new jtuple.Tuple3(i._1, i._2, i._3)).javaSet
+  def joinWithEdges[T: TypeInformation](
+      inputDataSet: DataSet[(K, K, T)],
+      edgeJoinFunction: EdgeJoinFunction[EV, T]): Graph[K, VV, EV] = {
+    val javaTupleSet =
+      inputDataSet.map((i: (K, K, T)) => new jtuple.Tuple3(i._1, i._2, i._3)).javaSet
     wrapGraph(jgraph.joinWithEdges[T](javaTupleSet, edgeJoinFunction))
   }
 
@@ -571,7 +611,7 @@ TypeInformation : ClassTag](jgraph: jg.Graph[K, VV, EV]) {
    * Joins the edge DataSet with an input DataSet on the composite key of both
    * source and target IDs and applies a user-defined transformation on the values
    * of the matched records. The first two fields of the input DataSet are used as join keys.
-   * 
+   *
    * @param inputDataSet the DataSet to join with.
    * The first two fields of the Tuple3 are used as the composite join key
    * and the third field is passed as a parameter to the transformation function.
@@ -582,8 +622,9 @@ TypeInformation : ClassTag](jgraph: jg.Graph[K, VV, EV]) {
    * @return a new Graph, where the edge values have been updated according to the
    * result of the edgeJoinFunction.
    */
-  def joinWithEdges[T: TypeInformation](inputDataSet: DataSet[(K, K, T)], fun: (EV, T) => EV):
-  Graph[K, VV, EV] = {
+  def joinWithEdges[T: TypeInformation](
+      inputDataSet: DataSet[(K, K, T)],
+      fun: (EV, T) => EV): Graph[K, VV, EV] = {
     val newEdgeJoin = new EdgeJoinFunction[EV, T]() {
       val cleanFun = clean(fun)
 
@@ -591,8 +632,8 @@ TypeInformation : ClassTag](jgraph: jg.Graph[K, VV, EV]) {
         cleanFun(edgeValue, inputValue)
       }
     }
-    val javaTupleSet = inputDataSet.map(
-      (i: (K, K, T)) => new jtuple.Tuple3(i._1, i._2, i._3)).javaSet
+    val javaTupleSet =
+      inputDataSet.map((i: (K, K, T)) => new jtuple.Tuple3(i._1, i._2, i._3)).javaSet
     wrapGraph(jgraph.joinWithEdges[T](javaTupleSet, newEdgeJoin))
   }
 
@@ -601,7 +642,7 @@ TypeInformation : ClassTag](jgraph: jg.Graph[K, VV, EV]) {
    * on the values of the matched records.
    * The source ID of the edges input and the first field of the input DataSet
    * are used as join keys.
-   * 
+   *
    * @param inputDataSet the DataSet to join with.
    * The first field of the Tuple2 is used as the join key
    * and the second field is passed as a parameter to the transformation function.
@@ -612,10 +653,10 @@ TypeInformation : ClassTag](jgraph: jg.Graph[K, VV, EV]) {
    * @return a new Graph, where the edge values have been updated according to the
    * result of the edgeJoinFunction.
    */
-  def joinWithEdgesOnSource[T: TypeInformation](inputDataSet: DataSet[(K, T)],
-  edgeJoinFunction: EdgeJoinFunction[EV, T]): Graph[K, VV, EV] = {
-    val javaTupleSet = inputDataSet.map(
-      (i: (K, T)) => new jtuple.Tuple2(i._1, i._2)).javaSet
+  def joinWithEdgesOnSource[T: TypeInformation](
+      inputDataSet: DataSet[(K, T)],
+      edgeJoinFunction: EdgeJoinFunction[EV, T]): Graph[K, VV, EV] = {
+    val javaTupleSet = inputDataSet.map((i: (K, T)) => new jtuple.Tuple2(i._1, i._2)).javaSet
     wrapGraph(jgraph.joinWithEdgesOnSource[T](javaTupleSet, edgeJoinFunction))
   }
 
@@ -624,7 +665,7 @@ TypeInformation : ClassTag](jgraph: jg.Graph[K, VV, EV]) {
    * on the values of the matched records.
    * The source ID of the edges input and the first field of the input DataSet
    * are used as join keys.
-   * 
+   *
    * @param inputDataSet the DataSet to join with.
    * The first field of the Tuple2 is used as the join key
    * and the second field is passed as a parameter to the transformation function.
@@ -635,8 +676,9 @@ TypeInformation : ClassTag](jgraph: jg.Graph[K, VV, EV]) {
    * @return a new Graph, where the edge values have been updated according to the
    * result of the edgeJoinFunction.
    */
-  def joinWithEdgesOnSource[T: TypeInformation](inputDataSet: DataSet[(K, T)], fun: (EV, T) =>
-    EV): Graph[K, VV, EV] = {
+  def joinWithEdgesOnSource[T: TypeInformation](
+      inputDataSet: DataSet[(K, T)],
+      fun: (EV, T) => EV): Graph[K, VV, EV] = {
     val newEdgeJoin = new EdgeJoinFunction[EV, T]() {
       val cleanFun = clean(fun)
 
@@ -644,8 +686,7 @@ TypeInformation : ClassTag](jgraph: jg.Graph[K, VV, EV]) {
         cleanFun(edgeValue, inputValue)
       }
     }
-    val javaTupleSet = inputDataSet.map(
-      (i: (K, T)) => new jtuple.Tuple2(i._1, i._2)).javaSet
+    val javaTupleSet = inputDataSet.map((i: (K, T)) => new jtuple.Tuple2(i._1, i._2)).javaSet
     wrapGraph(jgraph.joinWithEdgesOnSource[T](javaTupleSet, newEdgeJoin))
   }
 
@@ -654,7 +695,7 @@ TypeInformation : ClassTag](jgraph: jg.Graph[K, VV, EV]) {
    * on the values of the matched records.
    * The target ID of the edges input and the first field of the input DataSet
    * are used as join keys.
-   * 
+   *
    * @param inputDataSet the DataSet to join with.
    * The first field of the Tuple2 is used as the join key
    * and the second field is passed as a parameter to the transformation function.
@@ -665,10 +706,10 @@ TypeInformation : ClassTag](jgraph: jg.Graph[K, VV, EV]) {
    * @return a new Graph, where the edge values have been updated according to the
    * result of the edgeJoinFunction.
    */
-  def joinWithEdgesOnTarget[T: TypeInformation](inputDataSet: DataSet[(K, T)],
-  edgeJoinFunction: EdgeJoinFunction[EV, T]): Graph[K, VV, EV] = {
-    val javaTupleSet = inputDataSet.map(
-      (i: (K, T)) => new jtuple.Tuple2(i._1, i._2)).javaSet
+  def joinWithEdgesOnTarget[T: TypeInformation](
+      inputDataSet: DataSet[(K, T)],
+      edgeJoinFunction: EdgeJoinFunction[EV, T]): Graph[K, VV, EV] = {
+    val javaTupleSet = inputDataSet.map((i: (K, T)) => new jtuple.Tuple2(i._1, i._2)).javaSet
     wrapGraph(jgraph.joinWithEdgesOnTarget[T](javaTupleSet, edgeJoinFunction))
   }
 
@@ -677,7 +718,7 @@ TypeInformation : ClassTag](jgraph: jg.Graph[K, VV, EV]) {
    * on the values of the matched records.
    * The target ID of the edges input and the first field of the input DataSet
    * are used as join keys.
-   * 
+   *
    * @param inputDataSet the DataSet to join with.
    * The first field of the Tuple2 is used as the join key
    * and the second field is passed as a parameter to the transformation function.
@@ -688,17 +729,17 @@ TypeInformation : ClassTag](jgraph: jg.Graph[K, VV, EV]) {
    * @return a new Graph, where the edge values have been updated according to the
    * result of the edgeJoinFunction.
    */
-  def joinWithEdgesOnTarget[T: TypeInformation](inputDataSet: DataSet[(K, T)], fun: (EV, T) =>
-    EV): Graph[K, VV, EV] = {
+  def joinWithEdgesOnTarget[T: TypeInformation](
+      inputDataSet: DataSet[(K, T)],
+      fun: (EV, T) => EV): Graph[K, VV, EV] = {
     val newEdgeJoin = new EdgeJoinFunction[EV, T]() {
       val cleanFun = clean(fun)
 
-      override def edgeJoin(edgeValue: EV, inputValue:T): EV = {
+      override def edgeJoin(edgeValue: EV, inputValue: T): EV = {
         cleanFun(edgeValue, inputValue)
       }
     }
-    val javaTupleSet = inputDataSet.map(
-      (i: (K, T)) => new jtuple.Tuple2(i._1, i._2)).javaSet
+    val javaTupleSet = inputDataSet.map((i: (K, T)) => new jtuple.Tuple2(i._1, i._2)).javaSet
     wrapGraph(jgraph.joinWithEdgesOnTarget[T](javaTupleSet, newEdgeJoin))
   }
 
@@ -710,8 +751,9 @@ TypeInformation : ClassTag](jgraph: jg.Graph[K, VV, EV]) {
    * @param edgeFilter the filter function for edges.
    * @return the resulting sub-graph.
    */
-  def subgraph(vertexFilter: FilterFunction[Vertex[K, VV]], edgeFilter: FilterFunction[Edge[K,
-    EV]]) = {
+  def subgraph(
+      vertexFilter: FilterFunction[Vertex[K, VV]],
+      edgeFilter: FilterFunction[Edge[K, EV]]) = {
     wrapGraph(jgraph.subgraph(vertexFilter, edgeFilter))
   }
 
@@ -723,8 +765,7 @@ TypeInformation : ClassTag](jgraph: jg.Graph[K, VV, EV]) {
    * @param edgeFilterFun the filter function for edges.
    * @return the resulting sub-graph.
    */
-  def subgraph(vertexFilterFun: Vertex[K, VV] => Boolean, edgeFilterFun: Edge[K, EV] =>
-    Boolean) = {
+  def subgraph(vertexFilterFun: Vertex[K, VV] => Boolean, edgeFilterFun: Edge[K, EV] => Boolean) = {
     val vertexFilter = new FilterFunction[Vertex[K, VV]] {
       val cleanVertexFun = clean(vertexFilterFun)
 
@@ -851,10 +892,9 @@ TypeInformation : ClassTag](jgraph: jg.Graph[K, VV, EV]) {
    * @tparam T           the output type
    * @return a dataset of a T
    */
-  def groupReduceOnEdges[T: TypeInformation : ClassTag](edgesFunction:
-                                                        EdgesFunctionWithVertexValue[K, VV, EV,
-                                                          T], direction: EdgeDirection):
-  DataSet[T] = {
+  def groupReduceOnEdges[T: TypeInformation: ClassTag](
+      edgesFunction: EdgesFunctionWithVertexValue[K, VV, EV, T],
+      direction: EdgeDirection): DataSet[T] = {
     wrap(jgraph.groupReduceOnEdges(edgesFunction, direction, createTypeInformation[T]))
   }
 
@@ -867,8 +907,9 @@ TypeInformation : ClassTag](jgraph: jg.Graph[K, VV, EV]) {
    * @tparam T           the output type
    * @return a dataset of a T
    */
-  def groupReduceOnEdges[T: TypeInformation : ClassTag](edgesFunction: EdgesFunction[K, EV, T],
-                                                        direction: EdgeDirection): DataSet[T] = {
+  def groupReduceOnEdges[T: TypeInformation: ClassTag](
+      edgesFunction: EdgesFunction[K, EV, T],
+      direction: EdgeDirection): DataSet[T] = {
     wrap(jgraph.groupReduceOnEdges(edgesFunction, direction, createTypeInformation[T]))
   }
 
@@ -882,10 +923,9 @@ TypeInformation : ClassTag](jgraph: jg.Graph[K, VV, EV]) {
    * @tparam T               the output type
    * @return a dataset of a T
    */
-  def groupReduceOnNeighbors[T: TypeInformation : ClassTag](neighborsFunction:
-                                                            NeighborsFunctionWithVertexValue[K,
-                                                              VV, EV, T], direction:
-                                                            EdgeDirection): DataSet[T] = {
+  def groupReduceOnNeighbors[T: TypeInformation: ClassTag](
+      neighborsFunction: NeighborsFunctionWithVertexValue[K, VV, EV, T],
+      direction: EdgeDirection): DataSet[T] = {
     wrap(jgraph.groupReduceOnNeighbors(neighborsFunction, direction, createTypeInformation[T]))
   }
 
@@ -898,10 +938,9 @@ TypeInformation : ClassTag](jgraph: jg.Graph[K, VV, EV]) {
    * @tparam T               the output type
    * @return a dataset of a T
    */
-  def groupReduceOnNeighbors[T: TypeInformation : ClassTag](neighborsFunction:
-                                                            NeighborsFunction[K, VV, EV, T],
-                                                            direction: EdgeDirection):
-  DataSet[T] = {
+  def groupReduceOnNeighbors[T: TypeInformation: ClassTag](
+      neighborsFunction: NeighborsFunction[K, VV, EV, T],
+      direction: EdgeDirection): DataSet[T] = {
     wrap(jgraph.groupReduceOnNeighbors(neighborsFunction, direction, createTypeInformation[T]))
   }
 
@@ -1077,15 +1116,16 @@ TypeInformation : ClassTag](jgraph: jg.Graph[K, VV, EV]) {
    * [[ReduceNeighborsFunction]] until only a single value for each vertex remains.
    * The [[ReduceNeighborsFunction]] combines a pair of neighbor vertex values
    * into one new value of the same type.
-   * 
+   *
    * @param reduceNeighborsFunction the reduce function to apply to the neighbors of each vertex.
    * @param direction the edge direction (in-, out-, all-)
    * @return a Dataset of Tuple2, with one tuple per vertex.
    * The first field of the Tuple2 is the vertex ID and the second field
    * is the aggregate value computed by the provided [[ReduceNeighborsFunction]].
    */
-  def reduceOnNeighbors(reduceNeighborsFunction: ReduceNeighborsFunction[VV], direction:
-  EdgeDirection): DataSet[(K, VV)] = {
+  def reduceOnNeighbors(
+      reduceNeighborsFunction: ReduceNeighborsFunction[VV],
+      direction: EdgeDirection): DataSet[(K, VV)] = {
     wrap(jgraph.reduceOnNeighbors(reduceNeighborsFunction, direction)).map(
       (i: jtuple.Tuple2[K, VV]) => (i.f0, i.f1))
   }
@@ -1096,25 +1136,25 @@ TypeInformation : ClassTag](jgraph: jg.Graph[K, VV, EV]) {
    * [[ReduceNeighborsFunction]] until only a single value for each vertex remains.
    * The [[ReduceNeighborsFunction]] combines a pair of neighbor vertex values
    * into one new value of the same type.
-   * 
+   *
    * @param reduceEdgesFunction the reduce function to apply to the edges of each vertex.
    * @param direction the edge direction (in-, out-, all-)
    * @return a Dataset of Tuple2, with one tuple per vertex.
    * The first field of the Tuple2 is the vertex ID and the second field
    * is the aggregate value computed by the provided [[ReduceNeighborsFunction]].
    */
-  def reduceOnEdges(reduceEdgesFunction: ReduceEdgesFunction[EV], direction: EdgeDirection):
-  DataSet[(K, EV)] = {
-    wrap(jgraph.reduceOnEdges(reduceEdgesFunction, direction)).map(
-      (i: jtuple.Tuple2[K, EV]) => (i.f0, i.f1))
+  def reduceOnEdges(
+      reduceEdgesFunction: ReduceEdgesFunction[EV],
+      direction: EdgeDirection): DataSet[(K, EV)] = {
+    wrap(jgraph.reduceOnEdges(reduceEdgesFunction, direction)).map((i: jtuple.Tuple2[K, EV]) =>
+      (i.f0, i.f1))
   }
 
   /**
    * @param algorithm the algorithm to run on the Graph
    * @return the result of the graph algorithm
    */
-  def run[T: TypeInformation : ClassTag](algorithm: GraphAlgorithm[K, VV, EV, T]):
-  T = {
+  def run[T: TypeInformation: ClassTag](algorithm: GraphAlgorithm[K, VV, EV, T]): T = {
     jgraph.run(algorithm)
   }
 
@@ -1126,8 +1166,8 @@ TypeInformation : ClassTag](jgraph: jg.Graph[K, VV, EV]) {
    *
    * @param analytic the analytic to run on the Graph
    */
-  def run[T: TypeInformation : ClassTag](analytic: GraphAnalytic[K, VV, EV, T]):
-  GraphAnalytic[K, VV, EV, T] = {
+  def run[T: TypeInformation: ClassTag](
+      analytic: GraphAnalytic[K, VV, EV, T]): GraphAnalytic[K, VV, EV, T] = {
     jgraph.run(analytic)
     analytic
   }
@@ -1142,11 +1182,11 @@ TypeInformation : ClassTag](jgraph: jg.Graph[K, VV, EV]) {
    * @return the updated Graph after the scatter-gather iteration has converged or
    *         after maximumNumberOfIterations.
    */
-  def runScatterGatherIteration[M](scatterFunction: ScatterFunction[K, VV, M, EV],
-                                   gatherFunction: SpargelGatherFunction[K, VV, M],
-                                   maxIterations: Int): Graph[K, VV, EV] = {
-    wrapGraph(jgraph.runScatterGatherIteration(scatterFunction, gatherFunction,
-      maxIterations))
+  def runScatterGatherIteration[M](
+      scatterFunction: ScatterFunction[K, VV, M, EV],
+      gatherFunction: SpargelGatherFunction[K, VV, M],
+      maxIterations: Int): Graph[K, VV, EV] = {
+    wrapGraph(jgraph.runScatterGatherIteration(scatterFunction, gatherFunction, maxIterations))
   }
 
   /**
@@ -1159,12 +1199,13 @@ TypeInformation : ClassTag](jgraph: jg.Graph[K, VV, EV]) {
    * @return the updated Graph after the scatter-gather iteration has converged or
    *         after maximumNumberOfIterations.
    */
-  def runScatterGatherIteration[M](scatterFunction: ScatterFunction[K, VV, M, EV],
-                                   gatherFunction: SpargelGatherFunction[K, VV, M],
-                                   maxIterations: Int, parameters: ScatterGatherConfiguration):
-  Graph[K, VV, EV] = {
-    wrapGraph(jgraph.runScatterGatherIteration(scatterFunction, gatherFunction,
-      maxIterations, parameters))
+  def runScatterGatherIteration[M](
+      scatterFunction: ScatterFunction[K, VV, M, EV],
+      gatherFunction: SpargelGatherFunction[K, VV, M],
+      maxIterations: Int,
+      parameters: ScatterGatherConfiguration): Graph[K, VV, EV] = {
+    wrapGraph(
+      jgraph.runScatterGatherIteration(scatterFunction, gatherFunction, maxIterations, parameters))
   }
 
   /**
@@ -1180,11 +1221,13 @@ TypeInformation : ClassTag](jgraph: jg.Graph[K, VV, EV]) {
    * @return the updated Graph after the gather-sum-apply iteration has converged or
    *         after maximumNumberOfIterations.
    */
-  def runGatherSumApplyIteration[M](gatherFunction: GSAGatherFunction[VV, EV, M], sumFunction:
-  SumFunction[VV, EV, M], applyFunction: ApplyFunction[K, VV, M], maxIterations: Int): Graph[K,
-    VV, EV] = {
-    wrapGraph(jgraph.runGatherSumApplyIteration(gatherFunction, sumFunction, applyFunction,
-      maxIterations))
+  def runGatherSumApplyIteration[M](
+      gatherFunction: GSAGatherFunction[VV, EV, M],
+      sumFunction: SumFunction[VV, EV, M],
+      applyFunction: ApplyFunction[K, VV, M],
+      maxIterations: Int): Graph[K, VV, EV] = {
+    wrapGraph(
+      jgraph.runGatherSumApplyIteration(gatherFunction, sumFunction, applyFunction, maxIterations))
   }
 
   /**
@@ -1200,11 +1243,19 @@ TypeInformation : ClassTag](jgraph: jg.Graph[K, VV, EV]) {
    * @return the updated Graph after the gather-sum-apply iteration has converged or
    *         after maximumNumberOfIterations.
    */
-  def runGatherSumApplyIteration[M](gatherFunction: GSAGatherFunction[VV, EV, M], sumFunction:
-  SumFunction[VV, EV, M], applyFunction: ApplyFunction[K, VV, M], maxIterations: Int,
-                                    parameters: GSAConfiguration): Graph[K, VV, EV] = {
-    wrapGraph(jgraph.runGatherSumApplyIteration(gatherFunction, sumFunction, applyFunction,
-      maxIterations, parameters))
+  def runGatherSumApplyIteration[M](
+      gatherFunction: GSAGatherFunction[VV, EV, M],
+      sumFunction: SumFunction[VV, EV, M],
+      applyFunction: ApplyFunction[K, VV, M],
+      maxIterations: Int,
+      parameters: GSAConfiguration): Graph[K, VV, EV] = {
+    wrapGraph(
+      jgraph.runGatherSumApplyIteration(
+        gatherFunction,
+        sumFunction,
+        applyFunction,
+        maxIterations,
+        parameters))
   }
 
   /**
@@ -1217,11 +1268,11 @@ TypeInformation : ClassTag](jgraph: jg.Graph[K, VV, EV]) {
    * @return the updated Graph after the vertex-centric iteration has converged or
    *         after maximumNumberOfIterations.
    */
-  def runVertexCentricIteration[M](computeFunction: ComputeFunction[K, VV, EV, M],
-                                   combineFunction: MessageCombiner[K, M],
-                                   maxIterations: Int): Graph[K, VV, EV] = {
-    wrapGraph(jgraph.runVertexCentricIteration(computeFunction, combineFunction,
-      maxIterations))
+  def runVertexCentricIteration[M](
+      computeFunction: ComputeFunction[K, VV, EV, M],
+      combineFunction: MessageCombiner[K, M],
+      maxIterations: Int): Graph[K, VV, EV] = {
+    wrapGraph(jgraph.runVertexCentricIteration(computeFunction, combineFunction, maxIterations))
   }
 
   /**
@@ -1234,12 +1285,13 @@ TypeInformation : ClassTag](jgraph: jg.Graph[K, VV, EV]) {
    * @return the updated Graph after the vertex-centric iteration has converged or
    *         after maximumNumberOfIterations.
    */
-  def runVertexCentricIteration[M](computeFunction: ComputeFunction[K, VV, EV, M],
-                                   combineFunction: MessageCombiner[K, M],
-                                   maxIterations: Int, parameters: VertexCentricConfiguration):
-  Graph[K, VV, EV] = {
-    wrapGraph(jgraph.runVertexCentricIteration(computeFunction, combineFunction,
-      maxIterations, parameters))
+  def runVertexCentricIteration[M](
+      computeFunction: ComputeFunction[K, VV, EV, M],
+      combineFunction: MessageCombiner[K, M],
+      maxIterations: Int,
+      parameters: VertexCentricConfiguration): Graph[K, VV, EV] = {
+    wrapGraph(
+      jgraph.runVertexCentricIteration(computeFunction, combineFunction, maxIterations, parameters))
   }
 
   def validate(validator: GraphValidator[K, VV, EV]): Boolean = {

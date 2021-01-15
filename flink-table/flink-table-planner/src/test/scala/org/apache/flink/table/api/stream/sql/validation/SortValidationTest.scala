@@ -27,8 +27,8 @@ import org.junit.Test
 class SortValidationTest extends TableTestBase {
 
   private val streamUtil: StreamTableTestUtil = streamTestUtil()
-  streamUtil.addTable[(Int, String, Long)]("MyTable", 'a, 'b, 'c,
-      'proctime.proctime, 'rowtime.rowtime)
+  streamUtil
+    .addTable[(Int, String, Long)]("MyTable", 'a, 'b, 'c, 'proctime.proctime, 'rowtime.rowtime)
 
   // test should fail because time order is descending
   @Test(expected = classOf[TableException])

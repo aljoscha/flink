@@ -18,7 +18,13 @@
 
 package org.apache.flink.table.planner.runtime.batch.sql.join
 
-import org.apache.flink.table.planner.runtime.batch.sql.join.JoinType.{BroadcastHashJoin, HashJoin, JoinType, NestedLoopJoin, SortMergeJoin}
+import org.apache.flink.table.planner.runtime.batch.sql.join.JoinType.{
+  BroadcastHashJoin,
+  HashJoin,
+  JoinType,
+  NestedLoopJoin,
+  SortMergeJoin
+}
 import org.apache.flink.table.planner.runtime.batch.sql.join.SemiJoinITCase.leftT
 import org.apache.flink.table.planner.runtime.utils.BatchTestBase
 import org.apache.flink.table.planner.runtime.utils.BatchTestBase.row
@@ -69,7 +75,7 @@ class SemiJoinITCase(expectedJoinType: JoinType) extends BatchTestBase {
   def testSingleUniqueConditionLeftAnti(): Unit = {
     checkResult(
       "SELECT * FROM leftT WHERE NOT EXISTS " +
-          "(SELECT * FROM (SELECT DISTINCT c FROM rightT) WHERE a = c)",
+        "(SELECT * FROM (SELECT DISTINCT c FROM rightT) WHERE a = c)",
       Seq(row(1, 2.0), row(1, 2.0), row(null, null), row(null, 5.0)))
   }
 
@@ -89,11 +95,11 @@ class SemiJoinITCase(expectedJoinType: JoinType) extends BatchTestBase {
 
   @Test
   def testSemiJoinTranspose(): Unit = {
-    checkResult("SELECT a, b FROM " +
+    checkResult(
+      "SELECT a, b FROM " +
         "(SELECT a, b, c FROM leftT, rightT WHERE a = c) lr " +
         "WHERE lr.a > 0 AND lr.c IN (SELECT c FROM rightUniqueKeyT WHERE d > 1)",
-      Seq(row(2, 1.0), row(2, 1.0), row(2, 1.0), row(2, 1.0), row(3, 3.0))
-    )
+      Seq(row(2, 1.0), row(2, 1.0), row(2, 1.0), row(2, 1.0), row(3, 3.0)))
   }
 
   @Test
@@ -116,8 +122,8 @@ class SemiJoinITCase(expectedJoinType: JoinType) extends BatchTestBase {
   def testFilterPushDownLeftSemi3(): Unit = {
     checkResult(
       "SELECT * FROM " +
-          "(SELECT * FROM leftT WHERE EXISTS (SELECT * FROM rightT WHERE a = c)) T " +
-          "WHERE T.b > 2",
+        "(SELECT * FROM leftT WHERE EXISTS (SELECT * FROM rightT WHERE a = c)) T " +
+        "WHERE T.b > 2",
       Seq(row(3, 3.0)))
   }
 
@@ -149,8 +155,8 @@ class SemiJoinITCase(expectedJoinType: JoinType) extends BatchTestBase {
     if (expectedJoinType eq JoinType.NestedLoopJoin) {
       checkResult(
         "SELECT * FROM " +
-            "(SELECT * FROM leftT WHERE a NOT IN (SELECT c FROM rightT WHERE c < 3)) T " +
-            "WHERE T.b > 2",
+          "(SELECT * FROM leftT WHERE a NOT IN (SELECT c FROM rightT WHERE c < 3)) T " +
+          "WHERE T.b > 2",
         Seq(row(3, 3.0)))
     }
   }
@@ -160,8 +166,8 @@ class SemiJoinITCase(expectedJoinType: JoinType) extends BatchTestBase {
     if (expectedJoinType eq JoinType.NestedLoopJoin) {
       checkResult(
         "SELECT * FROM " +
-            "(SELECT * FROM leftT WHERE NOT EXISTS (SELECT * FROM rightT where c > 10)) T " +
-            "WHERE T.b > 2",
+          "(SELECT * FROM leftT WHERE NOT EXISTS (SELECT * FROM rightT where c > 10)) T " +
+          "WHERE T.b > 2",
         Seq(row(3, 3.0), row(null, 5.0)))
     }
   }
@@ -170,8 +176,8 @@ class SemiJoinITCase(expectedJoinType: JoinType) extends BatchTestBase {
   def testFilterPushDownLeftAnti3(): Unit = {
     checkResult(
       "SELECT * FROM " +
-          "(SELECT * FROM leftT WHERE a NOT IN (SELECT c FROM rightT WHERE b = d AND c < 3)) T " +
-          "WHERE T.b > 2",
+        "(SELECT * FROM leftT WHERE a NOT IN (SELECT c FROM rightT WHERE b = d AND c < 3)) T " +
+        "WHERE T.b > 2",
       Seq(row(3, 3.0), row(null, 5.0)))
   }
 
@@ -179,8 +185,8 @@ class SemiJoinITCase(expectedJoinType: JoinType) extends BatchTestBase {
   def testFilterPushDownLeftAnti4(): Unit = {
     checkResult(
       "SELECT * FROM " +
-          "(SELECT * FROM leftT WHERE NOT EXISTS (SELECT * FROM rightT WHERE a = c)) T " +
-          "WHERE T.b > 2",
+        "(SELECT * FROM leftT WHERE NOT EXISTS (SELECT * FROM rightT WHERE a = c)) T " +
+        "WHERE T.b > 2",
       Seq(row(null, 5.0)))
   }
 
@@ -206,88 +212,92 @@ class SemiJoinITCase(expectedJoinType: JoinType) extends BatchTestBase {
   def testJoinConditionPushDownLeftAnti3(): Unit = {
     checkResult(
       "SELECT * FROM leftT WHERE a NOT IN (SELECT c FROM rightT WHERE b = d AND b > 1)",
-      Seq(row(1, 2.0), row(1, 2.0), row(2, 1.0), row(2, 1.0),
-        row(3, 3.0), row(null, null), row(6, null)))
+      Seq(
+        row(1, 2.0),
+        row(1, 2.0),
+        row(2, 1.0),
+        row(2, 1.0),
+        row(3, 3.0),
+        row(null, null),
+        row(6, null)))
   }
 
   @Test
   def testJoinConditionPushDownLeftAnti4(): Unit = {
     checkResult(
       "SELECT * FROM leftT WHERE NOT EXISTS (SELECT * FROM rightT WHERE a = c AND b > 2)",
-      Seq(row(1, 2.0), row(1, 2.0), row(2, 1.0), row(2, 1.0),
-        row(null, null), row(null, 5.0), row(6, null)))
+      Seq(
+        row(1, 2.0),
+        row(1, 2.0),
+        row(2, 1.0),
+        row(2, 1.0),
+        row(null, null),
+        row(null, 5.0),
+        row(6, null)))
   }
 
   @Test
   def testInWithAggregate1(): Unit = {
     checkResult(
       "SELECT * FROM rightT WHERE c IN (SELECT SUM(a) FROM leftT WHERE b = d)",
-      Seq(row(4, 1.0))
-    )
+      Seq(row(4, 1.0)))
   }
 
   @Test
   def testInWithAggregate2(): Unit = {
     checkResult(
       "SELECT * FROM leftT t1 WHERE a IN (SELECT DISTINCT a FROM leftT t2 WHERE t1.b = t2.b)",
-      Seq(row(1, 2.0), row(1, 2.0), row(2, 1.0), row(2, 1.0), row(3, 3.0))
-    )
+      Seq(row(1, 2.0), row(1, 2.0), row(2, 1.0), row(2, 1.0), row(3, 3.0)))
   }
 
   @Test
   def testInWithAggregate3(): Unit = {
     checkResult(
       "SELECT * FROM rightT WHERE CAST(c/2 AS BIGINT) IN (SELECT COUNT(*) FROM leftT WHERE b = d)",
-      Seq(row(2, 3.0), row(2, 3.0), row(4, 1.0))
-    )
+      Seq(row(2, 3.0), row(2, 3.0), row(4, 1.0)))
   }
 
   @Test
   def testInWithOver1(): Unit = {
     checkResult(
       "SELECT * FROM rightT WHERE c IN (SELECT SUM(a) OVER " +
-          "(PARTITION BY b ORDER BY a ROWS BETWEEN UNBOUNDED preceding AND CURRENT ROW) " +
-          "FROM leftT)",
-      Seq(row(2, 3.0), row(2, 3.0), row(3, 2.0), row(4, 1.0), row(6, null))
-    )
+        "(PARTITION BY b ORDER BY a ROWS BETWEEN UNBOUNDED preceding AND CURRENT ROW) " +
+        "FROM leftT)",
+      Seq(row(2, 3.0), row(2, 3.0), row(3, 2.0), row(4, 1.0), row(6, null)))
   }
 
   @Test
   def testInWithOver2(): Unit = {
     checkResult(
       "SELECT * FROM rightT WHERE c IN (SELECT SUM(a) OVER" +
-          "(PARTITION BY b ORDER BY a ROWS BETWEEN UNBOUNDED preceding AND CURRENT ROW) " +
-          "FROM leftT GROUP BY a, b)",
-      Seq(row(2, 3.0), row(2, 3.0), row(3, 2.0), row(6, null))
-    )
+        "(PARTITION BY b ORDER BY a ROWS BETWEEN UNBOUNDED preceding AND CURRENT ROW) " +
+        "FROM leftT GROUP BY a, b)",
+      Seq(row(2, 3.0), row(2, 3.0), row(3, 2.0), row(6, null)))
   }
 
   @Test
   def testInWithOver3(): Unit = {
     checkResult(
       "SELECT * FROM rightT WHERE c IN (SELECT SUM(a) OVER " +
-          "(PARTITION BY b ORDER BY a ROWS BETWEEN UNBOUNDED preceding AND CURRENT ROW) " +
-          "FROM leftT WHERE b = d)",
-      Seq(row(4, 1.0))
-    )
+        "(PARTITION BY b ORDER BY a ROWS BETWEEN UNBOUNDED preceding AND CURRENT ROW) " +
+        "FROM leftT WHERE b = d)",
+      Seq(row(4, 1.0)))
   }
 
   @Test
   def testInWithOver4(): Unit = {
     checkResult(
       "SELECT * FROM rightT WHERE c IN (SELECT SUM(a) OVER" +
-          "(PARTITION BY b ORDER BY a ROWS BETWEEN UNBOUNDED preceding AND CURRENT ROW) " +
-          "FROM leftT WHERE b = d GROUP BY a, b)",
-      Seq()
-    )
+        "(PARTITION BY b ORDER BY a ROWS BETWEEN UNBOUNDED preceding AND CURRENT ROW) " +
+        "FROM leftT WHERE b = d GROUP BY a, b)",
+      Seq())
   }
 
   @Test
   def testExistsWithOver1(): Unit = {
     checkResult(
       "SELECT * FROM rightT WHERE EXISTS (SELECT SUM(a) OVER() FROM leftT WHERE b = d)",
-      Seq(row(2, 3.0), row(2, 3.0), row(3, 2.0), row(4, 1.0), row(null, 5.0))
-    )
+      Seq(row(2, 3.0), row(2, 3.0), row(3, 2.0), row(4, 1.0), row(null, 5.0)))
   }
 
   @Test
@@ -295,8 +305,7 @@ class SemiJoinITCase(expectedJoinType: JoinType) extends BatchTestBase {
     if (expectedJoinType eq NestedLoopJoin) {
       checkResult(
         "SELECT * FROM rightT WHERE EXISTS (SELECT SUM(a) OVER() FROM leftT WHERE b > d)",
-        Seq(row(2, 3.0), row(2, 3.0), row(3, 2.0), row(4, 1.0))
-      )
+        Seq(row(2, 3.0), row(2, 3.0), row(3, 2.0), row(4, 1.0)))
     }
   }
 
@@ -304,8 +313,7 @@ class SemiJoinITCase(expectedJoinType: JoinType) extends BatchTestBase {
   def testExistsWithOver3(): Unit = {
     checkResult(
       "SELECT * FROM rightT WHERE EXISTS (SELECT SUM(a) OVER() FROM leftT WHERE b = d GROUP BY a)",
-      Seq(row(2, 3.0), row(2, 3.0), row(3, 2.0), row(4, 1.0), row(null, 5.0))
-    )
+      Seq(row(2, 3.0), row(2, 3.0), row(3, 2.0), row(4, 1.0), row(null, 5.0)))
   }
 
   @Test
@@ -313,8 +321,7 @@ class SemiJoinITCase(expectedJoinType: JoinType) extends BatchTestBase {
     if (expectedJoinType eq NestedLoopJoin) {
       checkResult(
         "SELECT * FROM rightT WHERE EXISTS (SELECT SUM(a) OVER() FROM leftT WHERE b>d GROUP BY a)",
-        Seq(row(2, 3.0), row(2, 3.0), row(3, 2.0), row(4, 1.0))
-      )
+        Seq(row(2, 3.0), row(2, 3.0), row(3, 2.0), row(4, 1.0)))
     }
   }
 
@@ -322,17 +329,15 @@ class SemiJoinITCase(expectedJoinType: JoinType) extends BatchTestBase {
   def testInWithNonEqualityCorrelationCondition1(): Unit = {
     checkResult(
       "SELECT * FROM rightT WHERE c IN (SELECT a FROM leftT WHERE b > d)",
-      Seq(row(3, 2.0))
-    )
+      Seq(row(3, 2.0)))
   }
 
   @Test
   def testInWithNonEqualityCorrelationCondition2(): Unit = {
     checkResult(
       "SELECT * FROM leftT WHERE a IN " +
-          "(SELECT c FROM (SELECT MAX(c) AS c, d FROM rightT GROUP BY d) r WHERE leftT.b > r.d)",
-      Seq(row(3, 3.0))
-    )
+        "(SELECT c FROM (SELECT MAX(c) AS c, d FROM rightT GROUP BY d) r WHERE leftT.b > r.d)",
+      Seq(row(3, 3.0)))
   }
 
   @Test
@@ -340,9 +345,8 @@ class SemiJoinITCase(expectedJoinType: JoinType) extends BatchTestBase {
     if (expectedJoinType eq NestedLoopJoin) {
       checkResult(
         "SELECT * FROM leftT WHERE a IN " +
-            "(SELECT c FROM (SELECT MIN(c) OVER() AS c, d FROM rightT) r WHERE leftT.b <> r.d)",
-        Seq(row(2, 1.0), row(2, 1.0))
-      )
+          "(SELECT c FROM (SELECT MIN(c) OVER() AS c, d FROM rightT) r WHERE leftT.b <> r.d)",
+        Seq(row(2, 1.0), row(2, 1.0)))
     }
   }
 
@@ -351,9 +355,8 @@ class SemiJoinITCase(expectedJoinType: JoinType) extends BatchTestBase {
     if (expectedJoinType eq NestedLoopJoin) {
       checkResult(
         "SELECT * FROM leftT WHERE a IN (SELECT c FROM " +
-            "(SELECT MIN(c) OVER() AS c, d FROM rightT GROUP BY c, d) r WHERE leftT.b <> r.d)",
-        Seq(row(2, 1.0), row(2, 1.0))
-      )
+          "(SELECT MIN(c) OVER() AS c, d FROM rightT GROUP BY c, d) r WHERE leftT.b <> r.d)",
+        Seq(row(2, 1.0), row(2, 1.0)))
     }
   }
 
@@ -362,8 +365,7 @@ class SemiJoinITCase(expectedJoinType: JoinType) extends BatchTestBase {
     if (expectedJoinType eq JoinType.NestedLoopJoin) {
       checkResult(
         "SELECT * FROM leftT WHERE EXISTS (SELECT c FROM rightT WHERE b > d)",
-        Seq(row(1, 2.0), row(1, 2.0), row(3, 3.0), row(null, 5.0))
-      )
+        Seq(row(1, 2.0), row(1, 2.0), row(3, 3.0), row(null, 5.0)))
     }
   }
 
@@ -377,8 +379,8 @@ class SemiJoinITCase(expectedJoinType: JoinType) extends BatchTestBase {
       "SELECT * FROM leftT WHERE 0 < (SELECT COUNT(*) FROM rightT)",
       "SELECT * FROM leftT WHERE 0.99 < (SELECT COUNT(*) FROM rightT)",
       "SELECT * FROM leftT WHERE 1 <= (SELECT COUNT(*) FROM rightT)",
-      "SELECT * FROM leftT WHERE 0.01 <= (SELECT COUNT(*) FROM rightT)"
-    ).foreach(checkResult(_, leftT))
+      "SELECT * FROM leftT WHERE 0.01 <= (SELECT COUNT(*) FROM rightT)").foreach(
+      checkResult(_, leftT))
   }
 
   @Test
@@ -391,8 +393,8 @@ class SemiJoinITCase(expectedJoinType: JoinType) extends BatchTestBase {
       "SELECT * FROM leftT WHERE 0 < (SELECT COUNT(*) FROM rightT WHERE c > 5)",
       "SELECT * FROM leftT WHERE 0.99 < (SELECT COUNT(*) FROM rightT WHERE c > 5)",
       "SELECT * FROM leftT WHERE 1 <= (SELECT COUNT(*) FROM rightT WHERE c > 5)",
-      "SELECT * FROM leftT WHERE 0.01 <= (SELECT COUNT(*) FROM rightT WHERE c > 5)"
-    ).foreach(checkResult(_, leftT))
+      "SELECT * FROM leftT WHERE 0.01 <= (SELECT COUNT(*) FROM rightT WHERE c > 5)").foreach(
+      checkResult(_, leftT))
   }
 
   @Test
@@ -405,8 +407,8 @@ class SemiJoinITCase(expectedJoinType: JoinType) extends BatchTestBase {
       "SELECT * FROM leftT WHERE 0 < (SELECT COUNT(*) FROM rightT WHERE c > 15)",
       "SELECT * FROM leftT WHERE 0.99 < (SELECT COUNT(*) FROM rightT WHERE c > 15)",
       "SELECT * FROM leftT WHERE 1 <= (SELECT COUNT(*) FROM rightT WHERE c > 15)",
-      "SELECT * FROM leftT WHERE 0.01 <= (SELECT COUNT(*) FROM rightT WHERE c > 15)"
-    ).foreach(checkResult(_, Seq.empty))
+      "SELECT * FROM leftT WHERE 0.01 <= (SELECT COUNT(*) FROM rightT WHERE c > 15)").foreach(
+      checkResult(_, Seq.empty))
   }
 
   @Test
@@ -419,8 +421,8 @@ class SemiJoinITCase(expectedJoinType: JoinType) extends BatchTestBase {
       "SELECT * FROM leftT WHERE 0 < (SELECT COUNT(*) FROM rightT WHERE a = c)",
       "SELECT * FROM leftT WHERE 0.99 < (SELECT COUNT(*) FROM rightT WHERE a = c)",
       "SELECT * FROM leftT WHERE 1 <= (SELECT COUNT(*) FROM rightT WHERE a = c)",
-      "SELECT * FROM leftT WHERE 0.01 <= (SELECT COUNT(*) FROM rightT WHERE a = c)"
-    ).foreach(checkResult(_, Seq(row(2, 1.0), row(2, 1.0), row(3, 3.0), row(6, null))))
+      "SELECT * FROM leftT WHERE 0.01 <= (SELECT COUNT(*) FROM rightT WHERE a = c)").foreach(
+      checkResult(_, Seq(row(2, 1.0), row(2, 1.0), row(3, 3.0), row(6, null))))
   }
 
   @Test
@@ -433,8 +435,8 @@ class SemiJoinITCase(expectedJoinType: JoinType) extends BatchTestBase {
       "SELECT * FROM leftT WHERE 0 < (SELECT COUNT(*) FROM rightT WHERE a = c AND c > 5)",
       "SELECT * FROM leftT WHERE 0.99 < (SELECT COUNT(*) FROM rightT WHERE a = c AND c > 5)",
       "SELECT * FROM leftT WHERE 1 <= (SELECT COUNT(*) FROM rightT WHERE a = c AND c > 5)",
-      "SELECT * FROM leftT WHERE 0.01 <= (SELECT COUNT(*) FROM rightT WHERE a = c AND c > 5)"
-    ).foreach(checkResult(_, Seq(row(6, null))))
+      "SELECT * FROM leftT WHERE 0.01 <= (SELECT COUNT(*) FROM rightT WHERE a = c AND c > 5)")
+      .foreach(checkResult(_, Seq(row(6, null))))
   }
 
   @Test
@@ -447,8 +449,8 @@ class SemiJoinITCase(expectedJoinType: JoinType) extends BatchTestBase {
       "SELECT * FROM leftT WHERE 0 < (SELECT COUNT(*) FROM rightT WHERE a = c AND c > 15)",
       "SELECT * FROM leftT WHERE 0.99 < (SELECT COUNT(*) FROM rightT WHERE a = c AND c > 15)",
       "SELECT * FROM leftT WHERE 1 <= (SELECT COUNT(*) FROM rightT WHERE a = c AND c > 15)",
-      "SELECT * FROM leftT WHERE 0.01 <= (SELECT COUNT(*) FROM rightT WHERE a = c AND c > 15)"
-    ).foreach(checkResult(_, Seq.empty))
+      "SELECT * FROM leftT WHERE 0.01 <= (SELECT COUNT(*) FROM rightT WHERE a = c AND c > 15)")
+      .foreach(checkResult(_, Seq.empty))
   }
 }
 
@@ -466,8 +468,7 @@ object SemiJoinITCase {
     row(3, 3.0),
     row(null, null),
     row(null, 5.0),
-    row(6, null)
-  )
+    row(6, null))
 
   lazy val rightT = Seq(
     row(2, 3.0),
@@ -476,14 +477,8 @@ object SemiJoinITCase {
     row(4, 1.0),
     row(null, null),
     row(null, 5.0),
-    row(6, null)
-  )
+    row(6, null))
 
-  lazy val rightUniqueKeyT = Seq(
-    row(2, 3.0),
-    row(3, 2.0),
-    row(4, 1.0),
-    row(null, 5.0),
-    row(6, null)
-  )
+  lazy val rightUniqueKeyT =
+    Seq(row(2, 3.0), row(3, 2.0), row(4, 1.0), row(null, 5.0), row(6, null))
 }

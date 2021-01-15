@@ -33,17 +33,17 @@ abstract class FlinkLogicalJoinBase(
     right: RelNode,
     condition: RexNode,
     joinType: JoinRelType)
-  extends Join(
-    cluster,
-    traitSet,
-    left,
-    right,
-    condition,
-    Set.empty[CorrelationId].asJava,
-    joinType)
-  with FlinkLogicalRel {
+    extends Join(
+      cluster,
+      traitSet,
+      left,
+      right,
+      condition,
+      Set.empty[CorrelationId].asJava,
+      joinType)
+    with FlinkLogicalRel {
 
-  override def computeSelfCost (planner: RelOptPlanner, metadata: RelMetadataQuery): RelOptCost = {
+  override def computeSelfCost(planner: RelOptPlanner, metadata: RelMetadataQuery): RelOptCost = {
     val leftRowCnt = metadata.getRowCount(getLeft)
     val leftRowSize = estimateRowSize(getLeft.getRowType)
 

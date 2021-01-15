@@ -21,11 +21,17 @@ import org.apache.flink.api.scala._
 import org.apache.flink.table.api._
 import org.apache.flink.table.api.bridge.scala._
 import org.apache.flink.table.planner.plan.nodes.physical.stream.StreamPhysicalGroupWindowAggregate
-import org.apache.flink.table.planner.runtime.utils.JavaUserDefinedAggFunctions.{CountDistinct, WeightedAvg}
+import org.apache.flink.table.planner.runtime.utils.JavaUserDefinedAggFunctions.{
+  CountDistinct,
+  WeightedAvg
+}
 import org.apache.flink.table.planner.runtime.utils.StreamingWithMiniBatchTestBase.MiniBatchMode
 import org.apache.flink.table.planner.runtime.utils.StreamingWithStateTestBase.StateBackendMode
 import org.apache.flink.table.planner.runtime.utils.TimeTestUtil.TimestampAndWatermarkWithOffset
-import org.apache.flink.table.planner.runtime.utils.{StreamingWithMiniBatchTestBase, TestingAppendSink}
+import org.apache.flink.table.planner.runtime.utils.{
+  StreamingWithMiniBatchTestBase,
+  TestingAppendSink
+}
 import org.apache.flink.table.planner.utils.CountAggFunction
 import org.apache.flink.types.Row
 
@@ -47,7 +53,7 @@ import java.math.BigDecimal
  */
 @RunWith(classOf[Parameterized])
 class MiniBatchGroupWindowITCase(miniBatch: MiniBatchMode, mode: StateBackendMode)
-  extends StreamingWithMiniBatchTestBase(miniBatch, mode) {
+    extends StreamingWithMiniBatchTestBase(miniBatch, mode) {
 
   val data = List(
     (1L, 1, "Hi"),
@@ -78,9 +84,18 @@ class MiniBatchGroupWindowITCase(miniBatch: MiniBatchMode, mode: StateBackendMod
     val windowedTable = table
       .window(Tumble over 5.milli on 'rowtime as 'w)
       .groupBy('w, 'string)
-      .select('string, countFun('string), 'int.avg, weightAvgFun('long, 'int),
-              weightAvgFun('int, 'int), 'int.min, 'int.max, 'int.sum, 'w.start, 'w.end,
-              countDistinct('long))
+      .select(
+        'string,
+        countFun('string),
+        'int.avg,
+        weightAvgFun('long, 'int),
+        weightAvgFun('int, 'int),
+        'int.min,
+        'int.max,
+        'int.sum,
+        'w.start,
+        'w.end,
+        countDistinct('long))
 
     val sink = new TestingAppendSink
     windowedTable.toAppendStream[Row].addSink(sink)
@@ -93,7 +108,6 @@ class MiniBatchGroupWindowITCase(miniBatch: MiniBatchMode, mode: StateBackendMod
       "Hi,1,1,1,1,1,1,1,1970-01-01T00:00,1970-01-01T00:00:00.005,1")
     assertEquals(expected.sorted, sink.getAppendResults.sorted)
   }
-
 
   @Test
   def testEventTimeSlidingGroupWindowOverTimeNonOverlappingFullPane(): Unit = {

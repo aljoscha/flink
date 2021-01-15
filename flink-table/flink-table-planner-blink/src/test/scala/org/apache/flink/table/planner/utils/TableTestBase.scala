@@ -21,18 +21,34 @@ import org.apache.flink.api.common.typeinfo.{AtomicType, TypeInformation}
 import org.apache.flink.api.java.typeutils.{PojoTypeInfo, RowTypeInfo, TupleTypeInfo}
 import org.apache.flink.api.scala.typeutils.CaseClassTypeInfo
 import org.apache.flink.streaming.api.datastream.DataStream
-import org.apache.flink.streaming.api.environment.{LocalStreamEnvironment, StreamExecutionEnvironment}
+import org.apache.flink.streaming.api.environment.{
+  LocalStreamEnvironment,
+  StreamExecutionEnvironment
+}
 import org.apache.flink.streaming.api.graph.GlobalDataExchangeMode
 import org.apache.flink.streaming.api.scala.{StreamExecutionEnvironment => ScalaStreamExecEnv}
 import org.apache.flink.streaming.api.{TimeCharacteristic, environment}
 import org.apache.flink.table.api._
-import org.apache.flink.table.api.bridge.java.internal.{StreamTableEnvironmentImpl => JavaStreamTableEnvImpl}
+import org.apache.flink.table.api.bridge.java.internal.{
+  StreamTableEnvironmentImpl => JavaStreamTableEnvImpl
+}
 import org.apache.flink.table.api.bridge.java.{StreamTableEnvironment => JavaStreamTableEnv}
-import org.apache.flink.table.api.bridge.scala.internal.{StreamTableEnvironmentImpl => ScalaStreamTableEnvImpl}
+import org.apache.flink.table.api.bridge.scala.internal.{
+  StreamTableEnvironmentImpl => ScalaStreamTableEnvImpl
+}
 import org.apache.flink.table.api.bridge.scala.{StreamTableEnvironment => ScalaStreamTableEnv}
 import org.apache.flink.table.api.config.ExecutionConfigOptions
-import org.apache.flink.table.api.internal.{TableEnvironmentImpl, TableEnvironmentInternal, TableImpl}
-import org.apache.flink.table.catalog.{CatalogManager, FunctionCatalog, GenericInMemoryCatalog, ObjectIdentifier}
+import org.apache.flink.table.api.internal.{
+  TableEnvironmentImpl,
+  TableEnvironmentInternal,
+  TableImpl
+}
+import org.apache.flink.table.catalog.{
+  CatalogManager,
+  FunctionCatalog,
+  GenericInMemoryCatalog,
+  ObjectIdentifier
+}
 import org.apache.flink.table.data.RowData
 import org.apache.flink.table.delegation.{Executor, ExecutorFactory, PlannerFactory}
 import org.apache.flink.table.descriptors.ConnectorDescriptorValidator.CONNECTOR_TYPE
@@ -42,17 +58,30 @@ import org.apache.flink.table.expressions.Expression
 import org.apache.flink.table.factories.{ComponentFactoryService, StreamTableSourceFactory}
 import org.apache.flink.table.functions._
 import org.apache.flink.table.module.ModuleManager
-import org.apache.flink.table.operations.{CatalogSinkModifyOperation, ModifyOperation, Operation, QueryOperation}
+import org.apache.flink.table.operations.{
+  CatalogSinkModifyOperation,
+  ModifyOperation,
+  Operation,
+  QueryOperation
+}
 import org.apache.flink.table.planner.calcite.CalciteConfig
 import org.apache.flink.table.planner.delegation.PlannerBase
 import org.apache.flink.table.planner.functions.sql.FlinkSqlOperatorTable
-import org.apache.flink.table.planner.operations.{DataStreamQueryOperation, PlannerQueryOperation, RichTableSourceQueryOperation}
+import org.apache.flink.table.planner.operations.{
+  DataStreamQueryOperation,
+  PlannerQueryOperation,
+  RichTableSourceQueryOperation
+}
 import org.apache.flink.table.planner.plan.nodes.calcite.LogicalWatermarkAssigner
 import org.apache.flink.table.planner.plan.nodes.exec.utils.ExecNodePlanDumper
 import org.apache.flink.table.planner.plan.optimize.program._
 import org.apache.flink.table.planner.plan.stats.FlinkStatistic
 import org.apache.flink.table.planner.plan.utils.FlinkRelOptUtil
-import org.apache.flink.table.planner.runtime.utils.{TestingAppendTableSink, TestingRetractTableSink, TestingUpsertTableSink}
+import org.apache.flink.table.planner.runtime.utils.{
+  TestingAppendTableSink,
+  TestingRetractTableSink,
+  TestingUpsertTableSink
+}
 import org.apache.flink.table.planner.sinks.CollectRowTableSink
 import org.apache.flink.table.planner.utils.PlanKind.PlanKind
 import org.apache.flink.table.runtime.types.TypeInfoLogicalTypeConverter.fromLogicalTypeToTypeInfo
@@ -199,11 +228,11 @@ abstract class TableTestUtilBase(test: TableTestBase, isStreamingMode: Boolean) 
 
     val tableSchema = if (fields.isEmpty) {
       val fieldTypes: Array[TypeInformation[_]] = typeInfo match {
-        case tt: TupleTypeInfo[_] => (0 until tt.getArity).map(tt.getTypeAt).toArray
+        case tt: TupleTypeInfo[_]     => (0 until tt.getArity).map(tt.getTypeAt).toArray
         case ct: CaseClassTypeInfo[_] => (0 until ct.getArity).map(ct.getTypeAt).toArray
-        case at: AtomicType[_] => Array[TypeInformation[_]](at)
-        case pojo: PojoTypeInfo[_] => (0 until pojo.getArity).map(pojo.getTypeAt).toArray
-        case _ => throw new TableException(s"Unsupported type info: $typeInfo")
+        case at: AtomicType[_]        => Array[TypeInformation[_]](at)
+        case pojo: PojoTypeInfo[_]    => (0 until pojo.getArity).map(pojo.getTypeAt).toArray
+        case _                        => throw new TableException(s"Unsupported type info: $typeInfo")
       }
       val types = fieldTypes.map(TypeConversions.fromLegacyInfoToDataType)
       val names = FieldInfoUtils.getFieldNames(typeInfo)
@@ -240,11 +269,10 @@ abstract class TableTestUtilBase(test: TableTestBase, isStreamingMode: Boolean) 
    * @param tableSource table source
    * @return returns the registered [[Table]].
    */
-  def addTableSource(
-      name: String,
-      tableSource: TableSource[_]): Table = {
-    getTableEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(
-      name, tableSource)
+  def addTableSource(name: String, tableSource: TableSource[_]): Table = {
+    getTableEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSourceInternal(name, tableSource)
     getTableEnv.from(name)
   }
 
@@ -813,9 +841,10 @@ abstract class TableTestUtilBase(test: TableTestBase, isStreamingMode: Boolean) 
 
     val relNodes = testStmtSet.getOperations.map(getPlanner.translateToRel)
     if (relNodes.isEmpty) {
-      throw new TableException("No output table have been created yet. " +
-        "A program needs at least one output table that consumes data.\n" +
-        "Please create output table(s) for your program")
+      throw new TableException(
+        "No output table have been created yet. " +
+          "A program needs at least one output table that consumes data.\n" +
+          "Please create output table(s) for your program")
     }
 
     assertPlanEquals(
@@ -848,8 +877,8 @@ abstract class TableTestUtilBase(test: TableTestBase, isStreamingMode: Boolean) 
     relNodes.foreach { sink =>
       astBuilder
         .append(System.lineSeparator)
-        .append(FlinkRelOptUtil.toString(
-          sink, SqlExplainLevel.EXPPLAN_ATTRIBUTES, withRowType = withRowType))
+        .append(FlinkRelOptUtil
+          .toString(sink, SqlExplainLevel.EXPPLAN_ATTRIBUTES, withRowType = withRowType))
     }
     val astPlan = astBuilder.toString()
 
@@ -905,16 +934,19 @@ abstract class TableTestUtilBase(test: TableTestBase, isStreamingMode: Boolean) 
 
     val optimizedPlan = optimizedRels.head match {
       case _: RelNode =>
-        optimizedRels.map { rel =>
-          FlinkRelOptUtil.toString(
-            rel,
-            detailLevel = explainLevel,
-            withChangelogTraits = withChangelogTraits,
-            withRowType = withRowType)
-        }.mkString("\n")
+        optimizedRels
+          .map { rel =>
+            FlinkRelOptUtil.toString(
+              rel,
+              detailLevel = explainLevel,
+              withChangelogTraits = withChangelogTraits,
+              withRowType = withRowType)
+          }
+          .mkString("\n")
       case o =>
-        throw new TableException("The expected optimized plan is RelNode plan, " +
-          s"actual plan is ${o.getClass.getSimpleName} plan.")
+        throw new TableException(
+          "The expected optimized plan is RelNode plan, " +
+            s"actual plan is ${o.getClass.getSimpleName} plan.")
     }
     replaceEstimatedCost(optimizedPlan)
   }
@@ -957,7 +989,7 @@ abstract class TableTestUtil(
     isStreamingMode: Boolean,
     catalogManager: Option[CatalogManager] = None,
     val tableConfig: TableConfig)
-  extends TableTestUtilBase(test, isStreamingMode) {
+    extends TableTestUtilBase(test, isStreamingMode) {
   protected val testingTableEnv: TestingTableEnvironment =
     TestingTableEnvironment.create(setting, catalogManager, tableConfig)
   val tableEnv: TableEnvironment = testingTableEnv
@@ -1010,10 +1042,7 @@ abstract class TableTestUtil(
       testingTableEnv.getCurrentCatalog,
       testingTableEnv.getCurrentDatabase,
       name)
-    val operation = new RichTableSourceQueryOperation(
-      identifier,
-      tableSource,
-      statistic)
+    val operation = new RichTableSourceQueryOperation(identifier, tableSource, statistic)
     val table = testingTableEnv.createTable(operation)
     testingTableEnv.registerTable(name, table)
     testingTableEnv.from(name)
@@ -1023,9 +1052,8 @@ abstract class TableTestUtil(
    * @deprecated Use [[addTemporarySystemFunction()]] for the new type inference.
    */
   @deprecated
-  def addFunction[T: TypeInformation](
-      name: String,
-      function: TableFunction[T]): Unit = testingTableEnv.registerFunction(name, function)
+  def addFunction[T: TypeInformation](name: String, function: TableFunction[T]): Unit =
+    testingTableEnv.registerFunction(name, function)
 
   /**
    * @deprecated Use [[addTemporarySystemFunction()]] for the new type inference.
@@ -1046,10 +1074,8 @@ abstract class TableTestUtil(
   }
 }
 
-abstract class ScalaTableTestUtil(
-    test: TableTestBase,
-    isStreamingMode: Boolean)
-  extends TableTestUtilBase(test, isStreamingMode) {
+abstract class ScalaTableTestUtil(test: TableTestBase, isStreamingMode: Boolean)
+    extends TableTestUtilBase(test, isStreamingMode) {
   // scala env
   val env = new ScalaStreamExecEnv(new LocalStreamEnvironment())
   // scala tableEnv
@@ -1060,9 +1086,8 @@ abstract class ScalaTableTestUtil(
   /**
    * Registers a [[TableFunction]] under given name into the TableEnvironment's catalog.
    */
-  def addFunction[T: TypeInformation](
-      name: String,
-      function: TableFunction[T]): Unit = tableEnv.registerFunction(name, function)
+  def addFunction[T: TypeInformation](name: String, function: TableFunction[T]): Unit =
+    tableEnv.registerFunction(name, function)
 
   /**
    * Registers a [[AggregateFunction]] under given name into the TableEnvironment's catalog.
@@ -1079,10 +1104,8 @@ abstract class ScalaTableTestUtil(
       function: TableAggregateFunction[T, ACC]): Unit = tableEnv.registerFunction(name, function)
 }
 
-abstract class JavaTableTestUtil(
-    test: TableTestBase,
-    isStreamingMode: Boolean)
-  extends TableTestUtilBase(test, isStreamingMode) {
+abstract class JavaTableTestUtil(test: TableTestBase, isStreamingMode: Boolean)
+    extends TableTestUtilBase(test, isStreamingMode) {
   // java env
   val env = new LocalStreamEnvironment()
   // java tableEnv
@@ -1095,9 +1118,8 @@ abstract class JavaTableTestUtil(
   /**
    * Registers a [[TableFunction]] under given name into the TableEnvironment's catalog.
    */
-  def addFunction[T: TypeInformation](
-      name: String,
-      function: TableFunction[T]): Unit = tableEnv.registerFunction(name, function)
+  def addFunction[T: TypeInformation](name: String, function: TableFunction[T]): Unit =
+    tableEnv.registerFunction(name, function)
 
   /**
    * Registers a [[AggregateFunction]] under given name into the TableEnvironment's catalog.
@@ -1121,7 +1143,7 @@ case class StreamTableTestUtil(
     test: TableTestBase,
     catalogManager: Option[CatalogManager] = None,
     conf: TableConfig = new TableConfig)
-  extends TableTestUtil(test, isStreamingMode = true, catalogManager, conf) {
+    extends TableTestUtil(test, isStreamingMode = true, catalogManager, conf) {
 
   /**
    * Register a table with specific row time field and offset.
@@ -1152,8 +1174,7 @@ case class StreamTableTestUtil(
       sourceRel.getTraitSet,
       sourceRel,
       rowtimeFieldIdx,
-      expr
-    )
+      expr)
     val queryOperation = new PlannerQueryOperation(watermarkAssigner)
     testingTableEnv.registerTable(tableName, testingTableEnv.createTable(queryOperation))
   }
@@ -1161,39 +1182,40 @@ case class StreamTableTestUtil(
   def buildStreamProgram(firstProgramNameToRemove: String): Unit = {
     val program = FlinkStreamProgram.buildProgram(tableEnv.getConfig.getConfiguration)
     var startRemove = false
-    program.getProgramNames.foreach {
-      name =>
-        if (name.equals(firstProgramNameToRemove)) {
-          startRemove = true
-        }
-        if (startRemove) {
-          program.remove(name)
-        }
+    program.getProgramNames.foreach { name =>
+      if (name.equals(firstProgramNameToRemove)) {
+        startRemove = true
+      }
+      if (startRemove) {
+        program.remove(name)
+      }
     }
     replaceStreamProgram(program)
   }
 
   def replaceStreamProgram(program: FlinkChainedProgram[StreamOptimizeContext]): Unit = {
     var calciteConfig = TableConfigUtils.getCalciteConfig(tableEnv.getConfig)
-    calciteConfig = CalciteConfig.createBuilder(calciteConfig)
-      .replaceStreamProgram(program).build()
+    calciteConfig = CalciteConfig
+      .createBuilder(calciteConfig)
+      .replaceStreamProgram(program)
+      .build()
     tableEnv.getConfig.setPlannerConfig(calciteConfig)
   }
 
   def getStreamProgram(): FlinkChainedProgram[StreamOptimizeContext] = {
     val tableConfig = tableEnv.getConfig
     val calciteConfig = TableConfigUtils.getCalciteConfig(tableConfig)
-    calciteConfig.getStreamProgram.getOrElse(FlinkStreamProgram.buildProgram(
-      tableConfig.getConfiguration))
+    calciteConfig.getStreamProgram.getOrElse(
+      FlinkStreamProgram.buildProgram(tableConfig.getConfiguration))
   }
 
   def enableMiniBatch(): Unit = {
-    tableEnv.getConfig.getConfiguration.setBoolean(
-      ExecutionConfigOptions.TABLE_EXEC_MINIBATCH_ENABLED, true)
-    tableEnv.getConfig.getConfiguration.set(
-      ExecutionConfigOptions.TABLE_EXEC_MINIBATCH_ALLOW_LATENCY, Duration.ofSeconds(1))
-    tableEnv.getConfig.getConfiguration.setLong(
-      ExecutionConfigOptions.TABLE_EXEC_MINIBATCH_SIZE, 3L)
+    tableEnv.getConfig.getConfiguration
+      .setBoolean(ExecutionConfigOptions.TABLE_EXEC_MINIBATCH_ENABLED, true)
+    tableEnv.getConfig.getConfiguration
+      .set(ExecutionConfigOptions.TABLE_EXEC_MINIBATCH_ALLOW_LATENCY, Duration.ofSeconds(1))
+    tableEnv.getConfig.getConfiguration
+      .setLong(ExecutionConfigOptions.TABLE_EXEC_MINIBATCH_SIZE, 3L)
   }
 
   def createAppendTableSink(
@@ -1225,14 +1247,12 @@ case class StreamTableTestUtil(
 /**
  * Utility for stream scala table test.
  */
-case class ScalaStreamTableTestUtil(test: TableTestBase) extends ScalaTableTestUtil(test, true) {
-}
+case class ScalaStreamTableTestUtil(test: TableTestBase) extends ScalaTableTestUtil(test, true) {}
 
 /**
  * Utility for stream java table test.
  */
-case class JavaStreamTableTestUtil(test: TableTestBase) extends JavaTableTestUtil(test, true) {
-}
+case class JavaStreamTableTestUtil(test: TableTestBase) extends JavaTableTestUtil(test, true) {}
 
 /**
  * Utility for batch table test.
@@ -1241,35 +1261,36 @@ case class BatchTableTestUtil(
     test: TableTestBase,
     catalogManager: Option[CatalogManager] = None,
     conf: TableConfig = new TableConfig)
-  extends TableTestUtil(test, isStreamingMode = false, catalogManager, conf) {
+    extends TableTestUtil(test, isStreamingMode = false, catalogManager, conf) {
 
   def buildBatchProgram(firstProgramNameToRemove: String): Unit = {
     val program = FlinkBatchProgram.buildProgram(tableEnv.getConfig.getConfiguration)
     var startRemove = false
-    program.getProgramNames.foreach {
-      name =>
-        if (name.equals(firstProgramNameToRemove)) {
-          startRemove = true
-        }
-        if (startRemove) {
-          program.remove(name)
-        }
+    program.getProgramNames.foreach { name =>
+      if (name.equals(firstProgramNameToRemove)) {
+        startRemove = true
+      }
+      if (startRemove) {
+        program.remove(name)
+      }
     }
     replaceBatchProgram(program)
   }
 
   def replaceBatchProgram(program: FlinkChainedProgram[BatchOptimizeContext]): Unit = {
     var calciteConfig = TableConfigUtils.getCalciteConfig(tableEnv.getConfig)
-    calciteConfig = CalciteConfig.createBuilder(calciteConfig)
-      .replaceBatchProgram(program).build()
+    calciteConfig = CalciteConfig
+      .createBuilder(calciteConfig)
+      .replaceBatchProgram(program)
+      .build()
     tableEnv.getConfig.setPlannerConfig(calciteConfig)
   }
 
   def getBatchProgram(): FlinkChainedProgram[BatchOptimizeContext] = {
     val tableConfig = tableEnv.getConfig
     val calciteConfig = TableConfigUtils.getCalciteConfig(tableConfig)
-    calciteConfig.getBatchProgram.getOrElse(FlinkBatchProgram.buildProgram(
-      tableConfig.getConfiguration))
+    calciteConfig.getBatchProgram.getOrElse(
+      FlinkBatchProgram.buildProgram(tableConfig.getConfiguration))
   }
 
   def createCollectTableSink(
@@ -1284,20 +1305,18 @@ case class BatchTableTestUtil(
 /**
  * Utility for batch scala table test.
  */
-case class ScalaBatchTableTestUtil(test: TableTestBase) extends ScalaTableTestUtil(test, false) {
-}
+case class ScalaBatchTableTestUtil(test: TableTestBase) extends ScalaTableTestUtil(test, false) {}
 
 /**
  * Utility for batch java table test.
  */
-case class JavaBatchTableTestUtil(test: TableTestBase) extends JavaTableTestUtil(test, false) {
-}
+case class JavaBatchTableTestUtil(test: TableTestBase) extends JavaTableTestUtil(test, false) {}
 
 /**
  * Batch/Stream [[org.apache.flink.table.sources.TableSource]] for testing.
  */
 class TestTableSource(override val isBounded: Boolean, schema: TableSchema)
-  extends StreamTableSource[Row] {
+    extends StreamTableSource[Row] {
 
   override def getDataStream(execEnv: environment.StreamExecutionEnvironment): DataStream[Row] = {
     execEnv.fromCollection(List[Row](), getReturnType)
@@ -1317,9 +1336,10 @@ object TestTableSource {
       isBounded: Boolean,
       tableSchema: TableSchema,
       tableName: String): Unit = {
-    tEnv.connect(
-      new CustomConnectorDescriptor("TestTableSource", 1, false)
-        .property("is-bounded", if (isBounded) "true" else "false"))
+    tEnv
+      .connect(
+        new CustomConnectorDescriptor("TestTableSource", 1, false)
+          .property("is-bounded", if (isBounded) "true" else "false"))
       .withSchema(new Schema().schema(tableSchema))
       .createTemporaryTable(tableName)
 
@@ -1349,7 +1369,7 @@ class TestTableSourceFactory extends StreamTableSourceFactory[Row] {
   }
 }
 
-class TestingTableEnvironment private(
+class TestingTableEnvironment private (
     catalogManager: CatalogManager,
     moduleManager: ModuleManager,
     tableConfig: TableConfig,
@@ -1358,15 +1378,15 @@ class TestingTableEnvironment private(
     planner: PlannerBase,
     isStreamingMode: Boolean,
     userClassLoader: ClassLoader)
-  extends TableEnvironmentImpl(
-    catalogManager,
-    moduleManager,
-    tableConfig,
-    executor,
-    functionCatalog,
-    planner,
-    isStreamingMode,
-    userClassLoader) {
+    extends TableEnvironmentImpl(
+      catalogManager,
+      moduleManager,
+      tableConfig,
+      executor,
+      functionCatalog,
+      planner,
+      isStreamingMode,
+      userClassLoader) {
 
   // just for testing, remove this method while
   // `<T, ACC> void registerFunction(String name, AggregateFunction<T, ACC> aggregateFunction);`
@@ -1374,11 +1394,7 @@ class TestingTableEnvironment private(
   def registerFunction[T: TypeInformation](name: String, tf: TableFunction[T]): Unit = {
     val typeInfo = UserDefinedFunctionHelper
       .getReturnTypeOfTableFunction(tf, implicitly[TypeInformation[T]])
-    functionCatalog.registerTempSystemTableFunction(
-      name,
-      tf,
-      typeInfo
-    )
+    functionCatalog.registerTempSystemTableFunction(name, tf, typeInfo)
   }
 
   // just for testing, remove this method while
@@ -1406,12 +1422,7 @@ class TestingTableEnvironment private(
       .getReturnTypeOfAggregateFunction(f, implicitly[TypeInformation[T]])
     val accTypeInfo = UserDefinedFunctionHelper
       .getAccumulatorTypeOfAggregateFunction(f, implicitly[TypeInformation[ACC]])
-    functionCatalog.registerTempSystemAggregateFunction(
-      name,
-      f,
-      typeInfo,
-      accTypeInfo
-    )
+    functionCatalog.registerTempSystemAggregateFunction(name, f, typeInfo, accTypeInfo)
   }
 
   override def createTable(tableOperation: QueryOperation): TableImpl = {
@@ -1451,12 +1462,13 @@ class TestingStatementSet(tEnv: TestingTableEnvironment) extends StatementSet {
     val unresolvedIdentifier = tEnv.getParser.parseIdentifier(targetPath)
     val objectIdentifier = tEnv.getCatalogManager.qualifyIdentifier(unresolvedIdentifier)
 
-    operations.add(new CatalogSinkModifyOperation(
-      objectIdentifier,
-      table.getQueryOperation,
-      util.Collections.emptyMap[String, String],
-      overwrite,
-      util.Collections.emptyMap[String, String]))
+    operations.add(
+      new CatalogSinkModifyOperation(
+        objectIdentifier,
+        table.getQueryOperation,
+        util.Collections.emptyMap[String, String],
+        overwrite,
+        util.Collections.emptyMap[String, String]))
     this
   }
 
@@ -1502,11 +1514,13 @@ object TestingTableEnvironment {
     val functionCatalog = new FunctionCatalog(tableConfig, catalogMgr, moduleManager)
 
     val executorProperties = settings.toExecutorProperties
-    val executor = ComponentFactoryService.find(classOf[ExecutorFactory],
-      executorProperties).create(executorProperties)
+    val executor = ComponentFactoryService
+      .find(classOf[ExecutorFactory], executorProperties)
+      .create(executorProperties)
 
     val plannerProperties = settings.toPlannerProperties
-    val planner = ComponentFactoryService.find(classOf[PlannerFactory], plannerProperties)
+    val planner = ComponentFactoryService
+      .find(classOf[PlannerFactory], plannerProperties)
       .create(plannerProperties, executor, tableConfig, functionCatalog, catalogMgr)
       .asInstanceOf[PlannerBase]
 
@@ -1527,10 +1541,13 @@ object TestingTableEnvironment {
  */
 object PlanKind extends Enumeration {
   type PlanKind = Value
+
   /** Abstract Syntax Tree */
   val AST: Value = Value("AST")
+
   /** Optimized Rel Plan */
   val OPT_REL: Value = Value("OPT_REL")
+
   /** Optimized Execution Plan */
   val OPT_EXEC: Value = Value("OPT_EXEC")
 }
@@ -1545,10 +1562,15 @@ object TableTestUtil {
    * Converts operation tree in the given table to a RelNode tree.
    */
   def toRelNode(table: Table): RelNode = {
-    table.asInstanceOf[TableImpl]
-      .getTableEnvironment.asInstanceOf[TableEnvironmentImpl]
-      .getPlanner.asInstanceOf[PlannerBase]
-      .getRelBuilder.queryOperation(table.getQueryOperation).build()
+    table
+      .asInstanceOf[TableImpl]
+      .getTableEnvironment
+      .asInstanceOf[TableEnvironmentImpl]
+      .getPlanner
+      .asInstanceOf[PlannerBase]
+      .getRelBuilder
+      .queryOperation(table.getQueryOperation)
+      .build()
   }
 
   def createTemporaryView[T](
@@ -1562,18 +1584,21 @@ object TableTestUtil {
     val execEnv = planner.getExecEnv
     val streamType = dataStream.getType
     // get field names and types for all non-replaced fields
-    val typeInfoSchema = fields.map((f: Array[Expression]) => {
-      val fieldsInfo = FieldInfoUtils.getFieldsInfo(streamType, f)
-      // check if event-time is enabled
-      if (fieldsInfo.isRowtimeDefined &&
-        (execEnv.getStreamTimeCharacteristic ne TimeCharacteristic.EventTime)) {
-        throw new ValidationException(String.format(
-          "A rowtime attribute requires an EventTime time characteristic in stream " +
-            "environment. But is: %s",
-          execEnv.getStreamTimeCharacteristic))
-      }
-      fieldsInfo
-    }).getOrElse(FieldInfoUtils.getFieldsInfo(streamType))
+    val typeInfoSchema = fields
+      .map((f: Array[Expression]) => {
+        val fieldsInfo = FieldInfoUtils.getFieldsInfo(streamType, f)
+        // check if event-time is enabled
+        if (fieldsInfo.isRowtimeDefined &&
+          (execEnv.getStreamTimeCharacteristic ne TimeCharacteristic.EventTime)) {
+          throw new ValidationException(
+            String.format(
+              "A rowtime attribute requires an EventTime time characteristic in stream " +
+                "environment. But is: %s",
+              execEnv.getStreamTimeCharacteristic))
+        }
+        fieldsInfo
+      })
+      .getOrElse(FieldInfoUtils.getFieldsInfo(streamType))
 
     val fieldCnt = typeInfoSchema.getFieldTypes.length
     val dataStreamQueryOperation = new DataStreamQueryOperation(
@@ -1582,8 +1607,7 @@ object TableTestUtil {
       typeInfoSchema.getIndices,
       typeInfoSchema.toTableSchema,
       fieldNullables.getOrElse(Array.fill(fieldCnt)(true)),
-      statistic.getOrElse(FlinkStatistic.UNKNOWN)
-    )
+      statistic.getOrElse(FlinkStatistic.UNKNOWN))
     val table = createTable(tEnv, dataStreamQueryOperation)
     tEnv.registerTable(name, table)
   }

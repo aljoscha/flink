@@ -31,8 +31,8 @@ import org.apache.calcite.plan.hep.HepMatchOrder
 import org.junit.{Before, Test}
 
 /**
-  * Test for [[PythonMapMergeRule]].
-  */
+ * Test for [[PythonMapMergeRule]].
+ */
 class PythonMapMergeRuleTest extends TableTestBase {
   private val util = batchTestUtil()
 
@@ -59,7 +59,8 @@ class PythonMapMergeRuleTest extends TableTestBase {
   def testMapOperationsChained(): Unit = {
     val sourceTable = util.addTableSource[(Int, Int, Int)]("source", 'a, 'b, 'c)
     val func = new RowPythonScalarFunction("pyFunc2")
-    val result = sourceTable.map(func(withColumns('*)))
+    val result = sourceTable
+      .map(func(withColumns('*)))
       .map(func(withColumns('*)))
       .map(func(withColumns('*)))
     util.verifyRelPlan(result)

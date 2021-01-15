@@ -28,8 +28,8 @@ import org.junit.Test
 import scala.collection.JavaConverters._
 
 /**
-  * Tests for [[TableDescriptor]].
-  */
+ * Tests for [[TableDescriptor]].
+ */
 class TableDescriptorTest extends TableTestBase {
 
   @Test
@@ -117,16 +117,14 @@ class TableDescriptorTest extends TableTestBase {
       "schema.4.name" -> "myfield5",
       "schema.4.data-type" -> "ARRAY<SMALLINT NOT NULL>",
       "schema.5.name" -> "myfield6",
-      "schema.5.data-type" -> personArrayString
-    )
+      "schema.5.data-type" -> personArrayString)
 
     val expectedProperties = if (isStreaming) {
       expectedCommonProperties ++ Seq(
         //"schema.2.name" -> "proctime",
         //"schema.2.data-type" -> "TIMESTAMP",
         //"schema.2.proctime" -> "true",
-        "update-mode" -> "append"
-      )
+        "update-mode" -> "append")
     } else {
       expectedCommonProperties
     }

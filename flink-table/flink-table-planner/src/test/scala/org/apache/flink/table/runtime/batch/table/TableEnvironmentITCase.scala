@@ -39,9 +39,8 @@ import java.util
 import scala.collection.JavaConverters._
 
 @RunWith(classOf[Parameterized])
-class TableEnvironmentITCase(
-    configMode: TableConfigMode)
-  extends TableProgramsCollectionTestBase(configMode) {
+class TableEnvironmentITCase(configMode: TableConfigMode)
+    extends TableProgramsCollectionTestBase(configMode) {
 
   @Test
   def testSimpleRegister(): Unit = {
@@ -126,7 +125,8 @@ class TableEnvironmentITCase(
     val env = ExecutionEnvironment.getExecutionEnvironment
     val tEnv = BatchTableEnvironment.create(env, config)
 
-    val t = CollectionDataSets.get3TupleDataSet(env)
+    val t = CollectionDataSets
+      .get3TupleDataSet(env)
       .toTable(tEnv, 'a, 'b, 'c)
       .select('a, 'b, 'c)
 
@@ -150,14 +150,15 @@ class TableEnvironmentITCase(
       SomeCaseClass("Anna", 56, 10000.00, "Engineering"),
       SomeCaseClass("Lucy", 42, 6000.00, "HR"))
 
-    val t =  env.fromCollection(data)
+    val t = env
+      .fromCollection(data)
       .toTable(tEnv, 'a, 'b, 'c, 'd)
       .select('a, 'b, 'c, 'd)
 
     val expected: String =
       "Peter,28,4000.0,Sales\n" +
-      "Anna,56,10000.0,Engineering\n" +
-      "Lucy,42,6000.0,HR\n"
+        "Anna,56,10000.0,Engineering\n" +
+        "Lucy,42,6000.0,HR\n"
     val results = t.toDataSet[Row].collect()
     TestBaseUtils.compareResultAsText(results.asJava, expected)
   }
@@ -172,14 +173,15 @@ class TableEnvironmentITCase(
       SomeCaseClass("Anna", 56, 10000.00, "Engineering"),
       SomeCaseClass("Lucy", 42, 6000.00, "HR"))
 
-    val t =  env.fromCollection(data)
+    val t = env
+      .fromCollection(data)
       .toTable(tEnv, 'a, 'b, 'c, 'd)
       .select('a, 'b, 'c, 'd)
 
     val expected: String =
       "SomeCaseClass(Peter,28,4000.0,Sales)\n" +
-      "SomeCaseClass(Anna,56,10000.0,Engineering)\n" +
-      "SomeCaseClass(Lucy,42,6000.0,HR)\n"
+        "SomeCaseClass(Anna,56,10000.0,Engineering)\n" +
+        "SomeCaseClass(Lucy,42,6000.0,HR)\n"
     val results = t.toDataSet[SomeCaseClass].collect()
     TestBaseUtils.compareResultAsText(results.asJava, expected)
   }
@@ -196,10 +198,12 @@ class TableEnvironmentITCase(
     val fieldNames = Array("d", "e", "f")
     val fieldTypes = tEnv.scan("sourceTable").getSchema.getFieldTypes
     val sink = new MemoryTableSourceSinkUtil.UnsafeMemoryAppendTableSink
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSinkInternal(
-      "targetTable", sink.configure(fieldNames, fieldTypes))
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSinkInternal("targetTable", sink.configure(fieldNames, fieldTypes))
 
-    tEnv.scan("sourceTable")
+    tEnv
+      .scan("sourceTable")
       .select('a, 'b, 'c)
       .insertInto("targetTable")
     tEnv.execute("job name")
@@ -213,9 +217,7 @@ object TableEnvironmentITCase {
 
   @Parameterized.Parameters(name = "Table config = {0}")
   def parameters(): util.Collection[Array[java.lang.Object]] = {
-    Seq[Array[AnyRef]](
-      Array(TableProgramsTestBase.DEFAULT)
-    ).asJava
+    Seq[Array[AnyRef]](Array(TableProgramsTestBase.DEFAULT)).asJava
   }
 }
 

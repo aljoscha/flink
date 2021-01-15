@@ -31,7 +31,7 @@ abstract class MapSideJoinRunner[IN1, IN2, SINGLE_IN, MULTI_IN, OUT](
     code: String,
     @transient var returnType: TypeInformation[OUT],
     broadcastSetName: String)
-  extends RichFlatMapFunction[MULTI_IN, OUT]
+    extends RichFlatMapFunction[MULTI_IN, OUT]
     with ResultTypeQueryable[OUT]
     with Compiler[FlatJoinFunction[IN1, IN2, OUT]]
     with Logging {

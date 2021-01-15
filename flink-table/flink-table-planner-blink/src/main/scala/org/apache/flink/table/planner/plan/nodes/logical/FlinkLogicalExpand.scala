@@ -30,9 +30,9 @@ import org.apache.calcite.rex.RexNode
 import java.util
 
 /**
-  * Sub-class of [[Expand]] that is a relational expression
-  * which returns multiple rows expanded from one input row.
-  */
+ * Sub-class of [[Expand]] that is a relational expression
+ * which returns multiple rows expanded from one input row.
+ */
 class FlinkLogicalExpand(
     cluster: RelOptCluster,
     traits: RelTraitSet,
@@ -40,8 +40,8 @@ class FlinkLogicalExpand(
     outputRowType: RelDataType,
     projects: util.List[util.List[RexNode]],
     expandIdIndex: Int)
-  extends Expand(cluster, traits, input, outputRowType, projects, expandIdIndex)
-  with FlinkLogicalRel {
+    extends Expand(cluster, traits, input, outputRowType, projects, expandIdIndex)
+    with FlinkLogicalRel {
 
   override def copy(traitSet: RelTraitSet, inputs: util.List[RelNode]): RelNode = {
     new FlinkLogicalExpand(cluster, traitSet, inputs.get(0), outputRowType, projects, expandIdIndex)
@@ -50,20 +50,16 @@ class FlinkLogicalExpand(
 }
 
 private class FlinkLogicalExpandConverter
-  extends ConverterRule(
-    classOf[LogicalExpand],
-    Convention.NONE,
-    FlinkConventions.LOGICAL,
-    "FlinkLogicalExpandConverter") {
+    extends ConverterRule(
+      classOf[LogicalExpand],
+      Convention.NONE,
+      FlinkConventions.LOGICAL,
+      "FlinkLogicalExpandConverter") {
 
   override def convert(rel: RelNode): RelNode = {
     val expand = rel.asInstanceOf[LogicalExpand]
     val newInput = RelOptRule.convert(expand.getInput, FlinkConventions.LOGICAL)
-    FlinkLogicalExpand.create(
-      newInput,
-      expand.getRowType,
-      expand.projects,
-      expand.expandIdIndex)
+    FlinkLogicalExpand.create(newInput, expand.getRowType, expand.projects, expand.expandIdIndex)
   }
 }
 

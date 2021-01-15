@@ -22,9 +22,18 @@ import org.apache.flink.api.scala._
 import org.apache.flink.table.api._
 import org.apache.flink.table.api.bridge.scala._
 import org.apache.flink.table.planner.factories.TestValuesTableFactory
-import org.apache.flink.table.planner.factories.TestValuesTableFactory.{TestSinkContextTableSink, changelogRow}
+import org.apache.flink.table.planner.factories.TestValuesTableFactory.{
+  TestSinkContextTableSink,
+  changelogRow
+}
 import org.apache.flink.table.planner.runtime.utils.StreamingTestBase
-import org.apache.flink.table.planner.runtime.utils.TestData.{data1, nullData4, smallTupleData3, tupleData3, tupleData5}
+import org.apache.flink.table.planner.runtime.utils.TestData.{
+  data1,
+  nullData4,
+  smallTupleData3,
+  tupleData3,
+  tupleData5
+}
 import org.apache.flink.table.utils.LegacyRowResource
 import org.apache.flink.util.ExceptionUtils
 
@@ -46,12 +55,12 @@ class TableSinkITCase extends StreamingTestBase {
 
   @Test
   def testAppendSinkOnAppendTable(): Unit = {
-    val t = env.fromCollection(tupleData3)
+    val t = env
+      .fromCollection(tupleData3)
       .assignAscendingTimestamps(_._1.toLong)
       .toTable(tEnv, 'id, 'num, 'text, 'rowtime.rowtime)
 
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE TABLE appendSink (
          |  `t` TIMESTAMP(3),
          |  `icnt` BIGINT,
@@ -62,7 +71,8 @@ class TableSinkITCase extends StreamingTestBase {
          |)
          |""".stripMargin)
 
-    val table = t.window(Tumble over 5.millis on 'rowtime as 'w)
+    val table = t
+      .window(Tumble over 5.millis on 'rowtime as 'w)
       .groupBy('w)
       .select('w.end as 't, 'id.count as 'icnt, 'num.sum as 'nsum)
     table.executeInsert("appendSink").await()
@@ -79,12 +89,12 @@ class TableSinkITCase extends StreamingTestBase {
 
   @Test
   def testAppendSinkWithNestedRow(): Unit = {
-    val t = env.fromCollection(smallTupleData3)
+    val t = env
+      .fromCollection(smallTupleData3)
       .toTable(tEnv, 'id, 'num, 'text)
     tEnv.createTemporaryView("src", t)
 
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE TABLE appendSink (
          |  `t` INT,
          |  `item` ROW<`num` BIGINT, `text` STRING>
@@ -96,10 +106,7 @@ class TableSinkITCase extends StreamingTestBase {
     tEnv.executeSql("INSERT INTO appendSink SELECT id, ROW(num, text) FROM src").await()
 
     val result = TestValuesTableFactory.getResults("appendSink")
-    val expected = List(
-      "1,1,Hi",
-      "2,2,Hello",
-      "3,2,Hello world")
+    val expected = List("1,1,Hi", "2,2,Hello", "3,2,Hello world")
     assertEquals(expected.sorted, result.sorted)
   }
 
@@ -108,8 +115,7 @@ class TableSinkITCase extends StreamingTestBase {
     val ds1 = env.fromCollection(smallTupleData3).toTable(tEnv, 'a, 'b, 'c)
     val ds2 = env.fromCollection(tupleData5).toTable(tEnv, 'd, 'e, 'f, 'g, 'h)
 
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE TABLE appendSink (
          |  `c` STRING,
          |  `g` STRING
@@ -119,9 +125,11 @@ class TableSinkITCase extends StreamingTestBase {
          |)
          |""".stripMargin)
 
-    val table = ds1.join(ds2).where('b === 'e)
+    val table = ds1
+      .join(ds2)
+      .where('b === 'e)
       .select('c, 'g)
-   table.executeInsert("appendSink").await()
+    table.executeInsert("appendSink").await()
 
     val result = TestValuesTableFactory.getResults("appendSink")
     val expected = List("Hi,Hallo", "Hello,Hallo Welt", "Hello world,Hallo Welt")
@@ -130,12 +138,12 @@ class TableSinkITCase extends StreamingTestBase {
 
   @Test
   def testRetractSinkOnUpdatingTable(): Unit = {
-    val t = env.fromCollection(tupleData3)
+    val t = env
+      .fromCollection(tupleData3)
       .assignAscendingTimestamps(_._1.toLong)
       .toTable(tEnv, 'id, 'num, 'text)
 
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE TABLE retractSink (
          |  `len` INT,
          |  `icnt` BIGINT,
@@ -146,27 +154,26 @@ class TableSinkITCase extends StreamingTestBase {
          |)
          |""".stripMargin)
 
-    val table = t.select('id, 'num, 'text.charLength() as 'len)
+    val table = t
+      .select('id, 'num, 'text.charLength() as 'len)
       .groupBy('len)
       .select('len, 'id.count as 'icnt, 'num.sum as 'nsum)
     table.executeInsert("retractSink").await()
 
     val result = TestValuesTableFactory.getResults("retractSink")
-    val expected = List(
-      "2,1,1", "5,1,2", "11,1,2",
-      "25,1,3", "10,7,39", "14,1,3", "9,9,41")
+    val expected = List("2,1,1", "5,1,2", "11,1,2", "25,1,3", "10,7,39", "14,1,3", "9,9,41")
     assertEquals(expected.sorted, result.sorted)
 
   }
 
   @Test
   def testRetractSinkOnAppendTable(): Unit = {
-    val t = env.fromCollection(tupleData3)
+    val t = env
+      .fromCollection(tupleData3)
       .assignAscendingTimestamps(_._1.toLong)
       .toTable(tEnv, 'id, 'num, 'text, 'rowtime.rowtime)
 
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE TABLE retractSink (
          |  `t` TIMESTAMP(3),
          |  `icnt` BIGINT,
@@ -177,7 +184,8 @@ class TableSinkITCase extends StreamingTestBase {
          |)
          |""".stripMargin)
 
-    val table = t.window(Tumble over 5.millis on 'rowtime as 'w)
+    val table = t
+      .window(Tumble over 5.millis on 'rowtime as 'w)
       .groupBy('w)
       .select('w.end as 't, 'id.count as 'icnt, 'num.sum as 'nsum)
     table.executeInsert("retractSink").await()
@@ -185,7 +193,8 @@ class TableSinkITCase extends StreamingTestBase {
     val rawResult = TestValuesTableFactory.getRawResults("retractSink")
     assertFalse(
       "Received retraction messages for append only table",
-      rawResult.exists(_.startsWith("-"))) // maybe -U or -D
+      rawResult.exists(_.startsWith("-"))
+    ) // maybe -U or -D
 
     val result = TestValuesTableFactory.getResults("retractSink")
     val expected = List(
@@ -199,12 +208,12 @@ class TableSinkITCase extends StreamingTestBase {
 
   @Test
   def testUpsertSinkOnNestedAggregation(): Unit = {
-    val t = env.fromCollection(tupleData3)
+    val t = env
+      .fromCollection(tupleData3)
       .assignAscendingTimestamps(_._1.toLong)
       .toTable(tEnv, 'id, 'num, 'text)
 
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE TABLE upsertSink (
          |  `cnt` BIGINT,
          |  `lencnt` BIGINT,
@@ -216,7 +225,8 @@ class TableSinkITCase extends StreamingTestBase {
          |)
          |""".stripMargin)
 
-    val table = t.select('id, 'num, 'text.charLength() as 'len, ('id > 0) as 'cTrue)
+    val table = t
+      .select('id, 'num, 'text.charLength() as 'len, ('id > 0) as 'cTrue)
       .groupBy('len, 'cTrue)
       // test query field name is different with registered sink field name
       .select('len, 'id.count as 'count, 'cTrue)
@@ -225,9 +235,7 @@ class TableSinkITCase extends StreamingTestBase {
     table.executeInsert("upsertSink").await()
 
     val rawResult = TestValuesTableFactory.getRawResults("upsertSink")
-    assertTrue(
-      "Results must include delete messages",
-      rawResult.exists(_.startsWith("-D(")))
+    assertTrue("Results must include delete messages", rawResult.exists(_.startsWith("-D(")))
 
     val result = TestValuesTableFactory.getResults("upsertSink")
     val expected = List("1,5,true", "7,1,true", "9,1,true")
@@ -236,12 +244,12 @@ class TableSinkITCase extends StreamingTestBase {
 
   @Test
   def testUpsertSinkOnAppendingTable(): Unit = {
-    val t = env.fromCollection(tupleData3)
+    val t = env
+      .fromCollection(tupleData3)
       .assignAscendingTimestamps(_._1.toLong)
       .toTable(tEnv, 'id, 'num, 'text, 'rowtime.rowtime)
 
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE TABLE upsertSink (
          |  `num` BIGINT,
          |  `wend` TIMESTAMP(3),
@@ -253,7 +261,8 @@ class TableSinkITCase extends StreamingTestBase {
          |)
          |""".stripMargin)
 
-    val table = t.window(Tumble over 5.millis on 'rowtime as 'w)
+    val table = t
+      .window(Tumble over 5.millis on 'rowtime as 'w)
       .groupBy('w, 'num)
       // test query field name is different with registered sink field name
       .select('num, 'w.end as 'window_end, 'id.count as 'icnt)
@@ -262,7 +271,8 @@ class TableSinkITCase extends StreamingTestBase {
     val rawResult = TestValuesTableFactory.getRawResults("upsertSink")
     assertFalse(
       "Received retraction messages for append only table",
-      rawResult.exists(_.startsWith("-"))) // maybe -D or -U
+      rawResult.exists(_.startsWith("-"))
+    ) // maybe -D or -U
 
     val result = TestValuesTableFactory.getResults("upsertSink")
     val expected = List(
@@ -281,12 +291,12 @@ class TableSinkITCase extends StreamingTestBase {
 
   @Test
   def testUpsertSinkOnAppendingTableWithoutFullKey1(): Unit = {
-    val t = env.fromCollection(tupleData3)
+    val t = env
+      .fromCollection(tupleData3)
       .assignAscendingTimestamps(_._1.toLong)
       .toTable(tEnv, 'id, 'num, 'text, 'rowtime.rowtime)
 
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE TABLE upsertSink (
          |  `wend` TIMESTAMP(3),
          |  `icnt` BIGINT,
@@ -297,7 +307,8 @@ class TableSinkITCase extends StreamingTestBase {
          |)
          |""".stripMargin)
 
-    val table = t.window(Tumble over 5.millis on 'rowtime as 'w)
+    val table = t
+      .window(Tumble over 5.millis on 'rowtime as 'w)
       .groupBy('w, 'num)
       .select('w.end as 'wend, 'id.count as 'cnt)
     table.executeInsert("upsertSink").await()
@@ -305,7 +316,8 @@ class TableSinkITCase extends StreamingTestBase {
     val rawResult = TestValuesTableFactory.getRawResults("upsertSink")
     assertFalse(
       "Received retraction messages for append only table",
-      rawResult.exists(_.startsWith("-"))) // may -D or -U
+      rawResult.exists(_.startsWith("-"))
+    ) // may -D or -U
 
     val rawExpected = List(
       "+I(1970-01-01T00:00:00.005,1)",
@@ -323,12 +335,12 @@ class TableSinkITCase extends StreamingTestBase {
 
   @Test
   def testUpsertSinkOnAppendingTableWithoutFullKey2(): Unit = {
-    val t = env.fromCollection(tupleData3)
+    val t = env
+      .fromCollection(tupleData3)
       .assignAscendingTimestamps(_._1.toLong)
       .toTable(tEnv, 'id, 'num, 'text, 'rowtime.rowtime)
 
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE TABLE upsertSink (
          |  `num` BIGINT,
          |  `cnt` BIGINT,
@@ -339,7 +351,8 @@ class TableSinkITCase extends StreamingTestBase {
          |)
          |""".stripMargin)
 
-    val table = t.window(Tumble over 5.millis on 'rowtime as 'w)
+    val table = t
+      .window(Tumble over 5.millis on 'rowtime as 'w)
       .groupBy('w, 'num)
       .select('num, 'id.count as 'cnt)
     table.executeInsert("upsertSink").await()
@@ -347,7 +360,8 @@ class TableSinkITCase extends StreamingTestBase {
     val rawResult = TestValuesTableFactory.getRawResults("upsertSink")
     assertFalse(
       "Received retraction messages for append only table",
-      rawResult.exists(_.startsWith("-"))) // may -D or -U
+      rawResult.exists(_.startsWith("-"))
+    ) // may -D or -U
 
     val expected = List(
       "+I(1,1)",
@@ -365,12 +379,12 @@ class TableSinkITCase extends StreamingTestBase {
 
   @Test
   def testUpsertSinkWithFilter(): Unit = {
-    val t = env.fromCollection(tupleData3)
+    val t = env
+      .fromCollection(tupleData3)
       .assignAscendingTimestamps(_._1.toLong)
       .toTable(tEnv, 'id, 'num, 'text)
 
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE TABLE upsertSink (
          |  `num` BIGINT,
          |  `cnt` BIGINT,
@@ -389,7 +403,8 @@ class TableSinkITCase extends StreamingTestBase {
     //   5, 5
     //   6, 6
 
-    val table = t.groupBy('num)
+    val table = t
+      .groupBy('num)
       .select('num, 'id.count as 'cnt)
       .where('cnt <= 3)
     table.executeInsert("upsertSink").await()
@@ -401,12 +416,12 @@ class TableSinkITCase extends StreamingTestBase {
 
   @Test
   def testMultiRowtime(): Unit = {
-    val t = env.fromCollection(tupleData3)
+    val t = env
+      .fromCollection(tupleData3)
       .assignAscendingTimestamps(_._1.toLong)
       .toTable(tEnv, 'id, 'num, 'text, 'rowtime.rowtime)
 
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE TABLE sink (
          |  `num` BIGINT,
          |  `ts1` TIMESTAMP(3),
@@ -417,20 +432,21 @@ class TableSinkITCase extends StreamingTestBase {
          |)
          |""".stripMargin)
 
-    val table = t.window(Tumble over 5.milli on 'rowtime as 'w)
+    val table = t
+      .window(Tumble over 5.milli on 'rowtime as 'w)
       .groupBy('num, 'w)
       .select('num, 'w.rowtime as 'rowtime1, 'w.rowtime as 'rowtime2)
 
     thrown.expect(classOf[TableException])
-    thrown.expectMessage("Found more than one rowtime field: [rowtime1, rowtime2] " +
-      "in the query when insert into 'default_catalog.default_database.sink'")
+    thrown.expectMessage(
+      "Found more than one rowtime field: [rowtime1, rowtime2] " +
+        "in the query when insert into 'default_catalog.default_database.sink'")
     table.executeInsert("sink")
   }
 
   @Test
   def testDecimalOnSinkFunctionTableSink(): Unit = {
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE TABLE sink (
          |  `c` VARCHAR(5),
          |  `b` DECIMAL(10, 0),
@@ -441,7 +457,8 @@ class TableSinkITCase extends StreamingTestBase {
          |)
          |""".stripMargin)
 
-    val table = env.fromCollection(tupleData3)
+    val table = env
+      .fromCollection(tupleData3)
       .toTable(tEnv, 'a, 'b, 'c)
       .where('a > 20)
       .select("12345", 55.cast(DataTypes.DECIMAL(10, 0)), "12345".cast(DataTypes.CHAR(5)))
@@ -454,8 +471,7 @@ class TableSinkITCase extends StreamingTestBase {
 
   @Test
   def testDecimalOnOutputFormatTableSink(): Unit = {
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE TABLE sink (
          |  `c` VARCHAR(5),
          |  `b` DECIMAL(10, 0),
@@ -467,7 +483,8 @@ class TableSinkITCase extends StreamingTestBase {
          |)
          |""".stripMargin)
 
-    val table = env.fromCollection(tupleData3)
+    val table = env
+      .fromCollection(tupleData3)
       .toTable(tEnv, 'a, 'b, 'c)
       .where('a > 20)
       .select("12345", 55.cast(DataTypes.DECIMAL(10, 0)), "12345".cast(DataTypes.CHAR(5)))
@@ -493,8 +510,7 @@ class TableSinkITCase extends StreamingTestBase {
       rowOf(2L, "user1", new JBigDecimal("10")),
       rowOf(2L, "user3", new JBigDecimal("21.03")))
     val dataId = TestValuesTableFactory.registerData(orderData)
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE TABLE orders (
          |  product_id BIGINT,
          |  user_name STRING,
@@ -504,8 +520,7 @@ class TableSinkITCase extends StreamingTestBase {
          |  'data-id' = '$dataId'
          |)
          |""".stripMargin)
-    tEnv.executeSql(
-      """
+    tEnv.executeSql("""
         |CREATE TABLE changelog_sink (
         |  product_id BIGINT,
         |  user_name STRING,
@@ -515,13 +530,14 @@ class TableSinkITCase extends StreamingTestBase {
         |  'sink-insert-only' = 'false'
         |)
         |""".stripMargin)
-    tEnv.executeSql(
-      """
+    tEnv
+      .executeSql("""
         |INSERT INTO changelog_sink
         |SELECT product_id, user_name, SUM(order_price)
         |FROM orders
         |GROUP BY product_id, user_name
-        |""".stripMargin).await()
+        |""".stripMargin)
+      .await()
 
     val rawResult = TestValuesTableFactory.getRawResults("changelog_sink")
     val expected = List(
@@ -543,8 +559,7 @@ class TableSinkITCase extends StreamingTestBase {
       changelogRow(kindString, JLong.valueOf(fields(0)), fields(1), new JBigDecimal(fields(2)))
     }
     val dataId2 = TestValuesTableFactory.registerData(changelogData)
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
         |CREATE TABLE changelog_source (
         |  product_id BIGINT,
         |  user_name STRING,
@@ -555,8 +570,7 @@ class TableSinkITCase extends StreamingTestBase {
         |  'changelog-mode' = 'I,UB,UA,D'
         |)
         |""".stripMargin)
-    tEnv.executeSql(
-      """
+    tEnv.executeSql("""
         |CREATE TABLE final_sink (
         |  user_name STRING,
         |  total_pay DECIMAL(18, 2),
@@ -566,24 +580,23 @@ class TableSinkITCase extends StreamingTestBase {
         |  'sink-insert-only' = 'false'
         |)
         |""".stripMargin)
-    tEnv.executeSql(
-      """
+    tEnv
+      .executeSql("""
         |INSERT INTO final_sink
         |SELECT user_name, SUM(price) as total_pay
         |FROM changelog_source
         |GROUP BY user_name
-        |""".stripMargin).await()
+        |""".stripMargin)
+      .await()
     val finalResult = TestValuesTableFactory.getResults("final_sink")
-    val finalExpected = List(
-      "user1,28.12", "user2,71.20", "user3,32.33", "user4,9.99")
+    val finalExpected = List("user1,28.12", "user2,71.20", "user3,32.33", "user4,9.99")
     assertEquals(finalExpected.sorted, finalResult.sorted)
   }
 
   @Test
   def testNotNullEnforcer(): Unit = {
     val dataId = TestValuesTableFactory.registerData(nullData4)
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE TABLE nullable_src (
          |  category STRING,
          |  shopId INT,
@@ -593,8 +606,7 @@ class TableSinkITCase extends StreamingTestBase {
          |  'data-id' = '$dataId'
          |)
          |""".stripMargin)
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE TABLE not_null_sink (
          |  category STRING,
          |  shopId INT,
@@ -696,16 +708,16 @@ class TableSinkITCase extends StreamingTestBase {
     // Verify writing out with additional operator to generate a new rowtime attribute
     //---------------------------------------------------------------------------------------
 
-    tEnv.executeSql(
-      """
+    tEnv
+      .executeSql("""
         |INSERT INTO sink2
         |SELECT
         |  TUMBLE_ROWTIME(ts, INTERVAL '5' SECOND),
         |  SUM(b)
         |FROM src
         |GROUP BY TUMBLE(ts, INTERVAL '5' SECOND)
-        |""".stripMargin
-    ).await()
+        |""".stripMargin)
+      .await()
 
     val expected2 = List(4999, 9999, 19999)
     assertEquals(expected2.sorted, TestSinkContextTableSink.ROWTIMES.sorted)
@@ -715,8 +727,7 @@ class TableSinkITCase extends StreamingTestBase {
   def testMetadataSourceAndSink(): Unit = {
     val dataId = TestValuesTableFactory.registerData(nullData4)
     // tests metadata at different locations and casting in both sources and sinks
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE TABLE MetadataSource (
          |  category STRING,
          |  shopId INT,
@@ -727,8 +738,7 @@ class TableSinkITCase extends StreamingTestBase {
          |  'readable-metadata' = 'metadata_1:INT'
          |)
          |""".stripMargin)
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE TABLE MetadataSink (
          |  category STRING METADATA FROM 'metadata_1',
          |  shopId INT,
@@ -742,8 +752,7 @@ class TableSinkITCase extends StreamingTestBase {
          |""".stripMargin)
 
     tEnv
-      .executeSql(
-        s"""
+      .executeSql(s"""
            |INSERT INTO MetadataSink
            |SELECT category, shopId, CAST(num AS STRING)
            |FROM MetadataSource
@@ -756,13 +765,9 @@ class TableSinkITCase extends StreamingTestBase {
     assertEquals(expected.sorted, result.sorted)
   }
 
-
   @Test
   def testParallelismWithDataStream(): Unit = {
-    Try(innerTestSetParallelism(
-      "DataStreamWithParallelism",
-      1,
-      index = 1)) match {
+    Try(innerTestSetParallelism("DataStreamWithParallelism", 1, index = 1)) match {
       case Success(_) => fail("this should not happen")
       case Failure(t) => {
         val exception = ExceptionUtils.findThrowableWithMessage(
@@ -781,25 +786,23 @@ class TableSinkITCase extends StreamingTestBase {
     val oversizedParallelism = Int.MaxValue
     val index = new AtomicInteger(1)
 
-    Try(innerTestSetParallelism(
-      "SinkFunction",
-      oversizedParallelism,
-      index = index.getAndIncrement))
-    match {
+    Try(
+      innerTestSetParallelism(
+        "SinkFunction",
+        oversizedParallelism,
+        index = index.getAndIncrement)) match {
       case Success(_) => fail("this should not happen")
       case Failure(t) => {
-        val exception = ExceptionUtils.findThrowableWithMessage(
-          t,
-          s"Failed to wait job finish")
+        val exception = ExceptionUtils.findThrowableWithMessage(t, s"Failed to wait job finish")
         assertTrue(exception.isPresent)
       }
     }
 
-    Try(innerTestSetParallelism(
-      "SinkFunction",
-      negativeParallelism,
-      index = index.getAndIncrement))
-    match {
+    Try(
+      innerTestSetParallelism(
+        "SinkFunction",
+        negativeParallelism,
+        index = index.getAndIncrement)) match {
       case Success(_) => fail("this should not happen")
       case Failure(t) => {
         val exception = ExceptionUtils.findThrowableWithMessage(
@@ -809,10 +812,12 @@ class TableSinkITCase extends StreamingTestBase {
       }
     }
 
-    assertTrue(Try(innerTestSetParallelism(
-      "SinkFunction",
-      validParallelism,
-      index = index.getAndIncrement)).isSuccess)
+    assertTrue(
+      Try(
+        innerTestSetParallelism(
+          "SinkFunction",
+          validParallelism,
+          index = index.getAndIncrement)).isSuccess)
   }
 
   @Test
@@ -822,11 +827,11 @@ class TableSinkITCase extends StreamingTestBase {
     val validParallelism = 1
     val index = new AtomicInteger(1)
 
-    Try(innerTestSetParallelism(
-      "OutputFormat",
-      negativeParallelism,
-      index = index.getAndIncrement))
-    match {
+    Try(
+      innerTestSetParallelism(
+        "OutputFormat",
+        negativeParallelism,
+        index = index.getAndIncrement)) match {
       case Success(_) => fail("this should not happen")
       case Failure(t) => {
         val exception = ExceptionUtils.findThrowableWithMessage(
@@ -836,37 +841,35 @@ class TableSinkITCase extends StreamingTestBase {
       }
     }
 
-    Try(innerTestSetParallelism(
-      "SinkFunction",
-      oversizedParallelism,
-      index = index.getAndIncrement))
-    match {
+    Try(
+      innerTestSetParallelism(
+        "SinkFunction",
+        oversizedParallelism,
+        index = index.getAndIncrement)) match {
       case Success(_) => fail("this should not happen")
       case Failure(t) => {
-        val exception = ExceptionUtils.findThrowableWithMessage(
-          t,
-          s"Failed to wait job finish")
+        val exception = ExceptionUtils.findThrowableWithMessage(t, s"Failed to wait job finish")
         assertTrue(exception.isPresent)
       }
     }
 
-    assertTrue(Try(innerTestSetParallelism(
-      "SinkFunction",
-      validParallelism,
-      index = index.getAndIncrement))
-      .isSuccess)
+    assertTrue(
+      Try(
+        innerTestSetParallelism(
+          "SinkFunction",
+          validParallelism,
+          index = index.getAndIncrement)).isSuccess)
   }
 
   @Test
-  def testParallelismOnChangelogMode():Unit = {
+  def testParallelismOnChangelogMode(): Unit = {
     val dataId = TestValuesTableFactory.registerData(data1)
     val sourceTableName = s"test_para_source"
     val sinkTableWithoutPkName = s"test_para_sink_without_pk"
     val sinkTableWithPkName = s"test_para_sink_with_pk"
     val sinkParallelism = 2
 
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE TABLE $sourceTableName (
          |  the_month INT,
          |  area STRING,
@@ -877,8 +880,7 @@ class TableSinkITCase extends StreamingTestBase {
          |  'bounded' = 'true'
          |)
          |""".stripMargin)
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE TABLE $sinkTableWithoutPkName (
          |  the_month INT,
          |  area STRING,
@@ -890,19 +892,17 @@ class TableSinkITCase extends StreamingTestBase {
          |  'sink-changelog-mode-enforced' = 'I,D'
          |)
          |""".stripMargin)
-    Try(tEnv
-      .executeSql(s"INSERT INTO $sinkTableWithoutPkName SELECT * FROM $sourceTableName")
-      .await()) match {
+    Try(
+      tEnv
+        .executeSql(s"INSERT INTO $sinkTableWithoutPkName SELECT * FROM $sourceTableName")
+        .await()) match {
       case Failure(e) =>
         val exception = ExceptionUtils
-          .findThrowableWithMessage(
-            e,
-            "primary key is required but no primary key is found")
+          .findThrowableWithMessage(e, "primary key is required but no primary key is found")
         assertTrue(exception.isPresent)
     }
 
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE TABLE $sinkTableWithPkName (
          |  the_month INT,
          |  area STRING,
@@ -916,19 +916,19 @@ class TableSinkITCase extends StreamingTestBase {
          |)
          |""".stripMargin)
 
-    assertTrue(Try(tEnv
-      .executeSql(s"INSERT INTO $sinkTableWithPkName SELECT * FROM $sourceTableName")
-      .await()).isSuccess)
+    assertTrue(
+      Try(
+        tEnv
+          .executeSql(s"INSERT INTO $sinkTableWithPkName SELECT * FROM $sourceTableName")
+          .await()).isSuccess)
 
   }
-
 
   private def innerTestSetParallelism(provider: String, parallelism: Int, index: Int): Unit = {
     val dataId = TestValuesTableFactory.registerData(data1)
     val sourceTableName = s"test_para_source_${provider.toLowerCase.trim}_$index"
     val sinkTableName = s"test_para_sink_${provider.toLowerCase.trim}_$index"
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE TABLE $sourceTableName (
          |  the_month INT,
          |  area STRING,
@@ -939,8 +939,7 @@ class TableSinkITCase extends StreamingTestBase {
          |  'bounded' = 'true'
          |)
          |""".stripMargin)
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE TABLE $sinkTableName (
          |  the_month INT,
          |  area STRING,

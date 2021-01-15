@@ -34,24 +34,24 @@ import org.apache.flink.table.planner.PlanningConfigurationBuilder
 import scala.collection.JavaConverters._
 
 /**
-  * Common functionalities for both [[StreamOptimizer]] and [[BatchOptimizer]]. An [[Optimizer]]
-  * should be used to create an optimized tree from a logical input tree.
-  * See [[StreamOptimizer.optimize]] and [[BatchOptimizer.optimize]]
-  *
-  * @param calciteConfig                provider for [[CalciteConfig]]. It is a provider because the
-  *                                     [[TableConfig]] in a [[TableEnvImpl]] is mutable.
-  * @param planningConfigurationBuilder provider for [[RelOptPlanner]] and [[Context]]
-  */
+ * Common functionalities for both [[StreamOptimizer]] and [[BatchOptimizer]]. An [[Optimizer]]
+ * should be used to create an optimized tree from a logical input tree.
+ * See [[StreamOptimizer.optimize]] and [[BatchOptimizer.optimize]]
+ *
+ * @param calciteConfig                provider for [[CalciteConfig]]. It is a provider because the
+ *                                     [[TableConfig]] in a [[TableEnvImpl]] is mutable.
+ * @param planningConfigurationBuilder provider for [[RelOptPlanner]] and [[Context]]
+ */
 abstract class Optimizer(
-  calciteConfig: () => CalciteConfig,
-  planningConfigurationBuilder: PlanningConfigurationBuilder) {
+    calciteConfig: () => CalciteConfig,
+    planningConfigurationBuilder: PlanningConfigurationBuilder) {
 
   protected def materializedConfig: CalciteConfig = calciteConfig.apply()
 
   /**
-    * Returns the normalization rule set for this optimizer
-    * including a custom RuleSet configuration.
-    */
+   * Returns the normalization rule set for this optimizer
+   * including a custom RuleSet configuration.
+   */
   protected def getNormRuleSet: RuleSet = {
     materializedConfig.normRuleSet match {
 
@@ -68,9 +68,9 @@ abstract class Optimizer(
   }
 
   /**
-    * Returns the logical optimization rule set for this optimizer
-    * including a custom RuleSet configuration.
-    */
+   * Returns the logical optimization rule set for this optimizer
+   * including a custom RuleSet configuration.
+   */
   protected def getLogicalOptRuleSet: RuleSet = {
     materializedConfig.logicalOptRuleSet match {
 
@@ -87,9 +87,9 @@ abstract class Optimizer(
   }
 
   /**
-    * Returns the logical rewrite rule set for this optimizer
-    * including a custom RuleSet configuration.
-    */
+   * Returns the logical rewrite rule set for this optimizer
+   * including a custom RuleSet configuration.
+   */
   protected def getLogicalRewriteRuleSet: RuleSet = {
     materializedConfig.logicalRewriteRuleSet match {
 
@@ -106,9 +106,9 @@ abstract class Optimizer(
   }
 
   /**
-    * Returns the physical optimization rule set for this optimizer
-    * including a custom RuleSet configuration.
-    */
+   * Returns the physical optimization rule set for this optimizer
+   * including a custom RuleSet configuration.
+   */
   protected def getPhysicalOptRuleSet: RuleSet = {
     materializedConfig.physicalOptRuleSet match {
 
@@ -125,27 +125,27 @@ abstract class Optimizer(
   }
 
   /**
-    * Returns the built-in normalization rules that are defined by the optimizer.
-    */
+   * Returns the built-in normalization rules that are defined by the optimizer.
+   */
   protected def getBuiltInNormRuleSet: RuleSet
 
   /**
-    * Returns the built-in logical optimization rules that are defined by the optimizer.
-    */
+   * Returns the built-in logical optimization rules that are defined by the optimizer.
+   */
   protected def getBuiltInLogicalOptRuleSet: RuleSet = {
     FlinkRuleSets.LOGICAL_OPT_RULES
   }
 
   /**
-    * Returns the built-in logical rewrite rules that are defined by the optimizer.
-    */
+   * Returns the built-in logical rewrite rules that are defined by the optimizer.
+   */
   protected def getBuiltInLogicalRewriteRuleSet: RuleSet = {
     FlinkRuleSets.LOGICAL_REWRITE_RULES
   }
 
   /**
-    * Returns the built-in physical optimization rules that are defined by the optimizer.
-    */
+   * Returns the built-in physical optimization rules that are defined by the optimizer.
+   */
   protected def getBuiltInPhysicalOptRuleSet: RuleSet
 
   protected def optimizeConvertSubQueries(relNode: RelNode): RelNode = {
@@ -213,15 +213,15 @@ abstract class Optimizer(
   }
 
   /**
-    * run HEP planner with rules applied one by one. First apply one rule to all of the nodes
-    * and only then apply the next rule. If a rule creates a new node preceding rules will not
-    * be applied to the newly created node.
-    */
+   * run HEP planner with rules applied one by one. First apply one rule to all of the nodes
+   * and only then apply the next rule. If a rule creates a new node preceding rules will not
+   * be applied to the newly created node.
+   */
   protected def runHepPlannerSequentially(
-    hepMatchOrder: HepMatchOrder,
-    ruleSet: RuleSet,
-    input: RelNode,
-    targetTraits: RelTraitSet): RelNode = {
+      hepMatchOrder: HepMatchOrder,
+      ruleSet: RuleSet,
+      input: RelNode,
+      targetTraits: RelTraitSet): RelNode = {
 
     val builder = new HepProgramBuilder
     builder.addMatchOrder(hepMatchOrder)
@@ -234,15 +234,15 @@ abstract class Optimizer(
   }
 
   /**
-    * run HEP planner with rules applied simultaneously. Apply all of the rules to the given
-    * node before going to the next one. If a rule creates a new node all of the rules will
-    * be applied to this new node.
-    */
+   * run HEP planner with rules applied simultaneously. Apply all of the rules to the given
+   * node before going to the next one. If a rule creates a new node all of the rules will
+   * be applied to this new node.
+   */
   protected def runHepPlannerSimultaneously(
-    hepMatchOrder: HepMatchOrder,
-    ruleSet: RuleSet,
-    input: RelNode,
-    targetTraits: RelTraitSet): RelNode = {
+      hepMatchOrder: HepMatchOrder,
+      ruleSet: RuleSet,
+      input: RelNode,
+      targetTraits: RelTraitSet): RelNode = {
 
     val builder = new HepProgramBuilder
     builder.addMatchOrder(hepMatchOrder)
@@ -252,12 +252,12 @@ abstract class Optimizer(
   }
 
   /**
-    * run HEP planner
-    */
+   * run HEP planner
+   */
   protected def runHepPlanner(
-    hepProgram: HepProgram,
-    input: RelNode,
-    targetTraits: RelTraitSet): RelNode = {
+      hepProgram: HepProgram,
+      input: RelNode,
+      targetTraits: RelTraitSet): RelNode = {
 
     val planner = new HepPlanner(hepProgram, planningConfigurationBuilder.getContext)
     planner.setRoot(input)
@@ -268,34 +268,39 @@ abstract class Optimizer(
   }
 
   /**
-    * run VOLCANO planner
-    */
+   * run VOLCANO planner
+   */
   protected def runVolcanoPlanner(
-    ruleSet: RuleSet,
-    input: RelNode,
-    targetTraits: RelTraitSet): RelNode = {
+      ruleSet: RuleSet,
+      input: RelNode,
+      targetTraits: RelTraitSet): RelNode = {
     val optProgram = Programs.ofRules(ruleSet)
 
-    val output = try {
-      optProgram.run(planningConfigurationBuilder.getPlanner, input, targetTraits,
-        ImmutableList.of(), ImmutableList.of())
-    } catch {
-      case e: CannotPlanException =>
-        throw new TableException(
-          s"Cannot generate a valid execution plan for the given query: \n\n" +
-            s"${RelOptUtil.toString(input)}\n" +
-            s"This exception indicates that the query uses an unsupported SQL feature.\n" +
-            s"Please check the documentation for the set of currently supported SQL features.")
-      case t: TableException =>
-        throw new TableException(
-          s"Cannot generate a valid execution plan for the given query: \n\n" +
-            s"${RelOptUtil.toString(input)}\n" +
-            s"${t.getMessage}\n" +
-            s"Please check the documentation for the set of currently supported SQL features.")
-      case a: AssertionError =>
-        // keep original exception stack for caller
-        throw a
-    }
+    val output =
+      try {
+        optProgram.run(
+          planningConfigurationBuilder.getPlanner,
+          input,
+          targetTraits,
+          ImmutableList.of(),
+          ImmutableList.of())
+      } catch {
+        case e: CannotPlanException =>
+          throw new TableException(
+            s"Cannot generate a valid execution plan for the given query: \n\n" +
+              s"${RelOptUtil.toString(input)}\n" +
+              s"This exception indicates that the query uses an unsupported SQL feature.\n" +
+              s"Please check the documentation for the set of currently supported SQL features.")
+        case t: TableException =>
+          throw new TableException(
+            s"Cannot generate a valid execution plan for the given query: \n\n" +
+              s"${RelOptUtil.toString(input)}\n" +
+              s"${t.getMessage}\n" +
+              s"Please check the documentation for the set of currently supported SQL features.")
+        case a: AssertionError =>
+          // keep original exception stack for caller
+          throw a
+      }
     output
   }
 

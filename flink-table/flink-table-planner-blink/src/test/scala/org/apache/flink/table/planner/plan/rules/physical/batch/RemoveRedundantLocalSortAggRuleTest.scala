@@ -25,8 +25,8 @@ import org.apache.flink.table.planner.utils.TableTestBase
 import org.junit.{Before, Test}
 
 /**
-  * Test for [[RemoveRedundantLocalSortAggRule]].
-  */
+ * Test for [[RemoveRedundantLocalSortAggRule]].
+ */
 class RemoveRedundantLocalSortAggRuleTest extends TableTestBase {
 
   private val util = batchTestUtil()
@@ -41,10 +41,11 @@ class RemoveRedundantLocalSortAggRuleTest extends TableTestBase {
   @Test
   def testRemoveRedundantLocalSortAggWithSort(): Unit = {
     util.tableEnv.getConfig.getConfiguration.setString(
-      ExecutionConfigOptions.TABLE_EXEC_DISABLED_OPERATORS, "SortMergeJoin,NestedLoopJoin,HashAgg")
+      ExecutionConfigOptions.TABLE_EXEC_DISABLED_OPERATORS,
+      "SortMergeJoin,NestedLoopJoin,HashAgg")
     // disable BroadcastHashJoin
-    util.tableEnv.getConfig.getConfiguration.setLong(
-      OptimizerConfigOptions.TABLE_OPTIMIZER_BROADCAST_JOIN_THRESHOLD, -1)
+    util.tableEnv.getConfig.getConfiguration
+      .setLong(OptimizerConfigOptions.TABLE_OPTIMIZER_BROADCAST_JOIN_THRESHOLD, -1)
     val sqlQuery =
       """
         |WITH r AS (SELECT * FROM x, y WHERE a = d AND c LIKE 'He%')
@@ -56,7 +57,8 @@ class RemoveRedundantLocalSortAggRuleTest extends TableTestBase {
   @Test
   def testRemoveRedundantLocalSortAggWithoutSort(): Unit = {
     util.tableEnv.getConfig.getConfiguration.setString(
-      ExecutionConfigOptions.TABLE_EXEC_DISABLED_OPERATORS, "HashJoin,NestedLoopJoin,HashAgg")
+      ExecutionConfigOptions.TABLE_EXEC_DISABLED_OPERATORS,
+      "HashJoin,NestedLoopJoin,HashAgg")
     val sqlQuery =
       """
         |WITH r AS (SELECT * FROM x, y WHERE a = d AND c LIKE 'He%')
@@ -67,8 +69,8 @@ class RemoveRedundantLocalSortAggRuleTest extends TableTestBase {
 
   @Test
   def testUsingLocalAggCallFilters(): Unit = {
-    util.tableEnv.getConfig.getConfiguration.setString(
-      ExecutionConfigOptions.TABLE_EXEC_DISABLED_OPERATORS, "HashAgg")
+    util.tableEnv.getConfig.getConfiguration
+      .setString(ExecutionConfigOptions.TABLE_EXEC_DISABLED_OPERATORS, "HashAgg")
     val sqlQuery = "SELECT d, MAX(e), MAX(e) FILTER (WHERE a < 10), COUNT(DISTINCT c),\n" +
       "COUNT(DISTINCT c) FILTER (WHERE a > 5), COUNT(DISTINCT b) FILTER (WHERE b > 3)\n" +
       "FROM z GROUP BY d"

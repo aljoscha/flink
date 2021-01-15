@@ -41,9 +41,8 @@ import java.io.File
 import scala.collection.JavaConverters._
 
 @RunWith(classOf[Parameterized])
-class TableSinkITCase(
-    configMode: TableConfigMode)
-  extends TableProgramsCollectionTestBase(configMode) {
+class TableSinkITCase(configMode: TableConfigMode)
+    extends TableProgramsCollectionTestBase(configMode) {
 
   val _tempFolder = new TemporaryFolder
 
@@ -60,15 +59,20 @@ class TableSinkITCase(
     val tEnv = BatchTableEnvironment.create(env, config)
     env.setParallelism(4)
 
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSinkInternal(
-      "testSink",
-      new CsvTableSink(path, "|").configure(
-        Array[String]("c", "b"), Array[TypeInformation[_]](Types.STRING, Types.LONG)))
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSinkInternal(
+        "testSink",
+        new CsvTableSink(path, "|")
+          .configure(Array[String]("c", "b"), Array[TypeInformation[_]](Types.STRING, Types.LONG)))
 
-    val input = CollectionDataSets.get3TupleDataSet(env)
-      .map(x => x).setParallelism(4) // increase DOP to 4
+    val input = CollectionDataSets
+      .get3TupleDataSet(env)
+      .map(x => x)
+      .setParallelism(4) // increase DOP to 4
 
-    input.toTable(tEnv, 'a, 'b, 'c)
+    input
+      .toTable(tEnv, 'a, 'b, 'c)
       .where('a < 5 || 'a > 17)
       .select('c, 'b)
       .insertInto("testSink")
@@ -76,8 +80,14 @@ class TableSinkITCase(
     tEnv.execute("job name")
 
     val expected = Seq(
-      "Hi|1", "Hello|2", "Hello world|2", "Hello world, how are you?|3",
-      "Comment#12|6", "Comment#13|6", "Comment#14|6", "Comment#15|6").mkString("\n")
+      "Hi|1",
+      "Hello|2",
+      "Hello world|2",
+      "Hello world, how are you?|3",
+      "Comment#12|6",
+      "Comment#13|6",
+      "Comment#14|6",
+      "Comment#15|6").mkString("\n")
 
     TestBaseUtils.compareResultsByLinesInMemory(expected, path)
   }
@@ -91,13 +101,17 @@ class TableSinkITCase(
     val fieldNames = Array("c", "b")
     val fieldTypes: Array[TypeInformation[_]] = Array(Types.STRING, Types.LONG)
     val sink = new UnsafeMemoryOutputFormatTableSink
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSinkInternal(
-      "testSink", sink.configure(fieldNames, fieldTypes))
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSinkInternal("testSink", sink.configure(fieldNames, fieldTypes))
 
-    val input = CollectionDataSets.get3TupleDataSet(env)
-      .map(x => x).setParallelism(4) // increase DOP to 4
+    val input = CollectionDataSets
+      .get3TupleDataSet(env)
+      .map(x => x)
+      .setParallelism(4) // increase DOP to 4
 
-    input.toTable(tEnv, 'a, 'b, 'c)
+    input
+      .toTable(tEnv, 'a, 'b, 'c)
       .where('a < 5 || 'a > 17)
       .select('c, 'b)
       .insertInto("testSink")
@@ -106,8 +120,14 @@ class TableSinkITCase(
 
     val results = MemoryTableSourceSinkUtil.tableDataStrings.asJava
     val expected = Seq(
-      "Hi,1", "Hello,2", "Hello world,2", "Hello world, how are you?,3",
-      "Comment#12,6", "Comment#13,6", "Comment#14,6", "Comment#15,6").mkString("\n")
+      "Hi,1",
+      "Hello,2",
+      "Hello world,2",
+      "Hello world, how are you?,3",
+      "Comment#12,6",
+      "Comment#13,6",
+      "Comment#14,6",
+      "Comment#15,6").mkString("\n")
 
     TestBaseUtils.compareResultAsText(results, expected)
   }

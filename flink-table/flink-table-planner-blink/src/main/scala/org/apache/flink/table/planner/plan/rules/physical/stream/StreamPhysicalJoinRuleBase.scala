@@ -20,7 +20,11 @@ package org.apache.flink.table.planner.plan.rules.physical.stream
 
 import org.apache.flink.table.planner.plan.`trait`.FlinkRelDistribution
 import org.apache.flink.table.planner.plan.nodes.{FlinkConventions, FlinkRelNode}
-import org.apache.flink.table.planner.plan.nodes.logical.{FlinkLogicalJoin, FlinkLogicalRel, FlinkLogicalSnapshot}
+import org.apache.flink.table.planner.plan.nodes.logical.{
+  FlinkLogicalJoin,
+  FlinkLogicalRel,
+  FlinkLogicalSnapshot
+}
 import org.apache.flink.table.planner.plan.utils.IntervalJoinUtil.WindowBounds
 import org.apache.flink.table.planner.plan.utils.{FlinkRelOptUtil, IntervalJoinUtil}
 import org.apache.calcite.plan.{RelOptRule, RelOptRuleCall, RelTraitSet}
@@ -35,14 +39,15 @@ import java.util
  * regular stream join, interval join and temporal join.
  */
 abstract class StreamPhysicalJoinRuleBase(description: String)
-  extends RelOptRule(
-    operand(classOf[FlinkLogicalJoin],
-      operand(classOf[FlinkLogicalRel], any()),
-      operand(classOf[FlinkLogicalRel], any())),
-    description) {
+    extends RelOptRule(
+      operand(
+        classOf[FlinkLogicalJoin],
+        operand(classOf[FlinkLogicalRel], any()),
+        operand(classOf[FlinkLogicalRel], any())),
+      description) {
 
-  protected def extractWindowBounds(join: FlinkLogicalJoin):
-    (Option[WindowBounds], Option[RexNode]) = {
+  protected def extractWindowBounds(
+      join: FlinkLogicalJoin): (Option[WindowBounds], Option[RexNode]) = {
     val tableConfig = FlinkRelOptUtil.getTableConfigFromContext(join)
     IntervalJoinUtil.extractWindowBoundsFromPredicate(
       join.getCondition,
@@ -66,8 +71,8 @@ abstract class StreamPhysicalJoinRuleBase(description: String)
         FlinkRelDistribution.hash(columns)
       }
       inputTraitSet
-          .replace(FlinkConventions.STREAM_PHYSICAL)
-          .replace(distribution)
+        .replace(FlinkConventions.STREAM_PHYSICAL)
+        .replace(distribution)
     }
 
     def convertInput(input: RelNode, columns: util.Collection[_ <: Number]): RelNode = {

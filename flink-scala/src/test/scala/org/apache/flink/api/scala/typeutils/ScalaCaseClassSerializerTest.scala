@@ -24,10 +24,9 @@ import org.apache.flink.api.scala.createTypeInformation
 import org.apache.flink.api.scala.typeutils.ScalaCaseClassSerializerTest.SimpleCaseClass
 
 /**
-  * Test [[ScalaCaseClassSerializer]].
-  */
-class ScalaCaseClassSerializerTest
-    extends SerializerTestBase[SimpleCaseClass] {
+ * Test [[ScalaCaseClassSerializer]].
+ */
+class ScalaCaseClassSerializerTest extends SerializerTestBase[SimpleCaseClass] {
 
   val serializer = createTypeInformation[SimpleCaseClass]
     .createSerializer(new ExecutionConfig)
@@ -41,8 +40,7 @@ class ScalaCaseClassSerializerTest
   override protected def getTestData = Array(
     SimpleCaseClass("a", 1, Map("a" -> 15)),
     SimpleCaseClass("b", -1, Map("c" -> "C")),
-    SimpleCaseClass("c", 5, Map("e" -> "f"))
-  )
+    SimpleCaseClass("c", 5, Map("e" -> "f")))
 }
 
 object ScalaCaseClassSerializerTest {

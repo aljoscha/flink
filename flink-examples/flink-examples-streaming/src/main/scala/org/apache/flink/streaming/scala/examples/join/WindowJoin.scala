@@ -40,9 +40,9 @@ object WindowJoin {
   // *************************************************************************
 
   case class Grade(name: String, grade: Int)
-  
+
   case class Salary(name: String, salary: Int)
-  
+
   case class Person(name: String, grade: Int, salary: Int)
 
   // *************************************************************************
@@ -56,8 +56,9 @@ object WindowJoin {
     val rate = params.getLong("rate", 3)
 
     println("Using windowSize=" + windowSize + ", data rate=" + rate)
-    println("To customize example, use: WindowJoin " +
-      "[--windowSize <window-size-in-millis>] [--rate <elements-per-second>]")
+    println(
+      "To customize example, use: WindowJoin " +
+        "[--windowSize <window-size-in-millis>] [--rate <elements-per-second>]")
 
     // obtain execution environment, run this example in "ingestion time"
     val env = StreamExecutionEnvironment.getExecutionEnvironment
@@ -81,13 +82,13 @@ object WindowJoin {
     env.execute("Windowed Join Example")
   }
 
-
   def joinStreams(
       grades: DataStream[Grade],
       salaries: DataStream[Salary],
-      windowSize: Long) : DataStream[Person] = {
+      windowSize: Long): DataStream[Person] = {
 
-    grades.join(salaries)
+    grades
+      .join(salaries)
       .where(_.name)
       .equalTo(_.name)
       .window(TumblingEventTimeWindows.of(Time.milliseconds(windowSize)))

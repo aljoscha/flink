@@ -30,9 +30,8 @@ import org.apache.calcite.rel.logical.LogicalTableScan
  * so we can merge the optimization process with any plan that might be created
  * by the Table API.
  */
-class EnumerableToLogicalTableScan(
-    operand: RelOptRuleOperand,
-    description: String) extends RelOptRule(operand, description) {
+class EnumerableToLogicalTableScan(operand: RelOptRuleOperand, description: String)
+    extends RelOptRule(operand, description) {
 
   override def onMatch(call: RelOptRuleCall): Unit = {
     val oldRel = call.rel(0).asInstanceOf[EnumerableTableScan]
@@ -44,6 +43,6 @@ class EnumerableToLogicalTableScan(
 
 object EnumerableToLogicalTableScan {
   val INSTANCE = new EnumerableToLogicalTableScan(
-      operand(classOf[EnumerableTableScan], any),
+    operand(classOf[EnumerableTableScan], any),
     "EnumerableToLogicalTableScan")
 }

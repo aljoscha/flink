@@ -18,7 +18,11 @@
 
 package org.apache.flink.table.planner.plan.nodes.physical.batch
 
-import org.apache.flink.table.planner.plan.`trait`.{FlinkRelDistribution, FlinkRelDistributionTraitDef, TraitUtil}
+import org.apache.flink.table.planner.plan.`trait`.{
+  FlinkRelDistribution,
+  FlinkRelDistributionTraitDef,
+  TraitUtil
+}
 import org.apache.flink.table.planner.plan.nodes.common.CommonCalc
 
 import org.apache.calcite.plan._
@@ -32,16 +36,16 @@ import org.apache.calcite.util.mapping.{Mapping, MappingType, Mappings}
 import scala.collection.JavaConversions._
 
 /**
-  * Base batch physical RelNode for [[Calc]].
-  */
+ * Base batch physical RelNode for [[Calc]].
+ */
 abstract class BatchPhysicalCalcBase(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
     inputRel: RelNode,
     calcProgram: RexProgram,
     outputRowType: RelDataType)
-  extends CommonCalc(cluster, traitSet, inputRel, calcProgram)
-  with BatchPhysicalRel {
+    extends CommonCalc(cluster, traitSet, inputRel, calcProgram)
+    with BatchPhysicalRel {
 
   override def deriveRowType(): RelDataType = outputRowType
 
@@ -54,19 +58,20 @@ abstract class BatchPhysicalCalcBase(
     val projects = calcProgram.getProjectList.map(calcProgram.expandLocalRef)
 
     def getProjectMapping: Mapping = {
-      val mapping = Mappings.create(MappingType.INVERSE_FUNCTION,
-        getInput.getRowType.getFieldCount, projects.size)
-      projects.zipWithIndex.foreach {
-        case (project, index) =>
-          project match {
-            case inputRef: RexInputRef => mapping.set(inputRef.getIndex, index)
-            case call: RexCall if call.getKind == SqlKind.AS =>
-              call.getOperands.head match {
-                case inputRef: RexInputRef => mapping.set(inputRef.getIndex, index)
-                case _ => // ignore
-              }
-            case _ => // ignore
-          }
+      val mapping = Mappings.create(
+        MappingType.INVERSE_FUNCTION,
+        getInput.getRowType.getFieldCount,
+        projects.size)
+      projects.zipWithIndex.foreach { case (project, index) =>
+        project match {
+          case inputRef: RexInputRef => mapping.set(inputRef.getIndex, index)
+          case call: RexCall if call.getKind == SqlKind.AS =>
+            call.getOperands.head match {
+              case inputRef: RexInputRef => mapping.set(inputRef.getIndex, index)
+              case _                     => // ignore
+            }
+          case _ => // ignore
+        }
       }
       mapping.inverse()
     }

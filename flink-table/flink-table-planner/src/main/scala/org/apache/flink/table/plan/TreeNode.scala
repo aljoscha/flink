@@ -36,8 +36,8 @@ abstract class TreeNode[A <: TreeNode[A]] extends Product { self: A =>
   private[flink] def fastEquals(other: TreeNode[_]): Boolean = this.eq(other) || this == other
 
   /**
-    * Do tree transformation in post order.
-    */
+   * Do tree transformation in post order.
+   */
   private[flink] def postOrderTransform(rule: PartialFunction[A, A]): A = {
     def childrenTransform(rule: PartialFunction[A, A]): A = {
       var changed = false
@@ -50,19 +50,20 @@ abstract class TreeNode[A <: TreeNode[A]] extends Product { self: A =>
           } else {
             arg
           }
-        case args: Traversable[_] => args.map {
-          case arg: TreeNode[_] if children.contains(arg) =>
-            val newChild = arg.asInstanceOf[A].postOrderTransform(rule)
-            if (!(newChild fastEquals arg)) {
-              changed = true
-              newChild
-            } else {
-              arg
-            }
-          case other => other
-        }
+        case args: Traversable[_] =>
+          args.map {
+            case arg: TreeNode[_] if children.contains(arg) =>
+              val newChild = arg.asInstanceOf[A].postOrderTransform(rule)
+              if (!(newChild fastEquals arg)) {
+                changed = true
+                newChild
+              } else {
+                arg
+              }
+            case other => other
+          }
         case nonChild: AnyRef => nonChild
-        case null => null
+        case null             => null
       }.toArray
       if (changed) makeCopy(newArgs) else this
     }
@@ -76,8 +77,8 @@ abstract class TreeNode[A <: TreeNode[A]] extends Product { self: A =>
   }
 
   /**
-    * Runs the given function first on the node and then recursively on all its children.
-    */
+   * Runs the given function first on the node and then recursively on all its children.
+   */
   private[flink] def preOrderVisit(f: A => Unit): Unit = {
     f(this)
     children.foreach(_.preOrderVisit(f))
@@ -93,23 +94,24 @@ abstract class TreeNode[A <: TreeNode[A]] extends Product { self: A =>
       throw new RuntimeException(s"No valid constructor for ${getClass.getSimpleName}")
     }
 
-    val defaultCtor = ctors.find { ctor =>
-      if (ctor.getParameterTypes.length != newArgs.length) {
-        false
-      } else if (newArgs.contains(null)) {
-        false
-      } else {
-        val argsClasses: Array[Class[_]] = newArgs.map(_.getClass)
-        TypeCheckUtils.isAssignable(argsClasses, ctor.getParameterTypes)
+    val defaultCtor = ctors
+      .find { ctor =>
+        if (ctor.getParameterTypes.length != newArgs.length) {
+          false
+        } else if (newArgs.contains(null)) {
+          false
+        } else {
+          val argsClasses: Array[Class[_]] = newArgs.map(_.getClass)
+          TypeCheckUtils.isAssignable(argsClasses, ctor.getParameterTypes)
+        }
       }
-    }.getOrElse(ctors.maxBy(_.getParameterTypes.length))
+      .getOrElse(ctors.maxBy(_.getParameterTypes.length))
 
     try {
       defaultCtor.newInstance(newArgs: _*).asInstanceOf[A]
     } catch {
       case e: Throwable =>
-        throw new RuntimeException(
-          s"Fail to copy tree node ${getClass.getName}.", e)
+        throw new RuntimeException(s"Fail to copy tree node ${getClass.getName}.", e)
     }
   }
 }

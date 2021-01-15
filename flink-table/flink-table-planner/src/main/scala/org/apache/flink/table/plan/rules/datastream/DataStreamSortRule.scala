@@ -49,7 +49,7 @@ class DataStreamSortRule
     val sort: FlinkLogicalSort = rel.asInstanceOf[FlinkLogicalSort]
     val traitSet: RelTraitSet = rel.getTraitSet.replace(FlinkConventions.DATASTREAM)
     val convInput: RelNode = RelOptRule.convert(sort.getInput(0), FlinkConventions.DATASTREAM)
-    
+
     val inputRowType = convInput.asInstanceOf[RelSubset].getOriginal.getRowType
 
     new DataStreamSort(
@@ -63,13 +63,12 @@ class DataStreamSortRule
       sort.fetch,
       "DataStreamSortRule")
   }
-  
-   
+
   /**
    * Checks if first sort attribute is time attribute and order is ascending.
    */
   def checkTimeOrder(sort: FlinkLogicalSort): Boolean = {
-    
+
     val sortCollation = sort.collation
     if (sortCollation.getFieldCollations.size() == 0) {
       // no sort fields defined

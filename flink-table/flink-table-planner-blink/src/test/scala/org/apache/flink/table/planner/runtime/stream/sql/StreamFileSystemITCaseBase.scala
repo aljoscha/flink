@@ -22,7 +22,11 @@ import org.apache.flink.api.scala._
 import org.apache.flink.table.api.TableEnvironment
 import org.apache.flink.table.api.bridge.scala._
 import org.apache.flink.table.planner.runtime.FileSystemITCaseBase
-import org.apache.flink.table.planner.runtime.utils.{StreamingTestBase, TestSinkUtil, TestingAppendSink}
+import org.apache.flink.table.planner.runtime.utils.{
+  StreamingTestBase,
+  TestSinkUtil,
+  TestingAppendSink
+}
 import org.apache.flink.types.Row
 
 import org.junit.Assert.assertEquals
@@ -31,8 +35,8 @@ import org.junit.{Before, Test}
 import scala.collection.Seq
 
 /**
-  * Streaming [[FileSystemITCaseBase]].
-  */
+ * Streaming [[FileSystemITCaseBase]].
+ */
 abstract class StreamFileSystemITCaseBase extends StreamingTestBase with FileSystemITCaseBase {
 
   @Before

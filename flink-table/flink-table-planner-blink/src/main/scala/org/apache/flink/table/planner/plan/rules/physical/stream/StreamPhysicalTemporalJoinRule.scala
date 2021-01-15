@@ -33,7 +33,7 @@ import org.apache.calcite.rel.core.JoinRelType
  * the temporal join node is a [[FlinkLogicalJoin]] which contains [[TEMPORAL_JOIN_CONDITION]].
  */
 class StreamPhysicalTemporalJoinRule
-  extends StreamPhysicalJoinRuleBase("StreamPhysicalTemporalJoinRule") {
+    extends StreamPhysicalJoinRuleBase("StreamPhysicalTemporalJoinRule") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val join = call.rel[FlinkLogicalJoin](0)

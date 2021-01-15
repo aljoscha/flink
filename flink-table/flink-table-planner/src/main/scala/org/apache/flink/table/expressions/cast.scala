@@ -24,16 +24,14 @@ import org.apache.flink.table.calcite.FlinkTypeFactory
 import org.apache.flink.table.typeutils.TypeCoercion
 import org.apache.flink.table.validate._
 
-case class Cast(child: PlannerExpression, resultType: TypeInformation[_])
-  extends UnaryExpression {
+case class Cast(child: PlannerExpression, resultType: TypeInformation[_]) extends UnaryExpression {
 
   override def toString = s"$child.cast($resultType)"
 
   override private[flink] def toRexNode(implicit relBuilder: RelBuilder): RexNode = {
     val typeFactory = relBuilder.getTypeFactory.asInstanceOf[FlinkTypeFactory]
     val childRexNode = child.toRexNode
-    relBuilder
-      .getRexBuilder
+    relBuilder.getRexBuilder
       // we use abstract cast here because RelBuilder.cast() has to many side effects
       .makeAbstractCast(
         typeFactory.createTypeFromTypeInfo(resultType, childRexNode.getType.isNullable),

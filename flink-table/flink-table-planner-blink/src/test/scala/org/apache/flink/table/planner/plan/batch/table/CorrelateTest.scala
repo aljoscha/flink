@@ -21,7 +21,12 @@ package org.apache.flink.table.planner.plan.batch.table
 import org.apache.flink.api.scala._
 import org.apache.flink.table.api._
 import org.apache.flink.table.planner.plan.optimize.program.FlinkBatchProgram
-import org.apache.flink.table.planner.utils.{MockPythonTableFunction, TableFunc0, TableFunc1, TableTestBase}
+import org.apache.flink.table.planner.utils.{
+  MockPythonTableFunction,
+  TableFunc0,
+  TableFunc1,
+  TableTestBase
+}
 
 import org.apache.calcite.rel.rules.CoreRules
 import org.apache.calcite.tools.RuleSets
@@ -81,8 +86,9 @@ class CorrelateTest extends TableTestBase {
     val func = new TableFunc0
     util.addFunction("func1", func)
 
-    val result = sourceTable.select('a, 'b, 'c)
-      .joinLateral(func('c) as('d, 'e))
+    val result = sourceTable
+      .select('a, 'b, 'c)
+      .joinLateral(func('c) as ('d, 'e))
       .select('c, 'd, 'e)
       .where('e > 10)
       .where('e > 20)
@@ -95,12 +101,11 @@ class CorrelateTest extends TableTestBase {
   def testCorrelateWithMultiFilterAndWithoutCalcMergeRules(): Unit = {
     val util = batchTestUtil()
     val programs = util.getBatchProgram()
-    programs.getFlinkRuleSetProgram(FlinkBatchProgram.LOGICAL)
-      .get.remove(
-      RuleSets.ofList(
-        CoreRules.CALC_MERGE,
-        CoreRules.FILTER_CALC_MERGE,
-        CoreRules.PROJECT_CALC_MERGE))
+    programs
+      .getFlinkRuleSetProgram(FlinkBatchProgram.LOGICAL)
+      .get
+      .remove(RuleSets
+        .ofList(CoreRules.CALC_MERGE, CoreRules.FILTER_CALC_MERGE, CoreRules.PROJECT_CALC_MERGE))
     // removing
     util.replaceBatchProgram(programs)
 
@@ -108,8 +113,9 @@ class CorrelateTest extends TableTestBase {
     val func = new TableFunc0
     util.addFunction("func1", func)
 
-    val result = sourceTable.select('a, 'b, 'c)
-      .joinLateral(func('c) as('d, 'e))
+    val result = sourceTable
+      .select('a, 'b, 'c)
+      .joinLateral(func('c) as ('d, 'e))
       .select('c, 'd, 'e)
       .where('e > 10)
       .where('e > 20)
@@ -123,7 +129,7 @@ class CorrelateTest extends TableTestBase {
     val util = batchTestUtil()
     val sourceTable = util.addTableSource[(Int, Int, String)]("MyTable", 'a, 'b, 'c)
     val func = new MockPythonTableFunction
-    val result = sourceTable.joinLateral(func('a, 'b) as('x, 'y))
+    val result = sourceTable.joinLateral(func('a, 'b) as ('x, 'y))
 
     util.verifyExecPlan(result)
   }

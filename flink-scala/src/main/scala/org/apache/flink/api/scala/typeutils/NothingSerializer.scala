@@ -20,7 +20,11 @@ package org.apache.flink.api.scala.typeutils
 import java.util.function.Supplier
 
 import org.apache.flink.annotation.Internal
-import org.apache.flink.api.common.typeutils.{SimpleTypeSerializerSnapshot, TypeSerializer, TypeSerializerSnapshot}
+import org.apache.flink.api.common.typeutils.{
+  SimpleTypeSerializerSnapshot,
+  TypeSerializer,
+  TypeSerializerSnapshot
+}
 import org.apache.flink.core.memory.{DataInputView, DataOutputView}
 
 /**
@@ -64,7 +68,7 @@ class NothingSerializer extends TypeSerializer[Any] {
   override def equals(obj: Any): Boolean = {
     obj match {
       case nothingSerializer: NothingSerializer => true
-      case _ => false
+      case _                                    => false
     }
   }
 
@@ -74,7 +78,6 @@ class NothingSerializer extends TypeSerializer[Any] {
 }
 
 class NothingSerializerSnapshot
-  extends SimpleTypeSerializerSnapshot[Any](new Supplier[TypeSerializer[Any]] {
-    override def get(): TypeSerializer[Any] = new NothingSerializer
-  }) {
-}
+    extends SimpleTypeSerializerSnapshot[Any](new Supplier[TypeSerializer[Any]] {
+      override def get(): TypeSerializer[Any] = new NothingSerializer
+    }) {}

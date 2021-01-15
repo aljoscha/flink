@@ -34,8 +34,8 @@ import org.apache.flink.table.types.logical.RowType
 import org.apache.flink.table.types.utils.TypeConversions
 
 /**
-  * Flink RelNode which matches along with join a Python user defined table function.
-  */
+ * Flink RelNode which matches along with join a Python user defined table function.
+ */
 class DataStreamPythonCorrelate(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -47,16 +47,16 @@ class DataStreamPythonCorrelate(
     joinSchema: RowSchema,
     joinType: JoinRelType,
     ruleDescription: String)
-  extends DataStreamCorrelateBase(
-    cluster,
-    traitSet,
-    inputSchema,
-    input,
-    scan,
-    condition,
-    schema,
-    joinType)
-  with CommonPythonCorrelate {
+    extends DataStreamCorrelateBase(
+      cluster,
+      traitSet,
+      inputSchema,
+      input,
+      scan,
+      condition,
+      schema,
+      joinType)
+    with CommonPythonCorrelate {
 
   if (condition.isDefined) {
     throw new TableException("Currently Python correlate does not support conditions in left join.")
@@ -85,11 +85,13 @@ class DataStreamPythonCorrelate(
     val (pythonUdtfInputOffsets, pythonFunctionInfo) =
       extractPythonTableFunctionInfo(pythonTableFuncRexCall)
 
-    val pythonOperatorInputRowType = TypeConversions.fromLegacyInfoToDataType(
-      inputSchema.typeInfo).getLogicalType.asInstanceOf[RowType]
+    val pythonOperatorInputRowType = TypeConversions
+      .fromLegacyInfoToDataType(inputSchema.typeInfo)
+      .getLogicalType
+      .asInstanceOf[RowType]
 
-    val pythonOperatorOutputRowType = TypeConversions.fromLegacyInfoToDataType(
-      schema.typeInfo).getLogicalType.asInstanceOf[RowType]
+    val pythonOperatorOutputRowType =
+      TypeConversions.fromLegacyInfoToDataType(schema.typeInfo).getLogicalType.asInstanceOf[RowType]
 
     val sqlFunction = pythonTableFuncRexCall.getOperator.asInstanceOf[TableSqlFunction]
 

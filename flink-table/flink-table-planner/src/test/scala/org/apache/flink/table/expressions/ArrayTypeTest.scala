@@ -48,11 +48,7 @@ class ArrayTypeTest extends ArrayTypeTestBase {
       "ARRAY[ARRAY[ARRAY[1], ARRAY[1]]]",
       "[[[1], [1]]]")
 
-    testAllApis(
-      array(1 + 1, 3 * 3),
-      "array(1 + 1, 3 * 3)",
-      "ARRAY[1 + 1, 3 * 3]",
-      "[2, 9]")
+    testAllApis(array(1 + 1, 3 * 3), "array(1 + 1, 3 * 3)", "ARRAY[1 + 1, 3 * 3]", "[2, 9]")
 
     testAllApis(
       array(nullOf(Types.INT), 1),
@@ -67,15 +63,9 @@ class ArrayTypeTest extends ArrayTypeTestBase {
       "[[null, 1]]")
 
     // implicit conversion
-    testTableApi(
-      Array(1, 2, 3),
-      "array(1, 2, 3)",
-      "[1, 2, 3]")
+    testTableApi(Array(1, 2, 3), "array(1, 2, 3)", "[1, 2, 3]")
 
-    testTableApi(
-      Array[Integer](1, 2, 3),
-      "array(1, 2, 3)",
-      "[1, 2, 3]")
+    testTableApi(Array[Integer](1, 2, 3), "array(1, 2, 3)", "[1, 2, 3]")
 
     testAllApis(
       Array(Date.valueOf("1985-04-11")),
@@ -89,11 +79,7 @@ class ArrayTypeTest extends ArrayTypeTestBase {
       "ARRAY[CAST(2.0002 AS DECIMAL), CAST(2.0003 AS DECIMAL)]",
       "[2.0002, 2.0003]")
 
-    testAllApis(
-      Array(Array(x = true)),
-      "Array(Array(true))",
-      "ARRAY[ARRAY[TRUE]]",
-      "[[true]]")
+    testAllApis(Array(Array(x = true)), "Array(Array(true))", "ARRAY[ARRAY[TRUE]]", "[[true]]")
 
     testAllApis(
       Array(Array(1, 2, 3), Array(3, 2, 1)),
@@ -107,197 +93,73 @@ class ArrayTypeTest extends ArrayTypeTestBase {
 
   @Test
   def testArrayField(): Unit = {
-    testAllApis(
-      array('f0, 'f1),
-      "array(f0, f1)",
-      "ARRAY[f0, f1]",
-      "[null, 42]")
+    testAllApis(array('f0, 'f1), "array(f0, f1)", "ARRAY[f0, f1]", "[null, 42]")
 
-    testAllApis(
-      array('f0, 'f1),
-      "array(f0, f1)",
-      "ARRAY[f0, f1]",
-      "[null, 42]")
+    testAllApis(array('f0, 'f1), "array(f0, f1)", "ARRAY[f0, f1]", "[null, 42]")
 
-    testAllApis(
-      'f2,
-      "f2",
-      "f2",
-      "[1, 2, 3]")
+    testAllApis('f2, "f2", "f2", "[1, 2, 3]")
 
-    testAllApis(
-      'f3,
-      "f3",
-      "f3",
-      "[1984-03-12, 1984-02-10]")
+    testAllApis('f3, "f3", "f3", "[1984-03-12, 1984-02-10]")
 
-    testAllApis(
-      'f5,
-      "f5",
-      "f5",
-      "[[1, 2, 3], null]")
+    testAllApis('f5, "f5", "f5", "[[1, 2, 3], null]")
 
-    testAllApis(
-      'f6,
-      "f6",
-      "f6",
-      "[1, null, null, 4]")
+    testAllApis('f6, "f6", "f6", "[1, null, null, 4]")
 
-    testAllApis(
-      'f2,
-      "f2",
-      "f2",
-      "[1, 2, 3]")
+    testAllApis('f2, "f2", "f2", "[1, 2, 3]")
 
-    testAllApis(
-      'f2.at(1),
-      "f2.at(1)",
-      "f2[1]",
-      "1")
+    testAllApis('f2.at(1), "f2.at(1)", "f2[1]", "1")
 
-    testAllApis(
-      'f3.at(1),
-      "f3.at(1)",
-      "f3[1]",
-      "1984-03-12")
+    testAllApis('f3.at(1), "f3.at(1)", "f3[1]", "1984-03-12")
 
-    testAllApis(
-      'f3.at(2),
-      "f3.at(2)",
-      "f3[2]",
-      "1984-02-10")
+    testAllApis('f3.at(2), "f3.at(2)", "f3[2]", "1984-02-10")
 
-    testAllApis(
-      'f5.at(1).at(2),
-      "f5.at(1).at(2)",
-      "f5[1][2]",
-      "2")
+    testAllApis('f5.at(1).at(2), "f5.at(1).at(2)", "f5[1][2]", "2")
 
-    testAllApis(
-      'f5.at(2).at(2),
-      "f5.at(2).at(2)",
-      "f5[2][2]",
-      "null")
+    testAllApis('f5.at(2).at(2), "f5.at(2).at(2)", "f5[2][2]", "null")
 
-    testAllApis(
-      'f4.at(2).at(2),
-      "f4.at(2).at(2)",
-      "f4[2][2]",
-      "null")
+    testAllApis('f4.at(2).at(2), "f4.at(2).at(2)", "f4[2][2]", "null")
 
-    testAllApis(
-      'f11.at(1),
-      "f11.at(1)",
-      "f11[1]",
-      "1")
+    testAllApis('f11.at(1), "f11.at(1)", "f11[1]", "1")
   }
 
   @Test
   def testArrayOperations(): Unit = {
     // cardinality
-    testAllApis(
-      'f2.cardinality(),
-      "f2.cardinality()",
-      "CARDINALITY(f2)",
-      "3")
+    testAllApis('f2.cardinality(), "f2.cardinality()", "CARDINALITY(f2)", "3")
 
-    testAllApis(
-      'f4.cardinality(),
-      "f4.cardinality()",
-      "CARDINALITY(f4)",
-      "null")
+    testAllApis('f4.cardinality(), "f4.cardinality()", "CARDINALITY(f4)", "null")
 
-    testAllApis(
-      'f11.cardinality(),
-      "f11.cardinality()",
-      "CARDINALITY(f11)",
-      "1")
+    testAllApis('f11.cardinality(), "f11.cardinality()", "CARDINALITY(f11)", "1")
 
     // element
-    testAllApis(
-      'f9.element(),
-      "f9.element()",
-      "ELEMENT(f9)",
-      "1")
+    testAllApis('f9.element(), "f9.element()", "ELEMENT(f9)", "1")
 
-    testAllApis(
-      'f8.element(),
-      "f8.element()",
-      "ELEMENT(f8)",
-      "4.0")
+    testAllApis('f8.element(), "f8.element()", "ELEMENT(f8)", "4.0")
 
-    testAllApis(
-      'f10.element(),
-      "f10.element()",
-      "ELEMENT(f10)",
-      "null")
+    testAllApis('f10.element(), "f10.element()", "ELEMENT(f10)", "null")
 
-    testAllApis(
-      'f4.element(),
-      "f4.element()",
-      "ELEMENT(f4)",
-      "null")
+    testAllApis('f4.element(), "f4.element()", "ELEMENT(f4)", "null")
 
-    testAllApis(
-      'f11.element(),
-      "f11.element()",
-      "ELEMENT(f11)",
-      "1")
+    testAllApis('f11.element(), "f11.element()", "ELEMENT(f11)", "1")
 
     // comparison
-    testAllApis(
-      'f2 === 'f5.at(1),
-      "f2 === f5.at(1)",
-      "f2 = f5[1]",
-      "true")
+    testAllApis('f2 === 'f5.at(1), "f2 === f5.at(1)", "f2 = f5[1]", "true")
 
-    testAllApis(
-      'f6 === array(1, 2, 3),
-      "f6 === array(1, 2, 3)",
-      "f6 = ARRAY[1, 2, 3]",
-      "false")
+    testAllApis('f6 === array(1, 2, 3), "f6 === array(1, 2, 3)", "f6 = ARRAY[1, 2, 3]", "false")
 
-    testAllApis(
-      'f2 !== 'f5.at(1),
-      "f2 !== f5.at(1)",
-      "f2 <> f5[1]",
-      "false")
+    testAllApis('f2 !== 'f5.at(1), "f2 !== f5.at(1)", "f2 <> f5[1]", "false")
 
-    testAllApis(
-      'f2 === 'f7,
-      "f2 === f7",
-      "f2 = f7",
-      "false")
+    testAllApis('f2 === 'f7, "f2 === f7", "f2 = f7", "false")
 
-    testAllApis(
-      'f2 !== 'f7,
-      "f2 !== f7",
-      "f2 <> f7",
-      "true")
+    testAllApis('f2 !== 'f7, "f2 !== f7", "f2 <> f7", "true")
 
-    testAllApis(
-      'f11 === 'f11,
-      "f11 === f11",
-      "f11 = f11",
-      "true")
+    testAllApis('f11 === 'f11, "f11 === f11", "f11 = f11", "true")
 
-    testAllApis(
-      'f11 === 'f9,
-      "f11 === f9",
-      "f11 = f9",
-      "true")
+    testAllApis('f11 === 'f9, "f11 === f9", "f11 = f9", "true")
 
-    testAllApis(
-      'f11 !== 'f11,
-      "f11 !== f11",
-      "f11 <> f11",
-      "false")
+    testAllApis('f11 !== 'f11, "f11 !== f11", "f11 <> f11", "false")
 
-    testAllApis(
-      'f11 !== 'f9,
-      "f11 !== f9",
-      "f11 <> f9",
-      "false")
+    testAllApis('f11 !== 'f9, "f11 !== f9", "f11 <> f9", "false")
   }
 
   @Test
@@ -305,7 +167,6 @@ class ArrayTypeTest extends ArrayTypeTestBase {
     testTableApi(
       'f3.cast(Types.OBJECT_ARRAY(Types.SQL_DATE)),
       "f3.cast(OBJECT_ARRAY(SQL_DATE))",
-      "[1984-03-12, 1984-02-10]"
-    )
+      "[1984-03-12, 1984-02-10]")
   }
 }

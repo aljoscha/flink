@@ -25,13 +25,13 @@ import org.apache.flink.api.common.typeutils.{SerializerTestBase, TypeSerializer
 import org.apache.flink.table.api.dataview.MapView
 
 /**
-  * A test for the [[MapViewSerializer]].
-  */
+ * A test for the [[MapViewSerializer]].
+ */
 class MapViewSerializerTest extends SerializerTestBase[MapView[Long, String]] {
 
   override protected def createSerializer(): TypeSerializer[MapView[Long, String]] = {
-    val mapSerializer = new MapSerializer[Long, String](LongSerializer.INSTANCE,
-      StringSerializer.INSTANCE)
+    val mapSerializer =
+      new MapSerializer[Long, String](LongSerializer.INSTANCE, StringSerializer.INSTANCE)
     new MapViewSerializer[Long, String](mapSerializer)
   }
 

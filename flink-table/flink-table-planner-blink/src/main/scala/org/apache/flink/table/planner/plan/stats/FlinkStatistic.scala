@@ -31,31 +31,32 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
-  * The class provides statistics for a [[org.apache.calcite.schema.Table]].
-  */
+ * The class provides statistics for a [[org.apache.calcite.schema.Table]].
+ */
 class FlinkStatistic(
     tableStats: TableStats,
     uniqueKeys: util.Set[_ <: util.Set[String]] = null,
     relModifiedMonotonicity: RelModifiedMonotonicity = null)
-  extends Statistic {
+    extends Statistic {
 
   require(tableStats != null, "tableStats should not be null")
-  require(uniqueKeys == null || !uniqueKeys.exists(keys => keys == null || keys.isEmpty),
+  require(
+    uniqueKeys == null || !uniqueKeys.exists(keys => keys == null || keys.isEmpty),
     "uniqueKeys contains invalid elements!")
 
   /**
-    * Returns the table statistics.
-    *
-    * @return The table statistics
-    */
+   * Returns the table statistics.
+   *
+   * @return The table statistics
+   */
   def getTableStats: TableStats = tableStats
 
   /**
-    * Returns the stats of the specified the column.
-    *
-    * @param columnName The name of the column for which the stats are requested.
-    * @return The stats of the specified column.
-    */
+   * Returns the stats of the specified the column.
+   *
+   * @param columnName The name of the column for which the stats are requested.
+   * @return The stats of the specified column.
+   */
   def getColumnStats(columnName: String): ColumnStats = {
     if (tableStats != TableStats.UNKNOWN && tableStats.getColumnStats != null) {
       tableStats.getColumnStats.get(columnName)
@@ -65,21 +66,21 @@ class FlinkStatistic(
   }
 
   /**
-    * Returns the table uniqueKeys.
-    * @return
-    */
+   * Returns the table uniqueKeys.
+   * @return
+   */
   def getUniqueKeys: util.Set[_ <: util.Set[String]] = uniqueKeys
 
   /**
-    * Returns the modified monotonicity of the table
-    */
+   * Returns the modified monotonicity of the table
+   */
   def getRelModifiedMonotonicity: RelModifiedMonotonicity = relModifiedMonotonicity
 
   /**
-    * Returns the number of rows of the table.
-    *
-    * @return The number of rows of the table.
-    */
+   * Returns the number of rows of the table.
+   *
+   * @return The number of rows of the table.
+   */
   override def getRowCount: java.lang.Double = {
     if (tableStats != TableStats.UNKNOWN) {
       val rowCount = tableStats.getRowCount.toDouble
@@ -97,18 +98,18 @@ class FlinkStatistic(
   override def getCollations: util.List[RelCollation] = util.Collections.emptyList()
 
   /**
-    * Returns whether the given columns are a key or a superset of a unique key
-    * of this table.
-    *
-    * Note: Do not call this method!
-    * Use [[org.apache.calcite.rel.metadata.RelMetadataQuery]].areRowsUnique if need.
-    * Because columns in original uniqueKey may not exist in RowType after project pushDown, however
-    * the RowType cannot be available here.
-    *
-    * @param columns Ordinals of key columns
-    * @return if bit mask represents a unique column set; false if not (or
-    *         if no metadata is available).
-    */
+   * Returns whether the given columns are a key or a superset of a unique key
+   * of this table.
+   *
+   * Note: Do not call this method!
+   * Use [[org.apache.calcite.rel.metadata.RelMetadataQuery]].areRowsUnique if need.
+   * Because columns in original uniqueKey may not exist in RowType after project pushDown, however
+   * the RowType cannot be available here.
+   *
+   * @param columns Ordinals of key columns
+   * @return if bit mask represents a unique column set; false if not (or
+   *         if no metadata is available).
+   */
   override def isKey(columns: ImmutableBitSet): Boolean = false
 
   override def getDistribution: RelDistribution = null
@@ -119,9 +120,10 @@ class FlinkStatistic(
   override def toString: String = {
     val builder = new StringBuilder
     if (tableStats != TableStats.UNKNOWN) {
-      builder.append(s"TableStats: " +
-        s"{rowCount: ${tableStats.getRowCount}, " +
-        s"columnStats: ${tableStats.getColumnStats}}, ")
+      builder.append(
+        s"TableStats: " +
+          s"{rowCount: ${tableStats.getRowCount}, " +
+          s"columnStats: ${tableStats.getColumnStats}}, ")
     }
     if (uniqueKeys != null) {
       builder.append(s"uniqueKeys: $uniqueKeys, ")
@@ -141,8 +143,8 @@ class FlinkStatistic(
 }
 
 /**
-  * Methods to create FlinkStatistic.
-  */
+ * Methods to create FlinkStatistic.
+ */
 object FlinkStatistic {
 
   /** Represents a FlinkStatistic that knows nothing about a table */
@@ -193,9 +195,9 @@ object FlinkStatistic {
   }
 
   /**
-    * Return a new builder that builds a [[FlinkStatistic]].
-    *
-    * @return a new builder to build a [[FlinkStatistic]]
-    */
+   * Return a new builder that builds a [[FlinkStatistic]].
+   *
+   * @return a new builder to build a [[FlinkStatistic]]
+   */
   def builder(): Builder = new Builder
 }

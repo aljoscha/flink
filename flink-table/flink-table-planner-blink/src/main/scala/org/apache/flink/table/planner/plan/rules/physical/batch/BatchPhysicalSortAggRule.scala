@@ -58,17 +58,16 @@ import scala.collection.JavaConversions._
  * this rule will try to create two possibilities above, and chooses the best one based on cost.
  */
 class BatchPhysicalSortAggRule
-  extends RelOptRule(
-    operand(classOf[FlinkLogicalAggregate],
-      operand(classOf[RelNode], any)),
-    "BatchPhysicalSortAggRule")
-  with BatchPhysicalAggRuleBase {
+    extends RelOptRule(
+      operand(classOf[FlinkLogicalAggregate], operand(classOf[RelNode], any)),
+      "BatchPhysicalSortAggRule")
+    with BatchPhysicalAggRuleBase {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val tableConfig = call.getPlanner.getContext.unwrap(classOf[FlinkContext]).getTableConfig
     val agg: FlinkLogicalAggregate = call.rel(0)
     !isOperatorDisabled(tableConfig, OperatorType.SortAgg) &&
-      !agg.getAggCallList.exists(isPythonAggregate(_))
+    !agg.getAggCallList.exists(isPythonAggregate(_))
   }
 
   override def onMatch(call: RelOptRuleCall): Unit = {
@@ -80,7 +79,8 @@ class BatchPhysicalSortAggRule
     val (auxGroupSet, aggCallsWithoutAuxGroupCalls) = AggregateUtil.checkAndSplitAggCalls(agg)
 
     val (_, aggBufferTypes, aggFunctions) = AggregateUtil.transformToBatchAggregateFunctions(
-      FlinkTypeFactory.toLogicalRowType(inputRowType), aggCallsWithoutAuxGroupCalls)
+      FlinkTypeFactory.toLogicalRowType(inputRowType),
+      aggCallsWithoutAuxGroupCalls)
     val groupSet = agg.getGroupSet.toArray
     val aggCallToAggFunction = aggCallsWithoutAuxGroupCalls.zip(aggFunctions)
     // TODO aggregate include projection now, so do not provide new trait will be safe
@@ -117,20 +117,18 @@ class BatchPhysicalSortAggRule
           Seq(
             FlinkRelDistribution.hash(distributionFields),
             FlinkRelDistribution.hash(distributionFields, requireStrict = false)),
-          createRelCollation(globalGroupSet)
-        )
+          createRelCollation(globalGroupSet))
       } else {
         (Seq(FlinkRelDistribution.SINGLETON), RelCollations.EMPTY)
       }
       // Remove the global agg call filters because the
       // filter is already done by local aggregation.
-      val aggCallsWithoutFilter = aggCallsWithoutAuxGroupCalls.map {
-        aggCall =>
-          if (aggCall.filterArg > 0) {
-            aggCall.copy(aggCall.getArgList, -1, aggCall.getCollation)
-          } else {
-            aggCall
-          }
+      val aggCallsWithoutFilter = aggCallsWithoutAuxGroupCalls.map { aggCall =>
+        if (aggCall.filterArg > 0) {
+          aggCall.copy(aggCall.getArgList, -1, aggCall.getCollation)
+        } else {
+          aggCall
+        }
       }
       val globalAggCallToAggFunction = aggCallsWithoutFilter.zip(aggFunctions)
       globalDistributions.foreach { globalDistribution =>
@@ -183,8 +181,7 @@ class BatchPhysicalSortAggRule
           groupSet,
           auxGroupSet,
           aggCallToAggFunction,
-          isMerge = false
-        )
+          isMerge = false)
         call.transformTo(sortAgg)
       }
     }

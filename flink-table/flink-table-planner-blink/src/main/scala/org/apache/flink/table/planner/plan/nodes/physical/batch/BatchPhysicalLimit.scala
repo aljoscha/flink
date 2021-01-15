@@ -33,10 +33,10 @@ import org.apache.calcite.rel.metadata.RelMetadataQuery
 import org.apache.calcite.rex.RexNode
 
 /**
-  * Batch physical RelNode for [[Sort]].
-  *
-  * This node will output `limit` records beginning with the first `offset` records without sort.
-  */
+ * Batch physical RelNode for [[Sort]].
+ *
+ * This node will output `limit` records beginning with the first `offset` records without sort.
+ */
 class BatchPhysicalLimit(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -44,14 +44,14 @@ class BatchPhysicalLimit(
     offset: RexNode,
     fetch: RexNode,
     val isGlobal: Boolean)
-  extends Sort(
-    cluster,
-    traitSet,
-    inputRel,
-    traitSet.getTrait(RelCollationTraitDef.INSTANCE),
-    offset,
-    fetch)
-  with BatchPhysicalRel {
+    extends Sort(
+      cluster,
+      traitSet,
+      inputRel,
+      traitSet.getTrait(RelCollationTraitDef.INSTANCE),
+      offset,
+      fetch)
+    with BatchPhysicalRel {
 
   private lazy val limitStart: Long = SortUtil.getLimitStart(offset)
   private lazy val limitEnd: Long = SortUtil.getLimitEnd(offset, fetch)
@@ -81,11 +81,11 @@ class BatchPhysicalLimit(
 
   override def translateToExecNode(): ExecNode[_] = {
     new BatchExecLimit(
-        limitStart,
-        limitEnd,
-        isGlobal,
-        ExecEdge.DEFAULT,
-        FlinkTypeFactory.toLogicalRowType(getRowType),
-        getRelDetailedDescription)
+      limitStart,
+      limitEnd,
+      isGlobal,
+      ExecEdge.DEFAULT,
+      FlinkTypeFactory.toLogicalRowType(getRowType),
+      getRelDetailedDescription)
   }
 }

@@ -26,11 +26,11 @@ import org.apache.flink.table.plan.nodes.dataset.DataSetScan
 import org.apache.flink.table.plan.nodes.logical.FlinkLogicalDataSetScan
 
 class DataSetScanRule
-  extends ConverterRule(
-    classOf[FlinkLogicalDataSetScan],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.DATASET,
-    "DataSetScanRule") {
+    extends ConverterRule(
+      classOf[FlinkLogicalDataSetScan],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.DATASET,
+      "DataSetScanRule") {
 
   def convert(rel: RelNode): RelNode = {
     val scan: FlinkLogicalDataSetScan = rel.asInstanceOf[FlinkLogicalDataSetScan]
@@ -42,8 +42,7 @@ class DataSetScanRule
       scan.catalog,
       scan.dataSet,
       scan.fieldIdxs,
-      scan.schema
-    )
+      scan.schema)
   }
 }
 

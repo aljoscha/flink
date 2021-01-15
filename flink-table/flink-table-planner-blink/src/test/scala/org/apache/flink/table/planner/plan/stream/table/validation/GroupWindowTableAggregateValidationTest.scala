@@ -20,7 +20,10 @@ package org.apache.flink.table.planner.plan.stream.table.validation
 
 import org.apache.flink.api.scala._
 import org.apache.flink.table.api._
-import org.apache.flink.table.planner.plan.utils.WindowEmitStrategy.{TABLE_EXEC_EMIT_EARLY_FIRE_DELAY, TABLE_EXEC_EMIT_EARLY_FIRE_ENABLED}
+import org.apache.flink.table.planner.plan.utils.WindowEmitStrategy.{
+  TABLE_EXEC_EMIT_EARLY_FIRE_DELAY,
+  TABLE_EXEC_EMIT_EARLY_FIRE_ENABLED
+}
 import org.apache.flink.table.planner.runtime.utils.JavaUserDefinedAggFunctions.WeightedAvgWithMerge
 import org.apache.flink.table.planner.utils.{TableTestBase, Top3}
 
@@ -33,8 +36,8 @@ class GroupWindowTableAggregateValidationTest extends TableTestBase {
   val top3 = new Top3
   val weightedAvg = new WeightedAvgWithMerge
   val util = streamTestUtil()
-  val table = util.addTableSource[(Long, Int, String)](
-    'long, 'int, 'string, 'rowtime.rowtime, 'proctime.proctime)
+  val table = util
+    .addTableSource[(Long, Int, String)]('long, 'int, 'string, 'rowtime.rowtime, 'proctime.proctime)
 
   @Test
   def testTumbleUdAggWithInvalidArgs(): Unit = {

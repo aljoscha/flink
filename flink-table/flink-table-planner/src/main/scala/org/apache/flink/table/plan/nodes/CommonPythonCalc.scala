@@ -21,7 +21,10 @@ import org.apache.calcite.rex.{RexCall, RexFieldAccess, RexInputRef, RexNode, Re
 import org.apache.flink.configuration.Configuration
 import org.apache.flink.streaming.api.operators.OneInputStreamOperator
 import org.apache.flink.table.functions.python.{PythonFunctionInfo, PythonFunctionKind}
-import org.apache.flink.table.plan.nodes.CommonPythonCalc.{ARROW_PYTHON_SCALAR_FUNCTION_OPERATOR_NAME, PYTHON_SCALAR_FUNCTION_OPERATOR_NAME}
+import org.apache.flink.table.plan.nodes.CommonPythonCalc.{
+  ARROW_PYTHON_SCALAR_FUNCTION_OPERATOR_NAME,
+  PYTHON_SCALAR_FUNCTION_OPERATOR_NAME
+}
 import org.apache.flink.table.plan.util.PythonUtil.containsPythonCall
 import org.apache.flink.table.runtime.types.CRow
 import org.apache.flink.table.types.logical.RowType
@@ -42,7 +45,7 @@ trait CommonPythonCalc extends CommonPythonBase {
       .map(_._1)
       .collect {
         case inputRef: RexInputRef => inputRef.getIndex
-        case fac: RexFieldAccess => fac.getField.getIndex
+        case fac: RexFieldAccess   => fac.getField.getIndex
       }
     (udfInputOffsets, pythonFunctionInfos)
   }
@@ -66,12 +69,13 @@ trait CommonPythonCalc extends CommonPythonBase {
       inputRowType: RowType,
       outputRowType: RowType,
       calcProgram: RexProgram) = {
-    val clazz = if (calcProgram.getExprList.asScala.exists(
-      containsPythonCall(_, PythonFunctionKind.PANDAS))) {
-      loadClass(ARROW_PYTHON_SCALAR_FUNCTION_OPERATOR_NAME)
-    } else {
-      loadClass(PYTHON_SCALAR_FUNCTION_OPERATOR_NAME)
-    }
+    val clazz =
+      if (calcProgram.getExprList.asScala.exists(
+          containsPythonCall(_, PythonFunctionKind.PANDAS))) {
+        loadClass(ARROW_PYTHON_SCALAR_FUNCTION_OPERATOR_NAME)
+      } else {
+        loadClass(PYTHON_SCALAR_FUNCTION_OPERATOR_NAME)
+      }
     val ctor = clazz.getConstructor(
       classOf[Configuration],
       classOf[Array[PythonFunctionInfo]],
@@ -81,13 +85,14 @@ trait CommonPythonCalc extends CommonPythonBase {
       classOf[Array[Int]])
     val (udfInputOffsets, pythonFunctionInfos) =
       extractPythonScalarFunctionInfos(getPythonRexCalls(calcProgram))
-    ctor.newInstance(
-      config,
-      pythonFunctionInfos,
-      inputRowType,
-      outputRowType,
-      udfInputOffsets,
-      getForwardedFields(calcProgram))
+    ctor
+      .newInstance(
+        config,
+        pythonFunctionInfos,
+        inputRowType,
+        outputRowType,
+        udfInputOffsets,
+        getForwardedFields(calcProgram))
       .asInstanceOf[OneInputStreamOperator[CRow, CRow]]
   }
 }
@@ -100,4 +105,3 @@ object CommonPythonCalc {
     "org.apache.flink.table.runtime.operators.python.scalar.arrow." +
       "ArrowPythonScalarFunctionOperator"
 }
-

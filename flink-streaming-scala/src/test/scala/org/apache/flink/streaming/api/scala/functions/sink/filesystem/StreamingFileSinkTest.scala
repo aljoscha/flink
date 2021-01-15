@@ -21,7 +21,10 @@ package org.apache.flink.streaming.api.scala.functions.sink.filesystem
 import org.apache.flink.api.common.serialization.SimpleStringEncoder
 import org.apache.flink.core.fs.Path
 import org.apache.flink.streaming.api.functions.sink.filesystem.BulkWriterTest.TestBulkWriterFactory
-import org.apache.flink.streaming.api.functions.sink.filesystem.{OutputFileConfig, StreamingFileSink}
+import org.apache.flink.streaming.api.functions.sink.filesystem.{
+  OutputFileConfig,
+  StreamingFileSink
+}
 import org.junit.Test
 
 /**
@@ -34,7 +37,8 @@ class StreamingFileSinkTest {
    */
   @Test
   def testStreamingFileSinkRowFormatBuilderCompiles(): Unit = {
-    StreamingFileSink.forRowFormat(new Path("foobar"), new SimpleStringEncoder[String]())
+    StreamingFileSink
+      .forRowFormat(new Path("foobar"), new SimpleStringEncoder[String]())
       .withBucketCheckInterval(10L)
       .withOutputFileConfig(OutputFileConfig.builder().build())
       .build()
@@ -45,7 +49,8 @@ class StreamingFileSinkTest {
    */
   @Test
   def testStreamingFileSinkBulkFormatBuilderCompiles(): Unit = {
-    StreamingFileSink.forBulkFormat(new Path("foobar"), new TestBulkWriterFactory())
+    StreamingFileSink
+      .forBulkFormat(new Path("foobar"), new TestBulkWriterFactory())
       .withBucketCheckInterval(10L)
       .withOutputFileConfig(OutputFileConfig.builder().build())
       .build()

@@ -34,8 +34,8 @@ import org.apache.calcite.tools.RuleSets
 import org.junit.{Before, Test}
 
 /**
-  * Test for [[FlinkAggregateRemoveRule]].
-  */
+ * Test for [[FlinkAggregateRemoveRule]].
+ */
 class FlinkAggregateRemoveRuleTest extends TableTestBase {
   private val util = batchTestUtil()
 
@@ -45,12 +45,15 @@ class FlinkAggregateRemoveRuleTest extends TableTestBase {
     programs.addLast(
       // rewrite sub-queries to joins
       "subquery_rewrite",
-      FlinkGroupProgramBuilder.newBuilder[BatchOptimizeContext]
-        .addProgram(FlinkHepRuleSetProgramBuilder.newBuilder
-          .setHepRulesExecutionType(HEP_RULES_EXECUTION_TYPE.RULE_SEQUENCE)
-          .setHepMatchOrder(HepMatchOrder.BOTTOM_UP)
-          .add(FlinkBatchRuleSets.SEMI_JOIN_RULES)
-          .build(), "rewrite sub-queries to semi/anti join")
+      FlinkGroupProgramBuilder
+        .newBuilder[BatchOptimizeContext]
+        .addProgram(
+          FlinkHepRuleSetProgramBuilder.newBuilder
+            .setHepRulesExecutionType(HEP_RULES_EXECUTION_TYPE.RULE_SEQUENCE)
+            .setHepMatchOrder(HepMatchOrder.BOTTOM_UP)
+            .add(FlinkBatchRuleSets.SEMI_JOIN_RULES)
+            .build(),
+          "rewrite sub-queries to semi/anti join")
         .build())
 
     programs.addLast(
@@ -81,16 +84,16 @@ class FlinkAggregateRemoveRuleTest extends TableTestBase {
     util.replaceBatchProgram(programs)
 
     util.addTableSource[(Int, Int, String)]("MyTable1", 'a, 'b, 'c)
-    util.addTableSource("MyTable2",
+    util.addTableSource(
+      "MyTable2",
       Array[TypeInformation[_]](Types.INT, Types.INT, Types.STRING),
       Array("a", "b", "c"),
-      FlinkStatistic.builder().uniqueKeys(ImmutableSet.of(ImmutableSet.of("a"))).build()
-    )
-    util.addTableSource("MyTable3",
+      FlinkStatistic.builder().uniqueKeys(ImmutableSet.of(ImmutableSet.of("a"))).build())
+    util.addTableSource(
+      "MyTable3",
       Array[TypeInformation[_]](Types.INT, Types.INT, Types.STRING, Types.STRING),
       Array("a", "b", "c", "d"),
-      FlinkStatistic.builder().uniqueKeys(ImmutableSet.of(ImmutableSet.of("a"))).build()
-    )
+      FlinkStatistic.builder().uniqueKeys(ImmutableSet.of(ImmutableSet.of("a"))).build())
   }
 
   @Test
@@ -101,8 +104,9 @@ class FlinkAggregateRemoveRuleTest extends TableTestBase {
 
   @Test
   def testAggRemove_WithoutFilter1(): Unit = {
-    util.verifyRelPlan("SELECT a, b + 1, c, s FROM (" +
-      "SELECT a, MIN(b) AS b, SUM(b) AS s, MAX(c) AS c FROM MyTable2 GROUP BY a)")
+    util.verifyRelPlan(
+      "SELECT a, b + 1, c, s FROM (" +
+        "SELECT a, MIN(b) AS b, SUM(b) AS s, MAX(c) AS c FROM MyTable2 GROUP BY a)")
   }
 
   @Test

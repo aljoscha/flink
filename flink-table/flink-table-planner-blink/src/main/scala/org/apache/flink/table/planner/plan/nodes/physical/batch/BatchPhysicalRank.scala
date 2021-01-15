@@ -20,7 +20,10 @@ package org.apache.flink.table.planner.plan.nodes.physical.batch
 
 import org.apache.flink.table.api.TableException
 import org.apache.flink.table.planner.calcite.FlinkTypeFactory
-import org.apache.flink.table.planner.plan.`trait`.{FlinkRelDistribution, FlinkRelDistributionTraitDef}
+import org.apache.flink.table.planner.plan.`trait`.{
+  FlinkRelDistribution,
+  FlinkRelDistributionTraitDef
+}
 import org.apache.flink.table.planner.plan.cost.{FlinkCost, FlinkCostFactory}
 import org.apache.flink.table.planner.plan.nodes.calcite.Rank
 import org.apache.flink.table.planner.plan.nodes.exec.{ExecEdge, ExecNode}
@@ -42,10 +45,10 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
-  * Batch physical RelNode for [[Rank]].
-  *
-  * This node supports two-stage(local and global) rank to reduce data-shuffling.
-  */
+ * Batch physical RelNode for [[Rank]].
+ *
+ * This node supports two-stage(local and global) rank to reduce data-shuffling.
+ */
 class BatchPhysicalRank(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -57,22 +60,22 @@ class BatchPhysicalRank(
     rankNumberType: RelDataTypeField,
     outputRankNumber: Boolean,
     val isGlobal: Boolean)
-  extends Rank(
-    cluster,
-    traitSet,
-    inputRel,
-    partitionKey,
-    orderKey,
-    rankType,
-    rankRange,
-    rankNumberType,
-    outputRankNumber)
-  with BatchPhysicalRel {
+    extends Rank(
+      cluster,
+      traitSet,
+      inputRel,
+      partitionKey,
+      orderKey,
+      rankType,
+      rankRange,
+      rankNumberType,
+      outputRankNumber)
+    with BatchPhysicalRel {
 
   require(rankType == RankType.RANK, "Only RANK is supported now")
   val (rankStart, rankEnd) = rankRange match {
     case r: ConstantRankRange => (r.getRankStart, r.getRankEnd)
-    case o => throw new TableException(s"$o is not supported now")
+    case o                    => throw new TableException(s"$o is not supported now")
   }
 
   override def copy(traitSet: RelTraitSet, inputs: util.List[RelNode]): RelNode = {
@@ -86,8 +89,7 @@ class BatchPhysicalRank(
       rankRange,
       rankNumberType,
       outputRankNumber,
-      isGlobal
-    )
+      isGlobal)
   }
 
   override def explainTerms(pw: RelWriter): RelWriter = {
@@ -162,8 +164,8 @@ class BatchPhysicalRank(
     }
 
     // sort by partition keys + orderby keys
-    val providedFieldCollations = partitionKey.toArray.map {
-      k => FlinkRelOptUtil.ofRelFieldCollation(k)
+    val providedFieldCollations = partitionKey.toArray.map { k =>
+      FlinkRelOptUtil.ofRelFieldCollation(k)
     }.toList ++ orderKey.getFieldCollations
     val providedCollation = RelCollations.of(providedFieldCollations)
     val requiredCollation = requiredTraitSet.getTrait(RelCollationTraitDef.INSTANCE)
@@ -206,11 +208,12 @@ class BatchPhysicalRank(
 
         val inputRequiredDistributionKeys = shuffleKeys
         val inputRequiredDistribution = FlinkRelDistribution.hash(
-          inputRequiredDistributionKeys, requiredDistribution.requireStrict)
+          inputRequiredDistributionKeys,
+          requiredDistribution.requireStrict)
 
         // sort by partition keys + orderby keys
-        val providedFieldCollations = partitionKey.toArray.map {
-          k => FlinkRelOptUtil.ofRelFieldCollation(k)
+        val providedFieldCollations = partitionKey.toArray.map { k =>
+          FlinkRelOptUtil.ofRelFieldCollation(k)
         }.toList ++ orderKey.getFieldCollations
         val providedCollation = RelCollations.of(providedFieldCollations)
         val requiredCollation = requiredTraitSet.getTrait(RelCollationTraitDef.INSTANCE)
@@ -236,7 +239,6 @@ class BatchPhysicalRank(
       outputRankNumber,
       ExecEdge.DEFAULT,
       FlinkTypeFactory.toLogicalRowType(getRowType),
-      getRelDetailedDescription
-    )
+      getRelDetailedDescription)
   }
 }

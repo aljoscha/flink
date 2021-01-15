@@ -33,11 +33,12 @@ import org.apache.calcite.rel.convert.ConverterRule
 
 import scala.collection.JavaConversions._
 
-class StreamExecSinkRule extends ConverterRule(
-    classOf[FlinkLogicalSink],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.STREAM_PHYSICAL,
-    "StreamExecSinkRule") {
+class StreamExecSinkRule
+    extends ConverterRule(
+      classOf[FlinkLogicalSink],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.STREAM_PHYSICAL,
+      "StreamExecSinkRule") {
 
   def convert(rel: RelNode): RelNode = {
     val sinkNode = rel.asInstanceOf[FlinkLogicalSink]
@@ -48,36 +49,35 @@ class StreamExecSinkRule extends ConverterRule(
         case partitionSink: SupportsPartitioning =>
           partitionSink.applyStaticPartition(sinkNode.staticPartitions)
           val dynamicPartFields = sinkNode.catalogTable.getPartitionKeys
-              .filter(!sinkNode.staticPartitions.contains(_))
-          val fieldNames = sinkNode.catalogTable
-            .getSchema
-            .toPhysicalRowDataType
-            .getLogicalType.asInstanceOf[RowType]
+            .filter(!sinkNode.staticPartitions.contains(_))
+          val fieldNames = sinkNode.catalogTable.getSchema.toPhysicalRowDataType.getLogicalType
+            .asInstanceOf[RowType]
             .getFieldNames
 
           if (dynamicPartFields.nonEmpty) {
             val dynamicPartIndices =
               dynamicPartFields.map(fieldNames.indexOf(_))
 
-            val shuffleEnable = sinkNode
-                .catalogTable
-                .getOptions
-                .get(FileSystemOptions.SINK_SHUFFLE_BY_PARTITION.key())
+            val shuffleEnable = sinkNode.catalogTable.getOptions
+              .get(FileSystemOptions.SINK_SHUFFLE_BY_PARTITION.key())
 
             if (shuffleEnable != null && shuffleEnable.toBoolean) {
               requiredTraitSet = requiredTraitSet.plus(
-                FlinkRelDistribution.hash(dynamicPartIndices
-                    .map(Integer.valueOf), requireStrict = false))
+                FlinkRelDistribution.hash(
+                  dynamicPartIndices
+                    .map(Integer.valueOf),
+                  requireStrict = false))
             }
 
             if (partitionSink.requiresPartitionGrouping(false)) {
               throw new TableException("Partition grouping in stream mode is not supported yet!")
             }
           }
-        case _ => throw new TableException(
-          s"'${sinkNode.tableIdentifier.asSummaryString()}' is a partitioned table, " +
-            s"but the underlying [${sinkNode.tableSink.asSummaryString()}] DynamicTableSink " +
-            s"doesn't implement SupportsPartitioning interface.")
+        case _ =>
+          throw new TableException(
+            s"'${sinkNode.tableIdentifier.asSummaryString()}' is a partitioned table, " +
+              s"but the underlying [${sinkNode.tableSink.asSummaryString()}] DynamicTableSink " +
+              s"doesn't implement SupportsPartitioning interface.")
       }
     }
 
@@ -96,4 +96,3 @@ class StreamExecSinkRule extends ConverterRule(
 object StreamExecSinkRule {
   val INSTANCE = new StreamExecSinkRule
 }
-

@@ -30,8 +30,7 @@ class HashCalcCallGen(algName: String) extends CallGenerator {
 
   override def generate(
       codeGenerator: CodeGenerator,
-      operands: Seq[GeneratedExpression])
-    : GeneratedExpression = {
+      operands: Seq[GeneratedExpression]): GeneratedExpression = {
 
     val (initStmt, md) = operands.size match {
 

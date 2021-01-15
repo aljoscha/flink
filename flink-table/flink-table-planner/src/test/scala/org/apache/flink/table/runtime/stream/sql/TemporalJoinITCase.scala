@@ -43,10 +43,10 @@ class TemporalJoinITCase extends StreamingWithStateTestBase {
   }
 
   /**
-    * Because of nature of the processing time, we can not (or at least it is not that easy)
-    * validate the result here. Instead of that, here we are just testing whether there are no
-    * exceptions in a full blown ITCase. Actual correctness is tested in unit tests.
-    */
+   * Because of nature of the processing time, we can not (or at least it is not that easy)
+   * validate the result here. Instead of that, here we are just testing whether there are no
+   * exceptions in a full blown ITCase. Actual correctness is tested in unit tests.
+   */
   @Test
   def testProcessTimeInnerJoin(): Unit = {
     val env = StreamExecutionEnvironment.getExecutionEnvironment
@@ -89,9 +89,7 @@ class TemporalJoinITCase extends StreamingWithStateTestBase {
 
     tEnv.registerTable("Orders", orders)
     tEnv.registerTable("RatesHistory", ratesHistory)
-    tEnv.registerFunction(
-      "Rates",
-      ratesHistory.createTemporalTableFunction('proctime, 'currency))
+    tEnv.registerFunction("Rates", ratesHistory.createTemporalTableFunction('proctime, 'currency))
 
     val result = tEnv.sqlQuery(sqlQuery).toAppendStream[Row]
     result.addSink(new StreamITCase.StringSink[Row])
@@ -115,7 +113,6 @@ class TemporalJoinITCase extends StreamingWithStateTestBase {
         |  LATERAL TABLE (Rates(o.rowtime)) AS r
         |WHERE r.currency = o.currency
         |""".stripMargin
-
 
     val ordersData = new mutable.MutableList[(Long, String, Timestamp)]
     ordersData.+=((2L, "Euro", new Timestamp(2L)))
@@ -203,11 +200,11 @@ class TemporalJoinITCase extends StreamingWithStateTestBase {
       .toTable(tEnv, 'currency, 'rate, 'rowtime.rowtime)
 
     val pricesHistoryData = new mutable.MutableList[(String, String, Double, Timestamp)]
-    pricesHistoryData.+=(("A2", "US Dollar", 10.2D, new Timestamp(1L)))
-    pricesHistoryData.+=(("A1", "Euro", 11.4D, new Timestamp(1L)))
-    pricesHistoryData.+=(("A4", "Yen", 1D, new Timestamp(1L)))
-    pricesHistoryData.+=(("A1", "Euro", 11.6D, new Timestamp(5L)))
-    pricesHistoryData.+=(("A1", "Euro", 11.9D, new Timestamp(7L)))
+    pricesHistoryData.+=(("A2", "US Dollar", 10.2d, new Timestamp(1L)))
+    pricesHistoryData.+=(("A1", "Euro", 11.4d, new Timestamp(1L)))
+    pricesHistoryData.+=(("A4", "Yen", 1d, new Timestamp(1L)))
+    pricesHistoryData.+=(("A1", "Euro", 11.6d, new Timestamp(5L)))
+    pricesHistoryData.+=(("A1", "Euro", 11.9d, new Timestamp(7L)))
     val pricesHistory = env
       .fromCollection(pricesHistoryData)
       .assignTimestampsAndWatermarks(new TimestampExtractor[(String, String, Double, Timestamp)]())
@@ -240,11 +237,12 @@ class TemporalJoinITCase extends StreamingWithStateTestBase {
 }
 
 class TimestampExtractor[T <: Product]
-  extends BoundedOutOfOrdernessTimestampExtractor[T](Time.seconds(10))  {
+    extends BoundedOutOfOrdernessTimestampExtractor[T](Time.seconds(10)) {
   override def extractTimestamp(element: T): Long = element match {
-    case (_, _, ts: Timestamp) => ts.getTime
+    case (_, _, ts: Timestamp)    => ts.getTime
     case (_, _, _, ts: Timestamp) => ts.getTime
-    case _ => throw new IllegalArgumentException(
-      "Expected the last element in a tuple to be of a Timestamp type.")
+    case _ =>
+      throw new IllegalArgumentException(
+        "Expected the last element in a tuple to be of a Timestamp type.")
   }
 }

@@ -33,7 +33,12 @@ import org.apache.flink.table.planner.plan.utils.UpdatingPlanChecker
 import org.apache.flink.table.planner.sinks.DataStreamTableSink
 import org.apache.flink.table.runtime.types.ClassLogicalTypeConverter
 import org.apache.flink.table.runtime.typeutils.InternalTypeInfo
-import org.apache.flink.table.sinks.{RetractStreamTableSink, StreamTableSink, TableSink, UpsertStreamTableSink}
+import org.apache.flink.table.sinks.{
+  RetractStreamTableSink,
+  StreamTableSink,
+  TableSink,
+  UpsertStreamTableSink
+}
 import org.apache.flink.table.types.DataType
 
 import org.apache.calcite.plan.{RelOptCluster, RelTraitSet}
@@ -45,17 +50,17 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
-  * Batch physical RelNode to to write data into an external sink defined by a [[TableSink]].
-  */
+ * Batch physical RelNode to to write data into an external sink defined by a [[TableSink]].
+ */
 class BatchExecLegacySink[T](
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
     inputRel: RelNode,
     sink: TableSink[T],
     sinkName: String)
-  extends LegacySink(cluster, traitSet, inputRel, sink, sinkName)
-  with BatchPhysicalRel
-  with LegacyBatchExecNode[Any] {
+    extends LegacySink(cluster, traitSet, inputRel, sink, sinkName)
+    with BatchPhysicalRel
+    with LegacyBatchExecNode[Any] {
 
   override def copy(traitSet: RelTraitSet, inputs: util.List[RelNode]): RelNode = {
     new BatchExecLegacySink(cluster, traitSet, inputs.get(0), sink, sinkName)
@@ -66,12 +71,12 @@ class BatchExecLegacySink[T](
   // the input records will not trigger any output of a sink because it has no output,
   // so it's dam behavior is BLOCKING
   override def getInputEdges: util.List[ExecEdge] = List(
-    ExecEdge.builder()
+    ExecEdge
+      .builder()
       .damBehavior(ExecEdge.DamBehavior.BLOCKING)
       .build())
 
-  override protected def translateToPlanInternal(
-      planner: BatchPlanner): Transformation[Any] = {
+  override protected def translateToPlanInternal(planner: BatchPlanner): Transformation[Any] = {
     val resultTransformation = sink match {
       case streamTableSink: StreamTableSink[T] =>
         val transformation = streamTableSink match {
@@ -90,9 +95,10 @@ class BatchExecLegacySink[T](
         val boundedStream = new DataStream(planner.getExecEnv, transformation)
         val dsSink = streamTableSink.consumeDataStream(boundedStream)
         if (dsSink == null) {
-          throw new TableException("The StreamTableSink#consumeDataStream(DataStream) must be " +
-            "implemented and return the sink transformation DataStreamSink. " +
-            s"However, ${sink.getClass.getCanonicalName} doesn't implement this method.")
+          throw new TableException(
+            "The StreamTableSink#consumeDataStream(DataStream) must be " +
+              "implemented and return the sink transformation DataStreamSink. " +
+              s"However, ${sink.getClass.getCanonicalName} doesn't implement this method.")
         }
         dsSink.getTransformation
       case dsTableSink: DataStreamTableSink[T] =>
@@ -103,8 +109,9 @@ class BatchExecLegacySink[T](
         translateToTransformation(withChangeFlag = dsTableSink.withChangeFlag, planner)
 
       case _ =>
-        throw new TableException(s"Only Support StreamTableSink! " +
-          s"However ${sink.getClass.getCanonicalName} is not a StreamTableSink.")
+        throw new TableException(
+          s"Only Support StreamTableSink! " +
+            s"However ${sink.getClass.getCanonicalName} is not a StreamTableSink.")
     }
     resultTransformation.asInstanceOf[Transformation[Any]]
   }
@@ -129,8 +136,7 @@ class BatchExecLegacySink[T](
             plan.getOutputType.asInstanceOf[InternalTypeInfo[RowData]].toRowType,
             sink,
             withChangeFlag,
-            "SinkConversion"
-          )
+            "SinkConversion")
           ExecNodeUtil.createOneInputTransformation(
             plan,
             s"SinkConversionTo${resultDataType.getConversionClass.getSimpleName}",
@@ -140,16 +146,17 @@ class BatchExecLegacySink[T](
             0)
         }
       case _ =>
-        throw new TableException("Cannot generate BoundedStream due to an invalid logical plan. " +
-                                   "This is a bug and should not happen. Please file an issue.")
+        throw new TableException(
+          "Cannot generate BoundedStream due to an invalid logical plan. " +
+            "This is a bug and should not happen. Please file an issue.")
     }
   }
 
   /**
-    * Validate if class represented by the typeInfo is static and globally accessible
-    * @param dataType type to check
-    * @throws TableException if type does not meet these criteria
-    */
+   * Validate if class represented by the typeInfo is static and globally accessible
+   * @param dataType type to check
+   * @throws TableException if type does not meet these criteria
+   */
   private def validateType(dataType: DataType): Unit = {
     var clazz = dataType.getConversionClass
     if (clazz == null) {

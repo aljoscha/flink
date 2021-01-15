@@ -28,7 +28,10 @@ import org.apache.flink.table.plan.nodes.PhysicalTableSourceScan
 import org.apache.flink.table.plan.schema.RowSchema
 import org.apache.flink.table.sources._
 import org.apache.flink.table.types.utils.TypeConversions
-import org.apache.flink.table.types.utils.TypeConversions.{fromDataTypeToLegacyInfo, fromLegacyInfoToDataType}
+import org.apache.flink.table.types.utils.TypeConversions.{
+  fromDataTypeToLegacyInfo,
+  fromLegacyInfoToDataType
+}
 import org.apache.flink.table.utils.TypeMappingUtils
 import org.apache.flink.types.Row
 
@@ -49,53 +52,41 @@ class BatchTableSourceScan(
     tableSchema: TableSchema,
     tableSource: TableSource[_],
     selectedFields: Option[Array[Int]])
-  extends PhysicalTableSourceScan(
-    cluster,
-    traitSet,
-    table,
-    tableSchema,
-    tableSource,
-    selectedFields)
-  with BatchScan {
+    extends PhysicalTableSourceScan(
+      cluster,
+      traitSet,
+      table,
+      tableSchema,
+      tableSource,
+      selectedFields)
+    with BatchScan {
 
   override def deriveRowType(): RelDataType = {
     val rowType = table.getRowType
-    selectedFields.map(idxs => {
-      val fields = rowType.getFieldList
-      val builder = cluster.getTypeFactory.builder()
-      idxs.map(fields.get).foreach(builder.add)
-      builder.build()
-    }).getOrElse(rowType)
+    selectedFields
+      .map(idxs => {
+        val fields = rowType.getFieldList
+        val builder = cluster.getTypeFactory.builder()
+        idxs.map(fields.get).foreach(builder.add)
+        builder.build()
+      })
+      .getOrElse(rowType)
   }
 
-  override def computeSelfCost (planner: RelOptPlanner, metadata: RelMetadataQuery): RelOptCost = {
+  override def computeSelfCost(planner: RelOptPlanner, metadata: RelMetadataQuery): RelOptCost = {
     val rowCnt = metadata.getRowCount(this)
     planner.getCostFactory.makeCost(rowCnt, rowCnt, rowCnt * estimateRowSize(getRowType))
   }
 
   override def copy(traitSet: RelTraitSet, inputs: java.util.List[RelNode]): RelNode = {
-    new BatchTableSourceScan(
-      cluster,
-      traitSet,
-      getTable,
-      tableSchema,
-      tableSource,
-      selectedFields
-    )
+    new BatchTableSourceScan(cluster, traitSet, getTable, tableSchema, tableSource, selectedFields)
   }
 
   override def copy(
       traitSet: RelTraitSet,
       newTableSource: TableSource[_]): PhysicalTableSourceScan = {
 
-    new BatchTableSourceScan(
-      cluster,
-      traitSet,
-      getTable,
-      tableSchema,
-      tableSource,
-      selectedFields
-    )
+    new BatchTableSourceScan(cluster, traitSet, getTable, tableSchema, tableSource, selectedFields)
   }
 
   override def translateToPlan(tableEnv: BatchTableEnvImpl): DataSet[Row] = {
@@ -106,15 +97,17 @@ class BatchTableSourceScan(
         batchSource.getDataSet(tableEnv.execEnv)
       case boundedSource: InputFormatTableSource[_] =>
         val resultType = fromDataTypeToLegacyInfo(boundedSource.getProducedDataType)
-            .asInstanceOf[TypeInformation[Any]]
+          .asInstanceOf[TypeInformation[Any]]
         val inputFormat = boundedSource.getInputFormat
           .asInstanceOf[InputFormat[Any, _ <: InputSplit]]
         tableEnv.execEnv
           .createInput(inputFormat, resultType)
           .name(boundedSource.explainSource)
           .asInstanceOf[DataSet[_]]
-      case _ => throw new TableException("Only BatchTableSource and InputFormatTableSource are " +
-        "supported in BatchTableEnvironment.")
+      case _ =>
+        throw new TableException(
+          "Only BatchTableSource and InputFormatTableSource are " +
+            "supported in BatchTableEnvironment.")
     }
     // Fix the nullability of row type info.
     val inputDataType = fromLegacyInfoToDataType(inputDataSet.getType).notNull()
@@ -130,30 +123,29 @@ class BatchTableSourceScan(
 
     val nameMapping: JFunction[String, String] = tableSource match {
       case mapping: DefinedFieldMapping if mapping.getFieldMapping != null =>
-          new JFunction[String, String] {
-            override def apply(t: String): String = mapping.getFieldMapping.get(t)
-          }
+        new JFunction[String, String] {
+          override def apply(t: String): String = mapping.getFieldMapping.get(t)
+        }
       case _ => JFunction.identity()
     }
 
     val fieldIndexes = TypeMappingUtils.computePhysicalIndicesOrTimeAttributeMarkers(
       tableSource,
-      selectedFields.map(_.map(tableSchema.getTableColumn(_).get()).toList.asJava)
+      selectedFields
+        .map(_.map(tableSchema.getTableColumn(_).get()).toList.asJava)
         .getOrElse(tableSchema.getTableColumns),
       false,
-      nameMapping
-    )
+      nameMapping)
 
-    val rowtimeExpression = TableSourceUtil.getRowtimeAttributeDescriptor(
-        tableSource,
-        selectedFields)
-      .map(desc => TableSourceUtil.getRowtimeExtractionExpression(
-        desc.getTimestampExtractor,
-        producedDataType,
-        TypeConversions.fromLegacyInfoToDataType(Types.SQL_TIMESTAMP()),
-        tableEnv.getRelBuilder,
-        nameMapping
-      ))
+    val rowtimeExpression = TableSourceUtil
+      .getRowtimeAttributeDescriptor(tableSource, selectedFields)
+      .map(desc =>
+        TableSourceUtil.getRowtimeExtractionExpression(
+          desc.getTimestampExtractor,
+          producedDataType,
+          TypeConversions.fromLegacyInfoToDataType(Types.SQL_TIMESTAMP()),
+          tableEnv.getRelBuilder,
+          nameMapping))
 
     // ingest table and convert and extract time attributes if necessary
     convertToInternalRow(

@@ -54,8 +54,12 @@ class ReconciliationCoordinatorTest
   def randomTask = {
     val slaveID = Protos.SlaveID.newBuilder.setValue(UUID.randomUUID.toString).build()
     val taskID = Protos.TaskID.newBuilder.setValue(UUID.randomUUID.toString).build
-    val taskStatus = Protos.TaskStatus.newBuilder()
-      .setTaskId(taskID).setSlaveId(slaveID).setState(TASK_STAGING).build()
+    val taskStatus = Protos.TaskStatus
+      .newBuilder()
+      .setTaskId(taskID)
+      .setSlaveId(slaveID)
+      .setState(TASK_STAGING)
+      .build()
     (taskID, taskStatus)
   }
 
@@ -78,14 +82,14 @@ class ReconciliationCoordinatorTest
         "transitions to Idle when the queue is empty" in new Context {
           fsm.setState(Suspended)
           fsm ! new Connected {}
-          fsm.stateName should be (Idle)
-          fsm.stateData.remaining should be (empty)
+          fsm.stateName should be(Idle)
+          fsm.stateData.remaining should be(empty)
         }
 
         "transitions to Reconciling when the queue is non-empty" in new Context {
           fsm.setState(Suspended, ReconciliationData(Seq(randomTask).toMap))
           fsm ! new Connected {}
-          fsm.stateName should be (Reconciling)
+          fsm.stateName should be(Reconciling)
         }
       }
 
@@ -101,7 +105,7 @@ class ReconciliationCoordinatorTest
         "is disregarded" in new Context {
           fsm.setState(Suspended)
           fsm ! new StatusUpdate(task1._2)
-          fsm.stateName should be (Suspended)
+          fsm.stateName should be(Suspended)
         }
       }
     }
@@ -111,7 +115,7 @@ class ReconciliationCoordinatorTest
       "Disconnected" which {
         "transitions to Suspended" in new Context {
           fsm ! new Disconnected()
-          fsm.stateName should be (Suspended)
+          fsm.stateName should be(Suspended)
         }
       }
 
@@ -121,7 +125,7 @@ class ReconciliationCoordinatorTest
           fsm ! new Reconcile(Seq(task1._2))
 
           verify(schedulerDriver).reconcileTasks(contentsMatch(Seq(task1._2)))
-          fsm.stateName should be (Reconciling)
+          fsm.stateName should be(Reconciling)
           fsm.stateData.remaining should contain only (task1)
         }
       }
@@ -130,8 +134,8 @@ class ReconciliationCoordinatorTest
         "is disregarded" in new Context {
           fsm.setState(Idle)
           fsm ! new StatusUpdate(task1._2)
-          fsm.stateName should be (Idle)
-          fsm.stateData.remaining should be (empty)
+          fsm.stateName should be(Idle)
+          fsm.stateData.remaining should be(empty)
         }
       }
     }
@@ -152,7 +156,7 @@ class ReconciliationCoordinatorTest
           fsm ! FSM.StateTimeout
           fsm ! new Disconnected()
 
-          fsm.stateName should be (Suspended)
+          fsm.stateName should be(Suspended)
           fsm.stateData.remaining should contain only (task1)
         }
 
@@ -160,11 +164,11 @@ class ReconciliationCoordinatorTest
           fsm.setState(Reconciling, ReconciliationData(Seq(task1).toMap))
           reset(schedulerDriver)
           fsm ! FSM.StateTimeout
-          fsm.stateData.retries should be (1)
+          fsm.stateData.retries should be(1)
           fsm ! new Disconnected()
 
-          fsm.stateName should be (Suspended)
-          fsm.stateData.retries should be (0)
+          fsm.stateName should be(Suspended)
+          fsm.stateData.retries should be(0)
         }
       }
 
@@ -177,7 +181,7 @@ class ReconciliationCoordinatorTest
 
           // the reconcileTasks message should mention only the new tasks
           verify(schedulerDriver).reconcileTasks(contentsMatch(Seq(task2, task3).unzip._2))
-          fsm.stateName should be (Reconciling)
+          fsm.stateName should be(Reconciling)
           fsm.stateData.remaining should contain only (task1, task2, task3)
         }
       }
@@ -190,9 +194,9 @@ class ReconciliationCoordinatorTest
           fsm ! FSM.StateTimeout
           fsm ! new StatusUpdate(taskStatus)
 
-          fsm.stateName should be (Idle)
-          fsm.stateData.remaining should be (empty)
-          fsm.stateData.retries should be (0)
+          fsm.stateName should be(Idle)
+          fsm.stateData.remaining should be(empty)
+          fsm.stateData.retries should be(0)
         }
 
         "stays in Reconciling when queue is non-empty" in new Context {
@@ -201,7 +205,7 @@ class ReconciliationCoordinatorTest
           val taskStatus = task1._2.toBuilder.setState(TASK_LOST).build()
           fsm ! new StatusUpdate(taskStatus)
 
-          fsm.stateName should be (Reconciling)
+          fsm.stateName should be(Reconciling)
           fsm.stateData.remaining should contain only (task2)
         }
 
@@ -211,21 +215,21 @@ class ReconciliationCoordinatorTest
           val taskStatus = task2._2.toBuilder.setState(TASK_LOST).build()
           fsm ! new StatusUpdate(taskStatus)
 
-          fsm.stateName should be (Reconciling)
+          fsm.stateName should be(Reconciling)
           fsm.stateData.remaining should contain only (task1)
         }
       }
 
       "StateTimeout" which {
         "stays in Reconciling with reconciliation retry" in new Context {
-          fsm.setState(Reconciling, ReconciliationData(Seq(task1,task2).toMap))
+          fsm.setState(Reconciling, ReconciliationData(Seq(task1, task2).toMap))
           reset(schedulerDriver)
           fsm ! FSM.StateTimeout
 
-          verify(schedulerDriver).reconcileTasks(contentsMatch(Seq(task1,task2).unzip._2))
-          fsm.stateName should be (Reconciling)
-          fsm.stateData.remaining should contain only (task1,task2)
-          fsm.stateData.retries should be (1)
+          verify(schedulerDriver).reconcileTasks(contentsMatch(Seq(task1, task2).unzip._2))
+          fsm.stateName should be(Reconciling)
+          fsm.stateData.remaining should contain only (task1, task2)
+          fsm.stateData.retries should be(1)
         }
       }
     }

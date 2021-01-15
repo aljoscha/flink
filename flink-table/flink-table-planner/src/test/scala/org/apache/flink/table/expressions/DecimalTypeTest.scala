@@ -31,11 +31,7 @@ class DecimalTypeTest extends ExpressionTestBase {
   @Test
   def testDecimalLiterals(): Unit = {
     // implicit double
-    testAllApis(
-      11.2,
-      "11.2",
-      "11.2",
-      "11.2")
+    testAllApis(11.2, "11.2", "11.2", "11.2")
 
     // implicit double
     testAllApis(
@@ -124,11 +120,7 @@ class DecimalTypeTest extends ExpressionTestBase {
       "123456789123456789123456789")
 
     // from double
-    testAllApis(
-      'f3.cast(Types.DECIMAL),
-      "f3.cast(DECIMAL)",
-      "CAST(f3 AS DECIMAL)",
-      "4.2")
+    testAllApis('f3.cast(Types.DECIMAL), "f3.cast(DECIMAL)", "CAST(f3 AS DECIMAL)", "4.2")
 
     // to double
     testAllApis(
@@ -138,29 +130,15 @@ class DecimalTypeTest extends ExpressionTestBase {
       "1.2345678912345679E8")
 
     // to int
-    testAllApis(
-      'f4.cast(Types.INT),
-      "f4.cast(INT)",
-      "CAST(f4 AS INT)",
-      "123456789")
+    testAllApis('f4.cast(Types.INT), "f4.cast(INT)", "CAST(f4 AS INT)", "123456789")
 
     // to long
-    testAllApis(
-      'f4.cast(Types.LONG),
-      "f4.cast(LONG)",
-      "CAST(f4 AS BIGINT)",
-      "123456789")
+    testAllApis('f4.cast(Types.LONG), "f4.cast(LONG)", "CAST(f4 AS BIGINT)", "123456789")
 
     // to boolean (not SQL compliant)
-    testTableApi(
-      'f1.cast(Types.BOOLEAN),
-      "f1.cast(BOOLEAN)",
-      "true")
+    testTableApi('f1.cast(Types.BOOLEAN), "f1.cast(BOOLEAN)", "true")
 
-    testTableApi(
-      'f5.cast(Types.BOOLEAN),
-      "f5.cast(BOOLEAN)",
-      "false")
+    testTableApi('f5.cast(Types.BOOLEAN), "f5.cast(BOOLEAN)", "false")
 
     testTableApi(
       BigDecimal("123456789.123456789123456789").cast(Types.DOUBLE),
@@ -171,44 +149,20 @@ class DecimalTypeTest extends ExpressionTestBase {
   @Test
   def testDecimalArithmetic(): Unit = {
     // implicit cast to decimal
-    testAllApis(
-      'f1 + 12,
-      "f1 + 12",
-      "f1 + 12",
-      "123456789123456789123456801")
+    testAllApis('f1 + 12, "f1 + 12", "f1 + 12", "123456789123456789123456801")
 
     // implicit cast to decimal
-    testAllApis(
-      12.toExpr + 'f1,
-      "12 + f1",
-      "12 + f1",
-      "123456789123456789123456801")
+    testAllApis(12.toExpr + 'f1, "12 + f1", "12 + f1", "123456789123456789123456801")
 
     // implicit cast to decimal
-    testAllApis(
-      'f1 + 12.3,
-      "f1 + 12.3",
-      "f1 + 12.3",
-      "123456789123456789123456801.3")
+    testAllApis('f1 + 12.3, "f1 + 12.3", "f1 + 12.3", "123456789123456789123456801.3")
 
     // implicit cast to decimal
-    testAllApis(
-      12.3.toExpr + 'f1,
-      "12.3 + f1",
-      "12.3 + f1",
-      "123456789123456789123456801.3")
+    testAllApis(12.3.toExpr + 'f1, "12.3 + f1", "12.3 + f1", "123456789123456789123456801.3")
 
-    testAllApis(
-      'f1 + 'f1,
-      "f1 + f1",
-      "f1 + f1",
-      "246913578246913578246913578")
+    testAllApis('f1 + 'f1, "f1 + f1", "f1 + f1", "246913578246913578246913578")
 
-    testAllApis(
-      'f1 - 'f1,
-      "f1 - f1",
-      "f1 - f1",
-      "0")
+    testAllApis('f1 - 'f1, "f1 - f1", "f1 - f1", "0")
 
     testAllApis(
       'f1 * 'f1,
@@ -216,57 +170,28 @@ class DecimalTypeTest extends ExpressionTestBase {
       "f1 * f1",
       "15241578780673678546105778281054720515622620750190521")
 
-    testAllApis(
-      'f1 / 'f1,
-      "f1 / f1",
-      "f1 / f1",
-      "1")
+    testAllApis('f1 / 'f1, "f1 / f1", "f1 / f1", "1")
 
-    testAllApis(
-      'f1 % 'f1,
-      "f1 % f1",
-      "MOD(f1, f1)",
-      "0")
+    testAllApis('f1 % 'f1, "f1 % f1", "MOD(f1, f1)", "0")
 
-    testAllApis(
-      -'f0,
-      "-f0",
-      "-f0",
-      "-123456789.123456789123456789")
+    testAllApis(-'f0, "-f0", "-f0", "-123456789.123456789123456789")
 
     testAllApis(
       BigDecimal("1").toExpr / BigDecimal("3"),
       "1p / 3p",
       "CAST('1' AS DECIMAL) / CAST('3' AS DECIMAL)",
-      "0.3333333333333333333333333333333333"
-    )
+      "0.3333333333333333333333333333333333")
   }
 
   @Test
   def testDecimalComparison(): Unit = {
-    testAllApis(
-      'f1 < 12,
-      "f1 < 12",
-      "f1 < 12",
-      "false")
+    testAllApis('f1 < 12, "f1 < 12", "f1 < 12", "false")
 
-    testAllApis(
-      'f1 > 12,
-      "f1 > 12",
-      "f1 > 12",
-      "true")
+    testAllApis('f1 > 12, "f1 > 12", "f1 > 12", "true")
 
-    testAllApis(
-      'f1 === 12,
-      "f1 === 12",
-      "f1 = 12",
-      "false")
+    testAllApis('f1 === 12, "f1 === 12", "f1 = 12", "false")
 
-    testAllApis(
-      'f5 === 0,
-      "f5 === 0",
-      "f5 = 0",
-      "true")
+    testAllApis('f5 === 0, "f5 === 0", "f5 = 0", "true")
 
     testAllApis(
       'f1 === BigDecimal("123456789123456789123456789"),
@@ -280,16 +205,10 @@ class DecimalTypeTest extends ExpressionTestBase {
       "f1 <> CAST('123456789123456789123456789' AS DECIMAL)",
       "false")
 
-    testAllApis(
-      'f4 < 'f0,
-      "f4 < f0",
-      "f4 < f0",
-      "true")
+    testAllApis('f4 < 'f0, "f4 < f0", "f4 < f0", "true")
 
     // TODO add all tests if FLINK-4070 is fixed
-    testSqlApi(
-      "12 < f1",
-      "true")
+    testSqlApi("12 < f1", "true")
   }
 
   // ----------------------------------------------------------------------------------------------

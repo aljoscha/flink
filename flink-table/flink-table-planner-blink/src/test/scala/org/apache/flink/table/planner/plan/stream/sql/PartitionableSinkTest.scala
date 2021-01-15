@@ -31,8 +31,7 @@ class PartitionableSinkTest extends TableTestBase {
   createTable("sink", shuffleBy = false)
 
   private def createTable(name: String, shuffleBy: Boolean): Unit = {
-    util.tableEnv.executeSql(
-      s"""
+    util.tableEnv.executeSql(s"""
          |create table $name (
          |  a bigint,
          |  b bigint,

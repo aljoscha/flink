@@ -52,11 +52,11 @@ trait CommonJoin {
   private[flink] def joinTypeToString(joinType: JoinRelType) = {
     joinType match {
       case JoinRelType.INNER => "InnerJoin"
-      case JoinRelType.LEFT=> "LeftOuterJoin"
+      case JoinRelType.LEFT  => "LeftOuterJoin"
       case JoinRelType.RIGHT => "RightOuterJoin"
-      case JoinRelType.FULL => "FullOuterJoin"
-      case JoinRelType.SEMI => "SemiJoin"
-      case JoinRelType.ANTI => "AntiJoin"
+      case JoinRelType.FULL  => "FullOuterJoin"
+      case JoinRelType.SEMI  => "SemiJoin"
+      case JoinRelType.ANTI  => "AntiJoin"
     }
   }
 

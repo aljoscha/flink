@@ -23,11 +23,21 @@ import org.apache.flink.table.api.config.OptimizerConfigOptions
 import org.apache.flink.table.api.{ExplainDetail, TableConfig, TableException, TableSchema}
 import org.apache.flink.table.catalog.{CatalogManager, FunctionCatalog, ObjectIdentifier}
 import org.apache.flink.table.delegation.Executor
-import org.apache.flink.table.operations.{CatalogSinkModifyOperation, ModifyOperation, Operation, QueryOperation}
+import org.apache.flink.table.operations.{
+  CatalogSinkModifyOperation,
+  ModifyOperation,
+  Operation,
+  QueryOperation
+}
 import org.apache.flink.table.planner.operations.PlannerQueryOperation
 import org.apache.flink.table.planner.plan.`trait`.FlinkRelDistributionTraitDef
 import org.apache.flink.table.planner.plan.nodes.exec.batch.BatchExecNode
-import org.apache.flink.table.planner.plan.nodes.exec.processor.{DAGProcessContext, DAGProcessor, DeadlockBreakupProcessor, MultipleInputNodeCreationProcessor}
+import org.apache.flink.table.planner.plan.nodes.exec.processor.{
+  DAGProcessContext,
+  DAGProcessor,
+  DeadlockBreakupProcessor,
+  MultipleInputNodeCreationProcessor
+}
 import org.apache.flink.table.planner.plan.nodes.exec.utils.ExecNodePlanDumper
 import org.apache.flink.table.planner.plan.nodes.exec.{ExecNode, LegacyBatchExecNode}
 import org.apache.flink.table.planner.plan.optimize.{BatchCommonSubGraphBasedOptimizer, Optimizer}
@@ -49,7 +59,12 @@ class BatchPlanner(
     config: TableConfig,
     functionCatalog: FunctionCatalog,
     catalogManager: CatalogManager)
-  extends PlannerBase(executor, config, functionCatalog, catalogManager, isStreamingMode = false) {
+    extends PlannerBase(
+      executor,
+      config,
+      functionCatalog,
+      catalogManager,
+      isStreamingMode = false) {
 
   override protected def getTraitDefs: Array[RelTraitDef[_ <: RelTrait]] = {
     Array(
@@ -74,8 +89,8 @@ class BatchPlanner(
       processors.add(new MultipleInputNodeCreationProcessor(false))
     }
 
-    processors.foldLeft(execNodePlan)(
-      (sinkNodes, processor) => processor.process(sinkNodes, context))
+    processors.foldLeft(execNodePlan)((sinkNodes, processor) =>
+      processor.process(sinkNodes, context))
   }
 
   override protected def translateToPlan(
@@ -85,9 +100,10 @@ class BatchPlanner(
 
     execNodes.map {
       case legacyNode: LegacyBatchExecNode[_] => legacyNode.translateToPlan(planner)
-      case node: BatchExecNode[_] => node.translateToPlan(planner)
+      case node: BatchExecNode[_]             => node.translateToPlan(planner)
       case _ =>
-        throw new TableException("Cannot generate BoundedStream due to an invalid logical plan. " +
+        throw new TableException(
+          "Cannot generate BoundedStream due to an invalid logical plan. " +
             "This is a bug and should not happen. Please file an issue.")
     }
   }
@@ -109,8 +125,7 @@ class BatchPlanner(
             require(qualifiedName.size() == 3, "the length of qualified name should be 3.")
             val modifyOperation = new CatalogSinkModifyOperation(
               ObjectIdentifier.of(qualifiedName.get(0), qualifiedName.get(1), qualifiedName.get(2)),
-              new PlannerQueryOperation(modify.getInput)
-            )
+              new PlannerQueryOperation(modify.getInput))
             translateToRel(modifyOperation)
           case _ =>
             relNode

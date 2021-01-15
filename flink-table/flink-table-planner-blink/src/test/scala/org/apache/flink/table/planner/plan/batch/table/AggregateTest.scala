@@ -25,8 +25,8 @@ import org.apache.flink.table.planner.utils.TableTestBase
 import org.junit.Test
 
 /**
-  * Test for testing aggregate plans.
-  */
+ * Test for testing aggregate plans.
+ */
 class AggregateTest extends TableTestBase {
 
   @Test
@@ -35,7 +35,8 @@ class AggregateTest extends TableTestBase {
     val util = batchTestUtil()
     val sourceTable = util.addTableSource[(Int, Long, Int)]("MyTable", 'a, 'b, 'c)
 
-    val resultTable = sourceTable.groupBy('a)
+    val resultTable = sourceTable
+      .groupBy('a)
       .select('a, 'a.avg, 'b.sum, 'c.count)
       .where('a === 1)
 
@@ -46,7 +47,7 @@ class AggregateTest extends TableTestBase {
   def testAggregate(): Unit = {
     val util = batchTestUtil()
     val sourceTable = util.addTableSource[(Int, Long, Int)]("MyTable", 'a, 'b, 'c)
-    val resultTable = sourceTable.select('a.avg,'b.sum,'c.count)
+    val resultTable = sourceTable.select('a.avg, 'b.sum, 'c.count)
 
     util.verifyExecPlan(resultTable)
   }
@@ -56,8 +57,10 @@ class AggregateTest extends TableTestBase {
     val util = batchTestUtil()
     val sourceTable = util.addTableSource[(Int, Long, Int)]("MyTable", 'a, 'b, 'c)
 
-    val resultTable = sourceTable.select('a,'b,'c).where('a === 1)
-      .select('a.avg,'b.sum,'c.count)
+    val resultTable = sourceTable
+      .select('a, 'b, 'c)
+      .where('a === 1)
+      .select('a.avg, 'b.sum, 'c.count)
 
     util.verifyExecPlan(resultTable)
   }
@@ -67,8 +70,10 @@ class AggregateTest extends TableTestBase {
     val util = batchTestUtil()
     val sourceTable = util.addTableSource[(Int, Long, (Int, Long))]("MyTable", 'a, 'b, 'c)
 
-    val resultTable = sourceTable.select('a,'b,'c).where('a === 1)
-      .select('a.avg,'b.sum,'c.count, 'c.get("_1").sum)
+    val resultTable = sourceTable
+      .select('a, 'b, 'c)
+      .where('a === 1)
+      .select('a.avg, 'b.sum, 'c.count, 'c.get("_1").sum)
 
     util.verifyExecPlan(resultTable)
   }

@@ -31,12 +31,12 @@ import org.apache.flink.table.planner.JLong
 
 object TimeTestUtil {
 
-  class EventTimeSourceFunction[T](
-      dataWithTimestampList: Seq[Either[(Long, T), Long]]) extends SourceFunction[T] {
+  class EventTimeSourceFunction[T](dataWithTimestampList: Seq[Either[(Long, T), Long]])
+      extends SourceFunction[T] {
 
     override def run(ctx: SourceContext[T]): Unit = {
       dataWithTimestampList.foreach {
-        case Left(t) => ctx.collectWithTimestamp(t._2, t._1)
+        case Left(t)  => ctx.collectWithTimestamp(t._2, t._1)
         case Right(w) => ctx.emitWatermark(new Watermark(w))
       }
     }
@@ -44,8 +44,8 @@ object TimeTestUtil {
     override def cancel(): Unit = ???
   }
 
-  class TimestampAndWatermarkWithOffset[T <: Product](
-      offset: Long) extends AssignerWithPunctuatedWatermarks[T] {
+  class TimestampAndWatermarkWithOffset[T <: Product](offset: Long)
+      extends AssignerWithPunctuatedWatermarks[T] {
 
     override def checkAndGetNextWatermark(lastElement: T, extractedTimestamp: Long): Watermark = {
       new Watermark(extractedTimestamp - offset)
@@ -62,7 +62,7 @@ object TimeTestUtil {
    * This is necessary for late arrival testing with [[FailingCollectionSource]].
    */
   class EventTimeProcessOperator[T]
-    extends AbstractStreamOperator[T]
+      extends AbstractStreamOperator[T]
       with OneInputStreamOperator[Either[(Long, T), Long], T] {
 
     private var currentWatermark: Long = 0L

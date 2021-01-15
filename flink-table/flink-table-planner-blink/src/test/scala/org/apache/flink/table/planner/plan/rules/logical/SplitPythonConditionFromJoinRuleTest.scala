@@ -30,8 +30,8 @@ import org.apache.calcite.plan.hep.HepMatchOrder
 import org.junit.{Before, Test}
 
 /**
-  * Test for [[SplitPythonConditionFromJoinRule]].
-  */
+ * Test for [[SplitPythonConditionFromJoinRule]].
+ */
 class SplitPythonConditionFromJoinRuleTest extends TableTestBase {
 
   private val util = batchTestUtil()

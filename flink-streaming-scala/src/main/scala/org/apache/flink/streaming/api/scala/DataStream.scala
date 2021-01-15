@@ -20,8 +20,17 @@ package org.apache.flink.streaming.api.scala
 
 import org.apache.flink.annotation.{Internal, Public, PublicEvolving}
 import org.apache.flink.api.common.ExecutionConfig
-import org.apache.flink.api.common.eventtime.{TimestampAssigner, WatermarkGenerator, WatermarkStrategy}
-import org.apache.flink.api.common.functions.{FilterFunction, FlatMapFunction, MapFunction, Partitioner}
+import org.apache.flink.api.common.eventtime.{
+  TimestampAssigner,
+  WatermarkGenerator,
+  WatermarkStrategy
+}
+import org.apache.flink.api.common.functions.{
+  FilterFunction,
+  FlatMapFunction,
+  MapFunction,
+  Partitioner
+}
 import org.apache.flink.api.common.io.OutputFormat
 import org.apache.flink.api.common.operators.ResourceSpec
 import org.apache.flink.api.common.serialization.SerializationSchema
@@ -33,10 +42,22 @@ import org.apache.flink.api.java.tuple.{Tuple => JavaTuple}
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable
 import org.apache.flink.api.scala.operators.ScalaCsvOutputFormat
 import org.apache.flink.core.fs.{FileSystem, Path}
-import org.apache.flink.streaming.api.datastream.{AllWindowedStream => JavaAllWindowedStream, DataStream => JavaStream, KeyedStream => JavaKeyedStream, _}
+import org.apache.flink.streaming.api.datastream.{
+  AllWindowedStream => JavaAllWindowedStream,
+  DataStream => JavaStream,
+  KeyedStream => JavaKeyedStream,
+  _
+}
 import org.apache.flink.streaming.api.functions.sink.SinkFunction
-import org.apache.flink.streaming.api.functions.timestamps.{AscendingTimestampExtractor, BoundedOutOfOrdernessTimestampExtractor}
-import org.apache.flink.streaming.api.functions.{AssignerWithPeriodicWatermarks, AssignerWithPunctuatedWatermarks, ProcessFunction}
+import org.apache.flink.streaming.api.functions.timestamps.{
+  AscendingTimestampExtractor,
+  BoundedOutOfOrdernessTimestampExtractor
+}
+import org.apache.flink.streaming.api.functions.{
+  AssignerWithPeriodicWatermarks,
+  AssignerWithPunctuatedWatermarks,
+  ProcessFunction
+}
 import org.apache.flink.streaming.api.operators.OneInputStreamOperator
 import org.apache.flink.streaming.api.windowing.assigners._
 import org.apache.flink.streaming.api.windowing.time.Time
@@ -51,7 +72,7 @@ class DataStream[T](stream: JavaStream[T]) {
   /**
    * Returns the [[StreamExecutionEnvironment]] associated with the current [[DataStream]].
    *
-   * @return associated execution environment 
+   * @return associated execution environment
    * @deprecated Use [[executionEnvironment]] instead
    */
   @deprecated
@@ -61,7 +82,7 @@ class DataStream[T](stream: JavaStream[T]) {
 
   /**
    * Returns the TypeInformation for the elements of this DataStream.
-   * 
+   *
    * @deprecated Use [[dataType]] instead.
    */
   @deprecated
@@ -70,7 +91,7 @@ class DataStream[T](stream: JavaStream[T]) {
 
   /**
    * Returns the parallelism of this operation.
-   * 
+   *
    * @deprecated Use [[parallelism]] instead.
    */
   @deprecated
@@ -79,7 +100,7 @@ class DataStream[T](stream: JavaStream[T]) {
 
   /**
    * Returns the execution config.
-   * 
+   *
    * @deprecated Use [[executionConfig]] instead.
    */
   @deprecated
@@ -91,16 +112,16 @@ class DataStream[T](stream: JavaStream[T]) {
    */
   @Internal
   private[flink] def getId = stream.getId()
-  
+
   // --------------------------------------------------------------------------
-  //  Scalaesk accessors 
+  //  Scalaesk accessors
   // --------------------------------------------------------------------------
-  
+
   /**
    * Gets the underlying java DataStream object.
    */
   def javaStream: JavaStream[T] = stream
-  
+
   /**
    * Returns the TypeInformation for the elements of this DataStream.
    */
@@ -116,8 +137,7 @@ class DataStream[T](stream: JavaStream[T]) {
    */
   def executionEnvironment: StreamExecutionEnvironment =
     new StreamExecutionEnvironment(stream.getExecutionEnvironment())
-  
-  
+
   /**
    * Returns the parallelism of this operation.
    */
@@ -140,8 +160,9 @@ class DataStream[T](stream: JavaStream[T]) {
     stream match {
       case ds: SingleOutputStreamOperator[T] => ds.setMaxParallelism(maxParallelism)
       case _ =>
-        throw new UnsupportedOperationException("Operator " + stream + " cannot set the maximum" +
-                                                  "paralllelism")
+        throw new UnsupportedOperationException(
+          "Operator " + stream + " cannot set the maximum" +
+            "paralllelism")
     }
 
     this
@@ -192,13 +213,12 @@ class DataStream[T](stream: JavaStream[T]) {
    * @return Name of the stream.
    */
   def name: String = stream match {
-    case stream : SingleOutputStreamOperator[T] => stream.getName
-    case _ => throw new
-        UnsupportedOperationException("Only supported for operators.")
+    case stream: SingleOutputStreamOperator[T] => stream.getName
+    case _                                     => throw new UnsupportedOperationException("Only supported for operators.")
   }
-  
+
   // --------------------------------------------------------------------------
-  
+
   /**
    * Gets the name of the current data stream. This name is
    * used by the visualization and logging during runtime.
@@ -208,7 +228,7 @@ class DataStream[T](stream: JavaStream[T]) {
    */
   @deprecated
   @PublicEvolving
-  def getName : String = name
+  def getName: String = name
 
   /**
    * Sets the name of the current data stream. This name is
@@ -216,58 +236,61 @@ class DataStream[T](stream: JavaStream[T]) {
    *
    * @return The named operator
    */
-  def name(name: String) : DataStream[T] = stream match {
-    case stream : SingleOutputStreamOperator[T] => asScalaStream(stream.name(name))
-    case _ => throw new UnsupportedOperationException("Only supported for operators.")
-    this
+  def name(name: String): DataStream[T] = stream match {
+    case stream: SingleOutputStreamOperator[T] => asScalaStream(stream.name(name))
+    case _ =>
+      throw new UnsupportedOperationException("Only supported for operators.")
+      this
   }
 
   /**
-    * Sets an ID for this operator.
-    *
-    * The specified ID is used to assign the same operator ID across job
-    * submissions (for example when starting a job from a savepoint).
-    *
-    * <strong>Important</strong>: this ID needs to be unique per
-    * transformation and job. Otherwise, job submission will fail.
-    *
-    * @param uid The unique user-specified ID of this transformation.
-    * @return The operator with the specified ID.
-    */
+   * Sets an ID for this operator.
+   *
+   * The specified ID is used to assign the same operator ID across job
+   * submissions (for example when starting a job from a savepoint).
+   *
+   * <strong>Important</strong>: this ID needs to be unique per
+   * transformation and job. Otherwise, job submission will fail.
+   *
+   * @param uid The unique user-specified ID of this transformation.
+   * @return The operator with the specified ID.
+   */
   @PublicEvolving
-  def uid(uid: String) : DataStream[T] = javaStream match {
-    case stream : SingleOutputStreamOperator[T] => asScalaStream(stream.uid(uid))
-    case _ => throw new UnsupportedOperationException("Only supported for operators.")
-    this
+  def uid(uid: String): DataStream[T] = javaStream match {
+    case stream: SingleOutputStreamOperator[T] => asScalaStream(stream.uid(uid))
+    case _ =>
+      throw new UnsupportedOperationException("Only supported for operators.")
+      this
   }
 
   @PublicEvolving
   def getSideOutput[X: TypeInformation](tag: OutputTag[X]): DataStream[X] = javaStream match {
-    case stream : SingleOutputStreamOperator[X] =>
+    case stream: SingleOutputStreamOperator[X] =>
       asScalaStream(stream.getSideOutput(tag: OutputTag[X]))
   }
 
   /**
-    * Sets an user provided hash for this operator. This will be used AS IS the create
-    * the JobVertexID.
-    * <p/>
-    * <p>The user provided hash is an alternative to the generated hashes, that is
-    * considered when identifying an operator through the default hash mechanics fails
-    * (e.g. because of changes between Flink versions).
-    * <p/>
-    * <p><strong>Important</strong>: this should be used as a workaround or for trouble
-    * shooting. The provided hash needs to be unique per transformation and job. Otherwise,
-    * job submission will fail. Furthermore, you cannot assign user-specified hash to
-    * intermediate nodes in an operator chain and trying so will let your job fail.
-    *
-    * @param hash the user provided hash for this operator.
-    * @return The operator with the user provided hash.
-    */
+   * Sets an user provided hash for this operator. This will be used AS IS the create
+   * the JobVertexID.
+   * <p/>
+   * <p>The user provided hash is an alternative to the generated hashes, that is
+   * considered when identifying an operator through the default hash mechanics fails
+   * (e.g. because of changes between Flink versions).
+   * <p/>
+   * <p><strong>Important</strong>: this should be used as a workaround or for trouble
+   * shooting. The provided hash needs to be unique per transformation and job. Otherwise,
+   * job submission will fail. Furthermore, you cannot assign user-specified hash to
+   * intermediate nodes in an operator chain and trying so will let your job fail.
+   *
+   * @param hash the user provided hash for this operator.
+   * @return The operator with the user provided hash.
+   */
   @PublicEvolving
-  def setUidHash(hash: String) : DataStream[T] = javaStream match {
-    case stream : SingleOutputStreamOperator[T] =>
+  def setUidHash(hash: String): DataStream[T] = javaStream match {
+    case stream: SingleOutputStreamOperator[T] =>
       asScalaStream(stream.setUidHash(hash))
-    case _ => throw new UnsupportedOperationException("Only supported for operators.")
+    case _ =>
+      throw new UnsupportedOperationException("Only supported for operators.")
       this
   }
 
@@ -276,7 +299,6 @@ class DataStream[T](stream: JavaStream[T]) {
    * used as an optimization. </p> Chaining can be turned off for the whole
    * job by [[StreamExecutionEnvironment.disableOperatorChaining()]]
    * however it is not advised for performance considerations.
-   *
    */
   @PublicEvolving
   def disableChaining(): DataStream[T] = {
@@ -292,7 +314,6 @@ class DataStream[T](stream: JavaStream[T]) {
    * Starts a new task chain beginning at this operator. This operator will
    * not be chained (thread co-located for increased performance) to any
    * previous tasks even if possible.
-   *
    */
   @PublicEvolving
   def startNewChain(): DataStream[T] = {
@@ -345,14 +366,13 @@ class DataStream[T](stream: JavaStream[T]) {
   }
 
   // --------------------------------------------------------------------------
-  //  Stream Transformations 
+  //  Stream Transformations
   // --------------------------------------------------------------------------
-  
+
   /**
    * Creates a new DataStream by merging DataStream outputs of
    * the same type with each other. The DataStreams merged using this operator
    * will be transformed simultaneously.
-   *
    */
   def union(dataStreams: DataStream[T]*): DataStream[T] =
     asScalaStream(stream.union(dataStreams.map(_.javaStream): _*))
@@ -366,22 +386,22 @@ class DataStream[T](stream: JavaStream[T]) {
     asScalaStream(stream.connect(dataStream.javaStream))
 
   /**
-    * Creates a new [[BroadcastConnectedStream]] by connecting the current
-    * [[DataStream]] or [[KeyedStream]] with a [[BroadcastStream]].
-    *
-    * The latter can be created using the [[broadcast(MapStateDescriptor[])]] method.
-    *
-    * The resulting stream can be further processed using the
-    * ``broadcastConnectedStream.process(myFunction)``
-    * method, where ``myFunction`` can be either a
-    * [[org.apache.flink.streaming.api.functions.co.KeyedBroadcastProcessFunction]]
-    * or a [[org.apache.flink.streaming.api.functions.co.BroadcastProcessFunction]]
-    * depending on the current stream being a [[KeyedStream]] or not.
-    *
-    * @param broadcastStream The broadcast stream with the broadcast state to be
-    *                        connected with this stream.
-    * @return The [[BroadcastConnectedStream]].
-    */
+   * Creates a new [[BroadcastConnectedStream]] by connecting the current
+   * [[DataStream]] or [[KeyedStream]] with a [[BroadcastStream]].
+   *
+   * The latter can be created using the [[broadcast(MapStateDescriptor[])]] method.
+   *
+   * The resulting stream can be further processed using the
+   * ``broadcastConnectedStream.process(myFunction)``
+   * method, where ``myFunction`` can be either a
+   * [[org.apache.flink.streaming.api.functions.co.KeyedBroadcastProcessFunction]]
+   * or a [[org.apache.flink.streaming.api.functions.co.BroadcastProcessFunction]]
+   * depending on the current stream being a [[KeyedStream]] or not.
+   *
+   * @param broadcastStream The broadcast stream with the broadcast state to be
+   *                        connected with this stream.
+   * @return The [[BroadcastConnectedStream]].
+   */
   @PublicEvolving
   def connect[R](broadcastStream: BroadcastStream[R]): BroadcastConnectedStream[T, R] =
     asScalaStream(stream.connect(broadcastStream))
@@ -389,7 +409,6 @@ class DataStream[T](stream: JavaStream[T]) {
   /**
    * Groups the elements of a DataStream by the given key positions (for tuple/array types) to
    * be used with grouped operators like grouped reduce or grouped aggregations.
-   *
    */
   @deprecated("use [[DataStream.keyBy(KeySelector)]] instead")
   def keyBy(fields: Int*): KeyedStream[T, JavaTuple] = asScalaStream(stream.keyBy(fields: _*))
@@ -438,7 +457,7 @@ class DataStream[T](stream: JavaStream[T]) {
    * Note: This method works only on single field keys.
    */
   @deprecated("Use [[DataStream.partitionCustom(Partitioner, Function1)]] instead")
-  def partitionCustom[K: TypeInformation](partitioner: Partitioner[K], field: Int) : DataStream[T] =
+  def partitionCustom[K: TypeInformation](partitioner: Partitioner[K], field: Int): DataStream[T] =
     asScalaStream(stream.partitionCustom(partitioner, field))
 
   /**
@@ -449,8 +468,9 @@ class DataStream[T](stream: JavaStream[T]) {
    * Note: This method works only on single field keys.
    */
   @deprecated("Use [[DataStream.partitionCustom(Partitioner, Function1)]] instead")
-  def partitionCustom[K: TypeInformation](partitioner: Partitioner[K], field: String)
-        : DataStream[T] =
+  def partitionCustom[K: TypeInformation](
+      partitioner: Partitioner[K],
+      field: String): DataStream[T] =
     asScalaStream(stream.partitionCustom(partitioner, field))
 
   /**
@@ -461,12 +481,13 @@ class DataStream[T](stream: JavaStream[T]) {
    * Note: This method works only on single field keys, i.e. the selector cannot return tuples
    * of fields.
    */
-  def partitionCustom[K: TypeInformation](partitioner: Partitioner[K], fun: T => K)
-      : DataStream[T] = {
-    
+  def partitionCustom[K: TypeInformation](
+      partitioner: Partitioner[K],
+      fun: T => K): DataStream[T] = {
+
     val keyType = implicitly[TypeInformation[K]]
     val cleanFun = clean(fun)
-    
+
     val keyExtractor = new KeySelector[T, K] with ResultTypeQueryable[K] {
       def getKey(in: T) = cleanFun(in)
       override def getProducedType(): TypeInformation[K] = keyType
@@ -482,17 +503,17 @@ class DataStream[T](stream: JavaStream[T]) {
   def broadcast: DataStream[T] = asScalaStream(stream.broadcast())
 
   /**
-    * Sets the partitioning of the [[DataStream]] so that the output elements
-    * are broadcasted to every parallel instance of the next operation. In addition,
-    * it implicitly creates as many
-    * [[org.apache.flink.api.common.state.BroadcastState broadcast states]]
-    * as the specified descriptors which can be used to store the element of the stream.
-    *
-    * @param broadcastStateDescriptors the descriptors of the broadcast states to create.
-    * @return A [[BroadcastStream]] which can be used in the
-    *         [[DataStream.connect(BroadcastStream)]] to create a
-    *         [[BroadcastConnectedStream]] for further processing of the elements.
-    */
+   * Sets the partitioning of the [[DataStream]] so that the output elements
+   * are broadcasted to every parallel instance of the next operation. In addition,
+   * it implicitly creates as many
+   * [[org.apache.flink.api.common.state.BroadcastState broadcast states]]
+   * as the specified descriptors which can be used to store the element of the stream.
+   *
+   * @param broadcastStateDescriptors the descriptors of the broadcast states to create.
+   * @return A [[BroadcastStream]] which can be used in the
+   *         [[DataStream.connect(BroadcastStream)]] to create a
+   *         [[BroadcastConnectedStream]] for further processing of the elements.
+   */
   @PublicEvolving
   def broadcast(broadcastStateDescriptors: MapStateDescriptor[_, _]*): BroadcastStream[T] = {
     if (broadcastStateDescriptors == null) {
@@ -569,8 +590,9 @@ class DataStream[T](stream: JavaStream[T]) {
    * Please refer to the [[setParallelism]] method for parallelism modification
    */
   @PublicEvolving
-  def iterate[R](stepFunction: DataStream[T] => (DataStream[T], DataStream[R]),
-                    maxWaitTimeMillis:Long = 0) : DataStream[R] = {
+  def iterate[R](
+      stepFunction: DataStream[T] => (DataStream[T], DataStream[R]),
+      maxWaitTimeMillis: Long = 0): DataStream[R] = {
     val iterativeStream = stream.iterate(maxWaitTimeMillis)
 
     val (feedback, output) = stepFunction(new DataStream[T](iterativeStream))
@@ -596,17 +618,15 @@ class DataStream[T](stream: JavaStream[T]) {
    * The user must set the max waiting time for the iteration head.
    * If no data received in the set time the stream terminates. If this parameter is set
    * to 0 then the iteration sources will indefinitely, so the job must be killed to stop.
-   *
    */
   @PublicEvolving
   def iterate[R, F: TypeInformation](
-        stepFunction: ConnectedStreams[T, F] => (DataStream[F], DataStream[R]),
-        maxWaitTimeMillis:Long): DataStream[R] = {
-    
+      stepFunction: ConnectedStreams[T, F] => (DataStream[F], DataStream[R]),
+      maxWaitTimeMillis: Long): DataStream[R] = {
+
     val feedbackType: TypeInformation[F] = implicitly[TypeInformation[F]]
-    
-    val connectedIterativeStream = stream.iterate(maxWaitTimeMillis).
-                                   withFeedbackType(feedbackType)
+
+    val connectedIterativeStream = stream.iterate(maxWaitTimeMillis).withFeedbackType(feedbackType)
 
     val (feedback, output) = stepFunction(asScalaStream(connectedIterativeStream))
     connectedIterativeStream.closeWith(feedback.javaStream)
@@ -636,7 +656,7 @@ class DataStream[T](stream: JavaStream[T]) {
       throw new NullPointerException("Map function must not be null.")
     }
 
-    val outType : TypeInformation[R] = implicitly[TypeInformation[R]]
+    val outType: TypeInformation[R] = implicitly[TypeInformation[R]]
     asScalaStream(stream.map(mapper, outType).asInstanceOf[JavaStream[R]])
   }
 
@@ -649,7 +669,7 @@ class DataStream[T](stream: JavaStream[T]) {
       throw new NullPointerException("FlatMap function must not be null.")
     }
 
-    val outType : TypeInformation[R] = implicitly[TypeInformation[R]]
+    val outType: TypeInformation[R] = implicitly[TypeInformation[R]]
     asScalaStream(stream.flatMap(flatMapper, outType).asInstanceOf[JavaStream[R]])
   }
 
@@ -694,8 +714,7 @@ class DataStream[T](stream: JavaStream[T]) {
    *                   in the stream.
    */
   @PublicEvolving
-  def process[R: TypeInformation](
-      processFunction: ProcessFunction[T, R]): DataStream[R] = {
+  def process[R: TypeInformation](processFunction: ProcessFunction[T, R]): DataStream[R] = {
 
     if (processFunction == null) {
       throw new NullPointerException("ProcessFunction must not be null.")
@@ -703,7 +722,6 @@ class DataStream[T](stream: JavaStream[T]) {
 
     asScalaStream(javaStream.process(processFunction, implicitly[TypeInformation[R]]))
   }
-
 
   /**
    * Creates a new DataStream that contains only the elements satisfying the given filter predicate.
@@ -877,8 +895,8 @@ class DataStream[T](stream: JavaStream[T]) {
    */
   @deprecated
   @PublicEvolving
-  def assignTimestampsAndWatermarks(assigner: AssignerWithPunctuatedWatermarks[T])
-      : DataStream[T] = {
+  def assignTimestampsAndWatermarks(
+      assigner: AssignerWithPunctuatedWatermarks[T]): DataStream[T] = {
 
     asScalaStream(stream.assignTimestampsAndWatermarks(assigner))
   }
@@ -886,12 +904,12 @@ class DataStream[T](stream: JavaStream[T]) {
   /**
    * Assigns timestamps to the elements in the data stream and periodically creates
    * watermarks to signal event time progress.
-   * 
+   *
    * This method is a shortcut for data streams where the element timestamp are known
    * to be monotonously ascending within each parallel stream.
    * In that case, the system can generate watermarks automatically and perfectly
    * by tracking the ascending timestamps.
-   * 
+   *
    * For cases where the timestamps are not monotonously increasing, use the more
    * general methods [[assignTimestampsAndWatermarks(AssignerWithPeriodicWatermarks)]]
    * and [[assignTimestampsAndWatermarks(AssignerWithPunctuatedWatermarks)]].
@@ -927,7 +945,6 @@ class DataStream[T](stream: JavaStream[T]) {
    * Writes a DataStream to the standard output stream (stdout). For each
    * element of the DataStream the result of .toString is
    * written.
-   *
    */
   @PublicEvolving
   def print(): DataStreamSink[T] = stream.print()
@@ -944,59 +961,57 @@ class DataStream[T](stream: JavaStream[T]) {
   def printToErr() = stream.printToErr()
 
   /**
-    * Writes a DataStream to the standard output stream (stdout). For each
-    * element of the DataStream the result of [[AnyRef.toString()]] is
-    * written.
-    *
-    * @param sinkIdentifier The string to prefix the output with.
-    * @return The closed DataStream.
-    */
+   * Writes a DataStream to the standard output stream (stdout). For each
+   * element of the DataStream the result of [[AnyRef.toString()]] is
+   * written.
+   *
+   * @param sinkIdentifier The string to prefix the output with.
+   * @return The closed DataStream.
+   */
   @PublicEvolving
   def print(sinkIdentifier: String): DataStreamSink[T] = stream.print(sinkIdentifier)
 
   /**
-    * Writes a DataStream to the standard output stream (stderr).
-    *
-    * For each element of the DataStream the result of
-    * [[AnyRef.toString()]] is written.
-    *
-    * @param sinkIdentifier The string to prefix the output with.
-    * @return The closed DataStream.
-    */
+   * Writes a DataStream to the standard output stream (stderr).
+   *
+   * For each element of the DataStream the result of
+   * [[AnyRef.toString()]] is written.
+   *
+   * @param sinkIdentifier The string to prefix the output with.
+   * @return The closed DataStream.
+   */
   @PublicEvolving
   def printToErr(sinkIdentifier: String) = stream.printToErr(sinkIdentifier)
 
   /**
-    * Writes a DataStream to the file specified by path in text format. For
-    * every element of the DataStream the result of .toString is written.
-    *
-    * @param path The path pointing to the location the text file is written to
-    * @return The closed DataStream
-    *
-    * @deprecated Please use the
-    *             [[org.apache.flink.streaming.api.functions.sink.filesystem.StreamingFileSink]]
-    *             explicitly using the [[addSink()]] method.
-    */
+   * Writes a DataStream to the file specified by path in text format. For
+   * every element of the DataStream the result of .toString is written.
+   *
+   * @param path The path pointing to the location the text file is written to
+   * @return The closed DataStream
+   *
+   * @deprecated Please use the
+   *             [[org.apache.flink.streaming.api.functions.sink.filesystem.StreamingFileSink]]
+   *             explicitly using the [[addSink()]] method.
+   */
   @Deprecated
   @PublicEvolving
   def writeAsText(path: String): DataStreamSink[T] =
     stream.writeAsText(path)
 
-
-
   /**
-    * Writes a DataStream to the file specified by path in text format. For
-    * every element of the DataStream the result of .toString is written.
-    *
-    * @param path The path pointing to the location the text file is written to
-    * @param writeMode Controls the behavior for existing files. Options are NO_OVERWRITE and
-    *                  OVERWRITE.
-    * @return The closed DataStream
-    *
-    * @deprecated Please use the
-    *             [[org.apache.flink.streaming.api.functions.sink.filesystem.StreamingFileSink]]
-    *             explicitly using the [[addSink()]] method.
-    */
+   * Writes a DataStream to the file specified by path in text format. For
+   * every element of the DataStream the result of .toString is written.
+   *
+   * @param path The path pointing to the location the text file is written to
+   * @param writeMode Controls the behavior for existing files. Options are NO_OVERWRITE and
+   *                  OVERWRITE.
+   * @return The closed DataStream
+   *
+   * @deprecated Please use the
+   *             [[org.apache.flink.streaming.api.functions.sink.filesystem.StreamingFileSink]]
+   *             explicitly using the [[addSink()]] method.
+   */
   @Deprecated
   @PublicEvolving
   def writeAsText(path: String, writeMode: FileSystem.WriteMode): DataStreamSink[T] = {
@@ -1008,16 +1023,16 @@ class DataStream[T](stream: JavaStream[T]) {
   }
 
   /**
-    * Writes the DataStream in CSV format to the file specified by the path parameter. The writing
-    * is performed periodically every millis milliseconds.
-    *
-    * @param path Path to the location of the CSV file
-    * @return The closed DataStream
-    *
-    * @deprecated Please use the
-    *             [[org.apache.flink.streaming.api.functions.sink.filesystem.StreamingFileSink]]
-    *             explicitly using the [[addSink()]] method.
-    */
+   * Writes the DataStream in CSV format to the file specified by the path parameter. The writing
+   * is performed periodically every millis milliseconds.
+   *
+   * @param path Path to the location of the CSV file
+   * @return The closed DataStream
+   *
+   * @deprecated Please use the
+   *             [[org.apache.flink.streaming.api.functions.sink.filesystem.StreamingFileSink]]
+   *             explicitly using the [[addSink()]] method.
+   */
   @Deprecated
   @PublicEvolving
   def writeAsCsv(path: String): DataStreamSink[T] = {
@@ -1029,17 +1044,17 @@ class DataStream[T](stream: JavaStream[T]) {
   }
 
   /**
-    * Writes the DataStream in CSV format to the file specified by the path parameter. The writing
-    * is performed periodically every millis milliseconds.
-    *
-    * @param path Path to the location of the CSV file
-    * @param writeMode Controls whether an existing file is overwritten or not
-    * @return The closed DataStream
-    *
-    * @deprecated Please use the
-    *             [[org.apache.flink.streaming.api.functions.sink.filesystem.StreamingFileSink]]
-    *             explicitly using the [[addSink()]] method.
-    */
+   * Writes the DataStream in CSV format to the file specified by the path parameter. The writing
+   * is performed periodically every millis milliseconds.
+   *
+   * @param path Path to the location of the CSV file
+   * @param writeMode Controls whether an existing file is overwritten or not
+   * @return The closed DataStream
+   *
+   * @deprecated Please use the
+   *             [[org.apache.flink.streaming.api.functions.sink.filesystem.StreamingFileSink]]
+   *             explicitly using the [[addSink()]] method.
+   */
   @Deprecated
   @PublicEvolving
   def writeAsCsv(path: String, writeMode: FileSystem.WriteMode): DataStreamSink[T] = {
@@ -1051,27 +1066,26 @@ class DataStream[T](stream: JavaStream[T]) {
   }
 
   /**
-    * Writes the DataStream in CSV format to the file specified by the path parameter. The writing
-    * is performed periodically every millis milliseconds.
-    *
-    * @param path Path to the location of the CSV file
-    * @param writeMode Controls whether an existing file is overwritten or not
-    * @param rowDelimiter Delimiter for consecutive rows
-    * @param fieldDelimiter Delimiter for consecutive fields
-    * @return The closed DataStream
-    *
-    * @deprecated Please use the
-    *             [[org.apache.flink.streaming.api.functions.sink.filesystem.StreamingFileSink]]
-    *             explicitly using the [[addSink()]] method.
-    */
+   * Writes the DataStream in CSV format to the file specified by the path parameter. The writing
+   * is performed periodically every millis milliseconds.
+   *
+   * @param path Path to the location of the CSV file
+   * @param writeMode Controls whether an existing file is overwritten or not
+   * @param rowDelimiter Delimiter for consecutive rows
+   * @param fieldDelimiter Delimiter for consecutive fields
+   * @return The closed DataStream
+   *
+   * @deprecated Please use the
+   *             [[org.apache.flink.streaming.api.functions.sink.filesystem.StreamingFileSink]]
+   *             explicitly using the [[addSink()]] method.
+   */
   @Deprecated
   @PublicEvolving
   def writeAsCsv(
       path: String,
       writeMode: FileSystem.WriteMode,
       rowDelimiter: String,
-      fieldDelimiter: String)
-    : DataStreamSink[T] = {
+      fieldDelimiter: String): DataStreamSink[T] = {
     require(stream.getType.isTupleType, "CSV output can only be used with Tuple DataSets.")
     val of = new ScalaCsvOutputFormat[Product](new Path(path), rowDelimiter, fieldDelimiter)
     if (writeMode != null) {
@@ -1104,7 +1118,6 @@ class DataStream[T](stream: JavaStream[T]) {
    * Adds the given sink to this DataStream. Only streams with sinks added
    * will be executed once the StreamExecutionEnvironment.execute(...)
    * method is called.
-   *
    */
   def addSink(sinkFunction: SinkFunction[T]): DataStreamSink[T] =
     stream.addSink(sinkFunction)
@@ -1113,7 +1126,6 @@ class DataStream[T](stream: JavaStream[T]) {
    * Adds the given sink to this DataStream. Only streams with sinks added
    * will be executed once the StreamExecutionEnvironment.execute(...)
    * method is called.
-   *
    */
   def addSink(fun: T => Unit): DataStreamSink[T] = {
     if (fun == null) {
@@ -1190,12 +1202,12 @@ class DataStream[T](stream: JavaStream[T]) {
   }
 
   /**
-    * Transforms the [[DataStream]] by using a custom [[OneInputStreamOperator]].
-    *
-    * @param operatorName name of the operator, for logging purposes
-    * @param operator the object containing the transformation logic
-    * @tparam R the type of elements emitted by the operator
-    */
+   * Transforms the [[DataStream]] by using a custom [[OneInputStreamOperator]].
+   *
+   * @param operatorName name of the operator, for logging purposes
+   * @param operator the object containing the transformation logic
+   * @tparam R the type of elements emitted by the operator
+   */
   @PublicEvolving
   def transform[R: TypeInformation](
       operatorName: String,

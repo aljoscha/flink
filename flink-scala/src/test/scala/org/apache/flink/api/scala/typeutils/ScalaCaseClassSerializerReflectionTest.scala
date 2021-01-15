@@ -23,11 +23,10 @@ import org.apache.flink.util.TestLogger
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-
 /**
-  * Test obtaining the primary constructor of a case class
-  * via reflection.
-  */
+ * Test obtaining the primary constructor of a case class
+ * via reflection.
+ */
 class ScalaCaseClassSerializerReflectionTest extends TestLogger {
 
   @Test
@@ -84,11 +83,8 @@ class ScalaCaseClassSerializerReflectionTest extends TestLogger {
     val constructor = ScalaCaseClassSerializer
       .lookupConstructor(classOf[Measurement])
 
-    val arguments = Array(
-      1.asInstanceOf[AnyRef],
-      new DegreeCelsius(0.5f).asInstanceOf[AnyRef]
-    )
-    
+    val arguments = Array(1.asInstanceOf[AnyRef], new DegreeCelsius(0.5f).asInstanceOf[AnyRef])
+
     val actual = constructor(arguments)
 
     assertEquals(Measurement(1, new DegreeCelsius(0.5f)), actual)

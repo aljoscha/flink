@@ -33,9 +33,9 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
-  * Sub-class of [[Sink]] that is a relational expression
-  * which writes out data of input node into a [[DynamicTableSink]].
-  */
+ * Sub-class of [[Sink]] that is a relational expression
+ * which writes out data of input node into a [[DynamicTableSink]].
+ */
 class FlinkLogicalSink(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -44,22 +44,28 @@ class FlinkLogicalSink(
     catalogTable: CatalogTable,
     tableSink: DynamicTableSink,
     val staticPartitions: Map[String, String])
-  extends Sink(cluster, traitSet, input, tableIdentifier, catalogTable, tableSink)
-  with FlinkLogicalRel {
+    extends Sink(cluster, traitSet, input, tableIdentifier, catalogTable, tableSink)
+    with FlinkLogicalRel {
 
   override def copy(traitSet: RelTraitSet, inputs: util.List[RelNode]): RelNode = {
     new FlinkLogicalSink(
-      cluster, traitSet, inputs.head, tableIdentifier, catalogTable, tableSink, staticPartitions)
+      cluster,
+      traitSet,
+      inputs.head,
+      tableIdentifier,
+      catalogTable,
+      tableSink,
+      staticPartitions)
   }
 
 }
 
 private class FlinkLogicalSinkConverter
-  extends ConverterRule(
-    classOf[LogicalSink],
-    Convention.NONE,
-    FlinkConventions.LOGICAL,
-    "FlinkLogicalSinkConverter") {
+    extends ConverterRule(
+      classOf[LogicalSink],
+      Convention.NONE,
+      FlinkConventions.LOGICAL,
+      "FlinkLogicalSinkConverter") {
 
   override def convert(rel: RelNode): RelNode = {
     val sink = rel.asInstanceOf[LogicalSink]
@@ -85,6 +91,12 @@ object FlinkLogicalSink {
     val cluster = input.getCluster
     val traitSet = cluster.traitSetOf(FlinkConventions.LOGICAL).simplify()
     new FlinkLogicalSink(
-      cluster, traitSet, input, tableIdentifier, catalogTable, tableSink, staticPartitions)
+      cluster,
+      traitSet,
+      input,
+      tableIdentifier,
+      catalogTable,
+      tableSink,
+      staticPartitions)
   }
 }

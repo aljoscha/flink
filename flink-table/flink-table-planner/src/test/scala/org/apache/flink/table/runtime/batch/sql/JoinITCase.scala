@@ -38,9 +38,7 @@ import java.util
 import scala.collection.JavaConverters._
 
 @RunWith(classOf[Parameterized])
-class JoinITCase(
-    configMode: TableConfigMode)
-  extends TableProgramsCollectionTestBase(configMode) {
+class JoinITCase(configMode: TableConfigMode) extends TableProgramsCollectionTestBase(configMode) {
 
   @Test
   def testInnerJoin(): Unit = {
@@ -129,7 +127,7 @@ class JoinITCase(
 
     val sqlQuery =
       "SELECT Table5.c, T.`1-_./Ü` FROM (SELECT a, b, c AS `1-_./Ü` FROM Table3) AS T, Table5 " +
-      "WHERE a = d AND a < 4"
+        "WHERE a = d AND a < 4"
 
     val ds1 = CollectionDataSets.get3TupleDataSet(env).toTable(tEnv).as("a", "b", "c")
     val ds2 = CollectionDataSets.get5TupleDataSet(env).toTable(tEnv).as("d", "e", "f", "g", "c")
@@ -261,8 +259,8 @@ class JoinITCase(
     val sqlQuery2 = "SELECT * FROM (SELECT count(*) FROM A) CROSS JOIN A"
     val expected =
       "3,1,1,Hi\n" +
-      "3,2,2,Hello\n" +
-      "3,3,2,Hello world"
+        "3,2,2,Hello\n" +
+        "3,3,2,Hello world"
     val result = tEnv.sqlQuery(sqlQuery2).collect()
     TestBaseUtils.compareResultAsText(result.asJava, expected)
   }
@@ -278,8 +276,8 @@ class JoinITCase(
     val sqlQuery1 = "SELECT * FROM A CROSS JOIN (SELECT count(*) FROM A)"
     val expected =
       "1,1,Hi,3\n" +
-      "2,2,Hello,3\n" +
-      "3,2,Hello world,3"
+        "2,2,Hello,3\n" +
+        "3,2,Hello world,3"
     val result = tEnv.sqlQuery(sqlQuery1).collect()
     TestBaseUtils.compareResultAsText(result.asJava, expected)
   }
@@ -303,27 +301,35 @@ class JoinITCase(
     val tEnv = BatchTableEnvironment.create(env, config)
     val sqlQuery =
       "SELECT a, cnt " +
-      "FROM (SELECT cnt FROM (SELECT COUNT(*) AS cnt FROM B) WHERE cnt < 0) RIGHT JOIN A ON a < cnt"
+        "FROM (SELECT cnt FROM (SELECT COUNT(*) AS cnt FROM B) WHERE cnt < 0) RIGHT JOIN A ON a < cnt"
 
     val ds1 = CollectionDataSets.get5TupleDataSet(env).toTable(tEnv).as("a", "b", "c", "d", "e")
     val ds2 = CollectionDataSets.getSmall3TupleDataSet(env).toTable(tEnv)
     tEnv.registerTable("A", ds1)
     tEnv.registerTable("B", ds2)
 
-
     val result = tEnv.sqlQuery(sqlQuery)
     val expected = Seq(
-          "1,null",
-          "2,null", "2,null",
-          "3,null", "3,null", "3,null",
-          "4,null", "4,null", "4,null", "4,null",
-          "5,null", "5,null", "5,null", "5,null", "5,null").mkString("\n")
+      "1,null",
+      "2,null",
+      "2,null",
+      "3,null",
+      "3,null",
+      "3,null",
+      "4,null",
+      "4,null",
+      "4,null",
+      "4,null",
+      "5,null",
+      "5,null",
+      "5,null",
+      "5,null",
+      "5,null").mkString("\n")
 
     val results = result.toDataSet[Row].collect()
 
     TestBaseUtils.compareResultAsText(results.asJava, expected)
   }
-
 
   @Test
   def testLeftSingleRightJoinEqualPredicate(): Unit = {
@@ -339,10 +345,21 @@ class JoinITCase(
 
     val result = tEnv.sqlQuery(sqlQuery)
     val expected = Seq(
-      "1,null", "2,null", "2,null", "3,3", "3,3",
-      "3,3", "4,null", "4,null", "4,null",
-      "4,null", "5,null", "5,null", "5,null",
-      "5,null", "5,null").mkString("\n")
+      "1,null",
+      "2,null",
+      "2,null",
+      "3,3",
+      "3,3",
+      "3,3",
+      "4,null",
+      "4,null",
+      "4,null",
+      "4,null",
+      "5,null",
+      "5,null",
+      "5,null",
+      "5,null",
+      "5,null").mkString("\n")
 
     val results = result.toDataSet[Row].collect()
 
@@ -363,10 +380,21 @@ class JoinITCase(
 
     val result = tEnv.sqlQuery(sqlQuery)
     val expected = Seq(
-      "1,3", "2,3", "2,3", "3,null", "3,null",
-      "3,null", "4,null", "4,null", "4,null",
-      "4,null", "5,null", "5,null", "5,null",
-      "5,null", "5,null").mkString("\n")
+      "1,3",
+      "2,3",
+      "2,3",
+      "3,null",
+      "3,null",
+      "3,null",
+      "4,null",
+      "4,null",
+      "4,null",
+      "4,null",
+      "5,null",
+      "5,null",
+      "5,null",
+      "5,null",
+      "5,null").mkString("\n")
 
     val results = result.toDataSet[Row].collect()
 
@@ -379,7 +407,7 @@ class JoinITCase(
     val tEnv = BatchTableEnvironment.create(env, config)
     val sqlQuery =
       "SELECT a, cnt " +
-      "FROM A LEFT JOIN (SELECT cnt FROM (SELECT COUNT(*) AS cnt FROM B) WHERE cnt < 0) ON cnt > a"
+        "FROM A LEFT JOIN (SELECT cnt FROM (SELECT COUNT(*) AS cnt FROM B) WHERE cnt < 0) ON cnt > a"
 
     val ds1 = CollectionDataSets.get5TupleDataSet(env).toTable(tEnv)
     val ds2 = CollectionDataSets.getSmall3TupleDataSet(env).toTable(tEnv).as("a", "b", "c")
@@ -388,8 +416,7 @@ class JoinITCase(
 
     val result = tEnv.sqlQuery(sqlQuery)
 
-    val expected = Seq(
-      "2,null", "3,null", "1,null").mkString("\n")
+    val expected = Seq("2,null", "3,null", "1,null").mkString("\n")
 
     val results = result.toDataSet[Row].collect()
 
@@ -411,10 +438,21 @@ class JoinITCase(
     val result = tEnv.sqlQuery(sqlQuery)
 
     val expected = Seq(
-      "1,null", "2,null", "2,null", "3,3", "3,3",
-      "3,3", "4,null", "4,null", "4,null",
-      "4,null", "5,null", "5,null", "5,null",
-      "5,null", "5,null").mkString("\n")
+      "1,null",
+      "2,null",
+      "2,null",
+      "3,3",
+      "3,3",
+      "3,3",
+      "4,null",
+      "4,null",
+      "4,null",
+      "4,null",
+      "5,null",
+      "5,null",
+      "5,null",
+      "5,null",
+      "5,null").mkString("\n")
 
     val results = result.toDataSet[Row].collect()
 
@@ -436,10 +474,21 @@ class JoinITCase(
     val result = tEnv.sqlQuery(sqlQuery)
 
     val expected = Seq(
-      "1,null", "2,null", "2,null", "3,null", "3,null",
-      "3,null", "4,3", "4,3", "4,3",
-      "4,3", "5,3", "5,3", "5,3",
-      "5,3", "5,3").mkString("\n")
+      "1,null",
+      "2,null",
+      "2,null",
+      "3,null",
+      "3,null",
+      "3,null",
+      "4,3",
+      "4,3",
+      "4,3",
+      "4,3",
+      "5,3",
+      "5,3",
+      "5,3",
+      "5,3",
+      "5,3").mkString("\n")
 
     val results = result.toDataSet[Row].collect()
 
@@ -452,7 +501,7 @@ class JoinITCase(
     val tEnv = BatchTableEnvironment.create(env, config)
     val sqlQuery =
       "SELECT a, cnt, cnt2 " +
-      "FROM t1 LEFT JOIN (SELECT COUNT(*) AS cnt,COUNT(*) AS cnt2 FROM t2 ) AS x ON a = cnt"
+        "FROM t1 LEFT JOIN (SELECT COUNT(*) AS cnt,COUNT(*) AS cnt2 FROM t2 ) AS x ON a = cnt"
 
     val ds1 = CollectionDataSets.get5TupleDataSet(env).toTable(tEnv).as("a", "b", "c", "d", "e")
     val ds2 = CollectionDataSets.getSmall3TupleDataSet(env).toTable(tEnv)
@@ -462,10 +511,20 @@ class JoinITCase(
     val result = tEnv.sqlQuery(sqlQuery)
     val expected = Seq(
       "1,null,null",
-      "2,null,null", "2,null,null",
-      "3,3,3", "3,3,3", "3,3,3",
-      "4,null,null", "4,null,null", "4,null,null", "4,null,null",
-      "5,null,null", "5,null,null", "5,null,null", "5,null,null", "5,null,null").mkString("\n")
+      "2,null,null",
+      "2,null,null",
+      "3,3,3",
+      "3,3,3",
+      "3,3,3",
+      "4,null,null",
+      "4,null,null",
+      "4,null,null",
+      "4,null,null",
+      "5,null,null",
+      "5,null,null",
+      "5,null,null",
+      "5,null,null",
+      "5,null,null").mkString("\n")
 
     val results = result.toDataSet[Row].collect()
     TestBaseUtils.compareResultAsText(results.asJava, expected)
@@ -480,8 +539,7 @@ class JoinITCase(
     val data = List(
       (1, 1L, Array("Hi", "w")),
       (2, 2L, Array("Hello", "k")),
-      (3, 2L, Array("Hello world", "x"))
-    )
+      (3, 2L, Array("Hello world", "x")))
     val stream = env.fromCollection(data)
     tEnv.createTemporaryView("T", stream, 'a, 'b, 'c)
 
@@ -500,37 +558,35 @@ class JoinITCase(
     val tEnv = BatchTableEnvironment.create(env, config)
 
     val data = List(
-      Row.of(Int.box(1),
+      Row.of(
+        Int.box(1),
         Long.box(11L), {
           val map = new util.HashMap[String, String]()
           map.put("a", "10")
           map.put("b", "11")
           map
         }),
-      Row.of(Int.box(2),
+      Row.of(
+        Int.box(2),
         Long.box(22L), {
           val map = new util.HashMap[String, String]()
           map.put("c", "20")
           map
         }),
-      Row.of(Int.box(3),
+      Row.of(
+        Int.box(3),
         Long.box(33L), {
           val map = new util.HashMap[String, String]()
           map.put("d", "30")
           map.put("e", "31")
           map
-        })
-    )
+        }))
 
     implicit val typeInfo = Types.ROW(
       Array[String]("a", "b", "c"),
-      Array[TypeInformation[_]](Types.INT,
-        Types.LONG,
-        Types.MAP(Types.STRING, Types.STRING))
-    )
+      Array[TypeInformation[_]](Types.INT, Types.LONG, Types.MAP(Types.STRING, Types.STRING)))
     val table = tEnv.fromDataSet(env.fromCollection(data))
     tEnv.registerTable("src", table)
-
 
     val sqlQuery =
       """
@@ -552,8 +608,7 @@ class JoinITCase(
     val data = List(
       (1, Array((12, "45.6"), (2, "45.612"))),
       (2, Array((13, "41.6"), (1, "45.2136"))),
-      (3, Array((18, "42.6")))
-    )
+      (3, Array((18, "42.6"))))
     val stream = env.fromCollection(data)
     tEnv.createTemporaryView("T", stream, 'a, 'b)
 

@@ -20,7 +20,13 @@ package org.apache.flink.table.planner.plan.nodes.exec
 
 import org.apache.flink.api.dag.Transformation
 import org.apache.flink.table.api.TableConfig
-import org.apache.flink.table.planner.calcite.{FlinkContextImpl, FlinkRelOptClusterFactory, FlinkRexBuilder, FlinkTypeFactory, FlinkTypeSystem}
+import org.apache.flink.table.planner.calcite.{
+  FlinkContextImpl,
+  FlinkRelOptClusterFactory,
+  FlinkRexBuilder,
+  FlinkTypeFactory,
+  FlinkTypeSystem
+}
 import org.apache.flink.table.planner.delegation.BatchPlanner
 import org.apache.flink.table.planner.plan.nodes.physical.batch.BatchPhysicalRel
 import org.apache.flink.table.types.logical.{LogicalType, RowType}
@@ -38,7 +44,7 @@ import java.util
 class TestingBatchExecNode
     extends AbstractRelNode(TestingBatchExecNode.cluster, TestingBatchExecNode.traitSet)
     with BatchPhysicalRel
-    with LegacyBatchExecNode[BatchPlanner]  {
+    with LegacyBatchExecNode[BatchPlanner] {
 
   val inputNodes: util.List[ExecNode[_]] =
     new util.ArrayList[ExecNode[_]]()
@@ -58,15 +64,13 @@ class TestingBatchExecNode
 
   override def getInputEdges: util.List[ExecEdge] = inputEdges
 
-  override def replaceInputNode(
-      ordinalInParent: Int,
-      newInputNode: ExecNode[_]): Unit =
+  override def replaceInputNode(ordinalInParent: Int, newInputNode: ExecNode[_]): Unit =
     inputNodes.set(ordinalInParent, newInputNode)
 
   override def getTraitSet: RelTraitSet = TestingBatchExecNode.traitSet
 
   override protected def translateToPlanInternal(
-    planner: BatchPlanner): Transformation[BatchPlanner] = ???
+      planner: BatchPlanner): Transformation[BatchPlanner] = ???
 }
 
 object TestingBatchExecNode {

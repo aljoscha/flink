@@ -21,33 +21,43 @@ import org.apache.flink.table.expressions.ApiExpressionUtils.localRef
 import org.apache.flink.table.expressions._
 import org.apache.flink.table.planner.calcite.FlinkTypeFactory
 import org.apache.flink.table.planner.codegen.agg.AggsHandlerCodeGenerator.DISTINCT_KEY_TERM
-import org.apache.flink.table.planner.codegen.{CodeGeneratorContext, ExprCodeGenerator, GeneratedExpression}
-import org.apache.flink.table.planner.expressions.DeclarativeExpressionResolver.{toRexDistinctKey, toRexInputRef}
+import org.apache.flink.table.planner.codegen.{
+  CodeGeneratorContext,
+  ExprCodeGenerator,
+  GeneratedExpression
+}
+import org.apache.flink.table.planner.expressions.DeclarativeExpressionResolver.{
+  toRexDistinctKey,
+  toRexInputRef
+}
 import org.apache.flink.table.planner.expressions.converter.ExpressionConverter
 import org.apache.flink.table.planner.expressions.{DeclarativeExpressionResolver, RexNodeExpression}
 import org.apache.flink.table.planner.functions.aggfunctions.DeclarativeAggregateFunction
 import org.apache.flink.table.planner.plan.utils.AggregateInfo
-import org.apache.flink.table.runtime.types.LogicalTypeDataTypeConverter.{fromDataTypeToLogicalType, fromLogicalTypeToDataType}
+import org.apache.flink.table.runtime.types.LogicalTypeDataTypeConverter.{
+  fromDataTypeToLogicalType,
+  fromLogicalTypeToDataType
+}
 import org.apache.flink.table.types.logical.LogicalType
 
 import org.apache.calcite.rex.RexLiteral
 import org.apache.calcite.tools.RelBuilder
 
 /**
-  * It is for code generate aggregation functions that are specified using expressions.
-  * The aggregate buffer is embedded inside of a larger shared aggregation buffer.
-  *
-  * @param ctx the code gen context
-  * @param aggInfo  the aggregate information
-  * @param filterExpression filter argument access expression, none if no filter
-  * @param mergedAccOffset the mergedAcc may come from local aggregate,
-  *                        this is the first buffer offset in the row
-  * @param aggBufferOffset  the offset in the buffers of this aggregate
-  * @param aggBufferSize  the total size of aggregate buffers
-  * @param inputTypes   the input field type infos
-  * @param constants  the constant literals
-  * @param relBuilder  the rel builder to translate expressions to calcite rex nodes
-  */
+ * It is for code generate aggregation functions that are specified using expressions.
+ * The aggregate buffer is embedded inside of a larger shared aggregation buffer.
+ *
+ * @param ctx the code gen context
+ * @param aggInfo  the aggregate information
+ * @param filterExpression filter argument access expression, none if no filter
+ * @param mergedAccOffset the mergedAcc may come from local aggregate,
+ *                        this is the first buffer offset in the row
+ * @param aggBufferOffset  the offset in the buffers of this aggregate
+ * @param aggBufferSize  the total size of aggregate buffers
+ * @param inputTypes   the input field type infos
+ * @param constants  the constant literals
+ * @param relBuilder  the rel builder to translate expressions to calcite rex nodes
+ */
 class DeclarativeAggCodeGen(
     ctx: CodeGeneratorContext,
     aggInfo: AggregateInfo,
@@ -58,22 +68,27 @@ class DeclarativeAggCodeGen(
     inputTypes: Seq[LogicalType],
     constants: Seq[RexLiteral],
     relBuilder: RelBuilder)
-  extends AggCodeGen {
+    extends AggCodeGen {
 
   private val function = aggInfo.function.asInstanceOf[DeclarativeAggregateFunction]
 
   private val bufferTypes = aggInfo.externalAccTypes.map(fromDataTypeToLogicalType)
   private val bufferIndexes = Array.range(aggBufferOffset, aggBufferOffset + bufferTypes.length)
   private val bufferTerms = function.aggBufferAttributes
-      .map(a => s"agg${aggInfo.aggIndex}_${a.getName}")
+    .map(a => s"agg${aggInfo.aggIndex}_${a.getName}")
 
   private val rexNodeGen = new ExpressionConverter(relBuilder)
 
   private val bufferNullTerms = {
     val exprCodegen = new ExprCodeGenerator(ctx, false)
-    bufferTerms.zip(bufferTypes).map {
-      case (name, t) => localRef(name, fromLogicalTypeToDataType(t))
-    }.map(_.accept(rexNodeGen)).map(exprCodegen.generateExpression).map(_.nullTerm)
+    bufferTerms
+      .zip(bufferTypes)
+      .map { case (name, t) =>
+        localRef(name, fromLogicalTypeToDataType(t))
+      }
+      .map(_.accept(rexNodeGen))
+      .map(exprCodegen.generateExpression)
+      .map(_.nullTerm)
   }
 
   private val argIndexes = aggInfo.argIndexes
@@ -94,9 +109,8 @@ class DeclarativeAggCodeGen(
       }
       .map(expr => generator.generateExpression(expr.accept(rexNodeGen)))
 
-    val setters = aggBufferAccesses.zipWithIndex.map {
-      case (access, index) =>
-        s"""
+    val setters = aggBufferAccesses.zipWithIndex.map { case (access, index) =>
+      s"""
            |${access.copyResultTermToTargetIfChanged(ctx, bufferTerms(index))};
            |${bufferNullTerms(index)} = ${access.nullTerm};
          """.stripMargin
@@ -108,11 +122,10 @@ class DeclarativeAggCodeGen(
   override def resetAccumulator(generator: ExprCodeGenerator): String = {
     val initialExprs = function.initialValuesExpressions
       .map(expr => generator.generateExpression(expr.accept(rexNodeGen)))
-    val codes = initialExprs.zipWithIndex.map {
-      case (init, index) =>
-        val memberName = bufferTerms(index)
-        val memberNullTerm = bufferNullTerms(index)
-        s"""
+    val codes = initialExprs.zipWithIndex.map { case (init, index) =>
+      val memberName = bufferTerms(index)
+      val memberNullTerm = bufferNullTerms(index)
+      s"""
            |${init.code}
            |$memberName = ${init.resultTerm};
            |$memberNullTerm = ${init.nullTerm};
@@ -123,8 +136,7 @@ class DeclarativeAggCodeGen(
 
   def getAccumulator(generator: ExprCodeGenerator): Seq[GeneratedExpression] = {
     bufferTypes.zipWithIndex.map { case (bufferType, index) =>
-      GeneratedExpression(
-        bufferTerms(index), bufferNullTerms(index), "", bufferType)
+      GeneratedExpression(bufferTerms(index), bufferNullTerms(index), "", bufferType)
     }
   }
 
@@ -212,14 +224,12 @@ class DeclarativeAggCodeGen(
   }
 
   /**
-    * Resolves the given expression to a resolved Expression.
-    *
-    * @param isMerge this is called from merge() method
-    */
-  private case class ResolveReference(
-      isMerge: Boolean = false,
-      isDistinctMerge: Boolean = false)
-    extends DeclarativeExpressionResolver(relBuilder, function, isMerge) {
+   * Resolves the given expression to a resolved Expression.
+   *
+   * @param isMerge this is called from merge() method
+   */
+  private case class ResolveReference(isMerge: Boolean = false, isDistinctMerge: Boolean = false)
+      extends DeclarativeExpressionResolver(relBuilder, function, isMerge) {
 
     override def toMergeInputExpr(name: String, localIndex: Int): ResolvedExpression = {
       // in merge case, the input1 is mergedAcc
@@ -234,7 +244,8 @@ class DeclarativeAggCodeGen(
       if (inputIndex >= inputTypes.length) { // it is a constant
         val constantIndex = inputIndex - inputTypes.length
         val constant = constants(constantIndex)
-        new RexNodeExpression(constant,
+        new RexNodeExpression(
+          constant,
           fromLogicalTypeToDataType(FlinkTypeFactory.toLogicalType(constant.getType)))
       } else { // it is a input field
         if (isDistinctMerge) { // this is called from distinct merge
@@ -255,18 +266,16 @@ class DeclarativeAggCodeGen(
 
     override def toAggBufferExpr(name: String, localIndex: Int): ResolvedExpression = {
       // name => agg${aggInfo.aggIndex}_$name"
-      localRef(
-        bufferTerms(localIndex),
-        fromLogicalTypeToDataType(bufferTypes(localIndex)))
+      localRef(bufferTerms(localIndex), fromLogicalTypeToDataType(bufferTypes(localIndex)))
     }
   }
 
   override def checkNeededMethods(
-     needAccumulate: Boolean = false,
-     needRetract: Boolean = false,
-     needMerge: Boolean = false,
-     needReset: Boolean = false,
-     needEmitValue: Boolean = false): Unit = {
+      needAccumulate: Boolean = false,
+      needRetract: Boolean = false,
+      needMerge: Boolean = false,
+      needReset: Boolean = false,
+      needEmitValue: Boolean = false): Unit = {
     // skip the check for DeclarativeAggregateFunction for now
   }
 }

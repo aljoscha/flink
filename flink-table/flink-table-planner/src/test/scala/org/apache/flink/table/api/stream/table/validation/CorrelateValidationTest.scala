@@ -29,15 +29,17 @@ import org.junit.Test
 class CorrelateValidationTest extends TableTestBase {
 
   @Test
-  def testRegisterFunctionException(): Unit ={
+  def testRegisterFunctionException(): Unit = {
     val util = streamTestUtil()
     val t = util.addTable[(Int, Long, String)]('a, 'b, 'c)
 
     // check scala object is forbidden
     expectExceptionThrown(
-      util.tableEnv.registerFunction("func3", ObjectTableFunction), "Scala object")
+      util.tableEnv.registerFunction("func3", ObjectTableFunction),
+      "Scala object")
     expectExceptionThrown(
-      util.javaTableEnv.registerFunction("func3", ObjectTableFunction), "Scala object")
+      util.javaTableEnv.registerFunction("func3", ObjectTableFunction),
+      "Scala object")
 
     expectExceptionThrown(t.joinLateral(ObjectTableFunction('a, 1)), "Scala object")
   }
@@ -52,20 +54,18 @@ class CorrelateValidationTest extends TableTestBase {
     expectExceptionThrown(util.addFunction("udtf", ObjectTableFunction), "Scala object")
     // Java table environment register
     expectExceptionThrown(
-      util.tableEnv.registerFunction("udtf", ObjectTableFunction), "Scala object")
+      util.tableEnv.registerFunction("udtf", ObjectTableFunction),
+      "Scala object")
     // Scala Table API directly call
     expectExceptionThrown(t.joinLateral(ObjectTableFunction('a, 1)), "Scala object")
 
-
     //============ throw exception when table function is not registered =========
     // Java Table API call
-    expectExceptionThrown(
-      t.joinLateral(call("nonexist", $"a")), "Undefined function: nonexist")
+    expectExceptionThrown(t.joinLateral(call("nonexist", $"a")), "Undefined function: nonexist")
     // SQL API call
     expectExceptionThrown(
       util.tableEnv.sqlQuery("SELECT * FROM MyTable, LATERAL TABLE(nonexist(a))"),
       "No match found for function signature nonexist(<NUMERIC>)")
-
 
     //========= throw exception when the called function is a scalar function ====
     util.tableEnv.registerFunction("func0", Func0)
@@ -90,18 +90,20 @@ class CorrelateValidationTest extends TableTestBase {
   }
 
   /**
-    * Due to the improper translation of TableFunction left outer join (see CALCITE-2004), the
-    * join predicate can only be empty or literal true (the restriction should be removed in
-    * FLINK-7865).
-    */
-  @Test (expected = classOf[ValidationException])
+   * Due to the improper translation of TableFunction left outer join (see CALCITE-2004), the
+   * join predicate can only be empty or literal true (the restriction should be removed in
+   * FLINK-7865).
+   */
+  @Test(expected = classOf[ValidationException])
   def testLeftOuterJoinWithPredicates(): Unit = {
     val util = streamTestUtil()
     val table = util.addTable[(Int, Long, String)]("MyTable", 'a, 'b, 'c)
     val function = util.addFunction("func1", new TableFunc1)
 
-    val result = table.leftOuterJoinLateral(function('c) as 's, 'c === 's)
-      .select('c, 's).where('a > 10)
+    val result = table
+      .leftOuterJoinLateral(function('c) as 's, 'c === 's)
+      .select('c, 's)
+      .where('a > 10)
 
     util.verifyTable(result, "")
   }
@@ -109,8 +111,8 @@ class CorrelateValidationTest extends TableTestBase {
   @Test(expected = classOf[ValidationException])
   def testInvalidMapFunctionTypeAggregation(): Unit = {
     val util = streamTestUtil()
-    util.addTable[(Int)](
-      "MyTable", 'int)
+    util
+      .addTable[(Int)]("MyTable", 'int)
       .flatMap('int.sum) // do not support AggregateFunction as input
   }
 
@@ -119,8 +121,8 @@ class CorrelateValidationTest extends TableTestBase {
     val util = streamTestUtil()
 
     val weightedAvg = new WeightedAvg
-    util.addTable[(Int)](
-      "MyTable", 'int)
+    util
+      .addTable[(Int)]("MyTable", 'int)
       .flatMap(weightedAvg('int, 'int)) // do not support AggregateFunction as input
   }
 
@@ -129,8 +131,8 @@ class CorrelateValidationTest extends TableTestBase {
     val util = streamTestUtil()
 
     util.tableEnv.registerFunction("weightedAvg", new WeightedAvg)
-    util.addTable[(Int)](
-      "MyTable", 'int)
+    util
+      .addTable[(Int)]("MyTable", 'int)
       .flatMap(call("weightedAvg", $"int", $"int")) // do not support AggregateFunction as input
   }
 
@@ -138,8 +140,8 @@ class CorrelateValidationTest extends TableTestBase {
   def testInvalidMapFunctionTypeScalarFunction(): Unit = {
     val util = streamTestUtil()
 
-    util.addTable[(String)](
-      "MyTable", 'string)
+    util
+      .addTable[(String)]("MyTable", 'string)
       .flatMap(Func15('string)) // do not support ScalarFunction as input
   }
 
@@ -147,8 +149,8 @@ class CorrelateValidationTest extends TableTestBase {
   def testInvalidFlatMapFunctionTypeFieldReference(): Unit = {
     val util = batchTestUtil()
 
-    util.addTable[(String)](
-      "MyTable", 'string)
+    util
+      .addTable[(String)]("MyTable", 'string)
       .flatMap('string) // Only TableFunction can be used in flatMap
   }
 
@@ -157,8 +159,7 @@ class CorrelateValidationTest extends TableTestBase {
   private def expectExceptionThrown(
       function: => Unit,
       keywords: String,
-      clazz: Class[_ <: Throwable] = classOf[ValidationException])
-    : Unit = {
+      clazz: Class[_ <: Throwable] = classOf[ValidationException]): Unit = {
     try {
       function
       fail(s"Expected a $clazz, but no exception is thrown.")

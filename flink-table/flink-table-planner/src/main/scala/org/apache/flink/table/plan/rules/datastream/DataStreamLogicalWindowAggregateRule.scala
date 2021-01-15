@@ -27,12 +27,17 @@ import org.apache.flink.table.api.{TableException, ValidationException}
 import org.apache.flink.table.calcite.FlinkTypeFactory
 import org.apache.flink.table.catalog.BasicOperatorTable
 import org.apache.flink.table.expressions.{Literal, PlannerResolvedFieldReference, WindowReference}
-import org.apache.flink.table.plan.logical.{LogicalWindow, SessionGroupWindow, SlidingGroupWindow, TumblingGroupWindow}
+import org.apache.flink.table.plan.logical.{
+  LogicalWindow,
+  SessionGroupWindow,
+  SlidingGroupWindow,
+  TumblingGroupWindow
+}
 import org.apache.flink.table.plan.rules.common.LogicalWindowAggregateRule
 import org.apache.flink.table.typeutils.TimeIntervalTypeInfo
 
 class DataStreamLogicalWindowAggregateRule
-  extends LogicalWindowAggregateRule("DataStreamLogicalWindowAggregateRule") {
+    extends LogicalWindowAggregateRule("DataStreamLogicalWindowAggregateRule") {
 
   /** Returns a reference to the time attribute with a time indicator type */
   override private[table] def getInAggregateGroupExpression(
@@ -56,23 +61,20 @@ class DataStreamLogicalWindowAggregateRule
       rexBuilder: RexBuilder,
       windowExpression: RexCall): RexNode = {
 
-    rexBuilder.makeLiteral(
-      0L,
-      rexBuilder.getTypeFactory.createSqlType(SqlTypeName.TIMESTAMP),
-      true)
+    rexBuilder.makeLiteral(0L, rexBuilder.getTypeFactory.createSqlType(SqlTypeName.TIMESTAMP), true)
   }
 
   override private[table] def translateWindowExpression(
       windowExpr: RexCall,
-      rowType: RelDataType)
-    : LogicalWindow = {
+      rowType: RelDataType): LogicalWindow = {
 
     def getOperandAsLong(call: RexCall, idx: Int): Long =
       call.getOperands.get(idx) match {
         case v: RexLiteral if v.getTypeName.getFamily == SqlTypeFamily.INTERVAL_DAY_TIME =>
           v.getValue.asInstanceOf[JBigDecimal].longValue()
-        case _ => throw new TableException(
-          "Only constant window intervals with millisecond resolution are supported.")
+        case _ =>
+          throw new TableException(
+            "Only constant window intervals with millisecond resolution are supported.")
       }
 
     def getOperandAsTimeIndicator(call: RexCall, idx: Int): PlannerResolvedFieldReference =
@@ -92,8 +94,7 @@ class DataStreamLogicalWindowAggregateRule
         TumblingGroupWindow(
           WindowReference("w$", Some(time.resultType)),
           time,
-          Literal(interval, TimeIntervalTypeInfo.INTERVAL_MILLIS)
-        )
+          Literal(interval, TimeIntervalTypeInfo.INTERVAL_MILLIS))
 
       case BasicOperatorTable.HOP =>
         val time = getOperandAsTimeIndicator(windowExpr, 0)
@@ -102,8 +103,7 @@ class DataStreamLogicalWindowAggregateRule
           WindowReference("w$", Some(time.resultType)),
           time,
           Literal(size, TimeIntervalTypeInfo.INTERVAL_MILLIS),
-          Literal(slide, TimeIntervalTypeInfo.INTERVAL_MILLIS)
-        )
+          Literal(slide, TimeIntervalTypeInfo.INTERVAL_MILLIS))
 
       case BasicOperatorTable.SESSION =>
         val time = getOperandAsTimeIndicator(windowExpr, 0)
@@ -111,8 +111,7 @@ class DataStreamLogicalWindowAggregateRule
         SessionGroupWindow(
           WindowReference("w$", Some(time.resultType)),
           time,
-          Literal(gap, TimeIntervalTypeInfo.INTERVAL_MILLIS)
-        )
+          Literal(gap, TimeIntervalTypeInfo.INTERVAL_MILLIS))
     }
   }
 }

@@ -28,11 +28,11 @@ import org.apache.flink.table.plan.nodes.logical.FlinkLogicalWindowAggregate
 import scala.collection.JavaConversions._
 
 class DataSetWindowAggregateRule
-  extends ConverterRule(
-    classOf[FlinkLogicalWindowAggregate],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.DATASET,
-    "DataSetWindowAggregateRule") {
+    extends ConverterRule(
+      classOf[FlinkLogicalWindowAggregate],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.DATASET,
+      "DataSetWindowAggregateRule") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val agg: FlinkLogicalWindowAggregate = call.rel(0).asInstanceOf[FlinkLogicalWindowAggregate]

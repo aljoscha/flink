@@ -36,8 +36,8 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
-  * Batch physical RelNode for nested-loop [[Join]].
-  */
+ * Batch physical RelNode for nested-loop [[Join]].
+ */
 class BatchPhysicalNestedLoopJoin(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -49,7 +49,7 @@ class BatchPhysicalNestedLoopJoin(
     val leftIsBuild: Boolean,
     // true if one side returns single row, else false
     val singleRowJoin: Boolean)
-  extends BatchPhysicalJoinBase(cluster, traitSet, leftRel, rightRel, condition, joinType) {
+    extends BatchPhysicalJoinBase(cluster, traitSet, leftRel, rightRel, condition, joinType) {
 
   override def copy(
       traitSet: RelTraitSet,
@@ -70,7 +70,8 @@ class BatchPhysicalNestedLoopJoin(
   }
 
   override def explainTerms(pw: RelWriter): RelWriter = {
-    super.explainTerms(pw)
+    super
+      .explainTerms(pw)
       .item("build", if (leftIsBuild) "left" else "right")
       .itemIf("singleRowJoin", singleRowJoin, singleRowJoin)
   }
@@ -105,7 +106,8 @@ class BatchPhysicalNestedLoopJoin(
       1
     } else {
       val probeRowSize = mq.getAverageRowSize(probeRel)
-      Math.max(1,
+      Math.max(
+        1,
         (rowCount * probeRowSize / FlinkCost.SQL_DEFAULT_PARALLELISM_WORKER_PROCESS_SIZE).toInt)
     }
   }
@@ -127,8 +129,7 @@ class BatchPhysicalNestedLoopJoin(
       leftEdge,
       rightEdge,
       FlinkTypeFactory.toLogicalRowType(getRowType),
-      getRelDetailedDescription
-    )
+      getRelDetailedDescription)
   }
 
   def getInputEdges: (ExecEdge, ExecEdge) = {
@@ -138,12 +139,14 @@ class BatchPhysicalNestedLoopJoin(
     } else {
       (ExecEdge.RequiredShuffle.broadcast(), ExecEdge.RequiredShuffle.any())
     }
-    val buildEdge = ExecEdge.builder()
+    val buildEdge = ExecEdge
+      .builder()
       .requiredShuffle(buildRequiredShuffle)
       .damBehavior(ExecEdge.DamBehavior.BLOCKING)
       .priority(0)
       .build()
-    val probeEdge = ExecEdge.builder()
+    val probeEdge = ExecEdge
+      .builder()
       .requiredShuffle(probeRequiredShuffle)
       .damBehavior(ExecEdge.DamBehavior.PIPELINED)
       .priority(1)

@@ -23,8 +23,8 @@ import org.apache.flink.table.planner.codegen.{CodeGeneratorContext, GeneratedEx
 import org.apache.flink.table.types.logical.LogicalType
 
 /**
-  * Generates a function call which returns a constant.
-  */
+ * Generates a function call which returns a constant.
+ */
 class ConstantCallGen(constantCode: String, constantValue: Any) extends CallGenerator {
 
   override def generate(

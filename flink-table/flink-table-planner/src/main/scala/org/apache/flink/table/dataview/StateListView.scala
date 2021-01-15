@@ -24,11 +24,11 @@ import org.apache.flink.api.common.state._
 import org.apache.flink.table.api.dataview.ListView
 
 /**
-  * [[ListView]] use state backend.
-  *
-  * @param state list state
-  * @tparam T element type
-  */
+ * [[ListView]] use state backend.
+ *
+ * @param state list state
+ * @tparam T element type
+ */
 class StateListView[T](state: ListState[T]) extends ListView[T] {
 
   override def get: JIterable[T] = state.get()
@@ -44,4 +44,3 @@ class StateListView[T](state: ListState[T]) extends ListView[T] {
 
   override def clear(): Unit = state.clear()
 }
-

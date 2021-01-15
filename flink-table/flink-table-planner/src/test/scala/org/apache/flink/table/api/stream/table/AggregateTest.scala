@@ -44,10 +44,8 @@ class AggregateTest extends TableTestBase {
           "DataStreamGroupAggregate",
           streamTableNode(table),
           term("groupBy", "b"),
-          term("select", "b", "SUM(DISTINCT a) AS EXPR$0", "COUNT(DISTINCT c) AS EXPR$1")
-        ),
-        term("select", "EXPR$0", "EXPR$1")
-      )
+          term("select", "b", "SUM(DISTINCT a) AS EXPR$0", "COUNT(DISTINCT c) AS EXPR$1")),
+        term("select", "EXPR$0", "EXPR$1"))
     util.verifyTable(resultTable, expected)
   }
 
@@ -72,10 +70,8 @@ class AggregateTest extends TableTestBase {
             "select",
             "c",
             "WeightedAvg(DISTINCT a, b) AS EXPR$0",
-            "WeightedAvg(a, b) AS EXPR$1")
-        ),
-        term("select", "EXPR$0", "EXPR$1")
-      )
+            "WeightedAvg(a, b) AS EXPR$1")),
+        term("select", "EXPR$0", "EXPR$1"))
     util.verifyTable(resultTable, expected)
   }
 
@@ -93,16 +89,10 @@ class AggregateTest extends TableTestBase {
         "DataStreamCalc",
         unaryNode(
           "DataStreamGroupAggregate",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(table),
-            term("select", "a", "b")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "b")),
           term("groupBy", "b"),
-          term("select", "b", "COUNT(a) AS EXPR$0")
-        ),
-        term("select", "EXPR$0")
-      )
+          term("select", "b", "COUNT(a) AS EXPR$0")),
+        term("select", "EXPR$0"))
     util.verifyTable(resultTable, expected)
   }
 
@@ -124,13 +114,10 @@ class AggregateTest extends TableTestBase {
           unaryNode(
             "DataStreamCalc",
             streamTableNode(table),
-            term("select", "a", "4 AS four", "b")
-          ),
+            term("select", "a", "4 AS four", "b")),
           term("groupBy", "a", "four"),
-          term("select", "a", "four", "SUM(b) AS EXPR$0")
-        ),
-        term("select", "4 AS four", "EXPR$0")
-      )
+          term("select", "a", "four", "SUM(b) AS EXPR$0")),
+        term("select", "4 AS four", "EXPR$0"))
     util.verifyTable(resultTable, expected)
   }
 
@@ -152,13 +139,10 @@ class AggregateTest extends TableTestBase {
           unaryNode(
             "DataStreamCalc",
             streamTableNode(table),
-            term("select", "b", "4 AS four", "a")
-          ),
+            term("select", "b", "4 AS four", "a")),
           term("groupBy", "b", "four"),
-          term("select", "b", "four", "SUM(a) AS EXPR$0")
-        ),
-        term("select", "4 AS four", "EXPR$0")
-      )
+          term("select", "b", "four", "SUM(a) AS EXPR$0")),
+        term("select", "4 AS four", "EXPR$0"))
     util.verifyTable(resultTable, expected)
   }
 
@@ -180,13 +164,10 @@ class AggregateTest extends TableTestBase {
           unaryNode(
             "DataStreamCalc",
             streamTableNode(table),
-            term("select", "a", "MOD(b, 3) AS d", "c")
-          ),
+            term("select", "a", "MOD(b, 3) AS d", "c")),
           term("groupBy", "d"),
-          term("select", "d", "MIN(c) AS EXPR$0", "AVG(a) AS EXPR$1")
-        ),
-        term("select", "EXPR$0", "EXPR$1")
-      )
+          term("select", "d", "MIN(c) AS EXPR$0", "AVG(a) AS EXPR$1")),
+        term("select", "EXPR$0", "EXPR$1"))
     util.verifyTable(resultTable, expected)
   }
 
@@ -207,11 +188,9 @@ class AggregateTest extends TableTestBase {
           "DataStreamCalc",
           streamTableNode(table),
           term("select", "a", "b"),
-          term("where", "=(b, 2)")
-        ),
+          term("where", "=(b, 2)")),
         term("groupBy", "b"),
-        term("select", "b", "SUM(a) AS EXPR$0")
-      )
+        term("select", "b", "SUM(a) AS EXPR$0"))
     util.verifyTable(resultTable, expected)
   }
 
@@ -227,14 +206,9 @@ class AggregateTest extends TableTestBase {
     val expected =
       unaryNode(
         "DataStreamGroupAggregate",
-        unaryNode(
-          "DataStreamCalc",
-          streamTableNode(table),
-          term("select", "b", "CAST(a) AS a0")
-        ),
+        unaryNode("DataStreamCalc", streamTableNode(table), term("select", "b", "CAST(a) AS a0")),
         term("groupBy", "b"),
-        term("select", "b", "AVG(a0) AS EXPR$0")
-      )
+        term("select", "b", "AVG(a0) AS EXPR$0"))
 
     util.verifyTable(resultTable, expected)
   }
@@ -242,8 +216,7 @@ class AggregateTest extends TableTestBase {
   @Test
   def testDistinctAggregateOnTumbleWindow(): Unit = {
     val util = streamTestUtil()
-    val table = util.addTable[(Int, Long, String)](
-      "MyTable", 'a, 'b, 'c, 'rowtime.rowtime)
+    val table = util.addTable[(Int, Long, String)]("MyTable", 'a, 'b, 'c, 'rowtime.rowtime)
     val result = table
       .window(Tumble over 15.minute on 'rowtime as 'w)
       .groupBy('w)
@@ -251,14 +224,9 @@ class AggregateTest extends TableTestBase {
 
     val expected = unaryNode(
       "DataStreamGroupWindowAggregate",
-      unaryNode(
-        "DataStreamCalc",
-        streamTableNode(table),
-        term("select", "a", "rowtime")
-      ),
+      unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "rowtime")),
       term("window", "TumblingGroupWindow('w, 'rowtime, 900000.millis)"),
-      term("select", "COUNT(DISTINCT a) AS EXPR$0", "SUM(a) AS EXPR$1")
-    )
+      term("select", "COUNT(DISTINCT a) AS EXPR$0", "SUM(a) AS EXPR$1"))
 
     util.verifyTable(result, expected)
   }
@@ -266,8 +234,7 @@ class AggregateTest extends TableTestBase {
   @Test
   def testMultiDistinctAggregateSameFieldOnHopWindow(): Unit = {
     val util = streamTestUtil()
-    val table = util.addTable[(Int, Long, String)](
-      "MyTable", 'a, 'b, 'c, 'rowtime.rowtime)
+    val table = util.addTable[(Int, Long, String)]("MyTable", 'a, 'b, 'c, 'rowtime.rowtime)
     val result = table
       .window(Slide over 1.hour every 15.minute on 'rowtime as 'w)
       .groupBy('w)
@@ -275,15 +242,13 @@ class AggregateTest extends TableTestBase {
 
     val expected = unaryNode(
       "DataStreamGroupWindowAggregate",
-      unaryNode(
-        "DataStreamCalc",
-        streamTableNode(table),
-        term("select", "a", "rowtime")
-      ),
+      unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "rowtime")),
       term("window", "SlidingGroupWindow('w, 'rowtime, 3600000.millis, 900000.millis)"),
-      term("select", "COUNT(DISTINCT a) AS EXPR$0", "SUM(DISTINCT a) AS EXPR$1",
-           "MAX(a) AS EXPR$2")
-    )
+      term(
+        "select",
+        "COUNT(DISTINCT a) AS EXPR$0",
+        "SUM(DISTINCT a) AS EXPR$1",
+        "MAX(a) AS EXPR$2"))
 
     util.verifyTable(result, expected)
   }
@@ -291,8 +256,7 @@ class AggregateTest extends TableTestBase {
   @Test
   def testDistinctAggregateWithGroupingOnSessionWindow(): Unit = {
     val util = streamTestUtil()
-    val table = util.addTable[(Int, Long, String)](
-      "MyTable", 'a, 'b, 'c, 'rowtime.rowtime)
+    val table = util.addTable[(Int, Long, String)]("MyTable", 'a, 'b, 'c, 'rowtime.rowtime)
     val result = table
       .window(Session withGap 15.minute on 'rowtime as 'w)
       .groupBy('a, 'w)
@@ -300,15 +264,10 @@ class AggregateTest extends TableTestBase {
 
     val expected = unaryNode(
       "DataStreamGroupWindowAggregate",
-      unaryNode(
-        "DataStreamCalc",
-        streamTableNode(table),
-        term("select", "a", "c", "rowtime")
-      ),
+      unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "c", "rowtime")),
       term("groupBy", "a"),
       term("window", "SessionGroupWindow('w, 'rowtime, 900000.millis)"),
-      term("select", "a", "COUNT(a) AS EXPR$0", "COUNT(DISTINCT c) AS EXPR$1")
-    )
+      term("select", "a", "COUNT(a) AS EXPR$0", "COUNT(DISTINCT c) AS EXPR$1"))
 
     util.verifyTable(result, expected)
   }
@@ -316,8 +275,7 @@ class AggregateTest extends TableTestBase {
   @Test
   def testSimpleAggregate(): Unit = {
     val util = streamTestUtil()
-    val table = util.addTable[(Int, Long, String)](
-      "MyTable", 'a, 'b, 'c)
+    val table = util.addTable[(Int, Long, String)]("MyTable", 'a, 'b, 'c)
 
     val testAgg = new CountMinMax
     val resultTable = table
@@ -330,24 +288,17 @@ class AggregateTest extends TableTestBase {
         "DataStreamCalc",
         unaryNode(
           "DataStreamGroupAggregate",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(table),
-            term("select", "a", "b")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "b")),
           term("groupBy", "b"),
-          term("select", "b", "CountMinMax(a) AS TMP_0")
-        ),
-        term("select", "b", "TMP_0.f0 AS f0", "TMP_0.f1 AS f1")
-      )
+          term("select", "b", "CountMinMax(a) AS TMP_0")),
+        term("select", "b", "TMP_0.f0 AS f0", "TMP_0.f1 AS f1"))
     util.verifyTable(resultTable, expected)
   }
 
   @Test
   def testSelectStarAndGroupByCall(): Unit = {
     val util = streamTestUtil()
-    val table = util.addTable[(Int, Long, String)](
-      "MyTable", 'a, 'b, 'c)
+    val table = util.addTable[(Int, Long, String)]("MyTable", 'a, 'b, 'c)
 
     val testAgg = new CountMinMax
     val resultTable = table
@@ -363,21 +314,17 @@ class AggregateTest extends TableTestBase {
           unaryNode(
             "DataStreamCalc",
             streamTableNode(table),
-            term("select", "a", "MOD(b, 5) AS TMP_0")
-          ),
+            term("select", "a", "MOD(b, 5) AS TMP_0")),
           term("groupBy", "TMP_0"),
-          term("select", "TMP_0", "CountMinMax(a) AS TMP_1")
-        ),
-        term("select", "TMP_0", "TMP_1.f0 AS f0", "TMP_1.f1 AS f1", "TMP_1.f2 AS f2")
-      )
+          term("select", "TMP_0", "CountMinMax(a) AS TMP_1")),
+        term("select", "TMP_0", "TMP_1.f0 AS f0", "TMP_1.f1 AS f1", "TMP_1.f2 AS f2"))
     util.verifyTable(resultTable, expected)
   }
 
   @Test
   def testAggregateWithScalarResult(): Unit = {
     val util = streamTestUtil()
-    val table = util.addTable[(Int, Long, String)](
-      "MyTable", 'a, 'b, 'c)
+    val table = util.addTable[(Int, Long, String)]("MyTable", 'a, 'b, 'c)
 
     val resultTable = table
       .groupBy('b)
@@ -387,22 +334,16 @@ class AggregateTest extends TableTestBase {
     val expected =
       unaryNode(
         "DataStreamGroupAggregate",
-        unaryNode(
-          "DataStreamCalc",
-          streamTableNode(table),
-          term("select", "a", "b")
-        ),
+        unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "b")),
         term("groupBy", "b"),
-        term("select", "b", "COUNT(a) AS TMP_0")
-      )
+        term("select", "b", "COUNT(a) AS TMP_0"))
     util.verifyTable(resultTable, expected)
   }
 
   @Test
   def testAggregateWithAlias(): Unit = {
     val util = streamTestUtil()
-    val table = util.addTable[(Int, Long, String)](
-      "MyTable", 'a, 'b, 'c)
+    val table = util.addTable[(Int, Long, String)]("MyTable", 'a, 'b, 'c)
 
     val testAgg = new CountMinMax
     val resultTable = table
@@ -415,24 +356,17 @@ class AggregateTest extends TableTestBase {
         "DataStreamCalc",
         unaryNode(
           "DataStreamGroupAggregate",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(table),
-            term("select", "a", "b")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "b")),
           term("groupBy", "b"),
-          term("select", "b", "CountMinMax(a) AS TMP_0")
-        ),
-        term("select", "b", "TMP_0.f0 AS x", "TMP_0.f1 AS y")
-      )
+          term("select", "b", "CountMinMax(a) AS TMP_0")),
+        term("select", "b", "TMP_0.f0 AS x", "TMP_0.f1 AS y"))
     util.verifyTable(resultTable, expected)
   }
 
   @Test
   def testAggregateOnWindowedTable(): Unit = {
     val util = streamTestUtil()
-    val table = util.addTable[(Int, Long, String)](
-      "MyTable", 'a, 'b, 'c, 'rowtime.rowtime)
+    val table = util.addTable[(Int, Long, String)]("MyTable", 'a, 'b, 'c, 'rowtime.rowtime)
     val testAgg = new CountMinMax
 
     val result = table
@@ -449,14 +383,11 @@ class AggregateTest extends TableTestBase {
           unaryNode(
             "DataStreamCalc",
             streamTableNode(table),
-            term("select", "a", "rowtime", "MOD(b, 3) AS TMP_0")
-          ),
+            term("select", "a", "rowtime", "MOD(b, 3) AS TMP_0")),
           term("groupBy", "TMP_0"),
           term("window", "TumblingGroupWindow('w, 'rowtime, 900000.millis)"),
-          term("select", "TMP_0", "CountMinMax(a) AS TMP_1", "start('w) AS EXPR$0")
-        ),
-        term("select", "EXPR$0", "TMP_1.f0 AS x", "TMP_1.f1 AS y")
-      )
+          term("select", "TMP_0", "CountMinMax(a) AS TMP_1", "start('w) AS EXPR$0")),
+        term("select", "EXPR$0", "TMP_1.f0 AS x", "TMP_1.f1 AS y"))
 
     util.verifyTable(result, expected)
   }

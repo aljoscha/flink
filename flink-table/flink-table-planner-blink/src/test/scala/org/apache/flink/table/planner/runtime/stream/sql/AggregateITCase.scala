@@ -26,7 +26,10 @@ import org.apache.flink.streaming.api.scala.DataStream
 import org.apache.flink.table.api.bridge.scala._
 import org.apache.flink.table.api.internal.TableEnvironmentInternal
 import org.apache.flink.table.api.{Types, _}
-import org.apache.flink.table.planner.functions.aggfunctions.{ListAggWithRetractAggFunction, ListAggWsWithRetractAggFunction}
+import org.apache.flink.table.planner.functions.aggfunctions.{
+  ListAggWithRetractAggFunction,
+  ListAggWsWithRetractAggFunction
+}
 import org.apache.flink.table.planner.plan.utils.JavaUserDefinedAggFunctions.VarSumAggFunction
 import org.apache.flink.table.planner.runtime.batch.sql.agg.{MyPojoAggFunction, VarArgsAggFunction}
 import org.apache.flink.table.planner.runtime.utils.JavaUserDefinedAggFunctions.OverloadedMaxFunction
@@ -36,7 +39,11 @@ import org.apache.flink.table.planner.runtime.utils.StreamingWithStateTestBase.S
 import org.apache.flink.table.planner.runtime.utils.TimeTestUtil.TimestampAndWatermarkWithOffset
 import org.apache.flink.table.planner.runtime.utils.UserDefinedFunctionTestUtils._
 import org.apache.flink.table.planner.runtime.utils._
-import org.apache.flink.table.planner.utils.DateTimeTestUtil.{localDate, localDateTime, localTime => mLocalTime}
+import org.apache.flink.table.planner.utils.DateTimeTestUtil.{
+  localDate,
+  localDateTime,
+  localTime => mLocalTime
+}
 import org.apache.flink.table.runtime.typeutils.BigDecimalTypeInfo
 import org.apache.flink.types.Row
 
@@ -52,11 +59,8 @@ import scala.collection.{Seq, mutable}
 import scala.util.Random
 
 @RunWith(classOf[Parameterized])
-class AggregateITCase(
-    aggMode: AggMode,
-    miniBatch: MiniBatchMode,
-    backend: StateBackendMode)
-  extends StreamingWithAggTestBase(aggMode, miniBatch, backend) {
+class AggregateITCase(aggMode: AggMode, miniBatch: MiniBatchMode, backend: StateBackendMode)
+    extends StreamingWithAggTestBase(aggMode, miniBatch, backend) {
 
   val data = List(
     (1000L, 1, "Hello"),
@@ -72,9 +76,9 @@ class AggregateITCase(
   @Test
   def testEmptyInputAggregation(): Unit = {
     val data = new mutable.MutableList[(Int, Int)]
-    data .+= ((1, 1))
-    data .+= ((2, 2))
-    data .+= ((3, 3))
+    data.+=((1, 1))
+    data.+=((2, 2))
+    data.+=((3, 3))
 
     val t = failingDataSource(data).toTable(tEnv, 'a, 'b)
     tEnv.registerTable("T", t)
@@ -91,23 +95,20 @@ class AggregateITCase(
   @Test
   def testShufflePojo(): Unit = {
     val data = new mutable.MutableList[(Int, Int)]
-    data .+= ((1, 1))
-    data .+= ((2, 2))
-    data .+= ((3, 3))
+    data.+=((1, 1))
+    data.+=((2, 2))
+    data.+=((3, 3))
 
     val t = failingDataSource(data).toTable(tEnv, 'a, 'b)
     tEnv.registerTable("T", t)
     tEnv.registerFunction("pojoFunc", MyToPojoFunc)
 
-    val t1 = tEnv.sqlQuery(
-      "select sum(a), avg(a), min(a), count(a), count(1) from T group by pojoFunc(b)")
+    val t1 =
+      tEnv.sqlQuery("select sum(a), avg(a), min(a), count(a), count(1) from T group by pojoFunc(b)")
     val sink = new TestingRetractSink
     t1.toRetractStream[Row].addSink(sink)
     env.execute()
-    val expected = List(
-      "1,1,1,1,1",
-      "2,2,2,1,1",
-      "3,3,3,1,1")
+    val expected = List("1,1,1,1,1", "2,2,2,1,1", "3,3,3,1,1")
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
 
@@ -115,15 +116,15 @@ class AggregateITCase(
   @Test
   def testEmptyInputAggregationWithoutGroupBy(): Unit = {
     val data = new mutable.MutableList[(Int, Int)]
-    data .+= ((1, 1))
-    data .+= ((2, 2))
-    data .+= ((3, 3))
+    data.+=((1, 1))
+    data.+=((2, 2))
+    data.+=((3, 3))
 
     val t = failingDataSource(data).toTable(tEnv, 'a, 'b)
     tEnv.registerTable("T", t)
 
-    val t1 = tEnv.sqlQuery(
-      "select sum(a), avg(a), min(a), count(a), count(1) from T where a > 9999")
+    val t1 =
+      tEnv.sqlQuery("select sum(a), avg(a), min(a), count(a), count(1) from T where a > 9999")
     val sink = new TestingRetractSink
     t1.toRetractStream[Row].addSink(sink).setParallelism(1)
     env.execute()
@@ -138,15 +139,14 @@ class AggregateITCase(
     env.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime)
 
     val data = new mutable.MutableList[(Int, Int)]
-    data .+= ((1, 1))
-    data .+= ((2, 2))
-    data .+= ((3, 3))
+    data.+=((1, 1))
+    data.+=((2, 2))
+    data.+=((3, 3))
 
     val t = failingDataSource(data).toTable(tEnv, 'a, 'b)
     tEnv.registerTable("T", t)
 
-    val t1 = tEnv.sqlQuery(
-      "select sum(a), avg(a), min(a), count(a), count(1) from T")
+    val t1 = tEnv.sqlQuery("select sum(a), avg(a), min(a), count(a), count(1) from T")
     val sink = new TestingRetractSink
     t1.toRetractStream[Row].addSink(sink).setParallelism(1)
     env.execute()
@@ -173,62 +173,70 @@ class AggregateITCase(
     result.addSink(sink)
     env.execute()
 
-    val expected = List(
-      "1,3,1,1",
-      "2,15,1,2",
-      "3,45,3,3",
-      "4,102,1,4",
-      "5,195,1,5",
-      "6,333,1,6")
+    val expected = List("1,3,1,1", "2,15,1,2", "3,45,3,3", "4,102,1,4", "5,195,1,5", "6,333,1,6")
 
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
 
   @Test
   def testCountDistinct(): Unit = {
-    val ids = List(
-      1,
-      2, 2,
-      3, 3, 3,
-      4, 4, 4, 4,
-      5, 5, 5, 5, 5)
+    val ids = List(1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5)
 
     val dateTimes = List(
       "1970-01-01 00:00:01",
-      "1970-01-01 00:00:02", null,
-      "1970-01-01 00:00:04", "1970-01-01 00:00:05", "1970-01-01 00:00:06",
-      "1970-01-01 00:00:07", null, null, "1970-01-01 00:00:10",
-
-      "1970-01-01 00:00:11", "1970-01-01 00:00:11", "1970-01-01 00:00:13",
-      "1970-01-01 00:00:14", "1970-01-01 00:00:15")
+      "1970-01-01 00:00:02",
+      null,
+      "1970-01-01 00:00:04",
+      "1970-01-01 00:00:05",
+      "1970-01-01 00:00:06",
+      "1970-01-01 00:00:07",
+      null,
+      null,
+      "1970-01-01 00:00:10",
+      "1970-01-01 00:00:11",
+      "1970-01-01 00:00:11",
+      "1970-01-01 00:00:13",
+      "1970-01-01 00:00:14",
+      "1970-01-01 00:00:15")
 
     val dates = List(
       "1970-01-01",
-      "1970-01-02", null,
-      "1970-01-04", "1970-01-05", "1970-01-06",
-      "1970-01-07", null, null, "1970-01-10",
-      "1970-01-11", "1970-01-11", "1970-01-13", "1970-01-14", "1970-01-15")
+      "1970-01-02",
+      null,
+      "1970-01-04",
+      "1970-01-05",
+      "1970-01-06",
+      "1970-01-07",
+      null,
+      null,
+      "1970-01-10",
+      "1970-01-11",
+      "1970-01-11",
+      "1970-01-13",
+      "1970-01-14",
+      "1970-01-15")
 
     val times = List(
       "00:00:01",
-      "00:00:02", null,
-      "00:00:04", "00:00:05", "00:00:06",
-      "00:00:07", null, null, "00:00:10",
-      "00:00:11", "00:00:11", "00:00:13", "00:00:14", "00:00:15")
+      "00:00:02",
+      null,
+      "00:00:04",
+      "00:00:05",
+      "00:00:06",
+      "00:00:07",
+      null,
+      null,
+      "00:00:10",
+      "00:00:11",
+      "00:00:11",
+      "00:00:13",
+      "00:00:14",
+      "00:00:15")
 
-    val integers = List(
-      "1",
-      "2", null,
-      "4", "5", "6",
-      "7", null, null, "10",
-      "11", "11", "13", "14", "15")
+    val integers =
+      List("1", "2", null, "4", "5", "6", "7", null, null, "10", "11", "11", "13", "14", "15")
 
-    val chars = List(
-      "A",
-      "B", null,
-      "D", "E", "F",
-      "H", null, null, "K",
-      "L", "L", "N", "O", "P")
+    val chars = List("A", "B", null, "D", "E", "F", "H", null, null, "K", "L", "L", "N", "O", "P")
 
     val data = new mutable.MutableList[Row]
 
@@ -237,21 +245,33 @@ class AggregateITCase(
       val decimal = if (v == null) null else new JBigDecimal(v)
       val int = if (v == null) null else JInt.valueOf(v)
       val long = if (v == null) null else JLong.valueOf(v)
-      data.+=(Row.of(
-        Int.box(ids(i)), localDateTime(dateTimes(i)), localDate(dates(i)),
-        mLocalTime(times(i)), decimal, int, long, chars(i)))
+      data.+=(
+        Row.of(
+          Int.box(ids(i)),
+          localDateTime(dateTimes(i)),
+          localDate(dates(i)),
+          mLocalTime(times(i)),
+          decimal,
+          int,
+          long,
+          chars(i)))
     }
 
     val inputs = Random.shuffle(data)
 
     val rowType = new RowTypeInfo(
-      Types.INT, Types.LOCAL_DATE_TIME, Types.LOCAL_DATE, Types.LOCAL_TIME,
-      Types.DECIMAL, Types.INT, Types.LONG, Types.STRING)
+      Types.INT,
+      Types.LOCAL_DATE_TIME,
+      Types.LOCAL_DATE,
+      Types.LOCAL_TIME,
+      Types.DECIMAL,
+      Types.INT,
+      Types.LONG,
+      Types.STRING)
 
     val t = failingDataSource(inputs)(rowType).toTable(tEnv, 'id, 'a, 'b, 'c, 'd, 'e, 'f, 'g)
     tEnv.createTemporaryView("T", t)
-    val t1 = tEnv.sqlQuery(
-      s"""
+    val t1 = tEnv.sqlQuery(s"""
          |SELECT
          | id,
          | count(distinct a),
@@ -385,8 +405,7 @@ class AggregateITCase(
     val t = failingDataSource(data).toTable(tEnv, 'a, 'b, 'c)
     tEnv.registerTable("T", t)
     tEnv.createTemporarySystemFunction("CntNullNonNull", new CountNullNonNull)
-    val t1 = tEnv.sqlQuery(
-      "SELECT b, count(*), CntNullNonNull(DISTINCT c)  FROM T GROUP BY b")
+    val t1 = tEnv.sqlQuery("SELECT b, count(*), CntNullNonNull(DISTINCT c)  FROM T GROUP BY b")
 
     val sink = new TestingRetractSink
     t1.toRetractStream[Row].addSink(sink)
@@ -499,7 +518,7 @@ class AggregateITCase(
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
 
-  /** test unbounded groupBy (without window) **/
+  /** test unbounded groupBy (without window) * */
   @Test
   def testUnboundedGroupBy(): Unit = {
     val t = failingDataSource(TestData.tupleData3).toTable(tEnv, 'a, 'b, 'c)
@@ -517,11 +536,11 @@ class AggregateITCase(
 
   @Test
   def testWindowWithUnboundedAgg(): Unit = {
-    val t = failingDataSource(TestData.tupleData5.map {
-      case (a, b, c, d, e) => (b, a, c, d, e)
+    val t = failingDataSource(TestData.tupleData5.map { case (a, b, c, d, e) =>
+      (b, a, c, d, e)
     }).assignTimestampsAndWatermarks(
       new TimestampAndWatermarkWithOffset[(Long, Int, Int, String, Long)](0L))
-        .toTable(tEnv, 'rowtime.rowtime, 'a, 'c, 'd, 'e)
+      .toTable(tEnv, 'rowtime.rowtime, 'a, 'c, 'd, 'e)
     tEnv.registerTable("MyTable", t)
 
     val innerSql =
@@ -541,28 +560,20 @@ class AggregateITCase(
     results.addSink(sink)
     env.execute()
 
-    val expected = List(
-      "1,5,3",
-      "2,5,2")
+    val expected = List("1,5,3", "2,5,2")
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
-
 
   @Test
   def testListAggWithRetraction(): Unit = {
     env.setParallelism(1) // we have to use parallelism=1 to make sure the result is deterministic
-    val dataWithNull = List(
-      ("1", "a"),
-      ("1", "b"),
-      ("1", null),
-      ("1", "a"))
+    val dataWithNull = List(("1", "a"), ("1", "b"), ("1", null), ("1", "a"))
 
     val t: DataStream[(String, String)] = failingDataSource(dataWithNull)
     val streamTable = t.toTable(tEnv, 'x, 'y)
     tEnv.registerTable("T", streamTable)
 
-    tEnv.executeSql(
-      """
+    tEnv.executeSql("""
         |CREATE VIEW view1 AS
         |SELECT
         |    x,
@@ -598,10 +609,7 @@ class AggregateITCase(
 
   @Test
   def testListAggWithNullData(): Unit = {
-    val dataWithNull = List(
-      (1, 1, null),
-      (2, 1, null),
-      (3, 1, null))
+    val dataWithNull = List((1, 1, null), (2, 1, null), (3, 1, null))
 
     val t: DataStream[(Int, Int, String)] = failingDataSource(dataWithNull)
     val streamTable = t.toTable(tEnv, 'id, 'len, 'content)
@@ -622,10 +630,7 @@ class AggregateITCase(
 
   @Test
   def testListAggWithoutDelimiterTreatNull(): Unit = {
-    val dataWithNull = List(
-      (1, 1, null),
-      (2, 1, null),
-      (3, 1, null))
+    val dataWithNull = List((1, 1, null), (2, 1, null), (3, 1, null))
 
     val t: DataStream[(Int, Int, String)] = failingDataSource(dataWithNull)
     val streamTable = t.toTable(tEnv, 'id, 'len, 'content)
@@ -658,8 +663,7 @@ class AggregateITCase(
     data.+=((8, 4L, "EF"))
     data.+=((8, 4L, null))
     val sqlQuery = "SELECT b, LISTAGG(DISTINCT c, '#') FROM MyTable GROUP BY b"
-    tEnv.registerTable("MyTable",
-      failingDataSource(data).toTable(tEnv).as("a", "b", "c"))
+    tEnv.registerTable("MyTable", failingDataSource(data).toTable(tEnv).as("a", "b", "c"))
     val sink = new TestingRetractSink
     tEnv.sqlQuery(sqlQuery).toRetractStream[Row].addSink(sink).setParallelism(1)
     env.execute()
@@ -699,11 +703,9 @@ class AggregateITCase(
       (2, 2, List(12, "45.612")),
       (3, 2, List(13, "41.6")),
       (4, 3, List(14, "45.2136")),
-      (5, 3, List(18, "42.6"))
-    )
+      (5, 3, List(18, "42.6")))
 
-    tEnv.registerTable("MyTable",
-      failingDataSource(data).toTable(tEnv, 'a, 'b, 'c))
+    tEnv.registerTable("MyTable", failingDataSource(data).toTable(tEnv, 'a, 'b, 'c))
 
     val sink = new TestingRetractSink
     tEnv.sqlQuery(sqlQuery).toRetractStream[Row].addSink(sink)
@@ -754,10 +756,7 @@ class AggregateITCase(
 
   @Test
   def testPojoField(): Unit = {
-    val data = Seq(
-      (1, new MyPojo(5, 105)),
-      (1, new MyPojo(6, 11)),
-      (1, new MyPojo(7, 12)))
+    val data = Seq((1, new MyPojo(5, 105)), (1, new MyPojo(6, 11)), (1, new MyPojo(7, 12)))
 
     val t = failingDataSource(data).toTable(tEnv, 'a, 'b)
     tEnv.registerTable("MyTable", t)
@@ -804,15 +803,14 @@ class AggregateITCase(
   @Test
   def testDifferentTypesSumWithRetract(): Unit = {
     val data = List(
-      (1.toByte, 1.toShort, 1, 1L, 1.0F, 1.0, "a"),
-      (2.toByte, 2.toShort, 2, 2L, 2.0F, 2.0, "a"),
-      (3.toByte, 3.toShort, 3, 3L, 3.0F, 3.0, "a"),
-      (3.toByte, 3.toShort, 3, 3L, 3.0F, 3.0, "a"),
-      (1.toByte, 1.toShort, 1, 1L, 1.0F, 1.0, "b"),
-      (2.toByte, 2.toShort, 2, 2L, 2.0F, 2.0, "b"),
-      (3.toByte, 3.toShort, 3, 3L, 3.0F, 3.0, "c"),
-      (3.toByte, 3.toShort, 3, 3L, 3.0F, 3.0, "c")
-    )
+      (1.toByte, 1.toShort, 1, 1L, 1.0f, 1.0, "a"),
+      (2.toByte, 2.toShort, 2, 2L, 2.0f, 2.0, "a"),
+      (3.toByte, 3.toShort, 3, 3L, 3.0f, 3.0, "a"),
+      (3.toByte, 3.toShort, 3, 3L, 3.0f, 3.0, "a"),
+      (1.toByte, 1.toShort, 1, 1L, 1.0f, 1.0, "b"),
+      (2.toByte, 2.toShort, 2, 2L, 2.0f, 2.0, "b"),
+      (3.toByte, 3.toShort, 3, 3L, 3.0f, 3.0, "c"),
+      (3.toByte, 3.toShort, 3, 3L, 3.0f, 3.0, "c"))
 
     val t = failingDataSource(data).toTable(tEnv, 'a, 'b, 'c, 'd, 'e, 'f, 'g)
     tEnv.registerTable("T", t)
@@ -871,10 +869,7 @@ class AggregateITCase(
 
   @Test
   def testVarArgsNoGroupBy(): Unit = {
-    val data = List(
-      (1, 1L, "5", "3"),
-      (1, 22L, "15", "13"),
-      (3, 33L, "25", "23"))
+    val data = List((1, 1L, "5", "3"), (1, 22L, "15", "13"), (3, 33L, "25", "23"))
 
     val t = failingDataSource(data).toTable(tEnv, 'id, 's, 's1, 's2)
     tEnv.registerTable("MyTable", t)
@@ -891,10 +886,7 @@ class AggregateITCase(
 
   @Test
   def testVarArgsWithGroupBy(): Unit = {
-    val data = List(
-      (1, 1L, "5", "3"),
-      (1, 22L, "15", "13"),
-      (3, 33L, "25", "23"))
+    val data = List((1, 1L, "5", "3"), (1, 22L, "15", "13"), (3, 33L, "25", "23"))
 
     val t = failingDataSource(data).toTable(tEnv, 'id, 's, 's1, 's2)
     tEnv.registerTable("MyTable", t)
@@ -964,9 +956,17 @@ class AggregateITCase(
     tEnv.sqlQuery(sql).toRetractStream[Row].addSink(sink)
     env.execute()
 
-    val expected = List("0,0,90,0", "1,1,91,1", "2,2,92,12", "3,3,93,13",
-      "4,4,94,14", "5,5,95,15", "6,6,96,16", "7,7,97,17",
-      "8,8,98,18", "9,9,99,19")
+    val expected = List(
+      "0,0,90,0",
+      "1,1,91,1",
+      "2,2,92,12",
+      "3,3,93,13",
+      "4,4,94,14",
+      "5,5,95,15",
+      "6,6,96,16",
+      "7,7,97,17",
+      "8,8,98,18",
+      "9,9,99,19")
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
 
@@ -1049,8 +1049,7 @@ class AggregateITCase(
       (2, 2, (12, "45.612")),
       (3, 2, (13, "41.6")),
       (4, 3, (14, "45.2136")),
-      (5, 3, (18, "42.6"))
-    )
+      (5, 3, (18, "42.6")))
     tEnv.registerTable("src", env.fromCollection(data).toTable(tEnv, 'a, 'b, 'c))
 
     val sql = "SELECT a, b, COLLECT(c) as `set` FROM src GROUP BY a, b"
@@ -1086,12 +1085,10 @@ class AggregateITCase(
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
 
-  /** Test LISTAGG **/
+  /** Test LISTAGG * */
   @Test
   def testListAgg(): Unit = {
-    tEnv.createTemporarySystemFunction(
-      "listagg_retract",
-      classOf[ListAggWithRetractAggFunction])
+    tEnv.createTemporarySystemFunction("listagg_retract", classOf[ListAggWithRetractAggFunction])
     tEnv.createTemporarySystemFunction(
       "listagg_ws_retract",
       classOf[ListAggWsWithRetractAggFunction])
@@ -1114,8 +1111,9 @@ class AggregateITCase(
     val sink = new TestingRetractSink
     tEnv.sqlQuery(sqlQuery).toRetractStream[Row].addSink(sink)
     env.execute()
-    val expected = List("Hi,Hi,Hi,Hi,Hi,Hi,Hi,Hi,Hi,Hi,Hi-Hi-Hi-Hi-Hi-Hi-Hi-Hi-Hi-Hi," +
-      "Hi,Hi,Hi,Hi,Hi,Hi,Hi,Hi,Hi,Hi,Hi+Hi+Hi+Hi+Hi+Hi+Hi+Hi+Hi+Hi")
+    val expected = List(
+      "Hi,Hi,Hi,Hi,Hi,Hi,Hi,Hi,Hi,Hi,Hi-Hi-Hi-Hi-Hi-Hi-Hi-Hi-Hi-Hi," +
+        "Hi,Hi,Hi,Hi,Hi,Hi,Hi,Hi,Hi,Hi,Hi+Hi+Hi+Hi+Hi+Hi+Hi+Hi+Hi+Hi")
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
 
@@ -1138,7 +1136,7 @@ class AggregateITCase(
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
 
-  /** test VAR_POP **/
+  /** test VAR_POP * */
   @Test
   def testVAR_POP(): Unit = {
     val sqlQuery = "SELECT VAR_POP(a) FROM MyTable GROUP BY c"
@@ -1166,7 +1164,7 @@ class AggregateITCase(
     tEnv.createTemporarySystemFunction("var_sum", classOf[VarSumAggFunction])
     val sqlQuery = s"SELECT a, " +
       s"var_sum(${0.until(260).map(_ => "b").mkString(",")}) from MyTable group by a"
-    val data = Seq[(Int, Int)]((1, 1), (2,2))
+    val data = Seq[(Int, Int)]((1, 1), (2, 2))
 
     val t = failingDataSource(data).toTable(tEnv, 'a, 'b)
     tEnv.registerTable("MyTable", t)
@@ -1182,7 +1180,7 @@ class AggregateITCase(
   @Test
   def testCountDistinctWithBinaryRowSource(): Unit = {
     // this case is failed before, because of object reuse problem
-    val data = (0 until 100).map {i => ("1", "1", s"${i%50}", "1")}.toList
+    val data = (0 until 100).map { i => ("1", "1", s"${i % 50}", "1") }.toList
     // use BinaryRowData source here for StringData reuse
     val t = failingBinaryRowSource(data).toTable(tEnv, 'a, 'b, 'c, 'd)
     tEnv.registerTable("src", t)
@@ -1240,18 +1238,21 @@ class AggregateITCase(
     result.addSink(sink)
     env.execute()
     val expected = List(
-      "1,3,1,1,0,1", "2,15,1,2,1,0",
-      "3,45,3,3,1,1", "4,102,1,4,1,2",
-      "5,195,1,5,2,1", "6,333,1,6,2,2")
+      "1,3,1,1,0,1",
+      "2,15,1,2,1,0",
+      "3,45,3,3,1,1",
+      "4,102,1,4,1,2",
+      "5,195,1,5,2,1",
+      "6,333,1,6,2,2")
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
 
   @Test
   def testPruneUselessAggCall(): Unit = {
     val data = new mutable.MutableList[(Int, Long, String)]
-    data .+= ((1, 1L, "Hi"))
-    data .+= ((2, 2L, "Hello"))
-    data .+= ((3, 2L, "Hello world"))
+    data.+=((1, 1L, "Hi"))
+    data.+=((2, 2L, "Hello"))
+    data.+=((3, 2L, "Hello world"))
 
     val t = failingDataSource(data).toTable(tEnv, 'a, 'b, 'c)
     tEnv.registerTable("T", t)
@@ -1272,8 +1273,8 @@ class AggregateITCase(
     tEnv.getConfig.setIdleStateRetentionTime(Time.days(0), Time.days(0))
     val t = failingDataSource(Seq(1, 2, 3)).toTable(tEnv, 'a)
     val results = t
-        .select(new GenericAggregateFunction()('a))
-        .toRetractStream[Row]
+      .select(new GenericAggregateFunction()('a))
+      .toRetractStream[Row]
 
     val sink = new TestingRetractSink
     results.addSink(sink).setParallelism(1)
@@ -1292,17 +1293,18 @@ class AggregateITCase(
     val t = failingDataSource(data).toTable(tEnv, 'a, 'b, 'c)
     tEnv.registerTable("MyTable", t)
 
-    val tableSink = new TestingUpsertTableSink(Array(0)).configure(
-      Array[String]("c", "bMax"), Array[TypeInformation[_]](Types.STRING, Types.LONG))
+    val tableSink = new TestingUpsertTableSink(Array(0))
+      .configure(Array[String]("c", "bMax"), Array[TypeInformation[_]](Types.STRING, Types.LONG))
     tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSinkInternal("testSink", tableSink)
 
-    tEnv.executeSql(
-      """
+    tEnv
+      .executeSql("""
         |insert into testSink
         |select c, max(b) from
         | (select b, c, true as f from MyTable) t
         |group by c, f
-      """.stripMargin).await()
+      """.stripMargin)
+      .await()
 
     val expected = List("A,1", "B,2", "C,3")
     assertEquals(expected.sorted, tableSink.getUpsertResults.sorted)
@@ -1311,7 +1313,8 @@ class AggregateITCase(
   @Test
   def testAggregationCodeSplit(): Unit = {
 
-    val t = env.fromCollection(TestData.smallTupleData3)
+    val t = env
+      .fromCollection(TestData.smallTupleData3)
       .toTable(tEnv, 'a, 'b, 'c)
     tEnv.createTemporaryView("MyTable", t)
 
@@ -1320,7 +1323,8 @@ class AggregateITCase(
     // 50 can make sure all generated methods of [Namespace]AggsHandleFunction is longer than 2048
     val columnNumber = 50
 
-    val selectList = Stream.range(3, columnNumber)
+    val selectList = Stream
+      .range(3, columnNumber)
       .map(i => s"SUM(CASE WHEN a IS NOT NULL AND a > $i THEN 0 WHEN a < 0 THEN 0 ELSE $i END)")
       .mkString(",")
     val sqlQuery = s"select $selectList from MyTable group by b, c"
@@ -1332,20 +1336,18 @@ class AggregateITCase(
 
     val expected = Stream.range(3, columnNumber).map(_.toString).mkString(",")
     assertEquals(sink.getRawResults.size, 3)
-    sink.getRetractResults.foreach(result =>
-      assertEquals(expected, result)
-    )
+    sink.getRetractResults.foreach(result => assertEquals(expected, result))
   }
 
   @Test
   def testOverloadedAccumulator(): Unit = {
     val data = new mutable.MutableList[(String, Long)]
-    data .+= (("x", 1L))
-    data .+= (("x", 2L))
-    data .+= (("x", 3L))
-    data .+= (("y", 1L))
-    data .+= (("y", 2L))
-    data .+= (("z", 3L))
+    data.+=(("x", 1L))
+    data.+=(("x", 2L))
+    data.+=(("x", 3L))
+    data.+=(("y", 1L))
+    data.+=(("y", 2L))
+    data.+=(("z", 3L))
 
     val t = failingDataSource(data).toTable(tEnv, 'a, 'b)
     tEnv.createTemporaryView("T", t)
@@ -1354,26 +1356,22 @@ class AggregateITCase(
     val sink1 = new TestingRetractSink
     val sink2 = new TestingRetractSink
 
-    tEnv.sqlQuery("SELECT a, OverloadedMaxFunction(b) FROM T GROUP BY a")
+    tEnv
+      .sqlQuery("SELECT a, OverloadedMaxFunction(b) FROM T GROUP BY a")
       .toRetractStream[Row]
       .addSink(sink1)
 
-    tEnv.sqlQuery("SELECT b, OverloadedMaxFunction(a) FROM T GROUP BY b")
+    tEnv
+      .sqlQuery("SELECT b, OverloadedMaxFunction(a) FROM T GROUP BY b")
       .toRetractStream[Row]
       .addSink(sink2)
 
     env.execute()
 
-    val expected1 = List(
-      "x,3",
-      "y,2",
-      "z,3")
+    val expected1 = List("x,3", "y,2", "z,3")
     assertEquals(expected1.sorted, sink1.getRetractResults.sorted)
 
-    val expected2 = List(
-      "1,y",
-      "2,y",
-      "3,z")
+    val expected2 = List("1,y", "2,y", "3,z")
     assertEquals(expected2.sorted, sink2.getRetractResults.sorted)
   }
 }

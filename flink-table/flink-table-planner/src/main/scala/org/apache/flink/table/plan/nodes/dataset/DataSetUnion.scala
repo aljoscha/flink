@@ -34,16 +34,15 @@ import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 
 /**
-* Flink RelNode which matches along with UnionOperator.
-*
-*/
+ * Flink RelNode which matches along with UnionOperator.
+ */
 class DataSetUnion(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
     inputs: JList[RelNode],
     rowRelDataType: RelDataType)
-  extends Union(cluster, traitSet, inputs, true)
-  with DataSetRel {
+    extends Union(cluster, traitSet, inputs, true)
+    with DataSetRel {
 
   override def deriveRowType() = rowRelDataType
 
@@ -53,11 +52,7 @@ class DataSetUnion(
       throw new TableException("DataSetUnion only supports UNION ALL.")
     }
 
-    new DataSetUnion(
-      cluster,
-      traitSet,
-      inputs,
-      rowRelDataType)
+    new DataSetUnion(cluster, traitSet, inputs, rowRelDataType)
   }
 
   override def toString: String = {
@@ -68,10 +63,10 @@ class DataSetUnion(
     super.explainTerms(pw).item("union", unionSelectionToString)
   }
 
-  override def computeSelfCost (planner: RelOptPlanner, metadata: RelMetadataQuery): RelOptCost = {
+  override def computeSelfCost(planner: RelOptPlanner, metadata: RelMetadataQuery): RelOptCost = {
 
     val children = this.getInputs
-    val rowCnt = children.foldLeft(0D) { (rows, child) =>
+    val rowCnt = children.foldLeft(0d) { (rows, child) =>
       rows + metadata.getRowCount(child)
     }
 
@@ -85,8 +80,7 @@ class DataSetUnion(
 
   override def translateToPlan(tableEnv: BatchTableEnvImpl): DataSet[Row] = {
 
-    getInputs
-      .asScala
+    getInputs.asScala
       .map(_.asInstanceOf[DataSetRel].translateToPlan(tableEnv))
       .reduce((dataSetLeft, dataSetRight) => dataSetLeft.union(dataSetRight))
   }

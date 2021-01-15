@@ -45,8 +45,8 @@ class FlinkLogicalWindowAggregate(
     groupSet: ImmutableBitSet,
     groupSets: util.List[ImmutableBitSet],
     aggCalls: util.List[AggregateCall])
-  extends Aggregate(cluster, traitSet, child, groupSet, groupSets, aggCalls)
-  with FlinkLogicalRel {
+    extends Aggregate(cluster, traitSet, child, groupSet, groupSets, aggCalls)
+    with FlinkLogicalRel {
 
   def getWindow: LogicalWindow = window
 
@@ -65,8 +65,7 @@ class FlinkLogicalWindowAggregate(
       input: RelNode,
       groupSet: ImmutableBitSet,
       groupSets: util.List[ImmutableBitSet],
-      aggCalls: util.List[AggregateCall])
-    : Aggregate = {
+      aggCalls: util.List[AggregateCall]): Aggregate = {
 
     new FlinkLogicalWindowAggregate(
       window,
@@ -89,8 +88,7 @@ class FlinkLogicalWindowAggregate(
     namedProperties.foreach { namedProp =>
       builder.add(
         namedProp.name,
-        typeFactory.createTypeFromTypeInfo(namedProp.property.resultType, isNullable = false)
-      )
+        typeFactory.createTypeFromTypeInfo(namedProp.property.resultType, isNullable = false))
     }
     builder.build()
   }
@@ -105,11 +103,11 @@ class FlinkLogicalWindowAggregate(
 }
 
 class FlinkLogicalWindowAggregateConverter
-  extends ConverterRule(
-    classOf[LogicalWindowAggregate],
-    Convention.NONE,
-    FlinkConventions.LOGICAL,
-    "FlinkLogicalWindowAggregateConverter") {
+    extends ConverterRule(
+      classOf[LogicalWindowAggregate],
+      Convention.NONE,
+      FlinkConventions.LOGICAL,
+      "FlinkLogicalWindowAggregateConverter") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val agg = call.rel(0).asInstanceOf[LogicalWindowAggregate]
@@ -121,7 +119,7 @@ class FlinkLogicalWindowAggregateConverter
       case SqlKind.AVG => true
       // but none of the other AVG agg functions
       case k if SqlKind.AVG_AGG_FUNCTIONS.contains(k) => false
-      case _ => true
+      case _                                          => true
     }
   }
 

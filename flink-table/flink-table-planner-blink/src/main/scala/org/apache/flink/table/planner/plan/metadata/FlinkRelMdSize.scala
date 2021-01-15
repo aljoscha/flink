@@ -39,10 +39,10 @@ import org.apache.calcite.util.{BuiltInMethod, ImmutableNullableList, NlsString,
 import scala.collection.JavaConversions._
 
 /**
-  * FlinkRelMdSize supplies a implementation of
-  * [[RelMetadataQuery#getAverageRowSize]] and
-  * [[RelMetadataQuery#getAverageColumnSizes]] for the standard logical algebra.
-  */
+ * FlinkRelMdSize supplies a implementation of
+ * [[RelMetadataQuery#getAverageRowSize]] and
+ * [[RelMetadataQuery#getAverageColumnSizes]] for the standard logical algebra.
+ */
 class FlinkRelMdSize private extends MetadataHandler[BuiltInMetadata.Size] {
 
   def getDef: MetadataDef[BuiltInMetadata.Size] = BuiltInMetadata.Size.DEF
@@ -52,7 +52,7 @@ class FlinkRelMdSize private extends MetadataHandler[BuiltInMetadata.Size] {
   def averageRowSize(rel: TableScan, mq: RelMetadataQuery): JDouble = {
     val averageColumnSizes = mq.getAverageColumnSizes(rel)
     require(averageColumnSizes != null && !averageColumnSizes.contains(null))
-    averageColumnSizes.foldLeft(0D)(_ + _)
+    averageColumnSizes.foldLeft(0d)(_ + _)
   }
 
   def averageRowSize(rel: RelNode, mq: RelMetadataQuery): JDouble = {
@@ -61,11 +61,10 @@ class FlinkRelMdSize private extends MetadataHandler[BuiltInMetadata.Size] {
       FlinkRelMdSize.estimateRowSize(rel.getRowType)
     } else {
       val fields = rel.getRowType.getFieldList
-      val columnSizes = averageColumnSizes.zip(fields) map {
-        case (columnSize, field) =>
-          if (columnSize == null) FlinkRelMdSize.averageTypeValueSize(field.getType) else columnSize
+      val columnSizes = averageColumnSizes.zip(fields) map { case (columnSize, field) =>
+        if (columnSize == null) FlinkRelMdSize.averageTypeValueSize(field.getType) else columnSize
       }
-      columnSizes.foldLeft(0D)(_ + _)
+      columnSizes.foldLeft(0d)(_ + _)
     }
   }
 
@@ -86,19 +85,18 @@ class FlinkRelMdSize private extends MetadataHandler[BuiltInMetadata.Size] {
   def averageColumnSizes(rel: Values, mq: RelMetadataQuery): JList[JDouble] = {
     val fields = rel.getRowType.getFieldList
     val list = ImmutableList.builder[JDouble]()
-    fields.zipWithIndex.foreach {
-      case (field, index) =>
-        val d: JDouble = if (rel.getTuples().isEmpty) {
-          FlinkRelMdSize.averageTypeValueSize(field.getType)
-        } else {
-          val sumSize = rel.getTuples().foldLeft(0D) { (acc, literals) =>
-            val size = typeValueSize(field.getType,
-              literals.get(index).getValueAs(classOf[Comparable[_]]))
-            acc + size
-          }
-          sumSize / rel.getTuples.size()
+    fields.zipWithIndex.foreach { case (field, index) =>
+      val d: JDouble = if (rel.getTuples().isEmpty) {
+        FlinkRelMdSize.averageTypeValueSize(field.getType)
+      } else {
+        val sumSize = rel.getTuples().foldLeft(0d) { (acc, literals) =>
+          val size =
+            typeValueSize(field.getType, literals.get(index).getValueAs(classOf[Comparable[_]]))
+          acc + size
         }
-        list.add(d)
+        sumSize / rel.getTuples.size()
+      }
+      list.add(d)
     }
     list.build
   }
@@ -126,34 +124,32 @@ class FlinkRelMdSize private extends MetadataHandler[BuiltInMetadata.Size] {
     // get each column's RexNode (RexLiteral, RexInputRef or null)
     val projectNodes = (0 until fieldCount).map { i =>
       val initNode: RexNode = rel.getCluster.getRexBuilder.constantNull()
-      rel.projects.foldLeft(initNode) {
-        (mergeNode, project) =>
-          (mergeNode, project.get(i)) match {
-            case (l1: RexLiteral, l2: RexLiteral) =>
-              // choose non-null one
-              if (l1.getValueAs(classOf[Comparable[_]]) == null) l2 else l1
-            case (_: RexLiteral, r: RexInputRef) => r
-            case (r: RexInputRef, _: RexLiteral) => r
-            case (r1: RexInputRef, r2: RexInputRef) =>
-              // if reference different columns, return null (using default value)
-              if (r1.getIndex == r2.getIndex) r1 else null
-            case (_, _) => null
-          }
+      rel.projects.foldLeft(initNode) { (mergeNode, project) =>
+        (mergeNode, project.get(i)) match {
+          case (l1: RexLiteral, l2: RexLiteral) =>
+            // choose non-null one
+            if (l1.getValueAs(classOf[Comparable[_]]) == null) l2 else l1
+          case (_: RexLiteral, r: RexInputRef)    => r
+          case (r: RexInputRef, _: RexLiteral)    => r
+          case (r1: RexInputRef, r2: RexInputRef) =>
+            // if reference different columns, return null (using default value)
+            if (r1.getIndex == r2.getIndex) r1 else null
+          case (_, _) => null
+        }
       }
     }
 
     val inputColumnSizes = mq.getAverageColumnSizesNotNull(rel.getInput())
     val sizesBuilder = ImmutableNullableList.builder[JDouble]()
-    projectNodes.zipWithIndex.foreach {
-      case (p, i) =>
-        val size = if (p == null || i == rel.expandIdIndex) {
-          // use default value
-          FlinkRelMdSize.averageTypeValueSize(rel.getRowType.getFieldList.get(i).getType)
-        } else {
-          // use value from input
-          averageRexSize(p, inputColumnSizes)
-        }
-        sizesBuilder.add(size)
+    projectNodes.zipWithIndex.foreach { case (p, i) =>
+      val size = if (p == null || i == rel.expandIdIndex) {
+        // use default value
+        FlinkRelMdSize.averageTypeValueSize(rel.getRowType.getFieldList.get(i).getType)
+      } else {
+        // use value from input
+        averageRexSize(p, inputColumnSizes)
+      }
+      sizesBuilder.add(size)
     }
     sizesBuilder.build()
   }
@@ -182,8 +178,8 @@ class FlinkRelMdSize private extends MetadataHandler[BuiltInMetadata.Size] {
     val (auxGroupSet, otherAggCalls) = AggregateUtil.checkAndSplitAggCalls(rel)
     val fullGrouping = rel.getGroupSet.toArray ++ auxGroupSet
     fullGrouping.foreach(i => sizesBuilder.add(inputColumnSizes.get(i)))
-    otherAggCalls.foreach(aggCall => sizesBuilder.add(
-      FlinkRelMdSize.averageTypeValueSize(aggCall.getType)))
+    otherAggCalls.foreach(aggCall =>
+      sizesBuilder.add(FlinkRelMdSize.averageTypeValueSize(aggCall.getType)))
     sizesBuilder.build
   }
 
@@ -216,14 +212,14 @@ class FlinkRelMdSize private extends MetadataHandler[BuiltInMetadata.Size] {
       case agg: BatchPhysicalLocalHashWindowAggregate =>
         // local win-agg output type: grouping + assignTs + auxGrouping + aggCalls
         agg.grouping.zipWithIndex.toMap ++
-          agg.auxGrouping.zipWithIndex.map {
-            case (k, v) => k -> (agg.grouping.length + 1 + v)
+          agg.auxGrouping.zipWithIndex.map { case (k, v) =>
+            k -> (agg.grouping.length + 1 + v)
           }.toMap
       case agg: BatchPhysicalLocalSortWindowAggregate =>
         // local win-agg output type: grouping + assignTs + auxGrouping + aggCalls
         agg.grouping.zipWithIndex.toMap ++
-          agg.auxGrouping.zipWithIndex.map {
-            case (k, v) => k -> (agg.grouping.length + 1 + v)
+          agg.auxGrouping.zipWithIndex.map { case (k, v) =>
+            k -> (agg.grouping.length + 1 + v)
           }.toMap
       case agg: BatchPhysicalWindowAggregateBase =>
         (agg.grouping ++ agg.auxGrouping).zipWithIndex.toMap
@@ -249,7 +245,7 @@ class FlinkRelMdSize private extends MetadataHandler[BuiltInMetadata.Size] {
     val acsOfLeft = mq.getAverageColumnSizes(rel.getLeft)
     val acsOfRight = rel.getJoinType match {
       case JoinRelType.SEMI | JoinRelType.ANTI => null
-      case _ => mq.getAverageColumnSizes(rel.getRight)
+      case _                                   => mq.getAverageColumnSizes(rel.getRight)
     }
     if (acsOfLeft == null && acsOfRight == null) {
       null
@@ -281,7 +277,7 @@ class FlinkRelMdSize private extends MetadataHandler[BuiltInMetadata.Size] {
         var nn = 0
         val fieldCount: Int = rel.getRowType.getFieldCount
         (0 until fieldCount).foreach { i =>
-          var d = 0D
+          var d = 0d
           var n = 0
           inputColumnSizeList.foreach { inputColumnSizes =>
             val d2 = inputColumnSizes.get(i)
@@ -319,26 +315,26 @@ class FlinkRelMdSize private extends MetadataHandler[BuiltInMetadata.Size] {
   private def averageRexSize(node: RexNode, inputColumnSizes: JList[JDouble]): JDouble = {
     node match {
       case ref: RexInputRef => inputColumnSizes.get(ref.getIndex)
-      case lit: RexLiteral => typeValueSize(node.getType, lit.getValueAs(classOf[Comparable[_]]))
+      case lit: RexLiteral  => typeValueSize(node.getType, lit.getValueAs(classOf[Comparable[_]]))
       case call: RexCall =>
         val nodeSqlTypeName = node.getType.getSqlTypeName
         val matchedOps = call.getOperands.filter(op => op.getType.getSqlTypeName eq nodeSqlTypeName)
         matchedOps.headOption match {
           case Some(op) => averageRexSize(op, inputColumnSizes)
-          case _ => FlinkRelMdSize.averageTypeValueSize(node.getType)
+          case _        => FlinkRelMdSize.averageTypeValueSize(node.getType)
         }
       case _ => FlinkRelMdSize.averageTypeValueSize(node.getType)
     }
   }
 
   /**
-    * Estimates the average size (in bytes) of a value of a type.
-    *
-    * Nulls count as 1 byte.
-    */
+   * Estimates the average size (in bytes) of a value of a type.
+   *
+   * Nulls count as 1 byte.
+   */
   private def typeValueSize(t: RelDataType, value: Comparable[_]): JDouble = {
     if (value == null) {
-      return 1D
+      return 1d
     }
     t.getSqlTypeName match {
       case SqlTypeName.BINARY | SqlTypeName.VARBINARY =>
@@ -350,10 +346,10 @@ class FlinkRelMdSize private extends MetadataHandler[BuiltInMetadata.Size] {
   }
 
   /**
-    * Gets each column size of rel output from input column size or from column type.
-    * column size is from input column size if the column index is in `mapInputToOutput` keys,
-    * otherwise from column type.
-    */
+   * Gets each column size of rel output from input column size or from column type.
+   * column size is from input column size if the column index is in `mapInputToOutput` keys,
+   * otherwise from column type.
+   */
   private def getColumnSizesFromInputOrType(
       rel: SingleRel,
       mq: RelMetadataQuery,
@@ -367,13 +363,12 @@ class FlinkRelMdSize private extends MetadataHandler[BuiltInMetadata.Size] {
     val mapOutputToInput = mapInputToOutput.map(_.swap)
     val acsOfInput = mq.getAverageColumnSizesNotNull(input)
     val sizesBuilder = ImmutableList.builder[JDouble]()
-    rel.getRowType.getFieldList.zipWithIndex.foreach {
-      case (f, idx) =>
-        val size = mapOutputToInput.get(idx) match {
-          case Some(inputIdx) => acsOfInput.get(inputIdx)
-          case _ => FlinkRelMdSize.averageTypeValueSize(f.getType)
-        }
-        sizesBuilder.add(size)
+    rel.getRowType.getFieldList.zipWithIndex.foreach { case (f, idx) =>
+      val size = mapOutputToInput.get(idx) match {
+        case Some(inputIdx) => acsOfInput.get(inputIdx)
+        case _              => FlinkRelMdSize.averageTypeValueSize(f.getType)
+      }
+      sizesBuilder.add(size)
     }
     sizesBuilder.build()
   }
@@ -408,31 +403,31 @@ object FlinkRelMdSize {
 
   private def estimateRowSize(rowType: RelDataType): JDouble = {
     val fieldList = rowType.getFieldList
-    fieldList.map(_.getType).foldLeft(0.0) {
-      (s, t) =>
-        s + averageTypeValueSize(t)
+    fieldList.map(_.getType).foldLeft(0.0) { (s, t) =>
+      s + averageTypeValueSize(t)
     }
   }
 
   def averageTypeValueSize(sqlType: SqlTypeName): JDouble = sqlType match {
-    case SqlTypeName.TINYINT => 1D
-    case SqlTypeName.SMALLINT => 2D
-    case SqlTypeName.INTEGER => 4D
-    case SqlTypeName.BIGINT => 8D
-    case SqlTypeName.BOOLEAN => 1D
-    case SqlTypeName.FLOAT => 4D
-    case SqlTypeName.DOUBLE => 8D
-    case SqlTypeName.VARCHAR => 12D
-    case SqlTypeName.CHAR => 1D
-    case SqlTypeName.DECIMAL => 12D
-    case typeName if SqlTypeName.YEAR_INTERVAL_TYPES.contains(typeName) => 8D
-    case typeName if SqlTypeName.DAY_INTERVAL_TYPES.contains(typeName) => 4D
+    case SqlTypeName.TINYINT                                            => 1d
+    case SqlTypeName.SMALLINT                                           => 2d
+    case SqlTypeName.INTEGER                                            => 4d
+    case SqlTypeName.BIGINT                                             => 8d
+    case SqlTypeName.BOOLEAN                                            => 1d
+    case SqlTypeName.FLOAT                                              => 4d
+    case SqlTypeName.DOUBLE                                             => 8d
+    case SqlTypeName.VARCHAR                                            => 12d
+    case SqlTypeName.CHAR                                               => 1d
+    case SqlTypeName.DECIMAL                                            => 12d
+    case typeName if SqlTypeName.YEAR_INTERVAL_TYPES.contains(typeName) => 8d
+    case typeName if SqlTypeName.DAY_INTERVAL_TYPES.contains(typeName)  => 4d
     // TODO after time/date => int, timestamp => long, this estimate value should update
-    case SqlTypeName.TIME | SqlTypeName.TIMESTAMP |
-         SqlTypeName.TIMESTAMP_WITH_LOCAL_TIME_ZONE | SqlTypeName.DATE => 12D
-    case SqlTypeName.ANY | SqlTypeName.OTHER => 128D // 128 is an arbitrary estimate
-    case SqlTypeName.BINARY | SqlTypeName.VARBINARY => 16D // 16 is an arbitrary estimate
-    case _ => throw new TableException(s"Unsupported data type encountered: $sqlType")
+    case SqlTypeName.TIME | SqlTypeName.TIMESTAMP | SqlTypeName.TIMESTAMP_WITH_LOCAL_TIME_ZONE |
+        SqlTypeName.DATE =>
+      12d
+    case SqlTypeName.ANY | SqlTypeName.OTHER        => 128d // 128 is an arbitrary estimate
+    case SqlTypeName.BINARY | SqlTypeName.VARBINARY => 16d // 16 is an arbitrary estimate
+    case _                                          => throw new TableException(s"Unsupported data type encountered: $sqlType")
   }
 
 }

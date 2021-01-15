@@ -26,8 +26,8 @@ import org.apache.flink.table.types.logical.LogicalType
 import java.nio.charset.StandardCharsets
 
 /**
-  * Generates PRINT function call.
-  */
+ * Generates PRINT function call.
+ */
 class PrintCallGen extends CallGenerator {
 
   override def generate(

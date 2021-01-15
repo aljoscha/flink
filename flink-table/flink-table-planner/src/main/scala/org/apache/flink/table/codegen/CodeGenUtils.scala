@@ -28,7 +28,11 @@ import org.apache.flink.api.common.typeinfo.{FractionalTypeInfo, SqlTimeTypeInfo
 import org.apache.flink.api.common.typeutils.CompositeType
 import org.apache.flink.api.java.typeutils.{PojoTypeInfo, RowTypeInfo, TupleTypeInfo, TypeExtractor}
 import org.apache.flink.api.scala.typeutils.CaseClassTypeInfo
-import org.apache.flink.table.typeutils.{TimeIndicatorTypeInfo, TimeIntervalTypeInfo, TypeCheckUtils}
+import org.apache.flink.table.typeutils.{
+  TimeIndicatorTypeInfo,
+  TimeIntervalTypeInfo,
+  TypeCheckUtils
+}
 
 object CodeGenUtils {
 
@@ -45,29 +49,29 @@ object CodeGenUtils {
   // Float a = 1.0f;
   // Byte b = (byte)(float) a;
   def primitiveTypeTermForTypeInfo(tpe: TypeInformation[_]): String = tpe match {
-    case INT_TYPE_INFO => "int"
-    case LONG_TYPE_INFO => "long"
-    case SHORT_TYPE_INFO => "short"
-    case BYTE_TYPE_INFO => "byte"
-    case FLOAT_TYPE_INFO => "float"
-    case DOUBLE_TYPE_INFO => "double"
+    case INT_TYPE_INFO     => "int"
+    case LONG_TYPE_INFO    => "long"
+    case SHORT_TYPE_INFO   => "short"
+    case BYTE_TYPE_INFO    => "byte"
+    case FLOAT_TYPE_INFO   => "float"
+    case DOUBLE_TYPE_INFO  => "double"
     case BOOLEAN_TYPE_INFO => "boolean"
-    case CHAR_TYPE_INFO => "char"
+    case CHAR_TYPE_INFO    => "char"
 
     // From PrimitiveArrayTypeInfo we would get class "int[]", scala reflections
     // does not seem to like this, so we manually give the correct type here.
-    case INT_PRIMITIVE_ARRAY_TYPE_INFO => "int[]"
-    case LONG_PRIMITIVE_ARRAY_TYPE_INFO => "long[]"
-    case SHORT_PRIMITIVE_ARRAY_TYPE_INFO => "short[]"
-    case BYTE_PRIMITIVE_ARRAY_TYPE_INFO => "byte[]"
-    case FLOAT_PRIMITIVE_ARRAY_TYPE_INFO => "float[]"
-    case DOUBLE_PRIMITIVE_ARRAY_TYPE_INFO => "double[]"
+    case INT_PRIMITIVE_ARRAY_TYPE_INFO     => "int[]"
+    case LONG_PRIMITIVE_ARRAY_TYPE_INFO    => "long[]"
+    case SHORT_PRIMITIVE_ARRAY_TYPE_INFO   => "short[]"
+    case BYTE_PRIMITIVE_ARRAY_TYPE_INFO    => "byte[]"
+    case FLOAT_PRIMITIVE_ARRAY_TYPE_INFO   => "float[]"
+    case DOUBLE_PRIMITIVE_ARRAY_TYPE_INFO  => "double[]"
     case BOOLEAN_PRIMITIVE_ARRAY_TYPE_INFO => "boolean[]"
-    case CHAR_PRIMITIVE_ARRAY_TYPE_INFO => "char[]"
+    case CHAR_PRIMITIVE_ARRAY_TYPE_INFO    => "char[]"
 
     // internal primitive representation of time points
-    case SqlTimeTypeInfo.DATE => "int"
-    case SqlTimeTypeInfo.TIME => "int"
+    case SqlTimeTypeInfo.DATE      => "int"
+    case SqlTimeTypeInfo.TIME      => "int"
     case SqlTimeTypeInfo.TIMESTAMP => "long"
 
     // internal primitive representation of time intervals
@@ -81,14 +85,14 @@ object CodeGenUtils {
   def boxedTypeTermForTypeInfo(tpe: TypeInformation[_]): String = tpe match {
     // From PrimitiveArrayTypeInfo we would get class "int[]", scala reflections
     // does not seem to like this, so we manually give the correct type here.
-    case INT_PRIMITIVE_ARRAY_TYPE_INFO => "int[]"
-    case LONG_PRIMITIVE_ARRAY_TYPE_INFO => "long[]"
-    case SHORT_PRIMITIVE_ARRAY_TYPE_INFO => "short[]"
-    case BYTE_PRIMITIVE_ARRAY_TYPE_INFO => "byte[]"
-    case FLOAT_PRIMITIVE_ARRAY_TYPE_INFO => "float[]"
-    case DOUBLE_PRIMITIVE_ARRAY_TYPE_INFO => "double[]"
+    case INT_PRIMITIVE_ARRAY_TYPE_INFO     => "int[]"
+    case LONG_PRIMITIVE_ARRAY_TYPE_INFO    => "long[]"
+    case SHORT_PRIMITIVE_ARRAY_TYPE_INFO   => "short[]"
+    case BYTE_PRIMITIVE_ARRAY_TYPE_INFO    => "byte[]"
+    case FLOAT_PRIMITIVE_ARRAY_TYPE_INFO   => "float[]"
+    case DOUBLE_PRIMITIVE_ARRAY_TYPE_INFO  => "double[]"
     case BOOLEAN_PRIMITIVE_ARRAY_TYPE_INFO => "boolean[]"
-    case CHAR_PRIMITIVE_ARRAY_TYPE_INFO => "char[]"
+    case CHAR_PRIMITIVE_ARRAY_TYPE_INFO    => "char[]"
 
     // time indicators are represented as Long even if they seem to be Timestamp
     case _: TimeIndicatorTypeInfo => "java.lang.Long"
@@ -98,26 +102,26 @@ object CodeGenUtils {
   }
 
   def primitiveDefaultValue(tpe: TypeInformation[_]): String = tpe match {
-    case INT_TYPE_INFO => "-1"
-    case LONG_TYPE_INFO => "-1L"
-    case SHORT_TYPE_INFO => "-1"
-    case BYTE_TYPE_INFO => "-1"
-    case FLOAT_TYPE_INFO => "-1.0f"
-    case DOUBLE_TYPE_INFO => "-1.0d"
-    case BOOLEAN_TYPE_INFO => "false"
-    case STRING_TYPE_INFO => "\"\""
-    case CHAR_TYPE_INFO => "'\\0'"
+    case INT_TYPE_INFO                               => "-1"
+    case LONG_TYPE_INFO                              => "-1L"
+    case SHORT_TYPE_INFO                             => "-1"
+    case BYTE_TYPE_INFO                              => "-1"
+    case FLOAT_TYPE_INFO                             => "-1.0f"
+    case DOUBLE_TYPE_INFO                            => "-1.0d"
+    case BOOLEAN_TYPE_INFO                           => "false"
+    case STRING_TYPE_INFO                            => "\"\""
+    case CHAR_TYPE_INFO                              => "'\\0'"
     case SqlTimeTypeInfo.DATE | SqlTimeTypeInfo.TIME => "-1"
-    case SqlTimeTypeInfo.TIMESTAMP => "-1L"
-    case TimeIntervalTypeInfo.INTERVAL_MONTHS => "-1"
-    case TimeIntervalTypeInfo.INTERVAL_MILLIS => "-1L"
+    case SqlTimeTypeInfo.TIMESTAMP                   => "-1L"
+    case TimeIntervalTypeInfo.INTERVAL_MONTHS        => "-1"
+    case TimeIntervalTypeInfo.INTERVAL_MILLIS        => "-1L"
 
     case _ => "null"
   }
 
   def superPrimitive(typeInfo: TypeInformation[_]): String = typeInfo match {
     case _: FractionalTypeInfo[_] => "double"
-    case _ => "long"
+    case _                        => "long"
   }
 
   def qualifyMethod(method: Method): String =
@@ -164,8 +168,9 @@ object CodeGenUtils {
 
   def requireNumeric(genExpr: GeneratedExpression): Unit =
     if (!TypeCheckUtils.isNumeric(genExpr.resultType)) {
-      throw new CodeGenException("Numeric expression type expected, but was " +
-        s"'${genExpr.resultType}'.")
+      throw new CodeGenException(
+        "Numeric expression type expected, but was " +
+          s"'${genExpr.resultType}'.")
     }
 
   def requireComparable(genExpr: GeneratedExpression): Unit =
@@ -213,14 +218,9 @@ object CodeGenUtils {
   def isReference(genExpr: GeneratedExpression): Boolean = isReference(genExpr.resultType)
 
   def isReference(typeInfo: TypeInformation[_]): Boolean = typeInfo match {
-    case INT_TYPE_INFO
-         | LONG_TYPE_INFO
-         | SHORT_TYPE_INFO
-         | BYTE_TYPE_INFO
-         | FLOAT_TYPE_INFO
-         | DOUBLE_TYPE_INFO
-         | BOOLEAN_TYPE_INFO
-         | CHAR_TYPE_INFO => false
+    case INT_TYPE_INFO | LONG_TYPE_INFO | SHORT_TYPE_INFO | BYTE_TYPE_INFO | FLOAT_TYPE_INFO |
+        DOUBLE_TYPE_INFO | BOOLEAN_TYPE_INFO | CHAR_TYPE_INFO =>
+      false
     case _ => true
   }
 
@@ -261,8 +261,7 @@ object CodeGenUtils {
     val field = TypeExtractor.getDeclaredField(clazz, fieldName)
     if (field.isAccessible) {
       ObjectFieldAccessor(field)
-    }
-    else {
+    } else {
       ObjectPrivateFieldAccessor(field)
     }
   }
@@ -271,32 +270,31 @@ object CodeGenUtils {
 
   def reflectiveFieldReadAccess(fieldTerm: String, field: Field, objectTerm: String): String =
     field.getType match {
-      case java.lang.Integer.TYPE => s"$fieldTerm.getInt($objectTerm)"
-      case java.lang.Long.TYPE => s"$fieldTerm.getLong($objectTerm)"
-      case java.lang.Short.TYPE => s"$fieldTerm.getShort($objectTerm)"
-      case java.lang.Byte.TYPE => s"$fieldTerm.getByte($objectTerm)"
-      case java.lang.Float.TYPE => s"$fieldTerm.getFloat($objectTerm)"
-      case java.lang.Double.TYPE => s"$fieldTerm.getDouble($objectTerm)"
-      case java.lang.Boolean.TYPE => s"$fieldTerm.getBoolean($objectTerm)"
+      case java.lang.Integer.TYPE   => s"$fieldTerm.getInt($objectTerm)"
+      case java.lang.Long.TYPE      => s"$fieldTerm.getLong($objectTerm)"
+      case java.lang.Short.TYPE     => s"$fieldTerm.getShort($objectTerm)"
+      case java.lang.Byte.TYPE      => s"$fieldTerm.getByte($objectTerm)"
+      case java.lang.Float.TYPE     => s"$fieldTerm.getFloat($objectTerm)"
+      case java.lang.Double.TYPE    => s"$fieldTerm.getDouble($objectTerm)"
+      case java.lang.Boolean.TYPE   => s"$fieldTerm.getBoolean($objectTerm)"
       case java.lang.Character.TYPE => s"$fieldTerm.getChar($objectTerm)"
-      case _ => s"(${field.getType.getCanonicalName}) $fieldTerm.get($objectTerm)"
+      case _                        => s"(${field.getType.getCanonicalName}) $fieldTerm.get($objectTerm)"
     }
 
   def reflectiveFieldWriteAccess(
       fieldTerm: String,
       field: Field,
       objectTerm: String,
-      valueTerm: String)
-    : String =
+      valueTerm: String): String =
     field.getType match {
-      case java.lang.Integer.TYPE => s"$fieldTerm.setInt($objectTerm, $valueTerm)"
-      case java.lang.Long.TYPE => s"$fieldTerm.setLong($objectTerm, $valueTerm)"
-      case java.lang.Short.TYPE => s"$fieldTerm.setShort($objectTerm, $valueTerm)"
-      case java.lang.Byte.TYPE => s"$fieldTerm.setByte($objectTerm, $valueTerm)"
-      case java.lang.Float.TYPE => s"$fieldTerm.setFloat($objectTerm, $valueTerm)"
-      case java.lang.Double.TYPE => s"$fieldTerm.setDouble($objectTerm, $valueTerm)"
-      case java.lang.Boolean.TYPE => s"$fieldTerm.setBoolean($objectTerm, $valueTerm)"
+      case java.lang.Integer.TYPE   => s"$fieldTerm.setInt($objectTerm, $valueTerm)"
+      case java.lang.Long.TYPE      => s"$fieldTerm.setLong($objectTerm, $valueTerm)"
+      case java.lang.Short.TYPE     => s"$fieldTerm.setShort($objectTerm, $valueTerm)"
+      case java.lang.Byte.TYPE      => s"$fieldTerm.setByte($objectTerm, $valueTerm)"
+      case java.lang.Float.TYPE     => s"$fieldTerm.setFloat($objectTerm, $valueTerm)"
+      case java.lang.Double.TYPE    => s"$fieldTerm.setDouble($objectTerm, $valueTerm)"
+      case java.lang.Boolean.TYPE   => s"$fieldTerm.setBoolean($objectTerm, $valueTerm)"
       case java.lang.Character.TYPE => s"$fieldTerm.setChar($objectTerm, $valueTerm)"
-      case _ => s"$fieldTerm.set($objectTerm, $valueTerm)"
+      case _                        => s"$fieldTerm.set($objectTerm, $valueTerm)"
     }
 }

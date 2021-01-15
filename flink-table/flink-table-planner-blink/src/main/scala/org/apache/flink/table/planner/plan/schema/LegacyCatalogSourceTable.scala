@@ -23,7 +23,11 @@ import org.apache.flink.table.api.TableColumn.ComputedColumn
 import org.apache.flink.table.api.config.TableConfigOptions
 import org.apache.flink.table.api.{TableException, ValidationException}
 import org.apache.flink.table.catalog.CatalogTable
-import org.apache.flink.table.factories.{TableFactoryUtil, TableSourceFactory, TableSourceFactoryContextImpl}
+import org.apache.flink.table.factories.{
+  TableFactoryUtil,
+  TableSourceFactory,
+  TableSourceFactoryContextImpl
+}
 import org.apache.flink.table.planner.JMap
 import org.apache.flink.table.planner.calcite.{FlinkContext, FlinkRelBuilder, FlinkTypeFactory}
 import org.apache.flink.table.planner.catalog.CatalogSchemaTable
@@ -57,27 +61,22 @@ class LegacyCatalogSourceTable[T](
     relOptSchema: RelOptSchema,
     names: JList[String],
     rowType: RelDataType,
-  val schemaTable: CatalogSchemaTable,
-  val catalogTable: CatalogTable)
-  extends FlinkPreparingTableBase(relOptSchema, rowType, names, schemaTable.getStatistic) {
+    val schemaTable: CatalogSchemaTable,
+    val catalogTable: CatalogTable)
+    extends FlinkPreparingTableBase(relOptSchema, rowType, names, schemaTable.getStatistic) {
 
   lazy val columnExprs: Map[String, String] = {
-    catalogTable.getSchema
-      .getTableColumns
-      .flatMap {
-        case computedColumn: ComputedColumn =>
-          Some((computedColumn.getName, computedColumn.getExpression))
-        case _ =>
-          None
-      }
-      .toMap
+    catalogTable.getSchema.getTableColumns.flatMap {
+      case computedColumn: ComputedColumn =>
+        Some((computedColumn.getName, computedColumn.getExpression))
+      case _ =>
+        None
+    }.toMap
   }
 
   override def toRel(context: RelOptTable.ToRelContext): RelNode = {
     val cluster = context.getCluster
-    val flinkContext = cluster
-      .getPlanner
-      .getContext
+    val flinkContext = cluster.getPlanner.getContext
       .unwrap(classOf[FlinkContext])
     val typeFactory = cluster.getTypeFactory.asInstanceOf[FlinkTypeFactory]
 
@@ -86,14 +85,13 @@ class LegacyCatalogSourceTable[T](
     val hintedOptions = FlinkHints.getHintedOptions(context.getTableHints)
     if (hintedOptions.nonEmpty
       && !conf.getBoolean(TableConfigOptions.TABLE_DYNAMIC_TABLE_OPTIONS_ENABLED)) {
-      throw new ValidationException(s"${FlinkHints.HINT_NAME_OPTIONS} hint is allowed only when "
-        + s"${TableConfigOptions.TABLE_DYNAMIC_TABLE_OPTIONS_ENABLED.key} "
-        + s"is set to true")
+      throw new ValidationException(
+        s"${FlinkHints.HINT_NAME_OPTIONS} hint is allowed only when "
+          + s"${TableConfigOptions.TABLE_DYNAMIC_TABLE_OPTIONS_ENABLED.key} "
+          + s"is set to true")
     }
 
-    val tableSource = findAndCreateLegacyTableSource(
-      hintedOptions,
-      conf)
+    val tableSource = findAndCreateLegacyTableSource(hintedOptions, conf)
 
     // erase time indicator types in the rowType
     val actualRowType = eraseTimeIndicator(rowType, typeFactory, tableSource)
@@ -111,8 +109,7 @@ class LegacyCatalogSourceTable[T](
     // 1. push table scan
 
     // Get row type of physical fields.
-    val physicalFields = getRowType
-      .getFieldList
+    val physicalFields = getRowType.getFieldList
       .filter(f => !columnExprs.contains(f.getName))
       .map(f => f.getIndex)
       .toArray
@@ -127,21 +124,19 @@ class LegacyCatalogSourceTable[T](
     // 2. push computed column project
     val fieldNames = actualRowType.getFieldNames.asScala
     if (columnExprs.nonEmpty) {
-      val fieldExprs = fieldNames
-        .map { name =>
-          if (columnExprs.contains(name)) {
-            columnExprs(name)
-          } else {
-            s"`$name`"
-          }
-        }.toArray
+      val fieldExprs = fieldNames.map { name =>
+        if (columnExprs.contains(name)) {
+          columnExprs(name)
+        } else {
+          s"`$name`"
+        }
+      }.toArray
       val rexNodes = toRexFactory.create(newRelTable.getRowType).convertToRexNodes(fieldExprs)
       relBuilder.projectNamed(rexNodes.toList, fieldNames, true)
     }
 
     // 3. push watermark assigner
-    val watermarkSpec = catalogTable
-      .getSchema
+    val watermarkSpec = catalogTable.getSchema
       // we only support single watermark currently
       .getWatermarkSpecs.asScala.headOption
     if (schemaTable.isStreamingMode && watermarkSpec.nonEmpty) {
@@ -173,21 +168,23 @@ class LegacyCatalogSourceTable[T](
       conf: ReadableConfig): TableSource[T] = {
     val tableFactoryOpt = schemaTable.getCatalog.getTableFactory
     val tableToFind = if (hintedOptions.nonEmpty) {
-      catalogTable.copy(
-        FlinkHints.mergeTableOptions(
-          hintedOptions,
-          catalogTable.getProperties))
+      catalogTable.copy(FlinkHints.mergeTableOptions(hintedOptions, catalogTable.getProperties))
     } else {
       catalogTable
     }
     val context = new TableSourceFactoryContextImpl(
-      schemaTable.getTableIdentifier, tableToFind, conf, schemaTable.isTemporary)
+      schemaTable.getTableIdentifier,
+      tableToFind,
+      conf,
+      schemaTable.isTemporary)
     val tableSource = if (tableFactoryOpt.isPresent) {
       tableFactoryOpt.get() match {
         case tableSourceFactory: TableSourceFactory[_] =>
           tableSourceFactory.createTableSource(context)
-        case _ => throw new ValidationException("Cannot query a sink-only table. "
-          + "TableFactory provided by catalog must implement TableSourceFactory")
+        case _ =>
+          throw new ValidationException(
+            "Cannot query a sink-only table. "
+              + "TableFactory provided by catalog must implement TableSourceFactory")
       }
     } else {
       TableFactoryUtil.findAndCreateTableSource(context)
@@ -198,12 +195,14 @@ class LegacyCatalogSourceTable[T](
     tableSource match {
       case ts: StreamTableSource[_] =>
         if (!schemaTable.isStreamingMode && !ts.isBounded) {
-          throw new ValidationException("Cannot query on an unbounded source in batch mode, " +
-            s"but '$tableName' is unbounded.")
+          throw new ValidationException(
+            "Cannot query on an unbounded source in batch mode, " +
+              s"but '$tableName' is unbounded.")
         }
       case _ =>
-        throw new ValidationException("Catalog tables only support "
-          + "StreamTableSource and InputFormatTableSource")
+        throw new ValidationException(
+          "Catalog tables only support "
+            + "StreamTableSource and InputFormatTableSource")
     }
 
     tableSource.asInstanceOf[TableSource[T]]

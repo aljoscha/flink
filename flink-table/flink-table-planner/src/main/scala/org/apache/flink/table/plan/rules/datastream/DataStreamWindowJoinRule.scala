@@ -32,11 +32,11 @@ import org.apache.flink.table.runtime.join.WindowJoinUtil
 import scala.collection.JavaConverters._
 
 class DataStreamWindowJoinRule
-  extends ConverterRule(
-    classOf[FlinkLogicalJoin],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.DATASTREAM,
-    "DataStreamWindowJoinRule") {
+    extends ConverterRule(
+      classOf[FlinkLogicalJoin],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.DATASTREAM,
+      "DataStreamWindowJoinRule") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val join: FlinkLogicalJoin = call.rel(0).asInstanceOf[FlinkLogicalJoin]

@@ -31,8 +31,7 @@ class TableSinkTest extends TableTestBase {
 
   @Test
   def testInsertMismatchTypeForEmptyChar(): Unit = {
-    util.addTable(
-      s"""
+    util.addTable(s"""
          |CREATE TABLE my_sink (
          |  name STRING,
          |  email STRING,
@@ -44,14 +43,13 @@ class TableSinkTest extends TableTestBase {
     thrown.expect(classOf[ValidationException])
     thrown.expectMessage(
       "Query schema: [a: INT, EXPR$1: CHAR(0) NOT NULL, EXPR$2: CHAR(0) NOT NULL]\n" +
-      "Sink schema:  [name: STRING, email: STRING, message_offset: BIGINT]")
+        "Sink schema:  [name: STRING, email: STRING, message_offset: BIGINT]")
     util.verifyExecPlanInsert("INSERT INTO my_sink SELECT a, '', '' FROM MyTable")
   }
 
   @Test
   def testExceptionForAppendSink(): Unit = {
-    util.addTable(
-      s"""
+    util.addTable(s"""
          |CREATE TABLE appendSink (
          |  `a` BIGINT
          |) WITH (
@@ -60,20 +58,19 @@ class TableSinkTest extends TableTestBase {
          |)
          |""".stripMargin)
     val stmtSet = util.tableEnv.createStatementSet()
-    stmtSet.addInsertSql(
-      "INSERT INTO appendSink SELECT COUNT(*) AS cnt FROM MyTable GROUP BY a")
+    stmtSet.addInsertSql("INSERT INTO appendSink SELECT COUNT(*) AS cnt FROM MyTable GROUP BY a")
 
     thrown.expect(classOf[TableException])
-    thrown.expectMessage("Table sink 'default_catalog.default_database.appendSink' doesn't " +
-      "support consuming update changes which is produced by node " +
-      "GroupAggregate(groupBy=[a], select=[a, COUNT(*) AS cnt])")
+    thrown.expectMessage(
+      "Table sink 'default_catalog.default_database.appendSink' doesn't " +
+        "support consuming update changes which is produced by node " +
+        "GroupAggregate(groupBy=[a], select=[a, COUNT(*) AS cnt])")
     util.verifyRelPlan(stmtSet, ExplainDetail.CHANGELOG_MODE)
   }
 
   @Test
   def testExceptionForOverAggregate(): Unit = {
-    util.addTable(
-      s"""
+    util.addTable(s"""
          |CREATE TABLE retractSink1 (
          |  `cnt` BIGINT
          |) WITH (
@@ -81,8 +78,7 @@ class TableSinkTest extends TableTestBase {
          |  'sink-insert-only' = 'false'
          |)
          |""".stripMargin)
-    util.addTable(
-      s"""
+    util.addTable(s"""
          |CREATE TABLE retractSink2 (
          |  `cnt` BIGINT,
          |  `total` BIGINT
@@ -100,15 +96,15 @@ class TableSinkTest extends TableTestBase {
       "INSERT INTO retractSink2 SELECT cnt, SUM(cnt) OVER (ORDER BY PROCTIME()) FROM TempTable")
 
     thrown.expect(classOf[TableException])
-    thrown.expectMessage("OverAggregate doesn't support consuming update changes " +
-      "which is produced by node GroupAggregate(groupBy=[a], select=[a, COUNT(*) AS cnt])")
+    thrown.expectMessage(
+      "OverAggregate doesn't support consuming update changes " +
+        "which is produced by node GroupAggregate(groupBy=[a], select=[a, COUNT(*) AS cnt])")
     util.verifyRelPlan(stmtSet, ExplainDetail.CHANGELOG_MODE)
   }
 
   @Test
   def testAppendSink(): Unit = {
-    util.addTable(
-      s"""
+    util.addTable(s"""
          |CREATE TABLE appendSink (
          |  `a` BIGINT,
          |  `b` STRING
@@ -124,8 +120,7 @@ class TableSinkTest extends TableTestBase {
 
   @Test
   def testRetractSink1(): Unit = {
-    util.addTable(
-      s"""
+    util.addTable(s"""
          |CREATE TABLE retractSink (
          |  `a` INT,
          |  `cnt` BIGINT
@@ -142,8 +137,7 @@ class TableSinkTest extends TableTestBase {
 
   @Test
   def testRetractSink2(): Unit = {
-    util.addTable(
-      s"""
+    util.addTable(s"""
          |CREATE TABLE retractSink (
          |  `cnt` BIGINT,
          |  `a` BIGINT
@@ -166,8 +160,7 @@ class TableSinkTest extends TableTestBase {
 
   @Test
   def testUpsertSink(): Unit = {
-    util.addTable(
-      s"""
+    util.addTable(s"""
          |CREATE TABLE upsertSink (
          |  `a` INT,
          |  `cnt` BIGINT,
@@ -178,15 +171,13 @@ class TableSinkTest extends TableTestBase {
          |)
          |""".stripMargin)
     val stmtSet = util.tableEnv.createStatementSet()
-    stmtSet.addInsertSql(
-      "INSERT INTO upsertSink SELECT a, COUNT(*) AS cnt FROM MyTable GROUP BY a")
+    stmtSet.addInsertSql("INSERT INTO upsertSink SELECT a, COUNT(*) AS cnt FROM MyTable GROUP BY a")
     util.verifyRelPlan(stmtSet, ExplainDetail.CHANGELOG_MODE)
   }
 
   @Test
   def testUpsertSinkWithFilter(): Unit = {
-    util.addTable(
-      s"""
+    util.addTable(s"""
          |CREATE TABLE upsertSink (
          |  `a` INT,
          |  `cnt` BIGINT,
@@ -211,8 +202,7 @@ class TableSinkTest extends TableTestBase {
 
   @Test
   def testRetractAndUpsertSink(): Unit = {
-    util.addTable(
-      s"""
+    util.addTable(s"""
          |CREATE TABLE retractSink (
          |  `b` BIGINT,
          |  `cnt` BIGINT
@@ -221,8 +211,7 @@ class TableSinkTest extends TableTestBase {
          |  'sink-insert-only' = 'false'
          |)
          |""".stripMargin)
-    util.addTable(
-      s"""
+    util.addTable(s"""
          |CREATE TABLE upsertSink (
          |  `b` BIGINT,
          |  `cnt` BIGINT,
@@ -237,8 +226,7 @@ class TableSinkTest extends TableTestBase {
     util.tableEnv.createTemporaryView("TempTable", table)
 
     val stmtSet = util.tableEnv.createStatementSet()
-    stmtSet.addInsertSql(
-      "INSERT INTO retractSink SELECT b, cnt FROM TempTable WHERE b < 4")
+    stmtSet.addInsertSql("INSERT INTO retractSink SELECT b, cnt FROM TempTable WHERE b < 4")
     stmtSet.addInsertSql(
       "INSERT INTO upsertSink SELECT b, cnt FROM TempTable WHERE b >= 4 AND b < 6")
     stmtSet.addInsertSql(
@@ -252,8 +240,7 @@ class TableSinkTest extends TableTestBase {
   def testAppendUpsertAndRetractSink(): Unit = {
     util.addDataStream[(Int, Long, String)]("MyTable2", 'd, 'e, 'f)
     util.addDataStream[(Int, Long, String)]("MyTable3", 'i, 'j, 'k)
-    util.addTable(
-      s"""
+    util.addTable(s"""
          |CREATE TABLE appendSink (
          |  `a` INT,
          |  `b` BIGINT
@@ -263,15 +250,14 @@ class TableSinkTest extends TableTestBase {
          |)
          |""".stripMargin)
 
-    val table = util.tableEnv.sqlQuery(
-      "SELECT a, b FROM MyTable UNION ALL SELECT d, e FROM MyTable2")
+    val table =
+      util.tableEnv.sqlQuery("SELECT a, b FROM MyTable UNION ALL SELECT d, e FROM MyTable2")
     util.tableEnv.createTemporaryView("TempTable", table)
     val stmtSet = util.tableEnv.createStatementSet()
 
     stmtSet.addInsertSql("INSERT INTO appendSink SELECT * FROM TempTable")
 
-    util.addTable(
-      s"""
+    util.addTable(s"""
          |CREATE TABLE retractSink (
          |  `total_sum` INT
          |) WITH (
@@ -279,13 +265,12 @@ class TableSinkTest extends TableTestBase {
          |  'sink-insert-only' = 'false'
          |)
          |""".stripMargin)
-    val table1 = util.tableEnv.sqlQuery(
-      "SELECT a, b FROM TempTable UNION ALL SELECT i, j FROM MyTable3")
+    val table1 =
+      util.tableEnv.sqlQuery("SELECT a, b FROM TempTable UNION ALL SELECT i, j FROM MyTable3")
     util.tableEnv.createTemporaryView("TempTable1", table1)
     stmtSet.addInsertSql("INSERT INTO retractSink SELECT SUM(a) AS total_sum FROM TempTable1")
 
-    util.addTable(
-      s"""
+    util.addTable(s"""
          |CREATE TABLE upsertSink (
          |  `a` INT,
          |  `total_min` BIGINT,
@@ -304,8 +289,7 @@ class TableSinkTest extends TableTestBase {
   @Test
   def testExceptionForWritingVirtualMetadataColumn(): Unit = {
     // test reordering, skipping, casting of (virtual) metadata columns
-    util.addTable(
-      s"""
+    util.addTable(s"""
          |CREATE TABLE MetadataTable (
          |  `a` INT,
          |  `m_3` INT METADATA FROM 'metadata_3' VIRTUAL,
@@ -332,7 +316,7 @@ class TableSinkTest extends TableTestBase {
     thrown.expect(classOf[ValidationException])
     thrown.expectMessage(
       "Query schema: [a: INT, m_3: INT, m_2: INT, b: BIGINT, c: INT, metadata_1: STRING]\n" +
-      "Sink schema:  [a: INT, m_2: INT, b: BIGINT, c: INT, metadata_1: STRING]")
+        "Sink schema:  [a: INT, m_2: INT, b: BIGINT, c: INT, metadata_1: STRING]")
 
     util.verifyRelPlan(stmtSet)
   }
@@ -340,8 +324,7 @@ class TableSinkTest extends TableTestBase {
   @Test
   def testExceptionForWritingInvalidMetadataColumn(): Unit = {
     // test casting of metadata columns
-    util.addTable(
-      s"""
+    util.addTable(s"""
          |CREATE TABLE MetadataTable (
          |  `a` INT,
          |  `metadata_1` TIMESTAMP(3) METADATA
@@ -362,8 +345,8 @@ class TableSinkTest extends TableTestBase {
     thrown.expect(classOf[ValidationException])
     thrown.expectMessage(
       "Invalid data type for metadata column 'metadata_1' of table " +
-      "'default_catalog.default_database.MetadataTable'. The column cannot be declared as " +
-      "'TIMESTAMP(3)' because the type must be castable to metadata type 'BOOLEAN'.")
+        "'default_catalog.default_database.MetadataTable'. The column cannot be declared as " +
+        "'TIMESTAMP(3)' because the type must be castable to metadata type 'BOOLEAN'.")
 
     util.verifyRelPlan(stmtSet)
   }
@@ -371,8 +354,7 @@ class TableSinkTest extends TableTestBase {
   @Test
   def testMetadataColumn(): Unit = {
     // test reordering, skipping, casting of (virtual) metadata columns
-    util.addTable(
-      s"""
+    util.addTable(s"""
          |CREATE TABLE MetadataTable (
          |  `a` INT,
          |  `m_3` INT METADATA FROM 'metadata_3' VIRTUAL,

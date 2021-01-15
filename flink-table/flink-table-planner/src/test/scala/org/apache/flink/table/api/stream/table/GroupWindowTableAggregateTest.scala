@@ -21,7 +21,11 @@ package org.apache.flink.table.api.stream.table
 import org.apache.flink.api.scala._
 import org.apache.flink.table.api._
 import org.apache.flink.table.utils.TableTestUtil._
-import org.apache.flink.table.utils.{EmptyTableAggFunc, EmptyTableAggFuncWithIntResultType, TableTestBase}
+import org.apache.flink.table.utils.{
+  EmptyTableAggFunc,
+  EmptyTableAggFuncWithIntResultType,
+  TableTestBase
+}
 
 import org.junit.Test
 
@@ -51,22 +55,14 @@ class GroupWindowTableAggregateTest extends TableTestBase {
           "DataStreamCalc",
           unaryNode(
             "DataStreamGroupWindowTableAggregate",
-            unaryNode(
-              "DataStreamCalc",
-              streamTableNode(table),
-              term("select", "a", "b", "c", "e")
-            ),
+            unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "b", "c", "e")),
             term("groupBy", "c"),
             term("window", "TumblingGroupWindow('w1, 'e, 50.millis)"),
-            term("select", "c", "EmptyTableAggFunc(a, b) AS (f0, f1)", "proctime('w1) AS EXPR$0")
-          ),
-          term("select", "EXPR$0 AS proctime", "f0")
-        ),
+            term("select", "c", "EmptyTableAggFunc(a, b) AS (f0, f1)", "proctime('w1) AS EXPR$0")),
+          term("select", "EXPR$0 AS proctime", "f0")),
         term("window", "SlidingGroupWindow('w2, 'proctime, 20.millis, 10.millis)"),
-        term("select", "EmptyTableAggFunc(f0) AS (f0, f1)", "start('w2) AS EXPR$0")
-      ),
-      term("select", "EXPR$0", "f1")
-    )
+        term("select", "EmptyTableAggFunc(f0) AS (f0, f1)", "start('w2) AS EXPR$0")),
+      term("select", "EXPR$0", "f1"))
     util.verifyTable(windowedTable, expected)
   }
 
@@ -87,14 +83,11 @@ class GroupWindowTableAggregateTest extends TableTestBase {
           unaryNode(
             "DataStreamCalc",
             streamTableNode(table),
-            term("select", "a", "b", "e", "MOD(b, 5) AS bb")
-          ),
+            term("select", "a", "b", "e", "MOD(b, 5) AS bb")),
           term("groupBy", "bb"),
           term("window", "TumblingGroupWindow('w1, 'e, 50.millis)"),
-          term("select", "bb", "EmptyTableAggFunc(a, b) AS (f0, f1)", "proctime('w1) AS EXPR$0")
-        ),
-        term("select", "PROCTIME(EXPR$0) AS proctime", "bb", "+(f0, 1) AS _c2", "f1 AS y")
-      )
+          term("select", "bb", "EmptyTableAggFunc(a, b) AS (f0, f1)", "proctime('w1) AS EXPR$0")),
+        term("select", "PROCTIME(EXPR$0) AS proctime", "bb", "+(f0, 1) AS _c2", "f1 AS y"))
     util.verifyTable(windowedTable, expected)
   }
 
@@ -109,15 +102,10 @@ class GroupWindowTableAggregateTest extends TableTestBase {
     val expected =
       unaryNode(
         "DataStreamGroupWindowTableAggregate",
-        unaryNode(
-          "DataStreamCalc",
-          streamTableNode(table),
-          term("select", "a", "b", "c", "e")
-        ),
+        unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "b", "c", "e")),
         term("groupBy", "c"),
         term("window", "TumblingGroupWindow('w, 'e, 2)"),
-        term("select",  "c", "EmptyTableAggFunc(a, b) AS (f0, f1)")
-      )
+        term("select", "c", "EmptyTableAggFunc(a, b) AS (f0, f1)"))
 
     util.verifyTable(windowedTable, expected)
   }
@@ -133,15 +121,10 @@ class GroupWindowTableAggregateTest extends TableTestBase {
     val expected =
       unaryNode(
         "DataStreamGroupWindowTableAggregate",
-        unaryNode(
-          "DataStreamCalc",
-          streamTableNode(table),
-          term("select", "a", "b", "c", "d")
-        ),
+        unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "b", "c", "d")),
         term("groupBy", "c"),
         term("window", "TumblingGroupWindow('w, 'd, 5.millis)"),
-        term("select",  "c", "EmptyTableAggFunc(a, b) AS (f0, f1)")
-      )
+        term("select", "c", "EmptyTableAggFunc(a, b) AS (f0, f1)"))
 
     util.verifyTable(windowedTable, expected)
   }
@@ -159,17 +142,11 @@ class GroupWindowTableAggregateTest extends TableTestBase {
         "DataStreamCalc",
         unaryNode(
           "DataStreamGroupWindowTableAggregate",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(table),
-            term("select", "a", "b", "c", "e")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "b", "c", "e")),
           term("groupBy", "c"),
           term("window", "SlidingGroupWindow('w, 'e, 50.millis, 50.millis)"),
-          term("select",  "c", "EmptyTableAggFunc(a, b) AS (f0, f1)", "proctime('w) AS EXPR$0")
-        ),
-        term("select", "PROCTIME(EXPR$0) AS proctime", "c", "f0", "+(f1, 1) AS _c3")
-      )
+          term("select", "c", "EmptyTableAggFunc(a, b) AS (f0, f1)", "proctime('w) AS EXPR$0")),
+        term("select", "PROCTIME(EXPR$0) AS proctime", "c", "f0", "+(f1, 1) AS _c3"))
 
     util.verifyTable(windowedTable, expected)
   }
@@ -185,15 +162,10 @@ class GroupWindowTableAggregateTest extends TableTestBase {
     val expected =
       unaryNode(
         "DataStreamGroupWindowTableAggregate",
-        unaryNode(
-          "DataStreamCalc",
-          streamTableNode(table),
-          term("select", "a", "b", "c", "e")
-        ),
+        unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "b", "c", "e")),
         term("groupBy", "c"),
         term("window", "SlidingGroupWindow('w, 'e, 2, 1)"),
-        term("select",  "c", "EmptyTableAggFunc(a, b) AS (f0, f1)")
-      )
+        term("select", "c", "EmptyTableAggFunc(a, b) AS (f0, f1)"))
 
     util.verifyTable(windowedTable, expected)
   }
@@ -209,15 +181,10 @@ class GroupWindowTableAggregateTest extends TableTestBase {
     val expected =
       unaryNode(
         "DataStreamGroupWindowTableAggregate",
-        unaryNode(
-          "DataStreamCalc",
-          streamTableNode(table),
-          term("select", "a", "b", "c", "d")
-        ),
+        unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "b", "c", "d")),
         term("groupBy", "c"),
         term("window", "SlidingGroupWindow('w, 'd, 8.millis, 10.millis)"),
-        term("select",  "c", "EmptyTableAggFunc(a, b) AS (f0, f1)")
-      )
+        term("select", "c", "EmptyTableAggFunc(a, b) AS (f0, f1)"))
 
     util.verifyTable(windowedTable, expected)
   }
@@ -233,15 +200,10 @@ class GroupWindowTableAggregateTest extends TableTestBase {
     val expected =
       unaryNode(
         "DataStreamGroupWindowTableAggregate",
-        unaryNode(
-          "DataStreamCalc",
-          streamTableNode(table),
-          term("select", "a", "b", "c", "d")
-        ),
+        unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "b", "c", "d")),
         term("groupBy", "c"),
         term("window", "SessionGroupWindow('w, 'd, 7.millis)"),
-        term("select",  "c", "EmptyTableAggFunc(a, b) AS (f0, f1)")
-      )
+        term("select", "c", "EmptyTableAggFunc(a, b) AS (f0, f1)"))
 
     util.verifyTable(windowedTable, expected)
   }
@@ -257,14 +219,9 @@ class GroupWindowTableAggregateTest extends TableTestBase {
     val expected =
       unaryNode(
         "DataStreamGroupWindowTableAggregate",
-        unaryNode(
-          "DataStreamCalc",
-          streamTableNode(table),
-          term("select", "a", "b", "e")
-        ),
+        unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "b", "e")),
         term("window", "TumblingGroupWindow('w, 'e, 50.millis)"),
-        term("select",  "EmptyTableAggFunc(a, b) AS (f0, f1)")
-      )
+        term("select", "EmptyTableAggFunc(a, b) AS (f0, f1)"))
 
     util.verifyTable(windowedTable, expected)
   }
@@ -280,14 +237,9 @@ class GroupWindowTableAggregateTest extends TableTestBase {
     val expected =
       unaryNode(
         "DataStreamGroupWindowTableAggregate",
-        unaryNode(
-          "DataStreamCalc",
-          streamTableNode(table),
-          term("select", "a", "b", "e")
-        ),
+        unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "b", "e")),
         term("window", "TumblingGroupWindow('w, 'e, 2)"),
-        term("select",  "EmptyTableAggFunc(a, b) AS (f0, f1)")
-      )
+        term("select", "EmptyTableAggFunc(a, b) AS (f0, f1)"))
 
     util.verifyTable(windowedTable, expected)
   }
@@ -303,15 +255,9 @@ class GroupWindowTableAggregateTest extends TableTestBase {
     val expected =
       unaryNode(
         "DataStreamGroupWindowTableAggregate",
-        unaryNode(
-          "DataStreamCalc",
-          streamTableNode(table),
-          term("select", "a", "b", "d")
-        ),
+        unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "b", "d")),
         term("window", "TumblingGroupWindow('w, 'd, 5.millis)"),
-        term("select",  "EmptyTableAggFunc(a, b) AS (f0, f1)")
-      )
-
+        term("select", "EmptyTableAggFunc(a, b) AS (f0, f1)"))
 
     util.verifyTable(windowedTable, expected)
   }
@@ -327,14 +273,9 @@ class GroupWindowTableAggregateTest extends TableTestBase {
     val expected =
       unaryNode(
         "DataStreamGroupWindowTableAggregate",
-        unaryNode(
-          "DataStreamCalc",
-          streamTableNode(table),
-          term("select", "a", "b", "e")
-        ),
+        unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "b", "e")),
         term("window", "SlidingGroupWindow('w, 'e, 50.millis, 50.millis)"),
-        term("select",  "EmptyTableAggFunc(a, b) AS (f0, f1)")
-      )
+        term("select", "EmptyTableAggFunc(a, b) AS (f0, f1)"))
 
     util.verifyTable(windowedTable, expected)
   }
@@ -350,14 +291,9 @@ class GroupWindowTableAggregateTest extends TableTestBase {
     val expected =
       unaryNode(
         "DataStreamGroupWindowTableAggregate",
-        unaryNode(
-          "DataStreamCalc",
-          streamTableNode(table),
-          term("select", "a", "b", "e")
-        ),
+        unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "b", "e")),
         term("window", "SlidingGroupWindow('w, 'e, 2, 1)"),
-        term("select",  "EmptyTableAggFunc(a, b) AS (f0, f1)")
-      )
+        term("select", "EmptyTableAggFunc(a, b) AS (f0, f1)"))
 
     util.verifyTable(windowedTable, expected)
   }
@@ -373,14 +309,9 @@ class GroupWindowTableAggregateTest extends TableTestBase {
     val expected =
       unaryNode(
         "DataStreamGroupWindowTableAggregate",
-        unaryNode(
-          "DataStreamCalc",
-          streamTableNode(table),
-          term("select", "a", "b", "d")
-        ),
+        unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "b", "d")),
         term("window", "SlidingGroupWindow('w, 'd, 8.millis, 10.millis)"),
-        term("select",  "EmptyTableAggFunc(a, b) AS (f0, f1)")
-      )
+        term("select", "EmptyTableAggFunc(a, b) AS (f0, f1)"))
 
     util.verifyTable(windowedTable, expected)
   }
@@ -396,14 +327,9 @@ class GroupWindowTableAggregateTest extends TableTestBase {
     val expected =
       unaryNode(
         "DataStreamGroupWindowTableAggregate",
-        unaryNode(
-          "DataStreamCalc",
-          streamTableNode(table),
-          term("select", "a", "b", "d")
-        ),
+        unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "b", "d")),
         term("window", "SlidingGroupWindow('w, 'd, 8.millis, 10.millis)"),
-        term("select",  "EmptyTableAggFunc(a, b) AS (f0, f1)")
-      )
+        term("select", "EmptyTableAggFunc(a, b) AS (f0, f1)"))
 
     util.verifyTable(windowedTable, expected)
   }
@@ -419,14 +345,9 @@ class GroupWindowTableAggregateTest extends TableTestBase {
     val expected =
       unaryNode(
         "DataStreamGroupWindowTableAggregate",
-        unaryNode(
-          "DataStreamCalc",
-          streamTableNode(table),
-          term("select", "a", "b", "d")
-        ),
+        unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "b", "d")),
         term("window", "SessionGroupWindow('w, 'd, 7.millis)"),
-        term("select",  "EmptyTableAggFunc(a, b) AS (f0, f1)")
-      )
+        term("select", "EmptyTableAggFunc(a, b) AS (f0, f1)"))
 
     util.verifyTable(windowedTable, expected)
   }
@@ -444,18 +365,16 @@ class GroupWindowTableAggregateTest extends TableTestBase {
         "DataStreamCalc",
         unaryNode(
           "DataStreamGroupWindowTableAggregate",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(table),
-            term("select", "a", "b", "c", "d")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "b", "c", "d")),
           term("groupBy", "c"),
           term("window", "TumblingGroupWindow('w, 'd, 5.millis)"),
-          term("select",
-            "c", "EmptyTableAggFunc(a, b) AS (f0, f1)", "start('w) AS EXPR$0", "end('w) AS EXPR$1")
-        ),
-        term("select", "f0", "+(f1, 1) AS _c1", "EXPR$0", "EXPR$1")
-      )
+          term(
+            "select",
+            "c",
+            "EmptyTableAggFunc(a, b) AS (f0, f1)",
+            "start('w) AS EXPR$0",
+            "end('w) AS EXPR$1")),
+        term("select", "f0", "+(f1, 1) AS _c1", "EXPR$0", "EXPR$1"))
 
     util.verifyTable(windowedTable, expected)
   }
@@ -473,18 +392,16 @@ class GroupWindowTableAggregateTest extends TableTestBase {
         "DataStreamCalc",
         unaryNode(
           "DataStreamGroupWindowTableAggregate",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(table),
-            term("select", "a", "b", "c", "d")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "b", "c", "d")),
           term("groupBy", "c"),
           term("window", "SlidingGroupWindow('w, 'd, 10.millis, 5.millis)"),
-          term("select",
-            "c", "EmptyTableAggFunc(a, b) AS (f0, f1)", "start('w) AS EXPR$0", "end('w) AS EXPR$1")
-        ),
-        term("select", "f0", "+(f1, 1) AS _c1", "EXPR$0", "EXPR$1")
-      )
+          term(
+            "select",
+            "c",
+            "EmptyTableAggFunc(a, b) AS (f0, f1)",
+            "start('w) AS EXPR$0",
+            "end('w) AS EXPR$1")),
+        term("select", "f0", "+(f1, 1) AS _c1", "EXPR$0", "EXPR$1"))
 
     util.verifyTable(windowedTable, expected)
   }
@@ -502,18 +419,16 @@ class GroupWindowTableAggregateTest extends TableTestBase {
         "DataStreamCalc",
         unaryNode(
           "DataStreamGroupWindowTableAggregate",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(table),
-            term("select", "a", "b", "c", "d")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "b", "c", "d")),
           term("groupBy", "c"),
           term("window", "SessionGroupWindow('w, 'd, 3.millis)"),
-          term("select",
-            "c", "EmptyTableAggFunc(a, b) AS (f0, f1)", "end('w) AS EXPR$0", "start('w) AS EXPR$1")
-        ),
-        term("select", "EXPR$0 AS we1", "f0", "+(f1, 1) AS _c2", "EXPR$1", "EXPR$0")
-      )
+          term(
+            "select",
+            "c",
+            "EmptyTableAggFunc(a, b) AS (f0, f1)",
+            "end('w) AS EXPR$0",
+            "start('w) AS EXPR$1")),
+        term("select", "EXPR$0 AS we1", "f0", "+(f1, 1) AS _c2", "EXPR$1", "EXPR$0"))
 
     util.verifyTable(windowedTable, expected)
   }
@@ -534,18 +449,16 @@ class GroupWindowTableAggregateTest extends TableTestBase {
         "DataStreamCalc",
         unaryNode(
           "DataStreamGroupWindowTableAggregate",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(table),
-            term("select", "f0", "f1", "d")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(table), term("select", "f0", "f1", "d")),
           term("groupBy", "f0"),
           term("window", "SessionGroupWindow('w, 'd, 3.millis)"),
-          term("select", "f0", "EmptyTableAggFuncWithIntResultType(f1) AS (f0_0)",
-            "end('w) AS EXPR$0", "start('w) AS EXPR$1")
-        ),
-        term("select", "EXPR$0 AS we1", "f0", "+(f0_0, 1) AS _c2", "EXPR$1", "EXPR$0")
-      )
+          term(
+            "select",
+            "f0",
+            "EmptyTableAggFuncWithIntResultType(f1) AS (f0_0)",
+            "end('w) AS EXPR$0",
+            "start('w) AS EXPR$1")),
+        term("select", "EXPR$0 AS we1", "f0", "+(f0_0, 1) AS _c2", "EXPR$1", "EXPR$0"))
 
     util.verifyTable(windowedTable, expected)
   }
@@ -576,36 +489,23 @@ class GroupWindowTableAggregateTest extends TableTestBase {
           "DataStreamCalc",
           unaryNode(
             "DataStreamGroupWindowTableAggregate",
-            unaryNode(
-              "DataStreamCalc",
-              streamTableNode(table),
-              term("select", "a", "b", "d")
-            ),
+            unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "b", "d")),
             // This window is the 1hr window
             term("window", "SlidingGroupWindow('w1, 'd, 3600000.millis, 3600000.millis)"),
-            term("select", "EmptyTableAggFunc(a, b) AS (f0, f1)")
-          ),
-          term("select", "1 AS a")
-        ),
+            term("select", "EmptyTableAggFunc(a, b) AS (f0, f1)")),
+          term("select", "1 AS a")),
         unaryNode(
           "DataStreamCalc",
           unaryNode(
             "DataStreamGroupWindowTableAggregate",
-            unaryNode(
-              "DataStreamCalc",
-              streamTableNode(table),
-              term("select", "a", "b", "d")
-            ),
+            unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "b", "d")),
             // This window is the 2hr window
             term("window", "SlidingGroupWindow('w1, 'd, 7200000.millis, 3600000.millis)"),
-            term("select", "EmptyTableAggFunc(a, b) AS (f0, f1)")
-          ),
-          term("select", "1 AS b")
-        ),
+            term("select", "EmptyTableAggFunc(a, b) AS (f0, f1)")),
+          term("select", "1 AS b")),
         term("where", "=(a, b)"),
         term("join", "a", "b"),
-        term("joinType", "FullOuterJoin")
-      )
+        term("joinType", "FullOuterJoin"))
     util.verifyTable(joinTable, expected)
   }
 }

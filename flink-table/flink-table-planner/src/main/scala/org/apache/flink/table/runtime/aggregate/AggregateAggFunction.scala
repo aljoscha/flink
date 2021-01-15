@@ -25,17 +25,18 @@ import org.apache.flink.table.util.Logging
 import org.apache.flink.types.Row
 
 /**
-  * Aggregate Function used for the aggregate or table aggregate operator in
-  * [[org.apache.flink.streaming.api.datastream.WindowedStream]].
-  *
-  * @param genAggregations Generated aggregate or table aggregate helper function
-  * @param isTableAggregate Whether it is table aggregate.
-  */
+ * Aggregate Function used for the aggregate or table aggregate operator in
+ * [[org.apache.flink.streaming.api.datastream.WindowedStream]].
+ *
+ * @param genAggregations Generated aggregate or table aggregate helper function
+ * @param isTableAggregate Whether it is table aggregate.
+ */
 class AggregateAggFunction[F <: AggregationsFunction](
     genAggregations: GeneratedAggregationsFunction,
     isTableAggregate: Boolean)
-  extends AggregateFunction[CRow, Row, Row]
-    with Compiler[F] with Logging {
+    extends AggregateFunction[CRow, Row, Row]
+    with Compiler[F]
+    with Logging {
 
   private var function: F = _
 
@@ -77,8 +78,9 @@ class AggregateAggFunction[F <: AggregationsFunction](
   }
 
   def initFunction(): Unit = {
-    LOG.debug(s"Compiling AggregateHelper: $genAggregations.name \n\n " +
-      s"Code:\n$genAggregations.code")
+    LOG.debug(
+      s"Compiling AggregateHelper: $genAggregations.name \n\n " +
+        s"Code:\n$genAggregations.code")
     val clazz = compile(
       Thread.currentThread().getContextClassLoader,
       genAggregations.name,

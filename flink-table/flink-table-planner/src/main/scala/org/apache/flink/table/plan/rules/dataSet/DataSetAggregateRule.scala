@@ -28,11 +28,11 @@ import org.apache.flink.table.plan.nodes.logical.FlinkLogicalAggregate
 import scala.collection.JavaConversions._
 
 class DataSetAggregateRule
-  extends ConverterRule(
-    classOf[FlinkLogicalAggregate],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.DATASET,
-    "DataSetAggregateRule") {
+    extends ConverterRule(
+      classOf[FlinkLogicalAggregate],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.DATASET,
+      "DataSetAggregateRule") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val agg: FlinkLogicalAggregate = call.rel(0).asInstanceOf[FlinkLogicalAggregate]
@@ -63,8 +63,7 @@ class DataSetAggregateRule
       agg.getNamedAggCalls,
       rel.getRowType,
       agg.getInput.getRowType,
-      agg.getGroupSet.toArray
-    )
+      agg.getGroupSet.toArray)
   }
 }
 

@@ -47,7 +47,8 @@ class ColumnIntervalUtilTest {
     assertEquals(Some("1.11"), convertNumberToString(new lang.Double(1.11)))
     assertEquals(Some("1"), convertNumberToString(new BigInt(new BigInteger("1"))))
     assertEquals(Some("1"), convertNumberToString(new BigInteger("1")))
-    assertEquals(Some("1.11"),
+    assertEquals(
+      Some("1.11"),
       convertNumberToString(new BigDecimal(new java.math.BigDecimal("1.11"))))
     assertEquals(Some("1.11"), convertNumberToString(new java.math.BigDecimal("1.11")))
 
@@ -59,34 +60,27 @@ class ColumnIntervalUtilTest {
   def testNegativeValueInterval(): Unit = {
     assertEquals(
       toBigDecimalInterval(ValueInterval(-2, -1, includeLower = true, includeUpper = true)),
-      getNegativeOfValueInterval(ValueInterval(1, 2, includeLower = true, includeUpper = true))
-    )
+      getNegativeOfValueInterval(ValueInterval(1, 2, includeLower = true, includeUpper = true)))
     assertEquals(
       toBigDecimalInterval(ValueInterval(-2, -1, includeLower = true, includeUpper = false)),
-      getNegativeOfValueInterval(ValueInterval(1, 2, includeLower = false, includeUpper = true))
-    )
+      getNegativeOfValueInterval(ValueInterval(1, 2, includeLower = false, includeUpper = true)))
     assertEquals(
       toBigDecimalInterval(RightSemiInfiniteValueInterval(-2, includeLower = true)),
-      getNegativeOfValueInterval(LeftSemiInfiniteValueInterval(2, includeUpper = true))
-    )
+      getNegativeOfValueInterval(LeftSemiInfiniteValueInterval(2, includeUpper = true)))
     assertEquals(
       toBigDecimalInterval(LeftSemiInfiniteValueInterval(2, includeUpper = true)),
-      getNegativeOfValueInterval(RightSemiInfiniteValueInterval(-2, includeLower = true))
-    )
+      getNegativeOfValueInterval(RightSemiInfiniteValueInterval(-2, includeLower = true)))
     assertEquals(
       null,
-      getNegativeOfValueInterval(ValueInterval("1", "2", includeLower = true, includeUpper = true))
-    )
+      getNegativeOfValueInterval(ValueInterval("1", "2", includeLower = true, includeUpper = true)))
     assertEquals(
       null,
       getNegativeOfValueInterval(
-        ValueInterval(new Date(), new Date(), includeLower = true, includeUpper = true))
-    )
+        ValueInterval(new Date(), new Date(), includeLower = true, includeUpper = true)))
     assertEquals(
       toBigDecimalInterval(ValueInterval(-2.2f, -1.1f, includeLower = true, includeUpper = true)),
       getNegativeOfValueInterval(
-        ValueInterval(1.1f, 2.2f, includeLower = true, includeUpper = true))
-    )
+        ValueInterval(1.1f, 2.2f, includeLower = true, includeUpper = true)))
   }
 
   @Test
@@ -95,50 +89,42 @@ class ColumnIntervalUtilTest {
       toBigDecimalInterval(ValueInterval(2, 6, includeLower = true, includeUpper = false)),
       getValueIntervalOfPlus(
         ValueInterval(-1, 2, includeLower = true, includeUpper = false),
-        ValueInterval(3, 4, includeLower = true, includeUpper = true))
-    )
+        ValueInterval(3, 4, includeLower = true, includeUpper = true)))
     assertEquals(
       toBigDecimalInterval(LeftSemiInfiniteValueInterval(5, includeUpper = false)),
       getValueIntervalOfPlus(
         ValueInterval(-1, 2, includeLower = true, includeUpper = false),
-        LeftSemiInfiniteValueInterval(3, includeUpper = true))
-    )
+        LeftSemiInfiniteValueInterval(3, includeUpper = true)))
     assertEquals(
       toBigDecimalInterval(LeftSemiInfiniteValueInterval(2, includeUpper = true)),
       getValueIntervalOfPlus(
         LeftSemiInfiniteValueInterval(-1, includeUpper = true),
-        LeftSemiInfiniteValueInterval(3, includeUpper = true))
-    )
+        LeftSemiInfiniteValueInterval(3, includeUpper = true)))
     assertEquals(
       toBigDecimalInterval(RightSemiInfiniteValueInterval(2, includeLower = false)),
       getValueIntervalOfPlus(
         ValueInterval(-1, 2, includeLower = true, includeUpper = false),
-        RightSemiInfiniteValueInterval(3, includeLower = false))
-    )
+        RightSemiInfiniteValueInterval(3, includeLower = false)))
     assertEquals(
       toBigDecimalInterval(RightSemiInfiniteValueInterval(6, includeLower = false)),
       getValueIntervalOfPlus(
         RightSemiInfiniteValueInterval(3, includeLower = true),
-        RightSemiInfiniteValueInterval(3, includeLower = false))
-    )
+        RightSemiInfiniteValueInterval(3, includeLower = false)))
     assertEquals(
       null,
       getValueIntervalOfPlus(
         EmptyValueInterval,
-        ValueInterval(-1, 2, includeLower = true, includeUpper = false))
-    )
+        ValueInterval(-1, 2, includeLower = true, includeUpper = false)))
     assertEquals(
       null,
       getValueIntervalOfPlus(
         EmptyValueInterval,
-        LeftSemiInfiniteValueInterval(3, includeUpper = true))
-    )
+        LeftSemiInfiniteValueInterval(3, includeUpper = true)))
     assertEquals(
       null,
       getValueIntervalOfPlus(
         EmptyValueInterval,
-        RightSemiInfiniteValueInterval(3, includeLower = false))
-    )
+        RightSemiInfiniteValueInterval(3, includeLower = false)))
   }
 
   @Test
@@ -147,50 +133,43 @@ class ColumnIntervalUtilTest {
       toBigDecimalInterval(ValueInterval(-4, 2, includeLower = false, includeUpper = true)),
       getValueIntervalOfMultiply(
         ValueInterval(-1, 2, includeLower = true, includeUpper = false),
-        ValueInterval(-2, 1, includeLower = true, includeUpper = false))
-    )
+        ValueInterval(-2, 1, includeLower = true, includeUpper = false)))
 
     assertEquals(
       toBigDecimalInterval(ValueInterval(-2, 4, includeLower = false, includeUpper = false)),
       getValueIntervalOfMultiply(
         ValueInterval(-1, 2, includeLower = true, includeUpper = true),
-        ValueInterval(1, 2, includeLower = true, includeUpper = false))
-    )
+        ValueInterval(1, 2, includeLower = true, includeUpper = false)))
 
     assertEquals(
       toBigDecimalInterval(ValueInterval(1, 4, includeLower = false, includeUpper = false)),
       getValueIntervalOfMultiply(
         ValueInterval(-2, -1, includeLower = false, includeUpper = false),
-        ValueInterval(-2, -1, includeLower = false, includeUpper = false))
-    )
+        ValueInterval(-2, -1, includeLower = false, includeUpper = false)))
 
     assertEquals(
       null,
       getValueIntervalOfMultiply(
         ValueInterval(-2, -1, includeLower = false, includeUpper = false),
-        EmptyValueInterval)
-    )
+        EmptyValueInterval))
 
     assertEquals(
       null,
       getValueIntervalOfMultiply(
         ValueInterval(-2, -1, includeLower = false, includeUpper = false),
-        LeftSemiInfiniteValueInterval(1, includeUpper = false))
-    )
+        LeftSemiInfiniteValueInterval(1, includeUpper = false)))
 
     assertEquals(
       null,
       getValueIntervalOfMultiply(
         ValueInterval(-2, -1, includeLower = false, includeUpper = false),
-        RightSemiInfiniteValueInterval(1, includeLower = false))
-    )
+        RightSemiInfiniteValueInterval(1, includeLower = false)))
 
     assertEquals(
       null,
       getValueIntervalOfMultiply(
         LeftSemiInfiniteValueInterval(1, includeUpper = false),
-        RightSemiInfiniteValueInterval(1, includeLower = false))
-    )
+        RightSemiInfiniteValueInterval(1, includeLower = false)))
   }
 
   @Test
@@ -216,22 +195,18 @@ class ColumnIntervalUtilTest {
         rexBuilder.makeCall(
           SqlStdOperatorTable.GREATER_THAN,
           rexBuilder.makeInputRef(typeFactory.createSqlType(SqlTypeName.BIGINT), 1),
-          rexBuilder.makeBigintLiteral(java.math.BigDecimal.valueOf(5))))
-    )
+          rexBuilder.makeBigintLiteral(java.math.BigDecimal.valueOf(5)))))
 
     assertEquals(
       toBigDecimalInterval(ValueInterval.apply(null, 10L, includeUpper = false)),
-      ColumnIntervalUtil.getColumnIntervalWithFilter(
-        None,
-        predicate,
-        1,
-        rexBuilder))
+      ColumnIntervalUtil.getColumnIntervalWithFilter(None, predicate, 1, rexBuilder))
 
     assertEquals(
       toBigDecimalInterval(ValueInterval.apply(3L, 8L, includeLower = false, includeUpper = false)),
       ColumnIntervalUtil.getColumnIntervalWithFilter(
-        Some(toBigDecimalInterval(
-          ValueInterval.apply(3L, 8L, includeLower = false, includeUpper = false))),
+        Some(
+          toBigDecimalInterval(
+            ValueInterval.apply(3L, 8L, includeLower = false, includeUpper = false))),
         predicate,
         1,
         rexBuilder))
@@ -253,11 +228,8 @@ class ColumnIntervalUtilTest {
         rexBuilder))
 
     assertNull(
-      ColumnIntervalUtil.getColumnIntervalWithFilter(
-        None,
-        rexBuilder.makeLiteral(true),
-        0,
-        rexBuilder))
+      ColumnIntervalUtil
+        .getColumnIntervalWithFilter(None, rexBuilder.makeLiteral(true), 0, rexBuilder))
 
     assertEquals(
       ValueInterval.apply(1L, 10L),

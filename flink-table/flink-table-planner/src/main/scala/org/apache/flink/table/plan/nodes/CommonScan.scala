@@ -19,6 +19,6 @@
 package org.apache.flink.table.plan.nodes
 
 /**
-  * Common class for batch and stream scans.
-  */
+ * Common class for batch and stream scans.
+ */
 trait CommonScan[T]

@@ -21,15 +21,16 @@ package org.apache.flink.table.plan.nodes.datastream
 import org.apache.calcite.plan.{RelOptPlanner, RelTrait, RelTraitDef}
 import org.apache.flink.table.plan.nodes.datastream.AccMode.AccMode
 
-/** Tracks if a [[org.apache.calcite.rel.RelNode]] needs to send update and delete changes as
-  * retraction messages.
-  */
+/**
+ * Tracks if a [[org.apache.calcite.rel.RelNode]] needs to send update and delete changes as
+ * retraction messages.
+ */
 class UpdateAsRetractionTrait extends RelTrait {
 
   /**
-    * Defines whether the [[org.apache.calcite.rel.RelNode]] needs to send update and delete
-    * changes as retraction messages.
-    */
+   * Defines whether the [[org.apache.calcite.rel.RelNode]] needs to send update and delete
+   * changes as retraction messages.
+   */
   private var updateAsRetraction: Boolean = false
 
   def this(updateAsRetraction: Boolean) {
@@ -39,7 +40,7 @@ class UpdateAsRetractionTrait extends RelTrait {
 
   def sendsUpdatesAsRetractions: Boolean = updateAsRetraction
 
-  override def register(planner: RelOptPlanner): Unit = { }
+  override def register(planner: RelOptPlanner): Unit = {}
 
   override def getTraitDef: RelTraitDef[_ <: RelTrait] = UpdateAsRetractionTraitDef.INSTANCE
 
@@ -54,8 +55,8 @@ object UpdateAsRetractionTrait {
 }
 
 /**
-  * Tracks the AccMode of a [[org.apache.calcite.rel.RelNode]].
-  */
+ * Tracks the AccMode of a [[org.apache.calcite.rel.RelNode]].
+ */
 class AccModeTrait extends RelTrait {
 
   /** Defines the accumulating mode for a operator. */
@@ -68,7 +69,7 @@ class AccModeTrait extends RelTrait {
 
   def getAccMode: AccMode = accMode
 
-  override def register(planner: RelOptPlanner): Unit = { }
+  override def register(planner: RelOptPlanner): Unit = {}
 
   override def getTraitDef: RelTraitDef[_ <: RelTrait] = AccModeTraitDef.INSTANCE
 
@@ -82,39 +83,35 @@ object AccModeTrait {
 }
 
 /**
-  * The [[AccMode]] determines how insert, update, and delete changes of tables are encoded
-  * by the messeages that an operator emits.
-  */
+ * The [[AccMode]] determines how insert, update, and delete changes of tables are encoded
+ * by the messeages that an operator emits.
+ */
 object AccMode extends Enumeration {
   type AccMode = Value
 
   /**
-    * An operator in [[Acc]] mode emits change messages as
-    * [[org.apache.flink.table.runtime.types.CRow]] which encode a pair of (Boolean, Row).
-    *
-    * An operator in [[Acc]] mode may only produce update and delete messages, if the table has
-    * a unique key and all key attributes are contained in the Row.
-    *
-    * Changes are encoded as follows:
-    * - insert: (true, NewRow)
-    * - update: (true, NewRow) // the Row includes the full unique key to identify the row to update
-    * - delete: (false, OldRow) // the Row includes the full unique key to identify the row to
-    * delete
-    *
-    */
+   * An operator in [[Acc]] mode emits change messages as
+   * [[org.apache.flink.table.runtime.types.CRow]] which encode a pair of (Boolean, Row).
+   *
+   * An operator in [[Acc]] mode may only produce update and delete messages, if the table has
+   * a unique key and all key attributes are contained in the Row.
+   *
+   * Changes are encoded as follows:
+   * - insert: (true, NewRow)
+   * - update: (true, NewRow) // the Row includes the full unique key to identify the row to update
+   * - delete: (false, OldRow) // the Row includes the full unique key to identify the row to
+   * delete
+   */
   val Acc = Value
 
   /**
-    * An operator in [[AccRetract]] mode emits change messages as
-    * [[org.apache.flink.table.runtime.types.CRow]] which encode a pair of (Boolean, Row).
-    *
-    * Changes are encoded as follows:
-    * - insert: (true, NewRow)
-    * - update: (false, OldRow), (true, NewRow) // updates are encoded in two messages!
-    * - delete: (false, OldRow)
-    *
-    */
+   * An operator in [[AccRetract]] mode emits change messages as
+   * [[org.apache.flink.table.runtime.types.CRow]] which encode a pair of (Boolean, Row).
+   *
+   * Changes are encoded as follows:
+   * - insert: (true, NewRow)
+   * - update: (false, OldRow), (true, NewRow) // updates are encoded in two messages!
+   * - delete: (false, OldRow)
+   */
   val AccRetract = Value
 }
-
-

@@ -31,9 +31,8 @@ import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 
 /**
-  * Flink RelNode which translates Intersect into CoGroup Operator.
-  *
-  */
+ * Flink RelNode which translates Intersect into CoGroup Operator.
+ */
 class DataSetIntersect(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -41,20 +40,13 @@ class DataSetIntersect(
     rightNode: RelNode,
     rowRelDataType: RelDataType,
     all: Boolean)
-  extends BiRel(cluster, traitSet, leftNode, rightNode)
+    extends BiRel(cluster, traitSet, leftNode, rightNode)
     with DataSetRel {
 
   override def deriveRowType() = rowRelDataType
 
   override def copy(traitSet: RelTraitSet, inputs: java.util.List[RelNode]): RelNode = {
-    new DataSetIntersect(
-      cluster,
-      traitSet,
-      inputs.get(0),
-      inputs.get(1),
-      getRowType,
-      all
-    )
+    new DataSetIntersect(cluster, traitSet, inputs.get(0), inputs.get(1), getRowType, all)
   }
 
   override def toString: String = {
@@ -65,7 +57,7 @@ class DataSetIntersect(
     super.explainTerms(pw).item("intersect", intersectSelectionToString)
   }
 
-  override def computeSelfCost (planner: RelOptPlanner, metadata: RelMetadataQuery): RelOptCost = {
+  override def computeSelfCost(planner: RelOptPlanner, metadata: RelMetadataQuery): RelOptCost = {
     val children = this.getInputs
     children.foldLeft(planner.getCostFactory.makeCost(0, 0, 0)) { (cost, child) =>
       val rowCnt = metadata.getRowCount(child)

@@ -26,14 +26,12 @@ import org.apache.flink.table.util.Logging
 import org.apache.flink.types.Row
 
 /**
-  * IterativeConditionRunner with [[Row]] value.
-  */
-class IterativeConditionRunner(
-    name: String,
-    code: String)
-  extends RichIterativeCondition[Row]
-  with Compiler[RichIterativeCondition[Row]]
-  with Logging {
+ * IterativeConditionRunner with [[Row]] value.
+ */
+class IterativeConditionRunner(name: String, code: String)
+    extends RichIterativeCondition[Row]
+    with Compiler[RichIterativeCondition[Row]]
+    with Logging {
 
   @transient private var function: RichIterativeCondition[Row] = _
 

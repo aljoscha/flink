@@ -39,7 +39,7 @@ class LogicalWindowTableAggregate(
     groupSet: ImmutableBitSet,
     groupSets: util.List[ImmutableBitSet],
     aggCalls: util.List[AggregateCall])
-  extends TableAggregate(cluster, traitSet, input, indicatorFlag, groupSet, groupSets, aggCalls) {
+    extends TableAggregate(cluster, traitSet, input, indicatorFlag, groupSet, groupSets, aggCalls) {
 
   def getWindow: LogicalWindow = window
 
@@ -76,8 +76,7 @@ class LogicalWindowTableAggregate(
     namedProperties.foreach { namedProp =>
       builder.add(
         namedProp.name,
-        typeFactory.createTypeFromTypeInfo(namedProp.property.resultType, isNullable = false)
-      )
+        typeFactory.createTypeFromTypeInfo(namedProp.property.resultType, isNullable = false))
     }
     builder.build()
   }
@@ -91,18 +90,16 @@ class LogicalWindowTableAggregate(
       getInput,
       groupSet,
       groupSets,
-      aggCalls
-    )
+      aggCalls)
   }
 }
 
 object LogicalWindowTableAggregate {
 
   def create(
-    window: LogicalWindow,
-    namedProperties: Seq[NamedWindowProperty],
-    aggregate: Aggregate)
-  : LogicalWindowTableAggregate = {
+      window: LogicalWindow,
+      namedProperties: Seq[NamedWindowProperty],
+      aggregate: Aggregate): LogicalWindowTableAggregate = {
 
     val cluster: RelOptCluster = aggregate.getCluster
     val traitSet: RelTraitSet = cluster.traitSetOf(Convention.NONE)

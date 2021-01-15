@@ -25,22 +25,22 @@ import org.apache.flink.table.runtime.generated.GeneratedInput
 import org.apache.flink.table.types.logical.LogicalType
 
 /**
-  * A code generator for generating Flink [[GenericInputFormat]]s.
-  */
+ * A code generator for generating Flink [[GenericInputFormat]]s.
+ */
 object InputFormatCodeGenerator {
 
   /**
-    * Generates a values input format that can be passed to Java compiler.
-    *
-    * @param ctx The code generator context
-    * @param name Class name of the input format. Must not be unique but has to be a
-    *             valid Java class identifier.
-    * @param records code for creating records
-    * @param returnType expected return type
-    * @param outRecordTerm term of the output
-    * @tparam T Return type of the Flink Function.
-    * @return instance of GeneratedFunction
-    */
+   * Generates a values input format that can be passed to Java compiler.
+   *
+   * @param ctx The code generator context
+   * @param name Class name of the input format. Must not be unique but has to be a
+   *             valid Java class identifier.
+   * @param records code for creating records
+   * @param returnType expected return type
+   * @param outRecordTerm term of the output
+   * @tparam T Return type of the Flink Function.
+   * @return instance of GeneratedFunction
+   */
   def generateValuesInputFormat[T](
       ctx: CodeGeneratorContext,
       name: String,
@@ -48,11 +48,14 @@ object InputFormatCodeGenerator {
       returnType: LogicalType,
       outRecordTerm: String = CodeGenUtils.DEFAULT_OUT_RECORD_TERM,
       outRecordWriterTerm: String = CodeGenUtils.DEFAULT_OUT_RECORD_WRITER_TERM)
-    : GeneratedInput[GenericInputFormat[T]] = {
+      : GeneratedInput[GenericInputFormat[T]] = {
     val funcName = newName(name)
 
-    ctx.addReusableOutputRecord(returnType, classOf[GenericRowData], outRecordTerm,
-                                Some(outRecordWriterTerm))
+    ctx.addReusableOutputRecord(
+      returnType,
+      classOf[GenericRowData],
+      outRecordTerm,
+      Some(outRecordWriterTerm))
 
     val funcCode = j"""
       public class $funcName extends ${classOf[GenericInputFormat[_]].getCanonicalName} {
@@ -73,13 +76,15 @@ object InputFormatCodeGenerator {
         @Override
         public Object nextRecord(Object reuse) {
           switch (nextIdx) {
-            ${records.zipWithIndex.map { case (r, i) =>
-              s"""
+            ${records.zipWithIndex
+      .map { case (r, i) =>
+        s"""
                  |case $i:
                  |  $r
                  |break;
                        """.stripMargin
-            }.mkString("\n")}
+      }
+      .mkString("\n")}
           }
           nextIdx++;
           return $outRecordTerm;

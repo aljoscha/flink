@@ -35,9 +35,9 @@ import org.apache.calcite.util.{BuiltInMethod, ImmutableBitSet, NumberUtil, Util
 import scala.collection.JavaConversions._
 
 /**
-  * [[FlinkRelMdPopulationSize]] supplies a implementation of
-  * [[RelMetadataQuery#getPopulationSize]] for the standard logical algebra.
-  */
+ * [[FlinkRelMdPopulationSize]] supplies a implementation of
+ * [[RelMetadataQuery#getPopulationSize]] for the standard logical algebra.
+ */
 class FlinkRelMdPopulationSize private extends MetadataHandler[BuiltInMetadata.PopulationSize] {
 
   override def getDef: MetadataDef[BuiltInMetadata.PopulationSize] =
@@ -55,20 +55,14 @@ class FlinkRelMdPopulationSize private extends MetadataHandler[BuiltInMetadata.P
     }
   }
 
-  def getPopulationSize(
-      rel: Values,
-      mq: RelMetadataQuery,
-      groupKey: ImmutableBitSet): JDouble = {
+  def getPopulationSize(rel: Values, mq: RelMetadataQuery, groupKey: ImmutableBitSet): JDouble = {
     // assume half the rows are duplicates
     // PopulationSize should not be less than 1.0
     val rowCount = rel.estimateRowCount(mq)
     Math.max(rowCount / 2.0, 1.0)
   }
 
-  def getPopulationSize(
-      rel: Project,
-      mq: RelMetadataQuery,
-      groupKey: ImmutableBitSet): JDouble = {
+  def getPopulationSize(rel: Project, mq: RelMetadataQuery, groupKey: ImmutableBitSet): JDouble = {
     val baseCols = ImmutableBitSet.builder
     val projCols = ImmutableBitSet.builder
     val projExprs = rel.getProjects
@@ -97,15 +91,10 @@ class FlinkRelMdPopulationSize private extends MetadataHandler[BuiltInMetadata.P
     FlinkRelMdUtil.numDistinctVals(population, rowCount)
   }
 
-  def getPopulationSize(
-      rel: Filter,
-      mq: RelMetadataQuery,
-      groupKey: ImmutableBitSet): JDouble = mq.getPopulationSize(rel.getInput, groupKey)
+  def getPopulationSize(rel: Filter, mq: RelMetadataQuery, groupKey: ImmutableBitSet): JDouble =
+    mq.getPopulationSize(rel.getInput, groupKey)
 
-  def getPopulationSize(
-      rel: Calc,
-      mq: RelMetadataQuery,
-      groupKey: ImmutableBitSet): JDouble = {
+  def getPopulationSize(rel: Calc, mq: RelMetadataQuery, groupKey: ImmutableBitSet): JDouble = {
     val program = rel.getProgram
     val projects = program.getProjectList.map(program.expandLocalRef)
 
@@ -139,22 +128,19 @@ class FlinkRelMdPopulationSize private extends MetadataHandler[BuiltInMetadata.P
     FlinkRelMdUtil.numDistinctVals(population, rowCount)
   }
 
-  def getPopulationSize(
-      rel: Expand,
-      mq: RelMetadataQuery,
-      groupKey: ImmutableBitSet): JDouble = {
+  def getPopulationSize(rel: Expand, mq: RelMetadataQuery, groupKey: ImmutableBitSet): JDouble = {
     if (groupKey.toList.contains(rel.expandIdIndex)) {
       // populationSize of expand = populationSize of project1 + populationSize of project2 + ...
       // + populationSize of projectN-1
       val groupKeyIgnoreExpandId = groupKey.filter(_ != rel.expandIdIndex)
-      var populationSize = 0D
+      var populationSize = 0d
       rel.projects foreach { project =>
         val groupKeyOfCurrentProject = new JArrayList[Int]()
         groupKeyIgnoreExpandId.foreach { key =>
           project.get(key) match {
             case literal: RexLiteral if literal.isNull => // do nothing
-            case inputRef: RexInputRef => groupKeyOfCurrentProject.add(inputRef.getIndex)
-            case e => throw new TableException(s"Unknown expression ${e.toString}!")
+            case inputRef: RexInputRef                 => groupKeyOfCurrentProject.add(inputRef.getIndex)
+            case e                                     => throw new TableException(s"Unknown expression ${e.toString}!")
           }
         }
         val populationSizeOfCurrentProject =
@@ -170,28 +156,24 @@ class FlinkRelMdPopulationSize private extends MetadataHandler[BuiltInMetadata.P
     }
   }
 
-  def getPopulationSize(
-      rel: Exchange,
-      mq: RelMetadataQuery,
-      groupKey: ImmutableBitSet): JDouble = mq.getPopulationSize(rel.getInput, groupKey)
+  def getPopulationSize(rel: Exchange, mq: RelMetadataQuery, groupKey: ImmutableBitSet): JDouble =
+    mq.getPopulationSize(rel.getInput, groupKey)
 
-  def getPopulationSize(
-      rel: Rank,
-      mq: RelMetadataQuery,
-      groupKey: ImmutableBitSet): JDouble = {
+  def getPopulationSize(rel: Rank, mq: RelMetadataQuery, groupKey: ImmutableBitSet): JDouble = {
     val rankFunColumnIndex = RankUtil.getRankNumberColumnIndex(rel).getOrElse(-1)
     if (rankFunColumnIndex < 0 || !groupKey.toArray.contains(rankFunColumnIndex)) {
       mq.getPopulationSize(rel.getInput, groupKey)
     } else {
-      val rankFunNdv: JDouble = if (rankFunColumnIndex > 0 &&
-        groupKey.toArray.contains(rankFunColumnIndex)) {
-        FlinkRelMdUtil.getRankRangeNdv(rel.rankRange)
-      } else {
-        1D
-      }
+      val rankFunNdv: JDouble =
+        if (rankFunColumnIndex > 0 &&
+          groupKey.toArray.contains(rankFunColumnIndex)) {
+          FlinkRelMdUtil.getRankRangeNdv(rel.rankRange)
+        } else {
+          1d
+        }
       val newGroupKey = groupKey.clear(rankFunColumnIndex)
       val inputPopulationSize: JDouble = if (newGroupKey.isEmpty) {
-        1D
+        1d
       } else {
         val size = mq.getPopulationSize(rel.getInput, newGroupKey)
         if (size == null) {
@@ -205,10 +187,8 @@ class FlinkRelMdPopulationSize private extends MetadataHandler[BuiltInMetadata.P
     }
   }
 
-  def getPopulationSize(
-      rel: Sort,
-      mq: RelMetadataQuery,
-      groupKey: ImmutableBitSet): JDouble = mq.getPopulationSize(rel.getInput, groupKey)
+  def getPopulationSize(rel: Sort, mq: RelMetadataQuery, groupKey: ImmutableBitSet): JDouble =
+    mq.getPopulationSize(rel.getInput, groupKey)
 
   def getPopulationSize(
       rel: Aggregate,
@@ -239,34 +219,31 @@ class FlinkRelMdPopulationSize private extends MetadataHandler[BuiltInMetadata.P
       return null
     }
     val factorOfKeyInAggCall = 0.1
-    val popSizeOfColsInAggCalls = aggCalls.foldLeft(1D) {
-      (popSize, aggCall) =>
-        val popSizeOfAggCall = aggCall.getAggregation.getKind match {
-          case SqlKind.COUNT =>
-            val inputRowCnt = mq.getRowCount(agg.getInput)
-            // Assume result of count(c) of each group bucket is different, start with 0, end with
-            // N -1 (N is max ndv of count).
-            // 0 + 1 + ... + (N - 1) <= rowCount => N ~= Sqrt(2 * rowCnt)
-            if (inputRowCnt != null) {
-              Math.sqrt(2D * inputRowCnt)
-            } else {
-              return null
-            }
-          case _ =>
-            val argList = aggCall.getArgList
-            if (argList.isEmpty) {
-              return null
-            }
-            val approximatePopSize = mq.getPopulationSize(
-              agg.getInput,
-              ImmutableBitSet.of(argList))
-            if (approximatePopSize != null) {
-              approximatePopSize * factorOfKeyInAggCall
-            } else {
-              return null
-            }
-        }
-        popSize * Math.max(popSizeOfAggCall, 1D)
+    val popSizeOfColsInAggCalls = aggCalls.foldLeft(1d) { (popSize, aggCall) =>
+      val popSizeOfAggCall = aggCall.getAggregation.getKind match {
+        case SqlKind.COUNT =>
+          val inputRowCnt = mq.getRowCount(agg.getInput)
+          // Assume result of count(c) of each group bucket is different, start with 0, end with
+          // N -1 (N is max ndv of count).
+          // 0 + 1 + ... + (N - 1) <= rowCount => N ~= Sqrt(2 * rowCnt)
+          if (inputRowCnt != null) {
+            Math.sqrt(2d * inputRowCnt)
+          } else {
+            return null
+          }
+        case _ =>
+          val argList = aggCall.getArgList
+          if (argList.isEmpty) {
+            return null
+          }
+          val approximatePopSize = mq.getPopulationSize(agg.getInput, ImmutableBitSet.of(argList))
+          if (approximatePopSize != null) {
+            approximatePopSize * factorOfKeyInAggCall
+          } else {
+            return null
+          }
+      }
+      popSize * Math.max(popSizeOfAggCall, 1d)
     }
     val inputRowCnt = mq.getRowCount(agg.getInput)
     NumberUtil.min(popSizeOfColsInGroupKeys * popSizeOfColsInAggCalls, inputRowCnt)
@@ -315,10 +292,8 @@ class FlinkRelMdPopulationSize private extends MetadataHandler[BuiltInMetadata.P
     getPopulationSizeOfAggregate(rel, mq, groupKey)
   }
 
-  def getPopulationSize(
-      window: Window,
-      mq: RelMetadataQuery,
-      groupKey: ImmutableBitSet): JDouble = getPopulationSizeOfOverAgg(window, mq, groupKey)
+  def getPopulationSize(window: Window, mq: RelMetadataQuery, groupKey: ImmutableBitSet): JDouble =
+    getPopulationSizeOfOverAgg(window, mq, groupKey)
 
   def getPopulationSize(
       rel: BatchPhysicalOverAggregate,
@@ -340,10 +315,7 @@ class FlinkRelMdPopulationSize private extends MetadataHandler[BuiltInMetadata.P
     }
   }
 
-  def getPopulationSize(
-      rel: Join,
-      mq: RelMetadataQuery,
-      groupKey: ImmutableBitSet): JDouble = {
+  def getPopulationSize(rel: Join, mq: RelMetadataQuery, groupKey: ImmutableBitSet): JDouble = {
     rel.getJoinType match {
       case JoinRelType.SEMI | JoinRelType.ANTI =>
         mq.getPopulationSize(rel.getLeft, groupKey)
@@ -352,10 +324,7 @@ class FlinkRelMdPopulationSize private extends MetadataHandler[BuiltInMetadata.P
     }
   }
 
-  def getPopulationSize(
-      rel: Union,
-      mq: RelMetadataQuery,
-      groupKey: ImmutableBitSet): JDouble = {
+  def getPopulationSize(rel: Union, mq: RelMetadataQuery, groupKey: ImmutableBitSet): JDouble = {
     var population = 0.0
     for (input <- rel.getInputs) {
       val subPop = mq.getPopulationSize(input, groupKey)
@@ -376,17 +345,14 @@ class FlinkRelMdPopulationSize private extends MetadataHandler[BuiltInMetadata.P
   }
 
   /**
-    * Catch-all implementation for
-    * [[BuiltInMetadata.PopulationSize#getPopulationSize(ImmutableBitSet)]],
-    * invoked using reflection.
-    *
-    * @see org.apache.calcite.rel.metadata.RelMetadataQuery#getPopulationSize(RelNode,
-    *      ImmutableBitSet)
-    */
-  def getPopulationSize(
-      rel: RelNode,
-      mq: RelMetadataQuery,
-      groupKey: ImmutableBitSet): JDouble = {
+   * Catch-all implementation for
+   * [[BuiltInMetadata.PopulationSize#getPopulationSize(ImmutableBitSet)]],
+   * invoked using reflection.
+   *
+   * @see org.apache.calcite.rel.metadata.RelMetadataQuery#getPopulationSize(RelNode,
+   *      ImmutableBitSet)
+   */
+  def getPopulationSize(rel: RelNode, mq: RelMetadataQuery, groupKey: ImmutableBitSet): JDouble = {
     // if the keys are unique, return the row count; otherwise, we have
     // no further information on which to return any legitimate value
     // REVIEW zfong 4/11/06 - Broadbase code returns the product of each
@@ -406,7 +372,7 @@ object FlinkRelMdPopulationSize {
 
   private val INSTANCE = new FlinkRelMdPopulationSize
 
-  val SOURCE: RelMetadataProvider = ReflectiveRelMetadataProvider.reflectiveSource(
-    BuiltInMethod.POPULATION_SIZE.method, INSTANCE)
+  val SOURCE: RelMetadataProvider =
+    ReflectiveRelMetadataProvider.reflectiveSource(BuiltInMethod.POPULATION_SIZE.method, INSTANCE)
 
 }

@@ -32,23 +32,19 @@ import org.apache.flink.table.util.DummyExecutionEnvironment
 import _root_.scala.collection.JavaConverters._
 
 /**
-  * The implementation for the Java [[BatchTableEnvironment]] that works with [[DataSet]].
-  *
-  * @param execEnv The Java batch [[ExecutionEnvironment]] of the TableEnvironment.
-  * @param config The configuration of the TableEnvironment.
-  * @deprecated This constructor will be removed. Use [[BatchTableEnvironment#create()]] instead.
-  */
+ * The implementation for the Java [[BatchTableEnvironment]] that works with [[DataSet]].
+ *
+ * @param execEnv The Java batch [[ExecutionEnvironment]] of the TableEnvironment.
+ * @param config The configuration of the TableEnvironment.
+ * @deprecated This constructor will be removed. Use [[BatchTableEnvironment#create()]] instead.
+ */
 class BatchTableEnvironmentImpl(
     execEnv: ExecutionEnvironment,
     config: TableConfig,
     catalogManager: CatalogManager,
     moduleManager: ModuleManager)
-  extends BatchTableEnvImpl(
-    execEnv,
-    config,
-    catalogManager,
-    moduleManager)
-  with org.apache.flink.table.api.bridge.java.BatchTableEnvironment {
+    extends BatchTableEnvImpl(execEnv, config, catalogManager, moduleManager)
+    with org.apache.flink.table.api.bridge.java.BatchTableEnvironment {
 
   override def fromDataSet[T](dataSet: DataSet[T]): Table = {
     createTable(asQueryOperation(dataSet, None))
@@ -56,15 +52,14 @@ class BatchTableEnvironmentImpl(
 
   override def fromDataSet[T](dataSet: DataSet[T], fields: String): Table = {
     val exprs = ExpressionParser
-      .parseExpressionList(fields).asScala
+      .parseExpressionList(fields)
+      .asScala
       .toArray
 
     fromDataSet(dataSet, exprs: _*)
   }
 
-  override def fromDataSet[T](
-      dataSet: DataSet[T],
-      fields: Expression*): Table = {
+  override def fromDataSet[T](dataSet: DataSet[T], fields: Expression*): Table = {
     createTable(asQueryOperation(dataSet, Some(fields.toArray)))
   }
 
@@ -76,16 +71,11 @@ class BatchTableEnvironmentImpl(
     registerTable(name, fromDataSet(dataSet, fields))
   }
 
-  override def createTemporaryView[T](
-      path: String,
-      dataSet: DataSet[T]): Unit = {
+  override def createTemporaryView[T](path: String, dataSet: DataSet[T]): Unit = {
     createTemporaryView(path, fromDataSet(dataSet))
   }
 
-  override def createTemporaryView[T](
-      path: String,
-      dataSet: DataSet[T],
-      fields: String): Unit = {
+  override def createTemporaryView[T](path: String, dataSet: DataSet[T], fields: String): Unit = {
     createTemporaryView(path, fromDataSet(dataSet, fields))
   }
 
@@ -114,10 +104,7 @@ class BatchTableEnvironmentImpl(
     registerTableFunctionInternal[T](name, tf)
   }
 
-  override def registerFunction[T, ACC](
-      name: String,
-      f: AggregateFunction[T, ACC])
-  : Unit = {
+  override def registerFunction[T, ACC](name: String, f: AggregateFunction[T, ACC]): Unit = {
     implicit val typeInfo: TypeInformation[T] = TypeExtractor
       .createTypeInfo(f, classOf[AggregateFunction[T, ACC]], f.getClass, 0)
       .asInstanceOf[TypeInformation[T]]
@@ -134,7 +121,6 @@ class BatchTableEnvironmentImpl(
       new DummyExecutionEnvironment(execEnv),
       config,
       catalogManager,
-      moduleManager
-    )
+      moduleManager)
   }
 }

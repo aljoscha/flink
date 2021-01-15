@@ -32,11 +32,11 @@ import org.apache.flink.table.runtime.join.WindowJoinUtil
 import scala.collection.JavaConverters._
 
 class DataStreamJoinRule
-  extends ConverterRule(
-    classOf[FlinkLogicalJoin],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.DATASTREAM,
-    "DataStreamJoinRule") {
+    extends ConverterRule(
+      classOf[FlinkLogicalJoin],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.DATASTREAM,
+      "DataStreamJoinRule") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val join: FlinkLogicalJoin = call.rel(0).asInstanceOf[FlinkLogicalJoin]
@@ -61,7 +61,7 @@ class DataStreamJoinRule
     if (rowTimeAttrInOutput) {
       throw new TableException(
         "Rowtime attributes must not be in the input rows of a regular join. " +
-        "As a workaround you can cast the time attributes of input tables to TIMESTAMP before.")
+          "As a workaround you can cast the time attributes of input tables to TIMESTAMP before.")
     }
     true
   }

@@ -54,32 +54,36 @@ class SortITCase(mode: TestExecutionMode, configMode: TableConfigMode)
 
     val sqlQuery = "SELECT * FROM MyTable ORDER BY _1 DESC, _2 DESC"
 
-    implicit def tupleOrdering[T <: Product] = Ordering.by((x : T) =>
-      (- x.productElement(0).asInstanceOf[Int], - x.productElement(1).asInstanceOf[Long]))
+    implicit def tupleOrdering[T <: Product] = Ordering.by((x: T) =>
+      (-x.productElement(0).asInstanceOf[Int], -x.productElement(1).asInstanceOf[Long]))
 
     val ds = CollectionDataSets.get3TupleDataSet(env)
     tEnv.createTemporaryView("MyTable", ds)
 
     val expected = sortExpectedly(tupleDataSetStrings)
     // squash all rows inside a partition into one element
-    val results = tEnv.sqlQuery(sqlQuery).toDataSet[Row].mapPartition(rows => {
-      // the rows need to be copied in object reuse mode
-      val copied = new mutable.ArrayBuffer[Row]
-      rows.foreach(r => copied += Row.copy(r))
-      Seq(copied)
-    }).collect()
+    val results = tEnv
+      .sqlQuery(sqlQuery)
+      .toDataSet[Row]
+      .mapPartition(rows => {
+        // the rows need to be copied in object reuse mode
+        val copied = new mutable.ArrayBuffer[Row]
+        rows.foreach(r => copied += Row.copy(r))
+        Seq(copied)
+      })
+      .collect()
 
-    def rowOrdering = Ordering.by((r : Row) => {
+    def rowOrdering = Ordering.by((r: Row) => {
       // ordering for this tuple will fall into the previous defined tupleOrdering,
       // so we just need to return the field by their defining sequence
       (r.getField(0).asInstanceOf[Int], r.getField(1).asInstanceOf[Long])
     })
 
     val result = results
-        .filterNot(_.isEmpty)
-        // sort all partitions by their head element to verify the order across partitions
-        .sortBy(_.head)(rowOrdering)
-        .reduceLeft(_ ++ _)
+      .filterNot(_.isEmpty)
+      // sort all partitions by their head element to verify the order across partitions
+      .sortBy(_.head)(rowOrdering)
+      .reduceLeft(_ ++ _)
 
     TestBaseUtils.compareOrderedResultAsText(result.asJava, expected)
   }
@@ -91,26 +95,30 @@ class SortITCase(mode: TestExecutionMode, configMode: TableConfigMode)
 
     val sqlQuery = "SELECT * FROM MyTable ORDER BY _1 DESC OFFSET 2 ROWS"
 
-    implicit def tupleOrdering[T <: Product] = Ordering.by((x : T) =>
-      - x.productElement(0).asInstanceOf[Int] )
+    implicit def tupleOrdering[T <: Product] =
+      Ordering.by((x: T) => -x.productElement(0).asInstanceOf[Int])
 
     val ds = CollectionDataSets.get3TupleDataSet(env)
     tEnv.createTemporaryView("MyTable", ds)
 
     val expected = sortExpectedly(tupleDataSetStrings, 2, 21)
     // squash all rows inside a partition into one element
-    val results = tEnv.sqlQuery(sqlQuery).toDataSet[Row].mapPartition(rows => {
-      // the rows need to be copied in object reuse mode
-      val copied = new mutable.ArrayBuffer[Row]
-      rows.foreach(r => copied += Row.copy(r))
-      Seq(copied)
-    }).collect()
+    val results = tEnv
+      .sqlQuery(sqlQuery)
+      .toDataSet[Row]
+      .mapPartition(rows => {
+        // the rows need to be copied in object reuse mode
+        val copied = new mutable.ArrayBuffer[Row]
+        rows.foreach(r => copied += Row.copy(r))
+        Seq(copied)
+      })
+      .collect()
 
-    val result = results.
-        filterNot(_.isEmpty)
-        // sort all partitions by their head element to verify the order across partitions
-        .sortBy(_.head)(Ordering.by((r : Row) => -r.getField(0).asInstanceOf[Int]))
-        .reduceLeft(_ ++ _)
+    val result = results
+      .filterNot(_.isEmpty)
+      // sort all partitions by their head element to verify the order across partitions
+      .sortBy(_.head)(Ordering.by((r: Row) => -r.getField(0).asInstanceOf[Int]))
+      .reduceLeft(_ ++ _)
 
     TestBaseUtils.compareOrderedResultAsText(result.asJava, expected)
   }
@@ -122,25 +130,29 @@ class SortITCase(mode: TestExecutionMode, configMode: TableConfigMode)
 
     val sqlQuery = "SELECT * FROM MyTable ORDER BY _1 OFFSET 2 ROWS FETCH NEXT 5 ROWS ONLY"
 
-    implicit def tupleOrdering[T <: Product] = Ordering.by((x : T) =>
-      x.productElement(0).asInstanceOf[Int] )
+    implicit def tupleOrdering[T <: Product] =
+      Ordering.by((x: T) => x.productElement(0).asInstanceOf[Int])
 
     val ds = CollectionDataSets.get3TupleDataSet(env)
     tEnv.createTemporaryView("MyTable", ds)
 
     val expected = sortExpectedly(tupleDataSetStrings, 2, 7)
     // squash all rows inside a partition into one element
-    val results = tEnv.sqlQuery(sqlQuery).toDataSet[Row].mapPartition(rows => {
-      // the rows need to be copied in object reuse mode
-      val copied = new mutable.ArrayBuffer[Row]
-      rows.foreach(r => copied += Row.copy(r))
-      Seq(copied)
-    }).collect()
+    val results = tEnv
+      .sqlQuery(sqlQuery)
+      .toDataSet[Row]
+      .mapPartition(rows => {
+        // the rows need to be copied in object reuse mode
+        val copied = new mutable.ArrayBuffer[Row]
+        rows.foreach(r => copied += Row.copy(r))
+        Seq(copied)
+      })
+      .collect()
 
     val result = results
       .filterNot(_.isEmpty)
-        // sort all partitions by their head element to verify the order across partitions
-      .sortBy(_.head)(Ordering.by((r : Row) => r.getField(0).asInstanceOf[Int]))
+      // sort all partitions by their head element to verify the order across partitions
+      .sortBy(_.head)(Ordering.by((r: Row) => r.getField(0).asInstanceOf[Int]))
       .reduceLeft(_ ++ _)
 
     TestBaseUtils.compareOrderedResultAsText(result.asJava, expected)
@@ -153,32 +165,36 @@ class SortITCase(mode: TestExecutionMode, configMode: TableConfigMode)
 
     val sqlQuery = "SELECT * FROM MyTable ORDER BY _2, _1 LIMIT 5"
 
-    implicit def tupleOrdering[T <: Product] = Ordering.by((x : T) =>
-      (x.productElement(1).asInstanceOf[Long], x.productElement(0).asInstanceOf[Int]) )
+    implicit def tupleOrdering[T <: Product] = Ordering.by((x: T) =>
+      (x.productElement(1).asInstanceOf[Long], x.productElement(0).asInstanceOf[Int]))
 
     val ds = CollectionDataSets.get3TupleDataSet(env)
     tEnv.createTemporaryView("MyTable", ds)
 
     val expected = sortExpectedly(tupleDataSetStrings, 0, 5)
     // squash all rows inside a partition into one element
-    val results = tEnv.sqlQuery(sqlQuery).toDataSet[Row].mapPartition(rows => {
-      // the rows need to be copied in object reuse mode
-      val copied = new mutable.ArrayBuffer[Row]
-      rows.foreach(r => copied += Row.copy(r))
-      Seq(copied)
-    }).collect()
+    val results = tEnv
+      .sqlQuery(sqlQuery)
+      .toDataSet[Row]
+      .mapPartition(rows => {
+        // the rows need to be copied in object reuse mode
+        val copied = new mutable.ArrayBuffer[Row]
+        rows.foreach(r => copied += Row.copy(r))
+        Seq(copied)
+      })
+      .collect()
 
-    def rowOrdering = Ordering.by((r : Row) => {
+    def rowOrdering = Ordering.by((r: Row) => {
       // ordering for this tuple will fall into the previous defined tupleOrdering,
       // so we just need to return the field by their defining sequence
       (r.getField(0).asInstanceOf[Int], r.getField(1).asInstanceOf[Long])
     })
 
     val result = results
-        .filterNot(_.isEmpty)
-        // sort all partitions by their head element to verify the order across partitions
-        .sortBy(_.head)(rowOrdering)
-        .reduceLeft(_ ++ _)
+      .filterNot(_.isEmpty)
+      // sort all partitions by their head element to verify the order across partitions
+      .sortBy(_.head)(rowOrdering)
+      .reduceLeft(_ ++ _)
 
     TestBaseUtils.compareOrderedResultAsText(result.asJava, expected)
   }

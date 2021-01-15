@@ -37,11 +37,11 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 class StreamPhysicalMatchRule
-  extends ConverterRule(
-    classOf[FlinkLogicalMatch],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.STREAM_PHYSICAL,
-    "StreamPhysicalMatchRule") {
+    extends ConverterRule(
+      classOf[FlinkLogicalMatch],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.STREAM_PHYSICAL,
+      "StreamPhysicalMatchRule") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val logicalMatch: FlinkLogicalMatch = call.rel(0)
@@ -63,7 +63,8 @@ class StreamPhysicalMatchRule
     } else {
       FlinkRelDistribution.SINGLETON
     }
-    val requiredTraitSet = rel.getCluster.getPlanner.emptyTraitSet()
+    val requiredTraitSet = rel.getCluster.getPlanner
+      .emptyTraitSet()
       .replace(requiredDistribution)
       .replace(FlinkConventions.STREAM_PHYSICAL)
 
@@ -72,12 +73,15 @@ class StreamPhysicalMatchRule
 
     try {
       Class
-        .forName("org.apache.flink.cep.pattern.Pattern",
+        .forName(
+          "org.apache.flink.cep.pattern.Pattern",
           false,
           Thread.currentThread().getContextClassLoader)
     } catch {
-      case ex: ClassNotFoundException => throw new TableException(
-        "MATCH RECOGNIZE clause requires flink-cep dependency to be present on the classpath.", ex)
+      case ex: ClassNotFoundException =>
+        throw new TableException(
+          "MATCH RECOGNIZE clause requires flink-cep dependency to be present on the classpath.",
+          ex)
     }
 
     new StreamPhysicalMatch(
@@ -93,8 +97,7 @@ class StreamPhysicalMatchRule
         logicalMatch.isAllRows,
         logicalMatch.getPartitionKeys,
         logicalMatch.getOrderKeys,
-        logicalMatch.getInterval
-      ),
+        logicalMatch.getInterval),
       logicalMatch.getRowType)
   }
 
@@ -116,11 +119,10 @@ class StreamPhysicalMatchRule
   }
 
   private def validateAmbiguousColumnsOnRowPerMatch(
-    partitionKeys: ImmutableBitSet,
-    measuresNames: mutable.Set[String],
-    inputSchema: RelDataType,
-    expectedSchema: RelDataType)
-  : Unit = {
+      partitionKeys: ImmutableBitSet,
+      measuresNames: mutable.Set[String],
+      inputSchema: RelDataType,
+      expectedSchema: RelDataType): Unit = {
     val actualSize = partitionKeys.toArray.length + measuresNames.size
     val expectedSize = expectedSchema.getFieldCount
     if (actualSize != expectedSize) {
@@ -128,7 +130,8 @@ class StreamPhysicalMatchRule
 
       val ambiguousColumns = partitionKeys.toArray
         .map(inputSchema.getFieldList.get(_).getName)
-        .filter(measuresNames.contains).mkString("{", ", ", "}")
+        .filter(measuresNames.contains)
+        .mkString("{", ", ", "}")
 
       throw new ValidationException(s"Columns ambiguously defined: $ambiguousColumns")
     }

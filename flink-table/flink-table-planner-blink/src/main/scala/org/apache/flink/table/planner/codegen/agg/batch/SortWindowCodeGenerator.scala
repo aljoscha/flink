@@ -24,8 +24,16 @@ import org.apache.flink.table.functions.AggregateFunction
 import org.apache.flink.table.planner.calcite.FlinkRelBuilder.PlannerNamedWindowProperty
 import org.apache.flink.table.planner.codegen.CodeGenUtils.BINARY_ROW
 import org.apache.flink.table.planner.codegen.agg.batch.AggCodeGenHelper.genGroupKeyChangedCheckCode
-import org.apache.flink.table.planner.codegen.{CodeGenUtils, CodeGeneratorContext, ProjectionCodeGenerator}
-import org.apache.flink.table.planner.plan.logical.{LogicalWindow, SlidingGroupWindow, TumblingGroupWindow}
+import org.apache.flink.table.planner.codegen.{
+  CodeGenUtils,
+  CodeGeneratorContext,
+  ProjectionCodeGenerator
+}
+import org.apache.flink.table.planner.plan.logical.{
+  LogicalWindow,
+  SlidingGroupWindow,
+  TumblingGroupWindow
+}
 import org.apache.flink.table.planner.plan.utils.AggregateInfoList
 import org.apache.flink.table.runtime.generated.GeneratedOperator
 import org.apache.flink.table.runtime.operators.TableStreamOperator
@@ -35,24 +43,24 @@ import org.apache.flink.table.types.logical.RowType
 import org.apache.calcite.tools.RelBuilder
 
 /**
-  * Tumbling window: like [[SortAggCodeGenerator]].
-  *
-  * Sliding window:
-  * 1.enableAssignPane + 1 phase:
-  * -- distribute by (key)
-  *   -- sort by (key + ts)
-  *     -- assign pane + sort agg + assign window + sort agg
-  * 2.enableAssignPane + 2 phase:
-  * -- sort by (key + ts)
-  *   -- assign pane + sort agg 
-  *     -- distribute by (key)
-  *       -- sort by (key + pane)
-  *         -- assign window + sort agg
-  * 3.disableAssignPane + 1 phase:
-  * -- distribute by (key)
-  *   -- sort by (key +ts)
-  *     -- assign window + sort agg.
-  */
+ * Tumbling window: like [[SortAggCodeGenerator]].
+ *
+ * Sliding window:
+ * 1.enableAssignPane + 1 phase:
+ * -- distribute by (key)
+ *   -- sort by (key + ts)
+ *     -- assign pane + sort agg + assign window + sort agg
+ * 2.enableAssignPane + 2 phase:
+ * -- sort by (key + ts)
+ *   -- assign pane + sort agg
+ *     -- distribute by (key)
+ *       -- sort by (key + pane)
+ *         -- assign window + sort agg
+ * 3.disableAssignPane + 1 phase:
+ * -- distribute by (key)
+ *   -- sort by (key +ts)
+ *     -- assign window + sort agg.
+ */
 class SortWindowCodeGenerator(
     ctx: CodeGeneratorContext,
     relBuilder: RelBuilder,
@@ -72,25 +80,25 @@ class SortWindowCodeGenerator(
     enableAssignPane: Boolean = true,
     isMerge: Boolean,
     isFinal: Boolean)
-  extends WindowCodeGenerator(
-    relBuilder,
-    window,
-    inputTimeFieldIndex,
-    inputTimeIsDate,
-    namedProperties,
-    aggInfoList,
-    inputRowType,
-    grouping,
-    auxGrouping,
-    enableAssignPane,
-    isMerge,
-    isFinal) {
+    extends WindowCodeGenerator(
+      relBuilder,
+      window,
+      inputTimeFieldIndex,
+      inputTimeIsDate,
+      namedProperties,
+      aggInfoList,
+      inputRowType,
+      grouping,
+      auxGrouping,
+      enableAssignPane,
+      isMerge,
+      isFinal) {
 
   // prepare for aggregation
   aggInfos
-      .map(_.function)
-      .filter(_.isInstanceOf[AggregateFunction[_, _]])
-      .map(ctx.addReusableFunction(_))
+    .map(_.function)
+    .filter(_.isInstanceOf[AggregateFunction[_, _]])
+    .map(ctx.addReusableFunction(_))
 
   def genWithoutKeys(): GeneratedOperator[OneInputStreamOperator[RowData, RowData]] = {
     val inputTerm = CodeGenUtils.DEFAULT_INPUT1_TERM
@@ -118,7 +126,8 @@ class SortWindowCodeGenerator(
 
     val (processInput, endProcessInput) =
       if (enablePreAcc) {
-        genPreAccumulate(ctx,
+        genPreAccumulate(
+          ctx,
           windowStart,
           slideSize,
           windowSize,
@@ -131,11 +140,13 @@ class SortWindowCodeGenerator(
           triggerWindowAgg,
           endWindowAgg)
       } else {
-        (s"""
+        (
+          s"""
             |hasInput = true;
             |$windowsGrouping.addInputToBuffer(($BINARY_ROW)$inputTerm);
             |$triggerWindowAgg
-         """.stripMargin, endWindowAgg)
+         """.stripMargin,
+          endWindowAgg)
       }
 
     val processCode =
@@ -154,7 +165,12 @@ class SortWindowCodeGenerator(
     val className = if (isFinal) "SortWinAggWithoutKeys" else "LocalSortWinAggWithoutKeys"
     val baseClass = classOf[TableStreamOperator[_]].getName
     AggCodeGenHelper.generateOperator(
-      ctx, className, baseClass, processCode, endInputCode, inputRowType)
+      ctx,
+      className,
+      baseClass,
+      processCode,
+      endInputCode,
+      inputRowType)
   }
 
   def genWithKeys(): GeneratedOperator[OneInputStreamOperator[RowData, RowData]] = {
@@ -165,14 +181,16 @@ class SortWindowCodeGenerator(
     val lastKey = CodeGenUtils.newName("lastKey")
     ctx.addReusableMember(s"transient $BINARY_ROW $lastKey = null;")
 
-    val keyProjectionCode = ProjectionCodeGenerator.generateProjectionExpression(
-      ctx,
-      inputRowType,
-      groupKeyRowType,
-      grouping,
-      inputTerm = inputTerm,
-      outRecordTerm = currentKey,
-      outRecordWriterTerm = currentKeyWriter).code
+    val keyProjectionCode = ProjectionCodeGenerator
+      .generateProjectionExpression(
+        ctx,
+        inputRowType,
+        groupKeyRowType,
+        grouping,
+        inputTerm = inputTerm,
+        outRecordTerm = currentKey,
+        outRecordWriterTerm = currentKeyWriter)
+      .code
 
     val keyNotEqualsCode = genGroupKeyChangedCheckCode(currentKey, lastKey)
 
@@ -200,7 +218,8 @@ class SortWindowCodeGenerator(
 
     val (processCurrentKeyInput, endProcessCurrentKeyInput) =
       if (enablePreAcc) {
-        genPreAccumulate(ctx,
+        genPreAccumulate(
+          ctx,
           windowStart,
           slideSize,
           windowSize,
@@ -213,11 +232,13 @@ class SortWindowCodeGenerator(
           triggerWindowAgg,
           endWindowAgg)
       } else {
-        (s"""
+        (
+          s"""
             |hasInput = true;
             |$windowsGrouping.addInputToBuffer(($BINARY_ROW)$inputTerm);
             |$triggerWindowAgg
-         """.stripMargin, endWindowAgg)
+         """.stripMargin,
+          endWindowAgg)
       }
 
     val processCode =
@@ -252,14 +273,19 @@ class SortWindowCodeGenerator(
     val className = if (isFinal) "SortWinAggWithKeys" else "LocalSortWinAggWithKeys"
     val baseClass = classOf[TableStreamOperator[_]].getName
     AggCodeGenHelper.generateOperator(
-      ctx, className, baseClass, processCode, endInputCode, inputRowType)
+      ctx,
+      className,
+      baseClass,
+      processCode,
+      endInputCode,
+      inputRowType)
   }
 
   private def choosePreAcc: Boolean = {
     // pre accumulate by pane
     enableAssignPane ||
-        // pre accumulate by window
-        window.isInstanceOf[TumblingGroupWindow] ||
-        (window.isInstanceOf[SlidingGroupWindow] && slideSize == windowSize)
+    // pre accumulate by window
+    window.isInstanceOf[TumblingGroupWindow] ||
+    (window.isInstanceOf[SlidingGroupWindow] && slideSize == windowSize)
   }
 }

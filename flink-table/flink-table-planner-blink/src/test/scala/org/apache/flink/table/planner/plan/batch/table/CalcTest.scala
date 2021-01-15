@@ -22,7 +22,12 @@ import org.apache.flink.api.common.typeinfo.TypeInformation
 import org.apache.flink.api.scala.createTypeInformation
 import org.apache.flink.table.api._
 import org.apache.flink.table.functions.ScalarFunction
-import org.apache.flink.table.planner.plan.batch.table.CalcTest.{MyHashCode, TestCaseClass, WC, giveMeCaseClass}
+import org.apache.flink.table.planner.plan.batch.table.CalcTest.{
+  MyHashCode,
+  TestCaseClass,
+  WC,
+  giveMeCaseClass
+}
 import org.apache.flink.table.planner.utils.TableTestBase
 
 import org.junit.Test
@@ -170,7 +175,8 @@ class CalcTest extends TableTestBase {
   def testMultiFilter(): Unit = {
     val util = batchTestUtil()
     val sourceTable = util.addTableSource[(Int, Long, String, Double)]("MyTable", 'a, 'b, 'c, 'd)
-    val resultTable = sourceTable.select('a, 'b)
+    val resultTable = sourceTable
+      .select('a, 'b)
       .filter('a > 0)
       .filter('b < 2)
       .filter(('a % 2) === 1)

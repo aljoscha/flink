@@ -29,14 +29,14 @@ import org.apache.flink.table.plan.schema.RowSchema
 import scala.collection.JavaConversions._
 
 /**
-  * Rule to convert a [[FlinkLogicalTableAggregate]] into a [[DataStreamGroupTableAggregate]].
-  */
+ * Rule to convert a [[FlinkLogicalTableAggregate]] into a [[DataStreamGroupTableAggregate]].
+ */
 class DataStreamTableAggregateRule
-  extends ConverterRule(
-    classOf[FlinkLogicalTableAggregate],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.DATASTREAM,
-    "DataStreamTableAggregateRule") {
+    extends ConverterRule(
+      classOf[FlinkLogicalTableAggregate],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.DATASTREAM,
+      "DataStreamTableAggregateRule") {
 
   override def convert(rel: RelNode): RelNode = {
     val agg: FlinkLogicalTableAggregate = rel.asInstanceOf[FlinkLogicalTableAggregate]

@@ -27,7 +27,7 @@ class HadoopInputFormat[K, V](
     keyClass: Class[K],
     valueClass: Class[V],
     job: JobConf)
-  extends HadoopInputFormatBase[K, V, (K, V)](mapredInputFormat, keyClass, valueClass, job) {
+    extends HadoopInputFormatBase[K, V, (K, V)](mapredInputFormat, keyClass, valueClass, job) {
 
   def this(mapredInputFormat: InputFormat[K, V], keyClass: Class[K], valueClass: Class[V]) = {
     this(mapredInputFormat, keyClass, valueClass, new JobConf)

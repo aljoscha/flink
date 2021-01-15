@@ -23,15 +23,22 @@ import org.apache.flink.table.api._
 import org.apache.flink.table.planner.plan.nodes.FlinkConventions
 import org.apache.flink.table.planner.plan.optimize.program._
 import org.apache.flink.table.planner.plan.rules.{FlinkBatchRuleSets, FlinkStreamRuleSets}
-import org.apache.flink.table.planner.runtime.utils.JavaUserDefinedScalarFunctions.{BooleanPandasScalarFunction, BooleanPythonScalarFunction, PandasScalarFunction, PythonScalarFunction, RowJavaScalarFunction, RowPythonScalarFunction}
+import org.apache.flink.table.planner.runtime.utils.JavaUserDefinedScalarFunctions.{
+  BooleanPandasScalarFunction,
+  BooleanPythonScalarFunction,
+  PandasScalarFunction,
+  PythonScalarFunction,
+  RowJavaScalarFunction,
+  RowPythonScalarFunction
+}
 import org.apache.flink.table.planner.utils.TableTestBase
 
 import org.apache.calcite.plan.hep.HepMatchOrder
 import org.junit.{Before, Test}
 
 /**
-  * Test for [[PythonCalcSplitRule]].
-  */
+ * Test for [[PythonCalcSplitRule]].
+ */
 class PythonCalcSplitRuleTest extends TableTestBase {
 
   private val util = batchTestUtil()

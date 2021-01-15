@@ -31,23 +31,19 @@ import org.apache.flink.table.util.DummyExecutionEnvironment
 import _root_.scala.reflect.ClassTag
 
 /**
-  * The implementation for a Scala [[BatchTableEnvironment]] that works
-  * with [[DataSet]]s.
-  *
-  * @param execEnv The Scala batch [[ExecutionEnvironment]] of the TableEnvironment.
-  * @param config The configuration of the TableEnvironment.
-  */
+ * The implementation for a Scala [[BatchTableEnvironment]] that works
+ * with [[DataSet]]s.
+ *
+ * @param execEnv The Scala batch [[ExecutionEnvironment]] of the TableEnvironment.
+ * @param config The configuration of the TableEnvironment.
+ */
 class BatchTableEnvironmentImpl(
     execEnv: ExecutionEnvironment,
     config: TableConfig,
     catalogManager: CatalogManager,
     moduleManager: ModuleManager)
-  extends BatchTableEnvImpl(
-    execEnv.getJavaEnv,
-    config,
-    catalogManager,
-    moduleManager)
-  with org.apache.flink.table.api.bridge.scala.BatchTableEnvironment {
+    extends BatchTableEnvImpl(execEnv.getJavaEnv, config, catalogManager, moduleManager)
+    with org.apache.flink.table.api.bridge.scala.BatchTableEnvironment {
 
   override def fromDataSet[T](dataSet: DataSet[T]): Table = {
     createTable(asQueryOperation(dataSet.javaSet, None))
@@ -76,14 +72,11 @@ class BatchTableEnvironmentImpl(
 
   override def registerFunction[T: TypeInformation, ACC: TypeInformation](
       name: String,
-      f: AggregateFunction[T, ACC])
-  : Unit = {
+      f: AggregateFunction[T, ACC]): Unit = {
     registerAggregateFunctionInternal[T, ACC](name, f)
   }
 
-  override def createTemporaryView[T](
-      path: String,
-      dataSet: DataSet[T]): Unit = {
+  override def createTemporaryView[T](path: String, dataSet: DataSet[T]): Unit = {
     createTemporaryView(path, fromDataSet(dataSet))
   }
 
@@ -99,8 +92,6 @@ class BatchTableEnvironmentImpl(
       new ExecutionEnvironment(new DummyExecutionEnvironment(execEnv.getJavaEnv)),
       config,
       catalogManager,
-      moduleManager
-    )
+      moduleManager)
   }
 }
-

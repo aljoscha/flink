@@ -23,35 +23,35 @@ import org.apache.calcite.rex.{RexProgram, RexProgramBuilder}
 import org.apache.flink.table.plan.nodes.logical.{FlinkLogicalCalc, FlinkLogicalTableFunctionScan}
 
 /**
-  * A utility for datastream and dataset correlate rules.
-  */
+ * A utility for datastream and dataset correlate rules.
+ */
 object CorrelateUtil {
 
   /**
-    * Get [[FlinkLogicalTableFunctionScan]] from the input calc. Returns None if there is no table
-    * function at the end.
-    */
+   * Get [[FlinkLogicalTableFunctionScan]] from the input calc. Returns None if there is no table
+   * function at the end.
+   */
   def getTableFunctionScan(calc: FlinkLogicalCalc): Option[FlinkLogicalTableFunctionScan] = {
     val child = calc.getInput match {
-      case relSubset: RelSubset => relSubset.getOriginal
+      case relSubset: RelSubset       => relSubset.getOriginal
       case hepRelVertex: HepRelVertex => hepRelVertex.getCurrentRel
     }
     child match {
       case scan: FlinkLogicalTableFunctionScan => Some(scan)
-      case calc: FlinkLogicalCalc => getTableFunctionScan(calc)
-      case _ => None
+      case calc: FlinkLogicalCalc              => getTableFunctionScan(calc)
+      case _                                   => None
     }
   }
 
   /**
-    * Merge continuous calcs.
-    *
-    * @param calc the input calc
-    * @return the single merged calc
-    */
+   * Merge continuous calcs.
+   *
+   * @param calc the input calc
+   * @return the single merged calc
+   */
   def getMergedCalc(calc: FlinkLogicalCalc): FlinkLogicalCalc = {
     val child = calc.getInput match {
-      case relSubset: RelSubset => relSubset.getOriginal
+      case relSubset: RelSubset       => relSubset.getOriginal
       case hepRelVertex: HepRelVertex => hepRelVertex.getCurrentRel
     }
     child match {
@@ -65,7 +65,8 @@ object CorrelateUtil {
             bottomCalc.getProgram,
             topCalc.getCluster.getRexBuilder)
         assert(mergedProgram.getOutputRowType eq topProgram.getOutputRowType)
-        topCalc.copy(topCalc.getTraitSet, bottomCalc.getInput, mergedProgram)
+        topCalc
+          .copy(topCalc.getTraitSet, bottomCalc.getInput, mergedProgram)
           .asInstanceOf[FlinkLogicalCalc]
       case _ =>
         calc

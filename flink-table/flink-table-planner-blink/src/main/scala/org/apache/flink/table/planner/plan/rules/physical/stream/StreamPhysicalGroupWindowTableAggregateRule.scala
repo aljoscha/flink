@@ -33,15 +33,15 @@ import org.apache.calcite.rel.convert.ConverterRule
 import scala.collection.JavaConversions._
 
 /**
-  * Rule to convert a [[FlinkLogicalWindowTableAggregate]] into a
-  * [[StreamPhysicalGroupWindowTableAggregate]].
-  */
+ * Rule to convert a [[FlinkLogicalWindowTableAggregate]] into a
+ * [[StreamPhysicalGroupWindowTableAggregate]].
+ */
 class StreamPhysicalGroupWindowTableAggregateRule
-  extends ConverterRule(
-    classOf[FlinkLogicalWindowTableAggregate],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.STREAM_PHYSICAL,
-    "StreamPhysicalGroupWindowTableAggregateRule") {
+    extends ConverterRule(
+      classOf[FlinkLogicalWindowTableAggregate],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.STREAM_PHYSICAL,
+      "StreamPhysicalGroupWindowTableAggregateRule") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val agg: FlinkLogicalWindowTableAggregate = call.rel(0)

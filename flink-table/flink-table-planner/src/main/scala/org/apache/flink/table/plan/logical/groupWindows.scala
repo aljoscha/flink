@@ -33,7 +33,7 @@ case class TumblingGroupWindow(
     aliasAttribute: PlannerExpression,
     timeAttribute: PlannerExpression,
     size: PlannerExpression)
-  extends LogicalWindow {
+    extends LogicalWindow {
 
   override def toString: String = s"TumblingGroupWindow($aliasAttribute, $timeAttribute, $size)"
 }
@@ -43,7 +43,7 @@ case class SlidingGroupWindow(
     timeAttribute: PlannerExpression,
     size: PlannerExpression,
     slide: PlannerExpression)
-  extends LogicalWindow {
+    extends LogicalWindow {
 
   override def toString: String = s"SlidingGroupWindow($aliasAttribute, $timeAttribute, $size, " +
     s"$slide)"
@@ -53,7 +53,7 @@ case class SessionGroupWindow(
     aliasAttribute: PlannerExpression,
     timeAttribute: PlannerExpression,
     gap: PlannerExpression)
-  extends LogicalWindow {
+    extends LogicalWindow {
 
   override def toString: String = s"SessionGroupWindow($aliasAttribute, $timeAttribute, $gap)"
 }

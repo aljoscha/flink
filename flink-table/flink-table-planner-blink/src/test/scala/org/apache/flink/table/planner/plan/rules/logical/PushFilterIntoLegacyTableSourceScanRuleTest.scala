@@ -19,8 +19,16 @@ package org.apache.flink.table.planner.plan.rules.logical
 
 import org.apache.flink.table.api.{DataTypes, TableSchema}
 import org.apache.flink.table.planner.expressions.utils.Func1
-import org.apache.flink.table.planner.plan.optimize.program.{FlinkBatchProgram, FlinkHepRuleSetProgramBuilder, HEP_RULES_EXECUTION_TYPE}
-import org.apache.flink.table.planner.utils.{TableConfigUtils, TableTestBase, TestLegacyFilterableTableSource}
+import org.apache.flink.table.planner.plan.optimize.program.{
+  FlinkBatchProgram,
+  FlinkHepRuleSetProgramBuilder,
+  HEP_RULES_EXECUTION_TYPE
+}
+import org.apache.flink.table.planner.utils.{
+  TableConfigUtils,
+  TableTestBase,
+  TestLegacyFilterableTableSource
+}
 import org.apache.flink.types.Row
 
 import org.apache.calcite.plan.hep.HepMatchOrder
@@ -29,8 +37,8 @@ import org.apache.calcite.tools.RuleSets
 import org.junit.{Before, Test}
 
 /**
-  * Test for [[PushFilterIntoLegacyTableSourceScanRule]].
-  */
+ * Test for [[PushFilterIntoLegacyTableSourceScanRule]].
+ */
 class PushFilterIntoLegacyTableSourceScanRuleTest extends TableTestBase {
   protected val util = batchTestUtil()
 
@@ -43,10 +51,11 @@ class PushFilterIntoLegacyTableSourceScanRuleTest extends TableTestBase {
       FlinkHepRuleSetProgramBuilder.newBuilder
         .setHepRulesExecutionType(HEP_RULES_EXECUTION_TYPE.RULE_COLLECTION)
         .setHepMatchOrder(HepMatchOrder.BOTTOM_UP)
-        .add(RuleSets.ofList(PushFilterIntoLegacyTableSourceScanRule.INSTANCE,
-          CoreRules.FILTER_PROJECT_TRANSPOSE))
-        .build()
-    )
+        .add(
+          RuleSets.ofList(
+            PushFilterIntoLegacyTableSourceScanRule.INSTANCE,
+            CoreRules.FILTER_PROJECT_TRANSPOSE))
+        .build())
 
     // name: STRING, id: LONG, amount: INT, price: DOUBLE
     TestLegacyFilterableTableSource.createTemporaryTable(

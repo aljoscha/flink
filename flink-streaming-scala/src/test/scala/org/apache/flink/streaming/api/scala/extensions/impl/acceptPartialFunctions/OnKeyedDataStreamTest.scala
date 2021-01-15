@@ -29,20 +29,22 @@ class OnKeyedStreamTest extends AcceptPFTestBase {
   @Test
   def testReduceWithOnTuple(): Unit = {
     val test =
-      keyedTuples.reduceWith {
-        case ((_, v1), (_, v2)) => 0 -> s"$v1 $v2"
+      keyedTuples.reduceWith { case ((_, v1), (_, v2)) =>
+        0 -> s"$v1 $v2"
       }
-    assert(test.javaStream.isInstanceOf[SingleOutputStreamOperator[_]],
+    assert(
+      test.javaStream.isInstanceOf[SingleOutputStreamOperator[_]],
       "reduceWith should produce a SingleOutputStreamOperator")
   }
 
   @Test
   def testReduceWithOnCaseClass(): Unit = {
     val test =
-      keyedCaseObjects.reduceWith {
-        case (KeyValuePair(_, v1), KeyValuePair(_, v2)) => KeyValuePair(0, s"$v1 $v2")
+      keyedCaseObjects.reduceWith { case (KeyValuePair(_, v1), KeyValuePair(_, v2)) =>
+        KeyValuePair(0, s"$v1 $v2")
       }
-    assert(test.javaStream.isInstanceOf[SingleOutputStreamOperator[_]],
+    assert(
+      test.javaStream.isInstanceOf[SingleOutputStreamOperator[_]],
       "reduceWith should produce a SingleOutputStreamOperator")
   }
 }

@@ -24,9 +24,8 @@ import org.apache.flink.streaming.api.scala.function.ProcessAllWindowFunction
 import org.apache.flink.streaming.api.windowing.windows.Window
 import org.apache.flink.util.Collector
 
-
 class CheckingIdentityRichProcessAllWindowFunction[T, W <: Window]
-  extends ProcessAllWindowFunction[T, T, W] {
+    extends ProcessAllWindowFunction[T, T, W] {
 
   override def process(context: Context, input: Iterable[T], out: Collector[T]): Unit = {
     for (value <- input) {

@@ -35,8 +35,8 @@ class FlinkLogicalMinus(
     traitSet: RelTraitSet,
     inputs: JList[RelNode],
     all: Boolean)
-  extends Minus(cluster, traitSet, inputs, all)
-  with FlinkLogicalRel {
+    extends Minus(cluster, traitSet, inputs, all)
+    with FlinkLogicalRel {
 
   override def copy(traitSet: RelTraitSet, inputs: JList[RelNode], all: Boolean): SetOp = {
     new FlinkLogicalMinus(cluster, traitSet, inputs, all)
@@ -53,17 +53,18 @@ class FlinkLogicalMinus(
 }
 
 private class FlinkLogicalMinusConverter
-  extends ConverterRule(
-    classOf[LogicalMinus],
-    Convention.NONE,
-    FlinkConventions.LOGICAL,
-    "FlinkLogicalMinusConverter") {
+    extends ConverterRule(
+      classOf[LogicalMinus],
+      Convention.NONE,
+      FlinkConventions.LOGICAL,
+      "FlinkLogicalMinusConverter") {
 
   override def convert(rel: RelNode): RelNode = {
     val minus = rel.asInstanceOf[LogicalMinus]
     val traitSet = rel.getTraitSet.replace(FlinkConventions.LOGICAL)
     val newInputs = minus.getInputs.asScala
-        .map(input => RelOptRule.convert(input, FlinkConventions.LOGICAL)).asJava
+      .map(input => RelOptRule.convert(input, FlinkConventions.LOGICAL))
+      .asJava
 
     new FlinkLogicalMinus(rel.getCluster, traitSet, newInputs, minus.all)
   }

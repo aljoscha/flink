@@ -37,8 +37,7 @@ class Limit0RemoveITCase extends BatchTestBase {
       row(null, 1L, 1.0f, 1.0d, JBigDecimal.valueOf(1)),
       row(2, null, 2.0f, 2.0d, JBigDecimal.valueOf(2)),
       row(3, 3L, null, 3.0d, JBigDecimal.valueOf(3)),
-      row(3, 3L, 4.0f, null, JBigDecimal.valueOf(3))
-    )
+      row(3, 3L, 4.0f, null, JBigDecimal.valueOf(3)))
 
     registerCollection("t1", numericData, numericType, "a, b, c, d, e")
     registerCollection("t2", numericData, numericType, "a, b, c, d, e")

@@ -23,7 +23,12 @@ import org.apache.flink.table.planner.JDouble
 import org.apache.flink.table.planner.calcite.FlinkRelBuilder.PlannerNamedWindowProperty
 import org.apache.flink.table.planner.calcite.FlinkTypeFactory
 import org.apache.flink.table.planner.plan.nodes.calcite.{Expand, Rank, WindowAggregate}
-import org.apache.flink.table.planner.plan.nodes.physical.batch.{BatchPhysicalGroupAggregateBase, BatchPhysicalLocalHashWindowAggregate, BatchPhysicalLocalSortWindowAggregate, BatchPhysicalWindowAggregateBase}
+import org.apache.flink.table.planner.plan.nodes.physical.batch.{
+  BatchPhysicalGroupAggregateBase,
+  BatchPhysicalLocalHashWindowAggregate,
+  BatchPhysicalLocalSortWindowAggregate,
+  BatchPhysicalWindowAggregateBase
+}
 import org.apache.flink.table.runtime.operators.rank.{ConstantRankRange, RankRange}
 import org.apache.flink.table.runtime.operators.sort.BinaryIndexedSortable
 import org.apache.flink.table.runtime.typeutils.BinaryRowDataSerializer.LENGTH_SIZE_IN_BYTES
@@ -51,8 +56,13 @@ import scala.collection.mutable
 object FlinkRelMdUtil {
 
   /** Returns an estimate of the number of rows returned by a SEMI/ANTI [[Join]]. */
-  def getSemiAntiJoinRowCount(mq: RelMetadataQuery, left: RelNode, right: RelNode,
-      joinType: JoinRelType, condition: RexNode, isAnti: Boolean): JDouble = {
+  def getSemiAntiJoinRowCount(
+      mq: RelMetadataQuery,
+      left: RelNode,
+      right: RelNode,
+      joinType: JoinRelType,
+      condition: RexNode,
+      isAnti: Boolean): JDouble = {
     val leftCount = mq.getRowCount(left)
     if (leftCount == null) {
       return null
@@ -79,7 +89,12 @@ object FlinkRelMdUtil {
     val joinInfo = rel.analyzeCondition()
     val rexBuilder = rel.getCluster.getRexBuilder
     makeSemiAntiJoinSelectivityRexNode(
-      mq, joinInfo, rel.getLeft, rel.getRight, rel.getJoinType == JoinRelType.ANTI, rexBuilder)
+      mq,
+      joinInfo,
+      rel.getLeft,
+      rel.getRight,
+      rel.getJoinType == JoinRelType.ANTI,
+      rexBuilder)
   }
 
   private def makeSemiAntiJoinSelectivityRexNode(
@@ -92,7 +107,7 @@ object FlinkRelMdUtil {
     val equiSelectivity: JDouble = if (!joinInfo.leftKeys.isEmpty) {
       RelMdUtil.computeSemiJoinSelectivity(mq, left, right, joinInfo.leftKeys, joinInfo.rightKeys)
     } else {
-      1D
+      1d
     }
 
     val nonEquiSelectivity = RelMdUtil.guessSelectivity(joinInfo.getRemaining(rexBuilder))
@@ -157,9 +172,7 @@ object FlinkRelMdUtil {
    * @return constructed rexNode including non-NamedProperties predicates and
    *         a predicate that stores NamedProperties predicate's selectivity
    */
-  def makeNamePropertiesSelectivityRexNode(
-      winAgg: WindowAggregate,
-      predicate: RexNode): RexNode = {
+  def makeNamePropertiesSelectivityRexNode(winAgg: WindowAggregate, predicate: RexNode): RexNode = {
     val fullGroupSet = AggregateUtil.checkAndGetFullGroupSet(winAgg)
     makeNamePropertiesSelectivityRexNode(winAgg, fullGroupSet, winAgg.getNamedProperties, predicate)
   }
@@ -179,7 +192,10 @@ object FlinkRelMdUtil {
     require(globalWinAgg.isFinal, "local window agg does not contain NamedProperties!")
     val fullGrouping = globalWinAgg.grouping ++ globalWinAgg.auxGrouping
     makeNamePropertiesSelectivityRexNode(
-      globalWinAgg, fullGrouping, globalWinAgg.namedWindowProperties, predicate)
+      globalWinAgg,
+      fullGrouping,
+      globalWinAgg.namedWindowProperties,
+      predicate)
   }
 
   /**
@@ -264,8 +280,10 @@ object FlinkRelMdUtil {
       parallelism: Int,
       inputRowCount: JDouble,
       globalAggRowCount: JDouble): JDouble =
-    Math.min((1 - math.pow(1 - 1.0 / parallelism, inputRowCount / globalAggRowCount))
-      * globalAggRowCount * parallelism, inputRowCount)
+    Math.min(
+      (1 - math.pow(1 - 1.0 / parallelism, inputRowCount / globalAggRowCount))
+        * globalAggRowCount * parallelism,
+      inputRowCount)
 
   /**
    * Takes a bitmap representing a set of input references and extracts the
@@ -285,16 +303,14 @@ object FlinkRelMdUtil {
     // does not need to take keys in aggregate call into consideration if groupKey contains all
     // groupSet element in aggregate
     val containsAllAggGroupKeys = fullGroupSet.indices.forall(groupKey.get)
-    groupKey.foreach(
-      bit =>
-        if (bit < fullGroupSet.length) {
-          childKeyBuilder.set(fullGroupSet(bit))
-        } else if (!containsAllAggGroupKeys) {
-          // getIndicatorCount return 0 if auxGroupSet is not empty
-          val agg = otherAggCalls.get(bit - (fullGroupSet.length + aggRel.getIndicatorCount))
-          aggCalls += agg
-        }
-    )
+    groupKey.foreach(bit =>
+      if (bit < fullGroupSet.length) {
+        childKeyBuilder.set(fullGroupSet(bit))
+      } else if (!containsAllAggGroupKeys) {
+        // getIndicatorCount return 0 if auxGroupSet is not empty
+        val agg = otherAggCalls.get(bit - (fullGroupSet.length + aggRel.getIndicatorCount))
+        aggCalls += agg
+      })
     (childKeyBuilder.build(), aggCalls.toArray)
   }
 
@@ -518,17 +534,16 @@ object FlinkRelMdUtil {
       val aggOutputFields = agg.getRowType.getFieldList
       val aggInputFields = agg.getInput.getRowType.getFieldList
       val adjustments = new Array[Int](aggOutputFields.size)
-      grouping.zipWithIndex foreach {
-        case (bit, index) => adjustments(index) = bit - index
+      grouping.zipWithIndex foreach { case (bit, index) =>
+        adjustments(index) = bit - index
       }
-      val pushableConditions = pushable map {
-        pushCondition =>
-          pushCondition.accept(
-            new RelOptUtil.RexInputConverter(
-              rexBuilder,
-              aggOutputFields,
-              aggInputFields,
-              adjustments))
+      val pushableConditions = pushable map { pushCondition =>
+        pushCondition.accept(
+          new RelOptUtil.RexInputConverter(
+            rexBuilder,
+            aggOutputFields,
+            aggInputFields,
+            adjustments))
       }
       Option(RexUtil.composeConjunction(rexBuilder, pushableConditions, true))
     }
@@ -546,20 +561,19 @@ object FlinkRelMdUtil {
     val mq = rel.getCluster.getMetadataQuery
     val columnSizes = mq.getAverageColumnSizes(rel)
     var length = 0d
-    columnSizes.zip(binaryType.getChildren).foreach {
-      case (columnSize, internalType) =>
-        if (BinaryRowData.isInFixedLengthPart(internalType)) {
-          length += 8
+    columnSizes.zip(binaryType.getChildren).foreach { case (columnSize, internalType) =>
+      if (BinaryRowData.isInFixedLengthPart(internalType)) {
+        length += 8
+      } else {
+        if (columnSize == null) {
+          // find a better way of computing generic type field variable-length
+          // right now we use a small value assumption
+          length += 16
         } else {
-          if (columnSize == null) {
-            // find a better way of computing generic type field variable-length
-            // right now we use a small value assumption
-            length += 16
-          } else {
-            // the 8 bytes is used store the length and offset of variable-length part.
-            length += columnSize + 8
-          }
+          // the 8 bytes is used store the length and offset of variable-length part.
+          length += columnSize + 8
         }
+      }
     }
     length += BinaryRowData.calculateBitSetWidthInBytes(columnSizes.size())
     length
@@ -576,9 +590,7 @@ object FlinkRelMdUtil {
     recordAreaInBytes + indexAreaInBytes
   }
 
-  def splitPredicateOnRank(
-      rank: Rank,
-      predicate: RexNode): (Option[RexNode], Option[RexNode]) = {
+  def splitPredicateOnRank(rank: Rank, predicate: RexNode): (Option[RexNode], Option[RexNode]) = {
     val rankFunColumnIndex = RankUtil.getRankNumberColumnIndex(rank).getOrElse(-1)
     if (predicate == null || predicate.isAlwaysTrue || rankFunColumnIndex < 0) {
       return (Some(predicate), None)
@@ -607,7 +619,7 @@ object FlinkRelMdUtil {
 
   def getRankRangeNdv(rankRange: RankRange): JDouble = rankRange match {
     case r: ConstantRankRange => (r.getRankEnd - r.getRankStart + 1).toDouble
-    case _ => 100D // default value now
+    case _                    => 100d // default value now
   }
 
   /**
@@ -619,7 +631,7 @@ object FlinkRelMdUtil {
     for (project <- expand.projects) {
       project.get(index) match {
         case inputRef: RexInputRef => inputRefs.add(inputRef.getIndex)
-        case _ => inputRefs.add(-1)
+        case _                     => inputRefs.add(-1)
       }
     }
     inputRefs
@@ -631,8 +643,8 @@ object FlinkRelMdUtil {
       columns: ImmutableBitSet): (ImmutableBitSet, ImmutableBitSet) = {
     val leftBuilder = ImmutableBitSet.builder
     val rightBuilder = ImmutableBitSet.builder
-    columns.foreach {
-      bit => if (bit < leftCount) leftBuilder.set(bit) else rightBuilder.set(bit - leftCount)
+    columns.foreach { bit =>
+      if (bit < leftCount) leftBuilder.set(bit) else rightBuilder.set(bit - leftCount)
     }
     (leftBuilder.build, rightBuilder.build)
   }
@@ -658,10 +670,8 @@ object FlinkRelMdUtil {
    * @param mq   metadata query instance
    * @param calc calc relnode
    */
-  private class CardOfCalcExpr(
-      mq: RelMetadataQuery,
-      calc: Calc)
-    extends RexVisitorImpl[JDouble](true) {
+  private class CardOfCalcExpr(mq: RelMetadataQuery, calc: Calc)
+      extends RexVisitorImpl[JDouble](true) {
     private val program = calc.getProgram
 
     private val condition = if (program.getCondition != null) {
@@ -681,7 +691,7 @@ object FlinkRelMdUtil {
     }
 
     override def visitLiteral(literal: RexLiteral): JDouble = {
-      FlinkRelMdUtil.numDistinctVals(1D, mq.getAverageRowSize(calc))
+      FlinkRelMdUtil.numDistinctVals(1d, mq.getAverageRowSize(calc))
     }
 
     override def visitCall(call: RexCall): JDouble = {
@@ -715,36 +725,40 @@ object FlinkRelMdUtil {
             val timeOperandType = timeOperand.getType.getSqlTypeName
             // assume min time is 1970-01-01 00:00:00, max time is 2100-12-31 21:59:59
             unitValue match {
-              case YEAR => 130D // [1970, 2100]
-              case MONTH => 12D
-              case DAY => 31D
-              case HOUR => 24D
-              case MINUTE => 60D
-              case SECOND => timeOperandType match {
-                case TIMESTAMP | TIME => 60 * 1000D // [0.000, 59.999]
-                case _ => 60D // [0, 59]
-              }
-              case QUARTER => 4D
-              case WEEK => 53D // [1, 53]
-              case MILLISECOND => timeOperandType match {
-                case TIMESTAMP | TIME => 60 * 1000D // [0.000, 59.999]
-                case _ => 60D // [0, 59]
-              }
-              case MICROSECOND => timeOperandType match {
-                case TIMESTAMP | TIME => 60 * 1000D * 1000D // [0.000, 59.999]
-                case _ => 60D // [0, 59]
-              }
-              case DOW => 7D // [0, 6]
-              case DOY => 366D // [1, 366]
-              case EPOCH => timeOperandType match {
-                // the number of seconds since 1970-01-01 00:00:00 UTC
-                case TIMESTAMP | TIME => 130 * 24 * 60 * 60 * 1000D
-                case _ => 130 * 24 * 60 * 60D
-              }
-              case DECADE => 13D // The year field divided by 10
-              case CENTURY => 2D
-              case MILLENNIUM => 2D
-              case _ => cardOfCalcExpr(mq, calc, timeOperand)
+              case YEAR   => 130d // [1970, 2100]
+              case MONTH  => 12d
+              case DAY    => 31d
+              case HOUR   => 24d
+              case MINUTE => 60d
+              case SECOND =>
+                timeOperandType match {
+                  case TIMESTAMP | TIME => 60 * 1000d // [0.000, 59.999]
+                  case _                => 60d // [0, 59]
+                }
+              case QUARTER => 4d
+              case WEEK    => 53d // [1, 53]
+              case MILLISECOND =>
+                timeOperandType match {
+                  case TIMESTAMP | TIME => 60 * 1000d // [0.000, 59.999]
+                  case _                => 60d // [0, 59]
+                }
+              case MICROSECOND =>
+                timeOperandType match {
+                  case TIMESTAMP | TIME => 60 * 1000d * 1000d // [0.000, 59.999]
+                  case _                => 60d // [0, 59]
+                }
+              case DOW => 7d // [0, 6]
+              case DOY => 366d // [1, 366]
+              case EPOCH =>
+                timeOperandType match {
+                  // the number of seconds since 1970-01-01 00:00:00 UTC
+                  case TIMESTAMP | TIME => 130 * 24 * 60 * 60 * 1000d
+                  case _                => 130 * 24 * 60 * 60d
+                }
+              case DECADE     => 13d // The year field divided by 10
+              case CENTURY    => 2d
+              case MILLENNIUM => 2d
+              case _          => cardOfCalcExpr(mq, calc, timeOperand)
             }
           case _ => cardOfCalcExpr(mq, calc, timeOperand)
         }

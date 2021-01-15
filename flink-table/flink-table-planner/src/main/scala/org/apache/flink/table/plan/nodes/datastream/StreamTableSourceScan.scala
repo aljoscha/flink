@@ -19,7 +19,10 @@
 package org.apache.flink.table.plan.nodes.datastream
 
 import org.apache.flink.streaming.api.datastream.DataStream
-import org.apache.flink.streaming.api.functions.{AssignerWithPeriodicWatermarks, AssignerWithPunctuatedWatermarks}
+import org.apache.flink.streaming.api.functions.{
+  AssignerWithPeriodicWatermarks,
+  AssignerWithPunctuatedWatermarks
+}
 import org.apache.flink.streaming.api.watermark.Watermark
 import org.apache.flink.table.api.{TableException, TableSchema}
 import org.apache.flink.table.plan.nodes.PhysicalTableSourceScan
@@ -27,7 +30,11 @@ import org.apache.flink.table.plan.schema.RowSchema
 import org.apache.flink.table.planner.StreamPlanner
 import org.apache.flink.table.runtime.types.CRow
 import org.apache.flink.table.sources._
-import org.apache.flink.table.sources.wmstrategies.{PeriodicWatermarkAssigner, PreserveWatermarks, PunctuatedWatermarkAssigner}
+import org.apache.flink.table.sources.wmstrategies.{
+  PeriodicWatermarkAssigner,
+  PreserveWatermarks,
+  PunctuatedWatermarkAssigner
+}
 import org.apache.flink.table.types.utils.TypeConversions
 import org.apache.flink.table.types.utils.TypeConversions.fromLegacyInfoToDataType
 import org.apache.flink.table.typeutils.TimeIndicatorTypeInfo
@@ -50,39 +57,34 @@ class StreamTableSourceScan(
     tableSchema: TableSchema,
     tableSource: StreamTableSource[_],
     selectedFields: Option[Array[Int]])
-  extends PhysicalTableSourceScan(
-    cluster,
-    traitSet,
-    table,
-    tableSchema,
-    tableSource,
-    selectedFields)
-  with StreamScan {
+    extends PhysicalTableSourceScan(
+      cluster,
+      traitSet,
+      table,
+      tableSchema,
+      tableSource,
+      selectedFields)
+    with StreamScan {
 
   override def deriveRowType(): RelDataType = {
     val rowType = table.getRowType
-    selectedFields.map(idxs => {
-      val fields = rowType.getFieldList
-      val builder = cluster.getTypeFactory.builder()
-      idxs.map(fields.get).foreach(builder.add)
-      builder.build()
-    }).getOrElse(rowType)
+    selectedFields
+      .map(idxs => {
+        val fields = rowType.getFieldList
+        val builder = cluster.getTypeFactory.builder()
+        idxs.map(fields.get).foreach(builder.add)
+        builder.build()
+      })
+      .getOrElse(rowType)
   }
 
-  override def computeSelfCost (planner: RelOptPlanner, metadata: RelMetadataQuery): RelOptCost = {
+  override def computeSelfCost(planner: RelOptPlanner, metadata: RelMetadataQuery): RelOptCost = {
     val rowCnt = metadata.getRowCount(this)
     planner.getCostFactory.makeCost(rowCnt, rowCnt, rowCnt * estimateRowSize(getRowType))
   }
 
   override def copy(traitSet: RelTraitSet, inputs: java.util.List[RelNode]): RelNode = {
-    new StreamTableSourceScan(
-      cluster,
-      traitSet,
-      getTable,
-      tableSchema,
-      tableSource,
-      selectedFields
-    )
+    new StreamTableSourceScan(cluster, traitSet, getTable, tableSchema, tableSource, selectedFields)
   }
 
   override def copy(
@@ -95,14 +97,14 @@ class StreamTableSourceScan(
       getTable,
       tableSchema,
       newTableSource.asInstanceOf[StreamTableSource[_]],
-      selectedFields
-    )
+      selectedFields)
   }
 
   override def translateToPlan(planner: StreamPlanner): DataStream[CRow] = {
 
     val config = planner.getConfig
-    val inputDataStream = tableSource.getDataStream(planner.getExecutionEnvironment)
+    val inputDataStream = tableSource
+      .getDataStream(planner.getExecutionEnvironment)
       .asInstanceOf[DataStream[Any]]
     val outputSchema = new RowSchema(this.getRowType)
 
@@ -127,32 +129,27 @@ class StreamTableSourceScan(
     }
 
     // get expression to extract rowtime attribute
-    val rowtimeExpression = TableSourceUtil.getRowtimeAttributeDescriptor(
-      tableSource,
-      selectedFields)
-      .map(desc => TableSourceUtil.getRowtimeExtractionExpression(
-        desc.getTimestampExtractor,
-        producedDataType,
-        TypeConversions.fromLegacyInfoToDataType(TimeIndicatorTypeInfo.ROWTIME_INDICATOR),
-        planner.getRelBuilder,
-        nameMapping
-      ))
+    val rowtimeExpression = TableSourceUtil
+      .getRowtimeAttributeDescriptor(tableSource, selectedFields)
+      .map(desc =>
+        TableSourceUtil.getRowtimeExtractionExpression(
+          desc.getTimestampExtractor,
+          producedDataType,
+          TypeConversions.fromLegacyInfoToDataType(TimeIndicatorTypeInfo.ROWTIME_INDICATOR),
+          planner.getRelBuilder,
+          nameMapping))
 
     val fieldIndexes = TypeMappingUtils.computePhysicalIndicesOrTimeAttributeMarkers(
       tableSource,
-      selectedFields.map(_.map(tableSchema.getTableColumn(_).get()).toList.asJava)
+      selectedFields
+        .map(_.map(tableSchema.getTableColumn(_).get()).toList.asJava)
         .getOrElse(tableSchema.getTableColumns),
       true,
-      nameMapping
-    )
+      nameMapping)
 
     // ingest table and convert and extract time attributes if necessary
-    val ingestedTable = convertToInternalRow(
-      outputSchema,
-      inputDataStream,
-      fieldIndexes,
-      config,
-      rowtimeExpression)
+    val ingestedTable =
+      convertToInternalRow(outputSchema, inputDataStream, fieldIndexes, config, rowtimeExpression)
 
     // generate watermarks for rowtime indicator
     val rowtimeDesc: Option[RowtimeAttributeDescriptor] =
@@ -182,15 +179,15 @@ class StreamTableSourceScan(
 }
 
 /**
-  * Generates periodic watermarks based on a [[PeriodicWatermarkAssigner]].
-  *
-  * @param timeFieldIdx the index of the rowtime attribute.
-  * @param assigner the watermark assigner.
-  */
+ * Generates periodic watermarks based on a [[PeriodicWatermarkAssigner]].
+ *
+ * @param timeFieldIdx the index of the rowtime attribute.
+ * @param assigner the watermark assigner.
+ */
 private class PeriodicWatermarkAssignerWrapper(
     timeFieldIdx: Int,
     assigner: PeriodicWatermarkAssigner)
-  extends AssignerWithPeriodicWatermarks[CRow] {
+    extends AssignerWithPeriodicWatermarks[CRow] {
 
   override def getCurrentWatermark: Watermark = assigner.getWatermark
 
@@ -202,15 +199,15 @@ private class PeriodicWatermarkAssignerWrapper(
 }
 
 /**
-  * Generates periodic watermarks based on a [[PunctuatedWatermarkAssigner]].
-  *
-  * @param timeFieldIdx the index of the rowtime attribute.
-  * @param assigner the watermark assigner.
-  */
+ * Generates periodic watermarks based on a [[PunctuatedWatermarkAssigner]].
+ *
+ * @param timeFieldIdx the index of the rowtime attribute.
+ * @param assigner the watermark assigner.
+ */
 private class PunctuatedWatermarkAssignerWrapper(
     timeFieldIdx: Int,
     assigner: PunctuatedWatermarkAssigner)
-  extends AssignerWithPunctuatedWatermarks[CRow] {
+    extends AssignerWithPunctuatedWatermarks[CRow] {
 
   override def checkAndGetNextWatermark(crow: CRow, ts: Long): Watermark = {
     val timestamp: Long = crow.row.getField(timeFieldIdx).asInstanceOf[Long]

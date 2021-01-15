@@ -31,7 +31,7 @@ trait OverAggregate {
 
   private[flink] def partitionToString(inputType: RelDataType, partition: Array[Int]): String = {
     val inFields = inputType.getFieldNames.asScala
-    partition.map( inFields(_) ).mkString(", ")
+    partition.map(inFields(_)).mkString(", ")
   }
 
   private[flink] def orderingToString(
@@ -40,20 +40,19 @@ trait OverAggregate {
 
     val inFields = inputType.getFieldList.asScala
 
-    val orderingString = orderFields.asScala.map {
-      x => inFields(x.getFieldIndex).getName
-    }.mkString(", ")
+    val orderingString = orderFields.asScala
+      .map { x =>
+        inFields(x.getFieldIndex).getName
+      }
+      .mkString(", ")
 
     orderingString
   }
 
-  private[flink] def windowRange(
-      logicWindow: Window,
-      overWindow: Group,
-      input: RelNode): String = {
+  private[flink] def windowRange(logicWindow: Window, overWindow: Group, input: RelNode): String = {
     if (overWindow.lowerBound.isPreceding && !overWindow.lowerBound.isUnbounded) {
       s"BETWEEN ${getLowerBoundary(logicWindow, overWindow, input)} PRECEDING " +
-          s"AND ${overWindow.upperBound}"
+        s"AND ${overWindow.upperBound}"
     } else {
       s"BETWEEN ${overWindow.lowerBound} AND ${overWindow.upperBound}"
     }
@@ -68,36 +67,43 @@ trait OverAggregate {
     val inFields = inputType.getFieldNames.asScala
     val outFields = rowType.getFieldNames.asScala
 
-    val aggStrings = namedAggregates.map(_.getKey).map(
-      a => s"${a.getAggregation}(${
-        val prefix = if (a.isDistinct) {
-          "DISTINCT "
-        } else {
-          ""
-        }
-        prefix + (if (a.getArgList.size() > 0) {
-          a.getArgList.asScala.map { arg =>
-            // index to constant
-            if (arg >= inputType.getFieldCount) {
-              constants(arg - inputType.getFieldCount)
-            }
-            // index to input field
-            else {
-              inFields(arg)
-            }
-          }.mkString(", ")
-        } else {
-          "*"
-        })
-      })")
+    val aggStrings = namedAggregates
+      .map(_.getKey)
+      .map(a =>
+        s"${a.getAggregation}(${
+          val prefix = if (a.isDistinct) {
+            "DISTINCT "
+          } else {
+            ""
+          }
+          prefix + (if (a.getArgList.size() > 0) {
+                      a.getArgList.asScala
+                        .map { arg =>
+                          // index to constant
+                          if (arg >= inputType.getFieldCount) {
+                            constants(arg - inputType.getFieldCount)
+                          }
+                          // index to input field
+                          else {
+                            inFields(arg)
+                          }
+                        }
+                        .mkString(", ")
+                    } else {
+                      "*"
+                    })
+        })")
 
-    (inFields ++ aggStrings).zip(outFields).map {
-      case (f, o) => if (f == o) {
-        f
-      } else {
-        s"$f AS $o"
+    (inFields ++ aggStrings)
+      .zip(outFields)
+      .map { case (f, o) =>
+        if (f == o) {
+          f
+        } else {
+          s"$f AS $o"
+        }
       }
-    }.mkString(", ")
+      .mkString(", ")
   }
 
   private[flink] def getLowerBoundary(
@@ -110,7 +116,7 @@ trait OverAggregate {
     val lowerBound = logicWindow.constants.get(lowerBoundIndex).getValue2
     lowerBound match {
       case x: java.math.BigDecimal => x.asInstanceOf[java.math.BigDecimal].longValue()
-      case _ => lowerBound.asInstanceOf[Long]
+      case _                       => lowerBound.asInstanceOf[Long]
     }
   }
 

@@ -22,7 +22,13 @@ import org.apache.flink.api.common.typeinfo.BasicTypeInfo.INT_TYPE_INFO
 import org.apache.flink.api.java.typeutils.RowTypeInfo
 import org.apache.flink.table.api.config.ExecutionConfigOptions._
 import org.apache.flink.table.planner.runtime.batch.sql.join.JoinITCaseHelper.disableOtherJoinOpForJoin
-import org.apache.flink.table.planner.runtime.batch.sql.join.JoinType.{BroadcastHashJoin, HashJoin, JoinType, NestedLoopJoin, SortMergeJoin}
+import org.apache.flink.table.planner.runtime.batch.sql.join.JoinType.{
+  BroadcastHashJoin,
+  HashJoin,
+  JoinType,
+  NestedLoopJoin,
+  SortMergeJoin
+}
 import org.apache.flink.table.planner.runtime.utils.BatchTestBase
 import org.apache.flink.table.planner.runtime.utils.BatchTestBase.row
 import org.apache.flink.table.planner.runtime.utils.TestData._
@@ -50,31 +56,14 @@ class InnerJoinITCase(expectedJoinType: JoinType) extends BatchTestBase {
     row(6, "F"),
     row(null, "G"))
 
-  private lazy val myLowerCaseData = Seq(
-    row(1, "a"),
-    row(2, "b"),
-    row(3, "c"),
-    row(4, "d"),
-    row(null, "e")
-  )
+  private lazy val myLowerCaseData =
+    Seq(row(1, "a"), row(2, "b"), row(3, "c"), row(4, "d"), row(null, "e"))
 
-  private lazy val myTestData1 = Seq(
-    row(1, 1),
-    row(1, 2),
-    row(2, 1),
-    row(2, 2),
-    row(3, 1),
-    row(3, 2)
-  )
+  private lazy val myTestData1 =
+    Seq(row(1, 1), row(1, 2), row(2, 1), row(2, 2), row(3, 1), row(3, 2))
 
-  private lazy val myTestData2 = Seq(
-    row(1, 1),
-    row(1, 2),
-    row(2, 1),
-    row(2, 2),
-    row(3, 1),
-    row(3, 2)
-  )
+  private lazy val myTestData2 =
+    Seq(row(1, 1), row(1, 2), row(2, 1), row(2, 2), row(3, 1), row(3, 2))
 
   @Before
   override def before(): Unit = {
@@ -90,12 +79,7 @@ class InnerJoinITCase(expectedJoinType: JoinType) extends BatchTestBase {
   def testOneMatchPerRow(): Unit = {
     checkResult(
       "SELECT * FROM myUpperCaseData u, myLowerCaseData l WHERE u.N = l.n",
-      Seq(
-        row(1, "A", 1, "a"),
-        row(2, "B", 2, "b"),
-        row(3, "C", 3, "c"),
-        row(4, "D", 4, "d")
-      ))
+      Seq(row(1, "A", 1, "a"), row(2, "B", 2, "b"), row(3, "C", 3, "c"), row(4, "D", 4, "d")))
   }
 
   @Test
@@ -104,12 +88,7 @@ class InnerJoinITCase(expectedJoinType: JoinType) extends BatchTestBase {
       case NestedLoopJoin =>
         checkResult(
           "SELECT * FROM myTestData1 A, myTestData2 B WHERE A.a = B.a and A.a = 1",
-          Seq(
-            row(1, 1, 1, 1),
-            row(1, 1, 1, 2),
-            row(1, 2, 1, 1),
-            row(1, 2, 1, 2)
-          ))
+          Seq(row(1, 1, 1, 1), row(1, 1, 1, 2), row(1, 2, 1, 1), row(1, 2, 1, 2)))
       case _ =>
       // A.a = B.a and A.a = 1 => A.a = 1 and B.a = 1, so after ftd and join condition simplified,
       // join condition is TRUE. Only NestedLoopJoin can handle join without any equi-condition.
@@ -128,27 +107,17 @@ class InnerJoinITCase(expectedJoinType: JoinType) extends BatchTestBase {
     val DEC_INT = new RowTypeInfo(BigDecimalTypeInfo.of(9, 0), INT_TYPE_INFO)
     registerCollection(
       "leftTable",
-      Seq(
-        row(new JBigDecimal(0), 0),
-        row(new JBigDecimal(1), 1),
-        row(new JBigDecimal(2), 2)
-      ),
+      Seq(row(new JBigDecimal(0), 0), row(new JBigDecimal(1), 1), row(new JBigDecimal(2), 2)),
       DEC_INT,
       "a, b")
     registerCollection(
       "rightTable",
-      Seq(
-        row(new JBigDecimal(0), 0),
-        row(new JBigDecimal(1), 1)
-      ),
+      Seq(row(new JBigDecimal(0), 0), row(new JBigDecimal(1), 1)),
       DEC_INT,
       "c, d")
     checkResult(
       "SELECT * FROM leftTable, rightTable WHERE a = c",
-      Seq(
-        row(0, 0, 0, 0),
-        row(1, 1, 1, 1)
-      ))
+      Seq(row(0, 0, 0, 0), row(1, 1, 1, 1)))
   }
 
   @Test
@@ -189,7 +158,9 @@ object InnerJoinITCase {
   @Parameterized.Parameters(name = "{0}")
   def parameters(): util.Collection[Array[_]] = {
     util.Arrays.asList(
-      Array(BroadcastHashJoin), Array(HashJoin), Array(SortMergeJoin), Array(NestedLoopJoin))
+      Array(BroadcastHashJoin),
+      Array(HashJoin),
+      Array(SortMergeJoin),
+      Array(NestedLoopJoin))
   }
 }
-

@@ -25,7 +25,10 @@ import org.apache.flink.table.api._
 import org.apache.flink.table.api.bridge.scala._
 import org.apache.flink.table.api.internal.TableEnvironmentInternal
 import org.apache.flink.table.planner.expressions.utils.FuncWithOpen
-import org.apache.flink.table.planner.runtime.utils.JavaUserDefinedAggFunctions.{CountDistinct, WeightedAvg}
+import org.apache.flink.table.planner.runtime.utils.JavaUserDefinedAggFunctions.{
+  CountDistinct,
+  WeightedAvg
+}
 import org.apache.flink.table.planner.runtime.utils.StreamingWithStateTestBase.StateBackendMode
 import org.apache.flink.table.planner.runtime.utils.TestData._
 import org.apache.flink.table.planner.runtime.utils._
@@ -40,18 +43,9 @@ import org.junit.{Before, Ignore, Test}
 @RunWith(classOf[Parameterized])
 class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode) {
 
-  val data2 = List(
-    (1, 1L, "Hi"),
-    (2, 2L, "Hello"),
-    (3, 2L, "Hello world")
-  )
+  val data2 = List((1, 1L, "Hi"), (2, 2L, "Hello"), (3, 2L, "Hello world"))
 
-  val data3 = List(
-    (1, 1L, "Hi"),
-    (2, 2L, "Hello"),
-    (3, 2L, "Hello world"),
-    (4, 9L, "Having fun")
-  )
+  val data3 = List((1, 1L, "Hi"), (2, 2L, "Hello"), (3, 2L, "Hello world"), (4, 9L, "Having fun"))
 
   val data = List(
     (1, 1L, 0, "Hallo", 1L),
@@ -59,25 +53,17 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
     (2, 3L, 2, "Hallo Welt wie", 1L),
     (3, 4L, 3, "Hallo Welt wie gehts?", 2L),
     (3, 5L, 4, "ABC", 2L),
-    (3, 6L, 5, "BCD", 3L)
-  )
+    (3, 6L, 5, "BCD", 3L))
 
   val dataCannotBeJoinedByData2 = List(
     (2, 3L, 2, "Hallo Welt wie", 1L),
     (3, 4L, 3, "Hallo Welt wie gehts?", 2L),
     (3, 5L, 4, "ABC", 2L),
-    (3, 6L, 5, "BCD", 3L)
-  )
+    (3, 6L, 5, "BCD", 3L))
 
-  val retractLeftData = List(
-    (1, "left"),
-    (2, "left")
-  )
+  val retractLeftData = List((1, "left"), (2, "left"))
 
-  val retractRightData = List(
-    (1, "right"),
-    (1, "right")
-  )
+  val retractRightData = List((1, "right"), (1, "right"))
 
   @Before
   override def before(): Unit = {
@@ -88,18 +74,8 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
   @Test
   def testInnerJoinOutputWithPk(): Unit = {
     // data input
-    val data1 = List(
-      (0, 0),
-      (1, 0),
-      (1, 1),
-      (2, 2),
-      (3, 3),
-      (4, 4),
-      (5, 4),
-      (5, 5),
-      (5, null),
-      (6, null)
-    )
+    val data1 =
+      List((0, 0), (1, 0), (1, 1), (2, 2), (3, 3), (4, 4), (5, 4), (5, 5), (5, null), (6, null))
 
     val data2 = List(
       (0L, 0),
@@ -113,8 +89,7 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
       (5L, 5),
       (6L, 6),
       (7L, null),
-      (8L, null)
-    )
+      (8L, null))
 
     val leftTable = env.fromCollection(data1).toTable(tEnv, 'a, 'b)
     val rightTable = env.fromCollection(data2).toTable(tEnv, 'bb, 'c)
@@ -124,8 +99,8 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
       .select('a, 'b.count as 'b)
 
     val rightTableWithPk = rightTable
-        .groupBy('bb)
-        .select('bb, 'c.count as 'c)
+      .groupBy('bb)
+      .select('bb, 'c.count as 'c)
 
     val t = leftTableWithPk
       .join(rightTableWithPk, 'b === 'bb)
@@ -142,21 +117,11 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
     assertEquals(expected.sorted, sink.getUpsertResults.sorted)
   }
 
-
   @Test
   def testInnerJoinOutputWithoutPk(): Unit = {
     // data input
 
-    val data1 = List(
-      (0, 0),
-      (1, 0),
-      (1, 1),
-      (2, 2),
-      (3, 3),
-      (4, 4),
-      (5, 4),
-      (5, 5)
-    )
+    val data1 = List((0, 0), (1, 0), (1, 1), (2, 2), (3, 3), (4, 4), (5, 4), (5, 5))
 
     val data2 = List(
       (1, 1, 1),
@@ -168,8 +133,7 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
       (4, 4, 4),
       (5, 5, 5),
       (5, 5, 5),
-      (6, 6, 6)
-    )
+      (6, 6, 6))
 
     val leftTable = env.fromCollection(data1).toTable(tEnv, 'a, 'b)
     val rightTable = env.fromCollection(data2).toTable(tEnv, 'bb, 'c, 'd)
@@ -188,8 +152,8 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
     tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSinkInternal("retractSink", sink)
     t.executeInsert("retractSink").await()
 
-    val expected = Seq("1,1,1,1", "1,1,1,1", "1,1,1,1", "1,1,1,1", "2,2,2,2", "3,3,3,3",
-                       "5,5,5,5", "5,5,5,5")
+    val expected =
+      Seq("1,1,1,1", "1,1,1,1", "1,1,1,1", "1,1,1,1", "2,2,2,2", "3,3,3,3", "5,5,5,5", "5,5,5,5")
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
 
@@ -228,9 +192,18 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
     val windowedTable = table
       .window(Tumble over 5.milli on 'proctime as 'w)
       .groupBy('w, 'string)
-      .select('string, countFun('string), 'int.avg, weightAvgFun('long, 'int),
-              weightAvgFun('int, 'int), 'int.min, 'int.max, 'int.sum, 'w.start, 'w.end,
-              countDistinct('long))
+      .select(
+        'string,
+        countFun('string),
+        'int.avg,
+        weightAvgFun('long, 'int),
+        weightAvgFun('int, 'int),
+        'int.min,
+        'int.max,
+        'int.sum,
+        'w.start,
+        'w.end,
+        countDistinct('long))
 
     val sink = new TestingAppendSink
     val results = windowedTable.toAppendStream[Row]
@@ -247,7 +220,8 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
 
     val testOpenCall = new FuncWithOpen
 
-    val joinT = ds1.join(ds2)
+    val joinT = ds1
+      .join(ds2)
       .where('b === 'e)
       .where(testOpenCall('a + 'd))
       .select('c, 'g)
@@ -281,8 +255,11 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
     val joinT = ds1.join(ds2).where('b === 'e && 'a < 6).select('c, 'g)
 
     val expected = Seq(
-      "Hi,Hallo", "Hello,Hallo Welt", "Hello world,Hallo Welt",
-      "Hello world, how are you?,Hallo Welt wie", "I am fine.,Hallo Welt wie")
+      "Hi,Hallo",
+      "Hello,Hallo Welt",
+      "Hello world,Hallo Welt",
+      "Hello world, how are you?,Hallo Welt wie",
+      "I am fine.,Hallo Welt wie")
 
     val sink = new TestingRetractSink
     joinT.toRetractStream[Row].addSink(sink)
@@ -313,8 +290,12 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
     val joinT = ds1.join(ds2).filter('a === 'd && 'b === 'h).select('c, 'g)
 
     val expected = Seq(
-      "Hi,Hallo", "Hello,Hallo Welt", "Hello world,Hallo Welt wie gehts?", "Hello world,ABC",
-      "I am fine.,HIJ", "I am fine.,IJK")
+      "Hi,Hallo",
+      "Hello,Hallo Welt",
+      "Hello world,Hallo Welt wie gehts?",
+      "Hello world,ABC",
+      "I am fine.,HIJ",
+      "I am fine.,IJK")
 
     val sink = new TestingRetractSink
     joinT.toRetractStream[Row].addSink(sink)
@@ -342,7 +323,8 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
     val ds1 = env.fromCollection(smallTupleData3).toTable(tEnv, 'a, 'b, 'c)
     val ds2 = env.fromCollection(tupleData5).toTable(tEnv, 'd, 'e, 'f, 'g, 'h)
 
-    val joinT = ds1.join(ds2)
+    val joinT = ds1
+      .join(ds2)
       .where('a === 'd)
       .groupBy('a, 'd)
       .select('b.sum, 'g.count)
@@ -361,7 +343,8 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
     val ds2 = env.fromCollection(tupleData5).toTable(tEnv, 'd, 'e, 'f, 'g, 'h)
     val ds3 = env.fromCollection(smallTupleData3).toTable(tEnv, 'j, 'k, 'l)
 
-    val joinT = ds1.join(ds2)
+    val joinT = ds1
+      .join(ds2)
       .where(true)
       .join(ds3)
       .where('a === 'd && 'e === 'k)
@@ -397,8 +380,12 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
 
     val joinT = ds1.join(ds2).filter('b === 'h + 1 && 'a - 1 === 'd + 2).select('c, 'g)
 
-    val expected = Seq("I am fine.,Hallo Welt", "Luke Skywalker,Hallo Welt wie gehts?",
-      "Luke Skywalker,ABC", "Comment#2,HIJ", "Comment#2,IJK")
+    val expected = Seq(
+      "I am fine.,Hallo Welt",
+      "Luke Skywalker,Hallo Welt wie gehts?",
+      "Luke Skywalker,ABC",
+      "Comment#2,HIJ",
+      "Comment#2,IJK")
 
     val sink = new TestingRetractSink
     joinT.toRetractStream[Row].addSink(sink)
@@ -408,20 +395,40 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
 
   @Test
   def testLeftJoinWithMultipleKeys(): Unit = {
-    val ds1 = env.fromCollection(tupleData3).toTable(tEnv, 'a, 'b, 'c)
+    val ds1 = env
+      .fromCollection(tupleData3)
+      .toTable(tEnv, 'a, 'b, 'c)
       .select(('a === 21) ? (nullOf(Types.INT), 'a) as 'a, 'b, 'c)
-    val ds2 = env.fromCollection(tupleData5).toTable(tEnv, 'd, 'e, 'f, 'g, 'h)
-      .select(('e === 15) ? (nullOf(Types.INT), 'd) as 'd,  'e, 'f, 'g, 'h)
+    val ds2 = env
+      .fromCollection(tupleData5)
+      .toTable(tEnv, 'd, 'e, 'f, 'g, 'h)
+      .select(('e === 15) ? (nullOf(Types.INT), 'd) as 'd, 'e, 'f, 'g, 'h)
 
     val joinT = ds1.leftOuterJoin(ds2, 'a === 'd && 'b === 'h).select('c, 'g)
 
     val expected = Seq(
-      "Hi,Hallo", "Hello,Hallo Welt", "Hello world,Hallo Welt wie gehts?", "Hello world,ABC",
-      "Hello world, how are you?,null", "I am fine.,HIJ",
-      "I am fine.,IJK", "Luke Skywalker,null", "Comment#1,null", "Comment#2,null",
-      "Comment#3,null", "Comment#4,null", "Comment#5,null", "Comment#6,null",
-      "Comment#7,null", "Comment#8,null", "Comment#9,null", "Comment#10,null",
-      "Comment#11,null", "Comment#12,null", "Comment#13,null", "Comment#14,null",
+      "Hi,Hallo",
+      "Hello,Hallo Welt",
+      "Hello world,Hallo Welt wie gehts?",
+      "Hello world,ABC",
+      "Hello world, how are you?,null",
+      "I am fine.,HIJ",
+      "I am fine.,IJK",
+      "Luke Skywalker,null",
+      "Comment#1,null",
+      "Comment#2,null",
+      "Comment#3,null",
+      "Comment#4,null",
+      "Comment#5,null",
+      "Comment#6,null",
+      "Comment#7,null",
+      "Comment#8,null",
+      "Comment#9,null",
+      "Comment#10,null",
+      "Comment#11,null",
+      "Comment#12,null",
+      "Comment#13,null",
+      "Comment#14,null",
       "Comment#15,null")
 
     val sink = new TestingRetractSink
@@ -438,12 +445,30 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
     val joinT = ds1.leftOuterJoin(ds2, 'a === 'd && 'b <= 'h).select('c, 'g)
 
     val expected = Seq(
-      "Hi,Hallo", "Hello,Hallo Welt", "Hello world,Hallo Welt wie gehts?", "Hello world,ABC",
-      "Hello world,BCD", "I am fine.,HIJ", "I am fine.,IJK",
-      "Hello world, how are you?,null", "Luke Skywalker,null", "Comment#1,null", "Comment#2,null",
-      "Comment#3,null", "Comment#4,null", "Comment#5,null", "Comment#6,null", "Comment#7,null",
-      "Comment#8,null", "Comment#9,null", "Comment#10,null", "Comment#11,null", "Comment#12,null",
-      "Comment#13,null", "Comment#14,null", "Comment#15,null")
+      "Hi,Hallo",
+      "Hello,Hallo Welt",
+      "Hello world,Hallo Welt wie gehts?",
+      "Hello world,ABC",
+      "Hello world,BCD",
+      "I am fine.,HIJ",
+      "I am fine.,IJK",
+      "Hello world, how are you?,null",
+      "Luke Skywalker,null",
+      "Comment#1,null",
+      "Comment#2,null",
+      "Comment#3,null",
+      "Comment#4,null",
+      "Comment#5,null",
+      "Comment#6,null",
+      "Comment#7,null",
+      "Comment#8,null",
+      "Comment#9,null",
+      "Comment#10,null",
+      "Comment#11,null",
+      "Comment#12,null",
+      "Comment#13,null",
+      "Comment#14,null",
+      "Comment#15,null")
 
     val sink = new TestingRetractSink
     joinT.toRetractStream[Row].addSink(sink).setParallelism(1)
@@ -459,12 +484,30 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
     val joinT = ds1.leftOuterJoin(ds2, 'a === 'd && 'b === 2).select('c, 'g)
 
     val expected = Seq(
-      "Hello,Hallo Welt", "Hello,Hallo Welt wie",
-      "Hello world,Hallo Welt wie gehts?", "Hello world,ABC", "Hello world,BCD",
-      "Hi,null", "Hello world, how are you?,null", "I am fine.,null", "Luke Skywalker,null",
-      "Comment#1,null", "Comment#2,null", "Comment#3,null", "Comment#4,null", "Comment#5,null",
-      "Comment#6,null", "Comment#7,null", "Comment#8,null", "Comment#9,null", "Comment#10,null",
-      "Comment#11,null", "Comment#12,null", "Comment#13,null", "Comment#14,null", "Comment#15,null")
+      "Hello,Hallo Welt",
+      "Hello,Hallo Welt wie",
+      "Hello world,Hallo Welt wie gehts?",
+      "Hello world,ABC",
+      "Hello world,BCD",
+      "Hi,null",
+      "Hello world, how are you?,null",
+      "I am fine.,null",
+      "Luke Skywalker,null",
+      "Comment#1,null",
+      "Comment#2,null",
+      "Comment#3,null",
+      "Comment#4,null",
+      "Comment#5,null",
+      "Comment#6,null",
+      "Comment#7,null",
+      "Comment#8,null",
+      "Comment#9,null",
+      "Comment#10,null",
+      "Comment#11,null",
+      "Comment#12,null",
+      "Comment#13,null",
+      "Comment#14,null",
+      "Comment#15,null")
 
     val sink = new TestingRetractSink
     joinT.toRetractStream[Row].addSink(sink).setParallelism(1)
@@ -481,8 +524,21 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
 
     val joinT = leftT.leftOuterJoin(rightT, 'b === 'e).select('e, 'd, 'a)
     val expected = Seq(
-      "1,1,1", "2,1,2", "3,1,3", "4,1,4", "5,1,5", "6,1,6", "7,1,null", "8,1,null", "9,1,null",
-      "10,1,null", "11,1,null", "12,1,null", "13,1,null", "14,1,null", "15,1,null")
+      "1,1,1",
+      "2,1,2",
+      "3,1,3",
+      "4,1,4",
+      "5,1,5",
+      "6,1,6",
+      "7,1,null",
+      "8,1,null",
+      "9,1,null",
+      "10,1,null",
+      "11,1,null",
+      "12,1,null",
+      "13,1,null",
+      "14,1,null",
+      "15,1,null")
 
     val sink = new TestingRetractSink
     joinT.toRetractStream[Row].addSink(sink)
@@ -498,10 +554,21 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
     val joinT = ds1.rightOuterJoin(ds2, 'a === 'd && 'b === 'h).select('c, 'g)
 
     val expected = Seq(
-      "Hi,Hallo", "Hello,Hallo Welt", "null,Hallo Welt wie",
-      "Hello world,Hallo Welt wie gehts?", "Hello world,ABC", "null,BCD", "null,CDE",
-      "null,DEF", "null,EFG", "null,FGH", "null,GHI", "I am fine.,HIJ",
-      "I am fine.,IJK", "null,JKL", "null,KLM")
+      "Hi,Hallo",
+      "Hello,Hallo Welt",
+      "null,Hallo Welt wie",
+      "Hello world,Hallo Welt wie gehts?",
+      "Hello world,ABC",
+      "null,BCD",
+      "null,CDE",
+      "null,DEF",
+      "null,EFG",
+      "null,FGH",
+      "null,GHI",
+      "I am fine.,HIJ",
+      "I am fine.,IJK",
+      "null,JKL",
+      "null,KLM")
 
     val sink = new TestingRetractSink
     joinT.toRetractStream[Row].addSink(sink)
@@ -517,12 +584,30 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
     val joinT = ds1.rightOuterJoin(ds2, 'a === 'd && 'b <= 'h).select('c, 'g)
 
     val expected = Seq(
-      "Hi,Hallo", "Hello,Hallo Welt", "Hello world,Hallo Welt wie gehts?", "Hello world,ABC",
-      "Hello world,BCD", "I am fine.,HIJ", "I am fine.,IJK",
-      "Hello world, how are you?,null", "Luke Skywalker,null", "Comment#1,null", "Comment#2,null",
-      "Comment#3,null", "Comment#4,null", "Comment#5,null", "Comment#6,null", "Comment#7,null",
-      "Comment#8,null", "Comment#9,null", "Comment#10,null", "Comment#11,null", "Comment#12,null",
-      "Comment#13,null", "Comment#14,null", "Comment#15,null")
+      "Hi,Hallo",
+      "Hello,Hallo Welt",
+      "Hello world,Hallo Welt wie gehts?",
+      "Hello world,ABC",
+      "Hello world,BCD",
+      "I am fine.,HIJ",
+      "I am fine.,IJK",
+      "Hello world, how are you?,null",
+      "Luke Skywalker,null",
+      "Comment#1,null",
+      "Comment#2,null",
+      "Comment#3,null",
+      "Comment#4,null",
+      "Comment#5,null",
+      "Comment#6,null",
+      "Comment#7,null",
+      "Comment#8,null",
+      "Comment#9,null",
+      "Comment#10,null",
+      "Comment#11,null",
+      "Comment#12,null",
+      "Comment#13,null",
+      "Comment#14,null",
+      "Comment#15,null")
 
     val sink = new TestingRetractSink
     joinT.toRetractStream[Row].addSink(sink).setParallelism(1)
@@ -538,12 +623,30 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
     val joinT = ds1.rightOuterJoin(ds2, 'a === 'd && 'b === 2).select('c, 'g)
 
     val expected = Seq(
-      "Hello,Hallo Welt", "Hello,Hallo Welt wie",
-      "Hello world,Hallo Welt wie gehts?", "Hello world,ABC", "Hello world,BCD",
-      "Hi,null", "Hello world, how are you?,null", "I am fine.,null", "Luke Skywalker,null",
-      "Comment#1,null", "Comment#2,null", "Comment#3,null", "Comment#4,null", "Comment#5,null",
-      "Comment#6,null", "Comment#7,null", "Comment#8,null", "Comment#9,null", "Comment#10,null",
-      "Comment#11,null", "Comment#12,null", "Comment#13,null", "Comment#14,null", "Comment#15,null")
+      "Hello,Hallo Welt",
+      "Hello,Hallo Welt wie",
+      "Hello world,Hallo Welt wie gehts?",
+      "Hello world,ABC",
+      "Hello world,BCD",
+      "Hi,null",
+      "Hello world, how are you?,null",
+      "I am fine.,null",
+      "Luke Skywalker,null",
+      "Comment#1,null",
+      "Comment#2,null",
+      "Comment#3,null",
+      "Comment#4,null",
+      "Comment#5,null",
+      "Comment#6,null",
+      "Comment#7,null",
+      "Comment#8,null",
+      "Comment#9,null",
+      "Comment#10,null",
+      "Comment#11,null",
+      "Comment#12,null",
+      "Comment#13,null",
+      "Comment#14,null",
+      "Comment#15,null")
 
     val sink = new TestingRetractSink
     joinT.toRetractStream[Row].addSink(sink).setParallelism(1)
@@ -559,14 +662,37 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
     val joinT = ds1.fullOuterJoin(ds2, 'a === 'd && 'b === 'h).select('c, 'g)
 
     val expected = Seq(
-      "Hi,Hallo", "Hello,Hallo Welt", "null,Hallo Welt wie",
-      "Hello world,Hallo Welt wie gehts?", "Hello world,ABC", "null,BCD", "null,CDE",
-      "null,DEF", "null,EFG", "null,FGH", "null,GHI", "I am fine.,HIJ",
-      "I am fine.,IJK", "null,JKL", "null,KLM", "Luke Skywalker,null",
-      "Comment#1,null", "Comment#2,null", "Comment#3,null", "Comment#4,null",
-      "Comment#5,null", "Comment#6,null", "Comment#7,null", "Comment#8,null",
-      "Comment#9,null", "Comment#10,null", "Comment#11,null", "Comment#12,null",
-      "Comment#13,null", "Comment#14,null", "Comment#15,null",
+      "Hi,Hallo",
+      "Hello,Hallo Welt",
+      "null,Hallo Welt wie",
+      "Hello world,Hallo Welt wie gehts?",
+      "Hello world,ABC",
+      "null,BCD",
+      "null,CDE",
+      "null,DEF",
+      "null,EFG",
+      "null,FGH",
+      "null,GHI",
+      "I am fine.,HIJ",
+      "I am fine.,IJK",
+      "null,JKL",
+      "null,KLM",
+      "Luke Skywalker,null",
+      "Comment#1,null",
+      "Comment#2,null",
+      "Comment#3,null",
+      "Comment#4,null",
+      "Comment#5,null",
+      "Comment#6,null",
+      "Comment#7,null",
+      "Comment#8,null",
+      "Comment#9,null",
+      "Comment#10,null",
+      "Comment#11,null",
+      "Comment#12,null",
+      "Comment#13,null",
+      "Comment#14,null",
+      "Comment#15,null",
       "Hello world, how are you?,null")
 
     val sink = new TestingRetractSink
@@ -584,15 +710,39 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
 
     val expected = Seq(
       // join matches
-      "Hi,Hallo", "Hello,Hallo Welt", "Hello world,Hallo Welt wie gehts?", "Hello world,ABC",
-      "Hello world,BCD", "I am fine.,HIJ", "I am fine.,IJK",
+      "Hi,Hallo",
+      "Hello,Hallo Welt",
+      "Hello world,Hallo Welt wie gehts?",
+      "Hello world,ABC",
+      "Hello world,BCD",
+      "I am fine.,HIJ",
+      "I am fine.,IJK",
       // preserved left
-      "Hello world, how are you?,null", "Luke Skywalker,null", "Comment#1,null", "Comment#2,null",
-      "Comment#3,null", "Comment#4,null", "Comment#5,null", "Comment#6,null", "Comment#7,null",
-      "Comment#8,null", "Comment#9,null", "Comment#10,null", "Comment#11,null", "Comment#12,null",
-      "Comment#13,null", "Comment#14,null", "Comment#15,null",
+      "Hello world, how are you?,null",
+      "Luke Skywalker,null",
+      "Comment#1,null",
+      "Comment#2,null",
+      "Comment#3,null",
+      "Comment#4,null",
+      "Comment#5,null",
+      "Comment#6,null",
+      "Comment#7,null",
+      "Comment#8,null",
+      "Comment#9,null",
+      "Comment#10,null",
+      "Comment#11,null",
+      "Comment#12,null",
+      "Comment#13,null",
+      "Comment#14,null",
+      "Comment#15,null",
       // preserved right
-      "null,Hallo Welt wie", "null,CDE", "null,DEF", "null,EFG", "null,FGH", "null,GHI", "null,JKL",
+      "null,Hallo Welt wie",
+      "null,CDE",
+      "null,DEF",
+      "null,EFG",
+      "null,FGH",
+      "null,GHI",
+      "null,JKL",
       "null,KLM")
     val sink = new TestingRetractSink
     joinT.toRetractStream[Row].addSink(sink).setParallelism(1)
@@ -609,16 +759,41 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
 
     val expected = Seq(
       // join matches
-      "Hello,Hallo Welt wie", "Hello world, how are you?,DEF", "Hello world, how are you?,EFG",
+      "Hello,Hallo Welt wie",
+      "Hello world, how are you?,DEF",
+      "Hello world, how are you?,EFG",
       "I am fine.,GHI",
       // preserved left
-      "Hi,null", "Hello world,null", "Luke Skywalker,null",
-      "Comment#1,null", "Comment#2,null", "Comment#3,null", "Comment#4,null", "Comment#5,null",
-      "Comment#6,null", "Comment#7,null", "Comment#8,null", "Comment#9,null", "Comment#10,null",
-      "Comment#11,null", "Comment#12,null", "Comment#13,null", "Comment#14,null", "Comment#15,null",
+      "Hi,null",
+      "Hello world,null",
+      "Luke Skywalker,null",
+      "Comment#1,null",
+      "Comment#2,null",
+      "Comment#3,null",
+      "Comment#4,null",
+      "Comment#5,null",
+      "Comment#6,null",
+      "Comment#7,null",
+      "Comment#8,null",
+      "Comment#9,null",
+      "Comment#10,null",
+      "Comment#11,null",
+      "Comment#12,null",
+      "Comment#13,null",
+      "Comment#14,null",
+      "Comment#15,null",
       // preserved right
-      "null,Hallo", "null,Hallo Welt", "null,Hallo Welt wie gehts?", "null,ABC", "null,BCD",
-      "null,CDE", "null,FGH", "null,HIJ", "null,IJK", "null,JKL", "null,KLM")
+      "null,Hallo",
+      "null,Hallo Welt",
+      "null,Hallo Welt wie gehts?",
+      "null,ABC",
+      "null,BCD",
+      "null,CDE",
+      "null,FGH",
+      "null,HIJ",
+      "null,IJK",
+      "null,JKL",
+      "null,KLM")
     val sink = new TestingRetractSink
     joinT.toRetractStream[Row].addSink(sink).setParallelism(1)
     env.execute()
@@ -697,8 +872,10 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
     env.execute()
 
     val expected = Seq(
-      "1,Hi,1,Hallo", "2,Hello world,2,Hallo Welt",
-      "2,Hello,2,Hallo Welt", "9,Having fun,null,null")
+      "1,Hi,1,Hallo",
+      "2,Hello world,2,Hallo Welt",
+      "2,Hello,2,Hallo Welt",
+      "9,Having fun,null,null")
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
 
@@ -721,12 +898,7 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
     // data input
     // rightTable with (1, 1) and (1, 2)
     // leftTable with (1, 4) and (1, 5)
-    val data = List(
-      (1, 1),
-      (1, 2),
-      (1, 4),
-      (1, 5)
-    )
+    val data = List((1, 1), (1, 2), (1, 4), (1, 5))
 
     val stream = failingDataSource(data)
     val table = stream.toTable(tEnv, 'pk, 'a)
@@ -759,12 +931,7 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
     // data input
     // rightTable with (1, 1) and (1, 2)
     // leftTable with (1, 4) and (1, 5)
-    val data = List(
-      (1, 1),
-      (1, 2),
-      (1, 4),
-      (1, 5)
-    )
+    val data = List((1, 1), (1, 2), (1, 4), (1, 5))
 
     val stream = failingDataSource(data)
     val table = stream.toTable(tEnv, 'pk, 'a)
@@ -796,18 +963,12 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
     assertEquals(expected.sorted, sink.getUpsertResults.sorted)
   }
 
-
   @Test
   def testJoinKeyEqualsGroupByKeyWithRetractSink(): Unit = {
     // data input
     // rightTable with (1, 1) and (1, 2)
     // leftTable with (1, 4) and (1, 5)
-    val data = List(
-      (1, 1),
-      (1, 2),
-      (1, 4),
-      (1, 5)
-    )
+    val data = List((1, 1), (1, 2), (1, 4), (1, 5))
 
     val stream = failingDataSource(data)
     val table = stream.toTable(tEnv, 'pk, 'a)
@@ -842,12 +1003,7 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
     // data input
     // rightTable with (1, 1) and (1, 2)
     // leftTable with (1, 4) and (1, 5)
-    val data = List(
-      (1, 1),
-      (1, 2),
-      (1, 4),
-      (1, 5)
-    )
+    val data = List((1, 1), (1, 2), (1, 4), (1, 5))
 
     val stream = failingDataSource(data)
     val table = stream.toTable(tEnv, 'pk, 'a)
@@ -867,8 +1023,7 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
       .where('leftPk === 'rightPk)
       .select('leftPk, 'leftA, 'rightPk, 'rightA)
     val schema = t.getSchema
-    val sink = new TestingRetractTableSink().configure(
-      schema.getFieldNames, schema.getFieldTypes)
+    val sink = new TestingRetractTableSink().configure(schema.getFieldNames, schema.getFieldTypes)
     tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSinkInternal("MySink", sink)
     t.executeInsert("MySink").await()
 
@@ -876,18 +1031,12 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
 
-
   @Test
   def testOneSideJoinKeyEqualsGroupByKeyWithRetractSink(): Unit = {
     // data input
     // rightTable with (1, 1) and (1, 2)
     // leftTable with (1, 4) and (1, 5)
-    val data = List(
-      (1, 1),
-      (1, 2),
-      (1, 4),
-      (1, 5)
-    )
+    val data = List((1, 1), (1, 2), (1, 4), (1, 5))
 
     val stream = failingDataSource(data)
     val table = stream.toTable(tEnv, 'pk, 'a)
@@ -919,11 +1068,7 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
     // data input
     // rightTable with (1, 1) and (1, 1)
     // leftTable with (1, 4) and (1, 5)
-    val data = List(
-      (1, 1),
-      (1, 1),
-      (1, 4),
-      (1, 5))
+    val data = List((1, 1), (1, 1), (1, 4), (1, 5))
 
     val stream = failingDataSource(data)
     val table = stream.toTable(tEnv, 'pk, 'a)
@@ -954,31 +1099,10 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
 
   @Test
   def testStreamJoinWithSameRecord(): Unit = {
-    val data1 = List(
-      (1, 1),
-      (1, 1),
-      (2, 2),
-      (2, 2),
-      (3, 3),
-      (3, 3),
-      (4, 4),
-      (4, 4),
-      (5, 5),
-      (5, 5)
-    )
+    val data1 = List((1, 1), (1, 1), (2, 2), (2, 2), (3, 3), (3, 3), (4, 4), (4, 4), (5, 5), (5, 5))
 
-    val data2 = List(
-      (1, 1),
-      (2, 2),
-      (3, 3),
-      (4, 4),
-      (5, 5),
-      (6, 6),
-      (7, 7),
-      (8, 8),
-      (9, 9),
-      (10, 10)
-    )
+    val data2 =
+      List((1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6), (7, 7), (8, 8), (9, 9), (10, 10))
 
     val stream1 = failingDataSource(data1)
     val table1 = stream1.toTable(tEnv, 'pk, 'a)
@@ -997,30 +1121,25 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
     resultTable.toAppendStream[Row].addSink(sink)
     env.execute()
 
-    val expected = Seq("1,1,1,1", "1,1,1,1",
-      "2,2,2,2", "2,2,2,2",
-      "3,3,3,3", "3,3,3,3",
-      "4,4,4,4", "4,4,4,4",
-      "5,5,5,5", "5,5,5,5")
+    val expected = Seq(
+      "1,1,1,1",
+      "1,1,1,1",
+      "2,2,2,2",
+      "2,2,2,2",
+      "3,3,3,3",
+      "3,3,3,3",
+      "4,4,4,4",
+      "4,4,4,4",
+      "5,5,5,5",
+      "5,5,5,5")
     assertEquals(expected.sorted, sink.getAppendResults.sorted)
   }
-
 
   @Test
   def testOutputWithPk(): Unit = {
     // data input
-    val data1 = List(
-      (0, 0),
-      (1, 0),
-      (1, 1),
-      (2, 2),
-      (3, 3),
-      (4, 4),
-      (5, 4),
-      (5, 5),
-      (5, null),
-      (6, null)
-    )
+    val data1 =
+      List((0, 0), (1, 0), (1, 1), (2, 2), (3, 3), (4, 4), (5, 4), (5, 5), (5, null), (6, null))
 
     val data2 = List(
       (0L, 0),
@@ -1034,8 +1153,7 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
       (5L, 5),
       (6L, 6),
       (7L, null),
-      (8L, null)
-    )
+      (8L, null))
 
     val leftTable = failingDataSource(data1).toTable(tEnv, 'a, 'b)
     val rightTable = failingDataSource(data2).toTable(tEnv, 'bb, 'c)
@@ -1063,21 +1181,11 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
     assertEquals(expected.sorted, sink.getUpsertResults.sorted)
   }
 
-
   @Test
   def testOutputWithoutPk(): Unit = {
     // data input
 
-    val data1 = List(
-      (0, 0),
-      (1, 0),
-      (1, 1),
-      (2, 2),
-      (3, 3),
-      (4, 4),
-      (5, 4),
-      (5, 5)
-    )
+    val data1 = List((0, 0), (1, 0), (1, 1), (2, 2), (3, 3), (4, 4), (5, 4), (5, 5))
 
     val data2 = List(
       (1, 1, 1),
@@ -1089,8 +1197,7 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
       (4, 4, 4),
       (5, 5, 5),
       (5, 5, 5),
-      (6, 6, 6)
-    )
+      (6, 6, 6))
 
     val leftTable = failingDataSource(data1).toTable(tEnv, 'a, 'b)
     val rightTable = failingDataSource(data2).toTable(tEnv, 'bb, 'c, 'd)
@@ -1107,8 +1214,8 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
     val sink = new TestingRetractSink
     result.addSink(sink).setParallelism(1)
     env.execute()
-    val expected = Seq("1,1,1,1", "1,1,1,1", "1,1,1,1", "1,1,1,1", "2,2,2,2", "3,3,3,3",
-      "5,5,5,5", "5,5,5,5")
+    val expected =
+      Seq("1,1,1,1", "1,1,1,1", "1,1,1,1", "1,1,1,1", "2,2,2,2", "3,3,3,3", "5,5,5,5", "5,5,5,5")
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
 
@@ -1145,8 +1252,17 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
     val windowedTable = table
       .window(Tumble over 5.milli on 'proctime as 'w)
       .groupBy('w, 'string)
-      .select('string, countFun('string), 'int.avg, weightAvgFun('long, 'int),
-        weightAvgFun('int, 'int), 'int.min, 'int.max, 'int.sum, 'w.start, 'w.end,
+      .select(
+        'string,
+        countFun('string),
+        'int.avg,
+        weightAvgFun('long, 'int),
+        weightAvgFun('int, 'int),
+        'int.min,
+        'int.max,
+        'int.sum,
+        'w.start,
+        'w.end,
         countDistinct('long))
 
     val sink = new TestingAppendSink
@@ -1198,8 +1314,11 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
     env.execute()
 
     val expected = Seq(
-      "Hi,Hallo", "Hello,Hallo Welt", "Hello world,Hallo Welt",
-      "Hello world, how are you?,Hallo Welt wie", "I am fine.,Hallo Welt wie")
+      "Hi,Hallo",
+      "Hello,Hallo Welt",
+      "Hello world,Hallo Welt",
+      "Hello world, how are you?,Hallo Welt wie",
+      "I am fine.,Hallo Welt wie")
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
 
@@ -1215,8 +1334,12 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
     env.execute()
 
     val expected = Seq(
-      "Hi,Hallo", "Hello,Hallo Welt", "Hello world,Hallo Welt wie gehts?", "Hello world,ABC",
-      "I am fine.,HIJ", "I am fine.,IJK")
+      "Hi,Hallo",
+      "Hello,Hallo Welt",
+      "Hello world,Hallo Welt wie gehts?",
+      "Hello world,ABC",
+      "I am fine.,HIJ",
+      "I am fine.,IJK")
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
 
@@ -1240,7 +1363,8 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
     val ds1 = failingDataSource(smallTupleData3).toTable(tEnv, 'a, 'b, 'c)
     val ds2 = failingDataSource(tupleData5).toTable(tEnv, 'd, 'e, 'f, 'g, 'h)
 
-    val joinT = ds1.join(ds2)
+    val joinT = ds1
+      .join(ds2)
       .where('a === 'd)
       .groupBy('a, 'd)
       .select('b.sum, 'g.count)
@@ -1259,7 +1383,8 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
     val ds2 = failingDataSource(tupleData5).toTable(tEnv, 'd, 'e, 'f, 'g, 'h)
     val ds3 = failingDataSource(smallTupleData3).toTable(tEnv, 'j, 'k, 'l)
 
-    val joinT = ds1.join(ds2)
+    val joinT = ds1
+      .join(ds2)
       .where(true)
       .join(ds3)
       .where('a === 'd && 'e === 'k)
@@ -1299,20 +1424,19 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
     joinT.toRetractStream[Row].addSink(sink).setParallelism(1)
     env.execute()
 
-    val expected = Seq("I am fine.,Hallo Welt", "Luke Skywalker,Hallo Welt wie gehts?",
-      "Luke Skywalker,ABC", "Comment#2,HIJ", "Comment#2,IJK")
+    val expected = Seq(
+      "I am fine.,Hallo Welt",
+      "Luke Skywalker,Hallo Welt wie gehts?",
+      "Luke Skywalker,ABC",
+      "Comment#2,HIJ",
+      "Comment#2,IJK")
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
 
   @Test
   def testJoinKeyNotEqualPrimaryKey(): Unit = {
     // data input
-    val data = List(
-      (1, 1),
-      (1, 1),
-      (2, 2),
-      (4, 1),
-      (5, 5))
+    val data = List((1, 1), (1, 1), (2, 2), (4, 1), (5, 5))
 
     val stream = failingDataSource(data)
     val table = stream.toTable(tEnv, 'pk, 'a)
@@ -1345,16 +1469,10 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
     assertEquals(expected, sink.getUpsertResults)
   }
 
-
   @Test
   def testJoinKeyNotEqualPrimaryKeyWithRetractSink(): Unit = {
     // data input
-    val data = List(
-      (1, 1),
-      (1, 1),
-      (2, 1),
-      (4, 1),
-      (5, 5))
+    val data = List((1, 1), (1, 1), (2, 1), (4, 1), (5, 5))
 
     val stream = failingDataSource(data)
     val table = stream.toTable(tEnv, 'pk, 'a)
@@ -1386,10 +1504,14 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
 
   @Test
   def testLeftOuterJoinWithTwoSideJoinKeyContainPrimaryKey(): Unit = {
-    val ds1 = failingDataSource(data2).toTable(tEnv, 'a, 'b, 'c)
-      .groupBy('b).select('a.sum.as('a), 'b)
-    val ds2 = failingDataSource(dataCannotBeJoinedByData2).toTable(tEnv, 'd, 'e, 'f, 'g, 'h)
-      .groupBy('e).select('d.sum.as('d), 'e)
+    val ds1 = failingDataSource(data2)
+      .toTable(tEnv, 'a, 'b, 'c)
+      .groupBy('b)
+      .select('a.sum.as('a), 'b)
+    val ds2 = failingDataSource(dataCannotBeJoinedByData2)
+      .toTable(tEnv, 'd, 'e, 'f, 'g, 'h)
+      .groupBy('e)
+      .select('d.sum.as('d), 'e)
 
     val joinT = ds1.leftOuterJoin(ds2, 'b === 'e).select('b, 'e)
 
@@ -1403,8 +1525,10 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
 
   @Test
   def testLeftOuterJoinContainPrimaryKey(): Unit = {
-    val ds1 = failingDataSource(data2).toTable(tEnv, 'a, 'b, 'c)
-      .groupBy('b).select('a.sum.as('a), 'b)
+    val ds1 = failingDataSource(data2)
+      .toTable(tEnv, 'a, 'b, 'c)
+      .groupBy('b)
+      .select('a.sum.as('a), 'b)
     val ds2 = failingDataSource(dataCannotBeJoinedByData2).toTable(tEnv, 'd, 'e, 'f, 'g, 'h)
 
     val joinT = ds1.leftOuterJoin(ds2, 'b === 'e).select('b, 'e, 'g)
@@ -1419,8 +1543,10 @@ class JoinITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode
 
   @Test
   def testLeftOuterJoinContainPrimaryKeyAndWithNonEquiJoinPred(): Unit = {
-    val ds1 = failingDataSource(data2).toTable(tEnv, 'a, 'b, 'c)
-      .groupBy('b).select('a.sum.as('a), 'b)
+    val ds1 = failingDataSource(data2)
+      .toTable(tEnv, 'a, 'b, 'c)
+      .groupBy('b)
+      .select('a.sum.as('a), 'b)
     val ds2 = failingDataSource(dataCannotBeJoinedByData2).toTable(tEnv, 'd, 'e, 'f, 'g, 'h)
 
     val joinT = ds1.leftOuterJoin(ds2, 'b === 'e && 'a < 'b).select('b, 'e, 'g)

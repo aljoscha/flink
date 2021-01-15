@@ -41,8 +41,7 @@ class JoinOperatorTest {
     // should work
     try {
       ds1.join(ds2).where(0).equalTo(0)
-    }
-    catch {
+    } catch {
       case e: Exception => Assert.fail()
     }
   }
@@ -106,8 +105,7 @@ class JoinOperatorTest {
     // should work
     try {
       ds1.join(ds2).where("_1").equalTo("_1")
-    }
-    catch {
+    } catch {
       case e: Exception => Assert.fail()
     }
   }
@@ -172,8 +170,7 @@ class JoinOperatorTest {
     // should work
     try {
       ds1.join(ds2).where("myInt").equalTo("myInt")
-    }
-    catch {
+    } catch {
       case e: Exception => Assert.fail()
     }
   }
@@ -216,9 +213,8 @@ class JoinOperatorTest {
 
     // should work
     try {
-      ds1.join(ds2).where { _.myLong} equalTo { _.myLong }
-    }
-    catch {
+      ds1.join(ds2).where { _.myLong } equalTo { _.myLong }
+    } catch {
       case e: Exception => Assert.fail()
     }
   }
@@ -232,8 +228,7 @@ class JoinOperatorTest {
     // should work
     try {
       ds1.join(ds2).where { _.myLong }.equalTo(3)
-    }
-    catch {
+    } catch {
       case e: Exception => Assert.fail()
     }
   }
@@ -247,8 +242,7 @@ class JoinOperatorTest {
     // should work
     try {
       ds1.join(ds2).where(3).equalTo { _.myLong }
-    }
-    catch {
+    } catch {
       case e: Exception => Assert.fail()
     }
   }
@@ -336,4 +330,3 @@ class JoinOperatorTest {
     ds1.join(ds2).where("*").equalTo("*")
   }
 }
-

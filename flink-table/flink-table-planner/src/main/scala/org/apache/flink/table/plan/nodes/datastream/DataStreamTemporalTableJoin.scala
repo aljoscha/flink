@@ -27,8 +27,8 @@ import org.apache.flink.table.planner.StreamPlanner
 import org.apache.flink.util.Preconditions.checkState
 
 /**
-  * RelNode for a stream join with [[org.apache.flink.table.functions.TemporalTableFunction]].
-  */
+ * RelNode for a stream join with [[org.apache.flink.table.functions.TemporalTableFunction]].
+ */
 class DataStreamTemporalTableJoin(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -40,18 +40,18 @@ class DataStreamTemporalTableJoin(
     rightSchema: RowSchema,
     schema: RowSchema,
     ruleDescription: String)
-  extends DataStreamJoin(
-    cluster,
-    traitSet,
-    leftNode,
-    rightNode,
-    joinCondition,
-    joinInfo,
-    JoinRelType.INNER,
-    leftSchema,
-    rightSchema,
-    schema,
-    ruleDescription) {
+    extends DataStreamJoin(
+      cluster,
+      traitSet,
+      leftNode,
+      rightNode,
+      joinCondition,
+      joinInfo,
+      JoinRelType.INNER,
+      leftSchema,
+      rightSchema,
+      schema,
+      ruleDescription) {
 
   override def needsUpdatesAsRetraction: Boolean = true
 
@@ -82,4 +82,5 @@ class DataStreamTemporalTableJoin(
       rightSchema,
       joinInfo,
       cluster.getRexBuilder)
-  }}
+  }
+}

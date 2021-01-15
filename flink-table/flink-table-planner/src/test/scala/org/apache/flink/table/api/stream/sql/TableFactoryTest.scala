@@ -36,9 +36,11 @@ class TableFactoryTest extends TableTestBase {
       ObjectIdentifier.of("cat", "default", "t1"),
       ObjectIdentifier.of("cat", "default", "t2"))
     util.tableEnv.getConfig.getConfiguration.setBoolean(TestContextTableFactory.REQUIRED_KEY, true)
-    util.tableEnv.registerCatalog("cat", new GenericInMemoryCatalog("default") {
-      override def getTableFactory: Optional[TableFactory] = Optional.of(factory)
-    })
+    util.tableEnv.registerCatalog(
+      "cat",
+      new GenericInMemoryCatalog("default") {
+        override def getTableFactory: Optional[TableFactory] = Optional.of(factory)
+      })
     util.tableEnv.useCatalog("cat")
 
     val sourceDDL =

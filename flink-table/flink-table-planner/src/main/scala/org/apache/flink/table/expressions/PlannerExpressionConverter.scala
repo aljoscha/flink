@@ -33,11 +33,11 @@ import org.apache.flink.table.util.Logging
 import _root_.scala.collection.JavaConverters._
 
 /**
-  * Visitor implementation for converting [[Expression]]s to [[PlannerExpression]]s.
-  */
+ * Visitor implementation for converting [[Expression]]s to [[PlannerExpression]]s.
+ */
 class PlannerExpressionConverter private
-  extends ApiExpressionVisitor[PlannerExpression]
-  with Logging {
+    extends ApiExpressionVisitor[PlannerExpression]
+    with Logging {
 
   override def visit(call: CallExpression): PlannerExpression = {
     translateCall(call.getFunctionDefinition, call.getChildren.asScala)
@@ -49,8 +49,7 @@ class PlannerExpressionConverter private
 
   private def translateCall(
       func: FunctionDefinition,
-      children: Seq[Expression])
-    : PlannerExpression = {
+      children: Seq[Expression]): PlannerExpression = {
 
     // special case: requires individual handling of child expressions
     func match {
@@ -89,20 +88,14 @@ class PlannerExpressionConverter private
     func match {
       // explicit legacy
       case sfd: ScalarFunctionDefinition =>
-        val call = PlannerScalarFunctionCall(
-          sfd.getScalarFunction,
-          args)
+        val call = PlannerScalarFunctionCall(sfd.getScalarFunction, args)
         //it configures underlying state
         call.validateInput()
         call
 
       // explicit legacy
       case tfd: TableFunctionDefinition =>
-        PlannerTableFunctionCall(
-          tfd.toString,
-          tfd.getTableFunction,
-          args,
-          tfd.getResultType)
+        PlannerTableFunctionCall(tfd.toString, tfd.getTableFunction, args, tfd.getResultType)
 
       // explicit legacy
       case afd: AggregateFunctionDefinition =>
@@ -124,10 +117,9 @@ class PlannerExpressionConverter private
       case sf: ScalarFunction =>
         LOG.warn(
           "The new type inference for functions is only supported in the Blink planner. " +
-           "Falling back to legacy type inference for function '{}'.", sf.getClass)
-        val call = PlannerScalarFunctionCall(
-          sf,
-          args)
+            "Falling back to legacy type inference for function '{}'.",
+          sf.getClass)
+        val call = PlannerScalarFunctionCall(sf, args)
         // it configures underlying state
         call.validateInput()
         call
@@ -136,7 +128,8 @@ class PlannerExpressionConverter private
       case tf: TableFunction[_] =>
         LOG.warn(
           "The new type inference for functions is only supported in the Blink planner. " +
-           "Falling back to legacy type inference for function '{}'.", tf.getClass)
+            "Falling back to legacy type inference for function '{}'.",
+          tf.getClass)
         PlannerTableFunctionCall(
           tf.toString,
           tf,
@@ -147,7 +140,8 @@ class PlannerExpressionConverter private
       case af: AggregateFunction[_, _] =>
         LOG.warn(
           "The new type inference for functions is only supported in the Blink planner. " +
-           "Falling back to legacy type inference for function '{}'.", af.getClass)
+            "Falling back to legacy type inference for function '{}'.",
+          af.getClass)
         AggFunctionCall(
           af,
           UserDefinedFunctionHelper.getReturnTypeOfAggregateFunction(af),
@@ -158,14 +152,15 @@ class PlannerExpressionConverter private
       case taf: TableAggregateFunction[_, _] =>
         LOG.warn(
           "The new type inference for functions is only supported in the Blink planner. " +
-           "Falling back to legacy type inference for function '{}'.", taf.getClass)
+            "Falling back to legacy type inference for function '{}'.",
+          taf.getClass)
         AggFunctionCall(
           taf,
           UserDefinedFunctionHelper.getReturnTypeOfAggregateFunction(taf),
           UserDefinedFunctionHelper.getAccumulatorTypeOfAggregateFunction(taf),
           args)
 
-      case _ : UserDefinedFunction =>
+      case _: UserDefinedFunction =>
         throw new ValidationException(
           "The new type inference for functions is only supported in the Blink planner.")
 
@@ -384,11 +379,7 @@ class PlannerExpressionConverter private
             if (args.size == 3) {
               new Overlay(args.head, args(1), args.last)
             } else {
-              Overlay(
-                args.head,
-                args(1),
-                args(2),
-                args.last)
+              Overlay(args.head, args(1), args(2), args.last)
             }
 
           case CONCAT =>
@@ -644,11 +635,7 @@ class PlannerExpressionConverter private
 
           case TEMPORAL_OVERLAPS =>
             assert(args.size == 4)
-            TemporalOverlaps(
-              args.head,
-              args(1),
-              args(2),
-              args.last)
+            TemporalOverlaps(args.head, args(1), args(2), args.last)
 
           case DATE_FORMAT =>
             assert(args.size == 2)
@@ -717,13 +704,7 @@ class PlannerExpressionConverter private
 
           case OVER =>
             assert(args.size >= 4)
-            OverCall(
-              args.head,
-              args.slice(4, args.size),
-              args(1),
-              args(2),
-              args(3)
-            )
+            OverCall(args.head, args.slice(4, args.size), args(1), args(2), args(3))
 
           case UNBOUNDED_RANGE =>
             assert(args.isEmpty)
@@ -775,39 +756,37 @@ class PlannerExpressionConverter private
             java.sql.Time.valueOf(literal.getValueAs(classOf[java.time.LocalTime]).get()),
             SqlTimeTypeInfo.TIME)
         case _ =>
-          Literal(
-            literal.getValueAs(typeInfo.getTypeClass).get(),
-            typeInfo)
+          Literal(literal.getValueAs(typeInfo.getTypeClass).get(), typeInfo)
       }
     }
   }
 
   private def getSymbol(symbol: TableSymbol): PlannerSymbol = symbol match {
-    case TimeIntervalUnit.YEAR => PlannerTimeIntervalUnit.YEAR
-    case TimeIntervalUnit.YEAR_TO_MONTH => PlannerTimeIntervalUnit.YEAR_TO_MONTH
-    case TimeIntervalUnit.QUARTER => PlannerTimeIntervalUnit.QUARTER
-    case TimeIntervalUnit.MONTH => PlannerTimeIntervalUnit.MONTH
-    case TimeIntervalUnit.WEEK => PlannerTimeIntervalUnit.WEEK
-    case TimeIntervalUnit.DAY => PlannerTimeIntervalUnit.DAY
-    case TimeIntervalUnit.DAY_TO_HOUR => PlannerTimeIntervalUnit.DAY_TO_HOUR
-    case TimeIntervalUnit.DAY_TO_MINUTE => PlannerTimeIntervalUnit.DAY_TO_MINUTE
-    case TimeIntervalUnit.DAY_TO_SECOND => PlannerTimeIntervalUnit.DAY_TO_SECOND
-    case TimeIntervalUnit.HOUR => PlannerTimeIntervalUnit.HOUR
-    case TimeIntervalUnit.SECOND => PlannerTimeIntervalUnit.SECOND
-    case TimeIntervalUnit.HOUR_TO_MINUTE => PlannerTimeIntervalUnit.HOUR_TO_MINUTE
-    case TimeIntervalUnit.HOUR_TO_SECOND => PlannerTimeIntervalUnit.HOUR_TO_SECOND
-    case TimeIntervalUnit.MINUTE => PlannerTimeIntervalUnit.MINUTE
+    case TimeIntervalUnit.YEAR             => PlannerTimeIntervalUnit.YEAR
+    case TimeIntervalUnit.YEAR_TO_MONTH    => PlannerTimeIntervalUnit.YEAR_TO_MONTH
+    case TimeIntervalUnit.QUARTER          => PlannerTimeIntervalUnit.QUARTER
+    case TimeIntervalUnit.MONTH            => PlannerTimeIntervalUnit.MONTH
+    case TimeIntervalUnit.WEEK             => PlannerTimeIntervalUnit.WEEK
+    case TimeIntervalUnit.DAY              => PlannerTimeIntervalUnit.DAY
+    case TimeIntervalUnit.DAY_TO_HOUR      => PlannerTimeIntervalUnit.DAY_TO_HOUR
+    case TimeIntervalUnit.DAY_TO_MINUTE    => PlannerTimeIntervalUnit.DAY_TO_MINUTE
+    case TimeIntervalUnit.DAY_TO_SECOND    => PlannerTimeIntervalUnit.DAY_TO_SECOND
+    case TimeIntervalUnit.HOUR             => PlannerTimeIntervalUnit.HOUR
+    case TimeIntervalUnit.SECOND           => PlannerTimeIntervalUnit.SECOND
+    case TimeIntervalUnit.HOUR_TO_MINUTE   => PlannerTimeIntervalUnit.HOUR_TO_MINUTE
+    case TimeIntervalUnit.HOUR_TO_SECOND   => PlannerTimeIntervalUnit.HOUR_TO_SECOND
+    case TimeIntervalUnit.MINUTE           => PlannerTimeIntervalUnit.MINUTE
     case TimeIntervalUnit.MINUTE_TO_SECOND => PlannerTimeIntervalUnit.MINUTE_TO_SECOND
-    case TimePointUnit.YEAR => PlannerTimePointUnit.YEAR
-    case TimePointUnit.MONTH => PlannerTimePointUnit.MONTH
-    case TimePointUnit.DAY => PlannerTimePointUnit.DAY
-    case TimePointUnit.HOUR => PlannerTimePointUnit.HOUR
-    case TimePointUnit.MINUTE => PlannerTimePointUnit.MINUTE
-    case TimePointUnit.SECOND => PlannerTimePointUnit.SECOND
-    case TimePointUnit.QUARTER => PlannerTimePointUnit.QUARTER
-    case TimePointUnit.WEEK => PlannerTimePointUnit.WEEK
-    case TimePointUnit.MILLISECOND => PlannerTimePointUnit.MILLISECOND
-    case TimePointUnit.MICROSECOND => PlannerTimePointUnit.MICROSECOND
+    case TimePointUnit.YEAR                => PlannerTimePointUnit.YEAR
+    case TimePointUnit.MONTH               => PlannerTimePointUnit.MONTH
+    case TimePointUnit.DAY                 => PlannerTimePointUnit.DAY
+    case TimePointUnit.HOUR                => PlannerTimePointUnit.HOUR
+    case TimePointUnit.MINUTE              => PlannerTimePointUnit.MINUTE
+    case TimePointUnit.SECOND              => PlannerTimePointUnit.SECOND
+    case TimePointUnit.QUARTER             => PlannerTimePointUnit.QUARTER
+    case TimePointUnit.WEEK                => PlannerTimePointUnit.WEEK
+    case TimePointUnit.MILLISECOND         => PlannerTimePointUnit.MILLISECOND
+    case TimePointUnit.MICROSECOND         => PlannerTimePointUnit.MICROSECOND
 
     case _ =>
       throw new TableException("Unsupported symbol: " + symbol)
@@ -819,8 +798,7 @@ class PlannerExpressionConverter private
       fromDataTypeToLegacyInfo(fieldReference.getOutputDataType))
   }
 
-  override def visit(fieldReference: UnresolvedReferenceExpression)
-    : PlannerExpression = {
+  override def visit(fieldReference: UnresolvedReferenceExpression): PlannerExpression = {
     UnresolvedFieldReference(fieldReference.getName)
   }
 
@@ -831,8 +809,7 @@ class PlannerExpressionConverter private
   override def visit(tableRef: TableReferenceExpression): PlannerExpression = {
     TableReference(
       tableRef.asInstanceOf[TableReferenceExpression].getName,
-      tableRef.asInstanceOf[TableReferenceExpression].getQueryOperation
-    )
+      tableRef.asInstanceOf[TableReferenceExpression].getQueryOperation)
   }
 
   override def visit(localReference: LocalReferenceExpression): PlannerExpression =
@@ -863,7 +840,7 @@ class PlannerExpressionConverter private
   }
 
   private def translateWindowReference(reference: Expression): PlannerExpression = reference match {
-    case expr : LocalReferenceExpression =>
+    case expr: LocalReferenceExpression =>
       WindowReference(expr.getName, Some(fromDataTypeToLegacyInfo(expr.getOutputDataType)))
     //just because how the datastream is converted to table
     case expr: UnresolvedReferenceExpression =>

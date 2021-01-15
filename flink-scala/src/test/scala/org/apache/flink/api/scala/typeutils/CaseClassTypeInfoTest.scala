@@ -23,8 +23,8 @@ import org.apache.flink.api.common.typeinfo.BasicTypeInfo
 import org.apache.flink.api.common.typeutils.{TypeInformationTestBase, TypeSerializer}
 
 /**
-  * Test for [[CaseClassTypeInfo]].
-  */
+ * Test for [[CaseClassTypeInfo]].
+ */
 class CaseClassTypeInfoTest extends TypeInformationTestBase[CaseClassTypeInfo[_]] {
 
   override protected def getTestData: Array[CaseClassTypeInfo[_]] = Array(
@@ -41,6 +41,5 @@ class CaseClassTypeInfoTest extends TypeInformationTestBase[CaseClassTypeInfo[_]
       Array(BasicTypeInfo.INT_TYPE_INFO, BasicTypeInfo.BOOLEAN_TYPE_INFO),
       Array("_1", "_2")) {
       override def createSerializer(config: ExecutionConfig): TypeSerializer[(Int, Boolean)] = ???
-    }
-  )
+    })
 }

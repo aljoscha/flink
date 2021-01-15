@@ -44,17 +44,17 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
-  * Stream physical RelNode to to write data into an external sink defined by a [[TableSink]].
-  */
+ * Stream physical RelNode to to write data into an external sink defined by a [[TableSink]].
+ */
 class StreamExecLegacySink[T](
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
     inputRel: RelNode,
     sink: TableSink[T],
     sinkName: String)
-  extends LegacySink(cluster, traitSet, inputRel, sink, sinkName)
-  with StreamPhysicalRel
-  with LegacyStreamExecNode[Any] {
+    extends LegacySink(cluster, traitSet, inputRel, sink, sinkName)
+    with StreamPhysicalRel
+    with LegacyStreamExecNode[Any] {
 
   override def requireWatermark: Boolean = false
 
@@ -64,8 +64,7 @@ class StreamExecLegacySink[T](
 
   //~ ExecNode methods -----------------------------------------------------------
 
-  override protected def translateToPlanInternal(
-      planner: StreamPlanner): Transformation[Any] = {
+  override protected def translateToPlanInternal(planner: StreamPlanner): Transformation[Any] = {
     val resultTransformation = sink match {
       case streamTableSink: StreamTableSink[T] =>
         val transformation = streamTableSink match {
@@ -79,10 +78,11 @@ class StreamExecLegacySink[T](
 
             // check that we have keys if the table has changes (is not append-only)
             UpdatingPlanChecker.getUniqueKeyForUpsertSink(this, planner, upsertSink) match {
-              case Some(keys) => upsertSink.setKeyFields(keys)
+              case Some(keys)                => upsertSink.setKeyFields(keys)
               case None if isAppendOnlyTable => upsertSink.setKeyFields(null)
-              case None if !isAppendOnlyTable => throw new TableException(
-                "UpsertStreamTableSink requires that Table has" +
+              case None if !isAppendOnlyTable =>
+                throw new TableException(
+                  "UpsertStreamTableSink requires that Table has" +
                     " a full primary keys if it is updated.")
             }
 
@@ -104,9 +104,10 @@ class StreamExecLegacySink[T](
         val dataStream = new DataStream(planner.getExecEnv, transformation)
         val dsSink = streamTableSink.consumeDataStream(dataStream)
         if (dsSink == null) {
-          throw new TableException("The StreamTableSink#consumeDataStream(DataStream) must be " +
-            "implemented and return the sink transformation DataStreamSink. " +
-            s"However, ${sink.getClass.getCanonicalName} doesn't implement this method.")
+          throw new TableException(
+            "The StreamTableSink#consumeDataStream(DataStream) must be " +
+              "implemented and return the sink transformation DataStreamSink. " +
+              s"However, ${sink.getClass.getCanonicalName} doesn't implement this method.")
         }
         dsSink.getTransformation
 
@@ -118,18 +119,19 @@ class StreamExecLegacySink[T](
         translateToTransformation(dsTableSink.withChangeFlag, planner)
 
       case _ =>
-        throw new TableException(s"Only Support StreamTableSink! " +
-          s"However ${sink.getClass.getCanonicalName} is not a StreamTableSink.")
+        throw new TableException(
+          s"Only Support StreamTableSink! " +
+            s"However ${sink.getClass.getCanonicalName} is not a StreamTableSink.")
     }
     resultTransformation.asInstanceOf[Transformation[Any]]
   }
 
   /**
-    * Translates a logical [[RelNode]] into a [[Transformation]].
-    *
-    * @param withChangeFlag Set to true to emit records with change flags.
-    * @return The [[Transformation]] that corresponds to the translated [[Table]].
-    */
+   * Translates a logical [[RelNode]] into a [[Transformation]].
+   *
+   * @param withChangeFlag Set to true to emit records with change flags.
+   * @return The [[Transformation]] that corresponds to the translated [[Table]].
+   */
   private def translateToTransformation(
       withChangeFlag: Boolean,
       planner: StreamPlanner): Transformation[T] = {
@@ -145,14 +147,15 @@ class StreamExecLegacySink[T](
     val parTransformation = getInputNodes.get(0) match {
       // Sink's input must be LegacyStreamExecNode[RowData] or StreamExecNode[RowData] now.
       case legacyNode: LegacyStreamExecNode[RowData] => legacyNode.translateToPlan(planner)
-      case node: StreamExecNode[RowData] => node.translateToPlan(planner)
+      case node: StreamExecNode[RowData]             => node.translateToPlan(planner)
       case _ =>
-        throw new TableException("Cannot generate DataStream due to an invalid logical plan. " +
-                                   "This is a bug and should not happen. Please file an issue.")
+        throw new TableException(
+          "Cannot generate DataStream due to an invalid logical plan. " +
+            "This is a bug and should not happen. Please file an issue.")
     }
     val logicalType = getInput.getRowType
     val rowtimeFields = logicalType.getFieldList
-                        .filter(f => FlinkTypeFactory.isRowtimeIndicatorType(f.getType))
+      .filter(f => FlinkTypeFactory.isRowtimeIndicatorType(f.getType))
 
     val convType = if (rowtimeFields.size > 1) {
       throw new TableException(
@@ -184,8 +187,7 @@ class StreamExecLegacySink[T](
         convType.asInstanceOf[InternalTypeInfo[RowData]].toRowType,
         sink,
         withChangeFlag,
-        "SinkConversion"
-      )
+        "SinkConversion")
       new OneInputTransformation(
         parTransformation,
         s"SinkConversionTo${resultDataType.getConversionClass.getSimpleName}",

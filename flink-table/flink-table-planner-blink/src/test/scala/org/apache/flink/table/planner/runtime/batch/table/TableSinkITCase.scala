@@ -37,8 +37,7 @@ class TableSinkITCase extends BatchTestBase {
 
   @Test
   def testDecimalOnOutputFormatTableSink(): Unit = {
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE TABLE sink (
          |  `c` VARCHAR(5),
          |  `b` DECIMAL(10, 0),
@@ -52,7 +51,8 @@ class TableSinkITCase extends BatchTestBase {
 
     registerCollection("MyTable", data3, type3, "a, b, c", nullablesOfData3)
 
-    val table = tEnv.from("MyTable")
+    val table = tEnv
+      .from("MyTable")
       .where('a > 20)
       .select("12345", 55.cast(DataTypes.DECIMAL(10, 0)), "12345".cast(DataTypes.CHAR(5)))
     table.executeInsert("sink").await()
@@ -64,8 +64,7 @@ class TableSinkITCase extends BatchTestBase {
 
   @Test
   def testDecimalOnSinkFunctionTableSink(): Unit = {
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE TABLE sink (
          |  `c` VARCHAR(5),
          |  `b` DECIMAL(10, 0),
@@ -78,7 +77,8 @@ class TableSinkITCase extends BatchTestBase {
 
     registerCollection("MyTable", data3, type3, "a, b, c", nullablesOfData3)
 
-    val table = tEnv.from("MyTable")
+    val table = tEnv
+      .from("MyTable")
       .where('a > 20)
       .select("12345", 55.cast(DataTypes.DECIMAL(10, 0)), "12345".cast(DataTypes.CHAR(5)))
     table.executeInsert("sink").await()
@@ -90,8 +90,7 @@ class TableSinkITCase extends BatchTestBase {
 
   @Test
   def testSinkWithKey(): Unit = {
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE TABLE testSink (
          |  `a` INT,
          |  `b` DOUBLE,
@@ -104,25 +103,20 @@ class TableSinkITCase extends BatchTestBase {
 
     registerCollection("MyTable", simpleData2, simpleType2, "a, b", nullableOfSimpleData2)
 
-    val table = tEnv.from("MyTable")
+    val table = tEnv
+      .from("MyTable")
       .groupBy('a)
       .select('a, 'b.sum())
     table.executeInsert("testSink").await()
 
     val result = TestValuesTableFactory.getResults("testSink")
-    val expected = List(
-      "1,0.1",
-      "2,0.4",
-      "3,1.0",
-      "4,2.2",
-      "5,3.9")
+    val expected = List("1,0.1", "2,0.4", "3,1.0", "4,2.2", "5,3.9")
     assertEquals(expected.sorted, result.sorted)
   }
 
   @Test
   def testSinkWithoutKey(): Unit = {
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE TABLE testSink (
          |  `a` INT,
          |  `b` DOUBLE
@@ -134,18 +128,14 @@ class TableSinkITCase extends BatchTestBase {
 
     registerCollection("MyTable", simpleData2, simpleType2, "a, b", nullableOfSimpleData2)
 
-    val table = tEnv.from("MyTable")
+    val table = tEnv
+      .from("MyTable")
       .groupBy('a)
       .select('a, 'b.sum())
     table.executeInsert("testSink").await()
 
     val result = TestValuesTableFactory.getResults("testSink")
-    val expected = List(
-      "1,0.1",
-      "2,0.4",
-      "3,1.0",
-      "4,2.2",
-      "5,3.9")
+    val expected = List("1,0.1", "2,0.4", "3,1.0", "4,2.2", "5,3.9")
     assertEquals(expected.sorted, result.sorted)
   }
 
@@ -160,8 +150,7 @@ class TableSinkITCase extends BatchTestBase {
   }
   def innerTestNotNullEnforcer(provider: String): Unit = {
     val dataId = TestValuesTableFactory.registerData(nullData4)
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE TABLE nullable_src (
          |  category STRING,
          |  shopId INT,
@@ -172,8 +161,7 @@ class TableSinkITCase extends BatchTestBase {
          |  'bounded' = 'true'
          |)
          |""".stripMargin)
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE TABLE not_null_sink (
          |  category STRING,
          |  shopId INT,

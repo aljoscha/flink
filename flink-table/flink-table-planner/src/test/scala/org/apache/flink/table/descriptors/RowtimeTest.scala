@@ -78,8 +78,7 @@ class RowtimeTest extends DescriptorTestBase {
       "rowtime.timestamps.type" -> "from-field",
       "rowtime.timestamps.from" -> "otherField",
       "rowtime.watermarks.type" -> "periodic-bounded",
-      "rowtime.watermarks.delay" -> "1000"
-    )
+      "rowtime.watermarks.delay" -> "1000")
 
     val props2 = Map(
       "rowtime.timestamps.type" -> "from-source",
@@ -89,8 +88,7 @@ class RowtimeTest extends DescriptorTestBase {
         "B0b3JzLlJvd3RpbWVUZXN0JEN1c3RvbUFzc2lnbmVyeDcuDvfbu0kCAAB4cgBHb3JnLmFwYWNoZS5mbGluay" +
         "50YWJsZS5zb3VyY2VzLndtc3RyYXRlZ2llcy5QdW5jdHVhdGVkV2F0ZXJtYXJrQXNzaWduZXKBUc57oaWu9A" +
         "IAAHhyAD1vcmcuYXBhY2hlLmZsaW5rLnRhYmxlLnNvdXJjZXMud21zdHJhdGVnaWVzLldhdGVybWFya1N0cm" +
-        "F0ZWd53nt-g2OWaT4CAAB4cA")
-    )
+        "F0ZWd53nt-g2OWaT4CAAB4cA"))
 
     val props3 = Map(
       "rowtime.timestamps.type" -> "custom",
@@ -101,8 +99,7 @@ class RowtimeTest extends DescriptorTestBase {
         "luZzt4cgA-b3JnLmFwYWNoZS5mbGluay50YWJsZS5zb3VyY2VzLnRzZXh0cmFjdG9ycy5UaW1lc3RhbXBFeHRyYW" +
         "N0b3Jf1Y6piFNsGAIAAHhwdAAHdHNGaWVsZA"),
       "rowtime.watermarks.type" -> "periodic-bounded",
-      "rowtime.watermarks.delay" -> "1000"
-    )
+      "rowtime.watermarks.delay" -> "1000")
 
     util.Arrays.asList(props1.asJava, props2.asJava, props3.asJava)
   }
@@ -147,7 +144,7 @@ object RowtimeTest {
 
     override def equals(other: Any): Boolean = other match {
       case that: CustomExtractor => field == that.field
-      case _ => false
+      case _                     => false
     }
 
     override def hashCode(): Int = {

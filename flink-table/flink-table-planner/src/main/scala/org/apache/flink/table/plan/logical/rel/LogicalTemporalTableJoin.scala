@@ -29,61 +29,57 @@ import org.apache.calcite.sql.{SqlFunction, SqlFunctionCategory, SqlKind}
 import org.apache.flink.util.Preconditions.checkArgument
 
 /**
-  * Represents a join between a table and [[org.apache.flink.table.functions.TemporalTableFunction]]
-  *
-  * @param cluster
-  * @param traitSet
-  * @param left
-  * @param right     table scan (or other more complex table expression) of underlying
-  *                  [[org.apache.flink.table.functions.TemporalTableFunction]]
-  * @param condition must contain [[LogicalTemporalTableJoin#TEMPORAL_JOIN_CONDITION]] with
-  *                  correctly defined references to rightTimeAttribute,
-  *                  rightPrimaryKeyExpression and leftTimeAttribute. We can not implement
-  *                  those references as separate fields, because of problems with Calcite's
-  *                  optimization rules like projections push downs, column
-  *                  pruning/renaming/reordering, etc. Later rightTimeAttribute,
-  *                  rightPrimaryKeyExpression and leftTimeAttribute will be extracted from
-  *                  the condition.
-  */
-class LogicalTemporalTableJoin private(
+ * Represents a join between a table and [[org.apache.flink.table.functions.TemporalTableFunction]]
+ *
+ * @param cluster
+ * @param traitSet
+ * @param left
+ * @param right     table scan (or other more complex table expression) of underlying
+ *                  [[org.apache.flink.table.functions.TemporalTableFunction]]
+ * @param condition must contain [[LogicalTemporalTableJoin#TEMPORAL_JOIN_CONDITION]] with
+ *                  correctly defined references to rightTimeAttribute,
+ *                  rightPrimaryKeyExpression and leftTimeAttribute. We can not implement
+ *                  those references as separate fields, because of problems with Calcite's
+ *                  optimization rules like projections push downs, column
+ *                  pruning/renaming/reordering, etc. Later rightTimeAttribute,
+ *                  rightPrimaryKeyExpression and leftTimeAttribute will be extracted from
+ *                  the condition.
+ */
+class LogicalTemporalTableJoin private (
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
     left: RelNode,
     right: RelNode,
     condition: RexNode)
-  extends Join(
-    cluster,
-    traitSet,
-    left,
-    right,
-    condition,
-    Collections.emptySet().asInstanceOf[java.util.Set[CorrelationId]],
-    JoinRelType.INNER) {
-
-  override def copy(
-       traitSet: RelTraitSet,
-       condition: RexNode,
-       left: RelNode,
-       right: RelNode,
-       joinType: JoinRelType,
-       semiJoinDone: Boolean): LogicalTemporalTableJoin = {
-    checkArgument(joinType == this.getJoinType,
-      "Can not change join type".asInstanceOf[Object])
-    checkArgument(semiJoinDone == this.isSemiJoinDone,
-      "Can not change semiJoinDone".asInstanceOf[Object])
-    new LogicalTemporalTableJoin(
+    extends Join(
       cluster,
       traitSet,
       left,
       right,
-      condition)
+      condition,
+      Collections.emptySet().asInstanceOf[java.util.Set[CorrelationId]],
+      JoinRelType.INNER) {
+
+  override def copy(
+      traitSet: RelTraitSet,
+      condition: RexNode,
+      left: RelNode,
+      right: RelNode,
+      joinType: JoinRelType,
+      semiJoinDone: Boolean): LogicalTemporalTableJoin = {
+    checkArgument(joinType == this.getJoinType, "Can not change join type".asInstanceOf[Object])
+    checkArgument(
+      semiJoinDone == this.isSemiJoinDone,
+      "Can not change semiJoinDone".asInstanceOf[Object])
+    new LogicalTemporalTableJoin(cluster, traitSet, left, right, condition)
   }
 }
 
 object LogicalTemporalTableJoin {
+
   /**
-    * See [[LogicalTemporalTableJoin#condition]]
-    */
+   * See [[LogicalTemporalTableJoin#condition]]
+   */
   val TEMPORAL_JOIN_CONDITION = new SqlFunction(
     "__TEMPORAL_JOIN_CONDITION",
     SqlKind.OTHER_FUNCTION,
@@ -127,15 +123,12 @@ object LogicalTemporalTableJoin {
       rexBuilder: RexBuilder,
       leftTimeAttribute: RexNode,
       rightPrimaryKeyExpression: RexNode): RexNode = {
-    rexBuilder.makeCall(
-      TEMPORAL_JOIN_CONDITION,
-      leftTimeAttribute,
-      rightPrimaryKeyExpression)
+    rexBuilder.makeCall(TEMPORAL_JOIN_CONDITION, leftTimeAttribute, rightPrimaryKeyExpression)
   }
 
   /**
-    * See [[LogicalTemporalTableJoin]]
-    */
+   * See [[LogicalTemporalTableJoin]]
+   */
   def createRowtime(
       rexBuilder: RexBuilder,
       cluster: RelOptCluster,
@@ -144,8 +137,7 @@ object LogicalTemporalTableJoin {
       right: RelNode,
       leftTimeAttribute: RexNode,
       rightTimeAttribute: RexNode,
-      rightPrimaryKeyExpression: RexNode)
-    : LogicalTemporalTableJoin = {
+      rightPrimaryKeyExpression: RexNode): LogicalTemporalTableJoin = {
     new LogicalTemporalTableJoin(
       cluster,
       traitSet,
@@ -159,13 +151,13 @@ object LogicalTemporalTableJoin {
   }
 
   /**
-    * See [[LogicalTemporalTableJoin]]
-    *
-    * @param leftTimeAttribute is needed because otherwise,
-    *                          [[LogicalTemporalTableJoin#TEMPORAL_JOIN_CONDITION]] could be pushed
-    *                          down below [[LogicalTemporalTableJoin]], since it wouldn't have any
-    *                          references to the left node.
-    */
+   * See [[LogicalTemporalTableJoin]]
+   *
+   * @param leftTimeAttribute is needed because otherwise,
+   *                          [[LogicalTemporalTableJoin#TEMPORAL_JOIN_CONDITION]] could be pushed
+   *                          down below [[LogicalTemporalTableJoin]], since it wouldn't have any
+   *                          references to the left node.
+   */
   def createProctime(
       rexBuilder: RexBuilder,
       cluster: RelOptCluster,
@@ -173,8 +165,7 @@ object LogicalTemporalTableJoin {
       left: RelNode,
       right: RelNode,
       leftTimeAttribute: RexNode,
-      rightPrimaryKeyExpression: RexNode)
-    : LogicalTemporalTableJoin = {
+      rightPrimaryKeyExpression: RexNode): LogicalTemporalTableJoin = {
     new LogicalTemporalTableJoin(
       cluster,
       traitSet,

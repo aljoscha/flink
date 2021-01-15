@@ -30,9 +30,9 @@ import org.apache.flink.table.planner.plan.nodes.FlinkConventions
 import org.apache.flink.table.planner.plan.nodes.calcite.{LogicalTableAggregate, TableAggregate}
 
 /**
-  * Sub-class of [[TableAggregate]] that is a relational expression which performs aggregations but
-  * outputs 0 or more records for a group.
-  */
+ * Sub-class of [[TableAggregate]] that is a relational expression which performs aggregations but
+ * outputs 0 or more records for a group.
+ */
 class FlinkLogicalTableAggregate(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -40,27 +40,20 @@ class FlinkLogicalTableAggregate(
     groupSet: ImmutableBitSet,
     groupSets: util.List[ImmutableBitSet],
     aggCalls: util.List[AggregateCall])
-  extends TableAggregate(cluster, traitSet, input, groupSet, groupSets, aggCalls)
+    extends TableAggregate(cluster, traitSet, input, groupSet, groupSets, aggCalls)
     with FlinkLogicalRel {
 
   override def copy(traitSet: RelTraitSet, inputs: JList[RelNode]): RelNode = {
-    new FlinkLogicalTableAggregate(
-      cluster,
-      traitSet,
-      inputs.get(0),
-      groupSet,
-      groupSets,
-      aggCalls
-    )
+    new FlinkLogicalTableAggregate(cluster, traitSet, inputs.get(0), groupSet, groupSets, aggCalls)
   }
 }
 
 private class FlinkLogicalTableAggregateConverter
-  extends ConverterRule(
-    classOf[LogicalTableAggregate],
-    Convention.NONE,
-    FlinkConventions.LOGICAL,
-    "FlinkLogicalTableAggregateConverter") {
+    extends ConverterRule(
+      classOf[LogicalTableAggregate],
+      Convention.NONE,
+      FlinkConventions.LOGICAL,
+      "FlinkLogicalTableAggregateConverter") {
 
   override def convert(rel: RelNode): RelNode = {
     val agg = rel.asInstanceOf[LogicalTableAggregate]

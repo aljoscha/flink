@@ -32,15 +32,15 @@ import org.apache.flink.types.Row
 import scala.collection.JavaConverters._
 
 /**
-  * Flink RelNode which matches along with DataSource.
-  * It ensures that types without deterministic field order (e.g. POJOs) are not part of
-  * the plan translation.
-  *
-  * This may read only part, or change the order of the fields available in a
-  * [[org.apache.flink.api.common.typeutils.CompositeType]] of the underlying [[DataSet]].
-  * The fieldIdxs describe the indices of the fields in the
-  * [[org.apache.flink.api.common.typeinfo.TypeInformation]]
-  */
+ * Flink RelNode which matches along with DataSource.
+ * It ensures that types without deterministic field order (e.g. POJOs) are not part of
+ * the plan translation.
+ *
+ * This may read only part, or change the order of the fields available in a
+ * [[org.apache.flink.api.common.typeutils.CompositeType]] of the underlying [[DataSet]].
+ * The fieldIdxs describe the indices of the fields in the
+ * [[org.apache.flink.api.common.typeinfo.TypeInformation]]
+ */
 class DataSetScan(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -48,11 +48,11 @@ class DataSetScan(
     inputDataSet: DataSet[_],
     fieldIdxs: Array[Int],
     rowRelDataType: RelDataType)
-  extends TableScan(
-    cluster,
-    traitSet,
-    RelOptTableImpl.create(catalog, rowRelDataType, List[String]().asJava, null))
-  with BatchScan {
+    extends TableScan(
+      cluster,
+      traitSet,
+      RelOptTableImpl.create(catalog, rowRelDataType, List[String]().asJava, null))
+    with BatchScan {
 
   override def deriveRowType(): RelDataType = rowRelDataType
 
@@ -64,14 +64,7 @@ class DataSetScan(
   }
 
   override def copy(traitSet: RelTraitSet, inputs: java.util.List[RelNode]): RelNode = {
-    new DataSetScan(
-      cluster,
-      traitSet,
-      catalog,
-      inputDataSet,
-      fieldIdxs,
-      getRowType
-    )
+    new DataSetScan(cluster, traitSet, catalog, inputDataSet, fieldIdxs, getRowType)
   }
 
   override def translateToPlan(tableEnv: BatchTableEnvImpl): DataSet[Row] = {

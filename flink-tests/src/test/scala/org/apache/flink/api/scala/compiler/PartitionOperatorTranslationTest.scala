@@ -33,25 +33,28 @@ class PartitionOperatorTranslationTest extends CompilerTestBase {
   def testPartitionOperatorPreservesFields() {
     try {
       val env = ExecutionEnvironment.getExecutionEnvironment
-      
-      val data = env.fromElements( (0L, 0L) )
-      data.partitionCustom(new Partitioner[Long]() {
-          def partition(key: Long, numPartitions: Int): Int = key.intValue()
-        }, 1)
-        .groupBy(1).reduceGroup( x => x)
+
+      val data = env.fromElements((0L, 0L))
+      data
+        .partitionCustom(
+          new Partitioner[Long]() {
+            def partition(key: Long, numPartitions: Int): Int = key.intValue()
+          },
+          1)
+        .groupBy(1)
+        .reduceGroup(x => x)
         .output(new DiscardingOutputFormat[Iterator[(Long, Long)]])
 
       val p = env.createProgramPlan()
       val op = compileNoStats(p)
-      
+
       val sink = op.getDataSinks.iterator().next()
       val reducer = sink.getInput.getSource.asInstanceOf[SingleInputPlanNode]
       val partitioner = reducer.getInput.getSource.asInstanceOf[SingleInputPlanNode]
 
       assertEquals(ShipStrategyType.FORWARD, reducer.getInput.getShipStrategy)
       assertEquals(ShipStrategyType.PARTITION_CUSTOM, partitioner.getInput.getShipStrategy)
-    }
-    catch {
+    } catch {
       case e: Exception => {
         e.printStackTrace()
         fail(e.getMessage)

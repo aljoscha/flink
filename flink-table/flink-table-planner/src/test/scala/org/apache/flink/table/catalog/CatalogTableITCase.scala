@@ -46,20 +46,16 @@ class CatalogTableITCase(isStreaming: Boolean) extends AbstractTestBase {
 
   private val batchExec: ExecutionEnvironment = ExecutionEnvironment.getExecutionEnvironment
   private var batchEnv: BatchTableEnvironment = _
-  private val streamExec: StreamExecutionEnvironment = StreamExecutionEnvironment
-    .getExecutionEnvironment
+  private val streamExec: StreamExecutionEnvironment =
+    StreamExecutionEnvironment.getExecutionEnvironment
   private var streamEnv: StreamTableEnvironment = _
   private val settings = EnvironmentSettings.newInstance().useOldPlanner().build()
 
-  private val SOURCE_DATA = List(
-      toRow(1, "a"),
-      toRow(2, "b"),
-      toRow(3, "c")
-  )
+  private val SOURCE_DATA = List(toRow(1, "a"), toRow(2, "b"), toRow(3, "c"))
 
-  implicit def rowOrdering: Ordering[Row] = Ordering.by((r : Row) => {
+  implicit def rowOrdering: Ordering[Row] = Ordering.by((r: Row) => {
     val builder = new StringBuilder
-    0 until r.getArity foreach(idx => builder.append(r.getField(idx)))
+    0 until r.getArity foreach (idx => builder.append(r.getField(idx)))
     builder.toString()
   })
 
@@ -78,10 +74,10 @@ class CatalogTableITCase(isStreaming: Boolean) extends AbstractTestBase {
     TestCollectionTableFactory.isStreaming = isStreaming
   }
 
-  def toRow(args: Any*):Row = {
+  def toRow(args: Any*): Row = {
     val row = new Row(args.length)
-    0 until args.length foreach {
-      i => row.setField(i, args(i))
+    0 until args.length foreach { i =>
+      row.setField(i, args(i))
     }
     row
   }
@@ -109,8 +105,7 @@ class CatalogTableITCase(isStreaming: Boolean) extends AbstractTestBase {
       toRow(2, "1", 3),
       toRow(3, "2000", 4),
       toRow(1, "2", 2),
-      toRow(2, "3000", 3)
-    )
+      toRow(2, "3000", 3))
     TestCollectionTableFactory.initData(sourceData)
     val sourceDDL =
       """
@@ -182,20 +177,11 @@ class CatalogTableITCase(isStreaming: Boolean) extends AbstractTestBase {
 
   @Test
   def testInsertWithJoinedSource(): Unit = {
-    val sourceData = List(
-      toRow(1, 1000, 2),
-      toRow(2, 1, 3),
-      toRow(3, 2000, 4),
-      toRow(1, 2, 2),
-      toRow(2, 3000, 3)
-    )
+    val sourceData =
+      List(toRow(1, 1000, 2), toRow(2, 1, 3), toRow(3, 2000, 4), toRow(1, 2, 2), toRow(2, 3000, 3))
 
-    val expected = List(
-      toRow(1, 1000, 2, 1),
-      toRow(1, 2, 2, 1),
-      toRow(2, 1, 1, 2),
-      toRow(2, 3000, 1, 2)
-    )
+    val expected =
+      List(toRow(1, 1000, 2, 1), toRow(1, 2, 2, 1), toRow(2, 1, 1, 2), toRow(2, 3000, 1, 2))
     TestCollectionTableFactory.initData(sourceData)
     val sourceDDL =
       """
@@ -243,14 +229,9 @@ class CatalogTableITCase(isStreaming: Boolean) extends AbstractTestBase {
       toRow(2, 1000, 3),
       toRow(3, 2000, 4),
       toRow(4, 2000, 5),
-      toRow(5, 3000, 6)
-    )
+      toRow(5, 3000, 6))
 
-    val expected = List(
-      toRow(3, 1000),
-      toRow(5, 3000),
-      toRow(7, 2000)
-    )
+    val expected = List(toRow(3, 1000), toRow(5, 3000), toRow(7, 2000))
     TestCollectionTableFactory.initData(sourceData)
     val sourceDDL =
       """
@@ -285,11 +266,7 @@ class CatalogTableITCase(isStreaming: Boolean) extends AbstractTestBase {
 
   @Test @Ignore // need to implement
   def testStreamSourceTableWithProctime(): Unit = {
-    val sourceData = List(
-      toRow(1, 1000),
-      toRow(2, 2000),
-      toRow(3, 3000)
-    )
+    val sourceData = List(toRow(1, 1000), toRow(2, 2000), toRow(3, 3000))
     TestCollectionTableFactory.initData(sourceData, emitInterval = 1000L)
     val sourceDDL =
       """
@@ -326,11 +303,7 @@ class CatalogTableITCase(isStreaming: Boolean) extends AbstractTestBase {
 
   @Test @Ignore("FLINK-14320") // need to implement
   def testStreamSourceTableWithRowtime(): Unit = {
-    val sourceData = List(
-      toRow(1, 1000),
-      toRow(2, 2000),
-      toRow(3, 3000)
-    )
+    val sourceData = List(toRow(1, 1000), toRow(2, 2000), toRow(3, 3000))
     TestCollectionTableFactory.initData(sourceData, emitInterval = 1000L)
     val sourceDDL =
       """
@@ -366,11 +339,7 @@ class CatalogTableITCase(isStreaming: Boolean) extends AbstractTestBase {
 
   @Test @Ignore // need to implement
   def testBatchSourceTableWithProctime(): Unit = {
-    val sourceData = List(
-      toRow(1, 1000),
-      toRow(2, 2000),
-      toRow(3, 3000)
-    )
+    val sourceData = List(toRow(1, 1000), toRow(2, 2000), toRow(3, 3000))
     TestCollectionTableFactory.initData(sourceData, emitInterval = 1000L)
     val sourceDDL =
       """
@@ -407,11 +376,7 @@ class CatalogTableITCase(isStreaming: Boolean) extends AbstractTestBase {
 
   @Test @Ignore("FLINK-14320") // need to implement
   def testBatchTableWithRowtime(): Unit = {
-    val sourceData = List(
-      toRow(1, 1000),
-      toRow(2, 2000),
-      toRow(3, 3000)
-    )
+    val sourceData = List(toRow(1, 1000), toRow(2, 2000), toRow(3, 3000))
     TestCollectionTableFactory.initData(sourceData, emitInterval = 1000L)
     val sourceDDL =
       """
@@ -567,9 +532,10 @@ class CatalogTableITCase(isStreaming: Boolean) extends AbstractTestBase {
     tableEnv.executeSql(createTable2)
 
     expectedEx.expect(classOf[ValidationException])
-    expectedEx.expectMessage("Temporary table with identifier "
-      + "'`default_catalog`.`default_database`.`t1`' exists. "
-      + "Drop it first before removing the permanent table.")
+    expectedEx.expectMessage(
+      "Temporary table with identifier "
+        + "'`default_catalog`.`default_database`.`t1`' exists. "
+        + "Drop it first before removing the permanent table.")
     tableEnv.executeSql("drop table t1")
   }
 
@@ -588,8 +554,9 @@ class CatalogTableITCase(isStreaming: Boolean) extends AbstractTestBase {
     tableEnv.executeSql(createTable1)
 
     expectedEx.expect(classOf[ValidationException])
-    expectedEx.expectMessage("View with identifier "
-      + "'default_catalog.default_database.t1' does not exist.")
+    expectedEx.expectMessage(
+      "View with identifier "
+        + "'default_catalog.default_database.t1' does not exist.")
     tableEnv.executeSql("drop view t1")
   }
 
@@ -631,7 +598,9 @@ class CatalogTableITCase(isStreaming: Boolean) extends AbstractTestBase {
     expectedProperties.put("connector", "COLLECTION")
     expectedProperties.put("k1", "a")
     expectedProperties.put("k2", "b")
-    val properties = tableEnv.getCatalog(tableEnv.getCurrentCatalog).get()
+    val properties = tableEnv
+      .getCatalog(tableEnv.getCurrentCatalog)
+      .get()
       .getTable(new ObjectPath(tableEnv.getCurrentDatabase, "t2"))
       .getProperties
     assertEquals(expectedProperties, properties)
@@ -678,8 +647,9 @@ class CatalogTableITCase(isStreaming: Boolean) extends AbstractTestBase {
     } catch {
       case _: ValidationException => //ignore
     }
-    tableEnv.sqlUpdate("create database cat2.db1 comment 'test_comment'" +
-                         " with ('k1' = 'v1', 'k2' = 'v2')")
+    tableEnv.sqlUpdate(
+      "create database cat2.db1 comment 'test_comment'" +
+        " with ('k1' = 'v1', 'k2' = 'v2')")
     val database = tableEnv.getCatalog("cat2").get().getDatabase("db1")
     assertEquals("test_comment", database.getComment)
     assertEquals(2, database.getProperties.size())
@@ -752,11 +722,7 @@ class CatalogTableITCase(isStreaming: Boolean) extends AbstractTestBase {
 
   @Test(expected = classOf[ValidationException])
   def testCreateViewTwice(): Unit = {
-    val sourceData = List(
-      toRow(1, 1000),
-      toRow(2, 2000),
-      toRow(3, 3000)
-    )
+    val sourceData = List(toRow(1, 1000), toRow(2, 2000), toRow(3, 3000))
 
     TestCollectionTableFactory.initData(sourceData)
 
@@ -793,11 +759,7 @@ class CatalogTableITCase(isStreaming: Boolean) extends AbstractTestBase {
 
   @Test(expected = classOf[ValidationException])
   def testCreateTemporaryViewTwice(): Unit = {
-    val sourceData = List(
-      toRow(1, 1000),
-      toRow(2, 2000),
-      toRow(3, 3000)
-    )
+    val sourceData = List(toRow(1, 1000), toRow(2, 2000), toRow(3, 3000))
 
     TestCollectionTableFactory.initData(sourceData)
 
@@ -834,11 +796,7 @@ class CatalogTableITCase(isStreaming: Boolean) extends AbstractTestBase {
 
   @Test
   def testCreateViewIfNotExistsTwice(): Unit = {
-    val sourceData = List(
-      toRow(1, 1000),
-      toRow(2, 2000),
-      toRow(3, 3000)
-    )
+    val sourceData = List(toRow(1, 1000), toRow(2, 2000), toRow(3, 3000))
 
     TestCollectionTableFactory.initData(sourceData)
 
@@ -882,11 +840,7 @@ class CatalogTableITCase(isStreaming: Boolean) extends AbstractTestBase {
 
   @Test
   def testCreateTemporaryViewIfNotExistsTwice(): Unit = {
-    val sourceData = List(
-      toRow(1, 1000),
-      toRow(2, 2000),
-      toRow(3, 3000)
-    )
+    val sourceData = List(toRow(1, 1000), toRow(2, 2000), toRow(3, 3000))
 
     TestCollectionTableFactory.initData(sourceData)
 

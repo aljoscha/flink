@@ -32,39 +32,42 @@ trait CommonAggregate {
   private[flink] def groupingToString(inputType: RelDataType, grouping: Array[Int]): String = {
 
     val inFields = inputType.getFieldNames.asScala
-    grouping.map( inFields(_) ).mkString(", ")
+    grouping.map(inFields(_)).mkString(", ")
   }
 
   private[flink] def aggregationToString(
-    inputType: RelDataType,
-    grouping: Array[Int],
-    outFields: Seq[String],
-    namedAggregates: Seq[CalcitePair[AggregateCall, String]],
-    namedProperties: Seq[NamedWindowProperty])
-  : String = {
+      inputType: RelDataType,
+      grouping: Array[Int],
+      outFields: Seq[String],
+      namedAggregates: Seq[CalcitePair[AggregateCall, String]],
+      namedProperties: Seq[NamedWindowProperty]): String = {
 
     val inFields = inputType.getFieldNames.asScala
-    val groupStrings = grouping.map( inFields(_) )
+    val groupStrings = grouping.map(inFields(_))
 
     val aggs = namedAggregates.map(_.getKey)
-    val aggStrings = aggs.map( a => s"${a.getAggregation}(${
-      val prefix = if (a.isDistinct) "DISTINCT " else ""
-      prefix + (if (a.getArgList.size() > 0) {
-        a.getArgList.asScala.map(inFields(_)).mkString(", ")
-      } else {
-        "*"
-      })
-    })")
+    val aggStrings = aggs.map(a =>
+      s"${a.getAggregation}(${
+        val prefix = if (a.isDistinct) "DISTINCT " else ""
+        prefix + (if (a.getArgList.size() > 0) {
+                    a.getArgList.asScala.map(inFields(_)).mkString(", ")
+                  } else {
+                    "*"
+                  })
+      })")
 
     val propStrings = namedProperties.map(_.property.toString)
 
-    (groupStrings ++ aggStrings ++ propStrings).zip(outFields).map {
-      case (f, o) => if (f == o) {
-        f
-      } else {
-        s"$f AS $o"
+    (groupStrings ++ aggStrings ++ propStrings)
+      .zip(outFields)
+      .map { case (f, o) =>
+        if (f == o) {
+          f
+        } else {
+          s"$f AS $o"
+        }
       }
-    }.mkString(", ")
+      .mkString(", ")
   }
 
   private[flink] def aggregationToString(
@@ -72,9 +75,12 @@ trait CommonAggregate {
       grouping: Array[Int],
       rowType: RelDataType,
       namedAggregates: Seq[CalcitePair[AggregateCall, String]],
-      namedProperties: Seq[NamedWindowProperty])
-    : String = {
+      namedProperties: Seq[NamedWindowProperty]): String = {
     aggregationToString(
-      inputType, grouping, rowType.getFieldNames, namedAggregates, namedProperties)
+      inputType,
+      grouping,
+      rowType.getFieldNames,
+      namedAggregates,
+      namedProperties)
   }
 }

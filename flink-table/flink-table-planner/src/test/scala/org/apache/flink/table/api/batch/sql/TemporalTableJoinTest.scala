@@ -30,15 +30,14 @@ class TemporalTableJoinTest extends TableTestBase {
 
   val util: TableTestUtil = batchTestUtil()
 
-  val orders = util.addTable[(Long, String, Timestamp)](
-    "Orders", 'o_amount, 'o_currency, 'o_rowtime)
+  val orders =
+    util.addTable[(Long, String, Timestamp)]("Orders", 'o_amount, 'o_currency, 'o_rowtime)
 
-  val ratesHistory = util.addTable[(String, Int, Timestamp)](
-    "RatesHistory", 'currency, 'rate, 'rowtime)
+  val ratesHistory =
+    util.addTable[(String, Int, Timestamp)]("RatesHistory", 'currency, 'rate, 'rowtime)
 
-  val rates = util.addFunction(
-    "Rates",
-    ratesHistory.createTemporalTableFunction('rowtime, 'currency))
+  val rates =
+    util.addFunction("Rates", ratesHistory.createTemporalTableFunction('rowtime, 'currency))
 
   @Test
   def testSimpleJoin(): Unit = {
@@ -55,19 +54,29 @@ class TemporalTableJoinTest extends TableTestBase {
   }
 
   /**
-    * Test temporal table joins with more complicated query.
-    * Important thing here is that we have complex OR join condition
-    * and there are some columns that are not being used (are being pruned).
-    */
+   * Test temporal table joins with more complicated query.
+   * Important thing here is that we have complex OR join condition
+   * and there are some columns that are not being used (are being pruned).
+   */
   @Test(expected = classOf[TableException])
   def testComplexJoin(): Unit = {
     val util = batchTestUtil()
     util.addTable[(String, Int)]("Table3", 't3_comment, 't3_secondary_key)
     util.addTable[(Timestamp, String, Long, String, Int)](
-      "Orders", 'o_rowtime, 'o_comment, 'o_amount, 'o_currency, 'o_secondary_key)
+      "Orders",
+      'o_rowtime,
+      'o_comment,
+      'o_amount,
+      'o_currency,
+      'o_secondary_key)
 
     val ratesHistory = util.addTable[(Timestamp, String, String, Int, Int)](
-      "RatesHistory", 'rowtime, 'comment, 'currency, 'rate, 'secondary_key)
+      "RatesHistory",
+      'rowtime,
+      'comment,
+      'currency,
+      'rate,
+      'secondary_key)
     val rates = ratesHistory.createTemporalTableFunction('rowtime, 'currency)
     util.addFunction("Rates", rates)
 
@@ -80,7 +89,7 @@ class TemporalTableJoinTest extends TableTestBase {
         "LATERAL TABLE (Rates(o_rowtime)) AS r " +
         "WHERE currency = o_currency OR secondary_key = o_secondary_key), " +
         "Table3 " +
-      "WHERE t3_secondary_key = secondary_key"
+        "WHERE t3_secondary_key = secondary_key"
 
     util.printSql(sqlQuery)
   }

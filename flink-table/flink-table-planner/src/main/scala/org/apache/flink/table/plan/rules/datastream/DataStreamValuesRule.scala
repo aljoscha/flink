@@ -27,12 +27,11 @@ import org.apache.flink.table.plan.nodes.logical.FlinkLogicalValues
 import org.apache.flink.table.plan.schema.RowSchema
 
 class DataStreamValuesRule
-  extends ConverterRule(
-    classOf[FlinkLogicalValues],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.DATASTREAM,
-    "DataStreamValuesRule")
-{
+    extends ConverterRule(
+      classOf[FlinkLogicalValues],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.DATASTREAM,
+      "DataStreamValuesRule") {
 
   def convert(rel: RelNode): RelNode = {
     val values: FlinkLogicalValues = rel.asInstanceOf[FlinkLogicalValues]

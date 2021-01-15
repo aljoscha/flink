@@ -49,5 +49,3 @@ class ModifyKindSetTraitDef extends RelTraitDef[ModifyKindSetTrait] {
 object ModifyKindSetTraitDef {
   val INSTANCE = new ModifyKindSetTraitDef()
 }
-
-

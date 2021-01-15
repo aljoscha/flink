@@ -27,14 +27,14 @@ import org.apache.calcite.rel.RelNode
 import org.apache.calcite.rel.convert.ConverterRule
 
 /**
-  * Rule that converts [[FlinkLogicalExpand]] to [[BatchPhysicalExpand]].
-  */
+ * Rule that converts [[FlinkLogicalExpand]] to [[BatchPhysicalExpand]].
+ */
 class BatchPhysicalExpandRule
-  extends ConverterRule(
-    classOf[FlinkLogicalExpand],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.BATCH_PHYSICAL,
-    "BatchPhysicalExpandRule") {
+    extends ConverterRule(
+      classOf[FlinkLogicalExpand],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.BATCH_PHYSICAL,
+      "BatchPhysicalExpandRule") {
 
   def convert(rel: RelNode): RelNode = {
     val expand = rel.asInstanceOf[FlinkLogicalExpand]

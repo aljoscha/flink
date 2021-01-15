@@ -60,11 +60,13 @@ class TableITCase(tableEnvName: String) {
         tEnv = TableEnvironmentImpl.create(settings)
       case "StreamTableEnvironment" =>
         tEnv = StreamTableEnvironment.create(
-          StreamExecutionEnvironment.getExecutionEnvironment, settings)
+          StreamExecutionEnvironment.getExecutionEnvironment,
+          settings)
       case _ => throw new UnsupportedOperationException("unsupported tableEnvName: " + tableEnvName)
     }
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(
-      "MyTable", getPersonCsvTableSource)
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSourceInternal("MyTable", getPersonCsvTableSource)
   }
 
   @Test
@@ -79,7 +81,8 @@ class TableITCase(tableEnvName: String) {
     assertTrue(tableResult.getJobClient.isPresent)
     assertEquals(ResultKind.SUCCESS_WITH_CONTENT, tableResult.getResultKind)
     assertEquals(
-      TableSchema.builder()
+      TableSchema
+        .builder()
         .field("id", DataTypes.INT())
         .field("full name", DataTypes.STRING())
         .build(),
@@ -121,8 +124,7 @@ class TableITCase(tableEnvName: String) {
       Row.ofKind(RowKind.DELETE, JLong.valueOf(6)),
       Row.ofKind(RowKind.INSERT, JLong.valueOf(7)),
       Row.ofKind(RowKind.DELETE, JLong.valueOf(7)),
-      Row.ofKind(RowKind.INSERT, JLong.valueOf(8))
-    )
+      Row.ofKind(RowKind.INSERT, JLong.valueOf(8)))
     val actual = CollectionUtil.iteratorToList(tableResult.collect())
     assertEquals(expected, actual)
   }
@@ -132,9 +134,6 @@ class TableITCase(tableEnvName: String) {
 object TableITCase {
   @Parameterized.Parameters(name = "{0}")
   def parameters(): util.Collection[Array[_]] = {
-    util.Arrays.asList(
-      Array("TableEnvironment"),
-      Array("StreamTableEnvironment")
-    )
+    util.Arrays.asList(Array("TableEnvironment"), Array("StreamTableEnvironment"))
   }
 }

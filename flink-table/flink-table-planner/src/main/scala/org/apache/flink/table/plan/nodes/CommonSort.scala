@@ -29,78 +29,78 @@ import scala.collection.JavaConverters._
  * Common methods for Flink sort operators.
  */
 trait CommonSort {
-  
+
   private def offsetToString(offset: RexNode): String = {
     val offsetToString = s"$offset"
     offsetToString
   }
-  
+
   private def sortFieldsToString(
-      collationSort: RelCollation, 
+      collationSort: RelCollation,
       rowRelDataType: RelDataType): String = {
-    val fieldCollations = collationSort.getFieldCollations.asScala  
+    val fieldCollations = collationSort.getFieldCollations.asScala
       .map(c => (c.getFieldIndex, directionToOrder(c.getDirection)))
 
     fieldCollations
-      .map(col => s"${rowRelDataType.getFieldNames.get(col._1)} ${col._2.getShortName}" )
+      .map(col => s"${rowRelDataType.getFieldNames.get(col._1)} ${col._2.getShortName}")
       .mkString(", ")
   }
-  
+
   private def fetchToString(fetch: RexNode, offset: RexNode): String = {
     val limitEnd = getFetchLimitEnd(fetch, offset)
-    
+
     if (limitEnd == Long.MaxValue) {
       "unlimited"
     } else {
       s"$limitEnd"
     }
   }
-  
-  private[flink] def getFetchLimitEnd (fetch: RexNode, offset: RexNode): Long = {
+
+  private[flink] def getFetchLimitEnd(fetch: RexNode, offset: RexNode): Long = {
     if (fetch != null) {
       RexLiteral.intValue(fetch) + getFetchLimitStart(offset)
     } else {
       Long.MaxValue
     }
   }
-  
-  private[flink] def getFetchLimitStart (offset: RexNode): Long = {
+
+  private[flink] def getFetchLimitStart(offset: RexNode): Long = {
     if (offset != null) {
       RexLiteral.intValue(offset)
     } else {
       0L
     }
   }
-  
+
   private[flink] def sortToString(
-    rowRelDataType: RelDataType,
-    sortCollation: RelCollation,
-    sortOffset: RexNode,
-    sortFetch: RexNode): String = {
-      s"Sort(by: ($$sortFieldsToString(sortCollation, rowRelDataType))," +
-        (if (sortOffset != null) {
-          " offset: $offsetToString(sortOffset)," 
-        } else {
-          ""  
-        }) +
-        (if (sortFetch != null) {
-          " fetch: $fetchToString(sortFetch, sortOffset))"
-        } else {
-          ""  
-        })
+      rowRelDataType: RelDataType,
+      sortCollation: RelCollation,
+      sortOffset: RexNode,
+      sortFetch: RexNode): String = {
+    s"Sort(by: ($$sortFieldsToString(sortCollation, rowRelDataType))," +
+      (if (sortOffset != null) {
+         " offset: $offsetToString(sortOffset),"
+       } else {
+         ""
+       }) +
+      (if (sortFetch != null) {
+         " fetch: $fetchToString(sortFetch, sortOffset))"
+       } else {
+         ""
+       })
   }
-  
+
   private[flink] def sortExplainTerms(
       pw: RelWriter,
       rowRelDataType: RelDataType,
       sortCollation: RelCollation,
       sortOffset: RexNode,
-      sortFetch: RexNode) : RelWriter = {
-    
+      sortFetch: RexNode): RelWriter = {
+
     pw
       .item("orderBy", sortFieldsToString(sortCollation, rowRelDataType))
       .itemIf("offset", offsetToString(sortOffset), sortOffset != null)
       .itemIf("fetch", fetchToString(sortFetch, sortOffset), sortFetch != null)
   }
-  
+
 }

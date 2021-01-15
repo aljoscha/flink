@@ -29,12 +29,12 @@ import java.util
  * Describes MATCH RECOGNIZE clause.
  */
 case class MatchRecognize(
-  pattern: RexNode,
-  patternDefinitions: ImmutableMap[String, RexNode],
-  measures: ImmutableMap[String, RexNode],
-  after: RexNode,
-  subsets: ImmutableMap[String, util.SortedSet[String]],
-  allRows: Boolean,
-  partitionKeys: ImmutableBitSet,
-  orderKeys: RelCollation,
-  interval: RexNode)
+    pattern: RexNode,
+    patternDefinitions: ImmutableMap[String, RexNode],
+    measures: ImmutableMap[String, RexNode],
+    after: RexNode,
+    subsets: ImmutableMap[String, util.SortedSet[String]],
+    allRows: Boolean,
+    partitionKeys: ImmutableBitSet,
+    orderKeys: RelCollation,
+    interval: RexNode)

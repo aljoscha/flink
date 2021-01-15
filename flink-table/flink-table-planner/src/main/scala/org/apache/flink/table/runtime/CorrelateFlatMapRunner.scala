@@ -33,10 +33,10 @@ class CorrelateFlatMapRunner[IN, OUT](
     collectorName: String,
     collectorCode: String,
     @transient var returnType: TypeInformation[OUT])
-  extends RichFlatMapFunction[IN, OUT]
-  with ResultTypeQueryable[OUT]
-  with Compiler[Any]
-  with Logging {
+    extends RichFlatMapFunction[IN, OUT]
+    with ResultTypeQueryable[OUT]
+    with Compiler[Any]
+    with Logging {
 
   private var function: FlatMapFunction[IN, OUT] = _
   private var collector: TableFunctionCollector[_] = _

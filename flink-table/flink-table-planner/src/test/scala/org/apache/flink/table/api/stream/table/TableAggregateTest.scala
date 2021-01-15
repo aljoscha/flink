@@ -24,7 +24,11 @@ import org.apache.flink.table.api.Expressions.$
 import org.apache.flink.table.api.{Types, _}
 import org.apache.flink.table.expressions.utils.Func0
 import org.apache.flink.table.utils.TableTestUtil._
-import org.apache.flink.table.utils.{EmptyTableAggFunc, EmptyTableAggFuncWithIntResultType, TableTestBase}
+import org.apache.flink.table.utils.{
+  EmptyTableAggFunc,
+  EmptyTableAggFuncWithIntResultType,
+  TableTestBase
+}
 import org.apache.flink.types.Row
 
 import org.junit.Test
@@ -51,13 +55,10 @@ class TableAggregateTest extends TableTestBase {
           unaryNode(
             "DataStreamCalc",
             streamTableNode(table),
-            term("select", "a", "b", "MOD(b, 5) AS bb")
-          ),
+            term("select", "a", "b", "MOD(b, 5) AS bb")),
           term("groupBy", "bb"),
-          term("select", "bb", "EmptyTableAggFunc(a, b) AS (f0, f1)")
-        ),
-        term("select", "bb", "+(f0, 1) AS _c1", "f1 AS y")
-      )
+          term("select", "bb", "EmptyTableAggFunc(a, b) AS (f0, f1)")),
+        term("select", "bb", "+(f0, 1) AS _c1", "f1 AS y"))
     util.verifyTable(resultTable, expected)
   }
 
@@ -73,15 +74,9 @@ class TableAggregateTest extends TableTestBase {
         "DataStreamCalc",
         unaryNode(
           "DataStreamGroupTableAggregate",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(table),
-            term("select", "a", "b")
-          ),
-          term("select", "EmptyTableAggFunc(a, b) AS (f0, f1)")
-        ),
-        term("select", "Func0$(f0) AS a", "f1 AS b")
-      )
+          unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "b")),
+          term("select", "EmptyTableAggFunc(a, b) AS (f0, f1)")),
+        term("select", "Func0$(f0) AS a", "f1 AS b"))
     util.verifyTable(resultTable, expected)
   }
 
@@ -98,10 +93,8 @@ class TableAggregateTest extends TableTestBase {
         unaryNode(
           "DataStreamCalc",
           streamTableNode(table),
-          term("select", "CAST(d) AS d", "PROCTIME(e) AS e")
-        ),
-        term("select", "EmptyTableAggFunc(d, e) AS (f0, f1)")
-      )
+          term("select", "CAST(d) AS d", "PROCTIME(e) AS e")),
+        term("select", "EmptyTableAggFunc(d, e) AS (f0, f1)"))
     util.verifyTable(resultTable, expected)
   }
 
@@ -115,13 +108,8 @@ class TableAggregateTest extends TableTestBase {
     val expected =
       unaryNode(
         "DataStreamGroupTableAggregate",
-        unaryNode(
-          "DataStreamCalc",
-          streamTableNode(table),
-          term("select", "b")
-        ),
-        term("select", "EmptyTableAggFunc(b) AS (f0, f1)")
-      )
+        unaryNode("DataStreamCalc", streamTableNode(table), term("select", "b")),
+        term("select", "EmptyTableAggFunc(b) AS (f0, f1)"))
     util.verifyTable(resultTable, expected)
   }
 
@@ -137,15 +125,9 @@ class TableAggregateTest extends TableTestBase {
         "DataStreamCalc",
         unaryNode(
           "DataStreamGroupTableAggregate",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(table),
-            term("select", "b")
-          ),
-          term("select", "EmptyTableAggFunc(b) AS (f0, f1)")
-        ),
-        term("select", "f0 AS a", "f1 AS b")
-      )
+          unaryNode("DataStreamCalc", streamTableNode(table), term("select", "b")),
+          term("select", "EmptyTableAggFunc(b) AS (f0, f1)")),
+        term("select", "f0 AS a", "f1 AS b"))
     util.verifyTable(resultTable, expected)
   }
 
@@ -166,14 +148,9 @@ class TableAggregateTest extends TableTestBase {
     val expected =
       unaryNode(
         "DataStreamGroupTableAggregate",
-        unaryNode(
-          "DataStreamCalc",
-          streamTableNode(table),
-          term("select", "a", "c")
-        ),
+        unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "c")),
         term("groupBy", "c"),
-        term("select", "c", "EmptyTableAggFunc(a) AS (f0, f1)")
-      )
+        term("select", "c", "EmptyTableAggFunc(a) AS (f0, f1)"))
     util.verifyJavaTable(resultTable, expected)
   }
 
@@ -191,15 +168,9 @@ class TableAggregateTest extends TableTestBase {
     val expected =
       unaryNode(
         "DataStreamGroupTableAggregate",
-        unaryNode(
-          "DataStreamCalc",
-          streamTableNode(table),
-          term("select", "f0", "f1")
-        ),
+        unaryNode("DataStreamCalc", streamTableNode(table), term("select", "f0", "f1")),
         term("groupBy", "f0"),
-        term("select", "f0, EmptyTableAggFuncWithIntResultType(f1) AS (f0_0)")
-      )
+        term("select", "f0, EmptyTableAggFuncWithIntResultType(f1) AS (f0_0)"))
     util.verifyTable(resultTable, expected)
   }
 }
-

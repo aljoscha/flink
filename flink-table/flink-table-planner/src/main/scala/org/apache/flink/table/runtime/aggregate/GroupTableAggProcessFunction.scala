@@ -32,11 +32,11 @@ import org.apache.flink.types.Row
 import org.apache.flink.util.Collector
 
 /**
-  * Aggregate Function used for the groupby (without window) table aggregate.
-  *
-  * @param genTableAggregations Generated aggregate helper function
-  * @param aggregationStateType The row type info of aggregation
-  */
+ * Aggregate Function used for the groupby (without window) table aggregate.
+ *
+ * @param genTableAggregations Generated aggregate helper function
+ * @param aggregationStateType The row type info of aggregation
+ */
 class GroupTableAggProcessFunction[K](
     genTableAggregations: GeneratedTableAggregationsFunction,
     aggregationStateType: RowTypeInfo,
@@ -44,7 +44,7 @@ class GroupTableAggProcessFunction[K](
     groupKeySize: Int,
     minRetentionTime: Long,
     maxRetentionTime: Long)
-  extends ProcessFunctionWithCleanupState[K, CRow, CRow](minRetentionTime, maxRetentionTime)
+    extends ProcessFunctionWithCleanupState[K, CRow, CRow](minRetentionTime, maxRetentionTime)
     with Compiler[GeneratedTableAggregations]
     with Logging {
 
@@ -59,8 +59,9 @@ class GroupTableAggProcessFunction[K](
   private var concatCollector: TableAggregateCollector = _
 
   override def open(config: Configuration) {
-    LOG.debug(s"Compiling TableAggregateHelper: ${genTableAggregations.name} \n\n " +
-      s"Code:\n${genTableAggregations.code}")
+    LOG.debug(
+      s"Compiling TableAggregateHelper: ${genTableAggregations.name} \n\n " +
+        s"Code:\n${genTableAggregations.code}")
     val clazz = compile(
       getRuntimeContext.getUserCodeClassLoader,
       genTableAggregations.name,

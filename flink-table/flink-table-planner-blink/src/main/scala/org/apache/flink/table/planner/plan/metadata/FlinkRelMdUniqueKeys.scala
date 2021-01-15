@@ -22,7 +22,12 @@ import org.apache.flink.table.catalog.AbstractCatalogTable
 import org.apache.flink.table.planner._
 import org.apache.flink.table.planner.calcite.FlinkRelBuilder.PlannerNamedWindowProperty
 import org.apache.flink.table.planner.calcite.FlinkTypeFactory
-import org.apache.flink.table.planner.plan.nodes.calcite.{Expand, Rank, WatermarkAssigner, WindowAggregate}
+import org.apache.flink.table.planner.plan.nodes.calcite.{
+  Expand,
+  Rank,
+  WatermarkAssigner,
+  WindowAggregate
+}
 import org.apache.flink.table.planner.plan.nodes.common.CommonLookupJoin
 import org.apache.flink.table.planner.plan.nodes.logical._
 import org.apache.flink.table.planner.plan.nodes.physical.batch._
@@ -95,7 +100,7 @@ class FlinkRelMdUniqueKeys private extends MetadataHandler[BuiltInMetadata.Uniqu
             }
         }
       case table: FlinkPreparingTableBase => table.uniqueKeysSet.orElse(null)
-      case _ => null
+      case _                              => null
     }
   }
 
@@ -143,28 +148,28 @@ class FlinkRelMdUniqueKeys private extends MetadataHandler[BuiltInMetadata.Uniqu
       }
     }
     // Build an input to output position map.
-    projects.zipWithIndex.foreach {
-      case (projExpr, i) =>
-        projExpr match {
-          case ref: RexInputRef => appendMapInToOutPos(ref.getIndex, i)
-          case a: RexCall if ignoreNulls && a.getOperator.equals(SqlStdOperatorTable.CAST) =>
-            val castOperand = a.getOperands.get(0)
-            castOperand match {
-              case castRef: RexInputRef =>
-                val typeFactory = input.getCluster.getTypeFactory
-                val castType = typeFactory.createTypeWithNullability(projExpr.getType, true)
-                val origType = typeFactory.createTypeWithNullability(castOperand.getType, true)
-                if (castType == origType) {
-                  appendMapInToOutPos(castRef.getIndex, i)
-                }
-              case _ => // ignore
-            }
-          //rename or cast
-          case a: RexCall if (a.getKind.equals(SqlKind.AS) || isFidelityCast(a)) &&
-            a.getOperands.get(0).isInstanceOf[RexInputRef] =>
-            appendMapInToOutPos(a.getOperands.get(0).asInstanceOf[RexInputRef].getIndex, i)
-          case _ => // ignore
-        }
+    projects.zipWithIndex.foreach { case (projExpr, i) =>
+      projExpr match {
+        case ref: RexInputRef => appendMapInToOutPos(ref.getIndex, i)
+        case a: RexCall if ignoreNulls && a.getOperator.equals(SqlStdOperatorTable.CAST) =>
+          val castOperand = a.getOperands.get(0)
+          castOperand match {
+            case castRef: RexInputRef =>
+              val typeFactory = input.getCluster.getTypeFactory
+              val castType = typeFactory.createTypeWithNullability(projExpr.getType, true)
+              val origType = typeFactory.createTypeWithNullability(castOperand.getType, true)
+              if (castType == origType) {
+                appendMapInToOutPos(castRef.getIndex, i)
+              }
+            case _ => // ignore
+          }
+        //rename or cast
+        case a: RexCall
+            if (a.getKind.equals(SqlKind.AS) || isFidelityCast(a)) &&
+              a.getOperands.get(0).isInstanceOf[RexInputRef] =>
+          appendMapInToOutPos(a.getOperands.get(0).asInstanceOf[RexInputRef].getIndex, i)
+        case _ => // ignore
+      }
     }
     if (mapInToOutPos.isEmpty) {
       // if there's no RexInputRef in the projected expressions
@@ -281,8 +286,7 @@ class FlinkRelMdUniqueKeys private extends MetadataHandler[BuiltInMetadata.Uniqu
       val retSet = new JHashSet[ImmutableBitSet]
       retSet.add(rel.partitionKey)
       retSet
-    }
-    else if (rankFunColumnIndex < 0) {
+    } else if (rankFunColumnIndex < 0) {
       inputUniqueKeys
     } else {
       val retSet = new JHashSet[ImmutableBitSet]
@@ -292,18 +296,16 @@ class FlinkRelMdUniqueKeys private extends MetadataHandler[BuiltInMetadata.Uniqu
         case _ => // do nothing
       }
       if (inputUniqueKeys != null && inputUniqueKeys.nonEmpty) {
-        inputUniqueKeys.foreach {
-          uniqueKey => retSet.add(uniqueKey)
+        inputUniqueKeys.foreach { uniqueKey =>
+          retSet.add(uniqueKey)
         }
       }
       retSet
     }
   }
 
-  def getUniqueKeys(
-      rel: Sort,
-      mq: RelMetadataQuery,
-      ignoreNulls: Boolean): JSet[ImmutableBitSet] = mq.getUniqueKeys(rel.getInput, ignoreNulls)
+  def getUniqueKeys(rel: Sort, mq: RelMetadataQuery, ignoreNulls: Boolean): JSet[ImmutableBitSet] =
+    mq.getUniqueKeys(rel.getInput, ignoreNulls)
 
   def getUniqueKeys(
       rel: StreamPhysicalDeduplicate,
@@ -404,7 +406,11 @@ class FlinkRelMdUniqueKeys private extends MetadataHandler[BuiltInMetadata.Uniqu
       mq: RelMetadataQuery,
       ignoreNulls: Boolean): util.Set[ImmutableBitSet] = {
     getUniqueKeysOnWindowAgg(
-      rel.getRowType.getFieldCount, rel.namedWindowProperties, rel.grouping, mq, ignoreNulls)
+      rel.getRowType.getFieldCount,
+      rel.namedWindowProperties,
+      rel.grouping,
+      mq,
+      ignoreNulls)
   }
 
   private def getUniqueKeysOnWindowAgg(
@@ -418,9 +424,11 @@ class FlinkRelMdUniqueKeys private extends MetadataHandler[BuiltInMetadata.Uniqu
       val end = fieldCount - 1
       //namedProperties's indexes is at the end of output record
       val keys = ImmutableBitSet.of(grouping.indices: _*)
-      (begin to end).map {
-        i => keys.union(ImmutableBitSet.of(i))
-      }.toSet[ImmutableBitSet]
+      (begin to end)
+        .map { i =>
+          keys.union(ImmutableBitSet.of(i))
+        }
+        .toSet[ImmutableBitSet]
     } else {
       null
     }
@@ -465,7 +473,12 @@ class FlinkRelMdUniqueKeys private extends MetadataHandler[BuiltInMetadata.Uniqu
         mq.getUniqueKeys(join.getLeft, ignoreNulls)
       case _ =>
         getJoinUniqueKeys(
-          join.analyzeCondition(), join.getJoinType, join.getLeft, join.getRight, mq, ignoreNulls)
+          join.analyzeCondition(),
+          join.getJoinType,
+          join.getLeft,
+          join.getRight,
+          mq,
+          ignoreNulls)
     }
   }
 
@@ -485,7 +498,11 @@ class FlinkRelMdUniqueKeys private extends MetadataHandler[BuiltInMetadata.Uniqu
     val leftUniqueKeys = mq.getUniqueKeys(left, ignoreNulls)
     val leftType = left.getRowType
     getJoinUniqueKeys(
-      join.joinInfo, join.joinType, leftType, leftUniqueKeys, null,
+      join.joinInfo,
+      join.joinType,
+      leftType,
+      leftUniqueKeys,
+      null,
       mq.areColumnsUnique(left, join.joinInfo.leftSet, ignoreNulls),
       // TODO get uniqueKeys from TableSchema of TableSource
       null,
@@ -502,7 +519,11 @@ class FlinkRelMdUniqueKeys private extends MetadataHandler[BuiltInMetadata.Uniqu
     val leftUniqueKeys = mq.getUniqueKeys(left, ignoreNulls)
     val rightUniqueKeys = mq.getUniqueKeys(right, ignoreNulls)
     getJoinUniqueKeys(
-      joinInfo, joinRelType, left.getRowType, leftUniqueKeys, rightUniqueKeys,
+      joinInfo,
+      joinRelType,
+      left.getRowType,
+      leftUniqueKeys,
+      rightUniqueKeys,
       mq.areColumnsUnique(left, joinInfo.leftSet, ignoreNulls),
       mq.areColumnsUnique(right, joinInfo.rightSet, ignoreNulls),
       mq)
@@ -631,7 +652,7 @@ object FlinkRelMdUniqueKeys {
 
   private val INSTANCE = new FlinkRelMdUniqueKeys
 
-  val SOURCE: RelMetadataProvider = ReflectiveRelMetadataProvider.reflectiveSource(
-    BuiltInMethod.UNIQUE_KEYS.method, INSTANCE)
+  val SOURCE: RelMetadataProvider =
+    ReflectiveRelMetadataProvider.reflectiveSource(BuiltInMethod.UNIQUE_KEYS.method, INSTANCE)
 
 }

@@ -20,15 +20,18 @@ package org.apache.flink.table.factories.utils
 
 import java.util
 
-import org.apache.flink.table.descriptors.ConnectorDescriptorValidator.{CONNECTOR_PROPERTY_VERSION, CONNECTOR_TYPE}
+import org.apache.flink.table.descriptors.ConnectorDescriptorValidator.{
+  CONNECTOR_PROPERTY_VERSION,
+  CONNECTOR_TYPE
+}
 import org.apache.flink.table.factories.StreamTableSourceFactory
 import org.apache.flink.table.factories.utils.TestWildcardFormatTableSourceFactory.CONNECTOR_TYPE_VALUE_WILDCARD
 import org.apache.flink.table.sources.StreamTableSource
 import org.apache.flink.types.Row
 
 /**
-  * Table source factory for testing with a wildcard format ("format.*").
-  */
+ * Table source factory for testing with a wildcard format ("format.*").
+ */
 class TestWildcardFormatTableSourceFactory extends StreamTableSourceFactory[Row] {
 
   override def requiredContext(): util.Map[String, String] = {
@@ -47,8 +50,7 @@ class TestWildcardFormatTableSourceFactory extends StreamTableSourceFactory[Row]
   }
 
   override def createStreamTableSource(
-      properties: util.Map[String, String])
-    : StreamTableSource[Row] = {
+      properties: util.Map[String, String]): StreamTableSource[Row] = {
     throw new UnsupportedOperationException()
   }
 }

@@ -20,8 +20,15 @@ package org.apache.flink.table.planner.plan.rules.logical
 
 import org.apache.flink.table.api.TableException
 import org.apache.flink.table.api.config.OptimizerConfigOptions
-import org.apache.flink.table.planner.calcite.{FlinkContext, FlinkLogicalRelFactories, FlinkRelBuilder}
-import org.apache.flink.table.planner.functions.sql.{FlinkSqlOperatorTable, SqlFirstLastValueAggFunction}
+import org.apache.flink.table.planner.calcite.{
+  FlinkContext,
+  FlinkLogicalRelFactories,
+  FlinkRelBuilder
+}
+import org.apache.flink.table.planner.functions.sql.{
+  FlinkSqlOperatorTable,
+  SqlFirstLastValueAggFunction
+}
 import org.apache.flink.table.planner.plan.PartialFinalType
 import org.apache.flink.table.planner.plan.nodes.FlinkRelNode
 import org.apache.flink.table.planner.plan.nodes.logical.FlinkLogicalAggregate
@@ -42,74 +49,74 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
-  * Planner rule that splits aggregations containing distinct aggregates, e.g, count distinct,
-  * into partial aggregations and final aggregations.
-  *
-  * This rule rewrites an aggregate query with distinct aggregations into an expanded
-  * double aggregations. The first aggregation compute the results in sub-partition and
-  * the results are combined by the second aggregation.
-  *
-  * Examples:
-  *
-  * MyTable: a: BIGINT, b: INT, c: VARCHAR
-  *
-  * Original records:
-  * +-----+-----+-----+
-  * |  a  |  b  |  c  |
-  * +-----+-----+-----+
-  * |  1  |  1  |  c1 |
-  * +-----+-----+-----+
-  * |  1  |  2  |  c1 |
-  * +-----+-----+-----+
-  * |  2  |  1  |  c2 |
-  * +-----+-----+-----+
-  *
-  * SQL:
-  * SELECT SUM(b), COUNT(DISTINCT c), AVG(b) FROM MyTable GROUP BY a
-  *
-  * flink logical plan:
-  * {{{
-  * FlinkLogicalCalc(select=[a, $f1, $f2, CAST(IF(=($f4, 0:BIGINT), null:INTEGER, /($f3, $f4))) AS
-  *     $f3])
-  * +- FlinkLogicalAggregate(group=[{0}], agg#0=[SUM($2)], agg#1=[$SUM0($3)], agg#2=[$SUM0($4)],
-  *        agg#3=[$SUM0($5)])
-  *    +- FlinkLogicalAggregate(group=[{0, 3}], agg#0=[SUM($1) FILTER $4], agg#1=[COUNT(DISTINCT $2)
-  *           FILTER $5], agg#2=[$SUM0($1) FILTER $4], agg#3=[COUNT($1) FILTER $4])
-  *       +- FlinkLogicalCalc(select=[a, b, c, $f3, =($e, 1) AS $g_1, =($e, 0) AS $g_0])
-  *          +- FlinkLogicalExpand(projects=[{a=[$0], b=[$1], c=[$2], $f3=[$3], $e=[0]},
-  *                 {a=[$0], b=[$1], c=[$2], $f3=[null], $e=[1]}])
-  *             +- FlinkLogicalCalc(select=[a, b, c, MOD(HASH_CODE(c), 1024) AS $f3])
-  *                +- FlinkLogicalTableSourceScan(table=[[MyTable,
-  *                       source: [TestTableSource(a, b, c)]]], fields=[a, b, c])
-  * }}}
-  *
-  * '$e = 0' is equivalent to 'group by a, hash(c) % 256'
-  * '$e = 1' is equivalent to 'group by a'
-  *
-  * Expanded records:
-  * +-----+-----+-----+------------------+-----+
-  * |  a  |  b  |  c  |  hash(c) % 256   | $e  |
-  * +-----+-----+-----+------------------+-----+        ---+---
-  * |  1  |  1  | null|       null       |  1  |           |
-  * +-----+-----+-----+------------------+-----|  records expanded by record1
-  * |  1  |  1  |  c1 |  hash(c1) % 256  |  0  |           |
-  * +-----+-----+-----+------------------+-----+        ---+---
-  * |  1  |  2  | null|       null       |  1  |           |
-  * +-----+-----+-----+------------------+-----+  records expanded by record2
-  * |  1  |  2  |  c1 |  hash(c1) % 256  |  0  |           |
-  * +-----+-----+-----+------------------+-----+        ---+---
-  * |  2  |  1  | null|       null       |  1  |           |
-  * +-----+-----+-----+------------------+-----+  records expanded by record3
-  * |  2  |  1  |  c2 |  hash(c2) % 256  |  0  |           |
-  * +-----+-----+-----+------------------+-----+        ---+---
-  *
-  * NOTES: this rule is only used for Stream now.
-  */
-class SplitAggregateRule extends RelOptRule(
-  operand(classOf[FlinkLogicalAggregate],
-    operand(classOf[FlinkRelNode], any)),
-  FlinkLogicalRelFactories.FLINK_LOGICAL_REL_BUILDER,
-  "SplitAggregateRule") {
+ * Planner rule that splits aggregations containing distinct aggregates, e.g, count distinct,
+ * into partial aggregations and final aggregations.
+ *
+ * This rule rewrites an aggregate query with distinct aggregations into an expanded
+ * double aggregations. The first aggregation compute the results in sub-partition and
+ * the results are combined by the second aggregation.
+ *
+ * Examples:
+ *
+ * MyTable: a: BIGINT, b: INT, c: VARCHAR
+ *
+ * Original records:
+ * +-----+-----+-----+
+ * |  a  |  b  |  c  |
+ * +-----+-----+-----+
+ * |  1  |  1  |  c1 |
+ * +-----+-----+-----+
+ * |  1  |  2  |  c1 |
+ * +-----+-----+-----+
+ * |  2  |  1  |  c2 |
+ * +-----+-----+-----+
+ *
+ * SQL:
+ * SELECT SUM(b), COUNT(DISTINCT c), AVG(b) FROM MyTable GROUP BY a
+ *
+ * flink logical plan:
+ * {{{
+ * FlinkLogicalCalc(select=[a, $f1, $f2, CAST(IF(=($f4, 0:BIGINT), null:INTEGER, /($f3, $f4))) AS
+ *     $f3])
+ * +- FlinkLogicalAggregate(group=[{0}], agg#0=[SUM($2)], agg#1=[$SUM0($3)], agg#2=[$SUM0($4)],
+ *        agg#3=[$SUM0($5)])
+ *    +- FlinkLogicalAggregate(group=[{0, 3}], agg#0=[SUM($1) FILTER $4], agg#1=[COUNT(DISTINCT $2)
+ *           FILTER $5], agg#2=[$SUM0($1) FILTER $4], agg#3=[COUNT($1) FILTER $4])
+ *       +- FlinkLogicalCalc(select=[a, b, c, $f3, =($e, 1) AS $g_1, =($e, 0) AS $g_0])
+ *          +- FlinkLogicalExpand(projects=[{a=[$0], b=[$1], c=[$2], $f3=[$3], $e=[0]},
+ *                 {a=[$0], b=[$1], c=[$2], $f3=[null], $e=[1]}])
+ *             +- FlinkLogicalCalc(select=[a, b, c, MOD(HASH_CODE(c), 1024) AS $f3])
+ *                +- FlinkLogicalTableSourceScan(table=[[MyTable,
+ *                       source: [TestTableSource(a, b, c)]]], fields=[a, b, c])
+ * }}}
+ *
+ * '$e = 0' is equivalent to 'group by a, hash(c) % 256'
+ * '$e = 1' is equivalent to 'group by a'
+ *
+ * Expanded records:
+ * +-----+-----+-----+------------------+-----+
+ * |  a  |  b  |  c  |  hash(c) % 256   | $e  |
+ * +-----+-----+-----+------------------+-----+        ---+---
+ * |  1  |  1  | null|       null       |  1  |           |
+ * +-----+-----+-----+------------------+-----|  records expanded by record1
+ * |  1  |  1  |  c1 |  hash(c1) % 256  |  0  |           |
+ * +-----+-----+-----+------------------+-----+        ---+---
+ * |  1  |  2  | null|       null       |  1  |           |
+ * +-----+-----+-----+------------------+-----+  records expanded by record2
+ * |  1  |  2  |  c1 |  hash(c1) % 256  |  0  |           |
+ * +-----+-----+-----+------------------+-----+        ---+---
+ * |  2  |  1  | null|       null       |  1  |           |
+ * +-----+-----+-----+------------------+-----+  records expanded by record3
+ * |  2  |  1  |  c2 |  hash(c2) % 256  |  0  |           |
+ * +-----+-----+-----+------------------+-----+        ---+---
+ *
+ * NOTES: this rule is only used for Stream now.
+ */
+class SplitAggregateRule
+    extends RelOptRule(
+      operand(classOf[FlinkLogicalAggregate], operand(classOf[FlinkRelNode], any)),
+      FlinkLogicalRelFactories.FLINK_LOGICAL_REL_BUILDER,
+      "SplitAggregateRule") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val tableConfig = call.getPlanner.getContext.unwrap(classOf[FlinkContext]).getTableConfig
@@ -120,7 +127,7 @@ class SplitAggregateRule extends RelOptRule(
     val isAllAggSplittable = doAllAggSupportSplit(agg.getAggCallList)
 
     agg.partialFinalType == PartialFinalType.NONE && agg.containsDistinctCall() &&
-      splitDistinctAggEnabled && isAllAggSplittable
+    splitDistinctAggEnabled && isAllAggSplittable
   }
 
   override def onMatch(call: RelOptRuleCall): Unit = {
@@ -134,13 +141,18 @@ class SplitAggregateRule extends RelOptRule(
     val aggGroupSet = originalAggregate.getGroupSet.toArray
 
     // STEP 1: add hash fields if necessary
-    val hashFieldIndexes: Array[Int] = aggCalls.flatMap { aggCall =>
-      if (SplitAggregateRule.needAddHashFields(aggCall)) {
-        SplitAggregateRule.getArgIndexes(aggCall)
-      } else {
-        Array.empty[Int]
+    val hashFieldIndexes: Array[Int] = aggCalls
+      .flatMap { aggCall =>
+        if (SplitAggregateRule.needAddHashFields(aggCall)) {
+          SplitAggregateRule.getArgIndexes(aggCall)
+        } else {
+          Array.empty[Int]
+        }
       }
-    }.distinct.diff(aggGroupSet).sorted.toArray
+      .distinct
+      .diff(aggGroupSet)
+      .sorted
+      .toArray
 
     val hashFieldsMap: util.Map[Int, Int] = new util.HashMap()
     val buckets = tableConfig.getConfiguration.getInteger(
@@ -168,9 +180,12 @@ class SplitAggregateRule extends RelOptRule(
     val aggInfoToGroupSetMap = new util.HashMap[AggregateCall, ImmutableBitSet]()
     aggCalls.foreach { aggCall =>
       val groupSet = if (SplitAggregateRule.needAddHashFields(aggCall)) {
-        val newIndexes = SplitAggregateRule.getArgIndexes(aggCall).map { argIndex =>
-          hashFieldsMap.getOrElse(argIndex, argIndex).asInstanceOf[Integer]
-        }.toSeq
+        val newIndexes = SplitAggregateRule
+          .getArgIndexes(aggCall)
+          .map { argIndex =>
+            hashFieldsMap.getOrElse(argIndex, argIndex).asInstanceOf[Integer]
+          }
+          .toSeq
         ImmutableBitSet.of(newIndexes).union(ImmutableBitSet.of(aggGroupSet: _*))
       } else {
         ImmutableBitSet.of(aggGroupSet: _*)
@@ -186,8 +201,16 @@ class SplitAggregateRule extends RelOptRule(
     val partialAggCallToGroupSetMap = new util.HashMap[AggregateCall, ImmutableBitSet]()
     aggCalls.foreach { aggCall =>
       val newAggCalls = SplitAggregateRule.getPartialAggFunction(aggCall).map { aggFunc =>
-        AggregateCall.create(aggFunc, aggCall.isDistinct, aggCall.isApproximate, aggCall.getArgList,
-          aggCall.filterArg, fullGroupSet.cardinality, relBuilder.peek(), null, null)
+        AggregateCall.create(
+          aggFunc,
+          aggCall.isDistinct,
+          aggCall.isApproximate,
+          aggCall.getArgList,
+          aggCall.filterArg,
+          fullGroupSet.cardinality,
+          relBuilder.peek(),
+          null,
+          null)
       }
       partialAggCalls.addAll(newAggCalls)
       newAggCalls.foreach { newAggCall =>
@@ -197,8 +220,8 @@ class SplitAggregateRule extends RelOptRule(
 
     val needExpand = groupSets.size() > 1
     val duplicateFieldMap = if (needExpand) {
-      val (duplicateFieldMap, _) = ExpandUtil.buildExpandNode(
-        cluster, relBuilder, partialAggCalls, fullGroupSet, groupSets)
+      val (duplicateFieldMap, _) =
+        ExpandUtil.buildExpandNode(cluster, relBuilder, partialAggCalls, fullGroupSet, groupSets)
       duplicateFieldMap
     } else {
       Map.empty[Integer, Integer]
@@ -222,14 +245,17 @@ class SplitAggregateRule extends RelOptRule(
         if (!filters.contains(groupSet, oldFilterArg)) {
           val expandId = ExpandUtil.genExpandId(fullGroupSet, groupSet)
           if (oldFilterArg >= 0) {
-            nodes.add(relBuilder.alias(
-              relBuilder.and(
-                relBuilder.equals(expandIdNode, relBuilder.literal(expandId)),
-                relBuilder.field(oldFilterArg)),
-              "$g_" + expandId))
+            nodes.add(
+              relBuilder.alias(
+                relBuilder.and(
+                  relBuilder.equals(expandIdNode, relBuilder.literal(expandId)),
+                  relBuilder.field(oldFilterArg)),
+                "$g_" + expandId))
           } else {
-            nodes.add(relBuilder.alias(
-              relBuilder.equals(expandIdNode, relBuilder.literal(expandId)), "$g_" + expandId))
+            nodes.add(
+              relBuilder.alias(
+                relBuilder.equals(expandIdNode, relBuilder.literal(expandId)),
+                "$g_" + expandId))
           }
           val newFilterArg = filterColumnsOffset + x
           filters.put((groupSet, oldFilterArg), newFilterArg)
@@ -238,8 +264,11 @@ class SplitAggregateRule extends RelOptRule(
 
         val newFilterArg = filters((groupSet, oldFilterArg))
         val newAggCall = aggCall.adaptTo(
-          relBuilder.peek(), newArgList, newFilterArg,
-          fullGroupSet.cardinality, fullGroupSet.cardinality)
+          relBuilder.peek(),
+          newArgList,
+          newFilterArg,
+          fullGroupSet.cardinality,
+          fullGroupSet.cardinality)
         newPartialAggCalls.add(newAggCall)
       }
       relBuilder.project(nodes)
@@ -251,7 +280,9 @@ class SplitAggregateRule extends RelOptRule(
     relBuilder.aggregate(
       relBuilder.groupKey(fullGroupSet, ImmutableList.of[ImmutableBitSet](fullGroupSet)),
       newPartialAggCalls)
-    relBuilder.peek().asInstanceOf[FlinkLogicalAggregate]
+    relBuilder
+      .peek()
+      .asInstanceOf[FlinkLogicalAggregate]
       .setPartialFinalType(PartialFinalType.PARTIAL)
 
     // STEP 3: construct final aggregates
@@ -265,8 +296,15 @@ class SplitAggregateRule extends RelOptRule(
         x += 1
 
         AggregateCall.create(
-          aggFunction, false, aggCall.isApproximate, newArgList, -1,
-          originalAggregate.getGroupCount, relBuilder.peek(), null, null)
+          aggFunction,
+          false,
+          aggCall.isApproximate,
+          newArgList,
+          -1,
+          originalAggregate.getGroupCount,
+          relBuilder.peek(),
+          null,
+          null)
       }
 
       finalAggCalls.addAll(newAggCalls)
@@ -296,12 +334,10 @@ class SplitAggregateRule extends RelOptRule(
       var avgAggCount: Int = 0
       aggCalls.zipWithIndex.foreach { case (aggCall, index) =>
         val newNode = if (aggCall.getAggregation.getKind == SqlKind.AVG) {
-          val sumInputRef = RexInputRef.of(
-            aggGroupCount + index + avgAggCount,
-            finalAggregate.getRowType)
-          val countInputRef = RexInputRef.of(
-            aggGroupCount + index + avgAggCount + 1,
-            finalAggregate.getRowType)
+          val sumInputRef =
+            RexInputRef.of(aggGroupCount + index + avgAggCount, finalAggregate.getRowType)
+          val countInputRef =
+            RexInputRef.of(aggGroupCount + index + avgAggCount + 1, finalAggregate.getRowType)
           avgAggCount += 1
           // Make a guarantee that the final aggregation returns NULL if underlying count is ZERO.
           // We use SUM0 for underlying sum, which may run into ZERO / ZERO,
@@ -311,14 +347,10 @@ class SplitAggregateRule extends RelOptRule(
             FlinkSqlOperatorTable.EQUALS,
             countInputRef,
             relBuilder.getRexBuilder.makeBigintLiteral(JBigDecimal.valueOf(0)))
-          val ifTrue = relBuilder.cast(
-            relBuilder.getRexBuilder.constantNull(), aggCall.`type`.getSqlTypeName)
+          val ifTrue =
+            relBuilder.cast(relBuilder.getRexBuilder.constantNull(), aggCall.`type`.getSqlTypeName)
           val ifFalse = relBuilder.call(FlinkSqlOperatorTable.DIVIDE, sumInputRef, countInputRef)
-          relBuilder.call(
-            FlinkSqlOperatorTable.IF,
-            equals,
-            ifTrue,
-            ifFalse)
+          relBuilder.call(FlinkSqlOperatorTable.IF, equals, ifTrue, ifFalse)
         } else {
           RexInputRef.of(aggGroupCount + index + avgAggCount, finalAggregate.getRowType)
         }
@@ -351,8 +383,7 @@ object SplitAggregateRule {
       (Seq(FlinkSqlOperatorTable.LAST_VALUE), Seq(FlinkSqlOperatorTable.LAST_VALUE)),
     FlinkSqlOperatorTable.LISTAGG ->
       (Seq(FlinkSqlOperatorTable.LISTAGG), Seq(FlinkSqlOperatorTable.LISTAGG)),
-    SINGLE_VALUE -> (Seq(SINGLE_VALUE), Seq(SINGLE_VALUE))
-  )
+    SINGLE_VALUE -> (Seq(SINGLE_VALUE), Seq(SINGLE_VALUE)))
 
   private def needAddHashFields(aggCall: AggregateCall): Boolean = {
     // When min/max/first_value/last_value is in retraction mode, records will aggregate into
@@ -360,7 +391,7 @@ object SplitAggregateRule {
     // So we split them into partial/final aggs either.
     val needSplit = aggCall.getAggregation match {
       case _: SqlMinMaxAggFunction | _: SqlFirstLastValueAggFunction => true
-      case _ => false
+      case _                                                         => false
     }
     needSplit || aggCall.isDistinct
   }
@@ -372,25 +403,27 @@ object SplitAggregateRule {
   private def getPartialAggFunction(aggCall: AggregateCall): Seq[SqlAggFunction] = {
     PARTIAL_FINAL_MAP.get(aggCall.getAggregation) match {
       case Some((partialAggFunctions, _)) => partialAggFunctions
-      case _ => throw new TableException(
-        "Aggregation " + aggCall.getAggregation + " is not supported to split!")
+      case _ =>
+        throw new TableException(
+          "Aggregation " + aggCall.getAggregation + " is not supported to split!")
     }
   }
 
   private def getFinalAggFunction(aggCall: AggregateCall): Seq[SqlAggFunction] = {
     PARTIAL_FINAL_MAP.get(aggCall.getAggregation) match {
       case Some((_, finalAggFunctions)) => finalAggFunctions
-      case _ => throw new TableException(
-        "Aggregation " + aggCall.getAggregation + " is not supported to split!")
+      case _ =>
+        throw new TableException(
+          "Aggregation " + aggCall.getAggregation + " is not supported to split!")
     }
   }
 
   /**
-    * Compute the group sets of the final aggregation.
-    *
-    * @param groupSet the group set of the previous partial aggregation
-    * @param originalGroupSets the group set of the original aggregation
-    */
+   * Compute the group sets of the final aggregation.
+   *
+   * @param groupSet the group set of the previous partial aggregation
+   * @param originalGroupSets the group set of the original aggregation
+   */
   private def remap(
       groupSet: ImmutableBitSet,
       originalGroupSets: Iterable[ImmutableBitSet]): ImmutableList[ImmutableBitSet] = {
@@ -402,11 +435,11 @@ object SplitAggregateRule {
   }
 
   /**
-    * Compute the group set of the final aggregation.
-    *
-    * @param groupSet the group set of the previous partial aggregation
-    * @param originalGroupSet the group set of the original aggregation
-    */
+   * Compute the group set of the final aggregation.
+   *
+   * @param groupSet the group set of the previous partial aggregation
+   * @param originalGroupSet the group set of the original aggregation
+   */
   private def remap(
       groupSet: ImmutableBitSet,
       originalGroupSet: ImmutableBitSet): ImmutableBitSet = {

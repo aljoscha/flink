@@ -33,5 +33,5 @@ import org.apache.flink.streaming.api.windowing.windows.Window
  * @tparam W The type of Window that this window function can be applied on.
  */
 abstract class RichAllWindowFunction[IN, OUT, W <: Window]
-  extends AbstractRichFunction
-  with AllWindowFunction[IN, OUT, W] {}
+    extends AbstractRichFunction
+    with AllWindowFunction[IN, OUT, W] {}

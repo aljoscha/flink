@@ -35,8 +35,8 @@ class FlinkLogicalUnion(
     traitSet: RelTraitSet,
     inputs: JList[RelNode],
     all: Boolean)
-  extends Union(cluster, traitSet, inputs, all)
-  with FlinkLogicalRel {
+    extends Union(cluster, traitSet, inputs, all)
+    with FlinkLogicalRel {
 
   override def copy(traitSet: RelTraitSet, inputs: JList[RelNode], all: Boolean): SetOp = {
     new FlinkLogicalUnion(cluster, traitSet, inputs, all)
@@ -44,7 +44,7 @@ class FlinkLogicalUnion(
 
   override def computeSelfCost(planner: RelOptPlanner, metadata: RelMetadataQuery): RelOptCost = {
     val children = this.getInputs.asScala
-    val rowCnt = children.foldLeft(0D) { (rows, child) =>
+    val rowCnt = children.foldLeft(0d) { (rows, child) =>
       rows + metadata.getRowCount(child)
     }
     planner.getCostFactory.makeCost(rowCnt, 0, 0)
@@ -52,15 +52,15 @@ class FlinkLogicalUnion(
 }
 
 private class FlinkLogicalUnionConverter
-  extends ConverterRule(
-    classOf[LogicalUnion],
-    Convention.NONE,
-    FlinkConventions.LOGICAL,
-    "FlinkLogicalUnionConverter") {
+    extends ConverterRule(
+      classOf[LogicalUnion],
+      Convention.NONE,
+      FlinkConventions.LOGICAL,
+      "FlinkLogicalUnionConverter") {
 
   /**
-    * Only translate UNION ALL.
-    */
+   * Only translate UNION ALL.
+   */
   override def matches(call: RelOptRuleCall): Boolean = {
     val union: LogicalUnion = call.rel(0).asInstanceOf[LogicalUnion]
     union.all
@@ -70,7 +70,8 @@ private class FlinkLogicalUnionConverter
     val union = rel.asInstanceOf[LogicalUnion]
     val traitSet = rel.getTraitSet.replace(FlinkConventions.LOGICAL)
     val newInputs = union.getInputs.asScala
-        .map(input => RelOptRule.convert(input, FlinkConventions.LOGICAL)).asJava
+      .map(input => RelOptRule.convert(input, FlinkConventions.LOGICAL))
+      .asJava
 
     new FlinkLogicalUnion(rel.getCluster, traitSet, newInputs, union.all)
   }

@@ -22,18 +22,15 @@ import org.apache.flink.api.common.typeinfo.{SqlTimeTypeInfo, TypeInformation}
 import org.apache.flink.table.codegen.{CodeGenerator, GeneratedExpression}
 
 /**
-  * Generates function call to determine current time point (as date/time/timestamp) in
-  * local timezone or not.
-  */
-class CurrentTimePointCallGen(
-    targetType: TypeInformation[_],
-    local: Boolean)
-  extends CallGenerator {
+ * Generates function call to determine current time point (as date/time/timestamp) in
+ * local timezone or not.
+ */
+class CurrentTimePointCallGen(targetType: TypeInformation[_], local: Boolean)
+    extends CallGenerator {
 
   override def generate(
       codeGenerator: CodeGenerator,
-      operands: Seq[GeneratedExpression])
-    : GeneratedExpression = targetType match {
+      operands: Seq[GeneratedExpression]): GeneratedExpression = targetType match {
     case SqlTimeTypeInfo.TIME if local =>
       val time = codeGenerator.addReusableLocalTime()
       codeGenerator.generateTerm(targetType, time)

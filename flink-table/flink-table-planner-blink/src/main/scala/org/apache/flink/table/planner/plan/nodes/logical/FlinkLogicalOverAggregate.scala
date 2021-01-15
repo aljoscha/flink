@@ -38,9 +38,9 @@ import java.util.{List => JList}
 import scala.collection.JavaConversions._
 
 /**
-  * Sub-class of [[Window]] that is a relational expression
-  * which represents a set of over window aggregates in Flink.
-  */
+ * Sub-class of [[Window]] that is a relational expression
+ * which represents a set of over window aggregates in Flink.
+ */
 class FlinkLogicalOverAggregate(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -48,8 +48,8 @@ class FlinkLogicalOverAggregate(
     windowConstants: JList[RexLiteral],
     rowType: RelDataType,
     windowGroups: JList[Window.Group])
-  extends Window(cluster, traitSet, input, windowConstants, rowType, windowGroups)
-  with FlinkLogicalRel {
+    extends Window(cluster, traitSet, input, windowConstants, rowType, windowGroups)
+    with FlinkLogicalRel {
 
   override def copy(traitSet: RelTraitSet, inputs: JList[RelNode]): RelNode = {
     new FlinkLogicalOverAggregate(
@@ -64,29 +64,34 @@ class FlinkLogicalOverAggregate(
 }
 
 class FlinkLogicalOverAggregateConverter
-  extends ConverterRule(
-    classOf[LogicalWindow],
-    Convention.NONE,
-    FlinkConventions.LOGICAL,
-    "FlinkLogicalOverAggregateConverter") {
+    extends ConverterRule(
+      classOf[LogicalWindow],
+      Convention.NONE,
+      FlinkConventions.LOGICAL,
+      "FlinkLogicalOverAggregateConverter") {
 
   override def convert(rel: RelNode): RelNode = {
     val window = rel.asInstanceOf[LogicalWindow]
     val mq = rel.getCluster.getMetadataQuery
-    val traitSet = rel.getCluster.traitSetOf(FlinkConventions.LOGICAL).replaceIfs(
-      RelCollationTraitDef.INSTANCE, new Supplier[util.List[RelCollation]]() {
-        def get: util.List[RelCollation] = {
-          RelMdCollation.window(mq, window.getInput(), window.groups)
-        }
-      }).simplify()
+    val traitSet = rel.getCluster
+      .traitSetOf(FlinkConventions.LOGICAL)
+      .replaceIfs(
+        RelCollationTraitDef.INSTANCE,
+        new Supplier[util.List[RelCollation]]() {
+          def get: util.List[RelCollation] = {
+            RelMdCollation.window(mq, window.getInput(), window.groups)
+          }
+        })
+      .simplify()
     val newInput = RelOptRule.convert(window.getInput, FlinkConventions.LOGICAL)
 
     window.groups.foreach { group =>
       val orderKeySize = group.orderKeys.getFieldCollations.size()
       group.aggCalls.foreach { winAggCall =>
         if (orderKeySize == 0 && winAggCall.op.isInstanceOf[SqlRankFunction]) {
-          throw new ValidationException("Over Agg: The window rank function without order by. " +
-            "please re-check the over window statement.")
+          throw new ValidationException(
+            "Over Agg: The window rank function without order by. " +
+              "please re-check the over window statement.")
         }
       }
     }

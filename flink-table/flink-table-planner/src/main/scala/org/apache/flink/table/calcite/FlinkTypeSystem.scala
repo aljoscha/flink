@@ -22,8 +22,8 @@ import org.apache.calcite.rel.`type`.RelDataTypeSystemImpl
 import org.apache.calcite.sql.`type`.SqlTypeName
 
 /**
-  * Custom type system for Flink.
-  */
+ * Custom type system for Flink.
+ */
 class FlinkTypeSystem extends RelDataTypeSystemImpl {
 
   // we cannot use Int.MaxValue because of an overflow in Calcite's type inference logic

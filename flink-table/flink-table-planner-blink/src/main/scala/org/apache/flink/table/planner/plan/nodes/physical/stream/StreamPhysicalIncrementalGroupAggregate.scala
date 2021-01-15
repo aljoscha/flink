@@ -68,7 +68,7 @@ class StreamPhysicalIncrementalGroupAggregate(
     partialAggNeedRetraction: Boolean,
     partialLocalAggInputRowType: RelDataType,
     partialGlobalAggRowType: RelDataType)
-  extends StreamPhysicalGroupAggregateBase(cluster, traitSet, inputRel) {
+    extends StreamPhysicalGroupAggregateBase(cluster, traitSet, inputRel) {
 
   private lazy val incrementalAggInfo = AggregateUtil.createIncrementalAggInfoList(
     FlinkTypeFactory.toLogicalRowType(partialLocalAggInputRowType),
@@ -103,17 +103,20 @@ class StreamPhysicalIncrementalGroupAggregate(
   }
 
   override def explainTerms(pw: RelWriter): RelWriter = {
-    super.explainTerms(pw)
-      .item("partialAggGrouping",
+    super
+      .explainTerms(pw)
+      .item(
+        "partialAggGrouping",
         RelExplainUtil.fieldToString(partialAggGrouping, inputRel.getRowType))
-      .item("finalAggGrouping",
-        RelExplainUtil.fieldToString(finalAggGrouping, inputRel.getRowType))
-      .item("select", RelExplainUtil.streamGroupAggregationToString(
-        inputRel.getRowType,
-        getRowType,
-        incrementalAggInfo,
-        finalAggGrouping,
-        shuffleKey = Some(partialAggGrouping)))
+      .item("finalAggGrouping", RelExplainUtil.fieldToString(finalAggGrouping, inputRel.getRowType))
+      .item(
+        "select",
+        RelExplainUtil.streamGroupAggregationToString(
+          inputRel.getRowType,
+          getRowType,
+          incrementalAggInfo,
+          finalAggGrouping,
+          shuffleKey = Some(partialAggGrouping)))
   }
 
   override def translateToExecNode(): ExecNode[_] = {
@@ -126,7 +129,6 @@ class StreamPhysicalIncrementalGroupAggregate(
       partialAggNeedRetraction,
       ExecEdge.DEFAULT,
       FlinkTypeFactory.toLogicalRowType(getRowType),
-      getRelDetailedDescription
-    )
+      getRelDetailedDescription)
   }
 }

@@ -25,12 +25,16 @@ import org.apache.flink.table.planner.calcite.FlinkRelBuilder
 import org.apache.flink.table.planner.functions.sql.FlinkSqlOperatorTable
 import org.apache.flink.table.planner.typeutils.TypeInfoCheckUtils
 import org.apache.flink.table.planner.typeutils.TypeInfoCheckUtils.isTimeInterval
-import org.apache.flink.table.planner.validate.{ValidationFailure, ValidationResult, ValidationSuccess}
+import org.apache.flink.table.planner.validate.{
+  ValidationFailure,
+  ValidationResult,
+  ValidationSuccess
+}
 import org.apache.flink.table.runtime.typeutils.LegacyLocalDateTimeTypeInfo
 import org.apache.flink.table.typeutils.TimeIntervalTypeInfo
 
 case class Extract(timeIntervalUnit: PlannerExpression, temporal: PlannerExpression)
-  extends PlannerExpression {
+    extends PlannerExpression {
 
   override private[flink] def children: Seq[PlannerExpression] = timeIntervalUnit :: temporal :: Nil
 
@@ -38,59 +42,60 @@ case class Extract(timeIntervalUnit: PlannerExpression, temporal: PlannerExpress
 
   override private[flink] def validateInput(): ValidationResult = {
     if (!TypeInfoCheckUtils.isTemporal(temporal.resultType)) {
-      return ValidationFailure(s"Extract operator requires Temporal input, " +
-        s"but $temporal is of type ${temporal.resultType}")
+      return ValidationFailure(
+        s"Extract operator requires Temporal input, " +
+          s"but $temporal is of type ${temporal.resultType}")
     }
 
     timeIntervalUnit match {
-      case SymbolPlannerExpression(PlannerTimeIntervalUnit.YEAR)
-           | SymbolPlannerExpression(PlannerTimeIntervalUnit.QUARTER)
-           | SymbolPlannerExpression(PlannerTimeIntervalUnit.MONTH)
-           | SymbolPlannerExpression(PlannerTimeIntervalUnit.WEEK)
-           | SymbolPlannerExpression(PlannerTimeIntervalUnit.DAY)
-        if temporal.resultType == SqlTimeTypeInfo.DATE
-          || temporal.resultType == SqlTimeTypeInfo.TIMESTAMP
-          || temporal.resultType == LocalTimeTypeInfo.LOCAL_DATE
-          || temporal.resultType == LocalTimeTypeInfo.LOCAL_DATE_TIME
-          || temporal.resultType.isInstanceOf[LegacyLocalDateTimeTypeInfo]
-          || temporal.resultType == TimeIntervalTypeInfo.INTERVAL_MILLIS
-          || temporal.resultType == TimeIntervalTypeInfo.INTERVAL_MONTHS =>
+      case SymbolPlannerExpression(PlannerTimeIntervalUnit.YEAR) | SymbolPlannerExpression(
+            PlannerTimeIntervalUnit.QUARTER) | SymbolPlannerExpression(
+            PlannerTimeIntervalUnit.MONTH) | SymbolPlannerExpression(PlannerTimeIntervalUnit.WEEK) |
+          SymbolPlannerExpression(PlannerTimeIntervalUnit.DAY)
+          if temporal.resultType == SqlTimeTypeInfo.DATE
+            || temporal.resultType == SqlTimeTypeInfo.TIMESTAMP
+            || temporal.resultType == LocalTimeTypeInfo.LOCAL_DATE
+            || temporal.resultType == LocalTimeTypeInfo.LOCAL_DATE_TIME
+            || temporal.resultType.isInstanceOf[LegacyLocalDateTimeTypeInfo]
+            || temporal.resultType == TimeIntervalTypeInfo.INTERVAL_MILLIS
+            || temporal.resultType == TimeIntervalTypeInfo.INTERVAL_MONTHS =>
         ValidationSuccess
 
-      case SymbolPlannerExpression(PlannerTimeIntervalUnit.HOUR)
-           | SymbolPlannerExpression(PlannerTimeIntervalUnit.MINUTE)
-           | SymbolPlannerExpression(PlannerTimeIntervalUnit.SECOND)
-        if temporal.resultType == SqlTimeTypeInfo.TIME
-          || temporal.resultType == SqlTimeTypeInfo.TIMESTAMP
-          || temporal.resultType == LocalTimeTypeInfo.LOCAL_TIME
-          || temporal.resultType == LocalTimeTypeInfo.LOCAL_DATE_TIME
-          || temporal.resultType.isInstanceOf[LegacyLocalDateTimeTypeInfo]
-          || temporal.resultType == TimeIntervalTypeInfo.INTERVAL_MILLIS =>
+      case SymbolPlannerExpression(PlannerTimeIntervalUnit.HOUR) | SymbolPlannerExpression(
+            PlannerTimeIntervalUnit.MINUTE) | SymbolPlannerExpression(
+            PlannerTimeIntervalUnit.SECOND)
+          if temporal.resultType == SqlTimeTypeInfo.TIME
+            || temporal.resultType == SqlTimeTypeInfo.TIMESTAMP
+            || temporal.resultType == LocalTimeTypeInfo.LOCAL_TIME
+            || temporal.resultType == LocalTimeTypeInfo.LOCAL_DATE_TIME
+            || temporal.resultType.isInstanceOf[LegacyLocalDateTimeTypeInfo]
+            || temporal.resultType == TimeIntervalTypeInfo.INTERVAL_MILLIS =>
         ValidationSuccess
 
       case _ =>
-        ValidationFailure(s"Extract operator does not support unit '$timeIntervalUnit' for input" +
-          s" of type '${temporal.resultType}'.")
+        ValidationFailure(
+          s"Extract operator does not support unit '$timeIntervalUnit' for input" +
+            s" of type '${temporal.resultType}'.")
     }
   }
 
   override def toString: String = s"($temporal).extract($timeIntervalUnit)"
 }
 
-abstract class CurrentTimePoint(
-    targetType: TypeInformation[_],
-    local: Boolean)
-  extends LeafExpression {
+abstract class CurrentTimePoint(targetType: TypeInformation[_], local: Boolean)
+    extends LeafExpression {
 
   override private[flink] def resultType: TypeInformation[_] = targetType
 
   override private[flink] def validateInput(): ValidationResult = {
     if (!TypeInfoCheckUtils.isTimePoint(targetType)) {
-      ValidationFailure(s"CurrentTimePoint operator requires Time Point target type, " +
-        s"but get $targetType.")
+      ValidationFailure(
+        s"CurrentTimePoint operator requires Time Point target type, " +
+          s"but get $targetType.")
     } else if (local && targetType == SqlTimeTypeInfo.DATE) {
-      ValidationFailure(s"Localized CurrentTimePoint operator requires Time or Timestamp target " +
-        s"type, but get $targetType.")
+      ValidationFailure(
+        s"Localized CurrentTimePoint operator requires Time or Timestamp target " +
+          s"type, but get $targetType.")
     } else {
       ValidationSuccess
     }
@@ -114,14 +119,14 @@ case class LocalTime() extends CurrentTimePoint(SqlTimeTypeInfo.TIME, local = tr
 case class LocalTimestamp() extends CurrentTimePoint(SqlTimeTypeInfo.TIMESTAMP, local = true)
 
 /**
-  * Determines whether two anchored time intervals overlap.
-  */
+ * Determines whether two anchored time intervals overlap.
+ */
 case class TemporalOverlaps(
     leftTimePoint: PlannerExpression,
     leftTemporal: PlannerExpression,
     rightTimePoint: PlannerExpression,
     rightTemporal: PlannerExpression)
-  extends PlannerExpression {
+    extends PlannerExpression {
 
   override private[flink] def children: Seq[PlannerExpression] =
     Seq(leftTimePoint, leftTemporal, rightTimePoint, rightTemporal)
@@ -130,38 +135,45 @@ case class TemporalOverlaps(
 
   override private[flink] def validateInput(): ValidationResult = {
     if (!TypeInfoCheckUtils.isTimePoint(leftTimePoint.resultType)) {
-      return ValidationFailure(s"TemporalOverlaps operator requires leftTimePoint to be of type " +
-        s"Time Point, but get ${leftTimePoint.resultType}.")
+      return ValidationFailure(
+        s"TemporalOverlaps operator requires leftTimePoint to be of type " +
+          s"Time Point, but get ${leftTimePoint.resultType}.")
     }
     if (!TypeInfoCheckUtils.isTimePoint(rightTimePoint.resultType)) {
-      return ValidationFailure(s"TemporalOverlaps operator requires rightTimePoint to be of " +
-        s"type Time Point, but get ${rightTimePoint.resultType}.")
+      return ValidationFailure(
+        s"TemporalOverlaps operator requires rightTimePoint to be of " +
+          s"type Time Point, but get ${rightTimePoint.resultType}.")
     }
     if (leftTimePoint.resultType != rightTimePoint.resultType) {
-      return ValidationFailure(s"TemporalOverlaps operator requires leftTimePoint and " +
-        s"rightTimePoint to be of same type.")
+      return ValidationFailure(
+        s"TemporalOverlaps operator requires leftTimePoint and " +
+          s"rightTimePoint to be of same type.")
     }
 
     // leftTemporal is point, then it must be comparable with leftTimePoint
     if (TypeInfoCheckUtils.isTimePoint(leftTemporal.resultType)) {
       if (leftTemporal.resultType != leftTimePoint.resultType) {
-        return ValidationFailure(s"TemporalOverlaps operator requires leftTemporal and " +
-          s"leftTimePoint to be of same type if leftTemporal is of type Time Point.")
+        return ValidationFailure(
+          s"TemporalOverlaps operator requires leftTemporal and " +
+            s"leftTimePoint to be of same type if leftTemporal is of type Time Point.")
       }
     } else if (!isTimeInterval(leftTemporal.resultType)) {
-      return ValidationFailure(s"TemporalOverlaps operator requires leftTemporal to be of " +
-        s"type Time Point or Time Interval.")
+      return ValidationFailure(
+        s"TemporalOverlaps operator requires leftTemporal to be of " +
+          s"type Time Point or Time Interval.")
     }
 
     // rightTemporal is point, then it must be comparable with rightTimePoint
     if (TypeInfoCheckUtils.isTimePoint(rightTemporal.resultType)) {
       if (rightTemporal.resultType != rightTimePoint.resultType) {
-        return ValidationFailure(s"TemporalOverlaps operator requires rightTemporal and " +
-          s"rightTimePoint to be of same type if rightTemporal is of type Time Point.")
+        return ValidationFailure(
+          s"TemporalOverlaps operator requires rightTemporal and " +
+            s"rightTimePoint to be of same type if rightTemporal is of type Time Point.")
       }
     } else if (!isTimeInterval(rightTemporal.resultType)) {
-      return ValidationFailure(s"TemporalOverlaps operator requires rightTemporal to be of " +
-        s"type Time Point or Time Interval.")
+      return ValidationFailure(
+        s"TemporalOverlaps operator requires rightTemporal to be of " +
+          s"type Time Point or Time Interval.")
     }
     ValidationSuccess
   }
@@ -169,16 +181,15 @@ case class TemporalOverlaps(
   override def toString: String = s"temporalOverlaps(${children.mkString(", ")})"
 
   /**
-    * Standard conversion of the OVERLAPS operator.
-    * Source: [[org.apache.calcite.sql2rel.StandardConvertletTable#convertOverlaps()]]
-    */
+   * Standard conversion of the OVERLAPS operator.
+   * Source: [[org.apache.calcite.sql2rel.StandardConvertletTable#convertOverlaps()]]
+   */
   private def convertOverlaps(
       leftP: RexNode,
       leftT: RexNode,
       rightP: RexNode,
       rightT: RexNode,
-      relBuilder: FlinkRelBuilder)
-    : RexNode = {
+      relBuilder: FlinkRelBuilder): RexNode = {
     val convLeftT = convertOverlapsEnd(relBuilder, leftP, leftT, leftTemporal.resultType)
     val convRightT = convertOverlapsEnd(relBuilder, rightP, rightT, rightTemporal.resultType)
 
@@ -194,7 +205,8 @@ case class TemporalOverlaps(
 
   private def convertOverlapsEnd(
       relBuilder: FlinkRelBuilder,
-      start: RexNode, end: RexNode,
+      start: RexNode,
+      end: RexNode,
       endType: TypeInformation[_]) = {
     if (isTimeInterval(endType)) {
       relBuilder.call(FlinkSqlOperatorTable.DATETIME_PLUS, start, end)
@@ -212,7 +224,7 @@ case class TemporalOverlaps(
 }
 
 case class DateFormat(timestamp: PlannerExpression, format: PlannerExpression)
-  extends PlannerExpression {
+    extends PlannerExpression {
   override private[flink] def children = timestamp :: format :: Nil
 
   override def toString: String = s"$timestamp.dateFormat($format)"
@@ -224,7 +236,7 @@ case class TimestampDiff(
     timePointUnit: PlannerExpression,
     timePoint1: PlannerExpression,
     timePoint2: PlannerExpression)
-  extends PlannerExpression {
+    extends PlannerExpression {
 
   override private[flink] def children: Seq[PlannerExpression] =
     timePointUnit :: timePoint1 :: timePoint2 :: Nil
@@ -233,36 +245,35 @@ case class TimestampDiff(
     if (!TypeInfoCheckUtils.isTimePoint(timePoint1.resultType)) {
       return ValidationFailure(
         s"$this requires an input time point type, " +
-        s"but timePoint1 is of type '${timePoint1.resultType}'.")
+          s"but timePoint1 is of type '${timePoint1.resultType}'.")
     }
 
     if (!TypeInfoCheckUtils.isTimePoint(timePoint2.resultType)) {
       return ValidationFailure(
         s"$this requires an input time point type, " +
-        s"but timePoint2 is of type '${timePoint2.resultType}'.")
+          s"but timePoint2 is of type '${timePoint2.resultType}'.")
     }
 
     timePointUnit match {
-      case SymbolPlannerExpression(PlannerTimePointUnit.YEAR)
-           | SymbolPlannerExpression(PlannerTimePointUnit.QUARTER)
-           | SymbolPlannerExpression(PlannerTimePointUnit.MONTH)
-           | SymbolPlannerExpression(PlannerTimePointUnit.WEEK)
-           | SymbolPlannerExpression(PlannerTimePointUnit.DAY)
-           | SymbolPlannerExpression(PlannerTimePointUnit.HOUR)
-           | SymbolPlannerExpression(PlannerTimePointUnit.MINUTE)
-           | SymbolPlannerExpression(PlannerTimePointUnit.SECOND)
-        if timePoint1.resultType == SqlTimeTypeInfo.DATE
-          || timePoint1.resultType == SqlTimeTypeInfo.TIMESTAMP
-          || timePoint2.resultType == SqlTimeTypeInfo.DATE
-          || timePoint2.resultType == SqlTimeTypeInfo.TIMESTAMP
-          || timePoint1.resultType == LocalTimeTypeInfo.LOCAL_DATE
-          || timePoint1.resultType == LocalTimeTypeInfo.LOCAL_DATE_TIME
-          || timePoint2.resultType == LocalTimeTypeInfo.LOCAL_DATE
-          || timePoint2.resultType == LocalTimeTypeInfo.LOCAL_DATE_TIME =>
+      case SymbolPlannerExpression(PlannerTimePointUnit.YEAR) | SymbolPlannerExpression(
+            PlannerTimePointUnit.QUARTER) | SymbolPlannerExpression(PlannerTimePointUnit.MONTH) |
+          SymbolPlannerExpression(PlannerTimePointUnit.WEEK) | SymbolPlannerExpression(
+            PlannerTimePointUnit.DAY) | SymbolPlannerExpression(PlannerTimePointUnit.HOUR) |
+          SymbolPlannerExpression(PlannerTimePointUnit.MINUTE) | SymbolPlannerExpression(
+            PlannerTimePointUnit.SECOND)
+          if timePoint1.resultType == SqlTimeTypeInfo.DATE
+            || timePoint1.resultType == SqlTimeTypeInfo.TIMESTAMP
+            || timePoint2.resultType == SqlTimeTypeInfo.DATE
+            || timePoint2.resultType == SqlTimeTypeInfo.TIMESTAMP
+            || timePoint1.resultType == LocalTimeTypeInfo.LOCAL_DATE
+            || timePoint1.resultType == LocalTimeTypeInfo.LOCAL_DATE_TIME
+            || timePoint2.resultType == LocalTimeTypeInfo.LOCAL_DATE
+            || timePoint2.resultType == LocalTimeTypeInfo.LOCAL_DATE_TIME =>
         ValidationSuccess
 
       case _ =>
-        ValidationFailure(s"$this operator does not support unit '$timePointUnit'" +
+        ValidationFailure(
+          s"$this operator does not support unit '$timePointUnit'" +
             s" for input of type ('${timePoint1.resultType}', '${timePoint2.resultType}').")
     }
   }

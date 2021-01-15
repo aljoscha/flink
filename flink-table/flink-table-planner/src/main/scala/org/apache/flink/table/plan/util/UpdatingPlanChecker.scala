@@ -178,11 +178,7 @@ object UpdatingPlanChecker {
             val inKeys: Seq[(String, String)] = lInKeys.get ++ rInKeys.get
               .map(e => (rInNamesToJoinNamesMap(e._1), rInNamesToJoinNamesMap(e._2)))
 
-            getOutputKeysForNonWindowJoin(
-              joinNames,
-              inKeys,
-              lJoinKeys.zip(rJoinKeys)
-            )
+            getOutputKeysForNonWindowJoin(joinNames, inKeys, lJoinKeys.zip(rJoinKeys))
           }
         case _: DataStreamRel =>
           // anything else does not forward keys, so we can stop
@@ -191,20 +187,19 @@ object UpdatingPlanChecker {
     }
 
     /**
-      * Get output keys for non-window join according to it's inputs.
-      *
-      * @param inNames  Field names of join
-      * @param inKeys   Input keys of join
-      * @param joinKeys JoinKeys of join
-      * @return Return output keys of join
-      */
+     * Get output keys for non-window join according to it's inputs.
+     *
+     * @param inNames  Field names of join
+     * @param inKeys   Input keys of join
+     * @param joinKeys JoinKeys of join
+     * @return Return output keys of join
+     */
     def getOutputKeysForNonWindowJoin(
         inNames: Seq[String],
         inKeys: Seq[(String, String)],
-        joinKeys: Seq[(String, String)])
-    : Option[Seq[(String, String)]] = {
+        joinKeys: Seq[(String, String)]): Option[Seq[(String, String)]] = {
 
-      val nameToGroups = mutable.HashMap.empty[String,String]
+      val nameToGroups = mutable.HashMap.empty[String, String]
 
       // merge two groups
       def merge(nameA: String, nameB: String): Unit = {
@@ -249,8 +244,7 @@ object UpdatingPlanChecker {
       Some(
         inNames
           .filter(e => outputGroups.contains(nameToGroups(e)))
-          .map(e => (e, nameToGroups(e)))
-      )
+          .map(e => (e, nameToGroups(e))))
     }
   }
 }

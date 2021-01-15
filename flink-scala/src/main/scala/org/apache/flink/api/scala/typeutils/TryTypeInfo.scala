@@ -30,8 +30,7 @@ import scala.util.Try
  * TypeInformation for [[scala.util.Try]].
  */
 @Public
-class TryTypeInfo[A, T <: Try[A]](val elemTypeInfo: TypeInformation[A])
-  extends TypeInformation[T] {
+class TryTypeInfo[A, T <: Try[A]](val elemTypeInfo: TypeInformation[A]) extends TypeInformation[T] {
 
   @PublicEvolving
   override def isBasicType: Boolean = false
@@ -63,7 +62,7 @@ class TryTypeInfo[A, T <: Try[A]](val elemTypeInfo: TypeInformation[A])
     obj match {
       case tryTypeInfo: TryTypeInfo[_, _] =>
         tryTypeInfo.canEqual(this) &&
-        elemTypeInfo.equals(tryTypeInfo.elemTypeInfo)
+          elemTypeInfo.equals(tryTypeInfo.elemTypeInfo)
       case _ => false
     }
   }

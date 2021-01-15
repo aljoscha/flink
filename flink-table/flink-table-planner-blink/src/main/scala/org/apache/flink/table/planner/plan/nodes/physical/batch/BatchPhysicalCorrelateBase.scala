@@ -18,22 +18,33 @@
 
 package org.apache.flink.table.planner.plan.nodes.physical.batch
 
-import org.apache.flink.table.planner.plan.`trait`.{FlinkRelDistribution, FlinkRelDistributionTraitDef, TraitUtil}
+import org.apache.flink.table.planner.plan.`trait`.{
+  FlinkRelDistribution,
+  FlinkRelDistributionTraitDef,
+  TraitUtil
+}
 import org.apache.flink.table.planner.plan.nodes.logical.FlinkLogicalTableFunctionScan
 import org.apache.flink.table.planner.plan.utils.RelExplainUtil
 
 import org.apache.calcite.plan.{RelOptCluster, RelOptRule, RelTraitSet}
 import org.apache.calcite.rel.`type`.RelDataType
 import org.apache.calcite.rel.core.{Correlate, JoinRelType}
-import org.apache.calcite.rel.{RelCollationTraitDef, RelDistribution, RelFieldCollation, RelNode, RelWriter, SingleRel}
+import org.apache.calcite.rel.{
+  RelCollationTraitDef,
+  RelDistribution,
+  RelFieldCollation,
+  RelNode,
+  RelWriter,
+  SingleRel
+}
 import org.apache.calcite.rex.{RexCall, RexNode}
 import org.apache.calcite.util.mapping.{Mapping, MappingType, Mappings}
 
 import scala.collection.JavaConversions._
 
 /**
-  * Base Batch physical RelNode for [[Correlate]] (user defined table function).
-  */
+ * Base Batch physical RelNode for [[Correlate]] (user defined table function).
+ */
 abstract class BatchPhysicalCorrelateBase(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -42,8 +53,8 @@ abstract class BatchPhysicalCorrelateBase(
     condition: Option[RexNode],
     outputRowType: RelDataType,
     joinType: JoinRelType)
-  extends SingleRel(cluster, traitSet, inputRel)
-  with BatchPhysicalRel {
+    extends SingleRel(cluster, traitSet, inputRel)
+    with BatchPhysicalRel {
 
   require(joinType == JoinRelType.INNER || joinType == JoinRelType.LEFT)
 
@@ -54,19 +65,18 @@ abstract class BatchPhysicalCorrelateBase(
   }
 
   /**
-    * Note: do not passing member 'child' because singleRel.replaceInput may update 'input' rel.
-    */
-  def copy(
-      traitSet: RelTraitSet,
-      child: RelNode,
-      outputType: RelDataType): RelNode
+   * Note: do not passing member 'child' because singleRel.replaceInput may update 'input' rel.
+   */
+  def copy(traitSet: RelTraitSet, child: RelNode, outputType: RelDataType): RelNode
 
   override def explainTerms(pw: RelWriter): RelWriter = {
     val rexCall = scan.getCall.asInstanceOf[RexCall]
-    super.explainTerms(pw)
+    super
+      .explainTerms(pw)
       .item("invocation", scan.getCall)
-      .item("correlate", RelExplainUtil.correlateToString(
-        input.getRowType, rexCall, getExpressionString))
+      .item(
+        "correlate",
+        RelExplainUtil.correlateToString(input.getRowType, rexCall, getExpressionString))
       .item("select", outputRowType.getFieldNames.mkString(","))
       .item("rowType", outputRowType)
       .item("joinType", joinType)
@@ -83,8 +93,8 @@ abstract class BatchPhysicalCorrelateBase(
     def getOutputInputMapping: Mapping = {
       val inputFieldCnt = getInput.getRowType.getFieldCount
       val mapping = Mappings.create(MappingType.FUNCTION, inputFieldCnt, inputFieldCnt)
-      (0 until inputFieldCnt).foreach {
-        index => mapping.set(index, index)
+      (0 until inputFieldCnt).foreach { index =>
+        mapping.set(index, index)
       }
       mapping
     }
@@ -105,7 +115,7 @@ abstract class BatchPhysicalCorrelateBase(
     val canSatisfyCollation = appliedCollation.getFieldCollations.nonEmpty &&
       !appliedCollation.getFieldCollations.exists { c =>
         (c.getDirection eq RelFieldCollation.Direction.STRICTLY_ASCENDING) ||
-          (c.getDirection eq RelFieldCollation.Direction.STRICTLY_DESCENDING)
+        (c.getDirection eq RelFieldCollation.Direction.STRICTLY_DESCENDING)
       }
     // If required traits only contains collation requirements, but collation keys are not columns
     // from input, then no need to satisfy required traits.

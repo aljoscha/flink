@@ -36,8 +36,10 @@ trait CommonPythonBase {
     try {
       Class.forName(className, false, Thread.currentThread.getContextClassLoader)
     } catch {
-      case ex: ClassNotFoundException => throw new TableException(
-        "The dependency of 'flink-python' is not present on the classpath.", ex)
+      case ex: ClassNotFoundException =>
+        throw new TableException(
+          "The dependency of 'flink-python' is not present on the classpath.",
+          ex)
     }
   }
 
@@ -58,8 +60,7 @@ trait CommonPythonBase {
         inputs.append(argPythonInfo)
 
       case literal: RexLiteral =>
-        inputs.append(
-          convertLiteralToPython.invoke(null, literal, literal.getType.getSqlTypeName))
+        inputs.append(convertLiteralToPython.invoke(null, literal, literal.getType.getSqlTypeName))
 
       case argNode: RexNode =>
         // For input arguments of RexInputRef, it's replaced with an offset into the input row
@@ -86,16 +87,16 @@ trait CommonPythonBase {
     }
   }
 
-  protected def getConfig(
-      env: ExecutionEnvironment,
-      tableConfig: TableConfig): Configuration = {
+  protected def getConfig(env: ExecutionEnvironment, tableConfig: TableConfig): Configuration = {
     val field = classOf[ExecutionEnvironment].getDeclaredField("cacheFile")
     field.setAccessible(true)
     val clazz = loadClass(CommonPythonBase.PYTHON_DEPENDENCY_UTILS_CLASS)
     val method = clazz.getDeclaredMethod(
-      "configurePythonDependencies", classOf[java.util.List[_]], classOf[Configuration])
-    val config = method.invoke(
-      null, field.get(env), getMergedConfiguration(env, tableConfig))
+      "configurePythonDependencies",
+      classOf[java.util.List[_]],
+      classOf[Configuration])
+    val config = method
+      .invoke(null, field.get(env), getMergedConfiguration(env, tableConfig))
       .asInstanceOf[Configuration]
     config.setString("table.exec.timezone", tableConfig.getLocalTimeZone.getId)
     config
@@ -107,9 +108,11 @@ trait CommonPythonBase {
     val clazz = loadClass(CommonPythonBase.PYTHON_DEPENDENCY_UTILS_CLASS)
     val realEnv = getRealEnvironment(env)
     val method = clazz.getDeclaredMethod(
-      "configurePythonDependencies", classOf[java.util.List[_]], classOf[Configuration])
-    val config = method.invoke(
-      null, realEnv.getCachedFiles, getMergedConfiguration(realEnv, tableConfig))
+      "configurePythonDependencies",
+      classOf[java.util.List[_]],
+      classOf[Configuration])
+    val config = method
+      .invoke(null, realEnv.getCachedFiles, getMergedConfiguration(realEnv, tableConfig))
       .asInstanceOf[Configuration]
     config.setString("table.exec.timezone", tableConfig.getLocalTimeZone.getId)
     config
@@ -153,8 +156,11 @@ trait CommonPythonBase {
 
   protected def isPythonWorkerUsingManagedMemory(config: Configuration): Boolean = {
     val clazz = loadClass("org.apache.flink.python.PythonOptions")
-    config.getBoolean(clazz.getField("USE_MANAGED_MEMORY").get(null)
-      .asInstanceOf[ConfigOption[java.lang.Boolean]])
+    config.getBoolean(
+      clazz
+        .getField("USE_MANAGED_MEMORY")
+        .get(null)
+        .asInstanceOf[ConfigOption[java.lang.Boolean]])
   }
 }
 

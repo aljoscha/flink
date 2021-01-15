@@ -27,8 +27,8 @@ import org.junit.Test
 
 class OverAggregateTest extends TableTestBase {
   private val streamUtil: StreamTableTestUtil = streamTestUtil()
-  val table: Table = streamUtil.addDataStream[(Int, String, Long)]("MyTable",
-    'a, 'b, 'c, 'proctime.proctime, 'rowtime.rowtime)
+  val table: Table = streamUtil
+    .addDataStream[(Int, String, Long)]("MyTable", 'a, 'b, 'c, 'proctime.proctime, 'rowtime.rowtime)
 
   @Test
   def testScalarFunctionsOnOverWindow(): Unit = {
@@ -61,8 +61,7 @@ class OverAggregateTest extends TableTestBase {
     val weightedAvg = new WeightedAvgWithRetract
 
     val result = table
-      .window(
-        Over partitionBy 'a orderBy 'proctime preceding 2.hours following CURRENT_RANGE as 'w)
+      .window(Over partitionBy 'a orderBy 'proctime preceding 2.hours following CURRENT_RANGE as 'w)
       .select('a, call(weightedAvg, 'c, 'a) over 'w as 'myAvg)
     streamUtil.verifyExecPlan(result)
   }
@@ -113,8 +112,7 @@ class OverAggregateTest extends TableTestBase {
   @Test
   def testProcTimeUnboundedNonPartitionedRangeOver(): Unit = {
     val result = table
-      .window(
-        Over orderBy 'proctime preceding UNBOUNDED_RANGE as 'w)
+      .window(Over orderBy 'proctime preceding UNBOUNDED_RANGE as 'w)
       .select('a, 'c, 'a.count over 'w, 'a.sum over 'w)
     streamUtil.verifyExecPlan(result)
   }
@@ -133,8 +131,7 @@ class OverAggregateTest extends TableTestBase {
     val weightedAvg = new WeightedAvgWithRetract
 
     val result = table
-      .window(
-        Over partitionBy 'b orderBy 'rowtime preceding 2.rows following CURRENT_ROW as 'w)
+      .window(Over partitionBy 'b orderBy 'rowtime preceding 2.rows following CURRENT_ROW as 'w)
       .select('c, 'b.count over 'w, call(weightedAvg, 'c, 'a) over 'w as 'wAvg)
 
     streamUtil.verifyExecPlan(result)
@@ -145,8 +142,7 @@ class OverAggregateTest extends TableTestBase {
     val weightedAvg = new WeightedAvgWithRetract
 
     val result = table
-      .window(
-        Over partitionBy 'a orderBy 'rowtime preceding 2.hours following CURRENT_RANGE as 'w)
+      .window(Over partitionBy 'a orderBy 'rowtime preceding 2.hours following CURRENT_RANGE as 'w)
       .select('a, 'c.avg over 'w, call(weightedAvg, 'c, 'a) over 'w as 'wAvg)
 
     streamUtil.verifyExecPlan(result)
@@ -175,8 +171,9 @@ class OverAggregateTest extends TableTestBase {
     val weightedAvg = new WeightedAvgWithRetract
 
     val result = table
-      .window(Over partitionBy 'c orderBy 'rowtime preceding UNBOUNDED_RANGE following
-         CURRENT_RANGE as 'w)
+      .window(
+        Over partitionBy 'c orderBy 'rowtime preceding UNBOUNDED_RANGE following
+          CURRENT_RANGE as 'w)
       .select('a, 'c, 'a.count over 'w, call(weightedAvg, 'c, 'a) over 'w as 'wAvg)
 
     val result2 = table
@@ -193,8 +190,9 @@ class OverAggregateTest extends TableTestBase {
     val weightedAvg = new WeightedAvgWithRetract
 
     val result = table
-      .window(Over partitionBy 'c orderBy 'rowtime preceding UNBOUNDED_ROW following
-         CURRENT_ROW as 'w)
+      .window(
+        Over partitionBy 'c orderBy 'rowtime preceding UNBOUNDED_ROW following
+          CURRENT_ROW as 'w)
       .select('c, 'a.count over 'w, call(weightedAvg, 'c, 'a) over 'w as 'wAvg)
     streamUtil.verifyExecPlan(result)
   }
@@ -202,8 +200,7 @@ class OverAggregateTest extends TableTestBase {
   @Test
   def testRowTimeUnboundedNonPartitionedRangeOver(): Unit = {
     val result = table
-      .window(
-        Over orderBy 'rowtime preceding UNBOUNDED_RANGE as 'w)
+      .window(Over orderBy 'rowtime preceding UNBOUNDED_RANGE as 'w)
       .select('a, 'c, 'a.count over 'w, 'a.sum over 'w)
     streamUtil.verifyExecPlan(result)
   }
@@ -217,5 +214,3 @@ class OverAggregateTest extends TableTestBase {
     streamUtil.verifyExecPlan(result)
   }
 }
-
-

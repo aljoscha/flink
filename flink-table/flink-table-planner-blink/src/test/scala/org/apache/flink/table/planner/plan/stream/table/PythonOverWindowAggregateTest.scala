@@ -30,12 +30,12 @@ class PythonOverWindowAggregateTest extends TableTestBase {
   @Test
   def testPandasRowTimeBoundedPartitionedRangesOver(): Unit = {
     val util = streamTestUtil()
-    val sourceTable = util.addTableSource[(Int, Long, Int, Long)](
-      "MyTable", 'a, 'b, 'c, 'rowtime.rowtime)
+    val sourceTable =
+      util.addTableSource[(Int, Long, Int, Long)]("MyTable", 'a, 'b, 'c, 'rowtime.rowtime)
     val func = new PandasAggregateFunction
 
     val resultTable = sourceTable
-      .window(Over partitionBy 'b orderBy  'rowtime preceding 10.second as 'w)
+      .window(Over partitionBy 'b orderBy 'rowtime preceding 10.second as 'w)
       .select('b, func('a, 'c) over 'w)
 
     util.verifyExecPlan(resultTable)
@@ -44,12 +44,12 @@ class PythonOverWindowAggregateTest extends TableTestBase {
   @Test
   def testPandasProcTimeBoundedPartitionedRangesOver(): Unit = {
     val util = streamTestUtil()
-    val sourceTable = util.addTableSource[(Int, Long, Int)](
-      "MyTable", 'a, 'b, 'c, 'proctime.proctime)
+    val sourceTable =
+      util.addTableSource[(Int, Long, Int)]("MyTable", 'a, 'b, 'c, 'proctime.proctime)
     val func = new PandasAggregateFunction
 
     val resultTable = sourceTable
-      .window(Over partitionBy 'b orderBy  'proctime preceding 10.second as 'w)
+      .window(Over partitionBy 'b orderBy 'proctime preceding 10.second as 'w)
       .select('b, func('a, 'c) over 'w)
 
     util.verifyExecPlan(resultTable)
@@ -58,12 +58,12 @@ class PythonOverWindowAggregateTest extends TableTestBase {
   @Test
   def testPandasRowTimeBoundedPartitionedRowsOver(): Unit = {
     val util = streamTestUtil()
-    val sourceTable = util.addTableSource[(Int, Long, Int, Long)](
-      "MyTable", 'a, 'b, 'c, 'rowtime.rowtime)
+    val sourceTable =
+      util.addTableSource[(Int, Long, Int, Long)]("MyTable", 'a, 'b, 'c, 'rowtime.rowtime)
     val func = new PandasAggregateFunction
 
     val resultTable = sourceTable
-      .window(Over partitionBy 'b orderBy  'rowtime preceding 10.rows as 'w)
+      .window(Over partitionBy 'b orderBy 'rowtime preceding 10.rows as 'w)
       .select('b, func('a, 'c) over 'w)
 
     util.verifyExecPlan(resultTable)
@@ -72,12 +72,12 @@ class PythonOverWindowAggregateTest extends TableTestBase {
   @Test
   def testPandasProcTimeBoundedPartitionedRowsOver(): Unit = {
     val util = streamTestUtil()
-    val sourceTable = util.addTableSource[(Int, Long, Int)](
-      "MyTable", 'a, 'b, 'c, 'proctime.proctime)
+    val sourceTable =
+      util.addTableSource[(Int, Long, Int)]("MyTable", 'a, 'b, 'c, 'proctime.proctime)
     val func = new PandasAggregateFunction
 
     val resultTable = sourceTable
-      .window(Over partitionBy 'b orderBy  'proctime preceding 10.rows as 'w)
+      .window(Over partitionBy 'b orderBy 'proctime preceding 10.rows as 'w)
       .select('b, func('a, 'c) over 'w)
 
     util.verifyExecPlan(resultTable)

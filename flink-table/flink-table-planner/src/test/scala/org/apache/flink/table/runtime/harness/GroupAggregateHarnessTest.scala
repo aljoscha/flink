@@ -198,8 +198,7 @@ class GroupAggregateHarnessTest extends HarnessTestBase {
     val data = new mutable.MutableList[(JLong, JInt)]
     val t = env.fromCollection(data).toTable(tEnv, 'a, 'b)
     tEnv.registerTable("T", t)
-    val sqlQuery = tEnv.sqlQuery(
-      s"""
+    val sqlQuery = tEnv.sqlQuery(s"""
          |SELECT
          |  a, count(distinct b), sum(distinct b)
          |FROM (
@@ -209,17 +208,15 @@ class GroupAggregateHarnessTest extends HarnessTestBase {
          |) GROUP BY a
          |""".stripMargin)
 
-    val testHarness = createHarnessTester[String, CRow, CRow](
-      sqlQuery.toRetractStream[Row], "groupBy")
+    val testHarness =
+      createHarnessTester[String, CRow, CRow](sqlQuery.toRetractStream[Row], "groupBy")
 
     testHarness.setStateBackend(getStateBackend)
     testHarness.open()
 
     val operator = getOperator(testHarness)
-    val fields = getGeneratedAggregationFields(
-      operator,
-      "function",
-      classOf[GroupAggProcessFunction[Row]])
+    val fields =
+      getGeneratedAggregationFields(operator, "function", classOf[GroupAggProcessFunction[Row]])
 
     // check only one DistinctAccumulator is used
     assertTrue(fields.count(_.getName.endsWith("distinctValueMap_dataview")) == 1)
@@ -291,8 +288,7 @@ class GroupAggregateHarnessTest extends HarnessTestBase {
     tEnv.registerTable("T", t)
     tEnv.registerFunction("myCount", new MultiArgCount)
     tEnv.registerFunction("mySum", new MultiArgSum)
-    val sqlQuery = tEnv.sqlQuery(
-      s"""
+    val sqlQuery = tEnv.sqlQuery(s"""
          |SELECT
          |  a, myCount(distinct b, c), mySum(distinct c, b)
          |FROM (
@@ -302,17 +298,15 @@ class GroupAggregateHarnessTest extends HarnessTestBase {
          |) GROUP BY a
          |""".stripMargin)
 
-    val testHarness = createHarnessTester[String, CRow, CRow](
-      sqlQuery.toRetractStream[Row], "groupBy")
+    val testHarness =
+      createHarnessTester[String, CRow, CRow](sqlQuery.toRetractStream[Row], "groupBy")
 
     testHarness.setStateBackend(getStateBackend)
     testHarness.open()
 
     val operator = getOperator(testHarness)
-    val fields = getGeneratedAggregationFields(
-      operator,
-      "function",
-      classOf[GroupAggProcessFunction[Row]])
+    val fields =
+      getGeneratedAggregationFields(operator, "function", classOf[GroupAggProcessFunction[Row]])
 
     // check only one DistinctAccumulator is used
     assertTrue(fields.count(_.getName.endsWith("distinctValueMap_dataview")) == 1)

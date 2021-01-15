@@ -30,13 +30,14 @@ import org.junit.Test
 import scala.collection.Seq
 
 /**
-  * DistinctAggregateITCase using SortAgg Operator.
-  */
+ * DistinctAggregateITCase using SortAgg Operator.
+ */
 class SortDistinctAggregateITCase extends DistinctAggregateITCaseBase {
 
   override def prepareAggOp(): Unit = {
     tEnv.getConfig.getConfiguration.setString(
-      ExecutionConfigOptions.TABLE_EXEC_DISABLED_OPERATORS,  OperatorType.HashAgg.toString)
+      ExecutionConfigOptions.TABLE_EXEC_DISABLED_OPERATORS,
+      OperatorType.HashAgg.toString)
 
     registerFunction("countFun", new CountAggFunction())
     registerFunction("intSumFun", new IntSumAggFunction())
@@ -45,20 +46,13 @@ class SortDistinctAggregateITCase extends DistinctAggregateITCaseBase {
 
   @Test
   def testDistinctUDAGGWithoutGroupBy(): Unit = {
-    checkResult(
-      "SELECT countFun(DISTINCT c), SUM(a) FROM NullTable3",
-      Seq(row(18, 231))
-    )
+    checkResult("SELECT countFun(DISTINCT c), SUM(a) FROM NullTable3", Seq(row(18, 231)))
 
-    checkResult(
-      "SELECT countFun(DISTINCT c), SUM(a) FROM EmptyTable3",
-      Seq(row(0, null))
-    )
+    checkResult("SELECT countFun(DISTINCT c), SUM(a) FROM EmptyTable3", Seq(row(0, null)))
 
     checkResult(
       "SELECT countFun(DISTINCT b), intSumFun(DISTINCT a), countFun(c) FROM NullTable3",
-      Seq(row(6, 231, 18))
-    )
+      Seq(row(6, 231, 18)))
   }
 
   @Test
@@ -66,24 +60,21 @@ class SortDistinctAggregateITCase extends DistinctAggregateITCaseBase {
     checkResult(
       "SELECT b, countFun(b), intSumFun(DISTINCT a), countFun(DISTINCT c) " +
         "FROM SmallTable3 GROUP BY b",
-      Seq(row(1, 1, 1, 1), row(2, 2, 5, 2))
-    )
+      Seq(row(1, 1, 1, 1), row(2, 2, 5, 2)))
   }
 
   @Test
   def testUDAGGNullGroupKeyAggregation(): Unit = {
     checkResult(
       "SELECT c, countFun(b), intSumFun(DISTINCT a) FROM NullTable3 WHERE a < 6 GROUP BY c",
-      Seq(row(null, 3, 9), row("Hi", 1, 1), row("I am fine.", 1, 5))
-    )
+      Seq(row(null, 3, 9), row("Hi", 1, 1), row("I am fine.", 1, 5)))
   }
 
   @Test
   def testComplexUDAGGWithGroupBy(): Unit = {
     checkResult(
       "SELECT e, countFun(d), weightedAvg(DISTINCT c, a) FROM Table5 GROUP BY e",
-      Seq(row(1, 5, 7), row(2, 7, 8), row(3, 3, 10))
-    )
+      Seq(row(1, 5, 7), row(2, 7, 8), row(3, 3, 10)))
   }
 
 }

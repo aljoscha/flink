@@ -96,7 +96,7 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
 
   /**
    * Returns the execution environment associated with the current DataSet.
- *
+   *
    * @return associated execution environment
    */
   def getExecutionEnvironment: ExecutionEnvironment =
@@ -122,7 +122,8 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
    */
   private[flink] def clean[F <: AnyRef](f: F, checkSerializable: Boolean = true): F = {
     if (set.getExecutionEnvironment.getConfig.isClosureCleanerEnabled) {
-      ClosureCleaner.clean(f,
+      ClosureCleaner.clean(
+        f,
         checkSerializable,
         set.getExecutionEnvironment.getConfig.getClosureCleanerLevel)
     }
@@ -142,12 +143,13 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
    */
   def name(name: String) = {
     javaSet match {
-      case ds: DataSource[_] => ds.name(name)
-      case op: Operator[_, _] => op.name(name)
+      case ds: DataSource[_]                 => ds.name(name)
+      case op: Operator[_, _]                => op.name(name)
       case di: DeltaIterationResultSet[_, _] => di.getIterationHead.name(name)
       case _ =>
-        throw new UnsupportedOperationException("Operator " + javaSet.toString +
-          " cannot have a name.")
+        throw new UnsupportedOperationException(
+          "Operator " + javaSet.toString +
+            " cannot have a name.")
     }
     // return this for chaining methods calls
     this
@@ -158,12 +160,13 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
    */
   def setParallelism(parallelism: Int) = {
     javaSet match {
-      case ds: DataSource[_] => ds.setParallelism(parallelism)
-      case op: Operator[_, _] => op.setParallelism(parallelism)
+      case ds: DataSource[_]                 => ds.setParallelism(parallelism)
+      case op: Operator[_, _]                => op.setParallelism(parallelism)
       case di: DeltaIterationResultSet[_, _] => di.getIterationHead.parallelism(parallelism)
       case _ =>
-        throw new UnsupportedOperationException("Operator " + javaSet.toString + " cannot have " +
-          "parallelism.")
+        throw new UnsupportedOperationException(
+          "Operator " + javaSet.toString + " cannot have " +
+            "parallelism.")
     }
     this
   }
@@ -172,13 +175,13 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
    * Returns the parallelism of this operation.
    */
   def getParallelism: Int = javaSet match {
-    case ds: DataSource[_] => ds.getParallelism
+    case ds: DataSource[_]  => ds.getParallelism
     case op: Operator[_, _] => op.getParallelism
     case _ =>
-      throw new UnsupportedOperationException("Operator " + javaSet.toString + " does not have " +
-        "parallelism.")
+      throw new UnsupportedOperationException(
+        "Operator " + javaSet.toString + " does not have " +
+          "parallelism.")
   }
-
 
 // ---------------------------------------------------------------------------
 //  Fine-grained resource profiles are an incomplete work-in-progress feature
@@ -214,11 +217,12 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
    */
   @PublicEvolving
   def minResources: ResourceSpec = javaSet match {
-    case ds: DataSource[_] => ds.getMinResources()
+    case ds: DataSource[_]  => ds.getMinResources()
     case op: Operator[_, _] => op.getMinResources()
     case _ =>
-      throw new UnsupportedOperationException("Operator does not support " +
-        "configuring custom resources specs.")
+      throw new UnsupportedOperationException(
+        "Operator does not support " +
+          "configuring custom resources specs.")
   }
 
   /**
@@ -226,11 +230,12 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
    */
   @PublicEvolving
   def preferredResources: ResourceSpec = javaSet match {
-    case ds: DataSource[_] => ds.getPreferredResources()
+    case ds: DataSource[_]  => ds.getPreferredResources()
     case op: Operator[_, _] => op.getPreferredResources()
     case _ =>
-      throw new UnsupportedOperationException("Operator does not support " +
-        "configuring custom resources specs.")
+      throw new UnsupportedOperationException(
+        "Operator does not support " +
+          "configuring custom resources specs.")
   }
 
   /**
@@ -253,8 +258,9 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
       case di: DeltaIterationResultSet[_, _] =>
         di.getIterationHead.registerAggregator(name, aggregator)
       case _ =>
-        throw new UnsupportedOperationException("Operator " + javaSet.toString + " cannot have " +
-          "aggregators.")
+        throw new UnsupportedOperationException(
+          "Operator " + javaSet.toString + " cannot have " +
+            "aggregators.")
     }
     this
   }
@@ -278,174 +284,178 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
     javaSet match {
       case udfOp: UdfOperator[_] => udfOp.withBroadcastSet(data.javaSet, name)
       case _ =>
-        throw new UnsupportedOperationException("Operator " + javaSet.toString + " cannot have " +
-          "broadcast variables.")
+        throw new UnsupportedOperationException(
+          "Operator " + javaSet.toString + " cannot have " +
+            "broadcast variables.")
     }
     this
   }
 
   /**
-    * Adds semantic information about forwarded fields of the user-defined function.
-    * The forwarded fields information declares fields which are never modified by the function and
-    * which are forwarded to the same position in the output or copied unchanged to another position
-    * in the output.
-    *
-    * <p>Fields that are forwarded to the same position are specified just by their position.
-    * The specified position must be valid for the input and output data type and have
-    * the same type.
-    * For example <code>withForwardedFields("_3")</code> declares that the third field of
-    * an input tuple is copied to the third field of an output tuple.
-    *
-    * <p>Fields which are copied to another position in the output unchanged are declared by
-    * specifying the source field reference in the input and the target field reference
-    * in the output.
-    * {@code withForwardedFields("_1->_3")} denotes that the first field of the input tuple is
-    * copied to the third field of the output tuple unchanged. When using a wildcard ("*") ensure
-    * that the number of declared fields and their types in input and output type match.
-    *
-    * <p>Multiple forwarded fields can be annotated in one
-    * ({@code withForwardedFields("_2; _3->_1; _4")})
-    * or separate Strings ({@code withForwardedFields("_2", "_3->_1", "_4")}).
-    * Please refer to the JavaDoc of {@link org.apache.flink.api.common.functions.Function}
-    * or Flink's documentation for details on field references such as nested fields and wildcard.
-    *
-    * <p>It is not possible to override existing semantic information about forwarded fields
-    * which was for example added by a
-    * {@link org.apache.flink.api.java.functions.FunctionAnnotation.ForwardedFields} class
-    * annotation.
-    *
-    * <p><b>NOTE: Adding semantic information for functions is optional!
-    * If used correctly, semantic information can help the Flink optimizer to generate more
-    * efficient execution plans.
-    * However, incorrect semantic information can cause the optimizer to generate incorrect
-    * execution plans which compute wrong results!
-    * So be careful when adding semantic information.
-    * </b>
-    *
-    * @param forwardedFields A list of field forward expressions.
-    * @return This operator with annotated forwarded field information.
-    * @see org.apache.flink.api.java.functions.FunctionAnnotation
-    * @see org.apache.flink.api.java.functions.FunctionAnnotation.ForwardedFields
-    */
+   * Adds semantic information about forwarded fields of the user-defined function.
+   * The forwarded fields information declares fields which are never modified by the function and
+   * which are forwarded to the same position in the output or copied unchanged to another position
+   * in the output.
+   *
+   * <p>Fields that are forwarded to the same position are specified just by their position.
+   * The specified position must be valid for the input and output data type and have
+   * the same type.
+   * For example <code>withForwardedFields("_3")</code> declares that the third field of
+   * an input tuple is copied to the third field of an output tuple.
+   *
+   * <p>Fields which are copied to another position in the output unchanged are declared by
+   * specifying the source field reference in the input and the target field reference
+   * in the output.
+   * {@code withForwardedFields("_1->_3")} denotes that the first field of the input tuple is
+   * copied to the third field of the output tuple unchanged. When using a wildcard ("*") ensure
+   * that the number of declared fields and their types in input and output type match.
+   *
+   * <p>Multiple forwarded fields can be annotated in one
+   * ({@code withForwardedFields("_2; _3->_1; _4")})
+   * or separate Strings ({@code withForwardedFields("_2", "_3->_1", "_4")}).
+   * Please refer to the JavaDoc of {@link org.apache.flink.api.common.functions.Function}
+   * or Flink's documentation for details on field references such as nested fields and wildcard.
+   *
+   * <p>It is not possible to override existing semantic information about forwarded fields
+   * which was for example added by a
+   * {@link org.apache.flink.api.java.functions.FunctionAnnotation.ForwardedFields} class
+   * annotation.
+   *
+   * <p><b>NOTE: Adding semantic information for functions is optional!
+   * If used correctly, semantic information can help the Flink optimizer to generate more
+   * efficient execution plans.
+   * However, incorrect semantic information can cause the optimizer to generate incorrect
+   * execution plans which compute wrong results!
+   * So be careful when adding semantic information.
+   * </b>
+   *
+   * @param forwardedFields A list of field forward expressions.
+   * @return This operator with annotated forwarded field information.
+   * @see org.apache.flink.api.java.functions.FunctionAnnotation
+   * @see org.apache.flink.api.java.functions.FunctionAnnotation.ForwardedFields
+   */
   def withForwardedFields(forwardedFields: String*) = {
     javaSet match {
       case op: SingleInputUdfOperator[_, _, _] => op.withForwardedFields(forwardedFields: _*)
       case _ =>
-        throw new UnsupportedOperationException("Cannot specify forwarded fields for Operator " +
-          javaSet.toString + ".")
+        throw new UnsupportedOperationException(
+          "Cannot specify forwarded fields for Operator " +
+            javaSet.toString + ".")
     }
     this
   }
 
   /**
-    * Adds semantic information about forwarded fields of the first input
-    * of the user-defined function.
-    * The forwarded fields information declares fields which are never modified by the function and
-    * which are forwarded to the same position in the output or copied unchanged
-    * to another position in the output.
-    *
-    * <p>Fields that are forwarded to the same position are specified just by their position.
-    * The specified position must be valid for the input and output data type
-    * and have the same type.
-    * For example <code>withForwardedFieldsFirst("_3")</code> declares that the third field
-    * of an input tuple from the first input is copied to the third field of an output tuple.
-    *
-    * <p>Fields which are copied from the first input to another position in the output unchanged
-    * are declared by specifying the source field reference in the first input and the target field
-    * reference in the output. {@code withForwardedFieldsFirst("_1->_3")} denotes that the first
-    * field of the first input tuple is copied to the third field of the output tuple unchanged.
-    * When using a wildcard ("*") ensure that the number of declared fields and their types
-    * in the first input and output type match.
-    *
-    * <p>Multiple forwarded fields can be annotated in one
-    * ({@code withForwardedFieldsFirst("_2; _3->_0; _4")})
-    * or separate Strings ({@code withForwardedFieldsFirst("_2", "_3->_0", "_4")}).
-    * Please refer to the JavaDoc of
-    * {@link org.apache.flink.api.common.functions.Function} or Flink's documentation for
-    * details on field references such as nested fields and wildcard.
-    *
-    * <p>It is not possible to override existing semantic information about forwarded fields
-    * of the first input which was for example added by a
-    * {@link org.apache.flink.api.java.functions.FunctionAnnotation.ForwardedFieldsFirst}
-    * class annotation.
-    *
-    * <p><b>NOTE: Adding semantic information for functions is optional!
-    * If used correctly, semantic information can help the Flink optimizer to generate more
-    * efficient execution plans.
-    * However, incorrect semantic information can cause the optimizer to generate incorrect
-    * execution plans which compute wrong results!
-    * So be careful when adding semantic information.
-    * </b>
-    *
-    * @param forwardedFields A list of forwarded field expressions for the first input
-    *                        of the function.
-    * @return This operator with annotated forwarded field information.
-    * @see org.apache.flink.api.java.functions.FunctionAnnotation
-    * @see org.apache.flink.api.java.functions.FunctionAnnotation.ForwardedFieldsFirst
-    */
+   * Adds semantic information about forwarded fields of the first input
+   * of the user-defined function.
+   * The forwarded fields information declares fields which are never modified by the function and
+   * which are forwarded to the same position in the output or copied unchanged
+   * to another position in the output.
+   *
+   * <p>Fields that are forwarded to the same position are specified just by their position.
+   * The specified position must be valid for the input and output data type
+   * and have the same type.
+   * For example <code>withForwardedFieldsFirst("_3")</code> declares that the third field
+   * of an input tuple from the first input is copied to the third field of an output tuple.
+   *
+   * <p>Fields which are copied from the first input to another position in the output unchanged
+   * are declared by specifying the source field reference in the first input and the target field
+   * reference in the output. {@code withForwardedFieldsFirst("_1->_3")} denotes that the first
+   * field of the first input tuple is copied to the third field of the output tuple unchanged.
+   * When using a wildcard ("*") ensure that the number of declared fields and their types
+   * in the first input and output type match.
+   *
+   * <p>Multiple forwarded fields can be annotated in one
+   * ({@code withForwardedFieldsFirst("_2; _3->_0; _4")})
+   * or separate Strings ({@code withForwardedFieldsFirst("_2", "_3->_0", "_4")}).
+   * Please refer to the JavaDoc of
+   * {@link org.apache.flink.api.common.functions.Function} or Flink's documentation for
+   * details on field references such as nested fields and wildcard.
+   *
+   * <p>It is not possible to override existing semantic information about forwarded fields
+   * of the first input which was for example added by a
+   * {@link org.apache.flink.api.java.functions.FunctionAnnotation.ForwardedFieldsFirst}
+   * class annotation.
+   *
+   * <p><b>NOTE: Adding semantic information for functions is optional!
+   * If used correctly, semantic information can help the Flink optimizer to generate more
+   * efficient execution plans.
+   * However, incorrect semantic information can cause the optimizer to generate incorrect
+   * execution plans which compute wrong results!
+   * So be careful when adding semantic information.
+   * </b>
+   *
+   * @param forwardedFields A list of forwarded field expressions for the first input
+   *                        of the function.
+   * @return This operator with annotated forwarded field information.
+   * @see org.apache.flink.api.java.functions.FunctionAnnotation
+   * @see org.apache.flink.api.java.functions.FunctionAnnotation.ForwardedFieldsFirst
+   */
   def withForwardedFieldsFirst(forwardedFields: String*) = {
     javaSet match {
       case op: TwoInputUdfOperator[_, _, _, _] => op.withForwardedFieldsFirst(forwardedFields: _*)
       case _ =>
-        throw new UnsupportedOperationException("Cannot specify forwarded fields for Operator " +
-          javaSet.toString + ".")
+        throw new UnsupportedOperationException(
+          "Cannot specify forwarded fields for Operator " +
+            javaSet.toString + ".")
     }
     this
   }
 
   /**
-    * Adds semantic information about forwarded fields of the second input
-    * of the user-defined function.
-    * The forwarded fields information declares fields which are never modified by the function and
-    * which are forwarded to the same position in the output or copied unchanged
-    * to another position in the output.
-    *
-    * <p>Fields that are forwarded to the same position are specified just by their position.
-    * The specified position must be valid for the input and output data type
-    * and have the same type.
-    * For example <code>withForwardedFieldsFirst("_3")</code> declares that the third field
-    * of an input tuple from the second input is copied to the third field of an output tuple.
-    *
-    * <p>Fields which are copied from the second input to another position
-    * in the output unchanged are declared by specifying the source field reference
-    * in the second input and the target field reference in the output.
-    * {@code withForwardedFieldsFirst("_1->_3")} denotes that the first field of the second input
-    * tuple is copied to the third field of the output tuple unchanged. When using a wildcard ("*")
-    * ensure that the number of declared fields and their types in the second input and
-    * output type match.
-    *
-    * <p>Multiple forwarded fields can be annotated in one
-    * ({@code withForwardedFieldsFirst("_2; _3->_0; _4")})
-    * or separate Strings ({@code withForwardedFieldsFirst("_2", "_3->_0", "_4")}).
-    * Please refer to the JavaDoc of
-    * {@link org.apache.flink.api.common.functions.Function} or Flink's documentation for
-    * details on field references such as nested fields and wildcard.
-    *
-    * <p>It is not possible to override existing semantic information about forwarded fields
-    * of the second input which was for example added by a
-    * {@link org.apache.flink.api.java.functions.FunctionAnnotation.ForwardedFieldsFirst}
-    * class annotation.
-    *
-    * <p><b>NOTE: Adding semantic information for functions is optional!
-    * If used correctly, semantic information can help the Flink optimizer to generate more
-    * efficient execution plans.
-    * However, incorrect semantic information can cause the optimizer to generate incorrect
-    * execution plans which compute wrong results!
-    * So be careful when adding semantic information.
-    * </b>
-    *
-    * @param forwardedFields A list of forwarded field expressions for the second input
-    *                        of the function.
-    * @return This operator with annotated forwarded field information.
-    * @see org.apache.flink.api.java.functions.FunctionAnnotation
-    * @see org.apache.flink.api.java.functions.FunctionAnnotation.ForwardedFieldsFirst
-    */
+   * Adds semantic information about forwarded fields of the second input
+   * of the user-defined function.
+   * The forwarded fields information declares fields which are never modified by the function and
+   * which are forwarded to the same position in the output or copied unchanged
+   * to another position in the output.
+   *
+   * <p>Fields that are forwarded to the same position are specified just by their position.
+   * The specified position must be valid for the input and output data type
+   * and have the same type.
+   * For example <code>withForwardedFieldsFirst("_3")</code> declares that the third field
+   * of an input tuple from the second input is copied to the third field of an output tuple.
+   *
+   * <p>Fields which are copied from the second input to another position
+   * in the output unchanged are declared by specifying the source field reference
+   * in the second input and the target field reference in the output.
+   * {@code withForwardedFieldsFirst("_1->_3")} denotes that the first field of the second input
+   * tuple is copied to the third field of the output tuple unchanged. When using a wildcard ("*")
+   * ensure that the number of declared fields and their types in the second input and
+   * output type match.
+   *
+   * <p>Multiple forwarded fields can be annotated in one
+   * ({@code withForwardedFieldsFirst("_2; _3->_0; _4")})
+   * or separate Strings ({@code withForwardedFieldsFirst("_2", "_3->_0", "_4")}).
+   * Please refer to the JavaDoc of
+   * {@link org.apache.flink.api.common.functions.Function} or Flink's documentation for
+   * details on field references such as nested fields and wildcard.
+   *
+   * <p>It is not possible to override existing semantic information about forwarded fields
+   * of the second input which was for example added by a
+   * {@link org.apache.flink.api.java.functions.FunctionAnnotation.ForwardedFieldsFirst}
+   * class annotation.
+   *
+   * <p><b>NOTE: Adding semantic information for functions is optional!
+   * If used correctly, semantic information can help the Flink optimizer to generate more
+   * efficient execution plans.
+   * However, incorrect semantic information can cause the optimizer to generate incorrect
+   * execution plans which compute wrong results!
+   * So be careful when adding semantic information.
+   * </b>
+   *
+   * @param forwardedFields A list of forwarded field expressions for the second input
+   *                        of the function.
+   * @return This operator with annotated forwarded field information.
+   * @see org.apache.flink.api.java.functions.FunctionAnnotation
+   * @see org.apache.flink.api.java.functions.FunctionAnnotation.ForwardedFieldsFirst
+   */
   def withForwardedFieldsSecond(forwardedFields: String*) = {
     javaSet match {
       case op: TwoInputUdfOperator[_, _, _, _] => op.withForwardedFieldsSecond(forwardedFields: _*)
       case _ =>
-        throw new UnsupportedOperationException("Cannot specify forwarded fields for Operator " +
-          javaSet.toString + ".")
+        throw new UnsupportedOperationException(
+          "Cannot specify forwarded fields for Operator " +
+            javaSet.toString + ".")
     }
     this
   }
@@ -455,7 +465,8 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
       case udfOp: UdfOperator[_] => udfOp.withParameters(parameters)
       case source: DataSource[_] => source.withParameters(parameters)
       case _ =>
-        throw new UnsupportedOperationException("Operator " + javaSet.toString
+        throw new UnsupportedOperationException(
+          "Operator " + javaSet.toString
             + " cannot have parameters")
     }
     this
@@ -472,10 +483,8 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
     if (mapper == null) {
       throw new NullPointerException("Map function must not be null.")
     }
-    wrap(new MapOperator[T, R](javaSet,
-      implicitly[TypeInformation[R]],
-      mapper,
-      getCallLocationName()))
+    wrap(
+      new MapOperator[T, R](javaSet, implicitly[TypeInformation[R]], mapper, getCallLocationName()))
   }
 
   /**
@@ -489,10 +498,8 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
       val cleanFun = clean(fun)
       def map(in: T): R = cleanFun(in)
     }
-    wrap(new MapOperator[T, R](javaSet,
-      implicitly[TypeInformation[R]],
-      mapper,
-      getCallLocationName()))
+    wrap(
+      new MapOperator[T, R](javaSet, implicitly[TypeInformation[R]], mapper, getCallLocationName()))
   }
 
   /**
@@ -508,10 +515,12 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
     if (partitionMapper == null) {
       throw new NullPointerException("MapPartition function must not be null.")
     }
-    wrap(new MapPartitionOperator[T, R](javaSet,
-      implicitly[TypeInformation[R]],
-      partitionMapper,
-      getCallLocationName()))
+    wrap(
+      new MapPartitionOperator[T, R](
+        javaSet,
+        implicitly[TypeInformation[R]],
+        partitionMapper,
+        getCallLocationName()))
   }
 
   /**
@@ -533,10 +542,12 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
         cleanFun(in.iterator().asScala, out)
       }
     }
-    wrap(new MapPartitionOperator[T, R](javaSet,
-      implicitly[TypeInformation[R]],
-      partitionMapper,
-      getCallLocationName()))
+    wrap(
+      new MapPartitionOperator[T, R](
+        javaSet,
+        implicitly[TypeInformation[R]],
+        partitionMapper,
+        getCallLocationName()))
   }
 
   /**
@@ -558,10 +569,12 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
         cleanFun(in.iterator().asScala) foreach out.collect
       }
     }
-    wrap(new MapPartitionOperator[T, R](javaSet,
-      implicitly[TypeInformation[R]],
-      partitionMapper,
-      getCallLocationName()))
+    wrap(
+      new MapPartitionOperator[T, R](
+        javaSet,
+        implicitly[TypeInformation[R]],
+        partitionMapper,
+        getCallLocationName()))
   }
 
   /**
@@ -572,10 +585,12 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
     if (flatMapper == null) {
       throw new NullPointerException("FlatMap function must not be null.")
     }
-    wrap(new FlatMapOperator[T, R](javaSet,
-      implicitly[TypeInformation[R]],
-      flatMapper,
-      getCallLocationName()))
+    wrap(
+      new FlatMapOperator[T, R](
+        javaSet,
+        implicitly[TypeInformation[R]],
+        flatMapper,
+        getCallLocationName()))
   }
 
   /**
@@ -590,10 +605,12 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
       val cleanFun = clean(fun)
       def flatMap(in: T, out: Collector[R]) { cleanFun(in, out) }
     }
-    wrap(new FlatMapOperator[T, R](javaSet,
-      implicitly[TypeInformation[R]],
-      flatMapper,
-      getCallLocationName()))
+    wrap(
+      new FlatMapOperator[T, R](
+        javaSet,
+        implicitly[TypeInformation[R]],
+        flatMapper,
+        getCallLocationName()))
   }
 
   /**
@@ -608,10 +625,12 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
       val cleanFun = clean(fun)
       def flatMap(in: T, out: Collector[R]) { cleanFun(in) foreach out.collect }
     }
-    wrap(new FlatMapOperator[T, R](javaSet,
-      implicitly[TypeInformation[R]],
-      flatMapper,
-      getCallLocationName()))
+    wrap(
+      new FlatMapOperator[T, R](
+        javaSet,
+        implicitly[TypeInformation[R]],
+        flatMapper,
+        getCallLocationName()))
   }
 
   /**
@@ -733,17 +752,16 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
   def collect(): Seq[T] = {
     val id = new AbstractID().toString
     val serializer = getType().createSerializer(getExecutionEnvironment.getConfig)
-    
+
     javaSet.output(new Utils.CollectHelper[T](id, serializer))
-    
+
     val res = getExecutionEnvironment.execute()
 
     val accResult: java.util.ArrayList[Array[Byte]] = res.getAccumulatorResult(id)
 
     try {
       SerializedListAccumulator.deserializeList(accResult, serializer).asScala
-    }
-    catch {
+    } catch {
       case e: ClassNotFoundException => {
         throw new RuntimeException("Cannot find type class of collected data type.", e)
       }
@@ -788,10 +806,12 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
     if (reducer == null) {
       throw new NullPointerException("GroupReduce function must not be null.")
     }
-    wrap(new GroupReduceOperator[T, R](javaSet,
-      implicitly[TypeInformation[R]],
-      reducer,
-      getCallLocationName()))
+    wrap(
+      new GroupReduceOperator[T, R](
+        javaSet,
+        implicitly[TypeInformation[R]],
+        reducer,
+        getCallLocationName()))
   }
 
   /**
@@ -810,10 +830,12 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
         cleanFun(in.iterator().asScala, out)
       }
     }
-    wrap(new GroupReduceOperator[T, R](javaSet,
-      implicitly[TypeInformation[R]],
-      reducer,
-      getCallLocationName()))
+    wrap(
+      new GroupReduceOperator[T, R](
+        javaSet,
+        implicitly[TypeInformation[R]],
+        reducer,
+        getCallLocationName()))
   }
 
   /**
@@ -829,10 +851,12 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
         out.collect(cleanFun(in.iterator().asScala))
       }
     }
-    wrap(new GroupReduceOperator[T, R](javaSet,
-      implicitly[TypeInformation[R]],
-      reducer,
-      getCallLocationName()))
+    wrap(
+      new GroupReduceOperator[T, R](
+        javaSet,
+        implicitly[TypeInformation[R]],
+        reducer,
+        getCallLocationName()))
   }
 
   /**
@@ -854,10 +878,12 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
     if (combiner == null) {
       throw new NullPointerException("Combine function must not be null.")
     }
-    wrap(new GroupCombineOperator[T, R](javaSet,
-      implicitly[TypeInformation[R]],
-      combiner,
-      getCallLocationName()))
+    wrap(
+      new GroupCombineOperator[T, R](
+        javaSet,
+        implicitly[TypeInformation[R]],
+        combiner,
+        getCallLocationName()))
   }
 
   /**
@@ -885,33 +911,35 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
         cleanFun(in.iterator().asScala, out)
       }
     }
-    wrap(new GroupCombineOperator[T, R](javaSet,
-      implicitly[TypeInformation[R]],
-      combiner,
-      getCallLocationName()))
+    wrap(
+      new GroupCombineOperator[T, R](
+        javaSet,
+        implicitly[TypeInformation[R]],
+        combiner,
+        getCallLocationName()))
   }
 
   /**
-    * Selects an element with minimum value.
-    *
-    * The minimum is computed over the specified fields in lexicographical order.
-    *
-    * Example 1: Given a data set with elements [0, 1], [1, 0], the
-    * results will be:
-    * {{{
-    *   minBy(0)[0, 1]
-    *   minBy(1)[1, 0]
-    * }}}
-    * Example 2: Given a data set with elements [0, 0], [0, 1], the
-    * results will be:
-    * {{{
-    *   minBy(0, 1)[0, 0]
-    * }}}
-    * If multiple values with minimum value at the specified fields exist, a random one will be
-    * picked.
-    * Internally, this operation is implemented as a [[ReduceFunction]]
-    */
-  def minBy(fields: Int*) : DataSet[T]  = {
+   * Selects an element with minimum value.
+   *
+   * The minimum is computed over the specified fields in lexicographical order.
+   *
+   * Example 1: Given a data set with elements [0, 1], [1, 0], the
+   * results will be:
+   * {{{
+   *   minBy(0)[0, 1]
+   *   minBy(1)[1, 0]
+   * }}}
+   * Example 2: Given a data set with elements [0, 0], [0, 1], the
+   * results will be:
+   * {{{
+   *   minBy(0, 1)[0, 0]
+   * }}}
+   * If multiple values with minimum value at the specified fields exist, a random one will be
+   * picked.
+   * Internally, this operation is implemented as a [[ReduceFunction]]
+   */
+  def minBy(fields: Int*): DataSet[T] = {
     if (!getType.isTupleType) {
       throw new InvalidProgramException("DataSet#minBy(int...) only works on Tuple types.")
     }
@@ -920,27 +948,26 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
   }
 
   /**
-    * Selects an element with maximum value.
-    *
-    * The maximum is computed over the specified fields in lexicographical order.
-    *
-    * Example 1: Given a data set with elements [0, 1], [1, 0], the
-    * results will be:
-    * {{{
-    *   maxBy(0)[1, 0]
-    *   maxBy(1)[0, 1]
-    * }}}
-    * Example 2: Given a data set with elements [0, 0], [0, 1], the
-    * results will be:
-    * {{{
-    *   maxBy(0, 1)[0, 1]
-    * }}}
-    * If multiple values with maximum value at the specified fields exist, a random one will be
-    * picked
-    * Internally, this operation is implemented as a [[ReduceFunction]].
-    *
-    */
-  def maxBy(fields: Int*) : DataSet[T] = {
+   * Selects an element with maximum value.
+   *
+   * The maximum is computed over the specified fields in lexicographical order.
+   *
+   * Example 1: Given a data set with elements [0, 1], [1, 0], the
+   * results will be:
+   * {{{
+   *   maxBy(0)[1, 0]
+   *   maxBy(1)[0, 1]
+   * }}}
+   * Example 2: Given a data set with elements [0, 0], [0, 1], the
+   * results will be:
+   * {{{
+   *   maxBy(0, 1)[0, 1]
+   * }}}
+   * If multiple values with maximum value at the specified fields exist, a random one will be
+   * picked
+   * Internally, this operation is implemented as a [[ReduceFunction]].
+   */
+  def maxBy(fields: Int*): DataSet[T] = {
     if (!getType.isTupleType) {
       throw new InvalidProgramException("DataSet#maxBy(int...) only works on Tuple types.")
     }
@@ -973,16 +1000,19 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
       val cleanFun = clean(fun)
       def getKey(in: T) = cleanFun(in)
     }
-    wrap(new DistinctOperator[T](
-      javaSet,
-      new Keys.SelectorFunctionKeys[T, K](
-        keyExtractor, javaSet.getType, implicitly[TypeInformation[K]]),
+    wrap(
+      new DistinctOperator[T](
+        javaSet,
+        new Keys.SelectorFunctionKeys[T, K](
+          keyExtractor,
+          javaSet.getType,
+          implicitly[TypeInformation[K]]),
         getCallLocationName()))
   }
 
   /**
    * Returns a distinct set of this DataSet.
-   * 
+   *
    * <p>If the input is a composite type (Tuple or Pojo type), distinct is performed on all fields
    * and each field must be a key type.</p>
    */
@@ -992,24 +1022,25 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
 
   /**
    * Returns a distinct set of a tuple DataSet using field position keys.
-   * 
+   *
    * <p>The field position keys specify the fields of Tuples on which the decision is made if
    * two Tuples are distinct or not.</p>
-   * 
+   *
    * <p>Note: Field position keys can only be specified for Tuple DataSets.</p>
    *
    * @param fields One or more field positions on which the distinction of the DataSet is decided.
    */
   def distinct(fields: Int*): DataSet[T] = {
-    wrap(new DistinctOperator[T](
-      javaSet,
-      new Keys.ExpressionKeys[T](fields.toArray, javaSet.getType),
-      getCallLocationName()))
+    wrap(
+      new DistinctOperator[T](
+        javaSet,
+        new Keys.ExpressionKeys[T](fields.toArray, javaSet.getType),
+        getCallLocationName()))
   }
 
   /**
    * Returns a distinct set of this DataSet using expression keys.
-   * 
+   *
    * <p>The field position keys specify the fields of Tuples or Pojos on which the decision is made
    * if two elements are distinct or not.</p>
    *
@@ -1024,12 +1055,12 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
    *                    is decided
    */
   def distinct(firstField: String, otherFields: String*): DataSet[T] = {
-    wrap(new DistinctOperator[T](
-      javaSet,
-      new Keys.ExpressionKeys[T](firstField +: otherFields.toArray, javaSet.getType),
-      getCallLocationName()))
+    wrap(
+      new DistinctOperator[T](
+        javaSet,
+        new Keys.ExpressionKeys[T](firstField +: otherFields.toArray, javaSet.getType),
+        getCallLocationName()))
   }
-
 
   // --------------------------------------------------------------------------------------------
   //  Keyed DataSet
@@ -1048,7 +1079,8 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
       val cleanFun = clean(fun)
       def getKey(in: T) = cleanFun(in)
     }
-    new GroupedDataSet[T](this,
+    new GroupedDataSet[T](
+      this,
       new Keys.SelectorFunctionKeys[T, K](keyExtractor, javaSet.getType, keyType))
   }
 
@@ -1062,9 +1094,7 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
    * This only works on Tuple DataSets.
    */
   def groupBy(fields: Int*): GroupedDataSet[T] = {
-    new GroupedDataSet[T](
-      this,
-      new Keys.ExpressionKeys[T](fields.toArray, javaSet.getType))
+    new GroupedDataSet[T](this, new Keys.ExpressionKeys[T](fields.toArray, javaSet.getType))
   }
 
   /**
@@ -1073,7 +1103,6 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
    *
    * This will not create a new DataSet, it will just attach the field names which will be
    * used for grouping when executing a grouped operation.
-   *
    */
   def groupBy(firstField: String, otherFields: String*): GroupedDataSet[T] = {
     new GroupedDataSet[T](
@@ -1135,7 +1164,7 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
    */
   def join[O](other: DataSet[O], strategy: JoinHint): UnfinishedJoinOperation[T, O] =
     new UnfinishedJoinOperation(this, other, strategy)
-  
+
   /**
    * Special [[join]] operation for explicitly telling the system that the right side is assumed
    * to be a lot smaller than the left side of the join.
@@ -1183,8 +1212,7 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
    */
   def fullOuterJoin[O](other: DataSet[O], strategy: JoinHint): UnfinishedOuterJoinOperation[T, O] =
     strategy match {
-      case JoinHint.OPTIMIZER_CHOOSES |
-           JoinHint.REPARTITION_SORT_MERGE =>
+      case JoinHint.OPTIMIZER_CHOOSES | JoinHint.REPARTITION_SORT_MERGE =>
         new UnfinishedOuterJoinOperation(this, other, strategy, JoinType.FULL_OUTER)
       case _ =>
         throw new InvalidProgramException("Invalid JoinHint for FullOuterJoin: " + strategy)
@@ -1217,10 +1245,8 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
    */
   def leftOuterJoin[O](other: DataSet[O], strategy: JoinHint): UnfinishedOuterJoinOperation[T, O] =
     strategy match {
-      case JoinHint.OPTIMIZER_CHOOSES |
-           JoinHint.REPARTITION_SORT_MERGE |
-           JoinHint.REPARTITION_HASH_SECOND |
-      JoinHint.BROADCAST_HASH_SECOND =>
+      case JoinHint.OPTIMIZER_CHOOSES | JoinHint.REPARTITION_SORT_MERGE |
+          JoinHint.REPARTITION_HASH_SECOND | JoinHint.BROADCAST_HASH_SECOND =>
         new UnfinishedOuterJoinOperation(this, other, strategy, JoinType.LEFT_OUTER)
       case _ =>
         throw new InvalidProgramException("Invalid JoinHint for LeftOuterJoin: " + strategy)
@@ -1253,10 +1279,8 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
    */
   def rightOuterJoin[O](other: DataSet[O], strategy: JoinHint): UnfinishedOuterJoinOperation[T, O] =
     strategy match {
-      case JoinHint.OPTIMIZER_CHOOSES |
-           JoinHint.REPARTITION_SORT_MERGE |
-           JoinHint.REPARTITION_HASH_FIRST |
-      JoinHint.BROADCAST_HASH_FIRST =>
+      case JoinHint.OPTIMIZER_CHOOSES | JoinHint.REPARTITION_SORT_MERGE |
+          JoinHint.REPARTITION_HASH_FIRST | JoinHint.BROADCAST_HASH_FIRST =>
         new UnfinishedOuterJoinOperation(this, other, strategy, JoinType.RIGHT_OUTER)
       case _ =>
         throw new InvalidProgramException("Invalid JoinHint for RightOuterJoin: " + strategy)
@@ -1390,7 +1414,7 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
    * smaller than 3.
    */
   def iterateWithTermination(maxIterations: Int)(
-    stepFunction: (DataSet[T]) => (DataSet[T], DataSet[_])): DataSet[T] = {
+      stepFunction: (DataSet[T]) => (DataSet[T], DataSet[_])): DataSet[T] = {
     val iterativeSet =
       new IterativeDataSet[T](
         javaSet.getExecutionEnvironment,
@@ -1423,9 +1447,8 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
       key,
       maxIterations)
 
-    val (newSolution, newWorkset) = stepFunction(
-      wrap(iterativeSet.getSolutionSet),
-      wrap(iterativeSet.getWorkset))
+    val (newSolution, newWorkset) =
+      stepFunction(wrap(iterativeSet.getSolutionSet), wrap(iterativeSet.getWorkset))
     val result = iterativeSet.closeWith(newSolution.javaSet, newWorkset.javaSet)
     wrap(result)
   }
@@ -1438,9 +1461,12 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
    *
    * Note: The syntax of delta iterations are very likely going to change soon.
    */
-  def iterateDelta[R: ClassTag](workset: DataSet[R], maxIterations: Int, keyFields: Array[Int],
-                                 solutionSetUnManaged: Boolean)(
-    stepFunction: (DataSet[T], DataSet[R]) => (DataSet[T], DataSet[R])) = {
+  def iterateDelta[R: ClassTag](
+      workset: DataSet[R],
+      maxIterations: Int,
+      keyFields: Array[Int],
+      solutionSetUnManaged: Boolean)(
+      stepFunction: (DataSet[T], DataSet[R]) => (DataSet[T], DataSet[R])) = {
     val key = new ExpressionKeys[T](keyFields, javaSet.getType)
 
     val iterativeSet = new DeltaIteration[T, R](
@@ -1453,9 +1479,8 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
 
     iterativeSet.setSolutionSetUnManaged(solutionSetUnManaged)
 
-    val (newSolution, newWorkset) = stepFunction(
-      wrap(iterativeSet.getSolutionSet),
-      wrap(iterativeSet.getWorkset))
+    val (newSolution, newWorkset) =
+      stepFunction(wrap(iterativeSet.getSolutionSet), wrap(iterativeSet.getWorkset))
     val result = iterativeSet.closeWith(newSolution.javaSet, newWorkset.javaSet)
     wrap(result)
   }
@@ -1469,7 +1494,7 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
    * Note: The syntax of delta iterations are very likely going to change soon.
    */
   def iterateDelta[R: ClassTag](workset: DataSet[R], maxIterations: Int, keyFields: Array[String])(
-    stepFunction: (DataSet[T], DataSet[R]) => (DataSet[T], DataSet[R])) = {
+      stepFunction: (DataSet[T], DataSet[R]) => (DataSet[T], DataSet[R])) = {
 
     val key = new ExpressionKeys[T](keyFields, javaSet.getType)
     val iterativeSet = new DeltaIteration[T, R](
@@ -1480,9 +1505,8 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
       key,
       maxIterations)
 
-    val (newSolution, newWorkset) = stepFunction(
-      wrap(iterativeSet.getSolutionSet),
-      wrap(iterativeSet.getWorkset))
+    val (newSolution, newWorkset) =
+      stepFunction(wrap(iterativeSet.getSolutionSet), wrap(iterativeSet.getWorkset))
     val result = iterativeSet.closeWith(newSolution.javaSet, newWorkset.javaSet)
     wrap(result)
   }
@@ -1495,9 +1519,12 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
    *
    * Note: The syntax of delta iterations are very likely going to change soon.
    */
-  def iterateDelta[R: ClassTag](workset: DataSet[R], maxIterations: Int, keyFields: Array[String],
-                                 solutionSetUnManaged: Boolean)(
-    stepFunction: (DataSet[T], DataSet[R]) => (DataSet[T], DataSet[R])) = {
+  def iterateDelta[R: ClassTag](
+      workset: DataSet[R],
+      maxIterations: Int,
+      keyFields: Array[String],
+      solutionSetUnManaged: Boolean)(
+      stepFunction: (DataSet[T], DataSet[R]) => (DataSet[T], DataSet[R])) = {
 
     val key = new ExpressionKeys[T](keyFields, javaSet.getType)
     val iterativeSet = new DeltaIteration[T, R](
@@ -1510,9 +1537,8 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
 
     iterativeSet.setSolutionSetUnManaged(solutionSetUnManaged)
 
-    val (newSolution, newWorkset) = stepFunction(
-      wrap(iterativeSet.getSolutionSet),
-      wrap(iterativeSet.getWorkset))
+    val (newSolution, newWorkset) =
+      stepFunction(wrap(iterativeSet.getSolutionSet), wrap(iterativeSet.getWorkset))
     val result = iterativeSet.closeWith(newSolution.javaSet, newWorkset.javaSet)
     wrap(result)
   }
@@ -1540,9 +1566,8 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
    * Creates a new DataSet containing the elements from both `this` DataSet and the `other`
    * DataSet.
    */
-  def union(other: DataSet[T]): DataSet[T] = wrap(new UnionOperator[T](javaSet,
-    other.javaSet,
-    getCallLocationName()))
+  def union(other: DataSet[T]): DataSet[T] = wrap(
+    new UnionOperator[T](javaSet, other.javaSet, getCallLocationName()))
 
   // --------------------------------------------------------------------------------------------
   //  Partitioning
@@ -1596,7 +1621,7 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
         keyExtractor,
         javaSet.getType,
         implicitly[TypeInformation[K]]),
-        getCallLocationName())
+      getCallLocationName())
     wrap(op)
   }
 
@@ -1606,7 +1631,6 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
    * '''important:''' This operation requires an extra pass over the DataSet to compute the range
    * boundaries and shuffles the whole DataSet over the network.
    * This can take significant amount of time.
-   *
    */
   def partitionByRange(fields: Int*): DataSet[T] = {
     val op = new PartitionOperator[T](
@@ -1620,7 +1644,7 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
   /**
    * Range-partitions a DataSet on the specified fields.
    *
-  *'''important:''' This operation requires an extra pass over the DataSet to compute the range
+   * '''important:''' This operation requires an extra pass over the DataSet to compute the range
    * boundaries and shuffles the whole DataSet over the network.
    * This can take significant amount of time.
    */
@@ -1636,7 +1660,7 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
   /**
    * Range-partitions a DataSet using the specified key selector function.
    *
-  *'''important:''' This operation requires an extra pass over the DataSet to compute the range
+   * '''important:''' This operation requires an extra pass over the DataSet to compute the range
    * boundaries and shuffles the whole DataSet over the network.
    * This can take significant amount of time.
    */
@@ -1655,22 +1679,22 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
       getCallLocationName())
     wrap(op)
   }
-  
+
   /**
    * Partitions a tuple DataSet on the specified key fields using a custom partitioner.
    * This method takes the key position to partition on, and a partitioner that accepts the key
    * type.
-   * <p> 
+   * <p>
    * Note: This method works only on single field keys.
    */
-  def partitionCustom[K: TypeInformation](partitioner: Partitioner[K], field: Int) : DataSet[T] = {
+  def partitionCustom[K: TypeInformation](partitioner: Partitioner[K], field: Int): DataSet[T] = {
     val op = new PartitionOperator[T](
       javaSet,
       new Keys.ExpressionKeys[T](Array[Int](field), javaSet.getType),
       partitioner,
       implicitly[TypeInformation[K]],
       getCallLocationName())
-      
+
     wrap(op)
   }
 
@@ -1681,15 +1705,16 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
    * <p>
    * Note: This method works only on single field keys.
    */
-  def partitionCustom[K: TypeInformation](partitioner: Partitioner[K], field: String)
-    : DataSet[T] = {
+  def partitionCustom[K: TypeInformation](
+      partitioner: Partitioner[K],
+      field: String): DataSet[T] = {
     val op = new PartitionOperator[T](
       javaSet,
       new Keys.ExpressionKeys[T](Array[String](field), javaSet.getType),
       partitioner,
       implicitly[TypeInformation[K]],
       getCallLocationName())
-      
+
     wrap(op)
   }
 
@@ -1701,25 +1726,21 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
    * Note: This method works only on single field keys, i.e. the selector cannot return tuples
    * of fields.
    */
-  def partitionCustom[K: TypeInformation](partitioner: Partitioner[K], fun: T => K)
-    : DataSet[T] = {
+  def partitionCustom[K: TypeInformation](partitioner: Partitioner[K], fun: T => K): DataSet[T] = {
     val keyExtractor = new KeySelector[T, K] {
       val cleanFun = clean(fun)
       def getKey(in: T) = cleanFun(in)
     }
-    
+
     val keyType = implicitly[TypeInformation[K]]
 
     val op = new PartitionOperator[T](
       javaSet,
-      new Keys.SelectorFunctionKeys[T, K](
-        keyExtractor,
-        javaSet.getType,
-        keyType),
+      new Keys.SelectorFunctionKeys[T, K](keyExtractor, javaSet.getType, keyType),
       partitioner,
       keyType,
       getCallLocationName())
-      
+
     wrap(op)
   }
 
@@ -1747,7 +1768,7 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
    * The DataSet can be sorted on multiple fields by chaining sortPartition() calls.
    */
   def sortPartition(field: Int, order: Order): DataSet[T] = {
-    new PartitionSortedDataSet[T] (
+    new PartitionSortedDataSet[T](
       new SortPartitionOperator[T](javaSet, field, order, getCallLocationName()))
   }
 
@@ -1761,14 +1782,14 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
   }
 
   /**
-    * Locally sorts the partitions of the DataSet on the extracted key in the specified order.
-    * The DataSet can be sorted on multiple values by returning a tuple from the KeySelector.
-    *
-    * Note that no additional sort keys can be appended to a KeySelector sort keys. To sort
-    * the partitions by multiple values using KeySelector, the KeySelector must return a tuple
-    * consisting of the values.
-    */
-  def sortPartition[K: TypeInformation](fun: T => K, order: Order): DataSet[T] ={
+   * Locally sorts the partitions of the DataSet on the extracted key in the specified order.
+   * The DataSet can be sorted on multiple values by returning a tuple from the KeySelector.
+   *
+   * Note that no additional sort keys can be appended to a KeySelector sort keys. To sort
+   * the partitions by multiple values using KeySelector, the KeySelector must return a tuple
+   * consisting of the values.
+   */
+  def sortPartition[K: TypeInformation](fun: T => K, order: Order): DataSet[T] = {
     val keyExtractor = new KeySelector[T, K] {
       val cleanFun = clean(fun)
       def getKey(in: T) = cleanFun(in)
@@ -1776,11 +1797,9 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
 
     val keyType = implicitly[TypeInformation[K]]
     new PartitionSortedDataSet[T](
-      new SortPartitionOperator[T](javaSet,
-        new Keys.SelectorFunctionKeys[T, K](
-          keyExtractor,
-          javaSet.getType,
-          keyType),
+      new SortPartitionOperator[T](
+        javaSet,
+        new Keys.SelectorFunctionKeys[T, K](keyExtractor, javaSet.getType, keyType),
         order,
         getCallLocationName()))
   }
@@ -1792,12 +1811,10 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
   /**
    * Writes `this` DataSet to the specified location. This uses [[AnyRef.toString]] on
    * each element.
- *
+   *
    * @see org.apache.flink.api.java.DataSet#writeAsText(String)
    */
-  def writeAsText(
-      filePath: String,
-      writeMode: FileSystem.WriteMode = null): DataSink[T] = {
+  def writeAsText(filePath: String, writeMode: FileSystem.WriteMode = null): DataSink[T] = {
     val tof: TextOutputFormat[T] = new TextOutputFormat[T](new Path(filePath))
     if (writeMode != null) {
       tof.setWriteMode(writeMode)
@@ -1809,7 +1826,7 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
    * Writes `this` DataSet to the specified location as CSV file(s).
    *
    * This only works on Tuple DataSets. For individual tuple fields [[AnyRef.toString]] is used.
- *
+   *
    * @see org.apache.flink.api.java.DataSet#writeAsText(String)
    */
   def writeAsCsv(
@@ -1863,7 +1880,7 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
   def print(): Unit = {
     javaSet.print()
   }
-  
+
   /**
    * Prints the elements in a DataSet to the standard error stream [[System.err]] of the
    * JVM that calls the print() method. For programs that are executed in a cluster, this
@@ -1890,19 +1907,19 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
    * For each element of the DataSet the result of [[AnyRef.toString()]] is written.
    *
    * @param prefix The string to prefix each line of the output with. This helps identifying outputs
-   *               from different printing sinks.   
+   *               from different printing sinks.
    * @return The DataSink operator that writes the DataSet.
    */
   def printOnTaskManager(prefix: String): DataSink[T] = {
     javaSet.printOnTaskManager(prefix)
   }
-  
+
   /**
    * *
    * Writes a DataSet to the standard output stream (stdout) with a sink identifier prefixed.
    * This uses [[AnyRef.toString]] on each element.
- *
-   * @param sinkIdentifier The string to prefix the output with. 
+   *
+   * @param sinkIdentifier The string to prefix the output with.
    * @deprecated Use [[printOnTaskManager(String)]] instead.
    */
   @deprecated
@@ -1914,14 +1931,13 @@ class DataSet[T: ClassTag](set: JavaDataSet[T]) {
   /**
    * Writes a DataSet to the standard error stream (stderr) with a sink identifier prefixed.
    * This uses [[AnyRef.toString]] on each element.
- *
-   * @param sinkIdentifier The string to prefix the output with. 
+   *
+   * @param sinkIdentifier The string to prefix the output with.
    * @deprecated Use [[printOnTaskManager(String)]] instead.
    */
   @deprecated
   @PublicEvolving
   def printToErr(sinkIdentifier: String): DataSink[T] = {
-      output(new PrintingOutputFormat[T](sinkIdentifier, true))
+    output(new PrintingOutputFormat[T](sinkIdentifier, true))
   }
 }
-

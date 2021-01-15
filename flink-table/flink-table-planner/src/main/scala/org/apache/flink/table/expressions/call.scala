@@ -37,13 +37,13 @@ import org.apache.flink.table.validate.{ValidationFailure, ValidationResult, Val
 import _root_.scala.collection.JavaConverters._
 
 /**
-  * Over call with unresolved alias for over window.
-  *
-  * @param agg The aggregation of the over call.
-  * @param alias The alias of the referenced over window.
-  */
+ * Over call with unresolved alias for over window.
+ *
+ * @param agg The aggregation of the over call.
+ * @param alias The alias of the referenced over window.
+ */
 case class UnresolvedOverCall(agg: PlannerExpression, alias: PlannerExpression)
-  extends PlannerExpression {
+    extends PlannerExpression {
 
   override private[flink] def validateInput() =
     ValidationFailure(s"Over window with alias $alias could not be resolved.")
@@ -54,20 +54,21 @@ case class UnresolvedOverCall(agg: PlannerExpression, alias: PlannerExpression)
 }
 
 /**
-  * Over expression for Calcite over transform.
-  *
-  * @param agg            over-agg expression
-  * @param partitionBy    The fields by which the over window is partitioned
-  * @param orderBy        The field by which the over window is sorted
-  * @param preceding      The lower bound of the window
-  * @param following      The upper bound of the window
-  */
+ * Over expression for Calcite over transform.
+ *
+ * @param agg            over-agg expression
+ * @param partitionBy    The fields by which the over window is partitioned
+ * @param orderBy        The field by which the over window is sorted
+ * @param preceding      The lower bound of the window
+ * @param following      The upper bound of the window
+ */
 case class OverCall(
     agg: PlannerExpression,
     partitionBy: Seq[PlannerExpression],
     orderBy: PlannerExpression,
     preceding: PlannerExpression,
-    following: PlannerExpression) extends PlannerExpression {
+    following: PlannerExpression)
+    extends PlannerExpression {
 
   override def toString: String = s"$agg OVER (" +
     s"PARTITION BY (${partitionBy.mkString(", ")}) " +
@@ -81,8 +82,8 @@ case class OverCall(
 
     // assemble aggregation
     val operator: SqlAggFunction = agg.asInstanceOf[Aggregation].getSqlAggFunction()
-    val aggResultType = relBuilder
-      .getTypeFactory.asInstanceOf[FlinkTypeFactory]
+    val aggResultType = relBuilder.getTypeFactory
+      .asInstanceOf[FlinkTypeFactory]
       .createTypeFromTypeInfo(agg.resultType, isNullable = true)
 
     // assemble exprs by agg children
@@ -117,9 +118,9 @@ case class OverCall(
   }
 
   private def createBound(
-    relBuilder: RelBuilder,
-    bound: PlannerExpression,
-    sqlKind: SqlKind): RexWindowBound = {
+      relBuilder: RelBuilder,
+      bound: PlannerExpression,
+      sqlKind: SqlKind): RexWindowBound = {
 
     bound match {
       case _: UnboundedRow | _: UnboundedRange =>
@@ -129,8 +130,8 @@ case class OverCall(
         val currentRow = SqlWindow.createCurrentRow(SqlParserPos.ZERO)
         create(currentRow, null)
       case b: Literal =>
-        val returnType = relBuilder
-          .getTypeFactory.asInstanceOf[FlinkTypeFactory]
+        val returnType = relBuilder.getTypeFactory
+          .asInstanceOf[FlinkTypeFactory]
           .createTypeFromTypeInfo(Types.DECIMAL, isNullable = true)
 
         val sqlOperator = new SqlPostfixOperator(
@@ -172,14 +173,16 @@ case class OverCall(
 
     // check partitionBy expression keys are resolved field reference
     partitionBy.foreach {
-      case r: PlannerResolvedFieldReference if r.resultType.isKeyType  =>
+      case r: PlannerResolvedFieldReference if r.resultType.isKeyType =>
         ValidationSuccess
       case r: PlannerResolvedFieldReference =>
-        return ValidationFailure(s"Invalid PartitionBy expression: $r. " +
-          s"Expression must return key type.")
+        return ValidationFailure(
+          s"Invalid PartitionBy expression: $r. " +
+            s"Expression must return key type.")
       case r =>
-        return ValidationFailure(s"Invalid PartitionBy expression: $r. " +
-          s"Expression must be a resolved field reference.")
+        return ValidationFailure(
+          s"Invalid PartitionBy expression: $r. " +
+            s"Expression must be a resolved field reference.")
     }
 
     // check preceding is valid
@@ -232,15 +235,15 @@ case class OverCall(
 }
 
 /**
-  * Expression for calling a user-defined scalar functions.
-  *
-  * @param scalarFunction scalar function to be called (might be overloaded)
-  * @param parameters actual parameters that determine target evaluation method
-  */
+ * Expression for calling a user-defined scalar functions.
+ *
+ * @param scalarFunction scalar function to be called (might be overloaded)
+ * @param parameters actual parameters that determine target evaluation method
+ */
 case class PlannerScalarFunctionCall(
     scalarFunction: ScalarFunction,
     parameters: Seq[PlannerExpression])
-  extends PlannerExpression {
+    extends PlannerExpression {
 
   private var foundSignature: Option[Array[Class[_]]] = None
 
@@ -261,18 +264,17 @@ case class PlannerScalarFunctionCall(
     s"${scalarFunction.getClass.getCanonicalName}(${parameters.mkString(", ")})"
 
   override private[flink] def resultType =
-    getResultTypeOfScalarFunction(
-      scalarFunction,
-      foundSignature.get)
+    getResultTypeOfScalarFunction(scalarFunction, foundSignature.get)
 
   override private[flink] def validateInput(): ValidationResult = {
     val signature = children.map(_.resultType)
     // look for a signature that matches the input types
     foundSignature = getEvalMethodSignature(scalarFunction, signature)
     if (foundSignature.isEmpty) {
-      ValidationFailure(s"Given parameters do not match any signature. \n" +
-        s"Actual: ${signatureToString(signature)} \n" +
-        s"Expected: ${signaturesToString(scalarFunction, "eval")}")
+      ValidationFailure(
+        s"Given parameters do not match any signature. \n" +
+          s"Actual: ${signatureToString(signature)} \n" +
+          s"Expected: ${signaturesToString(scalarFunction, "eval")}")
     } else {
       ValidationSuccess
     }
@@ -280,20 +282,19 @@ case class PlannerScalarFunctionCall(
 }
 
 /**
-  *
-  * Expression for calling a user-defined table function with actual parameters.
-  *
-  * @param functionName function name
-  * @param tableFunction user-defined table function
-  * @param parameters actual parameters of function
-  * @param resultType type information of returned table
-  */
+ * Expression for calling a user-defined table function with actual parameters.
+ *
+ * @param functionName function name
+ * @param tableFunction user-defined table function
+ * @param parameters actual parameters of function
+ * @param resultType type information of returned table
+ */
 case class PlannerTableFunctionCall(
     functionName: String,
     tableFunction: TableFunction[_],
     parameters: Seq[PlannerExpression],
     resultType: TypeInformation[_])
-  extends PlannerExpression {
+    extends PlannerExpression {
 
   override private[flink] def children: Seq[PlannerExpression] = parameters
 

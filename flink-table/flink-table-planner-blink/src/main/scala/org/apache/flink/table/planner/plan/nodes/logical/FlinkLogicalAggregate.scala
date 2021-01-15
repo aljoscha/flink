@@ -38,9 +38,9 @@ import java.util.Collections
 import scala.collection.JavaConversions._
 
 /**
-  * Sub-class of [[Aggregate]] that is a relational operator which eliminates
-  * duplicates and computes totals in Flink.
-  */
+ * Sub-class of [[Aggregate]] that is a relational operator which eliminates
+ * duplicates and computes totals in Flink.
+ */
 class FlinkLogicalAggregate(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -50,9 +50,15 @@ class FlinkLogicalAggregate(
     aggCalls: util.List[AggregateCall],
     /* flag indicating whether to skip SplitAggregateRule */
     var partialFinalType: PartialFinalType = PartialFinalType.NONE)
-  extends Aggregate(cluster, traitSet, Collections.emptyList[RelHint](),
-    child, groupSet, groupSets, aggCalls)
-  with FlinkLogicalRel {
+    extends Aggregate(
+      cluster,
+      traitSet,
+      Collections.emptyList[RelHint](),
+      child,
+      groupSet,
+      groupSets,
+      aggCalls)
+    with FlinkLogicalRel {
 
   def setPartialFinalType(partialFinalType: PartialFinalType): Unit = {
     this.partialFinalType = partialFinalType
@@ -65,7 +71,13 @@ class FlinkLogicalAggregate(
       groupSets: util.List[ImmutableBitSet],
       aggCalls: util.List[AggregateCall]): Aggregate = {
     new FlinkLogicalAggregate(
-      cluster, traitSet, input, groupSet, groupSets, aggCalls, partialFinalType)
+      cluster,
+      traitSet,
+      input,
+      groupSet,
+      groupSets,
+      aggCalls,
+      partialFinalType)
   }
 
   override def computeSelfCost(planner: RelOptPlanner, mq: RelMetadataQuery): RelOptCost = {
@@ -84,11 +96,11 @@ class FlinkLogicalAggregate(
 }
 
 private class FlinkLogicalAggregateBatchConverter
-  extends ConverterRule(
-    classOf[LogicalAggregate],
-    Convention.NONE,
-    FlinkConventions.LOGICAL,
-    "FlinkLogicalAggregateBatchConverter") {
+    extends ConverterRule(
+      classOf[LogicalAggregate],
+      Convention.NONE,
+      FlinkConventions.LOGICAL,
+      "FlinkLogicalAggregateBatchConverter") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val agg = call.rel(0).asInstanceOf[LogicalAggregate]
@@ -100,7 +112,7 @@ private class FlinkLogicalAggregateBatchConverter
       case SqlKind.AVG => true
       // but none of the other AVG agg functions
       case k if SqlKind.AVG_AGG_FUNCTIONS.contains(k) => false
-      case _ => true
+      case _                                          => true
     }
 
     val hasAccurateDistinctCall = AggregateUtil.containsAccurateDistinctCall(agg.getAggCallList)
@@ -111,20 +123,16 @@ private class FlinkLogicalAggregateBatchConverter
   override def convert(rel: RelNode): RelNode = {
     val agg = rel.asInstanceOf[LogicalAggregate]
     val newInput = RelOptRule.convert(agg.getInput, FlinkConventions.LOGICAL)
-    FlinkLogicalAggregate.create(
-      newInput,
-      agg.getGroupSet,
-      agg.getGroupSets,
-      agg.getAggCallList)
+    FlinkLogicalAggregate.create(newInput, agg.getGroupSet, agg.getGroupSets, agg.getAggCallList)
   }
 }
 
 private class FlinkLogicalAggregateStreamConverter
-  extends ConverterRule(
-    classOf[LogicalAggregate],
-    Convention.NONE,
-    FlinkConventions.LOGICAL,
-    "FlinkLogicalAggregateStreamConverter") {
+    extends ConverterRule(
+      classOf[LogicalAggregate],
+      Convention.NONE,
+      FlinkConventions.LOGICAL,
+      "FlinkLogicalAggregateStreamConverter") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val agg = call.rel(0).asInstanceOf[LogicalAggregate]
@@ -133,18 +141,14 @@ private class FlinkLogicalAggregateStreamConverter
     // they have to be converted using the FlinkAggregateReduceFunctionsRule
     agg.getAggCallList.map(_.getAggregation.getKind).forall {
       case SqlKind.STDDEV_POP | SqlKind.STDDEV_SAMP | SqlKind.VAR_POP | SqlKind.VAR_SAMP => false
-      case _ => true
+      case _                                                                             => true
     }
   }
 
   override def convert(rel: RelNode): RelNode = {
     val agg = rel.asInstanceOf[LogicalAggregate]
     val newInput = RelOptRule.convert(agg.getInput, FlinkConventions.LOGICAL)
-    FlinkLogicalAggregate.create(
-      newInput,
-      agg.getGroupSet,
-      agg.getGroupSets,
-      agg.getAggCallList)
+    FlinkLogicalAggregate.create(newInput, agg.getGroupSet, agg.getGroupSets, agg.getAggCallList)
   }
 }
 

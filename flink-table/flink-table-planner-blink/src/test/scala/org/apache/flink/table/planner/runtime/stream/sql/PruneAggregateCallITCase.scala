@@ -24,7 +24,12 @@ import org.apache.flink.table.planner.runtime.utils.BatchTestBase.row
 import org.apache.flink.table.planner.runtime.utils.StreamingWithAggTestBase.AggMode
 import org.apache.flink.table.planner.runtime.utils.StreamingWithMiniBatchTestBase.MiniBatchMode
 import org.apache.flink.table.planner.runtime.utils.StreamingWithStateTestBase.StateBackendMode
-import org.apache.flink.table.planner.runtime.utils.{StreamTableEnvUtil, StreamingWithAggTestBase, TestData, TestingRetractSink}
+import org.apache.flink.table.planner.runtime.utils.{
+  StreamTableEnvUtil,
+  StreamingWithAggTestBase,
+  TestData,
+  TestingRetractSink
+}
 import org.apache.flink.table.utils.LegacyRowResource
 import org.apache.flink.types.Row
 
@@ -41,7 +46,7 @@ class PruneAggregateCallITCase(
     aggMode: AggMode,
     minibatch: MiniBatchMode,
     backend: StateBackendMode)
-  extends StreamingWithAggTestBase(aggMode, minibatch, backend) {
+    extends StreamingWithAggTestBase(aggMode, minibatch, backend) {
 
   @Rule
   def usesLegacyRows: LegacyRowResource = LegacyRowResource.INSTANCE
@@ -50,24 +55,19 @@ class PruneAggregateCallITCase(
   def testNoneEmptyGroupKey(): Unit = {
     checkResult(
       "SELECT a FROM (SELECT b, MAX(a) AS a, COUNT(*), MAX(c) FROM MyTable GROUP BY b) t",
-      Seq(row(1), row(3))
-    )
+      Seq(row(1), row(3)))
     checkResult(
       """
         |SELECT c, a FROM
         | (SELECT a, c, COUNT(b) as b, SUM(b) as s FROM MyTable GROUP BY a, c) t
         |WHERE s > 1
       """.stripMargin,
-      Seq(row("Hello world", 3), row("Hello", 2))
-    )
+      Seq(row("Hello world", 3), row("Hello", 2)))
   }
 
   @Test
   def testEmptyGroupKey(): Unit = {
-    checkResult(
-      "SELECT 1 FROM (SELECT SUM(a) FROM MyTable) t",
-      Seq(row(1))
-    )
+    checkResult("SELECT 1 FROM (SELECT SUM(a) FROM MyTable) t", Seq(row(1)))
 
     // TODO enable this case after translateToPlanInternal method is implemented
     //  in StreamExecJoin
@@ -76,15 +76,9 @@ class PruneAggregateCallITCase(
     //   Seq(row(1, 1, "Hi"), row(2, 2, "Hello"), row(3, 2, "Hello world"))
     // )
 
-    checkResult(
-      "SELECT 1 FROM (SELECT SUM(a), COUNT(*) FROM MyTable) t",
-      Seq(row(1))
-    )
+    checkResult("SELECT 1 FROM (SELECT SUM(a), COUNT(*) FROM MyTable) t", Seq(row(1)))
 
-    checkResult(
-      "SELECT 1 FROM (SELECT COUNT(*), SUM(a) FROM MyTable) t",
-      Seq(row(1))
-    )
+    checkResult("SELECT 1 FROM (SELECT COUNT(*), SUM(a) FROM MyTable) t", Seq(row(1)))
 
     // TODO enable this case after translateToPlanInternal method is implemented
     //  in StreamExecJoin
@@ -109,8 +103,7 @@ class PruneAggregateCallITCase(
       failingDataSource(TestData.smallTupleData3).javaStream,
       Some(Array("a", "b", "c")),
       Some(Array(true, true, true)),
-      Some(FlinkStatistic.UNKNOWN)
-    )
+      Some(FlinkStatistic.UNKNOWN))
 
     StreamTableEnvUtil.createTemporaryViewInternal[(Int, Long, Int, String, Long)](
       tEnv,
@@ -118,8 +111,7 @@ class PruneAggregateCallITCase(
       failingDataSource(TestData.smallTupleData5).javaStream,
       Some(Array("a", "b", "c", "d", "e")),
       Some(Array(true, true, true, true, true)),
-      Some(FlinkStatistic.builder().uniqueKeys(Set(Set("b").asJava).asJava).build())
-    )
+      Some(FlinkStatistic.builder().uniqueKeys(Set(Set("b").asJava).asJava).build()))
 
     val t = tEnv.sqlQuery(str)
     val sink = new TestingRetractSink

@@ -33,7 +33,6 @@ import scala.collection.JavaConverters._
  * [[NestedColumn]] is a tree node to build the used nested fields tree. For
  * non-nested field, it is a single node in the tree.
  *
- *
  * @param name                    The name of the fields in the origin schema
  * @param indexInOriginSchema     The index of the field in the origin schema.
  *                                It only works for the RowType.
@@ -85,11 +84,10 @@ class NestedColumn(
  */
 class NestedSchema(
     val inputRowType: RelDataType,
-    val columns: JLinkedHashMap[String, NestedColumn] = new JLinkedHashMap[String, NestedColumn]) {
-
-}
+    val columns: JLinkedHashMap[String, NestedColumn] = new JLinkedHashMap[String, NestedColumn]) {}
 
 object NestedProjectionUtil {
+
   /**
    * It will uses the RexNodes to build a tree of the used fields.
    * It uses a visitor to visit the operands of the expression. For
@@ -104,11 +102,11 @@ object NestedProjectionUtil {
    * expression "$0", it indicate the query will use the whole fields "$0"
    * rather than the child "child" only. In this situation, it will mark
    * the node "$0" as a leaf node and delete its children.
-   * */
+   */
   def build(exprs: JList[RexNode], inputRowType: RelDataType): NestedSchema = {
     val schema = new NestedSchema(inputRowType)
     val visitor = new NestedSchemaExtractor(schema)
-    for(expr <- exprs) {
+    for (expr <- exprs) {
       expr.accept(visitor)
     }
     schema
@@ -126,10 +124,7 @@ object NestedProjectionUtil {
    * iterate every level of the field with the name in the RexNode. For more
    * details, please refer to NestedFieldReWriter.
    */
-  def rewrite(
-      exprs: JList[RexNode],
-      schema: NestedSchema,
-      builder: RexBuilder): JList[RexNode] = {
+  def rewrite(exprs: JList[RexNode], schema: NestedSchema, builder: RexBuilder): JList[RexNode] = {
     val writer = new NestedSchemaRewriter(schema, builder)
     exprs.map(_.accept(writer)).toList.asJava
   }
@@ -143,15 +138,16 @@ object NestedProjectionUtil {
   def convertToIndexArray(root: NestedSchema): Array[Array[Int]] = {
     val allPaths = new JLinkedList[Array[Int]]()
     val path = new JLinkedList[Int]()
-    root.columns.foldLeft(0) {
-      case (newIndex, (_, column)) =>
-        traverse(column, newIndex, path, allPaths)
+    root.columns.foldLeft(0) { case (newIndex, (_, column)) =>
+      traverse(column, newIndex, path, allPaths)
     }
     allPaths.toArray(new Array[Array[Int]](0))
   }
 
   def createNestedColumnLeaf(
-      name: String, indexInOriginSchema: Int, originFieldType: RelDataType): NestedColumn = {
+      name: String,
+      indexInOriginSchema: Int,
+      originFieldType: RelDataType): NestedColumn = {
     new NestedColumn(name, indexInOriginSchema, originFieldType, isLeaf = true)
   }
 
@@ -159,7 +155,7 @@ object NestedProjectionUtil {
       parent: NestedColumn,
       index: Int,
       path: JList[Int],
-      allPaths: JList[Array[Int]]): Int ={
+      allPaths: JList[Array[Int]]): Int = {
     val tail = path.size()
     // push self
     path.add(parent.indexInOriginSchema)
@@ -171,9 +167,8 @@ object NestedProjectionUtil {
       index + 1
     } else {
       // iterate children
-      parent.children.values().foldLeft(index) {
-        case (index, child) =>
-          traverse(child, index, path, allPaths)
+      parent.children.values().foldLeft(index) { case (index, child) =>
+        traverse(child, index, path, allPaths)
       }
     }
     // pop self
@@ -207,8 +202,7 @@ private class NestedSchemaRewriter(schema: NestedSchema, builder: RexBuilder) ex
   override def visitInputRef(inputRef: RexInputRef): RexNode = {
     val name = schema.inputRowType.getFieldNames.get(inputRef.getIndex)
     if (!schema.columns.containsKey(name)) {
-      throw new TableException(
-        "Illegal input field access" + name)
+      throw new TableException("Illegal input field access" + name)
     } else {
       val field = schema.columns.get(name)
       new RexInputRef(field.indexOfLeafInNewSchema, field.originFieldType)
@@ -220,8 +214,7 @@ private class NestedSchemaRewriter(schema: NestedSchema, builder: RexBuilder) ex
     if (node.isDefined) {
       node.get
     } else {
-      throw new TableException(
-        "Unknown field " + fieldAccess + " when rewrite projection ")
+      throw new TableException("Unknown field " + fieldAccess + " when rewrite projection ")
     }
   }
 
@@ -232,10 +225,12 @@ private class NestedSchemaRewriter(schema: NestedSchema, builder: RexBuilder) ex
         val parent = schema.columns.get(name)
         if (parent.isLeaf) {
           (
-            Some(builder.makeFieldAccess(
-              new RexInputRef(parent.indexOfLeafInNewSchema, parent.originFieldType),
-              fieldAccess.getField.getName,
-              true)), parent)
+            Some(
+              builder.makeFieldAccess(
+                new RexInputRef(parent.indexOfLeafInNewSchema, parent.originFieldType),
+                fieldAccess.getField.getName,
+                true)),
+            parent)
         } else {
           val child = parent.children.get(fieldAccess.getField.getName)
           if (child.isLeaf) {
@@ -247,10 +242,7 @@ private class NestedSchemaRewriter(schema: NestedSchema, builder: RexBuilder) ex
       case acc: RexFieldAccess =>
         val (field, parent) = traverse(acc)
         if (field.isDefined) {
-          (
-            Some(
-              builder.makeFieldAccess(field.get, fieldAccess.getField.getName, true)),
-            parent)
+          (Some(builder.makeFieldAccess(field.get, fieldAccess.getField.getName, true)), parent)
         } else {
           val child = parent.children.get(fieldAccess.getField.getName)
           if (child.isLeaf) {
@@ -292,21 +284,20 @@ private class NestedSchemaExtractor(schema: NestedSchema) extends RexVisitorImpl
       schema.columns.get(topLevelNodeName)
     }
 
-    val leaf = names.slice(1, names.size).foldLeft(topLevelNode) {
-      case(parent, name) =>
-        if (parent.isLeaf) {
-          return
+    val leaf = names.slice(1, names.size).foldLeft(topLevelNode) { case (parent, name) =>
+      if (parent.isLeaf) {
+        return
+      }
+      if (!parent.children.containsKey(name)) {
+        val rowtype = parent.originFieldType
+        val index = rowtype.getFieldNames.indexOf(name)
+        if (index < 0) {
+          throw new TableException(
+            String.format("Could not find field %s in field %s.", name, parent.originFieldType))
         }
-        if(!parent.children.containsKey(name)) {
-          val rowtype = parent.originFieldType
-          val index = rowtype.getFieldNames.indexOf(name)
-          if (index < 0) {
-            throw new TableException(
-              String.format("Could not find field %s in field %s.", name, parent.originFieldType))
-          }
-          parent.addChild(new NestedColumn(name, index, rowtype.getFieldList.get(index).getType))
-        }
-        parent.children.get(name)
+        parent.addChild(new NestedColumn(name, index, rowtype.getFieldList.get(index).getType))
+      }
+      parent.children.get(name)
     }
     leaf.markLeaf()
   }

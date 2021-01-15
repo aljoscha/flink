@@ -32,22 +32,24 @@ import scala.PartialFunction.empty
 import scala.concurrent.duration._
 
 /**
-  * Monitors a Mesos task throughout its lifecycle.
-  *
-  * Models a task with a state machine reflecting the perceived state of the task in Mesos.
-  * The state is primarily updated when task status information arrives from Mesos.
-  *
-  * The associated state data primarily tracks the task's goal (intended) state, as
-  * persisted by the scheduler. Keep in mind that goal state is persisted before actions are taken.
-  * The goal state strictly transitions thru New->Launched->Released.
-  *
-  * Unlike most exchanges with Mesos, task status is delivered at-least-once,
-  * so status handling should be idempotent.
-  */
+ * Monitors a Mesos task throughout its lifecycle.
+ *
+ * Models a task with a state machine reflecting the perceived state of the task in Mesos.
+ * The state is primarily updated when task status information arrives from Mesos.
+ *
+ * The associated state data primarily tracks the task's goal (intended) state, as
+ * persisted by the scheduler. Keep in mind that goal state is persisted before actions are taken.
+ * The goal state strictly transitions thru New->Launched->Released.
+ *
+ * Unlike most exchanges with Mesos, task status is delivered at-least-once,
+ * so status handling should be idempotent.
+ */
 class TaskMonitor(
     flinkConfig: Configuration,
     schedulerDriver: SchedulerDriver,
-    goalState: TaskGoalState) extends Actor with FSM[TaskMonitorState,StateData] {
+    goalState: TaskGoalState)
+    extends Actor
+    with FSM[TaskMonitorState, StateData] {
 
   val LOG = Logger(getClass)
 
@@ -74,24 +76,26 @@ class TaskMonitor(
   //  New State
   // ------------------------------------------------------------------------
 
-  when(New) {
-    case Event(TaskGoalStateUpdated(goal: Launched), _) =>
-      goto(Staging) using StateData(goal)
+  when(New) { case Event(TaskGoalStateUpdated(goal: Launched), _) =>
+    goto(Staging) using StateData(goal)
   }
 
   // ------------------------------------------------------------------------
   //  Reconciliation State
   // ------------------------------------------------------------------------
 
-  onTransition {
-    case _ -> Reconciling =>
-      nextStateData.goal match {
-        case goal: Launched =>
-          val taskStatus = Protos.TaskStatus.newBuilder()
-            .setTaskId(goal.taskID).setSlaveId(goal.slaveID).setState(TASK_STAGING).build()
-          context.parent ! Reconcile(Seq(taskStatus))
-        case _ =>
-      }
+  onTransition { case _ -> Reconciling =>
+    nextStateData.goal match {
+      case goal: Launched =>
+        val taskStatus = Protos.TaskStatus
+          .newBuilder()
+          .setTaskId(goal.taskID)
+          .setSlaveId(goal.slaveID)
+          .setState(TASK_STAGING)
+          .build()
+        context.parent ! Reconcile(Seq(taskStatus))
+      case _ =>
+    }
   }
 
   when(Reconciling) {
@@ -102,13 +106,13 @@ class TaskMonitor(
   //  Staging State
   // ------------------------------------------------------------------------
 
-  when(Staging, stateTimeout = LAUNCH_TIMEOUT) {
-    case Event(StateTimeout, _) =>
-      LOG.warn(s"Mesos task ${stateData.goal.taskID.getValue} didn't launch as expected;"
+  when(Staging, stateTimeout = LAUNCH_TIMEOUT) { case Event(StateTimeout, _) =>
+    LOG.warn(
+      s"Mesos task ${stateData.goal.taskID.getValue} didn't launch as expected;"
         + s" reconciling.")
 
-      // likely cause: the task launch message was dropped - docs suggest reconciliation
-      goto(Reconciling)
+    // likely cause: the task launch message was dropped - docs suggest reconciliation
+    goto(Reconciling)
   }
 
   // ------------------------------------------------------------------------
@@ -123,9 +127,8 @@ class TaskMonitor(
   //  Killing State
   // ------------------------------------------------------------------------
 
-  onTransition {
-    case _ -> Killing =>
-      schedulerDriver.killTask(nextStateData.goal.taskID)
+  onTransition { case _ -> Killing =>
+    schedulerDriver.killTask(nextStateData.goal.taskID)
   }
 
   when(Killing, stateTimeout = RETRY_INTERVAL) {
@@ -180,9 +183,8 @@ class TaskMonitor(
       }
   }
 
-  onTransition {
-    case previousState -> nextState =>
-      LOG.debug(s"State change ($previousState -> $nextState) with data ${nextStateData}")
+  onTransition { case previousState -> nextState =>
+    LOG.debug(s"State change ($previousState -> $nextState) with data ${nextStateData}")
   }
 
   initialize()
@@ -198,8 +200,8 @@ object TaskMonitor {
   // ------------------------------------------------------------------------
 
   /**
-    * An FSM state of the task monitor, roughly corresponding to the task status.
-    */
+   * An FSM state of the task monitor, roughly corresponding to the task status.
+   */
   sealed trait TaskMonitorState
   case object Suspended extends TaskMonitorState
   case object New extends TaskMonitorState
@@ -209,14 +211,14 @@ object TaskMonitor {
   case object Killing extends TaskMonitorState
 
   /**
-    * The task monitor state data.
-    * @param goal the goal (intentional) state of the task.
-    */
-  case class StateData(goal:TaskGoalState)
+   * The task monitor state data.
+   * @param goal the goal (intentional) state of the task.
+   */
+  case class StateData(goal: TaskGoalState)
 
   /**
-    * Indicates the goal (intentional) state of a Mesos task; behavior varies accordingly.
-    */
+   * Indicates the goal (intentional) state of a Mesos task; behavior varies accordingly.
+   */
   sealed trait TaskGoalState {
     val taskID: Protos.TaskID
   }
@@ -224,19 +226,18 @@ object TaskMonitor {
   case class Launched(taskID: Protos.TaskID, slaveID: Protos.SlaveID) extends TaskGoalState
   case class Released(taskID: Protos.TaskID, slaveID: Protos.SlaveID) extends TaskGoalState
 
-
   // ------------------------------------------------------------------------
   //  Messages
   // ------------------------------------------------------------------------
 
   /**
-    * Conveys an update to the goal (intentional) state of a given task.
-    */
+   * Conveys an update to the goal (intentional) state of a given task.
+   */
   case class TaskGoalStateUpdated(state: TaskGoalState)
 
   /**
-    * Indicates that the Mesos task has terminated for whatever reason.
-    */
+   * Indicates that the Mesos task has terminated for whatever reason.
+   */
   case class TaskTerminated(taskID: Protos.TaskID, status: Protos.TaskStatus)
 
   // ------------------------------------------------------------------------
@@ -244,19 +245,20 @@ object TaskMonitor {
   // ------------------------------------------------------------------------
 
   /**
-    * Creates the properties for the TaskMonitor actor.
-    *
-    * @param actorClass the task monitor actor class
-    * @param flinkConfig the Flink configuration
-    * @param schedulerDriver the Mesos scheduler driver
-    * @param goalState the task's goal state
-    * @tparam T the type of the task monitor actor class
-    * @return the Props to create the task monitor
-    */
-  def createActorProps[T <: TaskMonitor](actorClass: Class[T],
-                                         flinkConfig: Configuration,
-                                         schedulerDriver: SchedulerDriver,
-                                         goalState: TaskGoalState): Props = {
+   * Creates the properties for the TaskMonitor actor.
+   *
+   * @param actorClass the task monitor actor class
+   * @param flinkConfig the Flink configuration
+   * @param schedulerDriver the Mesos scheduler driver
+   * @param goalState the task's goal state
+   * @tparam T the type of the task monitor actor class
+   * @return the Props to create the task monitor
+   */
+  def createActorProps[T <: TaskMonitor](
+      actorClass: Class[T],
+      flinkConfig: Configuration,
+      schedulerDriver: SchedulerDriver,
+      goalState: TaskGoalState): Props = {
     Props.create(actorClass, flinkConfig, schedulerDriver, goalState)
   }
 }

@@ -22,7 +22,6 @@ import org.apache.flink.api.common.typeutils.{ComparatorTestBase, TypeComparator
 import org.apache.flink.api.scala._
 import org.apache.flink.api.scala.typeutils.EnumValueTypeInfo
 
-
 class EnumValueComparatorTest extends ComparatorTestBase[Suit.Value] {
 
   protected def createComparator(ascending: Boolean): TypeComparator[Suit.Value] = {
@@ -39,12 +38,7 @@ class EnumValueComparatorTest extends ComparatorTestBase[Suit.Value] {
     dataISD
   }
 
-  private val dataISD = Array(
-    Suit.Clubs,
-    Suit.Diamonds,
-    Suit.Hearts,
-    Suit.Spades
-  )
+  private val dataISD = Array(Suit.Clubs, Suit.Diamonds, Suit.Hearts, Suit.Spades)
 }
 
 object Suit extends Enumeration {

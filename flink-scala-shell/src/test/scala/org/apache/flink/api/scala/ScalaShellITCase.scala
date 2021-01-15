@@ -21,7 +21,12 @@ package org.apache.flink.api.scala
 import java.io._
 
 import org.apache.flink.client.deployment.executors.RemoteExecutor
-import org.apache.flink.configuration.{Configuration, DeploymentOptions, JobManagerOptions, RestOptions}
+import org.apache.flink.configuration.{
+  Configuration,
+  DeploymentOptions,
+  JobManagerOptions,
+  RestOptions
+}
 import org.apache.flink.runtime.clusterframework.BootstrapTools
 import org.apache.flink.runtime.minicluster.MiniCluster
 import org.apache.flink.runtime.testutils.MiniClusterResource
@@ -59,9 +64,9 @@ class ScalaShellITCase extends TestLogger {
 
     val output: String = processInShell(input)
 
-    Assert.assertTrue(output.contains(
-      "UnsupportedOperationException: Execution Environment is already " +
-      "defined for this shell"))
+    Assert.assertTrue(
+      output.contains("UnsupportedOperationException: Execution Environment is already " +
+        "defined for this shell"))
   }
 
   /** Prevent re-creation of environment */
@@ -76,9 +81,9 @@ class ScalaShellITCase extends TestLogger {
 
     val output: String = processInShell(input)
 
-    Assert.assertTrue(output.contains(
-      "UnsupportedOperationException: Execution Environment is already " +
-      "defined for this shell"))
+    Assert.assertTrue(
+      output.contains("UnsupportedOperationException: Execution Environment is already " +
+        "defined for this shell"))
   }
 
   /** Iteration test with iterative Pi example */
@@ -251,7 +256,6 @@ class ScalaShellITCase extends TestLogger {
     Assert.assertFalse(output.contains("error"))
     Assert.assertFalse(output.contains("Exception"))
 
-
     Assert.assertTrue(output.contains("\nHELLO 42"))
   }
 
@@ -278,7 +282,6 @@ class ScalaShellITCase extends TestLogger {
 
     Assert.assertTrue(output.contains("\nHELLO 42"))
   }
-
 
   /**
    * tests flink shell startup with remote cluster (starts cluster internally)
@@ -327,9 +330,7 @@ class ScalaShellITCase extends TestLogger {
         |:q
       """.stripMargin
 
-    val in: BufferedReader = new BufferedReader(
-      new StringReader(
-        input + "\n"))
+    val in: BufferedReader = new BufferedReader(new StringReader(input + "\n"))
     val out: StringWriter = new StringWriter
 
     val baos: ByteArrayOutputStream = new ByteArrayOutputStream
@@ -340,14 +341,9 @@ class ScalaShellITCase extends TestLogger {
     BootstrapTools.writeConfiguration(configuration, new File(dir, "flink-conf.yaml"))
 
     val port: Int = clusterResource.getRestAddres.getPort
-    val hostname : String = clusterResource.getRestAddres.getHost
+    val hostname: String = clusterResource.getRestAddres.getHost
 
-    val args = Array(
-      "remote",
-      hostname,
-      Integer.toString(port),
-      "--configDir",
-      dir.getAbsolutePath)
+    val args = Array("remote", hostname, Integer.toString(port), "--configDir", dir.getAbsolutePath)
 
     //start scala shell with initialized
     // buffered reader for testing
@@ -445,8 +441,9 @@ class ScalaShellITCase extends TestLogger {
         |val newEnv = ExecutionEnvironment.getExecutionEnvironment
       """.stripMargin
     val output = processInShell(input)
-    Assert.assertTrue(output.contains("java.lang.UnsupportedOperationException: Execution " +
-      "Environment is already defined for this shell."))
+    Assert.assertTrue(
+      output.contains("java.lang.UnsupportedOperationException: Execution " +
+        "Environment is already defined for this shell."))
   }
 
 }
@@ -458,7 +455,8 @@ object ScalaShellITCase {
 
   val parallelism: Int = 4
 
-  val _clusterResource = new MiniClusterResource(new MiniClusterResourceConfiguration.Builder()
+  val _clusterResource = new MiniClusterResource(
+    new MiniClusterResourceConfiguration.Builder()
       .setNumberSlotsPerTaskManager(parallelism)
       .build())
 
@@ -467,8 +465,8 @@ object ScalaShellITCase {
 
   /**
    * Run the input using a Scala Shell and return the output of the shell.
-    *
-    * @param input commands to be processed in the shell
+   *
+   * @param input commands to be processed in the shell
    * @return output of shell
    */
   def processInShell(input: String, externalJars: Option[String] = None): String = {
@@ -480,7 +478,7 @@ object ScalaShellITCase {
     System.setOut(new PrintStream(baos))
 
     val port: Int = clusterResource.getRestAddres.getPort
-    val hostname : String = clusterResource.getRestAddres.getHost
+    val hostname: String = clusterResource.getRestAddres.getHost
 
     configuration.setString(DeploymentOptions.TARGET, RemoteExecutor.NAME)
     configuration.setBoolean(DeploymentOptions.ATTACHED, true)
@@ -491,37 +489,32 @@ object ScalaShellITCase {
     configuration.setString(RestOptions.ADDRESS, hostname)
     configuration.setInteger(RestOptions.PORT, port)
 
-      val repl = externalJars match {
-        case Some(ej) => new FlinkILoop(
-          configuration,
-          Option(Array(ej)),
-          in, new PrintWriter(out))
+    val repl = externalJars match {
+      case Some(ej) => new FlinkILoop(configuration, Option(Array(ej)), in, new PrintWriter(out))
 
-        case None => new FlinkILoop(
-          configuration,
-          in, new PrintWriter(out))
-      }
+      case None => new FlinkILoop(configuration, in, new PrintWriter(out))
+    }
 
-      repl.settings = new Settings()
+    repl.settings = new Settings()
 
-      // enable this line to use scala in intellij
-      repl.settings.usejavacp.value = true
+    // enable this line to use scala in intellij
+    repl.settings.usejavacp.value = true
 
-      externalJars match {
-        case Some(ej) => repl.settings.classpath.value = ej
-        case None =>
-      }
+    externalJars match {
+      case Some(ej) => repl.settings.classpath.value = ej
+      case None     =>
+    }
 
-      repl.process(repl.settings)
+    repl.process(repl.settings)
 
-      repl.closeInterpreter()
+    repl.closeInterpreter()
 
-      System.setOut(oldOut)
+    System.setOut(oldOut)
 
-      baos.flush()
+    baos.flush()
 
-      val stdout = baos.toString
+    val stdout = baos.toString
 
-      out.toString + stdout
+    out.toString + stdout
   }
 }

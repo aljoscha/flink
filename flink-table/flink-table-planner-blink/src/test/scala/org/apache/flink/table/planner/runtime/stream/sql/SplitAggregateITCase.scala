@@ -24,11 +24,23 @@ import org.apache.flink.table.api._
 import org.apache.flink.table.api.bridge.scala._
 import org.apache.flink.table.api.config.OptimizerConfigOptions
 import org.apache.flink.table.planner.runtime.stream.sql.SplitAggregateITCase.PartialAggMode
-import org.apache.flink.table.planner.runtime.utils.StreamingWithAggTestBase.{AggMode, LocalGlobalOff, LocalGlobalOn}
+import org.apache.flink.table.planner.runtime.utils.StreamingWithAggTestBase.{
+  AggMode,
+  LocalGlobalOff,
+  LocalGlobalOn
+}
 import org.apache.flink.table.planner.runtime.utils.StreamingWithMiniBatchTestBase.MiniBatchOn
-import org.apache.flink.table.planner.runtime.utils.StreamingWithStateTestBase.{HEAP_BACKEND, ROCKSDB_BACKEND, StateBackendMode}
+import org.apache.flink.table.planner.runtime.utils.StreamingWithStateTestBase.{
+  HEAP_BACKEND,
+  ROCKSDB_BACKEND,
+  StateBackendMode
+}
 import org.apache.flink.table.planner.runtime.utils.{StreamingWithAggTestBase, TestingRetractSink}
-import org.apache.flink.table.planner.utils.DateTimeTestUtil.{localDate, localDateTime, localTime => mLocalTime}
+import org.apache.flink.table.planner.utils.DateTimeTestUtil.{
+  localDate,
+  localDateTime,
+  localTime => mLocalTime
+}
 import org.apache.flink.types.Row
 
 import org.junit.Assert.assertEquals
@@ -49,18 +61,18 @@ class SplitAggregateITCase(
     partialAggMode: PartialAggMode,
     aggMode: AggMode,
     backend: StateBackendMode)
-  extends StreamingWithAggTestBase(aggMode, MiniBatchOn, backend) {
+    extends StreamingWithAggTestBase(aggMode, MiniBatchOn, backend) {
 
   @Before
   override def before(): Unit = {
     super.before()
 
     if (partialAggMode.isPartialAggEnabled) {
-      tEnv.getConfig.getConfiguration.setBoolean(
-        OptimizerConfigOptions.TABLE_OPTIMIZER_DISTINCT_AGG_SPLIT_ENABLED, true)
+      tEnv.getConfig.getConfiguration
+        .setBoolean(OptimizerConfigOptions.TABLE_OPTIMIZER_DISTINCT_AGG_SPLIT_ENABLED, true)
     } else {
-      tEnv.getConfig.getConfiguration.setBoolean(
-        OptimizerConfigOptions.TABLE_OPTIMIZER_DISTINCT_AGG_SPLIT_ENABLED, false)
+      tEnv.getConfig.getConfiguration
+        .setBoolean(OptimizerConfigOptions.TABLE_OPTIMIZER_DISTINCT_AGG_SPLIT_ENABLED, false)
     }
 
     val data = List(
@@ -87,49 +99,63 @@ class SplitAggregateITCase(
 
   @Test
   def testCountDistinct(): Unit = {
-    val ids = List(
-      1,
-      2, 2,
-      3, 3, 3,
-      4, 4, 4, 4,
-      5, 5, 5, 5, 5)
+    val ids = List(1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5)
 
     val dateTimes = List(
       "1970-01-01 00:00:01",
-      "1970-01-01 00:00:02", null,
-      "1970-01-01 00:00:04", "1970-01-01 00:00:05", "1970-01-01 00:00:06",
-      "1970-01-01 00:00:07", null, null, "1970-01-01 00:00:10",
-
-      "1970-01-01 00:00:11", "1970-01-01 00:00:11", "1970-01-01 00:00:13",
-      "1970-01-01 00:00:14", "1970-01-01 00:00:15")
+      "1970-01-01 00:00:02",
+      null,
+      "1970-01-01 00:00:04",
+      "1970-01-01 00:00:05",
+      "1970-01-01 00:00:06",
+      "1970-01-01 00:00:07",
+      null,
+      null,
+      "1970-01-01 00:00:10",
+      "1970-01-01 00:00:11",
+      "1970-01-01 00:00:11",
+      "1970-01-01 00:00:13",
+      "1970-01-01 00:00:14",
+      "1970-01-01 00:00:15")
 
     val dates = List(
       "1970-01-01",
-      "1970-01-02", null,
-      "1970-01-04", "1970-01-05", "1970-01-06",
-      "1970-01-07", null, null, "1970-01-10",
-      "1970-01-11", "1970-01-11", "1970-01-13", "1970-01-14", "1970-01-15")
+      "1970-01-02",
+      null,
+      "1970-01-04",
+      "1970-01-05",
+      "1970-01-06",
+      "1970-01-07",
+      null,
+      null,
+      "1970-01-10",
+      "1970-01-11",
+      "1970-01-11",
+      "1970-01-13",
+      "1970-01-14",
+      "1970-01-15")
 
     val times = List(
       "00:00:01",
-      "00:00:02", null,
-      "00:00:04", "00:00:05", "00:00:06",
-      "00:00:07", null, null, "00:00:10",
-      "00:00:11", "00:00:11", "00:00:13", "00:00:14", "00:00:15")
+      "00:00:02",
+      null,
+      "00:00:04",
+      "00:00:05",
+      "00:00:06",
+      "00:00:07",
+      null,
+      null,
+      "00:00:10",
+      "00:00:11",
+      "00:00:11",
+      "00:00:13",
+      "00:00:14",
+      "00:00:15")
 
-    val integers = List(
-      "1",
-      "2", null,
-      "4", "5", "6",
-      "7", null, null, "10",
-      "11", "11", "13", "14", "15")
+    val integers =
+      List("1", "2", null, "4", "5", "6", "7", null, null, "10", "11", "11", "13", "14", "15")
 
-    val chars = List(
-      "A",
-      "B", null,
-      "D", "E", "F",
-      "H", null, null, "K",
-      "L", "L", "N", "O", "P")
+    val chars = List("A", "B", null, "D", "E", "F", "H", null, null, "K", "L", "L", "N", "O", "P")
 
     val data = new mutable.MutableList[Row]
 
@@ -138,21 +164,33 @@ class SplitAggregateITCase(
       val decimal = if (v == null) null else new JBigDecimal(v)
       val int = if (v == null) null else JInt.valueOf(v)
       val long = if (v == null) null else JLong.valueOf(v)
-      data.+=(Row.of(
-        Int.box(ids(i)), localDateTime(dateTimes(i)), localDate(dates(i)),
-        mLocalTime(times(i)), decimal, int, long, chars(i)))
+      data.+=(
+        Row.of(
+          Int.box(ids(i)),
+          localDateTime(dateTimes(i)),
+          localDate(dates(i)),
+          mLocalTime(times(i)),
+          decimal,
+          int,
+          long,
+          chars(i)))
     }
 
     val inputs = Random.shuffle(data)
 
     val rowType = new RowTypeInfo(
-      Types.INT, Types.LOCAL_DATE_TIME, Types.LOCAL_DATE, Types.LOCAL_TIME,
-      Types.DECIMAL, Types.INT, Types.LONG, Types.STRING)
+      Types.INT,
+      Types.LOCAL_DATE_TIME,
+      Types.LOCAL_DATE,
+      Types.LOCAL_TIME,
+      Types.DECIMAL,
+      Types.INT,
+      Types.LONG,
+      Types.STRING)
 
     val t = failingDataSource(inputs)(rowType).toTable(tEnv, 'id, 'a, 'b, 'c, 'd, 'e, 'f, 'g)
     tEnv.createTemporaryView("MyTable", t)
-    val t1 = tEnv.sqlQuery(
-      s"""
+    val t1 = tEnv.sqlQuery(s"""
          |SELECT
          | id,
          | count(distinct a),
@@ -178,7 +216,6 @@ class SplitAggregateITCase(
       "5,4,4,4,4,4,4,4")
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
-
 
   @Test
   def testSingleDistinctAgg(): Unit = {
@@ -212,8 +249,7 @@ class SplitAggregateITCase(
     t1.toRetractStream[Row].addSink(sink)
     env.execute()
 
-    val expected = List("1,3,2,1", "2,29,5,3",
-      "3,10,2,5", "4,21,3,5")
+    val expected = List("1,3,2,1", "2,29,5,3", "3,10,2,5", "4,21,3,5")
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
 
@@ -255,8 +291,7 @@ class SplitAggregateITCase(
 
   @Test
   def testAggWithFilterClause(): Unit = {
-    val t1 = tEnv.sqlQuery(
-      s"""
+    val t1 = tEnv.sqlQuery(s"""
          |SELECT
          |  a,
          |  COUNT(DISTINCT b) filter (where not b = 2),
@@ -276,8 +311,7 @@ class SplitAggregateITCase(
 
   @Test
   def testMinMaxWithRetraction(): Unit = {
-    val t1 = tEnv.sqlQuery(
-      s"""
+    val t1 = tEnv.sqlQuery(s"""
          |SELECT
          |  c, MIN(b), MAX(b), COUNT(DISTINCT a)
          |FROM(
@@ -298,8 +332,7 @@ class SplitAggregateITCase(
 
   @Test
   def testAggWithJoin(): Unit = {
-    val t1 = tEnv.sqlQuery(
-      s"""
+    val t1 = tEnv.sqlQuery(s"""
          |SELECT *
          |FROM(
          |  SELECT
@@ -317,16 +350,23 @@ class SplitAggregateITCase(
     t1.toRetractStream[Row].addSink(sink)
     env.execute()
 
-    val expected = List("2,2,2,1,4,5,Hello 2", "2,2,2,1,4,5,Hello 3", "2,2,2,1,4,5,null",
-      "2,2,2,1,4,6,Hello 1", "5,1,4,2,3,5,Hello 0", "5,1,4,2,3,5,Hello 1",
-      "6,2,2,1,4,5,Hello 2", "6,2,2,1,4,5,Hello 3", "6,2,2,1,4,5,null",
+    val expected = List(
+      "2,2,2,1,4,5,Hello 2",
+      "2,2,2,1,4,5,Hello 3",
+      "2,2,2,1,4,5,null",
+      "2,2,2,1,4,6,Hello 1",
+      "5,1,4,2,3,5,Hello 0",
+      "5,1,4,2,3,5,Hello 1",
+      "6,2,2,1,4,5,Hello 2",
+      "6,2,2,1,4,5,Hello 3",
+      "6,2,2,1,4,5,null",
       "6,2,2,1,4,6,Hello 1")
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
 
   @Test
   def testUvWithRetraction(): Unit = {
-    val data = (0 until 1000).map {i => (s"${i%10}", s"${i%100}", s"$i")}.toList
+    val data = (0 until 1000).map { i => (s"${i % 10}", s"${i % 100}", s"$i") }.toList
     val t = failingDataSource(data).toTable(tEnv, 'a, 'b, 'c)
     tEnv.registerTable("src", t)
 
@@ -348,15 +388,15 @@ class SplitAggregateITCase(
     t1.toRetractStream[Row].addSink(sink)
     env.execute()
 
-    val expected = List("0,10", "1,10", "2,10", "3,10", "4,10",
-      "5,10", "6,10", "7,10", "8,10", "9,10")
+    val expected =
+      List("0,10", "1,10", "2,10", "3,10", "4,10", "5,10", "6,10", "7,10", "8,10", "9,10")
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
 
   @Test
   def testCountDistinctWithBinaryRowSource(): Unit = {
     // this case is failed before, because of object reuse problem
-    val data = (0 until 100).map {i => ("1", "1", s"${i%50}", "1")}.toList
+    val data = (0 until 100).map { i => ("1", "1", s"${i % 50}", "1") }.toList
     // use BinaryRowData source here for StringData reuse
     val t = failingBinaryRowSource(data).toTable(tEnv, 'a, 'b, 'c, 'd)
     tEnv.registerTable("src", t)

@@ -52,11 +52,7 @@ class LimitITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mod
     tEnv.sqlQuery(sql).toRetractStream[Row].addSink(sink).setParallelism(1)
     env.execute()
 
-    val expected = Seq(
-      "book,1,12",
-      "book,2,19",
-      "book,4,11",
-      "fruit,4,33")
+    val expected = Seq("book,1,12", "book,2,19", "book,4,11", "fruit,4,33")
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
 
@@ -79,11 +75,7 @@ class LimitITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mod
     tEnv.sqlQuery(sql).toRetractStream[Row].addSink(sink).setParallelism(1)
     env.execute()
 
-    val expected = Seq(
-      "book,4,11",
-      "fruit,4,33",
-      "fruit,3,44",
-      "fruit,5,22")
+    val expected = Seq("book,4,11", "fruit,4,33", "fruit,3,44", "fruit,5,22")
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
 

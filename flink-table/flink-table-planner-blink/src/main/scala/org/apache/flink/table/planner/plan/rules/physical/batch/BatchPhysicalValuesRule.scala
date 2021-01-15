@@ -27,23 +27,20 @@ import org.apache.calcite.rel.RelNode
 import org.apache.calcite.rel.convert.ConverterRule
 
 /**
-  * Rule that converts [[FlinkLogicalValues]] to [[BatchPhysicalValues]].
-  */
-class BatchPhysicalValuesRule extends ConverterRule(
-  classOf[FlinkLogicalValues],
-  FlinkConventions.LOGICAL,
-  FlinkConventions.BATCH_PHYSICAL,
-  "BatchPhysicalValuesRule") {
+ * Rule that converts [[FlinkLogicalValues]] to [[BatchPhysicalValues]].
+ */
+class BatchPhysicalValuesRule
+    extends ConverterRule(
+      classOf[FlinkLogicalValues],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.BATCH_PHYSICAL,
+      "BatchPhysicalValuesRule") {
 
   def convert(rel: RelNode): RelNode = {
     val values: FlinkLogicalValues = rel.asInstanceOf[FlinkLogicalValues]
     val providedTraitSet: RelTraitSet = rel.getTraitSet.replace(FlinkConventions.BATCH_PHYSICAL)
 
-    new BatchPhysicalValues(
-      rel.getCluster,
-      providedTraitSet,
-      values.getTuples,
-      rel.getRowType)
+    new BatchPhysicalValues(rel.getCluster, providedTraitSet, values.getTuples, rel.getRowType)
   }
 }
 

@@ -23,7 +23,7 @@ import org.apache.flink.streaming.api.windowing.windows.Window
 
 /**
  * Rich variant of the [[org.apache.flink.streaming.api.scala.function.WindowFunction]].
- * 
+ *
  * As a [[org.apache.flink.api.common.functions.RichFunction]], it gives access to the
  * [[org.apache.flink.api.common.functions.RuntimeContext]] and provides setup
  * and tear-down methods.
@@ -33,6 +33,6 @@ import org.apache.flink.streaming.api.windowing.windows.Window
  * @tparam KEY The type of the key.
  * @tparam W The type of Window that this window function can be applied on.
  */
-abstract class RichWindowFunction[IN, OUT, KEY, W <: Window] 
-  extends AbstractRichFunction
-  with WindowFunction[IN, OUT, KEY, W] {}
+abstract class RichWindowFunction[IN, OUT, KEY, W <: Window]
+    extends AbstractRichFunction
+    with WindowFunction[IN, OUT, KEY, W] {}

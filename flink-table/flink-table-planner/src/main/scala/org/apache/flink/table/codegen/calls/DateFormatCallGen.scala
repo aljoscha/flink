@@ -23,18 +23,18 @@ import org.apache.flink.table.codegen.{CodeGenerator, GeneratedExpression}
 import org.apache.flink.table.codegen.calls.CallGenerator.generateCallIfArgsNotNull
 
 class DateFormatCallGen extends CallGenerator {
-  override def generate(codeGenerator: CodeGenerator,
-                        operands: Seq[GeneratedExpression])
-  : GeneratedExpression = {
+  override def generate(
+      codeGenerator: CodeGenerator,
+      operands: Seq[GeneratedExpression]): GeneratedExpression = {
 
     if (operands.last.literal) {
       val formatter = codeGenerator.addReusableDateFormatter(operands.last)
-      generateCallIfArgsNotNull(codeGenerator.nullCheck, STRING_TYPE_INFO, operands) {
-        terms => s"$formatter.print(${terms.head})"
+      generateCallIfArgsNotNull(codeGenerator.nullCheck, STRING_TYPE_INFO, operands) { terms =>
+        s"$formatter.print(${terms.head})"
       }
     } else {
-      generateCallIfArgsNotNull(codeGenerator.nullCheck, STRING_TYPE_INFO, operands) {
-        terms => s"""
+      generateCallIfArgsNotNull(codeGenerator.nullCheck, STRING_TYPE_INFO, operands) { terms =>
+        s"""
           |org.apache.flink.table.runtime.functions.
           |DateTimeFunctions$$.MODULE$$.dateFormat(${terms.head}, ${terms.last});
           """.stripMargin

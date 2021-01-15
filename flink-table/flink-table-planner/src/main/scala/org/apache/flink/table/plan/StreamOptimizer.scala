@@ -34,29 +34,26 @@ import org.apache.flink.table.planner.PlanningConfigurationBuilder
 import scala.collection.JavaConverters._
 
 /**
-  * An [[Optimizer]] that can be used for optimizing a streaming plan. Should be used to create an
-  * optimized tree from a logical input tree.
-  *
-  * @param calciteConfig                provider for [[CalciteConfig]]. It is a provider because the
-  *                                     [[TableConfig]] in a [[TableEnvImpl]] is mutable.
-  * @param planningConfigurationBuilder provider for [[RelOptPlanner]] and [[Context]]
-  */
+ * An [[Optimizer]] that can be used for optimizing a streaming plan. Should be used to create an
+ * optimized tree from a logical input tree.
+ *
+ * @param calciteConfig                provider for [[CalciteConfig]]. It is a provider because the
+ *                                     [[TableConfig]] in a [[TableEnvImpl]] is mutable.
+ * @param planningConfigurationBuilder provider for [[RelOptPlanner]] and [[Context]]
+ */
 class StreamOptimizer(
     calciteConfig: () => CalciteConfig,
     planningConfigurationBuilder: PlanningConfigurationBuilder)
-  extends Optimizer(calciteConfig, planningConfigurationBuilder) {
+    extends Optimizer(calciteConfig, planningConfigurationBuilder) {
 
   /**
-    * Generates the optimized [[RelNode]] tree from the original relational node tree.
-    *
-    * @param relNode The root node of the relational expression tree.
-    * @param updatesAsRetraction True if the sink requests updates as retraction messages.
-    * @return The optimized [[RelNode]] tree
-    */
-  def optimize(
-    relNode: RelNode,
-    updatesAsRetraction: Boolean,
-    relBuilder: RelBuilder): RelNode = {
+   * Generates the optimized [[RelNode]] tree from the original relational node tree.
+   *
+   * @param relNode The root node of the relational expression tree.
+   * @param updatesAsRetraction True if the sink requests updates as retraction messages.
+   * @return The optimized [[RelNode]] tree
+   */
+  def optimize(relNode: RelNode, updatesAsRetraction: Boolean, relBuilder: RelBuilder): RelNode = {
     val convSubQueryPlan = optimizeConvertSubQueries(relNode)
     val expandedPlan = optimizeExpandPlan(convSubQueryPlan)
     val decorPlan = RelDecorrelator.decorrelateQuery(expandedPlan, relBuilder)
@@ -70,9 +67,9 @@ class StreamOptimizer(
   }
 
   /**
-    * Returns the decoration rule set for this optimizer
-    * including a custom RuleSet configuration.
-    */
+   * Returns the decoration rule set for this optimizer
+   * including a custom RuleSet configuration.
+   */
   protected def getDecoRuleSet: RuleSet = {
     materializedConfig.decoRuleSet match {
 
@@ -89,29 +86,25 @@ class StreamOptimizer(
   }
 
   /**
-    * Returns the built-in normalization rules that are defined by the optimizer.
-    */
+   * Returns the built-in normalization rules that are defined by the optimizer.
+   */
   protected def getBuiltInNormRuleSet: RuleSet = FlinkRuleSets.DATASTREAM_NORM_RULES
 
   /**
-    * Returns the built-in optimization rules that are defined by the optimizer.
-    */
+   * Returns the built-in optimization rules that are defined by the optimizer.
+   */
   protected def getBuiltInPhysicalOptRuleSet: RuleSet = FlinkRuleSets.DATASTREAM_OPT_RULES
 
   /**
-    * Returns the built-in decoration rules that are defined by the optimizer.
-    */
+   * Returns the built-in decoration rules that are defined by the optimizer.
+   */
   protected def getBuiltInDecoRuleSet: RuleSet = FlinkRuleSets.DATASTREAM_DECO_RULES
 
-  private def optimizeDecoratePlan(
-    relNode: RelNode,
-    updatesAsRetraction: Boolean): RelNode = {
+  private def optimizeDecoratePlan(relNode: RelNode, updatesAsRetraction: Boolean): RelNode = {
     val decoRuleSet = getDecoRuleSet
     if (decoRuleSet.iterator().hasNext) {
       val planToDecorate = if (updatesAsRetraction) {
-        relNode.copy(
-          relNode.getTraitSet.plus(new UpdateAsRetractionTrait(true)),
-          relNode.getInputs)
+        relNode.copy(relNode.getTraitSet.plus(new UpdateAsRetractionTrait(true)), relNode.getInputs)
       } else {
         relNode
       }

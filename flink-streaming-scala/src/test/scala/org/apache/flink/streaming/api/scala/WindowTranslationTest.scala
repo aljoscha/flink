@@ -20,7 +20,11 @@ package org.apache.flink.streaming.api.scala
 
 import org.apache.flink.api.common.ExecutionConfig
 import org.apache.flink.api.common.functions._
-import org.apache.flink.api.common.state.{AggregatingStateDescriptor, ListStateDescriptor, ReducingStateDescriptor}
+import org.apache.flink.api.common.state.{
+  AggregatingStateDescriptor,
+  ListStateDescriptor,
+  ReducingStateDescriptor
+}
 import org.apache.flink.api.common.typeinfo.{BasicTypeInfo, TypeInformation}
 import org.apache.flink.api.java.functions.KeySelector
 import org.apache.flink.streaming.api.operators.{OneInputStreamOperator, OutputTypeConfigurable}
@@ -29,7 +33,12 @@ import org.apache.flink.streaming.api.transformations.OneInputTransformation
 import org.apache.flink.streaming.api.windowing.assigners._
 import org.apache.flink.streaming.api.windowing.evictors.CountEvictor
 import org.apache.flink.streaming.api.windowing.time.Time
-import org.apache.flink.streaming.api.windowing.triggers.{CountTrigger, EventTimeTrigger, ProcessingTimeTrigger, Trigger}
+import org.apache.flink.streaming.api.windowing.triggers.{
+  CountTrigger,
+  EventTimeTrigger,
+  ProcessingTimeTrigger,
+  Trigger
+}
 import org.apache.flink.streaming.api.windowing.windows.{TimeWindow, Window}
 import org.apache.flink.streaming.runtime.operators.windowing._
 import org.apache.flink.streaming.runtime.streamrecord.StreamRecord
@@ -40,12 +49,12 @@ import org.junit.Assert._
 import org.junit.Test
 
 /**
-  * These tests verify that the api calls on [[WindowedStream]] instantiate the correct
-  * window operator.
-  *
-  * We also create a test harness and push one element into the operator to verify
-  * that we get some output.
-  */
+ * These tests verify that the api calls on [[WindowedStream]] instantiate the correct
+ * window operator.
+ *
+ * We also create a test harness and push one element into the operator to verify
+ * that we get some output.
+ */
 class WindowTranslationTest {
 
   // --------------------------------------------------------------------------
@@ -53,9 +62,9 @@ class WindowTranslationTest {
   // --------------------------------------------------------------------------
 
   /**
-    * .reduce() does not support [[RichReduceFunction]], since the reduce function is used
-    * internally in a [[org.apache.flink.api.common.state.ReducingState]].
-    */
+   * .reduce() does not support [[RichReduceFunction]], since the reduce function is used
+   * internally in a [[org.apache.flink.api.common.state.ReducingState]].
+   */
   @Test(expected = classOf[UnsupportedOperationException])
   def testReduceWithRichReducerFails() {
     val env = StreamExecutionEnvironment.getExecutionEnvironment
@@ -97,27 +106,26 @@ class WindowTranslationTest {
     // verify that we check for trigger compatibility
     val env = StreamExecutionEnvironment.getExecutionEnvironment
 
-    val windowedStream = env.fromElements("Hello", "Ciao")
+    val windowedStream = env
+      .fromElements("Hello", "Ciao")
       .keyBy(x => x)
       .window(EventTimeSessionWindows.withGap(Time.seconds(5)))
 
-    try
-      windowedStream.trigger(new Trigger[String, TimeWindow]() {
-        def onElement(
-            element: String,
-            timestamp: Long,
-            window: TimeWindow,
-            ctx: Trigger.TriggerContext) = null
+    try windowedStream.trigger(new Trigger[String, TimeWindow]() {
+      def onElement(
+          element: String,
+          timestamp: Long,
+          window: TimeWindow,
+          ctx: Trigger.TriggerContext) = null
 
-        def onProcessingTime(time: Long, window: TimeWindow, ctx: Trigger.TriggerContext) = null
+      def onProcessingTime(time: Long, window: TimeWindow, ctx: Trigger.TriggerContext) = null
 
-        def onEventTime(time: Long, window: TimeWindow, ctx: Trigger.TriggerContext) = null
+      def onEventTime(time: Long, window: TimeWindow, ctx: Trigger.TriggerContext) = null
 
-        override def canMerge = false
+      override def canMerge = false
 
-        def clear(window: TimeWindow, ctx: Trigger.TriggerContext) {}
-      })
-
+      def clear(window: TimeWindow, ctx: Trigger.TriggerContext) {}
+    })
     catch {
       case _: UnsupportedOperationException =>
         // expected
@@ -140,9 +148,7 @@ class WindowTranslationTest {
       .evictor(CountEvictor.of(2))
       .process(new TestProcessWindowFunction)
 
-    val transform = window1
-      .javaStream
-      .getTransformation
+    val transform = window1.javaStream.getTransformation
       .asInstanceOf[OneInputTransformation[(String, Int), (String, Int)]]
 
     val operator = transform.getOperator
@@ -177,9 +183,7 @@ class WindowTranslationTest {
       .window(SlidingEventTimeWindows.of(Time.seconds(1), Time.milliseconds(100)))
       .reduce(new DummyReducer)
 
-    val transform = window1
-      .javaStream
-      .getTransformation
+    val transform = window1.javaStream.getTransformation
       .asInstanceOf[OneInputTransformation[(String, Int), (String, Int)]]
 
     val operator = transform.getOperator
@@ -210,9 +214,7 @@ class WindowTranslationTest {
       .window(SlidingProcessingTimeWindows.of(Time.seconds(1), Time.milliseconds(100)))
       .reduce(new DummyReducer)
 
-    val transform = window1
-      .javaStream
-      .getTransformation
+    val transform = window1.javaStream.getTransformation
       .asInstanceOf[OneInputTransformation[(String, Int), (String, Int)]]
 
     val operator = transform.getOperator
@@ -241,11 +243,9 @@ class WindowTranslationTest {
     val window1 = source
       .keyBy(_._1)
       .window(SlidingEventTimeWindows.of(Time.seconds(1), Time.milliseconds(100)))
-      .reduce( (x, _) => x )
+      .reduce((x, _) => x)
 
-    val transform = window1
-      .javaStream
-      .getTransformation
+    val transform = window1.javaStream.getTransformation
       .asInstanceOf[OneInputTransformation[(String, Int), (String, Int)]]
 
     val operator = transform.getOperator
@@ -275,17 +275,16 @@ class WindowTranslationTest {
       .keyBy(_._1)
       .window(TumblingEventTimeWindows.of(Time.seconds(1)))
       .reduce(
-        new DummyReducer, new WindowFunction[(String, Int), (String, Int), String, TimeWindow] {
+        new DummyReducer,
+        new WindowFunction[(String, Int), (String, Int), String, TimeWindow] {
           override def apply(
               key: String,
               window: TimeWindow,
               input: Iterable[(String, Int)],
-              out: Collector[(String, Int)]): Unit = input foreach ( x => out.collect(x))
-      })
+              out: Collector[(String, Int)]): Unit = input foreach (x => out.collect(x))
+        })
 
-    val transform = window1
-      .javaStream
-      .getTransformation
+    val transform = window1.javaStream.getTransformation
       .asInstanceOf[OneInputTransformation[(String, Int), (String, Int)]]
 
     val operator = transform.getOperator
@@ -315,17 +314,16 @@ class WindowTranslationTest {
       .keyBy(_._1)
       .window(TumblingProcessingTimeWindows.of(Time.seconds(1)))
       .reduce(
-        new DummyReducer, new WindowFunction[(String, Int), (String, Int), String, TimeWindow] {
+        new DummyReducer,
+        new WindowFunction[(String, Int), (String, Int), String, TimeWindow] {
           override def apply(
               key: String,
               window: TimeWindow,
               input: Iterable[(String, Int)],
-              out: Collector[(String, Int)]): Unit = input foreach ( x => out.collect(x))
+              out: Collector[(String, Int)]): Unit = input foreach (x => out.collect(x))
         })
 
-    val transform = window1
-      .javaStream
-      .getTransformation
+    val transform = window1.javaStream.getTransformation
       .asInstanceOf[OneInputTransformation[(String, Int), (String, Int)]]
 
     val operator = transform.getOperator
@@ -361,12 +359,10 @@ class WindowTranslationTest {
               key: String,
               window: Context,
               input: Iterable[(String, Int)],
-              out: Collector[(String, Int)]): Unit = input foreach ( x => out.collect(x))
+              out: Collector[(String, Int)]): Unit = input foreach (x => out.collect(x))
         })
 
-    val transform = window1
-      .javaStream
-      .getTransformation
+    val transform = window1.javaStream.getTransformation
       .asInstanceOf[OneInputTransformation[(String, Int), (String, Int)]]
 
     val operator = transform.getOperator
@@ -402,12 +398,10 @@ class WindowTranslationTest {
               key: String,
               window: Context,
               input: Iterable[(String, Int)],
-              out: Collector[(String, Int)]): Unit = input foreach ( x => out.collect(x))
+              out: Collector[(String, Int)]): Unit = input foreach (x => out.collect(x))
         })
 
-    val transform = window1
-      .javaStream
-      .getTransformation
+    val transform = window1.javaStream.getTransformation
       .asInstanceOf[OneInputTransformation[(String, Int), (String, Int)]]
 
     val operator = transform.getOperator
@@ -437,17 +431,16 @@ class WindowTranslationTest {
       .keyBy(_._1)
       .window(TumblingEventTimeWindows.of(Time.seconds(1)))
       .apply(
-        new DummyReducer, new WindowFunction[(String, Int), (String, Int), String, TimeWindow] {
+        new DummyReducer,
+        new WindowFunction[(String, Int), (String, Int), String, TimeWindow] {
           override def apply(
               key: String,
               window: TimeWindow,
               input: Iterable[(String, Int)],
-              out: Collector[(String, Int)]): Unit = input foreach ( x => out.collect(x))
+              out: Collector[(String, Int)]): Unit = input foreach (x => out.collect(x))
         })
 
-    val transform = window1
-      .javaStream
-      .getTransformation
+    val transform = window1.javaStream.getTransformation
       .asInstanceOf[OneInputTransformation[(String, Int), (String, Int)]]
 
     val operator = transform.getOperator
@@ -484,12 +477,10 @@ class WindowTranslationTest {
               key: String,
               window: TimeWindow,
               input: Iterable[(String, Int)],
-              out: Collector[(String, Int)]): Unit = input foreach ( x => out.collect(x))
+              out: Collector[(String, Int)]): Unit = input foreach (x => out.collect(x))
         })
 
-    val transform = window1
-      .javaStream
-      .getTransformation
+    val transform = window1.javaStream.getTransformation
       .asInstanceOf[OneInputTransformation[(String, Int), (String, Int)]]
 
     val operator = transform.getOperator
@@ -509,7 +500,6 @@ class WindowTranslationTest {
       ("hello", 1))
   }
 
-
   @Test
   def testReduceWithWindowFunctionEventTimeWithScalaFunction() {
     val env = StreamExecutionEnvironment.getExecutionEnvironment
@@ -521,14 +511,11 @@ class WindowTranslationTest {
       .window(TumblingEventTimeWindows.of(Time.seconds(1)))
       .reduce(
         { (x, _) => x },
-        {
-          (_: String, _: TimeWindow, in: Iterable[(String, Int)], out: Collector[(String, Int)]) =>
-            in foreach { x => out.collect(x)}
+        { (_: String, _: TimeWindow, in: Iterable[(String, Int)], out: Collector[(String, Int)]) =>
+          in foreach { x => out.collect(x) }
         })
 
-    val transform = window1
-      .javaStream
-      .getTransformation
+    val transform = window1.javaStream.getTransformation
       .asInstanceOf[OneInputTransformation[(String, Int), (String, Int)]]
 
     val operator = transform.getOperator
@@ -563,9 +550,7 @@ class WindowTranslationTest {
       .window(SlidingEventTimeWindows.of(Time.seconds(1), Time.milliseconds(100)))
       .aggregate(new DummyAggregator())
 
-    val transform = window1
-      .javaStream
-      .getTransformation
+    val transform = window1.javaStream.getTransformation
       .asInstanceOf[OneInputTransformation[(String, Int), (String, Int)]]
 
     val operator = transform.getOperator
@@ -596,9 +581,7 @@ class WindowTranslationTest {
       .window(SlidingProcessingTimeWindows.of(Time.seconds(1), Time.milliseconds(100)))
       .aggregate(new DummyAggregator())
 
-    val transform = window1
-      .javaStream
-      .getTransformation
+    val transform = window1.javaStream.getTransformation
       .asInstanceOf[OneInputTransformation[(String, Int), (String, Int)]]
 
     val operator = transform.getOperator
@@ -629,9 +612,7 @@ class WindowTranslationTest {
       .window(TumblingEventTimeWindows.of(Time.seconds(1)))
       .aggregate(new DummyAggregator(), new TestWindowFunction())
 
-    val transform = window1
-      .javaStream
-      .getTransformation
+    val transform = window1.javaStream.getTransformation
       .asInstanceOf[OneInputTransformation[(String, Int), (String, Int)]]
 
     val operator = transform.getOperator
@@ -662,9 +643,7 @@ class WindowTranslationTest {
       .window(TumblingProcessingTimeWindows.of(Time.seconds(1)))
       .aggregate(new DummyAggregator(), new TestWindowFunction())
 
-    val transform = window1
-      .javaStream
-      .getTransformation
+    val transform = window1.javaStream.getTransformation
       .asInstanceOf[OneInputTransformation[(String, Int), (String, Int)]]
 
     val operator = transform.getOperator
@@ -695,9 +674,7 @@ class WindowTranslationTest {
       .window(TumblingEventTimeWindows.of(Time.seconds(1)))
       .aggregate(new DummyAggregator(), new TestProcessWindowFunction())
 
-    val transform = window1
-      .javaStream
-      .getTransformation
+    val transform = window1.javaStream.getTransformation
       .asInstanceOf[OneInputTransformation[(String, Int), (String, Int)]]
 
     val operator = transform.getOperator
@@ -728,9 +705,7 @@ class WindowTranslationTest {
       .window(TumblingProcessingTimeWindows.of(Time.seconds(1)))
       .aggregate(new DummyAggregator(), new TestProcessWindowFunction())
 
-    val transform = window1
-      .javaStream
-      .getTransformation
+    val transform = window1.javaStream.getTransformation
       .asInstanceOf[OneInputTransformation[(String, Int), (String, Int)]]
 
     val operator = transform.getOperator
@@ -762,12 +737,10 @@ class WindowTranslationTest {
       .aggregate(
         new DummyAggregator(),
         { (_: String, _: TimeWindow, in: Iterable[(String, Int)], out: Collector[(String, Int)]) =>
-          in foreach { x => out.collect(x)}
+          in foreach { x => out.collect(x) }
         })
 
-    val transform = window1
-      .javaStream
-      .getTransformation
+    val transform = window1.javaStream.getTransformation
       .asInstanceOf[OneInputTransformation[(String, Int), (String, Int)]]
 
     val operator = transform.getOperator
@@ -800,18 +773,15 @@ class WindowTranslationTest {
     val window1 = source
       .keyBy(_._1)
       .window(TumblingEventTimeWindows.of(Time.seconds(1), Time.milliseconds(100)))
-      .apply(
-        new WindowFunction[(String, Int), (String, Int), String, TimeWindow] {
-          override def apply(
-              key: String,
-              window: TimeWindow,
-              input: Iterable[(String, Int)],
-              out: Collector[(String, Int)]): Unit = input foreach {x => out.collect((x._1, x._2))}
-        })
+      .apply(new WindowFunction[(String, Int), (String, Int), String, TimeWindow] {
+        override def apply(
+            key: String,
+            window: TimeWindow,
+            input: Iterable[(String, Int)],
+            out: Collector[(String, Int)]): Unit = input foreach { x => out.collect((x._1, x._2)) }
+      })
 
-    val transform = window1
-      .javaStream
-      .getTransformation
+    val transform = window1.javaStream.getTransformation
       .asInstanceOf[OneInputTransformation[(String, Int), (String, Int)]]
 
     val operator = transform.getOperator
@@ -840,18 +810,15 @@ class WindowTranslationTest {
     val window1 = source
       .keyBy(_._1)
       .window(TumblingProcessingTimeWindows.of(Time.seconds(1), Time.milliseconds(100)))
-      .apply(
-        new WindowFunction[(String, Int), (String, Int), String, TimeWindow] {
-          override def apply(
-              key: String,
-              window: TimeWindow,
-              input: Iterable[(String, Int)],
-              out: Collector[(String, Int)]): Unit = input foreach {x => out.collect((x._1, x._2))}
-        })
+      .apply(new WindowFunction[(String, Int), (String, Int), String, TimeWindow] {
+        override def apply(
+            key: String,
+            window: TimeWindow,
+            input: Iterable[(String, Int)],
+            out: Collector[(String, Int)]): Unit = input foreach { x => out.collect((x._1, x._2)) }
+      })
 
-    val transform = window1
-      .javaStream
-      .getTransformation
+    val transform = window1.javaStream.getTransformation
       .asInstanceOf[OneInputTransformation[(String, Int), (String, Int)]]
 
     val operator = transform.getOperator
@@ -880,18 +847,15 @@ class WindowTranslationTest {
     val window1 = source
       .keyBy(_._1)
       .window(TumblingEventTimeWindows.of(Time.seconds(1), Time.milliseconds(100)))
-      .process(
-        new ProcessWindowFunction[(String, Int), (String, Int), String, TimeWindow] {
-          override def process(
-              key: String,
-              window: Context,
-              input: Iterable[(String, Int)],
-              out: Collector[(String, Int)]): Unit = input foreach {x => out.collect((x._1, x._2))}
-        })
+      .process(new ProcessWindowFunction[(String, Int), (String, Int), String, TimeWindow] {
+        override def process(
+            key: String,
+            window: Context,
+            input: Iterable[(String, Int)],
+            out: Collector[(String, Int)]): Unit = input foreach { x => out.collect((x._1, x._2)) }
+      })
 
-    val transform = window1
-      .javaStream
-      .getTransformation
+    val transform = window1.javaStream.getTransformation
       .asInstanceOf[OneInputTransformation[(String, Int), (String, Int)]]
 
     val operator = transform.getOperator
@@ -920,18 +884,15 @@ class WindowTranslationTest {
     val window1 = source
       .keyBy(_._1)
       .window(TumblingProcessingTimeWindows.of(Time.seconds(1), Time.milliseconds(100)))
-      .process(
-        new ProcessWindowFunction[(String, Int), (String, Int), String, TimeWindow] {
-          override def process(
-              key: String,
-              window: Context,
-              input: Iterable[(String, Int)],
-              out: Collector[(String, Int)]): Unit = input foreach {x => out.collect((x._1, x._2))}
-        })
+      .process(new ProcessWindowFunction[(String, Int), (String, Int), String, TimeWindow] {
+        override def process(
+            key: String,
+            window: Context,
+            input: Iterable[(String, Int)],
+            out: Collector[(String, Int)]): Unit = input foreach { x => out.collect((x._1, x._2)) }
+      })
 
-    val transform = window1
-      .javaStream
-      .getTransformation
+    val transform = window1.javaStream.getTransformation
       .asInstanceOf[OneInputTransformation[(String, Int), (String, Int)]]
 
     val operator = transform.getOperator
@@ -961,12 +922,10 @@ class WindowTranslationTest {
       .keyBy(_._1)
       .window(TumblingEventTimeWindows.of(Time.seconds(1), Time.milliseconds(100)))
       .apply { (key, window, in, out: Collector[(String, Int)]) =>
-        in foreach { x => out.collect(x)}
+        in foreach { x => out.collect(x) }
       }
 
-    val transform = window1
-      .javaStream
-      .getTransformation
+    val transform = window1.javaStream.getTransformation
       .asInstanceOf[OneInputTransformation[(String, Int), (String, Int)]]
 
     val operator = transform.getOperator
@@ -986,7 +945,6 @@ class WindowTranslationTest {
       ("hello", 1))
   }
 
-
   @Test
   def testReduceWithCustomTrigger() {
     val env = StreamExecutionEnvironment.getExecutionEnvironment
@@ -999,9 +957,7 @@ class WindowTranslationTest {
       .trigger(CountTrigger.of(1))
       .reduce(new DummyReducer)
 
-    val transform = window1
-      .javaStream
-      .getTransformation
+    val transform = window1.javaStream.getTransformation
       .asInstanceOf[OneInputTransformation[(String, Int), (String, Int)]]
 
     val operator = transform.getOperator
@@ -1031,18 +987,15 @@ class WindowTranslationTest {
       .keyBy(_._1)
       .window(TumblingEventTimeWindows.of(Time.seconds(1), Time.milliseconds(100)))
       .trigger(CountTrigger.of(1))
-      .apply(
-        new WindowFunction[(String, Int), (String, Int), String, TimeWindow] {
-          override def apply(
-              key: String,
-              window: TimeWindow,
-              input: Iterable[(String, Int)],
-              out: Collector[(String, Int)]): Unit = input foreach {x => out.collect((x._1, x._2))}
-        })
+      .apply(new WindowFunction[(String, Int), (String, Int), String, TimeWindow] {
+        override def apply(
+            key: String,
+            window: TimeWindow,
+            input: Iterable[(String, Int)],
+            out: Collector[(String, Int)]): Unit = input foreach { x => out.collect((x._1, x._2)) }
+      })
 
-    val transform = window1
-      .javaStream
-      .getTransformation
+    val transform = window1.javaStream.getTransformation
       .asInstanceOf[OneInputTransformation[(String, Int), (String, Int)]]
 
     val operator = transform.getOperator
@@ -1072,18 +1025,15 @@ class WindowTranslationTest {
       .keyBy(_._1)
       .window(TumblingEventTimeWindows.of(Time.seconds(1), Time.milliseconds(100)))
       .trigger(CountTrigger.of(1))
-      .process(
-        new ProcessWindowFunction[(String, Int), (String, Int), String, TimeWindow] {
-          override def process(
-              key: String,
-              window: Context,
-              input: Iterable[(String, Int)],
-              out: Collector[(String, Int)]): Unit = input foreach {x => out.collect((x._1, x._2))}
-        })
+      .process(new ProcessWindowFunction[(String, Int), (String, Int), String, TimeWindow] {
+        override def process(
+            key: String,
+            window: Context,
+            input: Iterable[(String, Int)],
+            out: Collector[(String, Int)]): Unit = input foreach { x => out.collect((x._1, x._2)) }
+      })
 
-    val transform = window1
-      .javaStream
-      .getTransformation
+    val transform = window1.javaStream.getTransformation
       .asInstanceOf[OneInputTransformation[(String, Int), (String, Int)]]
 
     val operator = transform.getOperator
@@ -1103,7 +1053,6 @@ class WindowTranslationTest {
       ("hello", 1))
   }
 
-
   @Test
   def testReduceWithEvictor() {
     val env = StreamExecutionEnvironment.getExecutionEnvironment
@@ -1116,17 +1065,14 @@ class WindowTranslationTest {
       .evictor(CountEvictor.of(100))
       .reduce(new DummyReducer)
 
-    val transform = window1
-      .javaStream
-      .getTransformation
+    val transform = window1.javaStream.getTransformation
       .asInstanceOf[OneInputTransformation[(String, Int), (String, Int)]]
 
     val operator = transform.getOperator
     assertTrue(operator.isInstanceOf[EvictingWindowOperator[_, _, _, _ <: Window]])
 
     val winOperator = operator
-      .asInstanceOf[
-      EvictingWindowOperator[String, (String, Int), (String, Int), _ <: Window]]
+      .asInstanceOf[EvictingWindowOperator[String, (String, Int), (String, Int), _ <: Window]]
 
     assertTrue(winOperator.getTrigger.isInstanceOf[EventTimeTrigger])
     assertTrue(winOperator.getEvictor.isInstanceOf[CountEvictor[_]])
@@ -1152,17 +1098,14 @@ class WindowTranslationTest {
       .evictor(CountEvictor.of(100))
       .reduce(new DummyReducer, new TestProcessWindowFunction)
 
-    val transform = window1
-      .javaStream
-      .getTransformation
+    val transform = window1.javaStream.getTransformation
       .asInstanceOf[OneInputTransformation[(String, Int), (String, Int)]]
 
     val operator = transform.getOperator
     assertTrue(operator.isInstanceOf[EvictingWindowOperator[_, _, _, _ <: Window]])
 
     val winOperator = operator
-      .asInstanceOf[
-      EvictingWindowOperator[String, (String, Int), (String, Int), _ <: Window]]
+      .asInstanceOf[EvictingWindowOperator[String, (String, Int), (String, Int), _ <: Window]]
 
     assertTrue(winOperator.getTrigger.isInstanceOf[EventTimeTrigger])
     assertTrue(winOperator.getEvictor.isInstanceOf[CountEvictor[_]])
@@ -1188,9 +1131,7 @@ class WindowTranslationTest {
       .evictor(CountEvictor.of(100))
       .aggregate(new DummyAggregator())
 
-    val transform = window1
-      .javaStream
-      .getTransformation
+    val transform = window1.javaStream.getTransformation
       .asInstanceOf[OneInputTransformation[(String, Int), (String, Int)]]
 
     val operator = transform.getOperator
@@ -1222,9 +1163,7 @@ class WindowTranslationTest {
       .evictor(CountEvictor.of(100))
       .aggregate(new DummyAggregator(), new TestProcessWindowFunction)
 
-    val transform = window1
-      .javaStream
-      .getTransformation
+    val transform = window1.javaStream.getTransformation
       .asInstanceOf[OneInputTransformation[(String, Int), (String, Int)]]
 
     val operator = transform.getOperator
@@ -1254,18 +1193,15 @@ class WindowTranslationTest {
       .keyBy(_._1)
       .window(TumblingEventTimeWindows.of(Time.seconds(1), Time.milliseconds(100)))
       .evictor(CountEvictor.of(100))
-      .apply(
-        new WindowFunction[(String, Int), (String, Int), String, TimeWindow] {
-          override def apply(
-              key: String,
-              window: TimeWindow,
-              input: Iterable[(String, Int)],
-              out: Collector[(String, Int)]): Unit = input foreach {x => out.collect((x._1, x._2))}
-        })
+      .apply(new WindowFunction[(String, Int), (String, Int), String, TimeWindow] {
+        override def apply(
+            key: String,
+            window: TimeWindow,
+            input: Iterable[(String, Int)],
+            out: Collector[(String, Int)]): Unit = input foreach { x => out.collect((x._1, x._2)) }
+      })
 
-    val transform = window1
-      .javaStream
-      .getTransformation
+    val transform = window1.javaStream.getTransformation
       .asInstanceOf[OneInputTransformation[(String, Int), (String, Int)]]
 
     val operator = transform.getOperator
@@ -1296,18 +1232,15 @@ class WindowTranslationTest {
       .keyBy(_._1)
       .window(TumblingEventTimeWindows.of(Time.seconds(1), Time.milliseconds(100)))
       .evictor(CountEvictor.of(100))
-      .process(
-        new ProcessWindowFunction[(String, Int), (String, Int), String, TimeWindow] {
-          override def process(
-              key: String,
-              window: Context,
-              input: Iterable[(String, Int)],
-              out: Collector[(String, Int)]): Unit = input foreach {x => out.collect((x._1, x._2))}
-        })
+      .process(new ProcessWindowFunction[(String, Int), (String, Int), String, TimeWindow] {
+        override def process(
+            key: String,
+            window: Context,
+            input: Iterable[(String, Int)],
+            out: Collector[(String, Int)]): Unit = input foreach { x => out.collect((x._1, x._2)) }
+      })
 
-    val transform = window1
-      .javaStream
-      .getTransformation
+    val transform = window1.javaStream.getTransformation
       .asInstanceOf[OneInputTransformation[(String, Int), (String, Int)]]
 
     val operator = transform.getOperator
@@ -1329,9 +1262,9 @@ class WindowTranslationTest {
   }
 
   /**
-    * Ensure that we get some output from the given operator when pushing in an element and
-    * setting watermark and processing time to `Long.MaxValue`.
-    */
+   * Ensure that we get some output from the given operator when pushing in an element and
+   * setting watermark and processing time to `Long.MaxValue`.
+   */
   @throws[Exception]
   private def processElementAndEnsureOutput[K, IN, OUT](
       operator: OneInputStreamOperator[IN, OUT],
@@ -1344,7 +1277,8 @@ class WindowTranslationTest {
     if (operator.isInstanceOf[OutputTypeConfigurable[String]]) {
       // use a dummy type since window functions just need the ExecutionConfig
       // this is also only needed for Fold, which we're getting rid off soon.
-      operator.asInstanceOf[OutputTypeConfigurable[String]]
+      operator
+        .asInstanceOf[OutputTypeConfigurable[String]]
         .setOutputType(BasicTypeInfo.STRING_TYPE_INFO, new ExecutionConfig)
     }
     testHarness.open()
@@ -1382,8 +1316,8 @@ class DummyAggregator extends AggregateFunction[(String, Int), (String, Int), (S
   override def add(value: (String, Int), accumulator: (String, Int)): (String, Int) = accumulator
 }
 
-class DummyRichAggregator extends RichAggregateFunction[(String, Int), (String, Int), (String, Int)]
-{
+class DummyRichAggregator
+    extends RichAggregateFunction[(String, Int), (String, Int), (String, Int)] {
 
   override def createAccumulator(): (String, Int) = ("", 0)
 
@@ -1395,7 +1329,7 @@ class DummyRichAggregator extends RichAggregateFunction[(String, Int), (String, 
 }
 
 class TestWindowFunction
-  extends WindowFunction[(String, Int), (String, String, Int), String, TimeWindow] {
+    extends WindowFunction[(String, Int), (String, String, Int), String, TimeWindow] {
 
   override def apply(
       key: String,
@@ -1408,7 +1342,7 @@ class TestWindowFunction
 }
 
 class TestProcessWindowFunction
-  extends ProcessWindowFunction[(String, Int), (String, String, Int), String, TimeWindow] {
+    extends ProcessWindowFunction[(String, Int), (String, String, Int), String, TimeWindow] {
 
   override def process(
       key: String,

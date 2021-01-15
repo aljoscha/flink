@@ -56,21 +56,11 @@ class CorrelateITCase2 extends BatchTestBase {
   def testGenericTableFunc(): Unit = {
     checkResult(
       "select a, s from inputT, LATERAL TABLE(func0(a)) as T(s)",
-      Seq(
-        row(1, 1),
-        row(2, 2),
-        row(3, 3),
-        row(4, 4)
-      ))
+      Seq(row(1, 1), row(2, 2), row(3, 3), row(4, 4)))
 
     checkResult(
       "select a, s from inputT, LATERAL TABLE(func1(a)) as T(s)",
-      Seq(
-        row(1, 1),
-        row(2, 2),
-        row(3, 3),
-        row(4, 4)
-      ))
+      Seq(row(1, 1), row(2, 2), row(3, 3), row(4, 4)))
   }
 
   @Test
@@ -78,13 +68,11 @@ class CorrelateITCase2 extends BatchTestBase {
     registerFunction("str_split", new StringSplit())
     checkResult(
       "SELECT * FROM LATERAL TABLE(str_split()) as T0(d)",
-      Seq(row("a"), row("b"), row("c"))
-    )
+      Seq(row("a"), row("b"), row("c")))
 
     checkResult(
       "SELECT * FROM LATERAL TABLE(str_split('Jack,John', ',')) as T0(d)",
-      Seq(row("Jack"), row("John"))
-    )
+      Seq(row("Jack"), row("John")))
   }
 
   @Test
@@ -94,30 +82,39 @@ class CorrelateITCase2 extends BatchTestBase {
     checkResult(
       "SELECT c, d FROM inputT, LATERAL TABLE(str_split()) AS T0(d)",
       Seq(
-        row("Jack#22", "a"), row("Jack#22", "b"), row("Jack#22", "c"),
-        row("John#19", "a"), row("John#19", "b"), row("John#19", "c"),
-        row("Anna#44", "a"), row("Anna#44", "b"), row("Anna#44", "c"),
-        row("nosharp", "a"), row("nosharp", "b"), row("nosharp", "c")
-      ))
+        row("Jack#22", "a"),
+        row("Jack#22", "b"),
+        row("Jack#22", "c"),
+        row("John#19", "a"),
+        row("John#19", "b"),
+        row("John#19", "c"),
+        row("Anna#44", "a"),
+        row("Anna#44", "b"),
+        row("Anna#44", "c"),
+        row("nosharp", "a"),
+        row("nosharp", "b"),
+        row("nosharp", "c")))
 
     checkResult(
       "SELECT c, d FROM inputT, LATERAL TABLE(str_split('Jack,John', ',')) AS T0(d)",
       Seq(
-        row("Jack#22", "Jack"), row("Jack#22", "John"),
-        row("John#19", "Jack"), row("John#19", "John"),
-        row("Anna#44", "Jack"), row("Anna#44", "John"),
-        row("nosharp", "Jack"), row("nosharp", "John")
-      ))
+        row("Jack#22", "Jack"),
+        row("Jack#22", "John"),
+        row("John#19", "Jack"),
+        row("John#19", "John"),
+        row("Anna#44", "Jack"),
+        row("Anna#44", "John"),
+        row("nosharp", "Jack"),
+        row("nosharp", "John")))
 
     checkResult(
       "SELECT c, d FROM inputT, LATERAL TABLE(str_split('Jack,John', ',')) AS T0(d) " +
-          "WHERE d = 'Jack'",
+        "WHERE d = 'Jack'",
       Seq(
         row("Jack#22", "Jack"),
         row("John#19", "Jack"),
         row("Anna#44", "Jack"),
-        row("nosharp", "Jack")
-      ))
+        row("nosharp", "Jack")))
   }
 
   @Test
@@ -126,9 +123,8 @@ class CorrelateITCase2 extends BatchTestBase {
 
     checkResult(
       "SELECT c, d FROM inputT, LATERAL TABLE(str_split('Jack,John', ',', 1)) AS T0(d) " +
-          "WHERE SUBSTRING(c, 1, 4) = d",
-      Seq(row("John#19", "John"))
-    )
+        "WHERE SUBSTRING(c, 1, 4) = d",
+      Seq(row("John#19", "John")))
   }
 
   @Test
@@ -136,11 +132,9 @@ class CorrelateITCase2 extends BatchTestBase {
     registerFunction("str_split", new StringSplit())
     checkResult(
       "SELECT * FROM " +
-          "LATERAL TABLE(str_split(SUBSTRING('a,b,c', 2, 4), ',')) as T1(s), " +
-          "LATERAL TABLE(str_split('a,b,c', ',')) as T2(x)",
-      Seq(row("b", "a"), row("b", "b"), row("b", "c"),
-        row("c", "a"), row("c", "b"), row("c", "c"))
-    )
+        "LATERAL TABLE(str_split(SUBSTRING('a,b,c', 2, 4), ',')) as T1(s), " +
+        "LATERAL TABLE(str_split('a,b,c', ',')) as T2(x)",
+      Seq(row("b", "a"), row("b", "b"), row("b", "c"), row("c", "a"), row("c", "b"), row("c", "c")))
   }
 
 // TODO support dyn
@@ -172,8 +166,8 @@ class CorrelateITCase2 extends BatchTestBase {
 //  }
 
   /**
-    * Test binaryString => string => binaryString => string => binaryString.
-    */
+   * Test binaryString => string => binaryString => string => binaryString.
+   */
   @Test
   def testUdfAfterUdtf(): Unit = {
 
@@ -182,8 +176,7 @@ class CorrelateITCase2 extends BatchTestBase {
 
     checkResult(
       "select func(s) from inputT, LATERAL TABLE(str_split(c, '#')) as T(s)",
-      Seq(row("Anna"), row("Jack"), row("John"), row("nosharp"),
-        row("19"), row("22"), row("44")))
+      Seq(row("Anna"), row("Jack"), row("John"), row("nosharp"), row("19"), row("22"), row("44")))
   }
 
   @Test
@@ -258,7 +251,6 @@ class CorrelateITCase2 extends BatchTestBase {
         row("Jack#22", "Jack#22", "haha"),
         row("John#19", "John#19", "haha"),
         row("nosharp", "nosharp", "haha"),
-        row("Anna#44", "Anna#44", "haha")
-      ))
+        row("Anna#44", "Anna#44", "haha")))
   }
 }

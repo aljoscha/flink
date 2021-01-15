@@ -41,8 +41,12 @@ abstract class RexNodeTestBase {
 
   val allFieldNames: java.util.List[String] = List("name", "id", "amount", "price", "flag").asJava
 
-  val allFieldTypes: java.util.List[RelDataType] = List(DataTypes.VARCHAR(100),
-    DataTypes.BIGINT(), DataTypes.INT(), DataTypes.DOUBLE(), DataTypes.BOOLEAN())
+  val allFieldTypes: java.util.List[RelDataType] = List(
+    DataTypes.VARCHAR(100),
+    DataTypes.BIGINT(),
+    DataTypes.INT(),
+    DataTypes.DOUBLE(),
+    DataTypes.BOOLEAN())
     .map(LogicalTypeDataTypeConverter.fromDataTypeToLogicalType)
     .map(typeFactory.createFieldTypeFromLogicalType)
     .asJava
@@ -132,12 +136,8 @@ abstract class RexNodeTestBase {
       .build
 
     val rowType = typeFactory.createStructType(
-      Seq(
-      personRow, paymentRow, fieldRowType),
-      Seq(
-        "persons", "payments", "field"
-      )
-    )
+      Seq(personRow, paymentRow, fieldRowType),
+      Seq("persons", "payments", "field"))
 
     // inputRowType
     //
@@ -181,8 +181,14 @@ abstract class RexNodeTestBase {
     //   field.with.deeper.entry
     //   persons
     // )
-    (List(multiplyAmount, person$pass$stat, field$with$deep$entry,
-      field$with$deeper$entry$inside$entry, field$with$deeper$entry, t0).asJava,
+    (
+      List(
+        multiplyAmount,
+        person$pass$stat,
+        field$with$deep$entry,
+        field$with$deeper$entry$inside$entry,
+        field$with$deeper$entry,
+        t0).asJava,
       rowType)
   }
 
@@ -197,9 +203,7 @@ abstract class RexNodeTestBase {
       .field("amount", INTEGER)
       .build
 
-    val rowType = typeFactory.createStructType(
-      Seq(personRow, paymentRow),
-      Seq("person", "payment"))
+    val rowType = typeFactory.createStructType(Seq(personRow, paymentRow), Seq("person", "payment"))
 
     val types = List(personRow, paymentRow).asJava
 

@@ -22,23 +22,28 @@ import java.lang.reflect.Method
 
 import org.apache.calcite.avatica.util.TimeUnitRange
 import org.apache.calcite.avatica.util.TimeUnitRange.{MONTH, YEAR}
-import org.apache.flink.api.common.typeinfo.BasicTypeInfo.{BIG_DEC_TYPE_INFO, DOUBLE_TYPE_INFO, FLOAT_TYPE_INFO}
-import org.apache.flink.table.codegen.CodeGenUtils.{getEnum, primitiveTypeTermForTypeInfo, qualifyMethod}
+import org.apache.flink.api.common.typeinfo.BasicTypeInfo.{
+  BIG_DEC_TYPE_INFO,
+  DOUBLE_TYPE_INFO,
+  FLOAT_TYPE_INFO
+}
+import org.apache.flink.table.codegen.CodeGenUtils.{
+  getEnum,
+  primitiveTypeTermForTypeInfo,
+  qualifyMethod
+}
 import org.apache.flink.table.codegen.calls.CallGenerator.generateCallIfArgsNotNull
 import org.apache.flink.table.codegen.{CodeGenerator, GeneratedExpression}
 
 /**
-  * Generates floor/ceil function calls.
-  */
-class FloorCeilCallGen(
-    arithmeticMethod: Method,
-    temporalMethod: Option[Method] = None)
-  extends MultiTypeMethodCallGen(arithmeticMethod) {
+ * Generates floor/ceil function calls.
+ */
+class FloorCeilCallGen(arithmeticMethod: Method, temporalMethod: Option[Method] = None)
+    extends MultiTypeMethodCallGen(arithmeticMethod) {
 
   override def generate(
       codeGenerator: CodeGenerator,
-      operands: Seq[GeneratedExpression])
-    : GeneratedExpression = operands.size match {
+      operands: Seq[GeneratedExpression]): GeneratedExpression = operands.size match {
     // arithmetic
     case 1 =>
       operands.head.resultType match {
@@ -54,20 +59,19 @@ class FloorCeilCallGen(
       val unit = getEnum(operands(1)).asInstanceOf[TimeUnitRange]
       val internalType = primitiveTypeTermForTypeInfo(operand.resultType)
 
-      generateCallIfArgsNotNull(codeGenerator.nullCheck, operand.resultType, operands) {
-        (terms) =>
-          unit match {
-            case YEAR | MONTH =>
-              s"""
+      generateCallIfArgsNotNull(codeGenerator.nullCheck, operand.resultType, operands) { (terms) =>
+        unit match {
+          case YEAR | MONTH =>
+            s"""
                 |($internalType) ${qualifyMethod(temporalMethod.get)}(${terms(1)}, ${terms.head})
                 |""".stripMargin
-            case _ =>
-              s"""
+          case _ =>
+            s"""
                 |${qualifyMethod(arithmeticMethod)}(
                 |  ($internalType) ${terms.head},
                 |  ($internalType) ${unit.startUnit.multiplier.intValue()})
                 |""".stripMargin
-          }
+        }
       }
   }
 }

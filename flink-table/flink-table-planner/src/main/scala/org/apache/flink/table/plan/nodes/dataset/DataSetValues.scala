@@ -34,28 +34,21 @@ import org.apache.flink.types.Row
 import scala.collection.JavaConverters._
 
 /**
-  * DataSet RelNode for a LogicalValues.
-  *
-  */
+ * DataSet RelNode for a LogicalValues.
+ */
 class DataSetValues(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
     rowRelDataType: RelDataType,
     tuples: ImmutableList[ImmutableList[RexLiteral]],
     ruleDescription: String)
-  extends Values(cluster, rowRelDataType, tuples, traitSet)
-  with DataSetRel {
+    extends Values(cluster, rowRelDataType, tuples, traitSet)
+    with DataSetRel {
 
   override def deriveRowType() = rowRelDataType
 
   override def copy(traitSet: RelTraitSet, inputs: java.util.List[RelNode]): RelNode = {
-    new DataSetValues(
-      cluster,
-      traitSet,
-      getRowType,
-      getTuples,
-      ruleDescription
-    )
+    new DataSetValues(cluster, traitSet, getRowType, getTuples, ruleDescription)
   }
 
   override def toString: String = {
@@ -76,17 +69,12 @@ class DataSetValues(
 
     // generate code for every record
     val generatedRecords = getTuples.asScala.map { r =>
-      generator.generateResultExpression(
-        returnType,
-        getRowType.getFieldNames.asScala,
-        r.asScala)
+      generator.generateResultExpression(returnType, getRowType.getFieldNames.asScala, r.asScala)
     }
 
     // generate input format
-    val generatedFunction = generator.generateValuesInputFormat(
-      ruleDescription,
-      generatedRecords.map(_.code),
-      returnType)
+    val generatedFunction =
+      generator.generateValuesInputFormat(ruleDescription, generatedRecords.map(_.code), returnType)
 
     val inputFormat = new ValuesInputFormat(
       generatedFunction.name,
@@ -101,5 +89,3 @@ class DataSetValues(
   }
 
 }
-
-

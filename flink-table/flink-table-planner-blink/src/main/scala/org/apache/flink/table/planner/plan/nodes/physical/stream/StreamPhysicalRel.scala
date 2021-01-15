@@ -21,12 +21,12 @@ package org.apache.flink.table.planner.plan.nodes.physical.stream
 import org.apache.flink.table.planner.plan.nodes.physical.FlinkPhysicalRel
 
 /**
-  * Base class for stream physical relational expression.
-  */
+ * Base class for stream physical relational expression.
+ */
 trait StreamPhysicalRel extends FlinkPhysicalRel {
 
   /**
-    * Whether the [[StreamPhysicalRel]] requires rowtime watermark in processing logic.
-    */
+   * Whether the [[StreamPhysicalRel]] requires rowtime watermark in processing logic.
+   */
   def requireWatermark: Boolean
 }

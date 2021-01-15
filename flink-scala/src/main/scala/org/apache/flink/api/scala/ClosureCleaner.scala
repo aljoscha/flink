@@ -28,7 +28,12 @@ import org.slf4j.LoggerFactory
 
 import scala.collection.mutable.Map
 import scala.collection.mutable.Set
-import org.apache.flink.shaded.asm7.org.objectweb.asm.{ClassReader, ClassVisitor, MethodVisitor, Type}
+import org.apache.flink.shaded.asm7.org.objectweb.asm.{
+  ClassReader,
+  ClassVisitor,
+  MethodVisitor,
+  Type
+}
 import org.apache.flink.shaded.asm7.org.objectweb.asm.Opcodes._
 
 import scala.collection.mutable
@@ -82,6 +87,7 @@ object ClosureCleaner {
     }
     (Nil, Nil)
   }
+
   /**
    * Return a list of classes that represent closures enclosed in the given closure object.
    */
@@ -179,9 +185,7 @@ object ClosureCleaner {
     }
     val isClosureCandidate =
       closure.getClass.isSynthetic &&
-        closure
-          .getClass
-          .getInterfaces.exists(_.getName == "scala.Serializable")
+        closure.getClass.getInterfaces.exists(_.getName == "scala.Serializable")
 
     if (isClosureCandidate) {
       try {
@@ -289,7 +293,7 @@ object ClosureCleaner {
         declaredMethods.foreach { m => LOG.debug(s"     $m") }
         LOG.debug(s" + inner classes: ${innerClasses.size}")
         innerClasses.foreach { c => LOG.debug(s"     ${c.getName}") }
-        LOG.debug(s" + outer classes: ${outerClasses.size}" )
+        LOG.debug(s" + outer classes: ${outerClasses.size}")
         outerClasses.foreach { c => LOG.debug(s"     ${c.getName}") }
         LOG.debug(s" + outer objects: ${outerObjects.size}")
         outerObjects.foreach { o => LOG.debug(s"     $o") }
@@ -336,8 +340,9 @@ object ClosureCleaner {
           // class without cloning it since we don't want to clone the user's objects.
           // Note that we still need to keep around the outermost object itself because
           // we need it to clone its child closure later (see below).
-          LOG.debug(" + outermost object is not a closure or REPL line object," +
-            "so do not clone it: " +  outerPairs.head)
+          LOG.debug(
+            " + outermost object is not a closure or REPL line object," +
+              "so do not clone it: " + outerPairs.head)
           parent = outermostObject // e.g. SparkContext
           outerPairs = outerPairs.tail
         }
@@ -387,8 +392,10 @@ object ClosureCleaner {
       LOG.debug(s"Cleaning lambda: ${lambdaFunc.get.getImplMethodName}")
 
       // scalastyle:off classforname
-      val captClass = Class.forName(lambdaFunc.get.getCapturingClass.replace('/', '.'),
-        false, Thread.currentThread.getContextClassLoader)
+      val captClass = Class.forName(
+        lambdaFunc.get.getCapturingClass.replace('/', '.'),
+        false,
+        Thread.currentThread.getContextClassLoader)
       // scalastyle:on classforname
       // Fail fast if we detect return statements in closures
       getClassReader(captClass)
@@ -409,9 +416,7 @@ object ClosureCleaner {
     }
   }
 
-  private def instantiateClass(
-      cls: Class[_],
-      enclosingObject: AnyRef): AnyRef = {
+  private def instantiateClass(cls: Class[_], enclosingObject: AnyRef): AnyRef = {
     // Use reflection to instantiate object without calling constructor
     val rf = sun.reflect.ReflectionFactory.getReflectionFactory()
     val parentCtor = classOf[java.lang.Object].getDeclaredConstructor()
@@ -425,13 +430,8 @@ object ClosureCleaner {
     obj
   }
 
-
   /** Copy all data from an InputStream to an OutputStream */
-  def copyStream(
-      in: InputStream,
-      out: OutputStream,
-      closeStreams: Boolean = false): Long =
-  {
+  def copyStream(in: InputStream, out: OutputStream, closeStreams: Boolean = false): Long = {
     var count = 0L
     try {
       if (in.isInstanceOf[FileInputStream] && out.isInstanceOf[FileOutputStream]) {
@@ -469,15 +469,16 @@ object ClosureCleaner {
 }
 
 private class ReturnStatementInClosureException
-  extends FlinkException("Return statements aren't allowed in Flink closures")
+    extends FlinkException("Return statements aren't allowed in Flink closures")
 
 private class ReturnStatementFinder(targetMethodName: Option[String] = None)
-  extends ClassVisitor(ASM6) {
+    extends ClassVisitor(ASM6) {
   override def visitMethod(
       access: Int,
       name: String,
       desc: String,
-      sig: String, exceptions: Array[String]): MethodVisitor = {
+      sig: String,
+      exceptions: Array[String]): MethodVisitor = {
 
     // $anonfun$ covers Java 8 lambdas
     if (name.contains("apply") || name.contains("$anonfun$")) {
@@ -521,7 +522,7 @@ private class FieldAccessFinder(
     findTransitively: Boolean,
     specificMethod: Option[MethodIdentifier[_]] = None,
     visitedMethods: Set[MethodIdentifier[_]] = Set.empty)
-  extends ClassVisitor(ASM6) {
+    extends ClassVisitor(ASM6) {
 
   override def visitMethod(
       access: Int,
@@ -546,7 +547,11 @@ private class FieldAccessFinder(
       }
 
       override def visitMethodInsn(
-          op: Int, owner: String, name: String, desc: String, itf: Boolean) {
+          op: Int,
+          owner: String,
+          name: String,
+          desc: String,
+          itf: Boolean) {
         for (cl <- fields.keys if cl.getName == owner.replace('/', '.')) {
           // Check for calls a getter method for a variable in an interpreter wrapper object.
           // This means that the corresponding field will be accessed, so we should save it.
@@ -564,8 +569,11 @@ private class FieldAccessFinder(
               assert(currentClass != null, "The outer class can't be null.")
 
               while (currentClass != null) {
-                ClosureCleaner.getClassReader(currentClass).accept(
-                  new FieldAccessFinder(fields, findTransitively, Some(m), visitedMethods), 0)
+                ClosureCleaner
+                  .getClassReader(currentClass)
+                  .accept(
+                    new FieldAccessFinder(fields, findTransitively, Some(m), visitedMethods),
+                    0)
                 currentClass = currentClass.getSuperclass()
               }
             }
@@ -584,16 +592,29 @@ private class InnerClosureFinder(output: Set[Class[_]]) extends ClassVisitor(ASM
   //   val closure2 = () => { (1 to 5).map(closure1) }
   // The second closure technically has two inner closures, but this finder only finds one
 
-  override def visit(version: Int, access: Int, name: String, sig: String,
-                     superName: String, interfaces: Array[String]) {
+  override def visit(
+      version: Int,
+      access: Int,
+      name: String,
+      sig: String,
+      superName: String,
+      interfaces: Array[String]) {
     myName = name
   }
 
-  override def visitMethod(access: Int, name: String, desc: String,
-                           sig: String, exceptions: Array[String]): MethodVisitor = {
+  override def visitMethod(
+      access: Int,
+      name: String,
+      desc: String,
+      sig: String,
+      exceptions: Array[String]): MethodVisitor = {
     new MethodVisitor(ASM6) {
       override def visitMethodInsn(
-          op: Int, owner: String, name: String, desc: String, itf: Boolean) {
+          op: Int,
+          owner: String,
+          name: String,
+          desc: String,
+          itf: Boolean) {
         val argTypes = Type.getArgumentTypes(desc)
         if (op == INVOKESPECIAL && name == "<init>" && argTypes.length > 0
           && argTypes(0).toString.startsWith("L") // is it an object?

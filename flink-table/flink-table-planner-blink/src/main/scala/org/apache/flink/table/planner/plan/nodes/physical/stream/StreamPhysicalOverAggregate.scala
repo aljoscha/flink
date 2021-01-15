@@ -38,21 +38,15 @@ class StreamPhysicalOverAggregate(
     inputRel: RelNode,
     outputRowType: RelDataType,
     logicWindow: Window)
-  extends StreamPhysicalOverAggregateBase(
-    cluster,
-    traitSet,
-    inputRel,
-    outputRowType,
-    logicWindow) {
-
-  override def copy(traitSet: RelTraitSet, inputs: util.List[RelNode]): RelNode = {
-    new StreamPhysicalOverAggregate(
+    extends StreamPhysicalOverAggregateBase(
       cluster,
       traitSet,
-      inputs.get(0),
+      inputRel,
       outputRowType,
-      logicWindow
-    )
+      logicWindow) {
+
+  override def copy(traitSet: RelTraitSet, inputs: util.List[RelNode]): RelNode = {
+    new StreamPhysicalOverAggregate(cluster, traitSet, inputs.get(0), outputRowType, logicWindow)
   }
 
   override def translateToExecNode(): ExecNode[_] = {
@@ -60,7 +54,6 @@ class StreamPhysicalOverAggregate(
       OverAggregateUtil.createOverSpec(logicWindow),
       ExecEdge.DEFAULT,
       FlinkTypeFactory.toLogicalRowType(getRowType),
-      getRelDetailedDescription
-    )
+      getRelDetailedDescription)
   }
 }

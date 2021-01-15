@@ -29,56 +29,43 @@ import java.io.{BufferedReader, File, FileOutputStream}
 
 import scala.tools.nsc.interpreter._
 
-
 class FlinkILoop(
     val flinkConfig: Configuration,
     val externalJars: Option[Array[String]],
     in0: Option[BufferedReader],
     out0: JPrintWriter)
-  extends ILoop(in0, out0) {
+    extends ILoop(in0, out0) {
 
   def this(
-    flinkConfig: Configuration,
-    externalJars: Option[Array[String]],
-    in0: BufferedReader,
-    out: JPrintWriter) {
+      flinkConfig: Configuration,
+      externalJars: Option[Array[String]],
+      in0: BufferedReader,
+      out: JPrintWriter) {
     this(flinkConfig, externalJars, Some(in0), out)
   }
 
-  def this(
-    flinkConfig: Configuration,
-    externalJars: Option[Array[String]]) {
+  def this(flinkConfig: Configuration, externalJars: Option[Array[String]]) {
     this(flinkConfig, externalJars, None, new JPrintWriter(Console.out, true))
   }
 
-  def this(
-    flinkConfig: Configuration,
-    in0: BufferedReader,
-    out: JPrintWriter){
+  def this(flinkConfig: Configuration, in0: BufferedReader, out: JPrintWriter) {
     this(flinkConfig, None, in0, out)
   }
 
   // remote environment
-  private val (remoteBenv: ScalaShellEnvironment,
-  remoteSenv: ScalaShellStreamEnvironment) = {
+  private val (remoteBenv: ScalaShellEnvironment, remoteSenv: ScalaShellStreamEnvironment) = {
     // allow creation of environments
     ScalaShellEnvironment.resetContextEnvironments()
     ScalaShellStreamEnvironment.resetContextEnvironments()
 
     // create our environment that submits against the cluster (local or remote)
-    val remoteBenv = new ScalaShellEnvironment(
-      flinkConfig,
-      this,
-      this.getExternalJars(): _*)
-    val remoteSenv = new ScalaShellStreamEnvironment(
-      flinkConfig,
-      this,
-      getExternalJars(): _*)
+    val remoteBenv = new ScalaShellEnvironment(flinkConfig, this, this.getExternalJars(): _*)
+    val remoteSenv = new ScalaShellStreamEnvironment(flinkConfig, this, getExternalJars(): _*)
     // prevent further instantiation of environments
     ScalaShellEnvironment.disableAllContextAndOtherEnvironments()
     ScalaShellStreamEnvironment.disableAllContextAndOtherEnvironments()
 
-    (remoteBenv,remoteSenv)
+    (remoteBenv, remoteSenv)
   }
 
   // local environment
@@ -86,14 +73,14 @@ class FlinkILoop(
     scalaBenv: ExecutionEnvironment,
     scalaSenv: StreamExecutionEnvironment,
     scalaBTEnv: BatchTableEnvironment,
-    scalaSTEnv: StreamTableEnvironment
-    ) = {
+    scalaSTEnv: StreamTableEnvironment) = {
     val scalaBenv = new ExecutionEnvironment(remoteBenv)
     val scalaSenv = new StreamExecutionEnvironment(remoteSenv)
     val scalaBTEnv = BatchTableEnvironment.create(scalaBenv)
     val scalaSTEnv = StreamTableEnvironment.create(
-      scalaSenv, EnvironmentSettings.newInstance().useOldPlanner().build())
-    (scalaBenv,scalaSenv,scalaBTEnv,scalaSTEnv)
+      scalaSenv,
+      EnvironmentSettings.newInstance().useOldPlanner().build())
+    (scalaBenv, scalaSenv, scalaBTEnv, scalaSTEnv)
   }
 
   /**
@@ -102,9 +89,8 @@ class FlinkILoop(
   private val tmpDirBase: File = {
     // get unique temporary folder:
     val abstractID: String = new AbstractID().toString
-    val tmpDir: File = new File(
-      System.getProperty("java.io.tmpdir"),
-      "scala_shell_tmp-" + abstractID)
+    val tmpDir: File =
+      new File(System.getProperty("java.io.tmpdir"), "scala_shell_tmp-" + abstractID)
     if (!tmpDir.exists) {
       tmpDir.mkdir
     }
@@ -142,8 +128,7 @@ class FlinkILoop(
     "org.apache.flink.streaming.api.windowing.time._",
     "org.apache.flink.table.api._",
     "org.apache.flink.table.api.bridge.scala._",
-    "org.apache.flink.types.Row"
-  )
+    "org.apache.flink.types.Row")
 
   override def createInterpreter(): Unit = {
     super.createInterpreter()
@@ -273,11 +258,10 @@ NOTE: Use the prebound Execution Environments and Table Environment to implement
     * senv.execute("My streaming program")
     HINT: You can only print a DataStream to the shell in local mode.
       """
-    // scalastyle:on
+      // scalastyle:on
     )
 
   }
 
   def getExternalJars(): Array[String] = externalJars.getOrElse(Array.empty[String])
 }
-

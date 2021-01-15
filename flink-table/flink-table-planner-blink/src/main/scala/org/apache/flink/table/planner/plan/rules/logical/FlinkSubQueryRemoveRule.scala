@@ -38,21 +38,21 @@ import scala.collection.JavaConversions._
 import scala.collection.mutable
 
 /**
-  * Planner rule that converts IN and EXISTS into semi-join,
-  * converts NOT IN and NOT EXISTS into anti-join.
-  *
-  * <p>Sub-queries are represented by [[RexSubQuery]] expressions.
-  *
-  * <p>A sub-query may or may not be correlated. If a sub-query is correlated,
-  * the wrapped [[RelNode]] will contain a [[RexCorrelVariable]] before the rewrite,
-  * and the product of the rewrite will be a [[org.apache.calcite.rel.core.Join]]
-  * with SEMI or ANTI join type.
-  */
+ * Planner rule that converts IN and EXISTS into semi-join,
+ * converts NOT IN and NOT EXISTS into anti-join.
+ *
+ * <p>Sub-queries are represented by [[RexSubQuery]] expressions.
+ *
+ * <p>A sub-query may or may not be correlated. If a sub-query is correlated,
+ * the wrapped [[RelNode]] will contain a [[RexCorrelVariable]] before the rewrite,
+ * and the product of the rewrite will be a [[org.apache.calcite.rel.core.Join]]
+ * with SEMI or ANTI join type.
+ */
 class FlinkSubQueryRemoveRule(
     operand: RelOptRuleOperand,
     relBuilderFactory: RelBuilderFactory,
     description: String)
-  extends RelOptRule(operand, relBuilderFactory, description) {
+    extends RelOptRule(operand, relBuilderFactory, description) {
 
   override def onMatch(call: RelOptRuleCall): Unit = {
     val filter: Filter = call.rel(0)
@@ -121,7 +121,7 @@ class FlinkSubQueryRemoveRule(
     val nextSubQueryCall = findSubQuery(newCondition)
     nextSubQueryCall match {
       case Some(subQuery) => handleSubQuery(subQuery, newCondition, relBuilder, decorrelate)
-      case _ => Some(newCondition)
+      case _              => Some(newCondition)
     }
   }
 
@@ -132,7 +132,7 @@ class FlinkSubQueryRemoveRule(
 
     val (subQuery: RexSubQuery, withNot: Boolean) = subQueryCall match {
       case s: RexSubQuery => (s, false)
-      case c: RexCall => (c.operands.head, true)
+      case c: RexCall     => (c.operands.head, true)
     }
 
     val equivalent = decorrelate.getSubQueryEquivalent(subQuery)
@@ -180,7 +180,7 @@ class FlinkSubQueryRemoveRule(
         // adds projection if the operands of IN contains non-RexInputRef nodes
         // e.g. SELECT * FROM l WHERE a + 1 IN (SELECT c FROM r)
         val (newOperands, newJoinCondition) =
-        handleSubQueryOperands(subQuery, joinCondition, relBuilder)
+          handleSubQueryOperands(subQuery, joinCondition, relBuilder)
         val leftFieldCount = relBuilder.peek().getRowType.getFieldCount
 
         relBuilder.push(newRight) // push join right
@@ -194,7 +194,8 @@ class FlinkSubQueryRemoveRule(
             } else {
               inCondition
             }
-          }.toBuffer
+          }
+          .toBuffer
 
         newJoinCondition.foreach(joinConditions += _)
 
@@ -310,13 +311,13 @@ class FlinkSubQueryRemoveRule(
   }
 
   /**
-    * Adds projection if the operands of a SubQuery contains non-RexInputRef nodes,
-    * and returns SubQuery's new operands and new join condition with new index.
-    *
-    * e.g. SELECT * FROM l WHERE a + 1 IN (SELECT c FROM r)
-    * We will add projection as SEMI join left input, the added projection will pass along fields
-    * from the input, and add `a + 1` as new field.
-    */
+   * Adds projection if the operands of a SubQuery contains non-RexInputRef nodes,
+   * and returns SubQuery's new operands and new join condition with new index.
+   *
+   * e.g. SELECT * FROM l WHERE a + 1 IN (SELECT c FROM r)
+   * We will add projection as SEMI join left input, the added projection will pass along fields
+   * from the input, and add `a + 1` as new field.
+   */
   private def handleSubQueryOperands(
       subQuery: RexSubQuery,
       joinCondition: Option[RexNode],
@@ -356,10 +357,10 @@ class FlinkSubQueryRemoveRule(
   }
 
   /**
-    * Check the condition whether contains unsupported SubQuery.
-    *
-    * Now, we only support single SubQuery or SubQuery connected with AND.
-    */
+   * Check the condition whether contains unsupported SubQuery.
+   *
+   * Now, we only support single SubQuery or SubQuery connected with AND.
+   */
   private def hasUnsupportedSubQuery(condition: RexNode): Boolean = {
     val visitor = new RexVisitorImpl[Unit](true) {
       val stack: util.Deque[SqlKind] = new util.ArrayDeque[SqlKind]()
@@ -401,8 +402,8 @@ class FlinkSubQueryRemoveRule(
   }
 
   /**
-    * Check nodes' SubQuery whether contains correlated expressions.
-    */
+   * Check nodes' SubQuery whether contains correlated expressions.
+   */
   private def hasCorrelatedExpressions(nodes: RexNode*): Boolean = {
     val relShuttle = new RelShuttleImpl() {
       private val corVarFinder = new RexVisitorImpl[Unit](true) {
@@ -433,18 +434,17 @@ class FlinkSubQueryRemoveRule(
       }
     }
 
-    nodes.foldLeft(false) {
-      case (found, c) =>
-        if (!found) {
-          try {
-            c.accept(subQueryFinder)
-            false
-          } catch {
-            case _: Util.FoundOne => true
-          }
-        } else {
-          true
+    nodes.foldLeft(false) { case (found, c) =>
+      if (!found) {
+        try {
+          c.accept(subQueryFinder)
+          false
+        } catch {
+          case _: Util.FoundOne => true
         }
+      } else {
+        true
+      }
     }
   }
 }

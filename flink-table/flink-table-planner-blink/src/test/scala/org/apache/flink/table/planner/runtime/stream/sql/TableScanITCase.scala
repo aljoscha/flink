@@ -26,7 +26,11 @@ import org.apache.flink.table.api._
 import org.apache.flink.table.api.bridge.scala._
 import org.apache.flink.table.api.internal.TableEnvironmentInternal
 import org.apache.flink.table.planner.runtime.utils.{StreamingTestBase, TestingAppendSink}
-import org.apache.flink.table.planner.utils.{TestPreserveWMTableSource, TestTableSourceWithTime, WithoutTimeAttributesTableSource}
+import org.apache.flink.table.planner.utils.{
+  TestPreserveWMTableSource,
+  TestTableSourceWithTime,
+  WithoutTimeAttributesTableSource
+}
 import org.apache.flink.types.Row
 import org.apache.flink.util.Collector
 
@@ -128,8 +132,7 @@ class TableScanITCase extends StreamingTestBase {
       Left(8L, Row.of(new JInt(6), new JLong(8), "C")),
       Right(20L),
       Left(21L, Row.of(new JInt(6), new JLong(21), "D")),
-      Right(30L)
-    )
+      Right(30L))
 
     val fieldNames = Array("id", "rtime", "name")
     val schema = new TableSchema(fieldNames, Array(Types.INT, Types.LOCAL_DATE_TIME, Types.STRING))
@@ -142,21 +145,24 @@ class TableScanITCase extends StreamingTestBase {
     val sqlQuery = s"SELECT id, name FROM $tableName"
     val sink = new TestingAppendSink
 
-    tEnv.sqlQuery(sqlQuery).toAppendStream[Row]
+    tEnv
+      .sqlQuery(sqlQuery)
+      .toAppendStream[Row]
       // append current watermark to each row to verify that original watermarks were preserved
       .process(new ProcessFunction[Row, Row] {
 
-      override def processElement(
-          value: Row,
-          ctx: ProcessFunction[Row, Row]#Context,
-          out: Collector[Row]): Unit = {
-        val res = new Row(3)
-        res.setField(0, value.getField(0))
-        res.setField(1, value.getField(1))
-        res.setField(2, ctx.timerService().currentWatermark())
-        out.collect(res)
-      }
-    }).addSink(sink)
+        override def processElement(
+            value: Row,
+            ctx: ProcessFunction[Row, Row]#Context,
+            out: Collector[Row]): Unit = {
+          val res = new Row(3)
+          res.setField(0, value.getField(0))
+          res.setField(1, value.getField(1))
+          res.setField(2, ctx.timerService().currentWatermark())
+          out.collect(res)
+        }
+      })
+      .addSink(sink)
     env.execute()
 
     val expected = Seq("1,A,1", "2,B,1", "6,C,10", "6,D,20")

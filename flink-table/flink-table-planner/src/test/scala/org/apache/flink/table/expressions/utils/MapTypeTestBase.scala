@@ -56,7 +56,7 @@ class MapTypeTestBase extends ExpressionTestBase {
       Types.STRING,
       Types.INT,
       Types.OBJECT_ARRAY(Types.DOUBLE),
-      new MapTypeInfo(BasicTypeInfo.INT_TYPE_INFO, BasicTypeInfo.STRING_TYPE_INFO)
-    ).asInstanceOf[TypeInformation[Any]]
+      new MapTypeInfo(BasicTypeInfo.INT_TYPE_INFO, BasicTypeInfo.STRING_TYPE_INFO))
+      .asInstanceOf[TypeInformation[Any]]
   }
 }

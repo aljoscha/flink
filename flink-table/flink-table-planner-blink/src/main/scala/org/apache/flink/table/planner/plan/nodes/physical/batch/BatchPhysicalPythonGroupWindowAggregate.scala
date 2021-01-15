@@ -51,19 +51,19 @@ class BatchPhysicalPythonGroupWindowAggregate(
     inputTimeFieldIndex: Int,
     inputTimeIsDate: Boolean,
     namedWindowProperties: Seq[PlannerNamedWindowProperty])
-  extends BatchPhysicalWindowAggregateBase(
-    cluster,
-    traitSet,
-    inputRel,
-    outputRowType,
-    grouping,
-    auxGrouping,
-    aggCalls.zip(aggFunctions),
-    window,
-    namedWindowProperties,
-    false,
-    false,
-    true) {
+    extends BatchPhysicalWindowAggregateBase(
+      cluster,
+      traitSet,
+      inputRel,
+      outputRowType,
+      grouping,
+      auxGrouping,
+      aggCalls.zip(aggFunctions),
+      window,
+      namedWindowProperties,
+      false,
+      false,
+      true) {
 
   override def copy(traitSet: RelTraitSet, inputs: util.List[RelNode]): RelNode = {
     new BatchPhysicalPythonGroupWindowAggregate(
@@ -107,7 +107,6 @@ class BatchPhysicalPythonGroupWindowAggregate(
       namedWindowProperties.toArray,
       ExecEdge.DEFAULT,
       FlinkTypeFactory.toLogicalRowType(getRowType),
-      getRelDetailedDescription
-    )
+      getRelDetailedDescription)
   }
 }

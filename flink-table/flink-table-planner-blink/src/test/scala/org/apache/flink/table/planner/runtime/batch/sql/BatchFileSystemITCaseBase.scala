@@ -28,8 +28,8 @@ import org.junit.Before
 import scala.collection.Seq
 
 /**
-  * Batch [[FileSystemITCaseBase]].
-  */
+ * Batch [[FileSystemITCaseBase]].
+ */
 abstract class BatchFileSystemITCaseBase extends BatchTestBase with FileSystemITCaseBase {
 
   @Before

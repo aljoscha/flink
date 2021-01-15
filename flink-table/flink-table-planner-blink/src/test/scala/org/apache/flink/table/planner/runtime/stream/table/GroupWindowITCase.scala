@@ -22,7 +22,12 @@ import org.apache.flink.api.common.time.Time
 import org.apache.flink.api.scala._
 import org.apache.flink.table.api._
 import org.apache.flink.table.api.bridge.scala._
-import org.apache.flink.table.planner.runtime.utils.JavaUserDefinedAggFunctions.{CountDistinct, CountDistinctWithMerge, WeightedAvg, WeightedAvgWithMerge}
+import org.apache.flink.table.planner.runtime.utils.JavaUserDefinedAggFunctions.{
+  CountDistinct,
+  CountDistinctWithMerge,
+  WeightedAvg,
+  WeightedAvgWithMerge
+}
 import org.apache.flink.table.planner.runtime.utils.StreamingWithStateTestBase.StateBackendMode
 import org.apache.flink.table.planner.runtime.utils.TimeTestUtil.TimestampAndWatermarkWithOffset
 import org.apache.flink.table.planner.runtime.utils.{StreamingWithStateTestBase, TestingAppendSink}
@@ -37,12 +42,11 @@ import org.junit.runners.Parameterized
 import java.math.BigDecimal
 
 /**
-  * We only test some aggregations until better testing of constructed DataStream
-  * programs is possible.
-  */
+ * We only test some aggregations until better testing of constructed DataStream
+ * programs is possible.
+ */
 @RunWith(classOf[Parameterized])
-class GroupWindowITCase(mode: StateBackendMode)
-  extends StreamingWithStateTestBase(mode) {
+class GroupWindowITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode) {
 
   val data = List(
     (1L, 1, "Hi"),
@@ -74,8 +78,12 @@ class GroupWindowITCase(mode: StateBackendMode)
     val windowedTable = table
       .window(Slide over 2.rows every 1.rows on 'proctime as 'w)
       .groupBy('w, 'string)
-      .select('string, countFun('int), 'int.avg,
-        weightAvgFun('long, 'int), weightAvgFun('int, 'int),
+      .select(
+        'string,
+        countFun('int),
+        'int.avg,
+        weightAvgFun('long, 'int),
+        weightAvgFun('int, 'int),
         countDistinct('long))
 
     val sink = new TestingAppendSink
@@ -110,8 +118,13 @@ class GroupWindowITCase(mode: StateBackendMode)
     val windowedTable = table
       .window(Session withGap 5.milli on 'rowtime as 'w)
       .groupBy('w, 'string)
-      .select('string, 'w.end, countFun('int), 'int.avg,
-        weightAvgFun('long, 'int), weightAvgFun('int, 'int),
+      .select(
+        'string,
+        'w.end,
+        countFun('int),
+        'int.avg,
+        weightAvgFun('long, 'int),
+        weightAvgFun('int, 'int),
         countDistinct('long))
 
     val sink = new TestingAppendSink
@@ -137,10 +150,12 @@ class GroupWindowITCase(mode: StateBackendMode)
     val windowedTable = table
       .window(Tumble over 2.rows on 'proctime as 'w)
       .groupBy('w)
-      .select(countFun('string), 'int.avg,
-        weightAvgFun('long, 'int), weightAvgFun('int, 'int),
-        countDistinct('long)
-      )
+      .select(
+        countFun('string),
+        'int.avg,
+        weightAvgFun('long, 'int),
+        weightAvgFun('int, 'int),
+        countDistinct('long))
 
     val sink = new TestingAppendSink
     windowedTable.toAppendStream[Row].addSink(sink)

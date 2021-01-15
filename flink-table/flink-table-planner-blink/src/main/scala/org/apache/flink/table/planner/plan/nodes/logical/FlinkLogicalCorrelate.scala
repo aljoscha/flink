@@ -28,9 +28,9 @@ import org.apache.calcite.rel.logical.LogicalCorrelate
 import org.apache.calcite.util.ImmutableBitSet
 
 /**
-  * Sub-class of [[Correlate]] that is a relational operator
-  * which performs nested-loop joins in Flink.
-  */
+ * Sub-class of [[Correlate]] that is a relational operator
+ * which performs nested-loop joins in Flink.
+ */
 class FlinkLogicalCorrelate(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -39,8 +39,8 @@ class FlinkLogicalCorrelate(
     correlationId: CorrelationId,
     requiredColumns: ImmutableBitSet,
     joinType: JoinRelType)
-  extends Correlate(cluster, traitSet, left, right, correlationId, requiredColumns, joinType)
-  with FlinkLogicalRel {
+    extends Correlate(cluster, traitSet, left, right, correlationId, requiredColumns, joinType)
+    with FlinkLogicalRel {
 
   override def copy(
       traitSet: RelTraitSet,
@@ -63,11 +63,11 @@ class FlinkLogicalCorrelate(
 }
 
 class FlinkLogicalCorrelateConverter
-  extends ConverterRule(
-    classOf[LogicalCorrelate],
-    Convention.NONE,
-    FlinkConventions.LOGICAL,
-    "FlinkLogicalCorrelateConverter") {
+    extends ConverterRule(
+      classOf[LogicalCorrelate],
+      Convention.NONE,
+      FlinkConventions.LOGICAL,
+      "FlinkLogicalCorrelateConverter") {
 
   override def convert(rel: RelNode): RelNode = {
     val correlate = rel.asInstanceOf[LogicalCorrelate]
@@ -94,6 +94,12 @@ object FlinkLogicalCorrelate {
     val cluster = left.getCluster
     val traitSet = cluster.traitSetOf(FlinkConventions.LOGICAL).simplify()
     new FlinkLogicalCorrelate(
-      cluster, traitSet, left, right, correlationId, requiredColumns, joinType)
+      cluster,
+      traitSet,
+      left,
+      right,
+      correlationId,
+      requiredColumns,
+      joinType)
   }
 }

@@ -26,8 +26,8 @@ import org.apache.flink.types.Row
 import _root_.java.lang.{Boolean => JBool}
 
 /**
-  * Convert [[CRow]] to a [[JTuple2]] containing a [[Row]].
-  */
+ * Convert [[CRow]] to a [[JTuple2]] containing a [[Row]].
+ */
 class CRowToJavaTupleMapFunction extends MapFunction[CRow, JTuple2[JBool, Row]] {
 
   val out: JTuple2[JBool, Row] = new JTuple2(true.asInstanceOf[JBool], null.asInstanceOf[Row])

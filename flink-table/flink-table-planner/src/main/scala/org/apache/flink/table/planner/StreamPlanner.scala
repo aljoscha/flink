@@ -24,11 +24,22 @@ import org.apache.flink.streaming.api.datastream.DataStream
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment
 import org.apache.flink.table.api._
 import org.apache.flink.table.calcite._
-import org.apache.flink.table.catalog.{CatalogManager, CatalogManagerCalciteSchema, CatalogTable, ConnectorCatalogTable, _}
+import org.apache.flink.table.catalog.{
+  CatalogManager,
+  CatalogManagerCalciteSchema,
+  CatalogTable,
+  ConnectorCatalogTable,
+  _
+}
 import org.apache.flink.table.delegation.{Executor, Parser, Planner}
 import org.apache.flink.table.executor.StreamExecutor
 import org.apache.flink.table.explain.PlanJsonParser
-import org.apache.flink.table.expressions.{ExpressionBridge, PlannerExpression, PlannerExpressionConverter, PlannerTypeInferenceUtilImpl}
+import org.apache.flink.table.expressions.{
+  ExpressionBridge,
+  PlannerExpression,
+  PlannerExpressionConverter,
+  PlannerTypeInferenceUtilImpl
+}
 import org.apache.flink.table.factories.{TableFactoryUtil, TableSinkFactoryContextImpl}
 import org.apache.flink.table.operations.OutputConversionModifyOperation.UpdateMode
 import org.apache.flink.table.operations._
@@ -53,23 +64,23 @@ import _root_.java.util.function.{Supplier => JSupplier}
 import _root_.scala.collection.JavaConverters._
 
 /**
-  * Implementation of [[Planner]] for legacy Flink planner. It supports only streaming use cases.
-  * (The new [[org.apache.flink.table.sources.InputFormatTableSource]] should work, but will be
-  * handled as streaming sources, and no batch specific optimizations will be applied).
-  *
-  * @param executor        instance of [[StreamExecutor]], needed to extract
-  *                        [[StreamExecutionEnvironment]] for
-  *                        [[org.apache.flink.table.sources.StreamTableSource.getDataStream]]
-  * @param config          mutable configuration passed from corresponding [[TableEnvironment]]
-  * @param functionCatalog catalog of functions
-  * @param catalogManager  manager of catalog meta objects such as tables, views, databases etc.
-  */
+ * Implementation of [[Planner]] for legacy Flink planner. It supports only streaming use cases.
+ * (The new [[org.apache.flink.table.sources.InputFormatTableSource]] should work, but will be
+ * handled as streaming sources, and no batch specific optimizations will be applied).
+ *
+ * @param executor        instance of [[StreamExecutor]], needed to extract
+ *                        [[StreamExecutionEnvironment]] for
+ *                        [[org.apache.flink.table.sources.StreamTableSource.getDataStream]]
+ * @param config          mutable configuration passed from corresponding [[TableEnvironment]]
+ * @param functionCatalog catalog of functions
+ * @param catalogManager  manager of catalog meta objects such as tables, views, databases etc.
+ */
 class StreamPlanner(
     executor: Executor,
     config: TableConfig,
     functionCatalog: FunctionCatalog,
     catalogManager: CatalogManager)
-  extends Planner {
+    extends Planner {
 
   // temporary utility until we don't use planner expressions anymore
   functionCatalog.setPlannerTypeInferenceUtil(PlannerTypeInferenceUtilImpl.INSTANCE)
@@ -82,17 +93,14 @@ class StreamPlanner(
     new ExpressionBridge[PlannerExpression](PlannerExpressionConverter.INSTANCE)
 
   private val planningConfigurationBuilder: PlanningConfigurationBuilder =
-    new PlanningConfigurationBuilder(
-      config,
-      functionCatalog,
-      internalSchema,
-      expressionBridge)
+    new PlanningConfigurationBuilder(config, functionCatalog, internalSchema, expressionBridge)
 
   @VisibleForTesting
   private[flink] val optimizer: StreamOptimizer = new StreamOptimizer(
-    () => config.getPlannerConfig
-      .unwrap(classOf[CalciteConfig])
-      .orElse(CalciteConfig.DEFAULT),
+    () =>
+      config.getPlannerConfig
+        .unwrap(classOf[CalciteConfig])
+        .orElse(CalciteConfig.DEFAULT),
     planningConfigurationBuilder)
 
   private val parser: Parser = new ParserImpl(
@@ -105,20 +113,22 @@ class StreamPlanner(
     },
     new JSupplier[CalciteParser] {
       override def get(): CalciteParser = planningConfigurationBuilder.createCalciteParser()
-    }
-  )
+    })
 
   override def getParser: Parser = parser
 
   override def translate(
       tableOperations: util.List[ModifyOperation]): util.List[Transformation[_]] = {
     val planner = createDummyPlanner()
-    tableOperations.asScala.map { operation =>
-      val (ast, updatesAsRetraction) = translateToRel(operation)
-      val optimizedPlan = optimizer.optimize(ast, updatesAsRetraction, getRelBuilder)
-      val dataStream = translateToCRow(planner, optimizedPlan)
-      dataStream.getTransformation.asInstanceOf[Transformation[_]]
-    }.filter(Objects.nonNull).asJava
+    tableOperations.asScala
+      .map { operation =>
+        val (ast, updatesAsRetraction) = translateToRel(operation)
+        val optimizedPlan = optimizer.optimize(ast, updatesAsRetraction, getRelBuilder)
+        val dataStream = translateToCRow(planner, optimizedPlan)
+        dataStream.getTransformation.asInstanceOf[Transformation[_]]
+      }
+      .filter(Objects.nonNull)
+      .asJava
   }
 
   override def explain(operations: util.List[Operation], extraDetails: ExplainDetail*): String = {
@@ -134,8 +144,7 @@ class StreamPlanner(
             require(qualifiedName.size() == 3, "the length of qualified name should be 3.")
             val modifyOperation = new CatalogSinkModifyOperation(
               ObjectIdentifier.of(qualifiedName.get(0), qualifiedName.get(1), qualifiedName.get(2)),
-              new PlannerQueryOperation(modify.getInput)
-            )
+              new PlannerQueryOperation(modify.getInput))
             translateToRel(modifyOperation)
           case _ =>
             (relNode, false)
@@ -145,17 +154,18 @@ class StreamPlanner(
       case o => throw new TableException(s"Unsupported operation: ${o.getClass.getCanonicalName}")
     }
 
-    val optimizedNodes = astWithUpdatesAsRetractionTuples.map {
-      case (ast, updatesAsRetraction) =>
-        optimizer.optimize(ast, updatesAsRetraction, getRelBuilder)
+    val optimizedNodes = astWithUpdatesAsRetractionTuples.map { case (ast, updatesAsRetraction) =>
+      optimizer.optimize(ast, updatesAsRetraction, getRelBuilder)
     }
 
     val planner = createDummyPlanner()
     val dataStreams = optimizedNodes.map(p => translateToCRow(planner, p))
 
-    val astPlan = astWithUpdatesAsRetractionTuples.map {
-      p => RelOptUtil.toString(p._1)
-    }.mkString(System.lineSeparator)
+    val astPlan = astWithUpdatesAsRetractionTuples
+      .map { p =>
+        RelOptUtil.toString(p._1)
+      }
+      .mkString(System.lineSeparator)
     val optimizedPlan = optimizedNodes.map(RelOptUtil.toString).mkString(System.lineSeparator)
 
     val env = dataStreams.head.getExecutionEnvironment
@@ -175,17 +185,14 @@ class StreamPlanner(
 
     if (extraDetails.contains(ExplainDetail.JSON_EXECUTION_PLAN)) {
       s"$explanation" +
-      s"$jsonSqlPlan"
+        s"$jsonSqlPlan"
     } else {
       s"$explanation" +
-      s"$sqlPlan"
+        s"$sqlPlan"
     }
   }
 
-  override def getCompletionHints(
-      statement: String,
-      position: Int)
-    : Array[String] = {
+  override def getCompletionHints(statement: String, position: Int): Array[String] = {
     val planner = getFlinkPlanner
     planner.getCompletionHints(statement, position)
   }
@@ -219,9 +226,11 @@ class StreamPlanner(
               case overwritableTableSink: OverwritableTableSink =>
                 overwritableTableSink.setOverwrite(catalogSink.isOverwrite)
               case _ =>
-                assert(!catalogSink.isOverwrite, "INSERT OVERWRITE requires " +
-                  s"${classOf[OverwritableTableSink].getSimpleName} but actually got " +
-                  sink.getClass.getName)
+                assert(
+                  !catalogSink.isOverwrite,
+                  "INSERT OVERWRITE requires " +
+                    s"${classOf[OverwritableTableSink].getSimpleName} but actually got " +
+                    sink.getClass.getName)
             }
             writeToSink(
               catalogSink.getChild,
@@ -236,8 +245,8 @@ class StreamPlanner(
       case outputConversion: OutputConversionModifyOperation =>
         val (isRetract, withChangeFlag) = outputConversion.getUpdateMode match {
           case UpdateMode.RETRACT => (true, true)
-          case UpdateMode.APPEND => (false, false)
-          case UpdateMode.UPSERT => (false, true)
+          case UpdateMode.APPEND  => (false, false)
+          case UpdateMode.UPSERT  => (false, true)
         }
 
         val tableSink = new DataStreamTableSink(
@@ -280,8 +289,9 @@ class StreamPlanner(
           Thread.currentThread().getContextClassLoader)
         node.translateToPlan(planner)
       case _ =>
-        throw new TableException("Cannot generate DataStream due to an invalid logical plan. " +
-          "This is a bug and should not happen. Please file an issue.")
+        throw new TableException(
+          "Cannot generate DataStream due to an invalid logical plan. " +
+            "This is a bug and should not happen. Please file an issue.")
     }
   }
 
@@ -294,8 +304,9 @@ class StreamPlanner(
       case retractSink: RetractStreamTableSink[T] =>
         retractSink match {
           case _: PartitionableTableSink =>
-            throw new TableException("Partitionable sink in retract stream mode " +
-              "is not supported yet!")
+            throw new TableException(
+              "Partitionable sink in retract stream mode " +
+                "is not supported yet!")
           case _ => // do nothing
         }
         true
@@ -303,8 +314,9 @@ class StreamPlanner(
       case upsertSink: UpsertStreamTableSink[T] =>
         upsertSink match {
           case _: PartitionableTableSink =>
-            throw new TableException("Partitionable sink in upsert stream mode " +
-              "is not supported yet!")
+            throw new TableException(
+              "Partitionable sink in upsert stream mode " +
+                "is not supported yet!")
           case _ => // do nothing
         }
         false
@@ -313,8 +325,9 @@ class StreamPlanner(
         false
 
       case _ =>
-        throw new ValidationException("Stream Tables can only be emitted by AppendStreamTableSink, "
-          + "RetractStreamTableSink, or UpsertStreamTableSink.")
+        throw new ValidationException(
+          "Stream Tables can only be emitted by AppendStreamTableSink, "
+            + "RetractStreamTableSink, or UpsertStreamTableSink.")
     }
 
     val input = getRelBuilder.tableOperation(tableOperation).build()
@@ -332,7 +345,10 @@ class StreamPlanner(
         val catalog = catalogManager.getCatalog(objectIdentifier.getCatalogName)
         val catalogTable = s.asInstanceOf[CatalogTable]
         val context = new TableSinkFactoryContextImpl(
-          objectIdentifier, catalogTable, config.getConfiguration, false,
+          objectIdentifier,
+          catalogTable,
+          config.getConfiguration,
+          false,
           lookupResult.get.isTemporary)
         if (catalog.isPresent && catalog.get().getTableFactory.isPresent) {
           val sink = TableFactoryUtil.createTableSinkForCatalogTable(catalog.get(), context)

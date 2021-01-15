@@ -26,10 +26,10 @@ import org.apache.calcite.plan.{Convention, RelTraitSet}
 import org.apache.calcite.rel.RelNode
 
 /**
-  * Override the default convention implementation to support using AbstractConverter for conversion
-  */
+ * Override the default convention implementation to support using AbstractConverter for conversion
+ */
 class FlinkConvention(name: String, relClass: Class[_ <: RelNode])
-  extends Convention.Impl(name, relClass) {
+    extends Convention.Impl(name, relClass) {
 
   override def useAbstractConvertersForConversion(
       fromTraits: RelTraitSet,
@@ -37,13 +37,13 @@ class FlinkConvention(name: String, relClass: Class[_ <: RelNode])
     if (relClass == classOf[StreamPhysicalRel]) {
       // stream
       !fromTraits.satisfies(toTraits) &&
-        fromTraits.containsIfApplicable(FlinkConventions.STREAM_PHYSICAL) &&
-        toTraits.containsIfApplicable(FlinkConventions.STREAM_PHYSICAL)
+      fromTraits.containsIfApplicable(FlinkConventions.STREAM_PHYSICAL) &&
+      toTraits.containsIfApplicable(FlinkConventions.STREAM_PHYSICAL)
     } else {
       // batch
       !fromTraits.satisfies(toTraits) &&
-        fromTraits.containsIfApplicable(FlinkConventions.BATCH_PHYSICAL) &&
-        toTraits.containsIfApplicable(FlinkConventions.BATCH_PHYSICAL)
+      fromTraits.containsIfApplicable(FlinkConventions.BATCH_PHYSICAL) &&
+      toTraits.containsIfApplicable(FlinkConventions.BATCH_PHYSICAL)
     }
   }
 }

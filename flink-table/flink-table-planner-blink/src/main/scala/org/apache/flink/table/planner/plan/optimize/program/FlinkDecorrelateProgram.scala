@@ -30,11 +30,11 @@ import org.apache.calcite.util.Util
 import scala.collection.JavaConversions._
 
 /**
-  * A FlinkOptimizeProgram that decorrelates a query
-  * and validates whether the result still has correlate variables.
-  *
-  * @tparam OC OptimizeContext
-  */
+ * A FlinkOptimizeProgram that decorrelates a query
+ * and validates whether the result still has correlate variables.
+ *
+ * @tparam OC OptimizeContext
+ */
 class FlinkDecorrelateProgram[OC <: FlinkOptimizeContext] extends FlinkOptimizeProgram[OC] {
 
   def optimize(root: RelNode, context: OC): RelNode = {
@@ -44,18 +44,19 @@ class FlinkDecorrelateProgram[OC <: FlinkOptimizeContext] extends FlinkOptimizeP
   }
 
   /**
-    * Check if there is still correlate variables after decorrelating.
-    *
-    * NOTES: this method only checks correlate variables in join, project and filter,
-    * and will ignore the correlate variables from UNNEST (inputs of Uncollect).
-    */
+   * Check if there is still correlate variables after decorrelating.
+   *
+   * NOTES: this method only checks correlate variables in join, project and filter,
+   * and will ignore the correlate variables from UNNEST (inputs of Uncollect).
+   */
   private def checkCorrelVariableExists(root: RelNode): Unit = {
     try {
       checkCorrelVariableOf(root)
     } catch {
       case fo: Util.FoundOne =>
-        throw new TableException(s"unexpected correlate variable " +
-          s"${fo.getNode.asInstanceOf[RexCorrelVariable].id} in the plan")
+        throw new TableException(
+          s"unexpected correlate variable " +
+            s"${fo.getNode.asInstanceOf[RexCorrelVariable].id} in the plan")
     }
   }
 
@@ -87,7 +88,7 @@ class FlinkDecorrelateProgram[OC <: FlinkOptimizeContext] extends FlinkOptimizeP
           // ignore Uncollect's inputs due to the correlate variables are from UNNEST directly,
           // not from cases (project, filter and join) which RelDecorrelator handles
           case r: Uncollect => r
-          case _ => super.visit(other)
+          case _            => super.visit(other)
         }
       }
     }

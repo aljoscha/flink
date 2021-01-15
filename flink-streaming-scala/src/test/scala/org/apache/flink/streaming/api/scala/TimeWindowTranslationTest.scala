@@ -37,15 +37,15 @@ import org.junit.Test
 import java.util.concurrent.TimeUnit
 
 /**
-  * These tests verify that the api calls on [[WindowedStream]] that use the "time" shortcut
-  * instantiate the correct window operator.
-  */
+ * These tests verify that the api calls on [[WindowedStream]] that use the "time" shortcut
+ * instantiate the correct window operator.
+ */
 class TimeWindowTranslationTest extends AbstractTestBase {
 
   /**
-    * Verifies that calls to timeWindow() instantiate a regular
-    * windowOperator instead of an aligned one.
-    */
+   * Verifies that calls to timeWindow() instantiate a regular
+   * windowOperator instead of an aligned one.
+   */
   @Test
   def testAlignedWindowDeprecation(): Unit = {
     val env = StreamExecutionEnvironment.getExecutionEnvironment
@@ -72,10 +72,10 @@ class TimeWindowTranslationTest extends AbstractTestBase {
       .timeWindow(Time.minutes(1))
       .apply(new WindowFunction[(String, Int), (String, Int), Tuple, TimeWindow]() {
         def apply(
-                   key: Tuple,
-                   window: TimeWindow,
-                   values: Iterable[(String, Int)],
-                   out: Collector[(String, Int)]) { }
+            key: Tuple,
+            window: TimeWindow,
+            values: Iterable[(String, Int)],
+            out: Collector[(String, Int)]) {}
       })
 
     val transform2 = window2.javaStream.getTransformation

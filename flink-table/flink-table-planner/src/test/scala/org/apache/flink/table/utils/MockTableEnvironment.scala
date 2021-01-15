@@ -22,7 +22,14 @@ import java.lang.{Iterable => JIterable}
 import java.util.Optional
 
 import org.apache.flink.api.common.JobExecutionResult
-import org.apache.flink.table.api.{ExplainDetail, StatementSet, Table, TableConfig, TableEnvironment, TableResult}
+import org.apache.flink.table.api.{
+  ExplainDetail,
+  StatementSet,
+  Table,
+  TableConfig,
+  TableEnvironment,
+  TableResult
+}
 import org.apache.flink.table.catalog.Catalog
 import org.apache.flink.table.descriptors.{ConnectTableDescriptor, ConnectorDescriptor}
 import org.apache.flink.table.expressions.Expression
@@ -77,9 +84,7 @@ class MockTableEnvironment extends TableEnvironment {
 
   override def getConfig: TableConfig = ???
 
-  override def registerCatalog(
-    name: String,
-    catalog: Catalog): Unit = ???
+  override def registerCatalog(name: String, catalog: Catalog): Unit = ???
 
   override def getCatalog(catalogName: String): Optional[Catalog] = ???
 
@@ -93,10 +98,7 @@ class MockTableEnvironment extends TableEnvironment {
 
   override def insertInto(sinkPath: String, table: Table): Unit = ???
 
-  override def insertInto(
-    table: Table,
-    sinkPath: String,
-    sinkPathContinued: String*): Unit = ???
+  override def insertInto(table: Table, sinkPath: String, sinkPathContinued: String*): Unit = ???
 
   override def execute(jobName: String): JobExecutionResult = ???
 
@@ -104,9 +106,7 @@ class MockTableEnvironment extends TableEnvironment {
 
   override def unloadModule(moduleName: String): Unit = ???
 
-  override def createTemporaryView(
-    path: String,
-    view: Table): Unit = ???
+  override def createTemporaryView(path: String, view: Table): Unit = ???
 
   override def listTemporaryTables(): Array[String] = ???
 
@@ -119,32 +119,31 @@ class MockTableEnvironment extends TableEnvironment {
   override def dropTemporaryView(path: String): Boolean = ???
 
   override def createTemporarySystemFunction(
-    name: String,
-    functionClass: Class[_ <: UserDefinedFunction]): Unit = ???
+      name: String,
+      functionClass: Class[_ <: UserDefinedFunction]): Unit = ???
 
   override def createTemporarySystemFunction(
-    name: String,
-    functionInstance: UserDefinedFunction): Unit = ???
+      name: String,
+      functionInstance: UserDefinedFunction): Unit = ???
 
   override def dropTemporarySystemFunction(name: String): Boolean = ???
 
-  override def createFunction(
-    path: String,
-    functionClass: Class[_ <: UserDefinedFunction]): Unit = ???
+  override def createFunction(path: String, functionClass: Class[_ <: UserDefinedFunction]): Unit =
+    ???
 
   override def createFunction(
-    path: String,
-    functionClass: Class[_ <: UserDefinedFunction], ignoreIfExists: Boolean): Unit = ???
+      path: String,
+      functionClass: Class[_ <: UserDefinedFunction],
+      ignoreIfExists: Boolean): Unit = ???
 
   override def dropFunction(path: String): Boolean = ???
 
   override def createTemporaryFunction(
-    path: String,
-    functionClass: Class[_ <: UserDefinedFunction]): Unit = ???
+      path: String,
+      functionClass: Class[_ <: UserDefinedFunction]): Unit = ???
 
-  override def createTemporaryFunction(
-    path: String,
-    functionInstance: UserDefinedFunction): Unit = ???
+  override def createTemporaryFunction(path: String, functionInstance: UserDefinedFunction): Unit =
+    ???
 
   override def dropTemporaryFunction(path: String): Boolean = ???
 

@@ -19,23 +19,32 @@
 package org.apache.flink.table.planner.plan.utils
 
 import org.apache.flink.table.planner.plan.stats._
-import org.apache.flink.table.planner.plan.utils.FlinkRelOptUtil.{ColumnRelatedVisitor, getLiteralValueByBroadType}
+import org.apache.flink.table.planner.plan.utils.FlinkRelOptUtil.{
+  ColumnRelatedVisitor,
+  getLiteralValueByBroadType
+}
 
 import org.apache.calcite.rex.{RexBuilder, RexCall, RexInputRef, RexLiteral, RexNode, RexUtil}
 import org.apache.calcite.sql.SqlKind
-import org.apache.calcite.sql.SqlKind.{EQUALS, GREATER_THAN, GREATER_THAN_OR_EQUAL, LESS_THAN, LESS_THAN_OR_EQUAL}
+import org.apache.calcite.sql.SqlKind.{
+  EQUALS,
+  GREATER_THAN,
+  GREATER_THAN_OR_EQUAL,
+  LESS_THAN,
+  LESS_THAN_OR_EQUAL
+}
 import org.apache.calcite.sql.fun.SqlStdOperatorTable
 
 import scala.collection.JavaConversions._
 
 /**
-  * Helper for FlinkRelMdColumnInterval/FlinkRelMdFilteredColumnInterval.
-  */
+ * Helper for FlinkRelMdColumnInterval/FlinkRelMdFilteredColumnInterval.
+ */
 object ColumnIntervalUtil {
 
   /**
-    * try get value interval if the operator is  +, -, *
-    */
+   * try get value interval if the operator is  +, -, *
+   */
   def getValueIntervalOfRexCall(
       rexCall: RexCall,
       leftInterval: ValueInterval,
@@ -55,19 +64,14 @@ object ColumnIntervalUtil {
 
   def getNegativeOfValueInterval(valueInterval: ValueInterval): ValueInterval = {
     valueInterval match {
-      case EmptyValueInterval => valueInterval
+      case EmptyValueInterval    => valueInterval
       case InfiniteValueInterval => valueInterval
       case finite: FiniteValueInterval =>
         (convertNumberToString(finite.upper), convertNumberToString(finite.lower)) match {
           case (Some(lower), Some(upper)) =>
             val lowerValue = new java.math.BigDecimal(lower).negate()
             val upperValue = new java.math.BigDecimal(upper).negate()
-            FiniteValueInterval(
-              lowerValue,
-              upperValue,
-              finite.includeUpper,
-              finite.includeLower
-            )
+            FiniteValueInterval(lowerValue, upperValue, finite.includeUpper, finite.includeLower)
           case _ => null
         }
       case left: LeftSemiInfiniteValueInterval =>
@@ -130,8 +134,11 @@ object ColumnIntervalUtil {
 
     (leftInterval, rightInterval) match {
       case (fl: FiniteValueInterval, fr: FiniteValueInterval) =>
-        (convertNumberToString(fl.lower), convertNumberToString(fr.lower),
-          convertNumberToString(fl.upper), convertNumberToString(fr.upper)) match {
+        (
+          convertNumberToString(fl.lower),
+          convertNumberToString(fr.lower),
+          convertNumberToString(fl.upper),
+          convertNumberToString(fr.upper)) match {
           case (Some(ll), Some(rl), Some(lu), Some(ru)) =>
             val leftLower = new java.math.BigDecimal(ll)
             val rightLower = new java.math.BigDecimal(rl)
@@ -146,27 +153,20 @@ object ColumnIntervalUtil {
                 fl.includeLower && fr.includeLower,
                 fl.includeLower && fr.includeUpper,
                 fl.includeUpper && fr.includeLower,
-                fl.includeUpper && fr.includeUpper
-              )
-            )
-            val sortedResult = allMultiplyResults.sortWith(
-              (res1, res2) => res1._1.compareTo(res2._1) < 0
-            )
+                fl.includeUpper && fr.includeUpper))
+            val sortedResult =
+              allMultiplyResults.sortWith((res1, res2) => res1._1.compareTo(res2._1) < 0)
 
             val lower = sortedResult.head._1
             val upper = sortedResult.last._1
-            val lowerInclude = sortedResult.exists {
-              case (value, include) => (value == lower) && include
+            val lowerInclude = sortedResult.exists { case (value, include) =>
+              (value == lower) && include
             }
-            val upperInclude = sortedResult.exists {
-              case (value, include) => (value == upper) && include
+            val upperInclude = sortedResult.exists { case (value, include) =>
+              (value == upper) && include
             }
 
-            FiniteValueInterval(
-              lower,
-              upper,
-              lowerInclude,
-              upperInclude)
+            FiniteValueInterval(lower, upper, lowerInclude, upperInclude)
           case _ => null
         }
       // TODO add more case
@@ -176,25 +176,25 @@ object ColumnIntervalUtil {
   }
 
   /**
-    * Calculate the interval of column which is referred in predicate expression, and intersect the
-    * result with the origin interval of the column.
-    *
-    * e.g for condition $1 <= 2 and $1 >= -1
-    * the interval of $1 is originInterval intersect with [-1, 2]
-    *
-    * for condition: $1 <= 2 and not ($1 < -1 or $2 is true),
-    * the interval of $1 is originInterval intersect with (-Inf, -1]
-    *
-    * for condition $1 <= 2 or $1 > -1
-    * the interval of $1 is (originInterval intersect with (-Inf, 2]) union
-    * (originInterval intersect with (-1, Inf])
-    *
-    * @param originInterval origin interval of the column
-    * @param oriPred        the predicate expression
-    * @param inputRef       the index of the given column
-    * @param rexBuilder     RexBuilder instance to analyze the predicate expression
-    * @return
-    */
+   * Calculate the interval of column which is referred in predicate expression, and intersect the
+   * result with the origin interval of the column.
+   *
+   * e.g for condition $1 <= 2 and $1 >= -1
+   * the interval of $1 is originInterval intersect with [-1, 2]
+   *
+   * for condition: $1 <= 2 and not ($1 < -1 or $2 is true),
+   * the interval of $1 is originInterval intersect with (-Inf, -1]
+   *
+   * for condition $1 <= 2 or $1 > -1
+   * the interval of $1 is (originInterval intersect with (-Inf, 2]) union
+   * (originInterval intersect with (-1, Inf])
+   *
+   * @param originInterval origin interval of the column
+   * @param oriPred        the predicate expression
+   * @param inputRef       the index of the given column
+   * @param rexBuilder     RexBuilder instance to analyze the predicate expression
+   * @return
+   */
   def getColumnIntervalWithFilter(
       originInterval: Option[ValueInterval],
       oriPred: RexNode,
@@ -205,7 +205,7 @@ object ColumnIntervalUtil {
     val (relatedSubRexNode, _) = FlinkRelOptUtil.partition(predicate, rexBuilder, isRelated)
     val beginInterval = originInterval match {
       case Some(i) => i
-      case _ => ValueInterval.infinite
+      case _       => ValueInterval.infinite
     }
     val interval = relatedSubRexNode match {
       case Some(rexNode) =>
@@ -218,14 +218,16 @@ object ColumnIntervalUtil {
           ValueInterval.infinite
         } else {
           val orParts = RexUtil.flattenOr(Vector(RexUtil.toDnf(rexBuilder, rexNode)))
-          orParts.map(or => {
-            val andParts = RexUtil.flattenAnd(Vector(or))
-            val andIntervals = andParts.map(and => columnIntervalOfSinglePredicate(and))
-            val res = andIntervals
-              .filter(_ != null)
-              .foldLeft(beginInterval)(ValueInterval.intersect)
-            res
-          }).reduceLeft(ValueInterval.union)
+          orParts
+            .map(or => {
+              val andParts = RexUtil.flattenAnd(Vector(or))
+              val andIntervals = andParts.map(and => columnIntervalOfSinglePredicate(and))
+              val res = andIntervals
+                .filter(_ != null)
+                .foldLeft(beginInterval)(ValueInterval.intersect)
+              res
+            })
+            .reduceLeft(ValueInterval.union)
         }
       case _ => beginInterval
     }
@@ -237,39 +239,39 @@ object ColumnIntervalUtil {
     if (convertedCondition == null || convertedCondition.operands.size() != 2) {
       null
     } else {
-      val (literalValue, op) = (convertedCondition.operands.head, convertedCondition.operands.last)
-      match {
-        case (_: RexInputRef, literal: RexLiteral) =>
-          (getLiteralValueByBroadType(literal), convertedCondition.getKind)
-        case (rex: RexCall, literal: RexLiteral) if rex.getKind == SqlKind.AS =>
-          (getLiteralValueByBroadType(literal), convertedCondition.getKind)
-        case (literal: RexLiteral, _: RexInputRef) =>
-          (getLiteralValueByBroadType(literal), convertedCondition.getKind.reverse())
-        case (literal: RexLiteral, rex: RexCall) if rex.getKind == SqlKind.AS =>
-          (getLiteralValueByBroadType(literal), convertedCondition.getKind.reverse())
-        case _ => (null, null)
-      }
+      val (literalValue, op) =
+        (convertedCondition.operands.head, convertedCondition.operands.last) match {
+          case (_: RexInputRef, literal: RexLiteral) =>
+            (getLiteralValueByBroadType(literal), convertedCondition.getKind)
+          case (rex: RexCall, literal: RexLiteral) if rex.getKind == SqlKind.AS =>
+            (getLiteralValueByBroadType(literal), convertedCondition.getKind)
+          case (literal: RexLiteral, _: RexInputRef) =>
+            (getLiteralValueByBroadType(literal), convertedCondition.getKind.reverse())
+          case (literal: RexLiteral, rex: RexCall) if rex.getKind == SqlKind.AS =>
+            (getLiteralValueByBroadType(literal), convertedCondition.getKind.reverse())
+          case _ => (null, null)
+        }
       if (op == null || literalValue == null) {
         null
       } else {
         op match {
-          case EQUALS => ValueInterval(literalValue, literalValue)
-          case LESS_THAN => ValueInterval(null, literalValue, includeUpper = false)
-          case LESS_THAN_OR_EQUAL => ValueInterval(null, literalValue)
-          case GREATER_THAN => ValueInterval(literalValue, null, includeLower = false)
+          case EQUALS                => ValueInterval(literalValue, literalValue)
+          case LESS_THAN             => ValueInterval(null, literalValue, includeUpper = false)
+          case LESS_THAN_OR_EQUAL    => ValueInterval(null, literalValue)
+          case GREATER_THAN          => ValueInterval(literalValue, null, includeLower = false)
           case GREATER_THAN_OR_EQUAL => ValueInterval(literalValue, null)
-          case _ => null
+          case _                     => null
         }
       }
     }
   }
 
   /**
-    * return ValueInterval with BigDecimal bound
-    */
+   * return ValueInterval with BigDecimal bound
+   */
   def toBigDecimalInterval(value: ValueInterval): ValueInterval = {
     value match {
-      case finite@ FiniteValueInterval(l, u, lb, ub) =>
+      case finite @ FiniteValueInterval(l, u, lb, ub) =>
         (convertNumberToString(l), convertNumberToString(u)) match {
           case (Some(lv), Some(uv)) =>
             FiniteValueInterval(new java.math.BigDecimal(lv), new java.math.BigDecimal(uv), lb, ub)
@@ -279,13 +281,13 @@ object ColumnIntervalUtil {
             FiniteValueInterval(l, new java.math.BigDecimal(uv), lb, ub)
           case _ => finite
         }
-      case left@ LeftSemiInfiniteValueInterval(u, ub) =>
+      case left @ LeftSemiInfiniteValueInterval(u, ub) =>
         convertNumberToString(u) match {
           case Some(uv) =>
             LeftSemiInfiniteValueInterval(new java.math.BigDecimal(uv), ub)
           case _ => left
         }
-      case right@ RightSemiInfiniteValueInterval(l, lb) =>
+      case right @ RightSemiInfiniteValueInterval(l, lb) =>
         convertNumberToString(l) match {
           case Some(lv) =>
             RightSemiInfiniteValueInterval(new java.math.BigDecimal(lv), lb)
@@ -298,13 +300,13 @@ object ColumnIntervalUtil {
   def convertNumberToString(number: Any): Option[String] = number match {
     // java number and scala BigInt, BigDecimal
     case jNum: java.lang.Number => Some(jNum.toString)
-    case sByte: scala.Byte => Some(sByte.toString)
-    case sShort: scala.Short => Some(sShort.toString)
-    case sInt: scala.Int => Some(sInt.toString)
-    case sLong: scala.Long => Some(sLong.toString)
-    case sFloat: scala.Float => Some(sFloat.toString)
-    case sDouble: scala.Double => Some(sDouble.toString)
-    case _ => None
+    case sByte: scala.Byte      => Some(sByte.toString)
+    case sShort: scala.Short    => Some(sShort.toString)
+    case sInt: scala.Int        => Some(sInt.toString)
+    case sLong: scala.Long      => Some(sLong.toString)
+    case sFloat: scala.Float    => Some(sFloat.toString)
+    case sDouble: scala.Double  => Some(sDouble.toString)
+    case _                      => None
   }
 
 }

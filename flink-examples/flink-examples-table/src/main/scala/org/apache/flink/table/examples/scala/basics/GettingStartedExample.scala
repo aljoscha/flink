@@ -49,20 +49,80 @@ object GettingStartedExample {
 
     // setup the unified API
     // in this case: declare that the table programs should be executed in batch mode
-    val settings = EnvironmentSettings.newInstance()
+    val settings = EnvironmentSettings
+      .newInstance()
       .inBatchMode()
       .build()
     val env = TableEnvironment.create(settings)
 
     // create a table with example data without a connector required
     val rawCustomers = env.fromValues(
-      row("Guillermo Smith", LocalDate.parse("1992-12-12"), "4081 Valley Road", "08540", "New Jersey", "m", true, 0, 78, 3),
-      row("Valeria Mendoza", LocalDate.parse("1970-03-28"), "1239  Rainbow Road", "90017", "Los Angeles", "f", true, 9, 39, 0),
-      row("Leann Holloway", LocalDate.parse("1989-05-21"), "2359 New Street", "97401", "Eugene", null, true, null, null, null),
-      row("Brandy Sanders", LocalDate.parse("1956-05-26"), "4891 Walkers-Ridge-Way", "73119", "Oklahoma City", "m", false, 9, 39, 0),
-      row("John Turner", LocalDate.parse("1982-10-02"), "2359 New Street", "60605", "Chicago", "m", true, 12, 39, 0),
-      row("Ellen Ortega", LocalDate.parse("1985-06-18"), "2448 Rodney STreet", "85023", "Phoenix", "f", true, 0, 78, 3)
-    )
+      row(
+        "Guillermo Smith",
+        LocalDate.parse("1992-12-12"),
+        "4081 Valley Road",
+        "08540",
+        "New Jersey",
+        "m",
+        true,
+        0,
+        78,
+        3),
+      row(
+        "Valeria Mendoza",
+        LocalDate.parse("1970-03-28"),
+        "1239  Rainbow Road",
+        "90017",
+        "Los Angeles",
+        "f",
+        true,
+        9,
+        39,
+        0),
+      row(
+        "Leann Holloway",
+        LocalDate.parse("1989-05-21"),
+        "2359 New Street",
+        "97401",
+        "Eugene",
+        null,
+        true,
+        null,
+        null,
+        null),
+      row(
+        "Brandy Sanders",
+        LocalDate.parse("1956-05-26"),
+        "4891 Walkers-Ridge-Way",
+        "73119",
+        "Oklahoma City",
+        "m",
+        false,
+        9,
+        39,
+        0),
+      row(
+        "John Turner",
+        LocalDate.parse("1982-10-02"),
+        "2359 New Street",
+        "60605",
+        "Chicago",
+        "m",
+        true,
+        12,
+        39,
+        0),
+      row(
+        "Ellen Ortega",
+        LocalDate.parse("1985-06-18"),
+        "2448 Rodney STreet",
+        "85023",
+        "Phoenix",
+        "f",
+        true,
+        0,
+        78,
+        3))
 
     // handle ranges of columns easily
     val truncatedCustomers = rawCustomers.select(withColumns(1 to 7))
@@ -82,8 +142,7 @@ object GettingStartedExample {
         |  COUNT(*) AS `number of customers`,
         |  AVG(YEAR(date_of_birth)) AS `average birth year`
         |FROM `customers`
-        |""".stripMargin
-      )
+        |""".stripMargin)
       .execute()
       .print()
 
@@ -97,8 +156,7 @@ object GettingStartedExample {
       .select(
         $"name".upperCase(),
         $"date_of_birth",
-        call(classOf[AddressNormalizer], $"street", $"zip_code", $"city").as("address")
-      )
+        call(classOf[AddressNormalizer], $"street", $"zip_code", $"city").as("address"))
 
     // use execute() and collect() to retrieve your results from the cluster
     // this can be useful for testing before storing it in an external system
@@ -108,10 +166,12 @@ object GettingStartedExample {
       val actualOutput = iterator.asScala.toSet
 
       val expectedOutput = Set(
-        Row.of("GUILLERMO SMITH", LocalDate.parse("1992-12-12"), "4081 VALLEY ROAD, 08540, NEW JERSEY"),
+        Row.of(
+          "GUILLERMO SMITH",
+          LocalDate.parse("1992-12-12"),
+          "4081 VALLEY ROAD, 08540, NEW JERSEY"),
         Row.of("JOHN TURNER", LocalDate.parse("1982-10-02"), "2359 NEW STREET, 60605, CHICAGO"),
-        Row.of("ELLEN ORTEGA", LocalDate.parse("1985-06-18"), "2448 RODNEY STREET, 85023, PHOENIX")
-      )
+        Row.of("ELLEN ORTEGA", LocalDate.parse("1985-06-18"), "2448 RODNEY STREET, 85023, PHOENIX"))
 
       if (actualOutput == expectedOutput) {
         println("SUCCESS!")

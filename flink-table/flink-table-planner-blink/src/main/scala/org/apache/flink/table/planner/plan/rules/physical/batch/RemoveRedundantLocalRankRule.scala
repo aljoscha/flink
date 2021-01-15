@@ -28,23 +28,26 @@ import org.apache.calcite.rel.RelNode
 import scala.collection.JavaConversions._
 
 /**
-  * Planner rule that matches a global [[BatchPhysicalRank]] on a local [[BatchPhysicalRank]],
-  * and merge them into a global [[BatchPhysicalRank]].
-  */
-class RemoveRedundantLocalRankRule extends RelOptRule(
-  operand(classOf[BatchPhysicalRank],
-    operand(classOf[BatchPhysicalRank],
-      operand(classOf[RelNode], FlinkConventions.BATCH_PHYSICAL, any))),
-  "RemoveRedundantLocalRankRule") {
+ * Planner rule that matches a global [[BatchPhysicalRank]] on a local [[BatchPhysicalRank]],
+ * and merge them into a global [[BatchPhysicalRank]].
+ */
+class RemoveRedundantLocalRankRule
+    extends RelOptRule(
+      operand(
+        classOf[BatchPhysicalRank],
+        operand(
+          classOf[BatchPhysicalRank],
+          operand(classOf[RelNode], FlinkConventions.BATCH_PHYSICAL, any))),
+      "RemoveRedundantLocalRankRule") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val globalRank: BatchPhysicalRank = call.rel(0)
     val localRank: BatchPhysicalRank = call.rel(1)
     globalRank.isGlobal && !localRank.isGlobal &&
-      globalRank.rankType == localRank.rankType &&
-      globalRank.partitionKey == localRank.partitionKey &&
-      globalRank.orderKey == globalRank.orderKey &&
-      globalRank.rankEnd == localRank.rankEnd
+    globalRank.rankType == localRank.rankType &&
+    globalRank.partitionKey == localRank.partitionKey &&
+    globalRank.orderKey == globalRank.orderKey &&
+    globalRank.rankEnd == localRank.rankEnd
   }
 
   override def onMatch(call: RelOptRuleCall): Unit = {

@@ -20,16 +20,25 @@ package org.apache.flink.table.factories.utils
 
 import java.util
 
-import org.apache.flink.table.descriptors.ConnectorDescriptorValidator.{CONNECTOR_PROPERTY_VERSION, CONNECTOR_TYPE}
-import org.apache.flink.table.descriptors.FormatDescriptorValidator.{FORMAT_PROPERTY_VERSION, FORMAT_TYPE}
-import org.apache.flink.table.factories.utils.TestTableSourceFactory.{CONNECTOR_TYPE_VALUE_TEST, FORMAT_TYPE_VALUE_TEST}
+import org.apache.flink.table.descriptors.ConnectorDescriptorValidator.{
+  CONNECTOR_PROPERTY_VERSION,
+  CONNECTOR_TYPE
+}
+import org.apache.flink.table.descriptors.FormatDescriptorValidator.{
+  FORMAT_PROPERTY_VERSION,
+  FORMAT_TYPE
+}
+import org.apache.flink.table.factories.utils.TestTableSourceFactory.{
+  CONNECTOR_TYPE_VALUE_TEST,
+  FORMAT_TYPE_VALUE_TEST
+}
 import org.apache.flink.table.factories.{StreamTableSourceFactory, TableFactory}
 import org.apache.flink.table.sources.StreamTableSource
 import org.apache.flink.types.Row
 
 /**
-  * Table source factory for testing.
-  */
+ * Table source factory for testing.
+ */
 class TestTableSourceFactory extends StreamTableSourceFactory[Row] with TableFactory {
 
   override def requiredContext(): util.Map[String, String] = {
@@ -51,8 +60,7 @@ class TestTableSourceFactory extends StreamTableSourceFactory[Row] with TableFac
   }
 
   override def createStreamTableSource(
-      properties: util.Map[String, String])
-    : StreamTableSource[Row] = {
+      properties: util.Map[String, String]): StreamTableSource[Row] = {
     throw new UnsupportedOperationException()
   }
 }

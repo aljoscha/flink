@@ -23,10 +23,11 @@ import org.apache.calcite.sql.`type`.MapSqlType
 import org.apache.flink.api.common.typeinfo.TypeInformation
 
 class MapRelDataType(
-   val typeInfo: TypeInformation[_],
-   val keyType: RelDataType,
-   val valueType: RelDataType,
-   isNullable: Boolean) extends MapSqlType(keyType, valueType, isNullable) {
+    val typeInfo: TypeInformation[_],
+    val keyType: RelDataType,
+    val valueType: RelDataType,
+    isNullable: Boolean)
+    extends MapSqlType(keyType, valueType, isNullable) {
 
   override def toString: String = s"MAP($typeInfo)"
 

@@ -23,7 +23,11 @@ import org.apache.flink.table.planner.calcite.FlinkTypeFactory
 import org.apache.flink.table.planner.plan.`trait`.FlinkRelDistribution
 import org.apache.flink.table.planner.plan.nodes.FlinkConventions
 import org.apache.flink.table.planner.plan.nodes.logical.FlinkLogicalOverAggregate
-import org.apache.flink.table.planner.plan.nodes.physical.batch.{BatchPhysicalOverAggregate, BatchPhysicalOverAggregateBase, BatchPhysicalPythonOverAggregate}
+import org.apache.flink.table.planner.plan.nodes.physical.batch.{
+  BatchPhysicalOverAggregate,
+  BatchPhysicalOverAggregateBase,
+  BatchPhysicalPythonOverAggregate
+}
 import org.apache.flink.table.planner.plan.utils.PythonUtil.isPythonAggregate
 import org.apache.flink.table.planner.plan.utils.{AggregateUtil, OverAggregateUtil, SortUtil}
 
@@ -40,15 +44,14 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable.ArrayBuffer
 
 /**
-  * Rule that converts [[FlinkLogicalOverAggregate]] to one or more [[BatchPhysicalOverAggregate]]s.
-  * If there are more than one [[Group]], this rule will combine adjacent [[Group]]s with the
-  * same partition keys and order keys into one BatchExecOverAggregate.
-  */
+ * Rule that converts [[FlinkLogicalOverAggregate]] to one or more [[BatchPhysicalOverAggregate]]s.
+ * If there are more than one [[Group]], this rule will combine adjacent [[Group]]s with the
+ * same partition keys and order keys into one BatchExecOverAggregate.
+ */
 class BatchPhysicalOverAggregateRule
-  extends RelOptRule(
-    operand(classOf[FlinkLogicalOverAggregate],
-      operand(classOf[RelNode], any)),
-    "BatchPhysicalOverAggregateRule") {
+    extends RelOptRule(
+      operand(classOf[FlinkLogicalOverAggregate], operand(classOf[RelNode], any)),
+      "BatchPhysicalOverAggregateRule") {
 
   override def onMatch(call: RelOptRuleCall): Unit = {
     val logicWindow: FlinkLogicalOverAggregate = call.rel(0)
@@ -61,8 +64,8 @@ class BatchPhysicalOverAggregateRule
     val inputNamesWithConstants = inputRowType.getFieldNames ++ constants.indices.map(i => s"TMP$i")
     val inputTypesWithConstants = inputRowType.getFieldList
       .map(i => FlinkTypeFactory.toLogicalType(i.getType)) ++ constantTypes
-    val inputTypeWithConstants = typeFactory.buildRelNodeRowType(
-      inputNamesWithConstants, inputTypesWithConstants)
+    val inputTypeWithConstants =
+      typeFactory.buildRelNodeRowType(inputNamesWithConstants, inputTypesWithConstants)
 
     var overWindowAgg: BatchPhysicalOverAggregateBase = null
 
@@ -101,7 +104,9 @@ class BatchPhysicalOverAggregateRule
         (group, aggCallToAggFunction)
       }
 
-      val outputRowType = inferOutputRowType(logicWindow.getCluster, inputRowType,
+      val outputRowType = inferOutputRowType(
+        logicWindow.getCluster,
+        inputRowType,
         groupToAggCallToAggFunction.flatMap(_._2).map(_._1))
 
       val providedTraitSet = call.getPlanner.emptyTraitSet.replace(FlinkConventions.BATCH_PHYSICAL)
@@ -163,8 +168,8 @@ class BatchPhysicalOverAggregateRule
   }
 
   /**
-    * Returns true if group1 satisfies group2 on keys and orderKeys, else false.
-    */
+   * Returns true if group1 satisfies group2 on keys and orderKeys, else false.
+   */
   def satisfies(group1: Group, group2: Group, logicWindow: FlinkLogicalOverAggregate): Boolean = {
     var isSatisfied = false
     val keyComp = group1.keys.compareTo(group2.keys)

@@ -31,7 +31,8 @@ import org.junit.Test
 class MatchRecognizeValidationTest extends TableTestBase {
 
   private val streamUtils = streamTestUtil()
-  streamUtils.addTable[(String, Long, Int, Int)]("Ticker",
+  streamUtils.addTable[(String, Long, Int, Int)](
+    "Ticker",
     'symbol,
     'tstamp,
     'price,
@@ -63,8 +64,9 @@ class MatchRecognizeValidationTest extends TableTestBase {
 
   @Test
   def testSortProcessingTimeSecondaryField(): Unit = {
-    thrown.expectMessage("You must specify either rowtime or proctime for order by as " +
-      "the first one.")
+    thrown.expectMessage(
+      "You must specify either rowtime or proctime for order by as " +
+        "the first one.")
     thrown.expect(classOf[ValidationException])
 
     val sqlQuery =
@@ -107,8 +109,9 @@ class MatchRecognizeValidationTest extends TableTestBase {
 
   @Test
   def testUpdatesInUpstreamOperatorNotSupported(): Unit = {
-    thrown.expectMessage("Retraction on match recognize is not supported. Note: Match " +
-      "recognize should not follow a non-windowed GroupBy aggregation.")
+    thrown.expectMessage(
+      "Retraction on match recognize is not supported. Note: Match " +
+        "recognize should not follow a non-windowed GroupBy aggregation.")
     thrown.expect(classOf[TableException])
 
     val sqlQuery =
@@ -229,8 +232,9 @@ class MatchRecognizeValidationTest extends TableTestBase {
 
   @Test
   def testGreedyQuantifierAtTheEndIsNotSupported(): Unit = {
-    thrown.expectMessage("Greedy quantifiers are not allowed as the last element of a " +
-      "Pattern yet. Finish your pattern with either a simple variable or reluctant quantifier.")
+    thrown.expectMessage(
+      "Greedy quantifiers are not allowed as the last element of a " +
+        "Pattern yet. Finish your pattern with either a simple variable or reluctant quantifier.")
     thrown.expect(classOf[TableException])
 
     val sqlQuery =
@@ -252,8 +256,9 @@ class MatchRecognizeValidationTest extends TableTestBase {
 
   @Test
   def testPatternsProducingEmptyMatchesAreNotSupported(): Unit = {
-    thrown.expectMessage("Patterns that can produce empty matches are not supported. " +
-      "There must be at least one non-optional state.")
+    thrown.expectMessage(
+      "Patterns that can produce empty matches are not supported. " +
+        "There must be at least one non-optional state.")
     thrown.expect(classOf[TableException])
 
     val sqlQuery =

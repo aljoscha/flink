@@ -29,20 +29,22 @@ class OnCrossDataSetTest extends AcceptPFTestBase {
   @Test
   def testCrossProjectingOnTuple(): Unit = {
     val test =
-      tuples.cross(tuples).projecting {
-        case ((_, v1), (_, v2)) => s"$v1 $v2"
+      tuples.cross(tuples).projecting { case ((_, v1), (_, v2)) =>
+        s"$v1 $v2"
       }
-    assert(test.javaSet.isInstanceOf[CrossOperator[_, _, _]],
+    assert(
+      test.javaSet.isInstanceOf[CrossOperator[_, _, _]],
       "projecting for cross on tuples should produce a CrossOperator")
   }
 
   @Test
   def testCrossProjectingOnCaseClass(): Unit = {
     val test =
-      caseObjects.cross(caseObjects).projecting {
-        case (KeyValuePair(_, v1), KeyValuePair(_, v2)) => s"$v1 $v2"
+      caseObjects.cross(caseObjects).projecting { case (KeyValuePair(_, v1), KeyValuePair(_, v2)) =>
+        s"$v1 $v2"
       }
-    assert(test.javaSet.isInstanceOf[CrossOperator[_, _, _]],
+    assert(
+      test.javaSet.isInstanceOf[CrossOperator[_, _, _]],
       "projecting for cross on case objects should produce a CrossOperator")
   }
 

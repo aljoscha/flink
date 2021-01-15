@@ -30,32 +30,32 @@ import scala.collection.JavaConversions._
 import scala.collection.mutable
 
 /**
-  * Planner Rule that extracts some sub-conditions in the Join OR condition that can be pushed
-  * into join inputs by [[FlinkFilterJoinRule]].
-  *
-  * <p>For example, there is a join query (table A join table B):
-  * {{{
-  * SELECT * FROM A, B WHERE A.f1 = B.f1 AND ((A.f2 = 'aaa1' AND B.f2 = 'bbb1') OR
-  * (A.f2 = 'aaa2' AND B.f2 = 'bbb2'))
-  * }}}
-  *
-  * <p>Hence the query rewards optimizers that can analyze complex join conditions which cannot be
-  * pushed below the join, but still derive filters from such join conditions. It could immediately
-  * filter the scan(A) with the condition: (A.f2 = 'aaa1' OR A.f2 = 'aaa2').
-  *
-  * <p>After join condition dependent optimization, the query will be:
-  * {{{
-  * SELECT * FROM A, B WHERE A.f1 = B.f1 AND
-  * ((A.f2 = 'aaa1' AND B.f2 = 'bbb1') OR (A.f2 = 'aaa2' AND B.f2 = 'bbb2'))
-  * AND (A.f2 = 'aaa1' OR A.f2 = 'aaa2') AND (B.f2 = 'bbb1' OR B.f2 = 'bbb2')
-  * }}}.
-  *
-  * <p>Note: This class can only be used in HepPlanner with RULE_SEQUENCE.
-  */
+ * Planner Rule that extracts some sub-conditions in the Join OR condition that can be pushed
+ * into join inputs by [[FlinkFilterJoinRule]].
+ *
+ * <p>For example, there is a join query (table A join table B):
+ * {{{
+ * SELECT * FROM A, B WHERE A.f1 = B.f1 AND ((A.f2 = 'aaa1' AND B.f2 = 'bbb1') OR
+ * (A.f2 = 'aaa2' AND B.f2 = 'bbb2'))
+ * }}}
+ *
+ * <p>Hence the query rewards optimizers that can analyze complex join conditions which cannot be
+ * pushed below the join, but still derive filters from such join conditions. It could immediately
+ * filter the scan(A) with the condition: (A.f2 = 'aaa1' OR A.f2 = 'aaa2').
+ *
+ * <p>After join condition dependent optimization, the query will be:
+ * {{{
+ * SELECT * FROM A, B WHERE A.f1 = B.f1 AND
+ * ((A.f2 = 'aaa1' AND B.f2 = 'bbb1') OR (A.f2 = 'aaa2' AND B.f2 = 'bbb2'))
+ * AND (A.f2 = 'aaa1' OR A.f2 = 'aaa2') AND (B.f2 = 'bbb1' OR B.f2 = 'bbb2')
+ * }}}.
+ *
+ * <p>Note: This class can only be used in HepPlanner with RULE_SEQUENCE.
+ */
 class JoinDependentConditionDerivationRule
-  extends RelOptRule(
-    operand(classOf[LogicalJoin], any()),
-    "JoinDependentConditionDerivationRule") {
+    extends RelOptRule(
+      operand(classOf[LogicalJoin], any()),
+      "JoinDependentConditionDerivationRule") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val join: LogicalJoin = call.rel(0)
@@ -80,7 +80,6 @@ class JoinDependentConditionDerivationRule
         val leftDisjunctions = new mutable.ArrayBuffer[RexNode]
         val rightDisjunctions = new mutable.ArrayBuffer[RexNode]
         disjunctions.foreach { disjunctionRex =>
-
           val leftConjunctions = new mutable.ArrayBuffer[RexNode]
           val rightConjunctions = new mutable.ArrayBuffer[RexNode]
 
@@ -131,8 +130,8 @@ class JoinDependentConditionDerivationRule
   }
 
   /**
-    * Returns true if the given index is from join left, else false.
-    */
+   * Returns true if the given index is from join left, else false.
+   */
   private def fromJoinLeft(join: Join, index: Int): Boolean = {
     require(join.getSystemFieldList.size() == 0)
     index < join.getLeft.getRowType.getFieldCount

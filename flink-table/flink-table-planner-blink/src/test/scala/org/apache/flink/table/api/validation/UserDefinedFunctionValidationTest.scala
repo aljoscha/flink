@@ -58,4 +58,3 @@ class UserDefinedFunctionValidationTest extends TableTestBase {
   }
 
 }
-

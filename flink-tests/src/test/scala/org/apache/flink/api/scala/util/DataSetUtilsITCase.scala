@@ -27,9 +27,8 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
 @RunWith(classOf[Parameterized])
-class DataSetUtilsITCase (
-    mode: MultipleProgramsTestBase.TestExecutionMode)
-  extends MultipleProgramsTestBase(mode) {
+class DataSetUtilsITCase(mode: MultipleProgramsTestBase.TestExecutionMode)
+    extends MultipleProgramsTestBase(mode) {
 
   @Test
   @throws(classOf[Exception])
@@ -44,7 +43,7 @@ class DataSetUtilsITCase (
 
     Assert.assertEquals(expectedSize, result.size)
 
-    for( ((index, _), expected) <- result.sortBy(_._1).zipWithIndex) {
+    for (((index, _), expected) <- result.sortBy(_._1).zipWithIndex) {
       Assert.assertEquals(expected, index)
     }
   }

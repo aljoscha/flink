@@ -26,7 +26,13 @@ import org.apache.flink.table.planner.runtime.utils.JavaUserDefinedAggFunctions.
 import org.apache.flink.table.planner.runtime.utils.StreamingWithStateTestBase.StateBackendMode
 import org.apache.flink.table.planner.runtime.utils.TestData.tupleData3
 import org.apache.flink.table.planner.runtime.utils.{StreamingWithStateTestBase, TestingRetractSink}
-import org.apache.flink.table.planner.utils.{TableAggSum, Top3, Top3Accum, Top3WithMapView, Top3WithRetractInput}
+import org.apache.flink.table.planner.utils.{
+  TableAggSum,
+  Top3,
+  Top3Accum,
+  Top3WithMapView,
+  Top3WithRetractInput
+}
 import org.apache.flink.types.Row
 
 import org.junit.Assert.assertEquals
@@ -35,8 +41,8 @@ import org.junit.runners.Parameterized
 import org.junit.{Before, Test}
 
 /**
-  * Tests of groupby (without window) table aggregations
-  */
+ * Tests of groupby (without window) table aggregations
+ */
 @RunWith(classOf[Parameterized])
 class TableAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode) {
 
@@ -50,7 +56,8 @@ class TableAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTes
   def testGroupByFlatAggregate(): Unit = {
     val top3 = new Top3
 
-    val resultTable = failingDataSource(tupleData3).toTable(tEnv, 'a, 'b, 'c)
+    val resultTable = failingDataSource(tupleData3)
+      .toTable(tEnv, 'a, 'b, 'c)
       .groupBy('b)
       .flatAggregate(top3('a))
       .select('b, 'f0, 'f1)
@@ -75,8 +82,7 @@ class TableAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTes
       "5,13,13",
       "6,21,21",
       "6,20,20",
-      "6,19,19"
-    ).sorted
+      "6,19,19").sorted
     assertEquals(expected, sink.getRetractResults.sorted)
   }
 
@@ -94,11 +100,7 @@ class TableAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTes
     resultTable.toRetractStream[Row].addSink(sink).setParallelism(1)
     env.execute()
 
-    val expected = List(
-      "19,19",
-      "20,20",
-      "21,21"
-    ).sorted
+    val expected = List("19,19", "20,20", "21,21").sorted
     assertEquals(expected, sink.getRetractResults.sorted)
   }
 
@@ -106,7 +108,8 @@ class TableAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTes
   def testAggregateAfterTableAggregate(): Unit = {
     val top3 = new Top3
 
-    val resultTable = failingDataSource(tupleData3).toTable(tEnv, 'a, 'b, 'c)
+    val resultTable = failingDataSource(tupleData3)
+      .toTable(tEnv, 'a, 'b, 'c)
       .groupBy('b)
       .flatAggregate(top3('a))
       .select('b, 'f0, 'f1)
@@ -118,14 +121,7 @@ class TableAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTes
     resultTable.toRetractStream[Row].addSink(sink).setParallelism(1)
     env.execute()
 
-    val expected = List(
-      "1,1",
-      "2,3",
-      "3,6",
-      "4,10",
-      "5,15",
-      "6,21"
-    ).sorted
+    val expected = List("1,1", "2,3", "3,6", "4,10", "5,15", "6,21").sorted
     assertEquals(expected, sink.getRetractResults.sorted)
   }
 
@@ -133,7 +129,8 @@ class TableAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTes
   def testGroupByFlatAggregateWithMapView(): Unit = {
     val top3 = new Top3WithMapView
 
-    val resultTable = failingDataSource(tupleData3).toTable(tEnv, 'a, 'b, 'c)
+    val resultTable = failingDataSource(tupleData3)
+      .toTable(tEnv, 'a, 'b, 'c)
       .groupBy('b)
       .flatAggregate(top3('a))
       .select('b, 'f0, 'f1)
@@ -158,8 +155,7 @@ class TableAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTes
       "5,13,13",
       "6,21,21",
       "6,20,20",
-      "6,19,19"
-    ).sorted
+      "6,19,19").sorted
     assertEquals(expected, sink.getRetractResults.sorted)
   }
 
@@ -178,11 +174,7 @@ class TableAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTes
     resultTable.toRetractStream[Row].addSink(sink).setParallelism(1)
     env.execute()
 
-    val expected = List(
-      "111,111",
-      "65,65",
-      "34,34"
-    ).sorted
+    val expected = List("111,111", "65,65", "34,34").sorted
     assertEquals(expected, sink.getRetractResults.sorted)
   }
 
@@ -198,8 +190,19 @@ class TableAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTes
     resultTable.toRetractStream[Row].addSink(sink).setParallelism(1)
     env.execute()
 
-    val expected = List("6,111", "6,111", "5,65", "5,65", "4,34", "4,34", "3,15", "3,15",
-      "2,5", "2,5", "1,1", "1,1").sorted
+    val expected = List(
+      "6,111",
+      "6,111",
+      "5,65",
+      "5,65",
+      "4,34",
+      "4,34",
+      "3,15",
+      "3,15",
+      "2,5",
+      "2,5",
+      "1,1",
+      "1,1").sorted
     assertEquals(expected, sink.getRetractResults.sorted)
   }
 
@@ -208,8 +211,8 @@ class TableAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTes
     expectedException.expect(classOf[ValidationException])
     expectedException.expectMessage(
       s"Could not find an implementation method 'retract' in class '${classOf[Top3].getName}' " +
-      s"for function 'Top3' that matches the following signature:\n" +
-      s"void retract(${classOf[Top3Accum].getName}, java.lang.Integer)")
+        s"for function 'Top3' that matches the following signature:\n" +
+        s"void retract(${classOf[Top3Accum].getName}, java.lang.Integer)")
 
     val top3 = new Top3
     val source = env.fromCollection(tupleData3).toTable(tEnv, 'a, 'b, 'c)
@@ -233,7 +236,8 @@ class TableAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTes
       .flatAggregate(call(classOf[OverloadedDoubleMaxFunction], 'a) as 'max)
       .select('b, 'max)
       .toRetractStream[Row]
-      .addSink(sink1).setParallelism(1)
+      .addSink(sink1)
+      .setParallelism(1)
 
     val sink2 = new TestingRetractSink()
     source
@@ -242,28 +246,28 @@ class TableAggregateITCase(mode: StateBackendMode) extends StreamingWithStateTes
       .flatAggregate(call(classOf[OverloadedDoubleMaxFunction], 'a) as 'max)
       .select('b, 'max)
       .toRetractStream[Row]
-      .addSink(sink2).setParallelism(1)
+      .addSink(sink2)
+      .setParallelism(1)
 
     env.execute()
 
-    val expected1 = List(
-      "1,1", "1,1",
-      "2,3", "2,3",
-      "3,6", "3,6",
-      "4,10", "4,10",
-      "5,15", "5,15",
-      "6,21", "6,21"
-    )
+    val expected1 =
+      List("1,1", "1,1", "2,3", "2,3", "3,6", "3,6", "4,10", "4,10", "5,15", "5,15", "6,21", "6,21")
     assertEquals(expected1.sorted, sink1.getRetractResults.sorted)
 
     val expected2 = List(
-      "1,1str", "1,1str",
-      "2,3str", "2,3str",
-      "3,6str", "3,6str",
-      "4,9str", "4,9str",
-      "5,15str", "5,15str",
-      "6,21str", "6,21str"
-    )
+      "1,1str",
+      "1,1str",
+      "2,3str",
+      "2,3str",
+      "3,6str",
+      "3,6str",
+      "4,9str",
+      "4,9str",
+      "5,15str",
+      "5,15str",
+      "6,21str",
+      "6,21str")
     assertEquals(expected2.sorted, sink2.getRetractResults.sorted)
   }
 }

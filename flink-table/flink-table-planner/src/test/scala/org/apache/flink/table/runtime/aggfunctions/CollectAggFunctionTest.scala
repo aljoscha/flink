@@ -28,15 +28,14 @@ import org.apache.flink.table.functions.aggfunctions._
 import scala.collection.JavaConverters._
 
 /**
-  * Test case for built-in collect aggregate functions
-  */
+ * Test case for built-in collect aggregate functions
+ */
 class StringCollectAggFunctionTest
-  extends AggFunctionTestBase[util.Map[String, Integer], CollectAccumulator[String]] {
+    extends AggFunctionTestBase[util.Map[String, Integer], CollectAccumulator[String]] {
 
   override def inputValueSets: Seq[Seq[_]] = Seq(
     Seq("a", "a", "b", null, "c", null, "d", "e", null, "f"),
-    Seq(null, null, null, null, null, null)
-  )
+    Seq(null, null, null, null, null, null))
 
   override def expectedResults: Seq[util.Map[String, Integer]] = {
     val map = new util.HashMap[String, Integer]()
@@ -49,20 +48,18 @@ class StringCollectAggFunctionTest
     Seq(map, Map[String, Integer]().asJava)
   }
 
-  override def aggregator: AggregateFunction[
-    util.Map[String, Integer], CollectAccumulator[String]] =
+  override def aggregator
+      : AggregateFunction[util.Map[String, Integer], CollectAccumulator[String]] =
     new CollectAggFunction(BasicTypeInfo.STRING_TYPE_INFO)
 
   override def retractFunc = aggregator.getClass.getMethod("retract", accType, classOf[Any])
 }
 
 class IntCollectAggFunctionTest
-  extends AggFunctionTestBase[util.Map[Int, Integer], CollectAccumulator[Int]] {
+    extends AggFunctionTestBase[util.Map[Int, Integer], CollectAccumulator[Int]] {
 
-  override def inputValueSets: Seq[Seq[_]] = Seq(
-    Seq(1, 1, 2, null, 3, null, 4, 5, null),
-    Seq(null, null, null, null, null, null)
-  )
+  override def inputValueSets: Seq[Seq[_]] =
+    Seq(Seq(1, 1, 2, null, 3, null, 4, 5, null), Seq(null, null, null, null, null, null))
 
   override def expectedResults: Seq[util.Map[Int, Integer]] = {
     val map = new util.HashMap[Int, Integer]()
@@ -81,12 +78,11 @@ class IntCollectAggFunctionTest
 }
 
 class ByteCollectAggFunctionTest
-  extends AggFunctionTestBase[util.Map[Byte, Integer], CollectAccumulator[Byte]] {
+    extends AggFunctionTestBase[util.Map[Byte, Integer], CollectAccumulator[Byte]] {
 
   override def inputValueSets: Seq[Seq[_]] = Seq(
     Seq(1.toByte, 1.toByte, 2.toByte, null, 3.toByte, null, 4.toByte, 5.toByte, null),
-    Seq(null, null, null, null, null, null)
-  )
+    Seq(null, null, null, null, null, null))
 
   override def expectedResults: Seq[util.Map[Byte, Integer]] = {
     val map = new util.HashMap[Byte, Integer]()
@@ -105,13 +101,11 @@ class ByteCollectAggFunctionTest
 }
 
 class ShortCollectAggFunctionTest
-  extends AggFunctionTestBase[util.Map[Short, Integer], CollectAccumulator[Short]] {
+    extends AggFunctionTestBase[util.Map[Short, Integer], CollectAccumulator[Short]] {
 
   override def inputValueSets: Seq[Seq[_]] = Seq(
-    Seq(1.toShort, 1.toShort, 2.toShort, null,
-      3.toShort, null, 4.toShort, 5.toShort, null),
-    Seq(null, null, null, null, null, null)
-  )
+    Seq(1.toShort, 1.toShort, 2.toShort, null, 3.toShort, null, 4.toShort, 5.toShort, null),
+    Seq(null, null, null, null, null, null))
 
   override def expectedResults: Seq[util.Map[Short, Integer]] = {
     val map = new util.HashMap[Short, Integer]()
@@ -130,12 +124,10 @@ class ShortCollectAggFunctionTest
 }
 
 class LongCollectAggFunctionTest
-  extends AggFunctionTestBase[util.Map[Long, Integer], CollectAccumulator[Long]] {
+    extends AggFunctionTestBase[util.Map[Long, Integer], CollectAccumulator[Long]] {
 
-  override def inputValueSets: Seq[Seq[_]] = Seq(
-    Seq(1L, 1L, 2L, null, 3L, null, 4L, 5L, null),
-    Seq(null, null, null, null, null, null)
-  )
+  override def inputValueSets: Seq[Seq[_]] =
+    Seq(Seq(1L, 1L, 2L, null, 3L, null, 4L, 5L, null), Seq(null, null, null, null, null, null))
 
   override def expectedResults: Seq[util.Map[Long, Integer]] = {
     val map = new util.HashMap[Long, Integer]()
@@ -154,12 +146,10 @@ class LongCollectAggFunctionTest
 }
 
 class FloatAggFunctionTest
-  extends AggFunctionTestBase[util.Map[Float, Integer], CollectAccumulator[Float]] {
+    extends AggFunctionTestBase[util.Map[Float, Integer], CollectAccumulator[Float]] {
 
-  override def inputValueSets: Seq[Seq[_]] = Seq(
-    Seq(1f, 1f, 2f, null, 3.2f, null, 4f, 5f, null),
-    Seq(null, null, null, null, null, null)
-  )
+  override def inputValueSets: Seq[Seq[_]] =
+    Seq(Seq(1f, 1f, 2f, null, 3.2f, null, 4f, 5f, null), Seq(null, null, null, null, null, null))
 
   override def expectedResults: Seq[util.Map[Float, Integer]] = {
     val map = new util.HashMap[Float, Integer]()
@@ -178,12 +168,10 @@ class FloatAggFunctionTest
 }
 
 class DoubleAggFunctionTest
-  extends AggFunctionTestBase[util.Map[Double, Integer], CollectAccumulator[Double]] {
+    extends AggFunctionTestBase[util.Map[Double, Integer], CollectAccumulator[Double]] {
 
-  override def inputValueSets: Seq[Seq[_]] = Seq(
-    Seq(1d, 1d, 2d, null, 3.2d, null, 4d, 5d),
-    Seq(null, null, null, null, null, null)
-  )
+  override def inputValueSets: Seq[Seq[_]] =
+    Seq(Seq(1d, 1d, 2d, null, 3.2d, null, 4d, 5d), Seq(null, null, null, null, null, null))
 
   override def expectedResults: Seq[util.Map[Double, Integer]] = {
     val map = new util.HashMap[Double, Integer]()
@@ -195,20 +183,19 @@ class DoubleAggFunctionTest
     Seq(map, Map[Double, Integer]().asJava)
   }
 
-  override def aggregator: AggregateFunction[
-    util.Map[Double, Integer], CollectAccumulator[Double]] =
+  override def aggregator
+      : AggregateFunction[util.Map[Double, Integer], CollectAccumulator[Double]] =
     new CollectAggFunction(BasicTypeInfo.DOUBLE_TYPE_INFO)
 
   override def retractFunc = aggregator.getClass.getMethod("retract", accType, classOf[Any])
 }
 
 class ObjectCollectAggFunctionTest
-  extends AggFunctionTestBase[util.Map[Object, Integer], CollectAccumulator[Object]] {
+    extends AggFunctionTestBase[util.Map[Object, Integer], CollectAccumulator[Object]] {
 
   override def inputValueSets: Seq[Seq[_]] = Seq(
     Seq(Tuple2(1, "a"), Tuple2(1, "a"), null, Tuple2(2, "b")),
-    Seq(null, null, null, null, null, null)
-  )
+    Seq(null, null, null, null, null, null))
 
   override def expectedResults: Seq[util.Map[Object, Integer]] = {
     val map = new util.HashMap[Object, Integer]()
@@ -217,10 +204,9 @@ class ObjectCollectAggFunctionTest
     Seq(map, Map[Object, Integer]().asJava)
   }
 
-  override def aggregator: AggregateFunction[
-    util.Map[Object, Integer], CollectAccumulator[Object]] =
+  override def aggregator
+      : AggregateFunction[util.Map[Object, Integer], CollectAccumulator[Object]] =
     new CollectAggFunction(new GenericTypeInfo[Object](classOf[Object]))
 
   override def retractFunc = aggregator.getClass.getMethod("retract", accType, classOf[Any])
 }
-

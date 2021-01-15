@@ -36,8 +36,8 @@ class FlinkLogicalOverWindow(
     windowConstants: JList[RexLiteral],
     rowType: RelDataType,
     windowGroups: JList[Window.Group])
-  extends Window(cluster, traitSet, input, windowConstants, rowType, windowGroups)
-  with FlinkLogicalRel {
+    extends Window(cluster, traitSet, input, windowConstants, rowType, windowGroups)
+    with FlinkLogicalRel {
 
   override def copy(traitSet: RelTraitSet, inputs: JList[RelNode]): RelNode = {
     new FlinkLogicalOverWindow(

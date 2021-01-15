@@ -26,16 +26,15 @@ import org.apache.flink.table.planner.utils.TableTestBase
 import org.junit.Test
 
 /**
-  * Tests for column functions.
-  */
+ * Tests for column functions.
+ */
 class ColumnFunctionsTest extends TableTestBase {
 
   private val util = batchTestUtil()
 
   @Test
   def testOrderBy(): Unit = {
-    val t = util.addTableSource[(Int, Long, String, Int, Long, String)](
-      'a, 'b, 'c, 'd, 'e, 'f)
+    val t = util.addTableSource[(Int, Long, String, Int, Long, String)]('a, 'b, 'c, 'd, 'e, 'f)
 
     val tab1 = t.orderBy(withColumns(1, 2 to 3))
     val tab2 = t.orderBy("withColumns(1, 2 to 3)")

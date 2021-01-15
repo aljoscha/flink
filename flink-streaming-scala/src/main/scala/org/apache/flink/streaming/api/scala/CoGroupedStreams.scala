@@ -108,7 +108,7 @@ class CoGroupedStreams[T1, T2](input1: DataStream[T1], input2: DataStream[T2]) {
       @PublicEvolving
       def window[W <: Window](
           assigner: WindowAssigner[_ >: JavaCoGroupedStreams.TaggedUnion[T1, T2], W])
-      : WithWindow[W] = {
+          : WithWindow[W] = {
         if (keySelector1 == null || keySelector2 == null) {
           throw new UnsupportedOperationException(
             "You first need to specify KeySelectors for both inputs using where() and equalTo().")
@@ -146,16 +146,15 @@ class CoGroupedStreams[T1, T2](input1: DataStream[T1], input2: DataStream[T2]) {
          * pre-aggregation of window results cannot be used.
          */
         @PublicEvolving
-        def evictor(
-            newEvictor: Evictor[_ >: JavaCoGroupedStreams.TaggedUnion[T1, T2], _ >: W])
+        def evictor(newEvictor: Evictor[_ >: JavaCoGroupedStreams.TaggedUnion[T1, T2], _ >: W])
             : WithWindow[W] = {
           new WithWindow[W](windowAssigner, trigger, newEvictor, allowedLateness)
         }
 
         /**
-          * Sets the time by which elements are allowed to be late.
-          * Delegates to [[WindowedStream#allowedLateness(Time)]]
-          */
+         * Sets the time by which elements are allowed to be late.
+         * Delegates to [[WindowedStream#allowedLateness(Time)]]
+         */
         @PublicEvolving
         def allowedLateness(newLateness: Time): WithWindow[W] = {
           new WithWindow[W](windowAssigner, trigger, evictor, newLateness)
@@ -165,15 +164,15 @@ class CoGroupedStreams[T1, T2](input1: DataStream[T1], input2: DataStream[T2]) {
          * Completes the co-group operation with the user function that is executed
          * for windowed groups.
          */
-        def apply[O: TypeInformation](
-            fun: (Iterator[T1], Iterator[T2]) => O): DataStream[O] = {
+        def apply[O: TypeInformation](fun: (Iterator[T1], Iterator[T2]) => O): DataStream[O] = {
           require(fun != null, "CoGroup function must not be null.")
 
           val coGrouper = new CoGroupFunction[T1, T2, O] {
             val cleanFun = clean(fun)
             def coGroup(
                 left: java.lang.Iterable[T1],
-                right: java.lang.Iterable[T2], out: Collector[O]) = {
+                right: java.lang.Iterable[T2],
+                out: Collector[O]) = {
               out.collect(cleanFun(left.iterator().asScala, right.iterator().asScala))
             }
           }
@@ -192,7 +191,8 @@ class CoGroupedStreams[T1, T2](input1: DataStream[T1], input2: DataStream[T2]) {
             val cleanFun = clean(fun)
             def coGroup(
                 left: java.lang.Iterable[T1],
-                right: java.lang.Iterable[T2], out: Collector[O]) = {
+                right: java.lang.Iterable[T2],
+                out: Collector[O]) = {
               cleanFun(left.iterator.asScala, right.iterator.asScala, out)
             }
           }
@@ -207,14 +207,15 @@ class CoGroupedStreams[T1, T2](input1: DataStream[T1], input2: DataStream[T2]) {
 
           val coGroup = new JavaCoGroupedStreams[T1, T2](input1.javaStream, input2.javaStream)
 
-          asScalaStream(coGroup
-            .where(keySelector1)
-            .equalTo(keySelector2)
-            .window(windowAssigner)
-            .trigger(trigger)
-            .evictor(evictor)
-            .allowedLateness(allowedLateness)
-            .apply(clean(function), implicitly[TypeInformation[T]]))
+          asScalaStream(
+            coGroup
+              .where(keySelector1)
+              .equalTo(keySelector2)
+              .window(windowAssigner)
+              .trigger(trigger)
+              .evictor(evictor)
+              .allowedLateness(allowedLateness)
+              .apply(clean(function), implicitly[TypeInformation[T]]))
         }
       }
 

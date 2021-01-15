@@ -44,9 +44,8 @@ class KeyedProcessFunctionWithCleanupStateTest extends HarnessTestBase {
       config.getMaxIdleStateRetentionTime)
     val operator = new KeyedProcessOperator(func)
 
-    val testHarness = createHarnessTester(operator,
-      new FirstFieldSelector,
-      TypeInformation.of(classOf[String]))
+    val testHarness =
+      createHarnessTester(operator, new FirstFieldSelector, TypeInformation.of(classOf[String]))
 
     testHarness.open()
 
@@ -95,11 +94,10 @@ class KeyedProcessFunctionWithCleanupStateTest extends HarnessTestBase {
   }
 }
 
-private class MockedKeyedProcessFunction(
-    minRetentionTime: Long,
-    maxRetentionTime: Long)
-  extends KeyedProcessFunctionWithCleanupState[String, (String, String), String](
-      minRetentionTime, maxRetentionTime) {
+private class MockedKeyedProcessFunction(minRetentionTime: Long, maxRetentionTime: Long)
+    extends KeyedProcessFunctionWithCleanupState[String, (String, String), String](
+      minRetentionTime,
+      maxRetentionTime) {
 
   var state: ValueState[String] = _
 

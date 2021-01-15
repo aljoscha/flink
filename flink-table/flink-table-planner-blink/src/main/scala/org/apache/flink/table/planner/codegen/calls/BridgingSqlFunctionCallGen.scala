@@ -18,7 +18,12 @@
 
 package org.apache.flink.table.planner.codegen.calls
 
-import org.apache.flink.table.functions.{FunctionDefinition, ScalarFunction, TableFunction, UserDefinedFunctionHelper}
+import org.apache.flink.table.functions.{
+  FunctionDefinition,
+  ScalarFunction,
+  TableFunction,
+  UserDefinedFunctionHelper
+}
 import org.apache.flink.table.planner.codegen._
 import org.apache.flink.table.planner.codegen.calls.BridgingFunctionGenUtil.generateFunctionAwareCall
 import org.apache.flink.table.planner.delegation.PlannerBase
@@ -43,8 +48,7 @@ class BridgingSqlFunctionCallGen(call: RexCall) extends CallGenerator {
   override def generate(
       ctx: CodeGeneratorContext,
       operands: Seq[GeneratedExpression],
-      returnType: LogicalType)
-    : GeneratedExpression = {
+      returnType: LogicalType): GeneratedExpression = {
 
     val function: BridgingSqlFunction = call.getOperator.asInstanceOf[BridgingSqlFunction]
     val definition: FunctionDefinition = function.getDefinition
@@ -55,10 +59,7 @@ class BridgingSqlFunctionCallGen(call: RexCall) extends CallGenerator {
     val callContext = new OperatorBindingCallContext(
       dataTypeFactory,
       definition,
-      RexCallBinding.create(
-        function.getTypeFactory,
-        call,
-        Collections.emptyList()),
+      RexCallBinding.create(function.getTypeFactory, call, Collections.emptyList()),
       call.getType)
 
     // create the final UDF for runtime

@@ -30,17 +30,17 @@ import scala.collection.JavaConverters._
 import scala.reflect.runtime.universe
 
 /**
-  * This is a non macro-generated, concrete Scala case class serializer.
-  *
-  * <p>We need this serializer to replace the previously macro generated,
-  * anonymous [[CaseClassSerializer]].
-  */
+ * This is a non macro-generated, concrete Scala case class serializer.
+ *
+ * <p>We need this serializer to replace the previously macro generated,
+ * anonymous [[CaseClassSerializer]].
+ */
 @SerialVersionUID(1L)
 class ScalaCaseClassSerializer[T <: Product](
     clazz: Class[T],
-    scalaFieldSerializers: Array[TypeSerializer[_]]
-    ) extends CaseClassSerializer[T](clazz, scalaFieldSerializers)
-  with SelfResolvingTypeSerializer[T] {
+    scalaFieldSerializers: Array[TypeSerializer[_]])
+    extends CaseClassSerializer[T](clazz, scalaFieldSerializers)
+    with SelfResolvingTypeSerializer[T] {
 
   @transient
   private var constructor = lookupConstructor(clazz)
@@ -66,11 +66,7 @@ class ScalaCaseClassSerializer[T <: Product](
     val newCompositeSnapshot =
       new ScalaCaseClassSerializerSnapshot[T](configSnapshot.getTupleClass)
 
-    delegateCompatibilityCheckToNewSnapshot(
-      this,
-      newCompositeSnapshot,
-      nestedSnapshots: _*
-    )
+    delegateCompatibilityCheckToNewSnapshot(this, newCompositeSnapshot, nestedSnapshots: _*)
   }
 
   private def readObject(in: ObjectInputStream): Unit = {
@@ -94,8 +90,7 @@ object ScalaCaseClassSerializer {
          |toplevel object, or of an object contained in a toplevel object,
          |therefore it requires an outer instance to be instantiated, but we don't have a
          |reference to the outer instance. Please consider changing the outer class to an object.
-         |""".stripMargin
-    )
+         |""".stripMargin)
 
     val primaryConstructorSymbol = classSymbol.toType
       .decl(universe.termNames.CONSTRUCTOR)

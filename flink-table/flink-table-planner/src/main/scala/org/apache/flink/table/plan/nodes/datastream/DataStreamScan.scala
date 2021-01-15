@@ -34,15 +34,15 @@ import org.apache.flink.table.typeutils.TimeIndicatorTypeInfo
 import scala.collection.JavaConverters._
 
 /**
-  * Flink RelNode which matches along with DataStreamSource.
-  * It ensures that types without deterministic field order (e.g. POJOs) are not part of
-  * the plan translation.
-  *
-  * This may read only part, or change the order of the fields available in a
-  * [[org.apache.flink.api.common.typeutils.CompositeType]] of the underlying [[DataStream]].
-  * The fieldIdxs describe the indices of the fields in the
-  * [[org.apache.flink.api.common.typeinfo.TypeInformation]]
-  */
+ * Flink RelNode which matches along with DataStreamSource.
+ * It ensures that types without deterministic field order (e.g. POJOs) are not part of
+ * the plan translation.
+ *
+ * This may read only part, or change the order of the fields available in a
+ * [[org.apache.flink.api.common.typeutils.CompositeType]] of the underlying [[DataStream]].
+ * The fieldIdxs describe the indices of the fields in the
+ * [[org.apache.flink.api.common.typeinfo.TypeInformation]]
+ */
 class DataStreamScan(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -50,23 +50,16 @@ class DataStreamScan(
     dataStream: DataStream[_],
     fieldIdxs: Array[Int],
     schema: RowSchema)
-  extends TableScan(
-    cluster,
-    traitSet,
-    RelOptTableImpl.create(catalog, schema.relDataType, List[String]().asJava, null))
-  with StreamScan {
+    extends TableScan(
+      cluster,
+      traitSet,
+      RelOptTableImpl.create(catalog, schema.relDataType, List[String]().asJava, null))
+    with StreamScan {
 
   override def deriveRowType(): RelDataType = schema.relDataType
 
   override def copy(traitSet: RelTraitSet, inputs: java.util.List[RelNode]): RelNode = {
-    new DataStreamScan(
-      cluster,
-      traitSet,
-      catalog,
-      dataStream,
-      fieldIdxs,
-      schema
-    )
+    new DataStreamScan(cluster, traitSet, catalog, dataStream, fieldIdxs, schema)
   }
 
   override def translateToPlan(planner: StreamPlanner): DataStream[CRow] = {

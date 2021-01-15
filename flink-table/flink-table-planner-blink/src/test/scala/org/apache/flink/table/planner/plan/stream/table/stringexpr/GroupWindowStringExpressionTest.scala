@@ -32,8 +32,7 @@ class GroupWindowStringExpressionTest extends TableTestBase {
   @Test
   def testRowTimeSlide(): Unit = {
     val util = streamTestUtil()
-    val t = util.addDataStream[(Int, Long, String)](
-      "T1", 'int, 'long, 'string, 'rowtime.rowtime)
+    val t = util.addDataStream[(Int, Long, String)]("T1", 'int, 'long, 'string, 'rowtime.rowtime)
 
     val myCountFun = new CountAggFunction
     util.addFunction("myCountFun", myCountFun)
@@ -58,12 +57,12 @@ class GroupWindowStringExpressionTest extends TableTestBase {
       .groupBy("w, string")
       .select(
         "string, " +
-        "myCountFun(string), " +
-        "int.sum, " +
-        "weightAvgFun(long, int), " +
-        "weightAvgFun(int, int) * 2, " +
-        "start(w)," +
-        "end(w)")
+          "myCountFun(string), " +
+          "int.sum, " +
+          "weightAvgFun(long, int), " +
+          "weightAvgFun(int, int) * 2, " +
+          "start(w)," +
+          "end(w)")
 
     verifyTableEquals(resJava, resScala)
   }
@@ -71,8 +70,8 @@ class GroupWindowStringExpressionTest extends TableTestBase {
   @Test
   def testRowTimeTumble(): Unit = {
     val util = streamTestUtil()
-    val t = util.addDataStream[(Int, Long, Long, String)](
-      "T1", 'int, 'long, 'rowtime.rowtime, 'string)
+    val t =
+      util.addDataStream[(Int, Long, Long, String)]("T1", 'int, 'long, 'rowtime.rowtime, 'string)
 
     val myCountFun = new CountAggFunction
     util.addFunction("myCountFun", myCountFun)
@@ -97,12 +96,12 @@ class GroupWindowStringExpressionTest extends TableTestBase {
       .groupBy("w, string")
       .select(
         "string, " +
-        "myCountFun(string), " +
-        "int.sum, " +
-        "weightAvgFun(long, int), " +
-        "weightAvgFun(int, int) * 2, " +
-        "start(w)," +
-        "end(w)")
+          "myCountFun(string), " +
+          "int.sum, " +
+          "weightAvgFun(long, int), " +
+          "weightAvgFun(int, int) * 2, " +
+          "start(w)," +
+          "end(w)")
 
     verifyTableEquals(resJava, resScala)
   }
@@ -110,8 +109,7 @@ class GroupWindowStringExpressionTest extends TableTestBase {
   @Test
   def testRowTimeSession(): Unit = {
     val util = streamTestUtil()
-    val t = util.addDataStream[(Int, Long, String)](
-      "T1", 'int, 'long, 'string, 'rowtime.rowtime)
+    val t = util.addDataStream[(Int, Long, String)]("T1", 'int, 'long, 'string, 'rowtime.rowtime)
 
     val myCountFun = new CountAggFunction
     util.addFunction("myCountFun", myCountFun)
@@ -135,20 +133,18 @@ class GroupWindowStringExpressionTest extends TableTestBase {
       .groupBy("w, string")
       .select(
         "string, " +
-        "myCountFun(string), " +
-        "int.sum, " +
-        "weightAvgFun(long, int), " +
-        "weightAvgFun(int, int) * 2, " +
-        "start(w)"
-      )
+          "myCountFun(string), " +
+          "int.sum, " +
+          "weightAvgFun(long, int), " +
+          "weightAvgFun(int, int) * 2, " +
+          "start(w)")
 
     verifyTableEquals(resJava, resScala)
   }
   @Test
   def testProcTimeSlide(): Unit = {
     val util = streamTestUtil()
-    val t = util.addDataStream[(Int, Long, String)](
-      "T1", 'int, 'long, 'string, 'proctime.proctime)
+    val t = util.addDataStream[(Int, Long, String)]("T1", 'int, 'long, 'string, 'proctime.proctime)
 
     val myCountFun = new CountAggFunction
     util.addFunction("myCountFun", myCountFun)
@@ -172,11 +168,11 @@ class GroupWindowStringExpressionTest extends TableTestBase {
       .groupBy("w")
       .select(
         "myCountFun(string), " +
-        "int.sum, " +
-        "weightAvgFun(long, int), " +
-        "weightAvgFun(int, int) * 2, " +
-        "start(w)," +
-        "end(w)")
+          "int.sum, " +
+          "weightAvgFun(long, int), " +
+          "weightAvgFun(int, int) * 2, " +
+          "start(w)," +
+          "end(w)")
 
     verifyTableEquals(resJava, resScala)
   }
@@ -184,8 +180,7 @@ class GroupWindowStringExpressionTest extends TableTestBase {
   @Test
   def testProcTimeTumble(): Unit = {
     val util = streamTestUtil()
-    val t = util.addDataStream[(Int, Long, String)](
-      "T1", 'int, 'long,'string, 'proctime.proctime)
+    val t = util.addDataStream[(Int, Long, String)]("T1", 'int, 'long, 'string, 'proctime.proctime)
 
     val myCountFun = new CountAggFunction
     util.addFunction("myCountFun", myCountFun)
@@ -209,11 +204,11 @@ class GroupWindowStringExpressionTest extends TableTestBase {
       .groupBy("w")
       .select(
         "myCountFun(string), " +
-        "int.sum, " +
-        "weightAvgFun(long, int), " +
-        "weightAvgFun(int, int) * 2, " +
-        "start(w)," +
-        "end(w)")
+          "int.sum, " +
+          "weightAvgFun(long, int), " +
+          "weightAvgFun(int, int) * 2, " +
+          "start(w)," +
+          "end(w)")
 
     verifyTableEquals(resJava, resScala)
   }
@@ -221,8 +216,7 @@ class GroupWindowStringExpressionTest extends TableTestBase {
   @Test
   def testProcTimeSession(): Unit = {
     val util = streamTestUtil()
-    val t = util.addDataStream[(Int, Long, String)](
-      "T1", 'int, 'long, 'string, 'proctime.proctime)
+    val t = util.addDataStream[(Int, Long, String)]("T1", 'int, 'long, 'string, 'proctime.proctime)
 
     val myCountFun = new CountAggFunction
     util.addFunction("myCountFun", myCountFun)
@@ -246,12 +240,11 @@ class GroupWindowStringExpressionTest extends TableTestBase {
       .groupBy("w")
       .select(
         "myCountFun(string), " +
-        "int.sum, " +
-        "weightAvgFun(long, int), " +
-        "weightAvgFun(int, int) * 2, " +
-        "start(w), " +
-        "end(w)"
-      )
+          "int.sum, " +
+          "weightAvgFun(long, int), " +
+          "weightAvgFun(int, int) * 2, " +
+          "start(w), " +
+          "end(w)")
 
     verifyTableEquals(resJava, resScala)
   }

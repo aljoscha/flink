@@ -23,10 +23,10 @@ import org.apache.flink.api.common.typeinfo.TypeInformation
 import org.apache.flink.types.Row
 
 /**
-  * Deserialization schema for testing purposes.
-  */
+ * Deserialization schema for testing purposes.
+ */
 class TestDeserializationSchema(val typeInfo: TypeInformation[Row])
-  extends DeserializationSchema[Row] {
+    extends DeserializationSchema[Row] {
 
   override def deserialize(message: Array[Byte]): Row = throw new UnsupportedOperationException()
 

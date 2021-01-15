@@ -27,14 +27,14 @@ import org.apache.calcite.rel.RelNode
 import org.apache.calcite.rel.convert.ConverterRule
 
 /**
-  * Rule that converts [[FlinkLogicalIntermediateTableScan]] to [[StreamExecIntermediateTableScan]].
-  */
+ * Rule that converts [[FlinkLogicalIntermediateTableScan]] to [[StreamExecIntermediateTableScan]].
+ */
 class StreamExecIntermediateTableScanRule
-  extends ConverterRule(
-    classOf[FlinkLogicalIntermediateTableScan],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.STREAM_PHYSICAL,
-    "StreamExecIntermediateTableScanRule") {
+    extends ConverterRule(
+      classOf[FlinkLogicalIntermediateTableScan],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.STREAM_PHYSICAL,
+      "StreamExecIntermediateTableScanRule") {
 
   def convert(rel: RelNode): RelNode = {
     val scan = rel.asInstanceOf[FlinkLogicalIntermediateTableScan]

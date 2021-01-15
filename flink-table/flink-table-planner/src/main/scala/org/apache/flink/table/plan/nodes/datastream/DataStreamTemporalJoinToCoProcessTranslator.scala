@@ -36,8 +36,8 @@ import org.apache.flink.types.Row
 import org.apache.flink.util.Preconditions.checkState
 
 /**
-  * @param rightTimeAttributeInputReference is defined only for event time joins.
-  */
+ * @param rightTimeAttributeInputReference is defined only for event time joins.
+ */
 class DataStreamTemporalJoinToCoProcessTranslator private (
     textualRepresentation: String,
     config: TableConfig,
@@ -49,20 +49,20 @@ class DataStreamTemporalJoinToCoProcessTranslator private (
     leftTimeAttributeInputReference: Int,
     rightTimeAttributeInputReference: Option[Int],
     remainingNonEquiJoinPredicates: RexNode)
-  extends DataStreamJoinToCoProcessTranslator(
-    config,
-    returnType,
-    leftSchema,
-    rightSchema,
-    joinInfo,
-    rexBuilder) {
+    extends DataStreamJoinToCoProcessTranslator(
+      config,
+      returnType,
+      leftSchema,
+      rightSchema,
+      joinInfo,
+      rexBuilder) {
 
   override val nonEquiJoinPredicates: Option[RexNode] = Some(remainingNonEquiJoinPredicates)
 
   override protected def createJoinOperator(
       joinType: JoinRelType,
       joinFunction: GeneratedFunction[FlatJoinFunction[Row, Row, Row], Row])
-    : TwoInputStreamOperator[CRow, CRow, CRow] = {
+      : TwoInputStreamOperator[CRow, CRow, CRow] = {
 
     joinType match {
       case JoinRelType.INNER =>
@@ -76,8 +76,7 @@ class DataStreamTemporalJoinToCoProcessTranslator private (
             config.getMaxIdleStateRetentionTime,
             leftTimeAttributeInputReference,
             rightTimeAttributeInputReference.get)
-        }
-        else {
+        } else {
           new TemporalProcessTimeJoin(
             leftSchema.typeInfo,
             rightSchema.typeInfo,
@@ -87,26 +86,23 @@ class DataStreamTemporalJoinToCoProcessTranslator private (
             config.getMaxIdleStateRetentionTime)
         }
       case _ =>
-       throw new ValidationException(
-         s"Only ${JoinRelType.INNER} temporal join is supported in [$textualRepresentation]")
+        throw new ValidationException(
+          s"Only ${JoinRelType.INNER} temporal join is supported in [$textualRepresentation]")
     }
   }
 }
 
 object DataStreamTemporalJoinToCoProcessTranslator {
   def create(
-    textualRepresentation: String,
-    config: TableConfig,
-    returnType: TypeInformation[Row],
-    leftSchema: RowSchema,
-    rightSchema: RowSchema,
-    joinInfo: JoinInfo,
-    rexBuilder: RexBuilder): DataStreamTemporalJoinToCoProcessTranslator = {
+      textualRepresentation: String,
+      config: TableConfig,
+      returnType: TypeInformation[Row],
+      leftSchema: RowSchema,
+      rightSchema: RowSchema,
+      joinInfo: JoinInfo,
+      rexBuilder: RexBuilder): DataStreamTemporalJoinToCoProcessTranslator = {
 
-    checkState(
-      !joinInfo.isEqui,
-      "Missing %s in join condition",
-      TEMPORAL_JOIN_CONDITION)
+    checkState(!joinInfo.isEqui, "Missing %s in join condition", TEMPORAL_JOIN_CONDITION)
 
     val nonEquiJoinRex: RexNode = joinInfo.getRemaining(rexBuilder)
     val temporalJoinConditionExtractor = new TemporalJoinConditionExtractor(
@@ -134,9 +130,8 @@ object DataStreamTemporalJoinToCoProcessTranslator {
       extractInputReference(
         temporalJoinConditionExtractor.leftTimeAttribute.get,
         textualRepresentation),
-      temporalJoinConditionExtractor.rightTimeAttribute.map(
-        rightTimeAttribute =>
-          extractInputReference(rightTimeAttribute, textualRepresentation) - leftSchema.arity),
+      temporalJoinConditionExtractor.rightTimeAttribute.map(rightTimeAttribute =>
+        extractInputReference(rightTimeAttribute, textualRepresentation) - leftSchema.arity),
       remainingNonEquiJoinPredicates)
   }
 
@@ -155,8 +150,7 @@ object DataStreamTemporalJoinToCoProcessTranslator {
       rightKeysStartingOffset: Int,
       joinInfo: JoinInfo,
       rexBuilder: RexBuilder)
-
-    extends RexShuttle {
+      extends RexShuttle {
 
     var leftTimeAttribute: Option[RexNode] = None
 
@@ -193,8 +187,7 @@ object DataStreamTemporalJoinToCoProcessTranslator {
             s"Non rowtime timeAttribute [${leftTimeAttribute.get.getType}] " +
               s"passed as the argument to TemporalTableFunction")
         }
-      }
-      else if (LogicalTemporalTableJoin.isProctimeCall(call)) {
+      } else if (LogicalTemporalTableJoin.isProctimeCall(call)) {
         leftTimeAttribute = Some(call.getOperands.get(0))
         rightPrimaryKeyExpression = Some(validateRightPrimaryKey(call.getOperands.get(1)))
 
@@ -203,10 +196,8 @@ object DataStreamTemporalJoinToCoProcessTranslator {
             s"Non processing timeAttribute [${leftTimeAttribute.get.getType}] " +
               s"passed as the argument to TemporalTableFunction")
         }
-      }
-      else {
-        throw new IllegalStateException(
-          s"Unsupported invocation $call in [$textualRepresentation]")
+      } else {
+        throw new IllegalStateException(s"Unsupported invocation $call in [$textualRepresentation]")
       }
       rexBuilder.makeLiteral(true)
     }
@@ -219,9 +210,8 @@ object DataStreamTemporalJoinToCoProcessTranslator {
       }
       val rightJoinKeyInputReference = joinInfo.rightKeys.get(0) + rightKeysStartingOffset
 
-      val rightPrimaryKeyInputReference = extractInputReference(
-        rightPrimaryKey,
-        textualRepresentation)
+      val rightPrimaryKeyInputReference =
+        extractInputReference(rightPrimaryKey, textualRepresentation)
 
       if (rightPrimaryKeyInputReference != rightJoinKeyInputReference) {
         throw new ValidationException(
@@ -235,10 +225,10 @@ object DataStreamTemporalJoinToCoProcessTranslator {
   }
 
   /**
-    * Extracts input references from RexNode.
-    */
+   * Extracts input references from RexNode.
+   */
   private class InputReferenceVisitor(textualRepresentation: String)
-    extends RexDefaultVisitor[RexNode] {
+      extends RexDefaultVisitor[RexNode] {
 
     var inputReference: Option[Int] = None
 

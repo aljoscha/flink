@@ -39,7 +39,8 @@ class GroupCombineITCase(mode: TestExecutionMode) extends MultipleProgramsTestBa
   def testApi(): Unit = {
     val env = ExecutionEnvironment.getExecutionEnvironment
 
-    val ds: DataSet[Tuple1[String]] = CollectionDataSets.getStringDataSet(env)
+    val ds: DataSet[Tuple1[String]] = CollectionDataSets
+      .getStringDataSet(env)
       .map(str => Tuple1(str))
 
     // all methods on DataSet
@@ -47,9 +48,8 @@ class GroupCombineITCase(mode: TestExecutionMode) extends MultipleProgramsTestBa
       .output(new DiscardingOutputFormat[Tuple1[String]])
 
     ds
-      .combineGroup(
-        (in: Iterator[Tuple1[String]], out: Collector[Tuple1[String]]) =>
-          in.toSet foreach (out.collect))
+      .combineGroup((in: Iterator[Tuple1[String]], out: Collector[Tuple1[String]]) =>
+        in.toSet foreach (out.collect))
       .output(new DiscardingOutputFormat[Tuple1[String]])
 
     // all methods on UnsortedGrouping
@@ -58,24 +58,22 @@ class GroupCombineITCase(mode: TestExecutionMode) extends MultipleProgramsTestBa
       .output(new DiscardingOutputFormat[Tuple1[String]])
 
     ds.groupBy(0)
-      .combineGroup(
-        (in: Iterator[Tuple1[String]], out: Collector[Tuple1[String]]) =>
-          in.toSet foreach (out.collect))
+      .combineGroup((in: Iterator[Tuple1[String]], out: Collector[Tuple1[String]]) =>
+        in.toSet foreach (out.collect))
       .output(new DiscardingOutputFormat[Tuple1[String]])
 
     // all methods on SortedGrouping
-    ds.groupBy(0).sortGroup(0, Order.ASCENDING)
+    ds.groupBy(0)
+      .sortGroup(0, Order.ASCENDING)
       .combineGroup(new ScalaGroupCombineFunctionExample())
       .output(new DiscardingOutputFormat[Tuple1[String]])
 
-    ds.groupBy(0).sortGroup(0, Order.ASCENDING)
-      .combineGroup(
-        (in: Iterator[Tuple1[String]], out: Collector[Tuple1[String]]) =>
-          in.toSet foreach (out.collect))
+    ds.groupBy(0)
+      .sortGroup(0, Order.ASCENDING)
+      .combineGroup((in: Iterator[Tuple1[String]], out: Collector[Tuple1[String]]) =>
+        in.toSet foreach (out.collect))
       .output(new DiscardingOutputFormat[Tuple1[String]])
 
     env.execute()
   }
 }
-
-

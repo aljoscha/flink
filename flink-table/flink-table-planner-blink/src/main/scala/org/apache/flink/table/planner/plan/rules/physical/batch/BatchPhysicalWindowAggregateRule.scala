@@ -24,10 +24,19 @@ import org.apache.flink.table.functions.{AggregateFunction, UserDefinedFunction}
 import org.apache.flink.table.planner.calcite.{FlinkContext, FlinkRelFactories, FlinkTypeFactory}
 import org.apache.flink.table.planner.functions.aggfunctions.DeclarativeAggregateFunction
 import org.apache.flink.table.planner.plan.`trait`.FlinkRelDistribution
-import org.apache.flink.table.planner.plan.logical.{LogicalWindow, SlidingGroupWindow, TumblingGroupWindow}
+import org.apache.flink.table.planner.plan.logical.{
+  LogicalWindow,
+  SlidingGroupWindow,
+  TumblingGroupWindow
+}
 import org.apache.flink.table.planner.plan.nodes.FlinkConventions
 import org.apache.flink.table.planner.plan.nodes.logical.FlinkLogicalWindowAggregate
-import org.apache.flink.table.planner.plan.nodes.physical.batch.{BatchPhysicalLocalSortWindowAggregate, BatchPhysicalSortWindowAggregate, BatchPhysicalHashWindowAggregate, BatchPhysicalLocalHashWindowAggregate}
+import org.apache.flink.table.planner.plan.nodes.physical.batch.{
+  BatchPhysicalLocalSortWindowAggregate,
+  BatchPhysicalSortWindowAggregate,
+  BatchPhysicalHashWindowAggregate,
+  BatchPhysicalLocalHashWindowAggregate
+}
 import org.apache.flink.table.planner.plan.utils.AggregateUtil
 import org.apache.flink.table.planner.plan.utils.AggregateUtil.hasTimeIntervalType
 import org.apache.flink.table.planner.plan.utils.PythonUtil.isPythonAggregate
@@ -68,12 +77,11 @@ import scala.collection.JavaConversions._
  * if all aggregate function buffer are fix length, the rule will choose hash window agg.
  */
 class BatchPhysicalWindowAggregateRule
-  extends RelOptRule(
-    operand(classOf[FlinkLogicalWindowAggregate],
-      operand(classOf[RelNode], any)),
-    FlinkRelFactories.LOGICAL_BUILDER_WITHOUT_AGG_INPUT_PRUNE,
-    "BatchPhysicalWindowAggregateRule")
-  with BatchPhysicalAggRuleBase {
+    extends RelOptRule(
+      operand(classOf[FlinkLogicalWindowAggregate], operand(classOf[RelNode], any)),
+      FlinkRelFactories.LOGICAL_BUILDER_WITHOUT_AGG_INPUT_PRUNE,
+      "BatchPhysicalWindowAggregateRule")
+    with BatchPhysicalAggRuleBase {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val agg: FlinkLogicalWindowAggregate = call.rel(0)
@@ -101,7 +109,8 @@ class BatchPhysicalWindowAggregateRule
     val (auxGroupSet, aggCallsWithoutAuxGroupCalls) = AggregateUtil.checkAndSplitAggCalls(agg)
 
     val (_, aggBufferTypes, aggregates) = AggregateUtil.transformToBatchAggregateFunctions(
-      FlinkTypeFactory.toLogicalRowType(input.getRowType), aggCallsWithoutAuxGroupCalls)
+      FlinkTypeFactory.toLogicalRowType(input.getRowType),
+      aggCallsWithoutAuxGroupCalls)
     val aggCallToAggFunction = aggCallsWithoutAuxGroupCalls.zip(aggregates)
     val internalAggBufferTypes = aggBufferTypes.map(_.map(fromDataTypeToLogicalType))
     val tableConfig = call.getPlanner.getContext.unwrap(classOf[FlinkContext]).getTableConfig
@@ -159,8 +168,8 @@ class BatchPhysicalWindowAggregateRule
     // TODO aggregate include projection now, so do not provide new trait will be safe
     val aggProvidedTraitSet = input.getTraitSet.replace(FlinkConventions.BATCH_PHYSICAL)
 
-    val inputTimeFieldIndex = AggregateUtil.timeFieldIndex(
-      input.getRowType, call.builder(), window.timeAttribute)
+    val inputTimeFieldIndex =
+      AggregateUtil.timeFieldIndex(input.getRowType, call.builder(), window.timeAttribute)
     val inputTimeFieldType = agg.getInput.getRowType.getFieldList.get(inputTimeFieldIndex).getType
     val inputTimeIsDate = inputTimeFieldType.getSqlTypeName == SqlTypeName.DATE
     // local-agg output order: groupSet | assignTs | auxGroupSet | aggCalls
@@ -172,8 +181,15 @@ class BatchPhysicalWindowAggregateRule
       // local
       var localRequiredTraitSet = input.getTraitSet.replace(FlinkConventions.BATCH_PHYSICAL)
       // local win-agg output order: groupSet + assignTs + auxGroupSet + aggCalls
-      val localAggRelType = inferLocalWindowAggType(enableAssignPane, input.getRowType, agg,
-        groupSet, auxGroupSet, windowType, aggregates, aggBufferTypes)
+      val localAggRelType = inferLocalWindowAggType(
+        enableAssignPane,
+        input.getRowType,
+        agg,
+        groupSet,
+        auxGroupSet,
+        windowType,
+        aggregates,
+        aggBufferTypes)
 
       val localAgg = if (preferHashExec) {
         // hash
@@ -310,8 +326,8 @@ class BatchPhysicalWindowAggregateRule
           isMerge = false)
       } else {
         // sort by grouping keys and time field in ascending direction
-        requiredTraitSet = requiredTraitSet.replace(createRelCollation(
-          groupSet :+ inputTimeFieldIndex))
+        requiredTraitSet =
+          requiredTraitSet.replace(createRelCollation(groupSet :+ inputTimeFieldIndex))
         val newInput = RelOptRule.convert(input, requiredTraitSet)
 
         new BatchPhysicalSortWindowAggregate(
@@ -346,7 +362,7 @@ class BatchPhysicalWindowAggregateRule
       windowSize: Long,
       slideSize: Long): Boolean = {
     doAllSupportMerge(aggregateList) &&
-      slideSize < windowSize && isEffectiveAssigningPane(windowSize, slideSize)
+    slideSize < windowSize && isEffectiveAssigningPane(windowSize, slideSize)
   }
 
   /**
@@ -416,7 +432,7 @@ class BatchPhysicalWindowAggregateRule
         Array(typeFactory.createFieldTypeFromLogicalType(windowType)) ++
         auxGroupSet.map(inputType.getFieldList.get(_).getType) ++ // auxGroupSet
         aggBufferSqlTypes // aggCalls
-      ).toList
+    ).toList
 
     val assignTsFieldName = if (enableAssignPane) "assignedPane$" else "assignedWindow$"
     val localAggFieldNames = (
@@ -424,7 +440,7 @@ class BatchPhysicalWindowAggregateRule
         Array(assignTsFieldName) ++ // assignTs
         auxGroupSet.map(inputType.getFieldList.get(_).getName) ++ // auxGroupSet
         aggBufferFieldNames.flatten.toArray[String] // aggCalls
-      ).toList
+    ).toList
 
     typeFactory.createStructType(localAggFieldTypes, localAggFieldNames)
   }

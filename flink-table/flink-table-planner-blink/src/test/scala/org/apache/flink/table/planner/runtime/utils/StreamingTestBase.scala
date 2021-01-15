@@ -66,8 +66,8 @@ class StreamingTestBase extends AbstractTestBase {
    */
   protected def rowOf(args: Any*): Row = {
     val row = new Row(args.length)
-    0 until args.length foreach {
-      i => row.setField(i, args(i))
+    0 until args.length foreach { i =>
+      row.setField(i, args(i))
     }
     row
   }

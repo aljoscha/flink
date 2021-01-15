@@ -27,26 +27,26 @@ import org.apache.flink.types.Row
 import org.apache.flink.util.Collector
 
 /**
-  * It wraps the aggregate logic inside of
-  * [[org.apache.flink.api.java.operators.GroupReduceOperator]]. It is used for Session time-window
-  * on batch.
-  *
-  * Note:
-  *
-  * This can handle two input types (depending if input is combined or not):
-  *
-  *  1. when partial aggregate is not supported, the input data structure of reduce is
-  * |groupKey1|groupKey2|sum1|count1|sum2|count2|rowTime|
-  *  2. when partial aggregate is supported, the input data structure of reduce is
-  * |groupKey1|groupKey2|sum1|count1|sum2|count2|windowStart|windowEnd|
-  *
-  * @param genAggregations Code-generated [[GeneratedAggregations]]
-  * @param keysAndAggregatesArity    The total arity of keys and aggregates
-  * @param finalRowWindowStartPos The relative window-start field position.
-  * @param finalRowWindowEndPos   The relative window-end field position.
-  * @param finalRowWindowRowtimePos The relative window-rowtime field position.
-  * @param gap                    Session time window gap.
-  */
+ * It wraps the aggregate logic inside of
+ * [[org.apache.flink.api.java.operators.GroupReduceOperator]]. It is used for Session time-window
+ * on batch.
+ *
+ * Note:
+ *
+ * This can handle two input types (depending if input is combined or not):
+ *
+ *  1. when partial aggregate is not supported, the input data structure of reduce is
+ * |groupKey1|groupKey2|sum1|count1|sum2|count2|rowTime|
+ *  2. when partial aggregate is supported, the input data structure of reduce is
+ * |groupKey1|groupKey2|sum1|count1|sum2|count2|windowStart|windowEnd|
+ *
+ * @param genAggregations Code-generated [[GeneratedAggregations]]
+ * @param keysAndAggregatesArity    The total arity of keys and aggregates
+ * @param finalRowWindowStartPos The relative window-start field position.
+ * @param finalRowWindowEndPos   The relative window-end field position.
+ * @param finalRowWindowRowtimePos The relative window-rowtime field position.
+ * @param gap                    Session time window gap.
+ */
 class DataSetSessionWindowAggReduceGroupFunction(
     genAggregations: GeneratedAggregationsFunction,
     keysAndAggregatesArity: Int,
@@ -55,7 +55,7 @@ class DataSetSessionWindowAggReduceGroupFunction(
     finalRowWindowRowtimePos: Option[Int],
     gap: Long,
     isInputCombined: Boolean)
-  extends RichGroupReduceFunction[Row, Row]
+    extends RichGroupReduceFunction[Row, Row]
     with Compiler[GeneratedAggregations]
     with Logging {
 
@@ -69,12 +69,11 @@ class DataSetSessionWindowAggReduceGroupFunction(
   private var function: GeneratedAggregations = _
 
   override def open(config: Configuration) {
-    LOG.debug(s"Compiling AggregateHelper: $genAggregations.name \n\n " +
-                s"Code:\n$genAggregations.code")
-    val clazz = compile(
-      getRuntimeContext.getUserCodeClassLoader,
-      genAggregations.name,
-      genAggregations.code)
+    LOG.debug(
+      s"Compiling AggregateHelper: $genAggregations.name \n\n " +
+        s"Code:\n$genAggregations.code")
+    val clazz =
+      compile(getRuntimeContext.getUserCodeClassLoader, genAggregations.name, genAggregations.code)
     LOG.debug("Instantiating AggregateHelper.")
     function = clazz.newInstance()
 
@@ -87,15 +86,14 @@ class DataSetSessionWindowAggReduceGroupFunction(
   }
 
   /**
-    * For grouped intermediate aggregate Rows, divide window according to the window-start
-    * and window-end, merge data (within a unified window) into an aggregate buffer, calculate
-    * aggregated values output from aggregate buffer, and then set them into output
-    * Row based on the mapping relationship between intermediate aggregate data and output data.
-    *
-    * @param records Grouped intermediate aggregate Rows iterator.
-    * @param out     The collector to hand results to.
-    *
-    */
+   * For grouped intermediate aggregate Rows, divide window according to the window-start
+   * and window-end, merge data (within a unified window) into an aggregate buffer, calculate
+   * aggregated values output from aggregate buffer, and then set them into output
+   * Row based on the mapping relationship between intermediate aggregate data and output data.
+   *
+   * @param records Grouped intermediate aggregate Rows iterator.
+   * @param out     The collector to hand results to.
+   */
   override def reduce(records: Iterable[Row], out: Collector[Row]): Unit = {
 
     var windowStart: java.lang.Long = null
@@ -143,18 +141,15 @@ class DataSetSessionWindowAggReduceGroupFunction(
   }
 
   /**
-    * Evaluate and emit the data of the current window.
-    *
-    * @param out             the collection of the aggregate results
-    * @param windowStart     the window's start attribute value is the min (rowtime) of all rows
-    *                        in the window.
-    * @param windowEnd       the window's end property value is max (rowtime) + gap for all rows
-    *                        in the window.
-    */
-  def doEvaluateAndCollect(
-      out: Collector[Row],
-      windowStart: Long,
-      windowEnd: Long): Unit = {
+   * Evaluate and emit the data of the current window.
+   *
+   * @param out             the collection of the aggregate results
+   * @param windowStart     the window's start attribute value is the min (rowtime) of all rows
+   *                        in the window.
+   * @param windowEnd       the window's end property value is max (rowtime) + gap for all rows
+   *                        in the window.
+   */
+  def doEvaluateAndCollect(out: Collector[Row], windowStart: Long, windowEnd: Long): Unit = {
 
     // set value for the final output
     function.setAggregationResults(accumulators, output)

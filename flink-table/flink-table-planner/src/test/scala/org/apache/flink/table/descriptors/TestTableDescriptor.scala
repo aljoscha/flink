@@ -22,7 +22,7 @@ import java.util
 import java.util.Collections
 
 class TestTableDescriptor(connector: ConnectorDescriptor)
-  extends TableDescriptor[TestTableDescriptor](connector) {
+    extends TableDescriptor[TestTableDescriptor](connector) {
 
   private var schemaDescriptor: Option[Schema] = None
 
@@ -34,7 +34,7 @@ class TestTableDescriptor(connector: ConnectorDescriptor)
   override protected def additionalProperties(): util.Map[String, String] = {
     schemaDescriptor match {
       case Some(d) => d.toProperties
-      case None => Collections.emptyMap()
+      case None    => Collections.emptyMap()
     }
   }
 }

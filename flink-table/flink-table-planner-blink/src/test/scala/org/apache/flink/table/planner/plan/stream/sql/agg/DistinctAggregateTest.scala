@@ -23,7 +23,11 @@ import org.apache.flink.api.scala._
 import org.apache.flink.table.api._
 import org.apache.flink.table.api.config.OptimizerConfigOptions
 import org.apache.flink.table.planner.plan.rules.physical.stream.IncrementalAggregateRule
-import org.apache.flink.table.planner.utils.{AggregatePhaseStrategy, StreamTableTestUtil, TableTestBase}
+import org.apache.flink.table.planner.utils.{
+  AggregatePhaseStrategy,
+  StreamTableTestUtil,
+  TableTestBase
+}
 
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
@@ -35,7 +39,7 @@ import java.util
 class DistinctAggregateTest(
     splitDistinctAggEnabled: Boolean,
     aggPhaseEnforcer: AggregatePhaseStrategy)
-  extends TableTestBase {
+    extends TableTestBase {
 
   protected val util: StreamTableTestUtil = streamTestUtil()
   util.addTableSource[(Int, Long, String)]("MyTable", 'a, 'b, 'c)
@@ -45,12 +49,14 @@ class DistinctAggregateTest(
     util.tableEnv.getConfig.setIdleStateRetentionTime(Time.hours(1), Time.hours(2))
     util.enableMiniBatch()
     util.tableEnv.getConfig.getConfiguration.setString(
-      OptimizerConfigOptions.TABLE_OPTIMIZER_AGG_PHASE_STRATEGY, aggPhaseEnforcer.toString)
+      OptimizerConfigOptions.TABLE_OPTIMIZER_AGG_PHASE_STRATEGY,
+      aggPhaseEnforcer.toString)
     util.tableEnv.getConfig.getConfiguration.setBoolean(
-      OptimizerConfigOptions.TABLE_OPTIMIZER_DISTINCT_AGG_SPLIT_ENABLED, splitDistinctAggEnabled)
+      OptimizerConfigOptions.TABLE_OPTIMIZER_DISTINCT_AGG_SPLIT_ENABLED,
+      splitDistinctAggEnabled)
     // disable incremental agg
-    util.tableEnv.getConfig.getConfiguration.setBoolean(
-      IncrementalAggregateRule.TABLE_OPTIMIZER_INCREMENTAL_AGG_ENABLED, false)
+    util.tableEnv.getConfig.getConfiguration
+      .setBoolean(IncrementalAggregateRule.TABLE_OPTIMIZER_INCREMENTAL_AGG_ENABLED, false)
   }
 
   @Test
@@ -209,7 +215,6 @@ object DistinctAggregateTest {
       Array(true, AggregatePhaseStrategy.ONE_PHASE),
       Array(true, AggregatePhaseStrategy.TWO_PHASE),
       Array(false, AggregatePhaseStrategy.ONE_PHASE),
-      Array(false, AggregatePhaseStrategy.TWO_PHASE)
-    )
+      Array(false, AggregatePhaseStrategy.TWO_PHASE))
   }
 }

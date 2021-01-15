@@ -22,7 +22,11 @@ import org.apache.flink.api.common.time.Time
 import org.apache.flink.api.scala._
 import org.apache.flink.table.api._
 import org.apache.flink.table.api.config.{ExecutionConfigOptions, OptimizerConfigOptions}
-import org.apache.flink.table.planner.utils.{AggregatePhaseStrategy, StreamTableTestUtil, TableTestBase}
+import org.apache.flink.table.planner.utils.{
+  AggregatePhaseStrategy,
+  StreamTableTestUtil,
+  TableTestBase
+}
 
 import java.time.Duration
 
@@ -39,7 +43,7 @@ class TwoStageAggregateTest extends TableTestBase {
     util.tableEnv.getConfig.getConfiguration
       .set(ExecutionConfigOptions.TABLE_EXEC_MINIBATCH_ALLOW_LATENCY, Duration.ofSeconds(1))
     util.tableEnv.getConfig.getConfiguration
-        .setBoolean(ExecutionConfigOptions.TABLE_EXEC_MINIBATCH_ENABLED, true)
+      .setBoolean(ExecutionConfigOptions.TABLE_EXEC_MINIBATCH_ENABLED, true)
     util.tableEnv.getConfig.getConfiguration
       .setLong(ExecutionConfigOptions.TABLE_EXEC_MINIBATCH_SIZE, 3)
     util.tableEnv.getConfig.getConfiguration.setString(

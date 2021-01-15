@@ -41,8 +41,8 @@ class BatchPhysicalBoundedStreamScan(
     traitSet: RelTraitSet,
     table: RelOptTable,
     outputRowType: RelDataType)
-  extends TableScan(cluster, traitSet, table)
-  with BatchPhysicalRel {
+    extends TableScan(cluster, traitSet, table)
+    with BatchPhysicalRel {
 
   val boundedStreamTable: DataStreamTable[Any] = getTable.unwrap(classOf[DataStreamTable[Any]])
 
@@ -59,7 +59,8 @@ class BatchPhysicalBoundedStreamScan(
   }
 
   override def explainTerms(pw: RelWriter): RelWriter = {
-    super.explainTerms(pw)
+    super
+      .explainTerms(pw)
       .item("fields", getRowType.getFieldNames.asScala.mkString(", "))
   }
 

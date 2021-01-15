@@ -32,7 +32,12 @@ import org.apache.flink.api.common.typeinfo.BasicTypeInfo._
 import org.apache.flink.api.common.typeinfo._
 import org.apache.flink.api.common.typeutils.CompositeType
 import org.apache.flink.api.java.typeutils.ValueTypeInfo._
-import org.apache.flink.api.java.typeutils.{MapTypeInfo, MultisetTypeInfo, ObjectArrayTypeInfo, RowTypeInfo}
+import org.apache.flink.api.java.typeutils.{
+  MapTypeInfo,
+  MultisetTypeInfo,
+  ObjectArrayTypeInfo,
+  RowTypeInfo
+}
 import org.apache.flink.table.api.{TableException, TableSchema}
 import org.apache.flink.table.calcite.FlinkTypeFactory.typeInfoToSqlTypeName
 import org.apache.flink.table.plan.schema._
@@ -47,20 +52,17 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 /**
-  * Flink specific type factory that represents the interface between Flink's [[TypeInformation]]
-  * and Calcite's [[RelDataType]].
-  */
+ * Flink specific type factory that represents the interface between Flink's [[TypeInformation]]
+ * and Calcite's [[RelDataType]].
+ */
 class FlinkTypeFactory(typeSystem: RelDataTypeSystem)
-  extends JavaTypeFactoryImpl(typeSystem)
-  with ExtendedRelTypeFactory {
+    extends JavaTypeFactoryImpl(typeSystem)
+    with ExtendedRelTypeFactory {
 
   // NOTE: for future data types it might be necessary to
   // override more methods of RelDataTypeFactoryImpl
 
-  def createTypeFromTypeInfo(
-      typeInfo: TypeInformation[_],
-      isNullable: Boolean)
-    : RelDataType = {
+  def createTypeFromTypeInfo(typeInfo: TypeInformation[_], isNullable: Boolean): RelDataType = {
 
     val relType = if (isSimple(typeInfo)) {
       // simple types can be converted to SQL types and vice versa
@@ -93,37 +95,33 @@ class FlinkTypeFactory(typeSystem: RelDataTypeSystem)
   }
 
   /**
-    * Creates a indicator type for processing-time, but with similar properties as SQL timestamp.
-    */
+   * Creates a indicator type for processing-time, but with similar properties as SQL timestamp.
+   */
   def createProctimeIndicatorType(): RelDataType = {
     val originalType = createTypeFromTypeInfo(SqlTimeTypeInfo.TIMESTAMP, isNullable = false)
     canonize(
       new TimeIndicatorRelDataType(
         getTypeSystem,
         originalType.asInstanceOf[BasicSqlType],
-        isEventTime = false)
-    )
+        isEventTime = false))
   }
 
   /**
-    * Creates a indicator type for event-time, but with similar properties as SQL timestamp.
-    */
+   * Creates a indicator type for event-time, but with similar properties as SQL timestamp.
+   */
   def createRowtimeIndicatorType(): RelDataType = {
     val originalType = createTypeFromTypeInfo(SqlTimeTypeInfo.TIMESTAMP, isNullable = false)
     canonize(
       new TimeIndicatorRelDataType(
         getTypeSystem,
         originalType.asInstanceOf[BasicSqlType],
-        isEventTime = true)
-    )
+        isEventTime = true))
   }
 
   /**
-    * Creates types that create custom [[RelDataType]]s that wrap Flink's [[TypeInformation]].
-    */
-  private def createAdvancedType(
-      typeInfo: TypeInformation[_],
-      isNullable: Boolean): RelDataType = {
+   * Creates types that create custom [[RelDataType]]s that wrap Flink's [[TypeInformation]].
+   */
+  private def createAdvancedType(typeInfo: TypeInformation[_], isNullable: Boolean): RelDataType = {
 
     val relType = typeInfo match {
 
@@ -152,8 +150,7 @@ class FlinkTypeFactory(typeSystem: RelDataTypeSystem)
         new MultisetRelDataType(
           mts,
           createTypeFromTypeInfo(mts.getElementTypeInfo, isNullable = true),
-          isNullable
-        )
+          isNullable)
 
       case mp: MapTypeInfo[_, _] =>
         new MapRelDataType(
@@ -163,12 +160,9 @@ class FlinkTypeFactory(typeSystem: RelDataTypeSystem)
           isNullable)
 
       case ti: TypeInformation[_] =>
-        new GenericRelDataType(
-          ti,
-          isNullable,
-          getTypeSystem.asInstanceOf[FlinkTypeSystem])
+        new GenericRelDataType(ti, isNullable, getTypeSystem.asInstanceOf[FlinkTypeSystem])
 
-      case ti@_ =>
+      case ti @ _ =>
         throw new TableException(s"Unsupported type information: $ti")
     }
 
@@ -176,11 +170,11 @@ class FlinkTypeFactory(typeSystem: RelDataTypeSystem)
   }
 
   /**
-    * Creates a struct type with the input fieldNames and input fieldTypes using FlinkTypeFactory
-    *
-    * @param tableSchema schema to convert to Calcite's specific one
-    * @return a struct type with the input fieldNames, input fieldTypes, and system fields
-    */
+   * Creates a struct type with the input fieldNames and input fieldTypes using FlinkTypeFactory
+   *
+   * @param tableSchema schema to convert to Calcite's specific one
+   * @return a struct type with the input fieldNames, input fieldTypes, and system fields
+   */
   def buildLogicalRowType(tableSchema: TableSchema): RelDataType = {
     buildLogicalRowType(tableSchema.getFieldNames, tableSchema.getFieldDataTypes)
   }
@@ -192,23 +186,21 @@ class FlinkTypeFactory(typeSystem: RelDataTypeSystem)
    * @param fieldTypes field types, every element is Flink's [[DataType]]
    * @return a struct type with the input fieldNames, input fieldTypes, and system fields
    */
-  def buildLogicalRowType(
-    fieldNames: Array[String],
-    fieldTypes: Array[DataType])
-  : RelDataType = {
+  def buildLogicalRowType(fieldNames: Array[String], fieldTypes: Array[DataType]): RelDataType = {
     val logicalRowTypeBuilder = builder
 
     val fields = fieldNames.zip(fieldTypes)
     fields.foreach(f => {
       // time indicators are not nullable
       val logicalType = f._2.getLogicalType
-      val nullable  = if (FlinkTypeFactory.isTimeIndicatorType(logicalType)) {
+      val nullable = if (FlinkTypeFactory.isTimeIndicatorType(logicalType)) {
         false
       } else {
         logicalType.isNullable
       }
 
-      logicalRowTypeBuilder.add(f._1,
+      logicalRowTypeBuilder.add(
+        f._1,
         createTypeFromTypeInfo(TypeConversions.fromDataTypeToLegacyInfo(f._2), nullable))
     })
 
@@ -216,16 +208,15 @@ class FlinkTypeFactory(typeSystem: RelDataTypeSystem)
   }
 
   /**
-    * Creates a struct type with the input fieldNames and input fieldTypes using FlinkTypeFactory
-    *
-    * @param fieldNames field names
-    * @param fieldTypes field types, every element is Flink's [[TypeInformation]]
-    * @return a struct type with the input fieldNames, input fieldTypes, and system fields
-    */
+   * Creates a struct type with the input fieldNames and input fieldTypes using FlinkTypeFactory
+   *
+   * @param fieldNames field names
+   * @param fieldTypes field types, every element is Flink's [[TypeInformation]]
+   * @return a struct type with the input fieldNames, input fieldTypes, and system fields
+   */
   def buildLogicalRowType(
       fieldNames: Seq[String],
-      fieldTypes: Seq[TypeInformation[_]])
-    : RelDataType = {
+      fieldTypes: Seq[TypeInformation[_]]): RelDataType = {
     val logicalRowTypeBuilder = builder
 
     val fields = fieldNames.zip(fieldTypes)
@@ -261,9 +252,7 @@ class FlinkTypeFactory(typeSystem: RelDataTypeSystem)
 
   override def createMapType(keyType: RelDataType, valueType: RelDataType): RelDataType = {
     val relType = new MapRelDataType(
-      new MapTypeInfo(
-        FlinkTypeFactory.toTypeInfo(keyType),
-        FlinkTypeFactory.toTypeInfo(valueType)),
+      new MapTypeInfo(FlinkTypeFactory.toTypeInfo(keyType), FlinkTypeFactory.toTypeInfo(valueType)),
       keyType,
       valueType,
       isNullable = false)
@@ -365,33 +354,33 @@ object FlinkTypeFactory {
   val INSTANCE = new FlinkTypeFactory(new FlinkTypeSystem)
 
   private def typeInfoToSqlTypeName(typeInfo: TypeInformation[_]): SqlTypeName = typeInfo match {
-      case BOOLEAN_TYPE_INFO => BOOLEAN
-      case BYTE_TYPE_INFO => TINYINT
-      case SHORT_TYPE_INFO => SMALLINT
-      case INT_TYPE_INFO => INTEGER
-      case LONG_TYPE_INFO => BIGINT
-      case FLOAT_TYPE_INFO => FLOAT
-      case DOUBLE_TYPE_INFO => DOUBLE
-      case STRING_TYPE_INFO => VARCHAR
-      case BIG_DEC_TYPE_INFO => DECIMAL
+    case BOOLEAN_TYPE_INFO => BOOLEAN
+    case BYTE_TYPE_INFO    => TINYINT
+    case SHORT_TYPE_INFO   => SMALLINT
+    case INT_TYPE_INFO     => INTEGER
+    case LONG_TYPE_INFO    => BIGINT
+    case FLOAT_TYPE_INFO   => FLOAT
+    case DOUBLE_TYPE_INFO  => DOUBLE
+    case STRING_TYPE_INFO  => VARCHAR
+    case BIG_DEC_TYPE_INFO => DECIMAL
 
-      // temporal types
-      case SqlTimeTypeInfo.DATE => DATE
-      case SqlTimeTypeInfo.TIME => TIME
-      case SqlTimeTypeInfo.TIMESTAMP => TIMESTAMP
-      case TimeIntervalTypeInfo.INTERVAL_MONTHS => INTERVAL_YEAR_MONTH
-      case TimeIntervalTypeInfo.INTERVAL_MILLIS => INTERVAL_DAY_SECOND
+    // temporal types
+    case SqlTimeTypeInfo.DATE                 => DATE
+    case SqlTimeTypeInfo.TIME                 => TIME
+    case SqlTimeTypeInfo.TIMESTAMP            => TIMESTAMP
+    case TimeIntervalTypeInfo.INTERVAL_MONTHS => INTERVAL_YEAR_MONTH
+    case TimeIntervalTypeInfo.INTERVAL_MILLIS => INTERVAL_DAY_SECOND
 
-      case CHAR_TYPE_INFO | CHAR_VALUE_TYPE_INFO =>
-        throw new TableException("Character type is not supported.")
+    case CHAR_TYPE_INFO | CHAR_VALUE_TYPE_INFO =>
+      throw new TableException("Character type is not supported.")
 
-      case _@t =>
-        throw new TableException(s"Type is not supported: $t")
+    case _ @t =>
+      throw new TableException(s"Type is not supported: $t")
   }
 
   /**
-    * Converts a Calcite logical record into a Flink type information.
-    */
+   * Converts a Calcite logical record into a Flink type information.
+   */
   @deprecated("Use the RowSchema class instead because it handles both logical and physical rows.")
   def toInternalRowTypeInfo(logicalRowType: RelDataType): TypeInformation[Row] = {
     // convert to type information
@@ -405,50 +394,51 @@ object FlinkTypeFactory {
 
   def isProctimeIndicatorType(relDataType: RelDataType): Boolean = relDataType match {
     case ti: TimeIndicatorRelDataType if !ti.isEventTime => true
-    case _ => false
+    case _                                               => false
   }
 
   def isProctimeIndicatorType(typeInfo: TypeInformation[_]): Boolean = typeInfo match {
     case ti: TimeIndicatorTypeInfo if !ti.isEventTime => true
-    case _ => false
+    case _                                            => false
   }
 
   def isRowtimeIndicatorType(relDataType: RelDataType): Boolean = relDataType match {
     case ti: TimeIndicatorRelDataType if ti.isEventTime => true
-    case _ => false
+    case _                                              => false
   }
 
   def isRowtimeIndicatorType(typeInfo: TypeInformation[_]): Boolean = typeInfo match {
     case ti: TimeIndicatorTypeInfo if ti.isEventTime => true
-    case _ => false
+    case _                                           => false
   }
 
   def isTimeIndicatorType(t: LogicalType): Boolean = t match {
     case t: TimestampType
-      if t.getKind == TimestampKind.ROWTIME || t.getKind == TimestampKind.PROCTIME => true
+        if t.getKind == TimestampKind.ROWTIME || t.getKind == TimestampKind.PROCTIME =>
+      true
     case _ => false
   }
 
   def isTimeIndicatorType(relDataType: RelDataType): Boolean = relDataType match {
     case ti: TimeIndicatorRelDataType => true
-    case _ => false
+    case _                            => false
   }
 
   def isTimeIndicatorType(typeInfo: TypeInformation[_]): Boolean = typeInfo match {
     case ti: TimeIndicatorTypeInfo => true
-    case _ => false
+    case _                         => false
   }
 
   def toTypeInfo(relDataType: RelDataType): TypeInformation[_] = relDataType.getSqlTypeName match {
-    case BOOLEAN => BOOLEAN_TYPE_INFO
-    case TINYINT => BYTE_TYPE_INFO
-    case SMALLINT => SHORT_TYPE_INFO
-    case INTEGER => INT_TYPE_INFO
-    case BIGINT => LONG_TYPE_INFO
-    case FLOAT => FLOAT_TYPE_INFO
-    case DOUBLE => DOUBLE_TYPE_INFO
+    case BOOLEAN        => BOOLEAN_TYPE_INFO
+    case TINYINT        => BYTE_TYPE_INFO
+    case SMALLINT       => SHORT_TYPE_INFO
+    case INTEGER        => INT_TYPE_INFO
+    case BIGINT         => LONG_TYPE_INFO
+    case FLOAT          => FLOAT_TYPE_INFO
+    case DOUBLE         => DOUBLE_TYPE_INFO
     case VARCHAR | CHAR => STRING_TYPE_INFO
-    case DECIMAL => BIG_DEC_TYPE_INFO
+    case DECIMAL        => BIG_DEC_TYPE_INFO
 
     // time indicators
     case TIMESTAMP if relDataType.isInstanceOf[TimeIndicatorRelDataType] =>
@@ -460,11 +450,11 @@ object FlinkTypeFactory {
       }
 
     // temporal types
-    case DATE => SqlTimeTypeInfo.DATE
-    case TIME => SqlTimeTypeInfo.TIME
-    case TIMESTAMP => SqlTimeTypeInfo.TIMESTAMP
+    case DATE                                               => SqlTimeTypeInfo.DATE
+    case TIME                                               => SqlTimeTypeInfo.TIME
+    case TIMESTAMP                                          => SqlTimeTypeInfo.TIMESTAMP
     case typeName if YEAR_INTERVAL_TYPES.contains(typeName) => TimeIntervalTypeInfo.INTERVAL_MONTHS
-    case typeName if DAY_INTERVAL_TYPES.contains(typeName) => TimeIntervalTypeInfo.INTERVAL_MILLIS
+    case typeName if DAY_INTERVAL_TYPES.contains(typeName)  => TimeIntervalTypeInfo.INTERVAL_MILLIS
 
     case NULL =>
       throw new TableException(
@@ -502,7 +492,7 @@ object FlinkTypeFactory {
       val multisetRelDataType = relDataType.asInstanceOf[MultisetRelDataType]
       multisetRelDataType.typeInfo
 
-    case _@t =>
+    case _ @t =>
       throw new TableException(s"Type is not supported: $t")
   }
 }

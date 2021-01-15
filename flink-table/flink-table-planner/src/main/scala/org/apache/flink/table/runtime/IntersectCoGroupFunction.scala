@@ -23,7 +23,7 @@ import java.lang.{Iterable => JIterable}
 import org.apache.flink.api.common.functions.CoGroupFunction
 import org.apache.flink.util.Collector
 
-class IntersectCoGroupFunction[T](all: Boolean) extends CoGroupFunction[T, T, T]{
+class IntersectCoGroupFunction[T](all: Boolean) extends CoGroupFunction[T, T, T] {
   override def coGroup(first: JIterable[T], second: JIterable[T], out: Collector[T]): Unit = {
     if (first == null || second == null) return
     val leftIter = first.iterator()

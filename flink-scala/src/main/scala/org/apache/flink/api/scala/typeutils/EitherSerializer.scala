@@ -30,10 +30,10 @@ import org.apache.flink.core.memory.{DataInputView, DataOutputView}
 class EitherSerializer[A, B](
     val leftSerializer: TypeSerializer[A],
     val rightSerializer: TypeSerializer[B])
-  extends TypeSerializer[Either[A, B]]
-  with LegacySerializerSnapshotTransformer[Either[A, B]] {
+    extends TypeSerializer[Either[A, B]]
+    with LegacySerializerSnapshotTransformer[Either[A, B]] {
 
-  override def duplicate: EitherSerializer[A,B] = {
+  override def duplicate: EitherSerializer[A, B] = {
     val leftDup = leftSerializer.duplicate()
     val rightDup = rightSerializer.duplicate()
 
@@ -50,13 +50,13 @@ class EitherSerializer[A, B](
 
   override def isImmutableType: Boolean = {
     (leftSerializer == null || leftSerializer.isImmutableType) &&
-      (rightSerializer == null || rightSerializer.isImmutableType)
+    (rightSerializer == null || rightSerializer.isImmutableType)
   }
 
   override def getLength: Int = -1
 
   override def copy(from: Either[A, B]): Either[A, B] = from match {
-    case Left(a) => Left(leftSerializer.copy(a))
+    case Left(a)  => Left(leftSerializer.copy(a))
     case Right(b) => Right(rightSerializer.copy(b))
   }
 
@@ -103,7 +103,7 @@ class EitherSerializer[A, B](
     obj match {
       case eitherSerializer: EitherSerializer[_, _] =>
         leftSerializer.equals(eitherSerializer.leftSerializer) &&
-        rightSerializer.equals(eitherSerializer.rightSerializer)
+          rightSerializer.equals(eitherSerializer.rightSerializer)
       case _ => false
     }
   }
@@ -125,8 +125,7 @@ class EitherSerializer[A, B](
   }
 
   override def transformLegacySerializerSnapshot[U](
-      legacySnapshot: TypeSerializerSnapshot[U]
-  ): TypeSerializerSnapshot[Either[A, B]] = {
+      legacySnapshot: TypeSerializerSnapshot[U]): TypeSerializerSnapshot[Either[A, B]] = {
 
     legacySnapshot match {
       case correctSnapshot: ScalaEitherSerializerSnapshot[A, B] =>
@@ -137,8 +136,7 @@ class EitherSerializer[A, B](
         CompositeTypeSerializerUtil.setNestedSerializersSnapshots(
           transformedSnapshot,
           legacySnapshot.getNestedSerializersAndConfigs.get(0).f1,
-          legacySnapshot.getNestedSerializersAndConfigs.get(1).f1
-        )
+          legacySnapshot.getNestedSerializersAndConfigs.get(1).f1)
         transformedSnapshot
     }
   }

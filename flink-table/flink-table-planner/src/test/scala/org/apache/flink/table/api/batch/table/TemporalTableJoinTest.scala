@@ -30,15 +30,14 @@ class TemporalTableJoinTest extends TableTestBase {
 
   val util: TableTestUtil = batchTestUtil()
 
-  val orders = util.addTable[(Long, String, Timestamp)](
-    "Orders", 'o_amount, 'o_currency, 'o_rowtime)
+  val orders =
+    util.addTable[(Long, String, Timestamp)]("Orders", 'o_amount, 'o_currency, 'o_rowtime)
 
-  val ratesHistory = util.addTable[(String, Int, Timestamp)](
-    "RatesHistory", 'currency, 'rate, 'rowtime)
+  val ratesHistory =
+    util.addTable[(String, Int, Timestamp)]("RatesHistory", 'currency, 'rate, 'rowtime)
 
-  val rates = util.addFunction(
-    "Rates",
-    ratesHistory.createTemporalTableFunction('rowtime, 'currency))
+  val rates =
+    util.addFunction("Rates", ratesHistory.createTemporalTableFunction('rowtime, 'currency))
 
   @Test
   def testSimpleJoin(): Unit = {
@@ -47,7 +46,8 @@ class TemporalTableJoinTest extends TableTestBase {
 
     val result = orders
       .joinLateral(rates('o_rowtime), 'currency === 'o_currency)
-      .select($"o_amount" * $"rate").as("rate")
+      .select($"o_amount" * $"rate")
+      .as("rate")
 
     util.printTable(result)
   }

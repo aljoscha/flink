@@ -33,11 +33,12 @@ import scala.collection.JavaConversions._
 /**
  * Rule to convert a [[FlinkLogicalTableAggregate]] into a [[StreamPhysicalGroupTableAggregate]].
  */
-class StreamPhysicalGroupTableAggregateRule extends ConverterRule(
-    classOf[FlinkLogicalTableAggregate],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.STREAM_PHYSICAL,
-    "StreamPhysicalGroupTableAggregateRule") {
+class StreamPhysicalGroupTableAggregateRule
+    extends ConverterRule(
+      classOf[FlinkLogicalTableAggregate],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.STREAM_PHYSICAL,
+      "StreamPhysicalGroupTableAggregateRule") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val agg: FlinkLogicalTableAggregate = call.rel(0)
@@ -51,7 +52,8 @@ class StreamPhysicalGroupTableAggregateRule extends ConverterRule(
     } else {
       FlinkRelDistribution.SINGLETON
     }
-    val requiredTraitSet = rel.getCluster.getPlanner.emptyTraitSet()
+    val requiredTraitSet = rel.getCluster.getPlanner
+      .emptyTraitSet()
       .replace(requiredDistribution)
       .replace(FlinkConventions.STREAM_PHYSICAL)
     val providedTraitSet = rel.getTraitSet.replace(FlinkConventions.STREAM_PHYSICAL)
@@ -63,8 +65,7 @@ class StreamPhysicalGroupTableAggregateRule extends ConverterRule(
       newInput,
       agg.getRowType,
       agg.getGroupSet.toArray,
-      agg.getAggCallList
-    )
+      agg.getAggCallList)
   }
 }
 

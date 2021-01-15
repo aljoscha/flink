@@ -23,8 +23,8 @@ import org.apache.flink.table.runtime.types.CRow
 import org.apache.flink.types.Row
 
 /**
-  * Maps a CRow to a Row.
-  */
+ * Maps a CRow to a Row.
+ */
 class CRowToRowMapFunction extends MapFunction[CRow, Row] {
 
   override def map(value: CRow): Row = value.row

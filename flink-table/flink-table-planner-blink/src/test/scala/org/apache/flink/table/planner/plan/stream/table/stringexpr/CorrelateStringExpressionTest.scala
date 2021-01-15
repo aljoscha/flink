@@ -81,8 +81,9 @@ class CorrelateStringExpressionTest extends TableTestBase {
     val hierarchy = new HierarchyTableFunction
     javaUtil.addFunction("hierarchy", hierarchy)
     scalaUtil.addFunction("hierarchy", hierarchy)
-    scalaTable = sTab.joinLateral(
-      call("hierarchy", 'c) as ('name, 'adult, 'len)).select('c, 'name, 'len, 'adult)
+    scalaTable = sTab
+      .joinLateral(call("hierarchy", 'c) as ('name, 'adult, 'len))
+      .select('c, 'name, 'len, 'adult)
     javaTable = jTab
       .joinLateral(call("hierarchy", $("c")).as("name", "adult", "len"))
       .select($("c"), $("name"), $("len"), $("adult"))
@@ -97,10 +98,12 @@ class CorrelateStringExpressionTest extends TableTestBase {
     verifyTableEquals(scalaTable, javaTable)
 
     // test with filter
-    scalaTable = sTab.joinLateral(
-      call("func2", 'c) as ('name, 'len)).select('c, 'name, 'len).filter('len > 2)
-    javaTable = jTab.joinLateral(call("func2", $("c")).as("name", "len"))
-      .select($("c"), $("name"), $("len")).filter($("len").isGreater(Int.box(2)))
+    scalaTable =
+      sTab.joinLateral(call("func2", 'c) as ('name, 'len)).select('c, 'name, 'len).filter('len > 2)
+    javaTable = jTab
+      .joinLateral(call("func2", $("c")).as("name", "len"))
+      .select($("c"), $("name"), $("len"))
+      .filter($("len").isGreater(Int.box(2)))
     verifyTableEquals(scalaTable, javaTable)
   }
 
@@ -138,7 +141,8 @@ class CorrelateStringExpressionTest extends TableTestBase {
     val hierarchy = new HierarchyTableFunction
     scalaUtil.addFunction("hierarchy", hierarchy)
     javaUtil.addFunction("hierarchy", hierarchy)
-    scalaTable = sTab.flatMap(call("hierarchy", 'c))
+    scalaTable = sTab
+      .flatMap(call("hierarchy", 'c))
       .as("name", "adult", "len")
       .select('name, 'len, 'adult)
     javaTable = jTab
@@ -156,7 +160,8 @@ class CorrelateStringExpressionTest extends TableTestBase {
     verifyTableEquals(scalaTable, javaTable)
 
     // test with filter
-    scalaTable = sTab.flatMap(call("func2", 'c))
+    scalaTable = sTab
+      .flatMap(call("func2", 'c))
       .as("name", "len")
       .select('name, 'len)
       .filter('len > 2)

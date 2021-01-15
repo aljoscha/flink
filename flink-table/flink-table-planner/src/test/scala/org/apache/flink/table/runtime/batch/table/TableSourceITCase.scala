@@ -43,9 +43,8 @@ import java.sql.{Date, Time, Timestamp}
 import scala.collection.JavaConverters._
 
 @RunWith(classOf[Parameterized])
-class TableSourceITCase(
-    configMode: TableConfigMode)
-  extends TableProgramsCollectionTestBase(configMode) {
+class TableSourceITCase(configMode: TableConfigMode)
+    extends TableProgramsCollectionTestBase(configMode) {
 
   @Test(expected = classOf[TableException])
   def testInvalidDatastreamType(): Unit = {
@@ -67,7 +66,8 @@ class TableSourceITCase(
     }
     tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal("T", tableSource)
 
-    tEnv.scan("T")
+    tEnv
+      .scan("T")
       .select('value, 'name)
       .collect()
 
@@ -95,15 +95,13 @@ class TableSourceITCase(
     val tableSource = new TestInputFormatTableSource(schema, rowType, data)
     tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(tableName, tableSource)
 
-    val results = tEnv.scan(tableName)
+    val results = tEnv
+      .scan(tableName)
       .groupBy('name)
       .select('name, 'amount.sum)
       .collect()
 
-    val expected = Seq(
-      "Mary,40",
-      "Bob,20",
-      "Liz,40").mkString("\n")
+    val expected = Seq("Mary,40", "Bob,20", "Liz,40").mkString("\n")
     TestBaseUtils.compareResultAsText(results.asJava, expected)
   }
 
@@ -122,12 +120,9 @@ class TableSourceITCase(
       .select('last, 'id.floor(), 'score * 2)
       .collect()
 
-    val expected = Seq(
-      "Smith,1,24.6",
-      "Miller,3,15.78",
-      "Smith,4,0.24",
-      "Miller,6,13.56",
-      "Williams,8,4.68").mkString("\n")
+    val expected =
+      Seq("Smith,1,24.6", "Miller,3,15.78", "Smith,4,0.24", "Miller,6,13.56", "Williams,8,4.68")
+        .mkString("\n")
     TestBaseUtils.compareResultAsText(results.asJava, expected)
   }
 
@@ -136,16 +131,16 @@ class TableSourceITCase(
     val tableName = "MyTable"
     val env = ExecutionEnvironment.getExecutionEnvironment
     val tableEnv = BatchTableEnvironment.create(env, config)
-    tableEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(
-      tableName, TestFilterableTableSource())
+    tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSourceInternal(tableName, TestFilterableTableSource())
     val results = tableEnv
       .scan(tableName)
       .where($"amount" > 4 && $"price" < 9)
       .select($"id", $"name")
       .collect()
 
-    val expected = Seq(
-      "5,Record_5", "6,Record_6", "7,Record_7", "8,Record_8").mkString("\n")
+    val expected = Seq("5,Record_5", "6,Record_6", "7,Record_7", "8,Record_8").mkString("\n")
     TestBaseUtils.compareResultAsText(results.asJava, expected)
   }
 
@@ -170,7 +165,8 @@ class TableSourceITCase(
     val tableSource = new TestTableSourceWithTime(schema, rowType, data, "rtime", null)
     tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(tableName, tableSource)
 
-    val results = tEnv.scan(tableName)
+    val results = tEnv
+      .scan(tableName)
       .window(Tumble over 1.second on 'rtime as 'w)
       .groupBy('name, 'w)
       .select('name, 'w.start, 'amount.sum)
@@ -206,16 +202,13 @@ class TableSourceITCase(
     val tableSource = new TestTableSourceWithTime(schema, rowType, data, null, "ptime")
     tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(tableName, tableSource)
 
-    val results = tEnv.scan(tableName)
+    val results = tEnv
+      .scan(tableName)
       .where('ptime.cast(Types.LONG) > 0L)
       .select('name, 'amount)
       .collect()
 
-    val expected = Seq(
-      "Mary,10",
-      "Bob,20",
-      "Mary,30",
-      "Liz,40").mkString("\n")
+    val expected = Seq("Mary,10", "Bob,20", "Mary,30", "Liz,40").mkString("\n")
     TestBaseUtils.compareResultAsText(results.asJava, expected)
   }
 
@@ -242,7 +235,8 @@ class TableSourceITCase(
     val tableSource = new TestTableSourceWithTime(schema, rowType, data, "rtime", "ptime")
     tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(tableName, tableSource)
 
-    val results = tEnv.scan(tableName)
+    val results = tEnv
+      .scan(tableName)
       .window(Tumble over 1.second on 'rtime as 'w)
       .groupBy('name, 'w)
       .select('name, 'w.start, 'amount.sum)
@@ -276,7 +270,8 @@ class TableSourceITCase(
     val tableSource = new TestTableSourceWithTime(schema, rowType, data, "rtime", null)
     tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(tableName, tableSource)
 
-    val results = tEnv.scan(tableName)
+    val results = tEnv
+      .scan(tableName)
       .window(Tumble over 1.second on 'rtime as 'w)
       .groupBy('name, 'w)
       .select('name, 'w.start, 'amount.sum)
@@ -302,8 +297,7 @@ class TableSourceITCase(
       makeRow(23, Date.valueOf("2017-04-23")),
       makeRow(24, Date.valueOf("2017-04-24")),
       makeRow(25, Date.valueOf("2017-04-25")),
-      makeRow(26, Date.valueOf("2017-04-26"))
-    )
+      makeRow(26, Date.valueOf("2017-04-26")))
 
     val query =
       """
@@ -311,7 +305,8 @@ class TableSourceITCase(
         |where date_val >= DATE '2017-04-24' and date_val < DATE '2017-04-26'
       """.stripMargin
     val tableSource = TestFilterableTableSource(rowTypeInfo, rows, Set("date_val"))
-    tableEnv.asInstanceOf[TableEnvironmentInternal]
+    tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
       .registerTableSourceInternal(tableName, tableSource)
     val results = tableEnv
       .sqlQuery(query)
@@ -335,16 +330,16 @@ class TableSourceITCase(
     val tableSource = new TestTableSourceWithTime(schema, returnType, data, "rtime", null)
     tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(tableName, tableSource)
 
-    val results = tEnv.scan(tableName)
+    val results = tEnv
+      .scan(tableName)
       .window(Tumble over 1.second on 'rtime as 'w)
       .groupBy('w)
       .select('w.start, 'rtime.count)
       .collect()
 
-    val expected = Seq(
-      "1970-01-01 00:00:00.0,3",
-      "1970-01-01 00:00:02.0,1",
-      "1970-01-01 00:00:04.0,1").mkString("\n")
+    val expected =
+      Seq("1970-01-01 00:00:00.0,3", "1970-01-01 00:00:02.0,1", "1970-01-01 00:00:04.0,1").mkString(
+        "\n")
     TestBaseUtils.compareResultAsText(results.asJava, expected)
   }
 
@@ -362,7 +357,8 @@ class TableSourceITCase(
     val tableSource = new TestTableSourceWithTime(schema, returnType, data, null, "ptime")
     tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(tableName, tableSource)
 
-    val results = tEnv.scan(tableName)
+    val results = tEnv
+      .scan(tableName)
       .where('ptime.cast(Types.LONG) > 1)
       .select('name)
       .collect()
@@ -379,25 +375,24 @@ class TableSourceITCase(
 
     val data = Seq(new JLong(1L), new JLong(2L), new JLong(2L), new JLong(2001L), new JLong(4001L))
 
-    val schema = new TableSchema(
-      Array("rtime", "ptime"),
-      Array(Types.SQL_TIMESTAMP, Types.SQL_TIMESTAMP))
+    val schema =
+      new TableSchema(Array("rtime", "ptime"), Array(Types.SQL_TIMESTAMP, Types.SQL_TIMESTAMP))
     val returnType = Types.LONG
 
     val tableSource = new TestTableSourceWithTime(schema, returnType, data, "rtime", "ptime")
     tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(tableName, tableSource)
 
-    val results = tEnv.scan(tableName)
+    val results = tEnv
+      .scan(tableName)
       .where('ptime.cast(Types.LONG) > 1)
       .window(Tumble over 1.second on 'rtime as 'w)
       .groupBy('w)
       .select('w.start, 'rtime.count)
       .collect()
 
-    val expected = Seq(
-      "1970-01-01 00:00:00.0,3",
-      "1970-01-01 00:00:02.0,1",
-      "1970-01-01 00:00:04.0,1").mkString("\n")
+    val expected =
+      Seq("1970-01-01 00:00:00.0,3", "1970-01-01 00:00:02.0,1", "1970-01-01 00:00:04.0,1").mkString(
+        "\n")
     TestBaseUtils.compareResultAsText(results.asJava, expected)
   }
 
@@ -422,7 +417,8 @@ class TableSourceITCase(
     val source = new TestTableSourceWithTime(schema, returnType, data, "rtime", "ptime", mapping)
     tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(tableName, source)
 
-    val results = tEnv.scan(tableName)
+    val results = tEnv
+      .scan(tableName)
       .window(Tumble over 1.second on 'rtime as 'w)
       .groupBy('name, 'w)
       .select('name, 'w.start, 'amount.sum)
@@ -454,19 +450,18 @@ class TableSourceITCase(
         .asInstanceOf[Array[TypeInformation[_]]],
       Array("id", "name", "val", "rtime"))
 
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(
-      "T",
-      new TestProjectableTableSource(tableSchema, returnType, data, "rtime", "ptime"))
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSourceInternal(
+        "T",
+        new TestProjectableTableSource(tableSchema, returnType, data, "rtime", "ptime"))
 
-    val results = tEnv.scan("T")
+    val results = tEnv
+      .scan("T")
       .select('name, 'val, 'id)
       .collect()
 
-    val expected = Seq(
-      "Mary,10,1",
-      "Bob,20,2",
-      "Mike,30,3",
-      "Liz,40,4").mkString("\n")
+    val expected = Seq("Mary,10,1", "Bob,20,2", "Mike,30,3", "Liz,40,4").mkString("\n")
     TestBaseUtils.compareResultAsText(results.asJava, expected)
   }
 
@@ -489,11 +484,14 @@ class TableSourceITCase(
         .asInstanceOf[Array[TypeInformation[_]]],
       Array("id", "name", "val", "rtime"))
 
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(
-      "T",
-      new TestProjectableTableSource(tableSchema, returnType, data, "rtime", "ptime"))
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSourceInternal(
+        "T",
+        new TestProjectableTableSource(tableSchema, returnType, data, "rtime", "ptime"))
 
-    val results = tEnv.scan("T")
+    val results = tEnv
+      .scan("T")
       .select('rtime, 'name, 'id)
       .collect()
 
@@ -524,20 +522,19 @@ class TableSourceITCase(
         .asInstanceOf[Array[TypeInformation[_]]],
       Array("id", "name", "val", "rtime"))
 
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(
-      "T",
-      new TestProjectableTableSource(tableSchema, returnType, data, "rtime", "ptime"))
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSourceInternal(
+        "T",
+        new TestProjectableTableSource(tableSchema, returnType, data, "rtime", "ptime"))
 
-    val results = tEnv.scan("T")
+    val results = tEnv
+      .scan("T")
       .filter('ptime.cast(Types.LONG) > 0)
       .select('name, 'id)
       .collect()
 
-    val expected = Seq(
-      "Mary,1",
-      "Bob,2",
-      "Mike,3",
-      "Liz,4").mkString("\n")
+    val expected = Seq("Mary,1", "Bob,2", "Mike,3", "Liz,4").mkString("\n")
     TestBaseUtils.compareResultAsText(results.asJava, expected)
   }
 
@@ -560,11 +557,14 @@ class TableSourceITCase(
         .asInstanceOf[Array[TypeInformation[_]]],
       Array("id", "rtime", "val", "name"))
 
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(
-      "T",
-      new TestProjectableTableSource(tableSchema, returnType, data, "rtime", "ptime"))
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSourceInternal(
+        "T",
+        new TestProjectableTableSource(tableSchema, returnType, data, "rtime", "ptime"))
 
-    val results = tEnv.scan("T")
+    val results = tEnv
+      .scan("T")
       .select('ptime.cast(Types.LONG) > 0)
       .select(1.count)
       .collect()
@@ -592,11 +592,14 @@ class TableSourceITCase(
         .asInstanceOf[Array[TypeInformation[_]]],
       Array("id", "rtime", "val", "name"))
 
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(
-      "T",
-      new TestProjectableTableSource(tableSchema, returnType, data, "rtime", "ptime"))
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSourceInternal(
+        "T",
+        new TestProjectableTableSource(tableSchema, returnType, data, "rtime", "ptime"))
 
-    val results = tEnv.scan("T")
+    val results = tEnv
+      .scan("T")
       .select('rtime)
       .collect()
 
@@ -628,11 +631,14 @@ class TableSourceITCase(
       Array("p-rtime", "p-id", "p-name", "p-val"))
     val mapping = Map("rtime" -> "p-rtime", "id" -> "p-id", "val" -> "p-val", "name" -> "p-name")
 
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(
-      "T",
-      new TestProjectableTableSource(tableSchema, returnType, data, "rtime", "ptime", mapping))
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSourceInternal(
+        "T",
+        new TestProjectableTableSource(tableSchema, returnType, data, "rtime", "ptime", mapping))
 
-    val results = tEnv.scan("T")
+    val results = tEnv
+      .scan("T")
       .select('name, 'rtime, 'val)
       .collect()
 
@@ -651,40 +657,31 @@ class TableSourceITCase(
     val tEnv = BatchTableEnvironment.create(env)
 
     val data = Seq(
-      Row.of(new JLong(1),
-        Row.of(
-          Row.of("Sarah", new JInt(100)),
-          Row.of(new JInt(1000), new JBool(true))
-        ),
+      Row.of(
+        new JLong(1),
+        Row.of(Row.of("Sarah", new JInt(100)), Row.of(new JInt(1000), new JBool(true))),
         Row.of("Peter", new JInt(10000)),
         "Mary"),
-      Row.of(new JLong(2),
-        Row.of(
-          Row.of("Rob", new JInt(200)),
-          Row.of(new JInt(2000), new JBool(false))
-        ),
+      Row.of(
+        new JLong(2),
+        Row.of(Row.of("Rob", new JInt(200)), Row.of(new JInt(2000), new JBool(false))),
         Row.of("Lucy", new JInt(20000)),
         "Bob"),
-      Row.of(new JLong(3),
-        Row.of(
-          Row.of("Mike", new JInt(300)),
-          Row.of(new JInt(3000), new JBool(true))
-        ),
+      Row.of(
+        new JLong(3),
+        Row.of(Row.of("Mike", new JInt(300)), Row.of(new JInt(3000), new JBool(true))),
         Row.of("Betty", new JInt(30000)),
         "Liz"))
 
     val nested1 = new RowTypeInfo(
       Array(Types.STRING, Types.INT).asInstanceOf[Array[TypeInformation[_]]],
-      Array("name", "value")
-    )
+      Array("name", "value"))
     val nested2 = new RowTypeInfo(
       Array(Types.INT, Types.BOOLEAN).asInstanceOf[Array[TypeInformation[_]]],
-      Array("num", "flag")
-    )
+      Array("num", "flag"))
     val deepNested = new RowTypeInfo(
       Array(nested1, nested2).asInstanceOf[Array[TypeInformation[_]]],
-      Array("nested1", "nested2")
-    )
+      Array("nested1", "nested2"))
     val tableSchema = new TableSchema(
       Array("id", "deepNested", "nested", "name"),
       Array(Types.LONG, deepNested, nested1, Types.STRING))
@@ -693,23 +690,25 @@ class TableSourceITCase(
       Array(Types.LONG, deepNested, nested1, Types.STRING).asInstanceOf[Array[TypeInformation[_]]],
       Array("id", "deepNested", "nested", "name"))
 
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(
-      "T",
-      new TestNestedProjectableTableSource(tableSchema, returnType, data))
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSourceInternal(
+        "T",
+        new TestNestedProjectableTableSource(tableSchema, returnType, data))
 
     val results = tEnv
       .scan("T")
-      .select('id,
+      .select(
+        'id,
         'deepNested.get("nested1").get("name") as 'nestedName,
         'nested.get("value") as 'nestedValue,
         'deepNested.get("nested2").get("flag") as 'nestedFlag,
         'deepNested.get("nested2").get("num") as 'nestedNum)
       .collect()
 
-    val expected = Seq(
-      "1,Sarah,10000,true,1000",
-      "2,Rob,20000,false,2000",
-      "3,Mike,30000,true,3000").mkString("\n")
+    val expected =
+      Seq("1,Sarah,10000,true,1000", "2,Rob,20000,false,2000", "3,Mike,30000,true,3000").mkString(
+        "\n")
     TestBaseUtils.compareResultAsText(results.asJava, expected)
   }
 
@@ -728,8 +727,7 @@ class TableSourceITCase(
       makeRow(2, Time.valueOf("11:45:00")),
       makeRow(3, Time.valueOf("11:45:01")),
       makeRow(4, Time.valueOf("12:14:23")),
-      makeRow(5, Time.valueOf("13:33:12"))
-    )
+      makeRow(5, Time.valueOf("13:33:12")))
 
     val query =
       """
@@ -737,7 +735,8 @@ class TableSourceITCase(
         |where time_val >= TIME '11:45:00' and time_val < TIME '12:14:23'
       """.stripMargin
     val tableSource = TestFilterableTableSource(rowTypeInfo, rows, Set("time_val"))
-    tableEnv.asInstanceOf[TableEnvironmentInternal]
+    tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
       .registerTableSourceInternal(tableName, tableSource)
     val results = tableEnv
       .sqlQuery(query)
@@ -762,8 +761,7 @@ class TableSourceITCase(
       makeRow(2, Timestamp.valueOf("2017-07-12 11:45:00")),
       makeRow(3, Timestamp.valueOf("2017-07-13 11:45:01")),
       makeRow(4, Timestamp.valueOf("2017-07-14 12:14:23")),
-      makeRow(5, Timestamp.valueOf("2017-07-13 13:33:12"))
-    )
+      makeRow(5, Timestamp.valueOf("2017-07-13 13:33:12")))
 
     val query =
       """
@@ -771,7 +769,8 @@ class TableSourceITCase(
         |where ts >= TIMESTAMP '2017-07-12 11:45:00' and ts < TIMESTAMP '2017-07-14 12:14:23'
       """.stripMargin
     val tableSource = TestFilterableTableSource(rowTypeInfo, rows, Set("ts"))
-    tableEnv.asInstanceOf[TableEnvironmentInternal]
+    tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
       .registerTableSourceInternal(tableName, tableSource)
     val results = tableEnv
       .sqlQuery(query)

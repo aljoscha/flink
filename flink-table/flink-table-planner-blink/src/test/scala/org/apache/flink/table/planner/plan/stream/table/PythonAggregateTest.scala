@@ -24,7 +24,11 @@ import org.apache.flink.table.api._
 import org.apache.flink.table.api.dataview.{ListView, MapView}
 import org.apache.flink.table.planner.plan.nodes.exec.common.CommonPythonAggregate
 import org.apache.flink.table.planner.runtime.utils.JavaUserDefinedAggFunctions.TestPythonAggregateFunction
-import org.apache.flink.table.planner.typeutils.DataViewUtils.{DataViewSpec, ListViewSpec, MapViewSpec}
+import org.apache.flink.table.planner.typeutils.DataViewUtils.{
+  DataViewSpec,
+  ListViewSpec,
+  MapViewSpec
+}
 import org.apache.flink.table.planner.utils.TableTestBase
 import org.apache.flink.table.types.DataType
 
@@ -50,7 +54,8 @@ class PythonAggregateTest extends TableTestBase {
     val sourceTable = util.addTableSource[(Int, Long, Int)]("MyTable", 'a, 'b, 'c)
     val func = new TestPythonAggregateFunction
 
-    val resultTable = sourceTable.groupBy('b)
+    val resultTable = sourceTable
+      .groupBy('b)
       .select('b, func('a, 'c))
 
     util.verifyExecPlan(resultTable)
@@ -62,7 +67,8 @@ class PythonAggregateTest extends TableTestBase {
     val sourceTable = util.addTableSource[(Int, Long, Int)]("MyTable", 'a, 'b, 'c)
     val func = new TestPythonAggregateFunction
 
-    val resultTable = sourceTable.groupBy('b)
+    val resultTable = sourceTable
+      .groupBy('b)
       .select('b, func('a, 'c), 'a.count())
 
     util.verifyExecPlan(resultTable)
@@ -85,8 +91,9 @@ class PythonAggregateTest extends TableTestBase {
       new MapViewSpec(
         "agg0$f2",
         2,
-        DataTypes.MAP(
-          DataTypes.STRING(), DataTypes.BIGINT()).bridgedTo(classOf[java.util.Map[_, _]]),
+        DataTypes
+          .MAP(DataTypes.STRING(), DataTypes.BIGINT())
+          .bridgedTo(classOf[java.util.Map[_, _]]),
         false))
 
     assertEquals(expected(0).getClass, specs(0).getClass)
@@ -102,8 +109,9 @@ class PythonAggregateTest extends TableTestBase {
   @Test(expected = classOf[TableException])
   def testExtractSecondLevelDataViewSpecs(): Unit = {
     val accType = DataTypes.ROW(
-      DataTypes.FIELD("f0", DataTypes.ROW(
-        DataTypes.FIELD("f0", ListView.newListViewDataType(DataTypes.STRING())))))
+      DataTypes.FIELD(
+        "f0",
+        DataTypes.ROW(DataTypes.FIELD("f0", ListView.newListViewDataType(DataTypes.STRING())))))
     TestCommonPythonAggregate.extractDataViewSpecs(accType)
   }
 

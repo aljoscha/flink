@@ -31,16 +31,16 @@ import org.apache.flink.types.Row
 import org.apache.flink.util.Collector
 
 /**
-  * ProcessRunner with [[CRow]] output.
-  */
+ * ProcessRunner with [[CRow]] output.
+ */
 class CRowOutputProcessRunner(
     name: String,
     code: String,
     @transient var returnType: TypeInformation[CRow])
-  extends ProcessFunction[Any, CRow]
-  with ResultTypeQueryable[CRow]
-  with Compiler[ProcessFunction[Any, Row]]
-  with Logging {
+    extends ProcessFunction[Any, CRow]
+    with ResultTypeQueryable[CRow]
+    with Compiler[ProcessFunction[Any, Row]]
+    with Logging {
 
   private var function: ProcessFunction[Any, Row] = _
   private var cRowWrapper: CRowWrappingCollector = _

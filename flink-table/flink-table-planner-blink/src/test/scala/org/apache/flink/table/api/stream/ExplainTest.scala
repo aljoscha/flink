@@ -52,43 +52,43 @@ class ExplainTest(extended: Boolean) extends TableTestBase {
 
   @Before
   def before(): Unit = {
-    util.tableEnv.getConfig.getConfiguration.setInteger(
-      ExecutionConfigOptions.TABLE_EXEC_RESOURCE_DEFAULT_PARALLELISM, 4)
+    util.tableEnv.getConfig.getConfiguration
+      .setInteger(ExecutionConfigOptions.TABLE_EXEC_RESOURCE_DEFAULT_PARALLELISM, 4)
   }
 
   @Test
   def testExplainTableSourceScan(): Unit = {
-    util.verifyExplain("SELECT * FROM MyTable", extraDetails:_*)
+    util.verifyExplain("SELECT * FROM MyTable", extraDetails: _*)
   }
 
   @Test
   def testExplainDataStreamScan(): Unit = {
-    util.verifyExplain("SELECT * FROM MyTable1", extraDetails:_*)
+    util.verifyExplain("SELECT * FROM MyTable1", extraDetails: _*)
   }
 
   @Test
   def testExplainWithFilter(): Unit = {
-    util.verifyExplain("SELECT * FROM MyTable1 WHERE mod(a, 2) = 0", extraDetails:_*)
+    util.verifyExplain("SELECT * FROM MyTable1 WHERE mod(a, 2) = 0", extraDetails: _*)
   }
 
   @Test
   def testExplainWithAgg(): Unit = {
-    util.verifyExplain("SELECT COUNT(*) FROM MyTable1 GROUP BY a", extraDetails:_*)
+    util.verifyExplain("SELECT COUNT(*) FROM MyTable1 GROUP BY a", extraDetails: _*)
   }
 
   @Test
   def testExplainWithJoin(): Unit = {
-    util.verifyExplain("SELECT a, b, c, e, f FROM MyTable1, MyTable2 WHERE a = d", extraDetails:_*)
+    util.verifyExplain("SELECT a, b, c, e, f FROM MyTable1, MyTable2 WHERE a = d", extraDetails: _*)
   }
 
   @Test
   def testExplainWithUnion(): Unit = {
-    util.verifyExplain("SELECT * FROM MyTable1 UNION ALL SELECT * FROM MyTable2", extraDetails:_*)
+    util.verifyExplain("SELECT * FROM MyTable1 UNION ALL SELECT * FROM MyTable2", extraDetails: _*)
   }
 
   @Test
   def testExplainWithSort(): Unit = {
-    util.verifyExplain("SELECT * FROM MyTable1 ORDER BY a LIMIT 5", extraDetails:_*)
+    util.verifyExplain("SELECT * FROM MyTable1 ORDER BY a LIMIT 5", extraDetails: _*)
   }
 
   @Test
@@ -106,14 +106,16 @@ class ExplainTest(extended: Boolean) extends TableTestBase {
 
     val table1 = util.tableEnv.sqlQuery("SELECT * FROM TempTable WHERE cnt > 10")
     val upsertSink1 = util.createUpsertTableSink(Array(0), Array("a", "cnt"), Array(INT, LONG))
-    util.tableEnv.asInstanceOf[TableEnvironmentInternal].registerTableSinkInternal(
-      "upsertSink1", upsertSink1)
+    util.tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSinkInternal("upsertSink1", upsertSink1)
     stmtSet.addInsert("upsertSink1", table1)
 
     val table2 = util.tableEnv.sqlQuery("SELECT * FROM TempTable WHERE cnt < 10")
     val upsertSink2 = util.createUpsertTableSink(Array(0), Array("a", "cnt"), Array(INT, LONG))
-    util.tableEnv.asInstanceOf[TableEnvironmentInternal].registerTableSinkInternal(
-      "upsertSink2", upsertSink2)
+    util.tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSinkInternal("upsertSink2", upsertSink2)
     stmtSet.addInsert("upsertSink2", table2)
 
     util.verifyExplain(stmtSet, extraDetails: _*)
@@ -125,15 +127,19 @@ class ExplainTest(extended: Boolean) extends TableTestBase {
     // Test emit latency propagate among RelNodeBlocks
     util.addDataStream[(Int, String, Timestamp)]("T1", 'id1, 'text, 'rowtime.rowtime)
     util.addDataStream[(Int, String, Int, String, Long, Timestamp)](
-      "T2", 'id2, 'cnt, 'name, 'goods, 'rowtime.rowtime)
+      "T2",
+      'id2,
+      'cnt,
+      'name,
+      'goods,
+      'rowtime.rowtime)
     util.addTableWithWatermark("T3", util.tableEnv.from("T1"), "rowtime", 0)
     util.addTableWithWatermark("T4", util.tableEnv.from("T2"), "rowtime", 0)
-    util.tableEnv.getConfig.getConfiguration.setBoolean(
-      ExecutionConfigOptions.TABLE_EXEC_MINIBATCH_ENABLED, true)
-    util.tableEnv.getConfig.getConfiguration.set(
-      ExecutionConfigOptions.TABLE_EXEC_MINIBATCH_ALLOW_LATENCY, Duration.ofSeconds(3))
-    val table = util.tableEnv.sqlQuery(
-      """
+    util.tableEnv.getConfig.getConfiguration
+      .setBoolean(ExecutionConfigOptions.TABLE_EXEC_MINIBATCH_ENABLED, true)
+    util.tableEnv.getConfig.getConfiguration
+      .set(ExecutionConfigOptions.TABLE_EXEC_MINIBATCH_ALLOW_LATENCY, Duration.ofSeconds(3))
+    val table = util.tableEnv.sqlQuery("""
         |SELECT id1, T3.rowtime AS ts, text
         |  FROM T3, T4
         |WHERE id1 = id2
@@ -142,26 +148,26 @@ class ExplainTest(extended: Boolean) extends TableTestBase {
       """.stripMargin)
     util.tableEnv.registerTable("TempTable", table)
 
-    val table1 = util.tableEnv.sqlQuery(
-      """
+    val table1 = util.tableEnv.sqlQuery("""
         |SELECT id1, LISTAGG(text, '#')
         |FROM TempTable
         |GROUP BY id1, TUMBLE(ts, INTERVAL '8' SECOND)
       """.stripMargin)
     val appendSink1 = util.createAppendTableSink(Array("a", "b"), Array(INT, STRING))
-    util.tableEnv.asInstanceOf[TableEnvironmentInternal].registerTableSinkInternal(
-      "appendSink1", appendSink1)
+    util.tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSinkInternal("appendSink1", appendSink1)
     stmtSet.addInsert("appendSink1", table1)
 
-    val table2 = util.tableEnv.sqlQuery(
-      """
+    val table2 = util.tableEnv.sqlQuery("""
         |SELECT id1, LISTAGG(text, '*')
         |FROM TempTable
         |GROUP BY id1, HOP(ts, INTERVAL '12' SECOND, INTERVAL '6' SECOND)
       """.stripMargin)
     val appendSink2 = util.createAppendTableSink(Array("a", "b"), Array(INT, STRING))
-    util.tableEnv.asInstanceOf[TableEnvironmentInternal].registerTableSinkInternal(
-      "appendSink2", appendSink2)
+    util.tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSinkInternal("appendSink2", appendSink2)
     stmtSet.addInsert("appendSink2", table2)
 
     util.verifyExplain(stmtSet, extraDetails: _*)

@@ -28,20 +28,20 @@ import org.junit._
 class OverWindowValidationTest extends TableTestBase {
 
   /**
-    * OVER clause is necessary for [[OverAgg0]] window function.
-    */
+   * OVER clause is necessary for [[OverAgg0]] window function.
+   */
   @Test(expected = classOf[ValidationException])
   def testInvalidOverAggregation(): Unit = {
     val util = batchTestUtil()
-    val t = util.addTable[(Int, Long, String)]("Table3",'a, 'b, 'c)
+    val t = util.addTable[(Int, Long, String)]("Table3", 'a, 'b, 'c)
 
     val overAgg = new OverAgg0
     t.select('c.count, overAgg('b, 'a))
   }
 
   /**
-    * OVER clause is necessary for [[OverAgg0]] window function.
-    */
+   * OVER clause is necessary for [[OverAgg0]] window function.
+   */
   @Test(expected = classOf[ValidationException])
   def testInvalidOverAggregation2(): Unit = {
     val util = batchTestUtil()
@@ -49,7 +49,7 @@ class OverWindowValidationTest extends TableTestBase {
     val overAgg = new OverAgg0
     table
       .window(Tumble over 5.milli on 'long as 'w)
-      .groupBy('string,'w)
+      .groupBy('string, 'w)
       .select(overAgg('long, 'int))
   }
 }

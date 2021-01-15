@@ -20,7 +20,11 @@ package org.apache.flink.table.expressions.utils
 
 import java.sql.Date
 
-import org.apache.flink.api.common.typeinfo.{BasicArrayTypeInfo, PrimitiveArrayTypeInfo, TypeInformation}
+import org.apache.flink.api.common.typeinfo.{
+  BasicArrayTypeInfo,
+  PrimitiveArrayTypeInfo,
+  TypeInformation
+}
 import org.apache.flink.api.java.typeutils.{ObjectArrayTypeInfo, RowTypeInfo}
 import org.apache.flink.table.api.Types
 import org.apache.flink.types.Row
@@ -59,7 +63,6 @@ class ArrayTypeTestBase extends ExpressionTestBase {
       PrimitiveArrayTypeInfo.DOUBLE_PRIMITIVE_ARRAY_TYPE_INFO,
       ObjectArrayTypeInfo.getInfoFor(Types.INT),
       ObjectArrayTypeInfo.getInfoFor(Types.INT),
-      BasicArrayTypeInfo.INT_ARRAY_TYPE_INFO
-    ).asInstanceOf[TypeInformation[Any]]
+      BasicArrayTypeInfo.INT_ARRAY_TYPE_INFO).asInstanceOf[TypeInformation[Any]]
   }
 }

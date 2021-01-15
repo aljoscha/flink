@@ -32,7 +32,12 @@ import org.apache.flink.table.expressions.utils.Func15
 import org.apache.flink.table.runtime.stream.sql.SqlITCase.TimestampAndWatermarkWithOffset
 import org.apache.flink.table.runtime.utils.JavaUserDefinedAggFunctions.MultiArgCount
 import org.apache.flink.table.runtime.utils.TimeTestUtil.EventTimeSourceFunction
-import org.apache.flink.table.runtime.utils.{JavaUserDefinedTableFunctions, StreamITCase, StreamTestData, StreamingWithStateTestBase}
+import org.apache.flink.table.runtime.utils.{
+  JavaUserDefinedTableFunctions,
+  StreamITCase,
+  StreamTestData,
+  StreamingWithStateTestBase
+}
 import org.apache.flink.table.utils.{InMemoryTableFactory, MemoryTableSourceSinkUtil}
 import org.apache.flink.types.Row
 
@@ -64,21 +69,21 @@ class SqlITCase extends StreamingWithStateTestBase {
   def testDistinctAggWithMergeOnEventTimeSessionGroupWindow(): Unit = {
     // create a watermark with 10ms offset to delay the window emission by 10ms to verify merge
     val sessionWindowTestData = List(
-      (1L, 2, "Hello"),       // (1, Hello)       - window
-      (2L, 2, "Hello"),       // (1, Hello)       - window, deduped
-      (8L, 2, "Hello"),       // (2, Hello)       - window, deduped during merge
-      (10L, 3, "Hello"),      // (2, Hello)       - window, forwarded during merge
+      (1L, 2, "Hello"), // (1, Hello)       - window
+      (2L, 2, "Hello"), // (1, Hello)       - window, deduped
+      (8L, 2, "Hello"), // (2, Hello)       - window, deduped during merge
+      (10L, 3, "Hello"), // (2, Hello)       - window, forwarded during merge
       (9L, 9, "Hello World"), // (1, Hello World) - window
-      (4L, 1, "Hello"),       // (1, Hello)       - window, triggering merge
-      (16L, 16, "Hello"))     // (3, Hello)       - window (not merged)
+      (4L, 1, "Hello"), // (1, Hello)       - window, triggering merge
+      (16L, 16, "Hello")
+    ) // (3, Hello)       - window (not merged)
 
     val env = StreamExecutionEnvironment.getExecutionEnvironment
     env.setParallelism(1)
 
     val stream = env
       .fromCollection(sessionWindowTestData)
-      .assignTimestampsAndWatermarks(
-        new TimestampAndWatermarkWithOffset[(Long, Int, String)](10L))
+      .assignTimestampsAndWatermarks(new TimestampAndWatermarkWithOffset[(Long, Int, String)](10L))
 
     val settings = EnvironmentSettings.newInstance().useOldPlanner().build()
     val tEnv = StreamTableEnvironment.create(env, settings)
@@ -101,9 +106,9 @@ class SqlITCase extends StreamingWithStateTestBase {
 
     val expected = Seq(
       "Hello World,1,9,1,1,1970-01-01 00:00:00.014", // window starts at [9L] till {14L}
-      "Hello,1,16,1,1,1970-01-01 00:00:00.021",    // window starts at [16L] till {21L}, not merged
-      "Hello,3,6,3,3,1970-01-01 00:00:00.015"      // window starts at [1L,2L],
-                                                   // merged with [8L,10L], by [4L], till {15L}
+      "Hello,1,16,1,1,1970-01-01 00:00:00.021", // window starts at [16L] till {21L}, not merged
+      "Hello,3,6,3,3,1970-01-01 00:00:00.015" // window starts at [1L,2L],
+      // merged with [8L,10L], by [4L], till {15L}
     )
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
   }
@@ -115,7 +120,9 @@ class SqlITCase extends StreamingWithStateTestBase {
     val tEnv = StreamTableEnvironment.create(env, settings)
     env.setParallelism(1)
 
-    val t = StreamTestData.get5TupleDataStream(env).assignAscendingTimestamps(x => x._2)
+    val t = StreamTestData
+      .get5TupleDataStream(env)
+      .assignAscendingTimestamps(x => x._2)
       .toTable(tEnv, 'a, 'b, 'c, 'd, 'e, 'rowtime.rowtime)
     tEnv.registerTable("MyTable", t)
 
@@ -131,12 +138,7 @@ class SqlITCase extends StreamingWithStateTestBase {
     results.addSink(new StreamITCase.StringSink[Row])
     env.execute()
 
-    val expected = List(
-      "1,1,1,1",
-      "2,3,1,2",
-      "3,5,2,2",
-      "4,3,1,2",
-      "5,6,1,3")
+    val expected = List("1,1,1,1", "2,3,1,2", "3,5,2,2", "4,3,1,2", "5,6,1,3")
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
   }
 
@@ -148,9 +150,9 @@ class SqlITCase extends StreamingWithStateTestBase {
     env.setParallelism(1)
 
     val stream = env
-                 .fromCollection(data)
-                 .assignTimestampsAndWatermarks(
-                   new TimestampAndWatermarkWithOffset[(Long, String, String)](0L))
+      .fromCollection(data)
+      .assignTimestampsAndWatermarks(
+        new TimestampAndWatermarkWithOffset[(Long, String, String)](0L))
     val table = stream.toTable(tEnv, 'a, 'b, 'c, 'rowtime.rowtime)
 
     tEnv.registerTable("T1", table)
@@ -188,7 +190,7 @@ class SqlITCase extends StreamingWithStateTestBase {
     assertEquals(expected.sorted, StreamITCase.retractedResults.sorted)
   }
 
-   /** test row stream registered table **/
+  /** test row stream registered table * */
   @Test
   def testRowRegister(): Unit = {
     val settings = EnvironmentSettings.newInstance().useOldPlanner().build()
@@ -201,14 +203,15 @@ class SqlITCase extends StreamingWithStateTestBase {
       Row.of("Hello", "Worlds", Int.box(1)),
       Row.of("Hello", "Hiden", Int.box(5)),
       Row.of("Hello again", "Worlds", Int.box(2)))
-        
+
     implicit val tpe: TypeInformation[Row] = new RowTypeInfo(
       BasicTypeInfo.STRING_TYPE_INFO,
       BasicTypeInfo.STRING_TYPE_INFO,
-      BasicTypeInfo.INT_TYPE_INFO) // tpe is automatically 
-    
+      BasicTypeInfo.INT_TYPE_INFO
+    ) // tpe is automatically
+
     val ds = env.fromCollection(data)
-    
+
     val t = ds.toTable(tEnv).as("a", "b", "c")
     tEnv.registerTable("MyTableRow", t)
 
@@ -216,11 +219,11 @@ class SqlITCase extends StreamingWithStateTestBase {
     result.addSink(new StreamITCase.StringSink[Row])
     env.execute()
 
-    val expected = List("Hello,Worlds,1","Hello again,Worlds,2")
+    val expected = List("Hello,Worlds,1", "Hello again,Worlds,2")
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
   }
-    
-  /** test unbounded groupBy (without window) **/
+
+  /** test unbounded groupBy (without window) * */
   @Test
   def testUnboundedGroupBy(): Unit = {
     val settings = EnvironmentSettings.newInstance().useOldPlanner().build()
@@ -248,11 +251,11 @@ class SqlITCase extends StreamingWithStateTestBase {
 
     val sqlQuery =
       "SELECT b, " +
-      "  SUM(DISTINCT (a / 3)), " +
-      "  COUNT(DISTINCT SUBSTRING(c FROM 1 FOR 2))," +
-      "  COUNT(DISTINCT c) " +
-      "FROM MyTable " +
-      "GROUP BY b"
+        "  SUM(DISTINCT (a / 3)), " +
+        "  COUNT(DISTINCT SUBSTRING(c FROM 1 FOR 2))," +
+        "  COUNT(DISTINCT c) " +
+        "FROM MyTable " +
+        "GROUP BY b"
 
     val t = StreamTestData.get3TupleDataStream(env).toTable(tEnv).as("a", "b", "c")
     tEnv.registerTable("MyTable", t)
@@ -342,24 +345,20 @@ class SqlITCase extends StreamingWithStateTestBase {
       (2, 2, (12, "45.612")),
       (3, 2, (13, "41.6")),
       (4, 3, (14, "45.2136")),
-      (5, 3, (18, "42.6"))
-    )
+      (5, 3, (18, "42.6")))
 
-    tEnv.registerTable("MyTable",
-      env.fromCollection(data).toTable(tEnv).as("a", "b", "c"))
+    tEnv.registerTable("MyTable", env.fromCollection(data).toTable(tEnv).as("a", "b", "c"))
 
     val result = tEnv.sqlQuery(sqlQuery).toRetractStream[Row]
     result.addSink(new StreamITCase.RetractingSink).setParallelism(1)
     env.execute()
 
-    val expected = List(
-      "1,{(12,45.6)=1}",
-      "2,{(13,41.6)=1, (12,45.612)=1}",
-      "3,{(18,42.6)=1, (14,45.2136)=1}")
+    val expected =
+      List("1,{(12,45.6)=1}", "2,{(13,41.6)=1, (12,45.612)=1}", "3,{(18,42.6)=1, (14,45.2136)=1}")
     assertEquals(expected.sorted, StreamITCase.retractedResults.sorted)
   }
 
-  /** test select star **/
+  /** test select star * */
   @Test
   def testSelectStar(): Unit = {
     val settings = EnvironmentSettings.newInstance().useOldPlanner().build()
@@ -379,7 +378,7 @@ class SqlITCase extends StreamingWithStateTestBase {
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
   }
 
-  /** test selection **/
+  /** test selection * */
   @Test
   def testSelectExpressionFromTable(): Unit = {
     val settings = EnvironmentSettings.newInstance().useOldPlanner().build()
@@ -419,7 +418,7 @@ class SqlITCase extends StreamingWithStateTestBase {
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
   }
 
-  /** test filtering with registered table **/
+  /** test filtering with registered table * */
   @Test
   def testSimpleFilter(): Unit = {
     val settings = EnvironmentSettings.newInstance().useOldPlanner().build()
@@ -439,7 +438,7 @@ class SqlITCase extends StreamingWithStateTestBase {
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
   }
 
-  /** test filtering with registered datastream **/
+  /** test filtering with registered datastream * */
   @Test
   def testDatastreamFilter(): Unit = {
     val settings = EnvironmentSettings.newInstance().useOldPlanner().build()
@@ -459,7 +458,7 @@ class SqlITCase extends StreamingWithStateTestBase {
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
   }
 
-  /** test union with registered tables **/
+  /** test union with registered tables * */
   @Test
   def testUnion(): Unit = {
     val settings = EnvironmentSettings.newInstance().useOldPlanner().build()
@@ -479,14 +478,12 @@ class SqlITCase extends StreamingWithStateTestBase {
     result.addSink(new StreamITCase.StringSink[Row])
     env.execute()
 
-    val expected = List(
-      "1,1,Hi", "1,1,Hi",
-      "2,2,Hello", "2,2,Hello",
-      "3,2,Hello world", "3,2,Hello world")
+    val expected =
+      List("1,1,Hi", "1,1,Hi", "2,2,Hello", "2,2,Hello", "3,2,Hello world", "3,2,Hello world")
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
   }
 
-  /** test union with filter **/
+  /** test union with filter * */
   @Test
   def testUnionWithFilter(): Unit = {
     val settings = EnvironmentSettings.newInstance().useOldPlanner().build()
@@ -506,13 +503,11 @@ class SqlITCase extends StreamingWithStateTestBase {
     result.addSink(new StreamITCase.StringSink[Row])
     env.execute()
 
-    val expected = List(
-      "2,2,Hello",
-      "3,2,Hello world")
+    val expected = List("2,2,Hello", "3,2,Hello world")
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
   }
 
-  /** test union of a table and a datastream **/
+  /** test union of a table and a datastream * */
   @Test
   def testUnionTableWithDataSet(): Unit = {
     val settings = EnvironmentSettings.newInstance().useOldPlanner().build()
@@ -545,8 +540,7 @@ class SqlITCase extends StreamingWithStateTestBase {
     val data = List(
       (1, Array(12, 45), Array(Array(12, 45))),
       (2, Array(41, 5), Array(Array(18), Array(87))),
-      (3, Array(18, 42), Array(Array(1), Array(45)))
-    )
+      (3, Array(18, 42), Array(Array(1), Array(45))))
     val stream = env.fromCollection(data)
     tEnv.createTemporaryView("T", stream, 'a, 'b, 'c)
 
@@ -562,8 +556,7 @@ class SqlITCase extends StreamingWithStateTestBase {
       "2,[41, 5],41",
       "2,[41, 5],5",
       "3,[18, 42],18",
-      "3,[18, 42],42"
-    )
+      "3,[18, 42],42")
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
   }
 
@@ -576,8 +569,7 @@ class SqlITCase extends StreamingWithStateTestBase {
     val data = List(
       (1, Array(12, 45), Array(Array(12, 45))),
       (2, Array(41, 5), Array(Array(18), Array(87))),
-      (3, Array(18, 42), Array(Array(1), Array(45)))
-    )
+      (3, Array(18, 42), Array(Array(1), Array(45))))
     val stream = env.fromCollection(data)
     tEnv.createTemporaryView("T", stream, 'a, 'b, 'c)
 
@@ -587,12 +579,7 @@ class SqlITCase extends StreamingWithStateTestBase {
     result.addSink(new StreamITCase.StringSink[Row])
     env.execute()
 
-    val expected = List(
-      "1,[12, 45]",
-      "2,[18]",
-      "2,[87]",
-      "3,[1]",
-      "3,[45]")
+    val expected = List("1,[12, 45]", "2,[18]", "2,[87]", "3,[1]", "3,[45]")
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
   }
 
@@ -605,8 +592,7 @@ class SqlITCase extends StreamingWithStateTestBase {
     val data = List(
       (1, Array((12, "45.6"), (12, "45.612"))),
       (2, Array((13, "41.6"), (14, "45.2136"))),
-      (3, Array((18, "42.6")))
-    )
+      (3, Array((18, "42.6"))))
     val stream = env.fromCollection(data)
     tEnv.createTemporaryView("T", stream, 'a, 'b)
 
@@ -616,9 +602,7 @@ class SqlITCase extends StreamingWithStateTestBase {
     result.addSink(new StreamITCase.StringSink[Row])
     env.execute()
 
-    val expected = List(
-      "2,[(13,41.6), (14,45.2136)],14,45.2136",
-      "3,[(18,42.6)],18,42.6")
+    val expected = List("2,[(13,41.6), (14,45.2136)],14,45.2136", "3,[(18,42.6)],18,42.6")
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
   }
 
@@ -646,10 +630,7 @@ class SqlITCase extends StreamingWithStateTestBase {
     result.addSink(new StreamITCase.RetractingSink).setParallelism(1)
     env.execute()
 
-    val expected = List(
-      "1,12,45.6",
-      "2,12,45.612",
-      "2,13,41.6")
+    val expected = List("1,12,45.6", "2,12,45.612", "2,13,41.6")
     assertEquals(expected.sorted, StreamITCase.retractedResults.sorted)
   }
 
@@ -683,13 +664,7 @@ class SqlITCase extends StreamingWithStateTestBase {
     result.addSink(new StreamITCase.RetractingSink).setParallelism(1)
     env.execute()
 
-    val expected = List(
-      "1,1",
-      "1,2",
-      "2,2",
-      "3,null",
-      "4,4"
-    )
+    val expected = List("1,1", "1,2", "2,2", "3,null", "4,4")
     assertEquals(expected.sorted, StreamITCase.retractedResults.sorted)
   }
 
@@ -722,10 +697,10 @@ class SqlITCase extends StreamingWithStateTestBase {
       Right(14000010L),
       Left(8640000000L, (4, 1L, "Hello")), // data for the quarter to validate having filter
       Left(8640000001L, (4, 1L, "Hello")),
-      Right(8640000010L)
-    )
+      Right(8640000010L))
 
-    val t1 = env.addSource(new EventTimeSourceFunction[(Int, Long, String)](data))
+    val t1 = env
+      .addSource(new EventTimeSourceFunction[(Int, Long, String)](data))
       .toTable(tEnv, 'a, 'b, 'c, 'rowtime.rowtime)
 
     tEnv.registerTable("T1", t1)
@@ -737,9 +712,7 @@ class SqlITCase extends StreamingWithStateTestBase {
 
     env.execute()
 
-    val expected = List(
-      "Hello,2,1970-01-01 03:53:00.0,1970-01-01 03:54:00.0"
-    )
+    val expected = List("Hello,2,1970-01-01 03:53:00.0,1970-01-01 03:54:00.0")
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
   }
 
@@ -755,23 +728,32 @@ class SqlITCase extends StreamingWithStateTestBase {
       .field("e", Types.LONG)
       .field("f", Types.STRING)
       .field("t", Types.SQL_TIMESTAMP)
-        .rowtime(new Rowtime().timestampsFromField("t").watermarksPeriodicAscending())
-      .field("proctime", Types.SQL_TIMESTAMP).proctime()
+      .rowtime(new Rowtime().timestampsFromField("t").watermarksPeriodicAscending())
+      .field("proctime", Types.SQL_TIMESTAMP)
+      .proctime()
     val properties = desc.toProperties
 
-    val t = StreamTestData.getSmall3TupleDataStream(env)
+    val t = StreamTestData
+      .getSmall3TupleDataStream(env)
       .assignAscendingTimestamps(x => x._2)
       .toTable(tEnv, 'a, 'b, 'c, 'rowtime.rowtime)
     tEnv.registerTable("sourceTable", t)
 
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal("targetTable",
-      new InMemoryTableFactory(3).createStreamTableSource(properties))
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSinkInternal("targetTable",
-      new InMemoryTableFactory(3).createStreamTableSink(properties))
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSourceInternal(
+        "targetTable",
+        new InMemoryTableFactory(3).createStreamTableSource(properties))
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSinkInternal(
+        "targetTable",
+        new InMemoryTableFactory(3).createStreamTableSink(properties))
 
     tEnv.sqlUpdate("INSERT INTO targetTable SELECT a, b, c, rowtime FROM sourceTable")
     tEnv.execute("job name")
-    tEnv.sqlQuery("SELECT a, e, f, t from targetTable")
+    tEnv
+      .sqlQuery("SELECT a, e, f, t from targetTable")
       .addSink(new StreamITCase.StringSink[Row])
     env.execute()
 
@@ -800,10 +782,7 @@ class SqlITCase extends StreamingWithStateTestBase {
     result.addSink(new StreamITCase.StringSink[Row])
     env.execute()
 
-    val expected = List(
-      "Hi300",
-      "Hello300",
-      "Hello world300")
+    val expected = List("Hi300", "Hello300", "Hello world300")
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
   }
 
@@ -826,10 +805,7 @@ class SqlITCase extends StreamingWithStateTestBase {
     result.addSink(new StreamITCase.StringSink[Row])
     env.execute()
 
-    val expected = List(
-      "1,600",
-      "2,1500",
-      "3,3300")
+    val expected = List("1,600", "2,1500", "3,3300")
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
   }
 
@@ -900,18 +876,14 @@ class SqlITCase extends StreamingWithStateTestBase {
 
 object SqlITCase {
 
-  class TimestampAndWatermarkWithOffset[T <: Product](
-      offset: Long) extends AssignerWithPunctuatedWatermarks[T] {
+  class TimestampAndWatermarkWithOffset[T <: Product](offset: Long)
+      extends AssignerWithPunctuatedWatermarks[T] {
 
-    override def checkAndGetNextWatermark(
-        lastElement: T,
-        extractedTimestamp: Long): Watermark = {
+    override def checkAndGetNextWatermark(lastElement: T, extractedTimestamp: Long): Watermark = {
       new Watermark(extractedTimestamp - offset)
     }
 
-    override def extractTimestamp(
-        element: T,
-        previousElementTimestamp: Long): Long = {
+    override def extractTimestamp(element: T, previousElementTimestamp: Long): Long = {
       element.productElement(0).asInstanceOf[Long]
     }
   }

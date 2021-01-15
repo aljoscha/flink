@@ -23,18 +23,15 @@ import org.apache.flink.api.scala.typeutils.AlternateEnumeration.AlternateEnumer
 import org.apache.flink.api.scala.typeutils.TestEnumeration.TestEnumeration
 
 /**
-  * Test for [[EnumValueTypeInfo]].
-  */
+ * Test for [[EnumValueTypeInfo]].
+ */
 class EnumValueTypeInfoTest extends TypeInformationTestBase[EnumValueTypeInfo[_]] {
 
   override protected def getTestData: Array[EnumValueTypeInfo[_]] = Array(
-    new EnumValueTypeInfo[TestEnumeration.type](
-      TestEnumeration,
-      classOf[TestEnumeration]),
+    new EnumValueTypeInfo[TestEnumeration.type](TestEnumeration, classOf[TestEnumeration]),
     new EnumValueTypeInfo[AlternateEnumeration.type](
       AlternateEnumeration,
-      classOf[AlternateEnumeration])
-  )
+      classOf[AlternateEnumeration]))
 }
 
 object TestEnumeration extends Enumeration {

@@ -23,16 +23,25 @@ import org.apache.flink.api.java.typeutils.RowTypeInfo
 import org.apache.flink.table.api.internal.TableEnvironmentInternal
 import org.apache.flink.table.api.{TableSchema, Types}
 import org.apache.flink.table.planner.expressions.utils.Func0
-import org.apache.flink.table.planner.plan.optimize.program.{FlinkBatchProgram, FlinkHepRuleSetProgramBuilder, HEP_RULES_EXECUTION_TYPE}
-import org.apache.flink.table.planner.utils.{BatchTableTestUtil, TableConfigUtils, TableTestBase, TestNestedProjectableTableSource}
+import org.apache.flink.table.planner.plan.optimize.program.{
+  FlinkBatchProgram,
+  FlinkHepRuleSetProgramBuilder,
+  HEP_RULES_EXECUTION_TYPE
+}
+import org.apache.flink.table.planner.utils.{
+  BatchTableTestUtil,
+  TableConfigUtils,
+  TableTestBase,
+  TestNestedProjectableTableSource
+}
 
 import org.apache.calcite.plan.hep.HepMatchOrder
 import org.apache.calcite.tools.RuleSets
 import org.junit.{Before, Test}
 
 /**
-  * Test for [[PushProjectIntoLegacyTableSourceScanRule]].
-  */
+ * Test for [[PushProjectIntoLegacyTableSourceScanRule]].
+ */
 class PushProjectIntoLegacyTableSourceScanRuleTest extends TableTestBase {
 
   protected val util: BatchTableTestUtil = batchTestUtil()
@@ -47,8 +56,7 @@ class PushProjectIntoLegacyTableSourceScanRuleTest extends TableTestBase {
         .setHepRulesExecutionType(HEP_RULES_EXECUTION_TYPE.RULE_SEQUENCE)
         .setHepMatchOrder(HepMatchOrder.BOTTOM_UP)
         .add(RuleSets.ofList(PushProjectIntoLegacyTableSourceScanRule.INSTANCE))
-        .build()
-    )
+        .build())
 
     val ddl1 =
       s"""
@@ -121,18 +129,15 @@ class PushProjectIntoLegacyTableSourceScanRuleTest extends TableTestBase {
   def testNestedProject(): Unit = {
     val nested1 = new RowTypeInfo(
       Array(Types.STRING, Types.INT).asInstanceOf[Array[TypeInformation[_]]],
-      Array("name", "value")
-    )
+      Array("name", "value"))
 
     val nested2 = new RowTypeInfo(
       Array(Types.INT, Types.BOOLEAN).asInstanceOf[Array[TypeInformation[_]]],
-      Array("num", "flag")
-    )
+      Array("num", "flag"))
 
     val deepNested = new RowTypeInfo(
       Array(nested1, nested2).asInstanceOf[Array[TypeInformation[_]]],
-      Array("nested1", "nested2")
-    )
+      Array("nested1", "nested2"))
 
     val tableSchema = new TableSchema(
       Array("id", "deepNested", "nested", "name"),
@@ -142,9 +147,11 @@ class PushProjectIntoLegacyTableSourceScanRuleTest extends TableTestBase {
       Array(Types.INT, deepNested, nested1, Types.STRING).asInstanceOf[Array[TypeInformation[_]]],
       Array("id", "deepNested", "nested", "name"))
 
-    util.tableEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(
-      "T",
-      new TestNestedProjectableTableSource(true, tableSchema, returnType, Seq()))
+    util.tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSourceInternal(
+        "T",
+        new TestNestedProjectableTableSource(true, tableSchema, returnType, Seq()))
 
     val sqlQuery =
       """

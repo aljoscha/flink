@@ -24,7 +24,10 @@ import org.apache.flink.table.api.TableConfig
 import org.apache.flink.table.data.utils.JoinedRowData
 import org.apache.flink.table.data.{RowData, TimestampData}
 import org.apache.flink.table.planner.codegen.CodeGenUtils._
-import org.apache.flink.table.planner.codegen.OperatorCodeGenerator.{INPUT_SELECTION, generateCollect}
+import org.apache.flink.table.planner.codegen.OperatorCodeGenerator.{
+  INPUT_SELECTION,
+  generateCollect
+}
 import org.apache.flink.table.runtime.generated.{GeneratedJoinCondition, GeneratedProjection}
 import org.apache.flink.table.runtime.hashtable.{LongHashPartition, LongHybridHashTable}
 import org.apache.flink.table.runtime.operators.CodeGenOperatorFactory
@@ -34,23 +37,21 @@ import org.apache.flink.table.types.logical.LogicalTypeRoot.{TIMESTAMP_WITHOUT_T
 import org.apache.flink.table.types.logical._
 
 /**
-  * Generate a long key hash join operator using [[LongHybridHashTable]].
-  */
+ * Generate a long key hash join operator using [[LongHybridHashTable]].
+ */
 object LongHashJoinGenerator {
 
-  def support(
-      joinType: HashJoinType,
-      keyType: RowType,
-      filterNulls: Array[Boolean]): Boolean = {
+  def support(joinType: HashJoinType, keyType: RowType, filterNulls: Array[Boolean]): Boolean = {
     (joinType == HashJoinType.INNER ||
-        joinType == HashJoinType.SEMI ||
-        joinType == HashJoinType.ANTI ||
-        joinType == HashJoinType.PROBE_OUTER) &&
-        filterNulls.forall(b => b) &&
-        keyType.getFieldCount == 1 && {
+      joinType == HashJoinType.SEMI ||
+      joinType == HashJoinType.ANTI ||
+      joinType == HashJoinType.PROBE_OUTER) &&
+    filterNulls.forall(b => b) &&
+    keyType.getFieldCount == 1 && {
       keyType.getTypeAt(0).getTypeRoot match {
         case BIGINT | INTEGER | SMALLINT | TINYINT | FLOAT | DOUBLE | DATE |
-             TIME_WITHOUT_TIME_ZONE => true
+            TIME_WITHOUT_TIME_ZONE =>
+          true
         case TIMESTAMP_WITHOUT_TIME_ZONE =>
           val timestampType = keyType.getTypeAt(0).asInstanceOf[TimestampType]
           TimestampData.isCompact(timestampType.getPrecision)
@@ -72,11 +73,11 @@ object LongHashJoinGenerator {
     val singleType = keyType.getTypeAt(0)
     val getCode = rowFieldReadAccess(ctx, keyMapping(0), rowTerm, singleType)
     val term = singleType.getTypeRoot match {
-      case FLOAT => s"Float.floatToIntBits($getCode)"
-      case DOUBLE => s"Double.doubleToLongBits($getCode)"
-      case TIMESTAMP_WITHOUT_TIME_ZONE => s"$getCode.getMillisecond()"
+      case FLOAT                          => s"Float.floatToIntBits($getCode)"
+      case DOUBLE                         => s"Double.doubleToLongBits($getCode)"
+      case TIMESTAMP_WITHOUT_TIME_ZONE    => s"$getCode.getMillisecond()"
       case TIMESTAMP_WITH_LOCAL_TIME_ZONE => s"$getCode.getMillisecond()"
-      case _ => getCode
+      case _                              => getCode
     }
     s"return $term;"
   }
@@ -84,13 +85,13 @@ object LongHashJoinGenerator {
   def genAnyNullsInKeys(keyMapping: Array[Int], rowTerm: String): (String, String) = {
     val builder = new StringBuilder()
     val anyNullTerm = newName("anyNull")
-    keyMapping.foreach(key =>
-      builder.append(s"$anyNullTerm |= $rowTerm.isNullAt($key);")
-    )
-    (s"""
+    keyMapping.foreach(key => builder.append(s"$anyNullTerm |= $rowTerm.isNullAt($key);"))
+    (
+      s"""
        |boolean $anyNullTerm = false;
        |$builder
-     """.stripMargin, anyNullTerm)
+     """.stripMargin,
+      anyNullTerm)
   }
 
   def genProjection(conf: TableConfig, types: Array[LogicalType]): GeneratedProjection = {
@@ -148,8 +149,7 @@ object LongHashJoinGenerator {
     ctx.addReusableCloseStatement(s"condFunc.close();")
 
     val gauge = classOf[Gauge[_]].getCanonicalName
-    ctx.addReusableOpenStatement(
-      s"""
+    ctx.addReusableOpenStatement(s"""
          |getMetricGroup().gauge("memoryUsedSizeInBytes", new $gauge<Long>() {
          |  @Override
          |  public Long getValue() {
@@ -291,8 +291,7 @@ object LongHashJoinGenerator {
       case _ => ""
     }
 
-    ctx.addReusableMember(
-      s"""
+    ctx.addReusableMember(s"""
          |private void joinWithNextKey() throws Exception {
          |  ${classOf[LongHashPartition#MatchIterator].getCanonicalName} buildIter =
          |      table.getBuildSideIterator();
@@ -304,8 +303,7 @@ object LongHashJoinGenerator {
          |}
        """.stripMargin)
 
-    ctx.addReusableCloseStatement(
-      s"""
+    ctx.addReusableCloseStatement(s"""
          |if (this.table != null) {
          |  this.table.close();
          |  this.table.free();
@@ -339,22 +337,19 @@ object LongHashJoinGenerator {
        """.stripMargin,
       buildType,
       probeType,
-      nextSelectionCode = Some(
-        s"""
+      nextSelectionCode = Some(s"""
            |if ($buildEnd) {
            |  return $INPUT_SELECTION.SECOND;
            |} else {
            |  return $INPUT_SELECTION.FIRST;
            |}
          """.stripMargin),
-      endInputCode1 = Some(
-        s"""
+      endInputCode1 = Some(s"""
            |LOG.info("Finish build phase.");
            |table.endBuild();
            |$buildEnd = true;
        """.stripMargin),
-      endInputCode2 = Some(
-        s"""
+      endInputCode2 = Some(s"""
            |LOG.info("Finish probe phase.");
            |while (this.table.nextMatching()) {
            |  joinWithNextKey();

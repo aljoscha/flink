@@ -39,13 +39,13 @@ class CsvInputFormatTest {
   private final val SECOND_PART: String = "That is the second part"
 
   @Test
-  def ignoreSingleCharPrefixComments():Unit = {
+  def ignoreSingleCharPrefixComments(): Unit = {
     try {
       val fileContent = "#description of the data\n" +
-                        "#successive commented line\n" +
-                        "this is|1|2.0|\n" +
-                        "a test|3|4.0|\n" +
-                        "#next|5|6.0|\n"
+        "#successive commented line\n" +
+        "this is|1|2.0|\n" +
+        "a test|3|4.0|\n" +
+        "#next|5|6.0|\n"
       val split = createTempFile(fileContent)
       val format = new TupleCsvInputFormat[(String, Integer, Double)](
         PATH,
@@ -71,8 +71,7 @@ class CsvInputFormatTest {
       result = format.nextRecord(result)
       assertNull(result)
       assertTrue(format.reachedEnd)
-    }
-    catch {
+    } catch {
       case ex: Exception => {
         ex.printStackTrace
         fail("Test failed due to a " + ex.getClass.getName + ": " + ex.getMessage)
@@ -81,13 +80,13 @@ class CsvInputFormatTest {
   }
 
   @Test
-  def ignoreMultiCharPrefixComments():Unit = {
+  def ignoreMultiCharPrefixComments(): Unit = {
     try {
       val fileContent = "//description of the data\n" +
-                        "//successive commented line\n" +
-                        "this is|1|2.0|\n" +
-                        "a test|3|4.0|\n" +
-                        "//next|5|6.0|\n"
+        "//successive commented line\n" +
+        "this is|1|2.0|\n" +
+        "a test|3|4.0|\n" +
+        "//next|5|6.0|\n"
       val split = createTempFile(fileContent)
       val format = new TupleCsvInputFormat[(String, Integer, Double)](
         PATH,
@@ -113,8 +112,7 @@ class CsvInputFormatTest {
       result = format.nextRecord(result)
       assertNull(result)
       assertTrue(format.reachedEnd)
-    }
-    catch {
+    } catch {
       case ex: Exception => {
         ex.printStackTrace
         fail("Test failed due to a " + ex.getClass.getName + ": " + ex.getMessage)
@@ -123,7 +121,7 @@ class CsvInputFormatTest {
   }
 
   @Test
-  def readStringFields():Unit = {
+  def readStringFields(): Unit = {
     try {
       val fileContent = "abc|def|ghijk\nabc||hhg\n|||"
       val split = createTempFile(fileContent)
@@ -155,8 +153,7 @@ class CsvInputFormatTest {
       result = format.nextRecord(result)
       assertNull(result)
       assertTrue(format.reachedEnd)
-    }
-    catch {
+    } catch {
       case ex: Exception => {
         ex.printStackTrace()
         fail("Test failed due to a " + ex.getClass.getName + ": " + ex.getMessage)
@@ -165,7 +162,7 @@ class CsvInputFormatTest {
   }
 
   @Test
-  def readMixedQuotedStringFields():Unit = {
+  def readMixedQuotedStringFields(): Unit = {
     try {
       val fileContent = "abc|\"de|f\"|ghijk\n\"a|bc\"||hhg\n|||"
       val split = createTempFile(fileContent)
@@ -198,8 +195,7 @@ class CsvInputFormatTest {
       result = format.nextRecord(result)
       assertNull(result)
       assertTrue(format.reachedEnd)
-    }
-    catch {
+    } catch {
       case ex: Exception => {
         ex.printStackTrace()
         fail("Test failed due to a " + ex.getClass.getName + ": " + ex.getMessage)
@@ -240,8 +236,7 @@ class CsvInputFormatTest {
       result = format.nextRecord(result)
       assertNull(result)
       assertTrue(format.reachedEnd)
-    }
-    catch {
+    } catch {
       case ex: Exception =>
         ex.printStackTrace()
         fail("Test failed due to a " + ex.getClass.getName + ": " + ex.getMessage)
@@ -254,8 +249,9 @@ class CsvInputFormatTest {
       val fileContent = "111|222|333|444|555\n666|777|888|999|000|\n"
       val split = createTempFile(fileContent)
       val format = new TupleCsvInputFormat[(Int, Int, Int, Int, Int)](
-        PATH, createTypeInformation[(Int, Int, Int, Int, Int)].
-          asInstanceOf[CaseClassTypeInfo[(Int, Int, Int, Int, Int)]])
+        PATH,
+        createTypeInformation[(Int, Int, Int, Int, Int)]
+          .asInstanceOf[CaseClassTypeInfo[(Int, Int, Int, Int, Int)]])
       format.setFieldDelimiter("|")
       format.configure(new Configuration)
       format.open(split)
@@ -277,8 +273,7 @@ class CsvInputFormatTest {
       result = format.nextRecord(result)
       assertNull(result)
       assertTrue(format.reachedEnd)
-    }
-    catch {
+    } catch {
       case ex: Exception =>
         fail("Test failed due to a " + ex.getClass.getName + ": " + ex.getMessage)
     }
@@ -308,8 +303,7 @@ class CsvInputFormatTest {
       result = format.nextRecord(result)
       assertNull(result)
       assertTrue(format.reachedEnd)
-    }
-    catch {
+    } catch {
       case ex: Exception =>
         fail("Test failed due to a " + ex.getClass.getName + ": " + ex.getMessage)
     }
@@ -341,8 +335,7 @@ class CsvInputFormatTest {
       result = format.nextRecord(result)
       assertNull(result)
       assertTrue(format.reachedEnd)
-    }
-    catch {
+    } catch {
       case ex: Exception =>
         fail("Test failed due to a " + ex.getClass.getName + ": " + ex.getMessage)
     }
@@ -354,8 +347,12 @@ class CsvInputFormatTest {
     val wrt = new FileWriter(tempFile)
     wrt.write(content)
     wrt.close()
-    new FileInputSplit(0, new Path(tempFile.toURI.toString), 0,
-      tempFile.length,Array[String]("localhost"))
+    new FileInputSplit(
+      0,
+      new Path(tempFile.toURI.toString),
+      0,
+      tempFile.length,
+      Array[String]("localhost"))
   }
 
   @Test
@@ -375,7 +372,8 @@ class CsvInputFormatTest {
       val wrt = new OutputStreamWriter(new FileOutputStream(tempFile))
       wrt.write(fileContent)
       wrt.close()
-      val inputFormat = new TupleCsvInputFormat[Tuple1[String]](new Path(tempFile.toURI.toString),
+      val inputFormat = new TupleCsvInputFormat[Tuple1[String]](
+        new Path(tempFile.toURI.toString),
         createTypeInformation[Tuple1[String]].asInstanceOf[CaseClassTypeInfo[Tuple1[String]]])
       val parameters = new Configuration
       inputFormat.configure(parameters)
@@ -388,8 +386,7 @@ class CsvInputFormatTest {
       result = inputFormat.nextRecord(result)
       assertNotNull("Expecting to not return null", result)
       assertEquals(SECOND_PART, result._1)
-    }
-    catch {
+    } catch {
       case t: Throwable =>
         System.err.println("test failed with exception: " + t.getMessage)
         t.printStackTrace(System.err)
@@ -450,7 +447,7 @@ class CsvInputFormatTest {
     val tempFile = createTempFile(fileContent)
     val typeInfo: CaseClassTypeInfo[CaseClassItem] =
       createTypeInformation[CaseClassItem]
-      .asInstanceOf[CaseClassTypeInfo[CaseClassItem]]
+        .asInstanceOf[CaseClassTypeInfo[CaseClassItem]]
     val format = new TupleCsvInputFormat[CaseClassItem](PATH, typeInfo)
 
     format.setDelimiter('\n')
@@ -467,8 +464,8 @@ class CsvInputFormatTest {
     val tempFile = createTempFile(fileContent)
     val typeInfo: PojoTypeInfo[POJOItem] = createTypeInformation[POJOItem]
       .asInstanceOf[PojoTypeInfo[POJOItem]]
-    val format = new PojoCsvInputFormat[POJOItem](
-      PATH, typeInfo, Array("field2", "field1", "field3"))
+    val format =
+      new PojoCsvInputFormat[POJOItem](PATH, typeInfo, Array("field2", "field1", "field3"))
 
     format.setDelimiter('\n')
     format.setFieldDelimiter(",")
@@ -477,7 +474,7 @@ class CsvInputFormatTest {
 
     validatePOJOItem(format)
   }
-  
+
   @Test
   def testPOJOTypeWithFieldSubsetAndDataSubset(): Unit = {
     val fileContent = "HELLO,123,NODATA,3.123,NODATA\n" + "ABC,456,NODATA,1.234,NODATA"
@@ -485,7 +482,9 @@ class CsvInputFormatTest {
     val typeInfo: PojoTypeInfo[POJOItem] = createTypeInformation[POJOItem]
       .asInstanceOf[PojoTypeInfo[POJOItem]]
     val format = new PojoCsvInputFormat[POJOItem](
-      PATH, typeInfo, Array("field2", "field1", "field3"),
+      PATH,
+      typeInfo,
+      Array("field2", "field1", "field3"),
       Array(true, true, false, true, false))
 
     format.setDelimiter('\n')
@@ -532,7 +531,7 @@ class CsvInputFormatTest {
 
 }
 
-class POJO (var table: String, var time: String) {
+class POJO(var table: String, var time: String) {
 
   def this() {
     this("", "")
@@ -541,13 +540,13 @@ class POJO (var table: String, var time: String) {
   override def equals(obj: Any): Boolean = {
     obj match {
       case that: POJO => table == that.table && time == that.time
-      case _ => false
+      case _          => false
     }
   }
 }
 
 class TwitterPOJO(theTable: String, theTime: String, var tweet: String)
-  extends POJO(theTable, theTime) {
+    extends POJO(theTable, theTime) {
 
   def this() {
     this("", "", "")
@@ -556,7 +555,7 @@ class TwitterPOJO(theTable: String, theTime: String, var tweet: String)
   override def equals(obj: Any): Boolean = {
     obj match {
       case that: TwitterPOJO => table == that.table && time == that.time && tweet == that.tweet
-      case _ => false
+      case _                 => false
     }
   }
 }

@@ -39,13 +39,13 @@ class StreamPhysicalPythonGroupTableAggregate(
     outputRowType: RelDataType,
     grouping: Array[Int],
     aggCalls: Seq[AggregateCall])
-  extends StreamPhysicalGroupTableAggregateBase(
-    cluster,
-    traitSet,
-    inputRel,
-    outputRowType,
-    grouping,
-    aggCalls) {
+    extends StreamPhysicalGroupTableAggregateBase(
+      cluster,
+      traitSet,
+      inputRel,
+      outputRowType,
+      grouping,
+      aggCalls) {
 
   override def copy(traitSet: RelTraitSet, inputs: util.List[RelNode]): RelNode = {
     new StreamPhysicalPythonGroupTableAggregate(
@@ -70,7 +70,6 @@ class StreamPhysicalPythonGroupTableAggregate(
       needRetraction,
       ExecEdge.DEFAULT,
       FlinkTypeFactory.toLogicalRowType(getRowType),
-      getRelDetailedDescription
-    )
+      getRelDetailedDescription)
   }
 }

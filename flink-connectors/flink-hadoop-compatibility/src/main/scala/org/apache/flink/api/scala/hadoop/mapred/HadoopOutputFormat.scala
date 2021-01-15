@@ -23,7 +23,7 @@ import org.apache.hadoop.mapred.{JobConf, OutputCommitter, OutputFormat}
 
 @Public
 class HadoopOutputFormat[K, V](mapredOutputFormat: OutputFormat[K, V], job: JobConf)
-  extends HadoopOutputFormatBase[K, V, (K, V)](mapredOutputFormat, job) {
+    extends HadoopOutputFormatBase[K, V, (K, V)](mapredOutputFormat, job) {
 
   def this(
       mapredOutputFormat: OutputFormat[K, V],

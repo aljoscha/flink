@@ -27,7 +27,14 @@ import org.apache.calcite.plan.{RelOptRule, RelOptRuleCall}
 import org.apache.calcite.rel.RelCollations
 import org.apache.calcite.rel.`type`.RelDataType
 import org.apache.calcite.rel.core.{Aggregate, Correlate, Filter, JoinRelType, Project, Sort}
-import org.apache.calcite.rex.{RexCall, RexCorrelVariable, RexFieldAccess, RexInputRef, RexLiteral, RexNode}
+import org.apache.calcite.rex.{
+  RexCall,
+  RexCorrelVariable,
+  RexFieldAccess,
+  RexInputRef,
+  RexLiteral,
+  RexNode
+}
 import org.apache.calcite.sql.SqlKind
 import org.apache.calcite.util.ImmutableBitSet
 
@@ -66,15 +73,14 @@ import scala.collection.JavaConversions._
  *
  * <p>This rule can only be used in HepPlanner.
  */
-class CorrelateSortToRankRule extends RelOptRule(
-  operand(classOf[Correlate],
-    operand(classOf[Aggregate],
-      operand(classOf[Project], any())),
-    operand(classOf[Sort],
-      operand(classOf[Project],
-        operand(classOf[Filter], any())))),
-  FlinkRelFactories.FLINK_REL_BUILDER,
-  "CorrelateSortToRankRule") {
+class CorrelateSortToRankRule
+    extends RelOptRule(
+      operand(
+        classOf[Correlate],
+        operand(classOf[Aggregate], operand(classOf[Project], any())),
+        operand(classOf[Sort], operand(classOf[Project], operand(classOf[Filter], any())))),
+      FlinkRelFactories.FLINK_REL_BUILDER,
+      "CorrelateSortToRankRule") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val correlate: Correlate = call.rel(0)
@@ -156,14 +162,17 @@ class CorrelateSortToRankRule extends RelOptRule(
 
     val oriCollation = sort.getCollation
     val newFieldCollations = oriCollation.getFieldCollations.map { fc =>
-      val newFieldIdx = sortInput.getProjects.get(fc.getFieldIndex)
-        .asInstanceOf[RexInputRef].getIndex
+      val newFieldIdx = sortInput.getProjects
+        .get(fc.getFieldIndex)
+        .asInstanceOf[RexInputRef]
+        .getIndex
       fc.withFieldIndex(newFieldIdx)
     }
     val newCollation = RelCollations.of(newFieldCollations)
 
     val newRel = builder
-      .push(filter.getInput()).asInstanceOf[FlinkRelBuilder]
+      .push(filter.getInput())
+      .asInstanceOf[FlinkRelBuilder]
       .rank(
         partitionKey,
         newCollation,

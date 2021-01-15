@@ -19,7 +19,12 @@
 package org.apache.flink.table.planner.plan.metadata
 
 import org.apache.flink.table.planner.JDouble
-import org.apache.flink.table.planner.plan.nodes.physical.batch.{BatchPhysicalGroupAggregateBase, BatchPhysicalLocalHashWindowAggregate, BatchPhysicalLocalSortWindowAggregate, BatchPhysicalWindowAggregateBase}
+import org.apache.flink.table.planner.plan.nodes.physical.batch.{
+  BatchPhysicalGroupAggregateBase,
+  BatchPhysicalLocalHashWindowAggregate,
+  BatchPhysicalLocalSortWindowAggregate,
+  BatchPhysicalWindowAggregateBase
+}
 import org.apache.flink.table.planner.plan.stats._
 import org.apache.flink.table.planner.plan.utils.AggregateUtil
 
@@ -45,7 +50,7 @@ import scala.collection.JavaConversions._
  * @param mq  Metadata query
  */
 class AggCallSelectivityEstimator(agg: RelNode, mq: FlinkRelMetadataQuery)
-  extends RexVisitorImpl[Option[Double]](true) {
+    extends RexVisitorImpl[Option[Double]](true) {
 
   private val rexBuilder = agg.getCluster.getRexBuilder
   // create SelectivityEstimator instance to use its default selectivity values
@@ -85,8 +90,8 @@ class AggCallSelectivityEstimator(agg: RelNode, mq: FlinkRelMetadataQuery)
   def isSupportedAggCall(aggCall: AggregateCall): Boolean = {
     aggCall.getAggregation.getKind match {
       case SqlKind.SUM | SqlKind.MAX | SqlKind.MIN | SqlKind.AVG => true
-      case SqlKind.COUNT => aggCall.getArgList.size() == 1
-      case _ => false
+      case SqlKind.COUNT                                         => aggCall.getArgList.size() == 1
+      case _                                                     => false
     }
   }
 
@@ -123,9 +128,9 @@ class AggCallSelectivityEstimator(agg: RelNode, mq: FlinkRelMetadataQuery)
 
     val argInterval = mq.getColumnInterval(aggInput, aggCall.getArgList.head)
     argInterval match {
-      case null => null
+      case null                   => null
       case ValueInterval.infinite => ValueInterval.infinite
-      case ValueInterval.empty => ValueInterval.empty
+      case ValueInterval.empty    => ValueInterval.empty
       case _ =>
         val (min, includeMin) = argInterval match {
           case hasLower: WithLower =>
@@ -170,8 +175,8 @@ class AggCallSelectivityEstimator(agg: RelNode, mq: FlinkRelMetadataQuery)
       if (predicate == null) {
         Some(1.0)
       } else {
-        val rexSimplify = new RexSimplify(
-          rexBuilder, RelOptPredicateList.EMPTY, true, RexUtil.EXECUTOR)
+        val rexSimplify =
+          new RexSimplify(rexBuilder, RelOptPredicateList.EMPTY, true, RexUtil.EXECUTOR)
         val simplifiedPredicate = rexSimplify.simplify(predicate)
         if (simplifiedPredicate.isAlwaysTrue) {
           Some(1.0)
@@ -266,37 +271,42 @@ class AggCallSelectivityEstimator(agg: RelNode, mq: FlinkRelMetadataQuery)
       !SelectivityEstimator.isSupportedComparisonType(right.getType)) {
       val default = op match {
         case EQUALS => se.defaultEqualsSelectivity
-        case _ => se.defaultComparisonSelectivity
+        case _      => se.defaultComparisonSelectivity
       }
       return default
     }
 
     op match {
-      case EQUALS => (left, right) match {
-        case (i: RexInputRef, l: RexLiteral) => estimateEquals(i, l)
-        case (l: RexLiteral, i: RexInputRef) => estimateEquals(i, l)
-        case _ => se.defaultEqualsSelectivity
-      }
-      case LESS_THAN => (left, right) match {
-        case (i: RexInputRef, l: RexLiteral) => estimateComparison(LESS_THAN, i, l)
-        case (l: RexLiteral, i: RexInputRef) => estimateComparison(GREATER_THAN, i, l)
-        case _ => se.defaultComparisonSelectivity
-      }
-      case LESS_THAN_OR_EQUAL => (left, right) match {
-        case (i: RexInputRef, l: RexLiteral) => estimateComparison(LESS_THAN_OR_EQUAL, i, l)
-        case (l: RexLiteral, i: RexInputRef) => estimateComparison(GREATER_THAN_OR_EQUAL, i, l)
-        case _ => se.defaultComparisonSelectivity
-      }
-      case GREATER_THAN => (left, right) match {
-        case (i: RexInputRef, l: RexLiteral) => estimateComparison(GREATER_THAN, i, l)
-        case (l: RexLiteral, i: RexInputRef) => estimateComparison(LESS_THAN, i, l)
-        case _ => se.defaultComparisonSelectivity
-      }
-      case GREATER_THAN_OR_EQUAL => (left, right) match {
-        case (i: RexInputRef, l: RexLiteral) => estimateComparison(GREATER_THAN_OR_EQUAL, i, l)
-        case (l: RexLiteral, i: RexInputRef) => estimateComparison(LESS_THAN_OR_EQUAL, i, l)
-        case _ => se.defaultComparisonSelectivity
-      }
+      case EQUALS =>
+        (left, right) match {
+          case (i: RexInputRef, l: RexLiteral) => estimateEquals(i, l)
+          case (l: RexLiteral, i: RexInputRef) => estimateEquals(i, l)
+          case _                               => se.defaultEqualsSelectivity
+        }
+      case LESS_THAN =>
+        (left, right) match {
+          case (i: RexInputRef, l: RexLiteral) => estimateComparison(LESS_THAN, i, l)
+          case (l: RexLiteral, i: RexInputRef) => estimateComparison(GREATER_THAN, i, l)
+          case _                               => se.defaultComparisonSelectivity
+        }
+      case LESS_THAN_OR_EQUAL =>
+        (left, right) match {
+          case (i: RexInputRef, l: RexLiteral) => estimateComparison(LESS_THAN_OR_EQUAL, i, l)
+          case (l: RexLiteral, i: RexInputRef) => estimateComparison(GREATER_THAN_OR_EQUAL, i, l)
+          case _                               => se.defaultComparisonSelectivity
+        }
+      case GREATER_THAN =>
+        (left, right) match {
+          case (i: RexInputRef, l: RexLiteral) => estimateComparison(GREATER_THAN, i, l)
+          case (l: RexLiteral, i: RexInputRef) => estimateComparison(LESS_THAN, i, l)
+          case _                               => se.defaultComparisonSelectivity
+        }
+      case GREATER_THAN_OR_EQUAL =>
+        (left, right) match {
+          case (i: RexInputRef, l: RexLiteral) => estimateComparison(GREATER_THAN_OR_EQUAL, i, l)
+          case (l: RexLiteral, i: RexInputRef) => estimateComparison(LESS_THAN_OR_EQUAL, i, l)
+          case _                               => se.defaultComparisonSelectivity
+        }
       case _ => se.defaultComparisonSelectivity
     }
   }
@@ -323,11 +333,11 @@ class AggCallSelectivityEstimator(agg: RelNode, mq: FlinkRelMetadataQuery)
     if (aggCallInterval == null) {
       return se.defaultEqualsSelectivity
     }
-    val convertedInterval = SelectivityEstimator.convertValueInterval(
-      aggCallInterval, inputRef.getType)
+    val convertedInterval =
+      SelectivityEstimator.convertValueInterval(aggCallInterval, inputRef.getType)
     convertedInterval match {
       case ValueInterval.infinite => se.defaultEqualsSelectivity
-      case ValueInterval.empty =>
+      case ValueInterval.empty    =>
         // return defaultAggCallSelectivity instead of 0.0
         defaultAggCallSelectivity
       case i: FiniteValueInterval =>
@@ -392,7 +402,7 @@ class AggCallSelectivityEstimator(agg: RelNode, mq: FlinkRelMetadataQuery)
 
     aggCallInterval match {
       case ValueInterval.infinite => se.defaultComparisonSelectivity
-      case ValueInterval.empty =>
+      case ValueInterval.empty    =>
         // return defaultAggCallSelectivity instead of 0.0
         defaultAggCallSelectivity
       case _ =>
@@ -442,7 +452,7 @@ class AggCallSelectivityEstimator(agg: RelNode, mq: FlinkRelMetadataQuery)
           1.0 - defaultAggCallSelectivity.get
         } else if (min != null && max != null) {
           op match {
-            case LESS_THAN | LESS_THAN_OR_EQUAL => (lit - min) / (max - min)
+            case LESS_THAN | LESS_THAN_OR_EQUAL       => (lit - min) / (max - min)
             case GREATER_THAN | GREATER_THAN_OR_EQUAL => (max - lit) / (max - min)
           }
         } else {

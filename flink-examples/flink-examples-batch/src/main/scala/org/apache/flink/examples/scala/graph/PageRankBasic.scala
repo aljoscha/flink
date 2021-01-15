@@ -30,7 +30,7 @@ import scala.collection.JavaConverters._
 
 /**
  * A basic implementation of the Page Rank algorithm using a bulk iteration.
- * 
+ *
  * This implementation requires a set of pages and a set of directed links as input and works as
  * follows.
  *
@@ -40,7 +40,7 @@ import scala.collection.JavaConverters._
  * with the new ranks of all pages. This implementation terminates after a fixed number of
  * iterations. This is the Wikipedia entry for the
  * [[http://en.wikipedia.org/wiki/Page_rank Page Rank algorithm]]
- * 
+ *
  * Input files are plain text files and must be formatted as follows:
  *
  *  - Pages represented as an (long) ID separated by new-line characters.
@@ -58,13 +58,12 @@ import scala.collection.JavaConverters._
  *
  * If no parameters are provided, the program is run with default data from
  * [[org.apache.flink.examples.java.graph.util.PageRankData]] and 10 iterations.
- * 
+ *
  * This example shows how to use:
  *
  *  - Bulk Iterations
  *  - Default Join
  *  - Configure user-defined functions using constructor parameters.
- *
  */
 object PageRankBasic {
 
@@ -91,7 +90,8 @@ object PageRankBasic {
 
     // build adjacency list from link input
     val adjacencyLists = links
-      .groupBy("sourceId").reduceGroup( new GroupReduceFunction[Link, AdjacencyList] {
+      .groupBy("sourceId")
+      .reduceGroup(new GroupReduceFunction[Link, AdjacencyList] {
         override def reduce(values: Iterable[Link], out: Collector[AdjacencyList]): Unit = {
           var outputId = -1L
           val outputList = values.asScala map { t => outputId = t.sourceId; t.targetId }
@@ -100,30 +100,32 @@ object PageRankBasic {
       })
 
     // start iteration
-    val finalRanks = pagesWithRanks.iterateWithTermination(maxIterations) {
-      currentRanks =>
-        val newRanks = currentRanks
-          // distribute ranks to target pages
-          .join(adjacencyLists).where("pageId").equalTo("sourceId") {
-            (page, adjacent, out: Collector[Page]) =>
-              val targets = adjacent.targetIds
-              val len = targets.length
-              adjacent.targetIds foreach { t => out.collect(Page(t, page.rank /len )) }
-          }
-          // collect ranks and sum them up
-          .groupBy("pageId").aggregate(SUM, "rank")
-          // apply dampening factor
-          .map { p =>
-            Page(p.pageId, (p.rank * DAMPENING_FACTOR) + ((1 - DAMPENING_FACTOR) / numPages))
-          }.withForwardedFields("pageId")
-
-        // terminate if no rank update was significant
-        val termination = currentRanks.join(newRanks).where("pageId").equalTo("pageId") {
-          (current, next, out: Collector[Int]) =>
-            // check for significant update
-            if (math.abs(current.rank - next.rank) > EPSILON) out.collect(1)
+    val finalRanks = pagesWithRanks.iterateWithTermination(maxIterations) { currentRanks =>
+      val newRanks = currentRanks
+        // distribute ranks to target pages
+        .join(adjacencyLists)
+        .where("pageId")
+        .equalTo("sourceId") { (page, adjacent, out: Collector[Page]) =>
+          val targets = adjacent.targetIds
+          val len = targets.length
+          adjacent.targetIds foreach { t => out.collect(Page(t, page.rank / len)) }
         }
-        (newRanks, termination)
+        // collect ranks and sum them up
+        .groupBy("pageId")
+        .aggregate(SUM, "rank")
+        // apply dampening factor
+        .map { p =>
+          Page(p.pageId, (p.rank * DAMPENING_FACTOR) + ((1 - DAMPENING_FACTOR) / numPages))
+        }
+        .withForwardedFields("pageId")
+
+      // terminate if no rank update was significant
+      val termination = currentRanks.join(newRanks).where("pageId").equalTo("pageId") {
+        (current, next, out: Collector[Int]) =>
+          // check for significant update
+          if (math.abs(current.rank - next.rank) > EPSILON) out.collect(1)
+      }
+      (newRanks, termination)
     }
 
     val result = finalRanks
@@ -153,8 +155,9 @@ object PageRankBasic {
   //     UTIL METHODS
   // *************************************************************************
 
-  private def getPagesDataSet(env: ExecutionEnvironment, params: ParameterTool):
-                     (DataSet[Long], Long) = {
+  private def getPagesDataSet(
+      env: ExecutionEnvironment,
+      params: ParameterTool): (DataSet[Long], Long) = {
     if (params.has("pages") && params.has("numPages")) {
       val pages = env
         .readCsvFile[Tuple1[Long]](params.get("pages"), fieldDelimiter = " ", lineDelimiter = "\n")
@@ -167,16 +170,15 @@ object PageRankBasic {
     }
   }
 
-  private def getLinksDataSet(env: ExecutionEnvironment, params: ParameterTool):
-                      DataSet[Link] = {
+  private def getLinksDataSet(env: ExecutionEnvironment, params: ParameterTool): DataSet[Link] = {
     if (params.has("links")) {
-      env.readCsvFile[Link](params.get("links"), fieldDelimiter = " ",
-        includedFields = Array(0, 1))
+      env.readCsvFile[Link](params.get("links"), fieldDelimiter = " ", includedFields = Array(0, 1))
     } else {
       println("Executing PageRank example with default links data set.")
       println("Use --links to specify file input.")
-      val edges = PageRankData.EDGES.map { case Array(v1, v2) => Link(v1.asInstanceOf[Long],
-        v2.asInstanceOf[Long])}
+      val edges = PageRankData.EDGES.map { case Array(v1, v2) =>
+        Link(v1.asInstanceOf[Long], v2.asInstanceOf[Long])
+      }
       env.fromCollection(edges)
     }
   }

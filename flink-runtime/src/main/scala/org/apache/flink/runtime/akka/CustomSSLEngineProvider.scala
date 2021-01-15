@@ -18,13 +18,12 @@
 
 package org.apache.flink.runtime.akka
 
-
 import akka.remote.transport.netty.ConfigSSLEngineProvider
 import javax.net.ssl.{TrustManager, TrustManagerFactory}
 import org.apache.flink.shaded.netty4.io.netty.handler.ssl.util.FingerprintTrustManagerFactory
 
-class CustomSSLEngineProvider(system : akka.actor.ActorSystem)
-                              extends ConfigSSLEngineProvider(system) {
+class CustomSSLEngineProvider(system: akka.actor.ActorSystem)
+    extends ConfigSSLEngineProvider(system) {
 
   private val securityConfig = system.settings.config.getConfig("akka.remote.netty.ssl.security")
   private val SSLTrustStore = securityConfig.getString("trust-store")

@@ -22,15 +22,16 @@ import org.apache.calcite.sql._
 import org.apache.calcite.sql.`type`._
 
 /**
-  * Function to access the timestamp of a StreamRecord.
-  */
-object StreamRecordTimestampSqlFunction extends SqlFunction(
-  "STREAMRECORD_TIMESTAMP",
-  SqlKind.OTHER_FUNCTION,
-  ReturnTypes.explicit(SqlTypeName.BIGINT),
-  InferTypes.RETURN_TYPE,
-  OperandTypes.family(SqlTypeFamily.NUMERIC),
-  SqlFunctionCategory.SYSTEM) {
+ * Function to access the timestamp of a StreamRecord.
+ */
+object StreamRecordTimestampSqlFunction
+    extends SqlFunction(
+      "STREAMRECORD_TIMESTAMP",
+      SqlKind.OTHER_FUNCTION,
+      ReturnTypes.explicit(SqlTypeName.BIGINT),
+      InferTypes.RETURN_TYPE,
+      OperandTypes.family(SqlTypeFamily.NUMERIC),
+      SqlFunctionCategory.SYSTEM) {
 
   override def getSyntax: SqlSyntax = SqlSyntax.FUNCTION
 

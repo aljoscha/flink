@@ -27,25 +27,23 @@ import org.apache.calcite.util.BuiltInMethod
 import scala.collection.JavaConversions._
 
 /**
-  * FlinkRelMdCumulativeCost supplies a implementation of
-  * [[RelMetadataQuery#getCumulativeCost]] for the standard logical algebra.
-  */
+ * FlinkRelMdCumulativeCost supplies a implementation of
+ * [[RelMetadataQuery#getCumulativeCost]] for the standard logical algebra.
+ */
 class FlinkRelMdCumulativeCost private extends MetadataHandler[BuiltInMetadata.CumulativeCost] {
 
   def getDef: MetadataDef[BuiltInMetadata.CumulativeCost] = BuiltInMetadata.CumulativeCost.DEF
 
   def getCumulativeCost(rel: RelNode, mq: RelMetadataQuery): RelOptCost = {
     val cost = mq.getNonCumulativeCost(rel)
-    rel.getInputs.foldLeft(cost) {
-      (acc, input) =>
-        val inputCost = mq.getCumulativeCost(input)
-        acc.plus(inputCost)
+    rel.getInputs.foldLeft(cost) { (acc, input) =>
+      val inputCost = mq.getCumulativeCost(input)
+      acc.plus(inputCost)
     }
   }
 
-  def getCumulativeCost(
-      rel: EnumerableInterpreter,
-      mq: RelMetadataQuery): RelOptCost = mq.getNonCumulativeCost(rel)
+  def getCumulativeCost(rel: EnumerableInterpreter, mq: RelMetadataQuery): RelOptCost =
+    mq.getNonCumulativeCost(rel)
 
 }
 
@@ -53,7 +51,7 @@ object FlinkRelMdCumulativeCost {
 
   private val INSTANCE = new FlinkRelMdCumulativeCost
 
-  val SOURCE: RelMetadataProvider = ReflectiveRelMetadataProvider.reflectiveSource(
-    BuiltInMethod.CUMULATIVE_COST.method, INSTANCE)
+  val SOURCE: RelMetadataProvider =
+    ReflectiveRelMetadataProvider.reflectiveSource(BuiltInMethod.CUMULATIVE_COST.method, INSTANCE)
 
 }

@@ -19,14 +19,19 @@
 package org.apache.flink.table.planner.calcite
 
 import org.apache.flink.table.runtime.typeutils.TypeCheckUtils
-import org.apache.flink.table.types.logical.{DecimalType, LocalZonedTimestampType, LogicalType, TimestampType}
+import org.apache.flink.table.types.logical.{
+  DecimalType,
+  LocalZonedTimestampType,
+  LogicalType,
+  TimestampType
+}
 import org.apache.calcite.rel.`type`.{RelDataType, RelDataTypeFactory, RelDataTypeSystemImpl}
 import org.apache.calcite.sql.`type`.{SqlTypeName, SqlTypeUtil}
 import org.apache.flink.table.types.logical.utils.LogicalTypeMerging
 
 /**
-  * Custom type system for Flink.
-  */
+ * Custom type system for Flink.
+ */
 class FlinkTypeSystem extends RelDataTypeSystemImpl {
 
   // set the maximum precision of a NUMERIC or DECIMAL type to DecimalType.MAX_PRECISION.
@@ -76,29 +81,31 @@ class FlinkTypeSystem extends RelDataTypeSystemImpl {
   override def shouldConvertRaggedUnionTypesToVarying(): Boolean = true
 
   override def deriveAvgAggType(
-      typeFactory: RelDataTypeFactory, argType: RelDataType): RelDataType = {
+      typeFactory: RelDataTypeFactory,
+      argType: RelDataType): RelDataType = {
     val argTypeInfo = FlinkTypeFactory.toLogicalType(argType)
     val avgType = FlinkTypeSystem.deriveAvgAggType(argTypeInfo)
-    typeFactory.asInstanceOf[FlinkTypeFactory].createFieldTypeFromLogicalType(
-      avgType.copy(argType.isNullable))
+    typeFactory
+      .asInstanceOf[FlinkTypeFactory]
+      .createFieldTypeFromLogicalType(avgType.copy(argType.isNullable))
   }
 
-  override def deriveSumType(
-      typeFactory: RelDataTypeFactory, argType: RelDataType): RelDataType = {
+  override def deriveSumType(typeFactory: RelDataTypeFactory, argType: RelDataType): RelDataType = {
     val argTypeInfo = FlinkTypeFactory.toLogicalType(argType)
     val sumType = FlinkTypeSystem.deriveSumType(argTypeInfo)
-    typeFactory.asInstanceOf[FlinkTypeFactory].createFieldTypeFromLogicalType(
-      sumType.copy(argType.isNullable))
+    typeFactory
+      .asInstanceOf[FlinkTypeFactory]
+      .createFieldTypeFromLogicalType(sumType.copy(argType.isNullable))
   }
 
   /**
-    * Calcite's default impl for division is apparently borrowed from T-SQL,
-    * but the details are a little different, e.g. when Decimal(34,0)/Decimal(10,0)
-    * To avoid confusion, follow the exact T-SQL behavior.
-    * Note that for (+-*), Calcite is also different from T-SQL;
-    * however, Calcite conforms to SQL2003 while T-SQL does not.
-    * therefore we keep Calcite's behavior on (+-*).
-    */
+   * Calcite's default impl for division is apparently borrowed from T-SQL,
+   * but the details are a little different, e.g. when Decimal(34,0)/Decimal(10,0)
+   * To avoid confusion, follow the exact T-SQL behavior.
+   * Note that for (+-*), Calcite is also different from T-SQL;
+   * however, Calcite conforms to SQL2003 while T-SQL does not.
+   * therefore we keep Calcite's behavior on (+-*).
+   */
   override def deriveDecimalDivideType(
       typeFactory: RelDataTypeFactory,
       type1: RelDataType,
@@ -106,8 +113,10 @@ class FlinkTypeSystem extends RelDataTypeSystemImpl {
     if (SqlTypeUtil.isExactNumeric(type1) && SqlTypeUtil.isExactNumeric(type2) &&
       (SqlTypeUtil.isDecimal(type1) || SqlTypeUtil.isDecimal(type2))) {
       val result = LogicalTypeMerging.findDivisionDecimalType(
-        type1.getPrecision, type1.getScale,
-        type2.getPrecision, type2.getScale)
+        type1.getPrecision,
+        type1.getScale,
+        type2.getPrecision,
+        type2.getScale)
       typeFactory.createSqlType(SqlTypeName.DECIMAL, result.getPrecision, result.getScale)
     } else {
       null
@@ -142,15 +151,15 @@ object FlinkTypeSystem {
   }
 
   /**
-    * https://docs.microsoft.com/en-us/sql/t-sql/functions/sum-transact-sql.
-    */
+   * https://docs.microsoft.com/en-us/sql/t-sql/functions/sum-transact-sql.
+   */
   def inferAggSumType(scale: Int) = new DecimalType(38, scale)
 
   /**
-    * https://docs.microsoft.com/en-us/sql/t-sql/functions/avg-transact-sql
-    * however, we count by LONG, therefore divide by Decimal(20,0),
-    * but the end result is actually the same, which is Decimal(38, max(6,s)).
-    */
+   * https://docs.microsoft.com/en-us/sql/t-sql/functions/avg-transact-sql
+   * however, we count by LONG, therefore divide by Decimal(20,0),
+   * but the end result is actually the same, which is Decimal(38, max(6,s)).
+   */
   def inferAggAvgType(scale: Int): DecimalType =
     LogicalTypeMerging.findDivisionDecimalType(38, scale, 20, 0)
 

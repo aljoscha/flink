@@ -35,26 +35,27 @@ import org.apache.flink.table.runtime.{CRowMapRunner, OutputRowtimeProcessFuncti
 object DataStreamConversions {
 
   /**
-    * Translates a [[DataStream]] of internal [[CRow]] type into a [[DataStream]] of requested type.
-    *
-    * @param inputDataStream     The input [[DataStream]] for the conversion.
-    * @param logicalType         The logical row type of the [[DataStream]]. This is needed because
-    *                            field naming might be lost during optimization.
-    * @param withChangeFlag      Set to true to emit records with change flags.
-    * @param requestedOutputType The [[TypeInformation]] of the resulting [[DataStream]].
-    * @param config              The [[TableConfig]] of the current [[TableEnvironment]].
-    * @tparam A                  The type of the resulting [[DataStream]].
-    * @return The [[DataStream]] of requested type.
-    */
+   * Translates a [[DataStream]] of internal [[CRow]] type into a [[DataStream]] of requested type.
+   *
+   * @param inputDataStream     The input [[DataStream]] for the conversion.
+   * @param logicalType         The logical row type of the [[DataStream]]. This is needed because
+   *                            field naming might be lost during optimization.
+   * @param withChangeFlag      Set to true to emit records with change flags.
+   * @param requestedOutputType The [[TypeInformation]] of the resulting [[DataStream]].
+   * @param config              The [[TableConfig]] of the current [[TableEnvironment]].
+   * @tparam A                  The type of the resulting [[DataStream]].
+   * @return The [[DataStream]] of requested type.
+   */
   def convert[A](
       inputDataStream: DataStream[CRow],
       logicalType: TableSchema,
       withChangeFlag: Boolean,
       requestedOutputType: TypeInformation[A],
-      config: TableConfig)
-    : DataStream[A] = {
+      config: TableConfig): DataStream[A] = {
 
-    val rowtimeFields = logicalType.getFieldTypes.zip(logicalType.getFieldNames).zipWithIndex
+    val rowtimeFields = logicalType.getFieldTypes
+      .zip(logicalType.getFieldNames)
+      .zipWithIndex
       .filter(f => FlinkTypeFactory.isRowtimeIndicatorType(f._1._1))
 
     // convert the input type for the conversion mapper
@@ -115,30 +116,28 @@ object DataStreamConversions {
   }
 
   /**
-    * Creates a final converter that maps the internal row type to external type.
-    *
-    * @param physicalInputType   the input of the sink
-    * @param logicalInputSchema  the input schema with correct field names (esp. for POJO field
-    *                            mapping)
-    * @param requestedOutputType the output type of the sink
-    * @param functionName        name of the map function. Must not be unique but has to be a
-    *                            valid Java class identifier.
-    */
+   * Creates a final converter that maps the internal row type to external type.
+   *
+   * @param physicalInputType   the input of the sink
+   * @param logicalInputSchema  the input schema with correct field names (esp. for POJO field
+   *                            mapping)
+   * @param requestedOutputType the output type of the sink
+   * @param functionName        name of the map function. Must not be unique but has to be a
+   *                            valid Java class identifier.
+   */
   private def getConversionMapper[OUT](
       physicalInputType: TypeInformation[CRow],
       logicalInputSchema: TableSchema,
       requestedOutputType: TypeInformation[OUT],
       functionName: String,
-      config: TableConfig)
-    : MapFunction[CRow, OUT] = {
+      config: TableConfig): MapFunction[CRow, OUT] = {
 
     val converterFunction = Conversions.generateRowConverterFunction[OUT](
       physicalInputType.asInstanceOf[CRowTypeInfo].rowType,
       logicalInputSchema,
       requestedOutputType,
       functionName,
-      config
-    )
+      config)
 
     converterFunction match {
 
@@ -151,27 +150,25 @@ object DataStreamConversions {
   }
 
   /**
-    * Creates a converter that maps the internal CRow type to Scala or Java Tuple2 with change flag.
-    *
-    * @param physicalInputType   the input of the sink
-    * @param logicalInputSchema  the input schema with correct field names (esp. for POJO field
-    *                            mapping)
-    * @param requestedOutputType the output type of the sink.
-    * @param functionName        name of the map function. Must not be unique but has to be a
-    *                            valid Java class identifier.
-    */
+   * Creates a converter that maps the internal CRow type to Scala or Java Tuple2 with change flag.
+   *
+   * @param physicalInputType   the input of the sink
+   * @param logicalInputSchema  the input schema with correct field names (esp. for POJO field
+   *                            mapping)
+   * @param requestedOutputType the output type of the sink.
+   * @param functionName        name of the map function. Must not be unique but has to be a
+   *                            valid Java class identifier.
+   */
   private def getConversionMapperWithChanges[OUT](
       physicalInputType: TypeInformation[CRow],
       logicalInputSchema: TableSchema,
       requestedOutputType: TypeInformation[OUT],
       functionName: String,
-      config: TableConfig)
-    : MapFunction[CRow, OUT] = requestedOutputType match {
+      config: TableConfig): MapFunction[CRow, OUT] = requestedOutputType match {
 
     // Scala tuple
     case t: CaseClassTypeInfo[_]
-      if t.getTypeClass == classOf[(_, _)] && t.getTypeAt(0) == Types.BOOLEAN =>
-
+        if t.getTypeClass == classOf[(_, _)] && t.getTypeAt(0) == Types.BOOLEAN =>
       val reqType = t.getTypeAt[Any](1)
 
       // convert Row into requested type and wrap result in Tuple2
@@ -180,8 +177,7 @@ object DataStreamConversions {
         logicalInputSchema,
         reqType,
         functionName,
-        config
-      )
+        config)
 
       converterFunction match {
 
@@ -189,8 +185,8 @@ object DataStreamConversions {
           new CRowToScalaTupleMapRunner(
             func.name,
             func.code,
-            requestedOutputType.asInstanceOf[TypeInformation[(Boolean, Any)]]
-          ).asInstanceOf[MapFunction[CRow, OUT]]
+            requestedOutputType.asInstanceOf[TypeInformation[(Boolean, Any)]])
+            .asInstanceOf[MapFunction[CRow, OUT]]
 
         case _ =>
           new CRowToScalaTupleMapFunction().asInstanceOf[MapFunction[CRow, OUT]]
@@ -198,8 +194,7 @@ object DataStreamConversions {
 
     // Java tuple
     case t: TupleTypeInfo[_]
-      if t.getTypeClass == classOf[JTuple2[_, _]] && t.getTypeAt(0) == Types.BOOLEAN =>
-
+        if t.getTypeClass == classOf[JTuple2[_, _]] && t.getTypeAt(0) == Types.BOOLEAN =>
       val reqType = t.getTypeAt[Any](1)
 
       // convert Row into requested type and wrap result in Tuple2
@@ -208,8 +203,7 @@ object DataStreamConversions {
         logicalInputSchema,
         reqType,
         functionName,
-        config
-      )
+        config)
 
       converterFunction match {
 
@@ -217,8 +211,8 @@ object DataStreamConversions {
           new CRowToJavaTupleMapRunner(
             func.name,
             func.code,
-            requestedOutputType.asInstanceOf[TypeInformation[JTuple2[JBool, Any]]]
-          ).asInstanceOf[MapFunction[CRow, OUT]]
+            requestedOutputType.asInstanceOf[TypeInformation[JTuple2[JBool, Any]]])
+            .asInstanceOf[MapFunction[CRow, OUT]]
 
         case _ =>
           new CRowToJavaTupleMapFunction().asInstanceOf[MapFunction[CRow, OUT]]

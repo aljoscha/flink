@@ -28,8 +28,8 @@ import org.junit.Assert.assertNotSame
 import org.junit.Assert.assertSame
 
 /**
-  * Test suite for the [[EitherSerializer]]
-  */
+ * Test suite for the [[EitherSerializer]]
+ */
 class EitherSerializerTest extends SerializerTestBase[Either[String, Integer]] {
 
   // --------------------------------------------------------------------------
@@ -37,9 +37,7 @@ class EitherSerializerTest extends SerializerTestBase[Either[String, Integer]] {
   // --------------------------------------------------------------------------
 
   override protected def createSerializer() =
-    new EitherSerializer[String, Integer](
-      StringSerializer.INSTANCE,
-      IntSerializer.INSTANCE)
+    new EitherSerializer[String, Integer](StringSerializer.INSTANCE, IntSerializer.INSTANCE)
 
   override protected def getLength: Int = -1
 
@@ -56,8 +54,7 @@ class EitherSerializerTest extends SerializerTestBase[Either[String, Integer]] {
       Right(100),
       Left("foo"),
       Right(1060876234),
-      Left("bar")
-    )
+      Left("bar"))
 
   // --------------------------------------------------------------------------
   //  either serializer specific tests
@@ -66,22 +63,17 @@ class EitherSerializerTest extends SerializerTestBase[Either[String, Integer]] {
   @Test
   def testDuplication(): Unit = {
     val serializerSS: EitherSerializer[String, String] =
-      new EitherSerializer[String, String](
-        StringSerializer.INSTANCE,
-        StringSerializer.INSTANCE
-      )
+      new EitherSerializer[String, String](StringSerializer.INSTANCE, StringSerializer.INSTANCE)
 
     val serializerSO: EitherSerializer[String, Object] =
       new EitherSerializer[String, Object](
         StringSerializer.INSTANCE,
-        new KryoSerializer[Object](classOf[Object], new ExecutionConfig())
-      )
+        new KryoSerializer[Object](classOf[Object], new ExecutionConfig()))
 
     val serializerOS: EitherSerializer[Object, String] =
       new EitherSerializer[Object, String](
         new KryoSerializer[Object](classOf[Object], new ExecutionConfig()),
-        StringSerializer.INSTANCE
-      )
+        StringSerializer.INSTANCE)
 
     assertSame(serializerSS, serializerSS.duplicate())
     assertNotSame(serializerSO, serializerSO.duplicate())

@@ -40,8 +40,8 @@ class StreamPhysicalUnion(
     inputRels: util.List[RelNode],
     all: Boolean,
     outputRowType: RelDataType)
-  extends Union(cluster, traitSet, inputRels, all)
-  with StreamPhysicalRel {
+    extends Union(cluster, traitSet, inputRels, all)
+    with StreamPhysicalRel {
 
   require(all, "Only support union all")
 
@@ -61,7 +61,6 @@ class StreamPhysicalUnion(
     new StreamExecUnion(
       getInputs.map(_ => ExecEdge.DEFAULT),
       FlinkTypeFactory.toLogicalRowType(getRowType),
-      getRelDetailedDescription
-    )
+      getRelDetailedDescription)
   }
 }

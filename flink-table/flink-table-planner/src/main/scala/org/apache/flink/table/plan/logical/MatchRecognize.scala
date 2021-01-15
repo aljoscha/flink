@@ -26,17 +26,17 @@ import org.apache.calcite.rex.RexNode
 import org.apache.calcite.util.ImmutableBitSet
 
 /**
-  * Describes MATCH RECOGNIZE clause.
-  */
+ * Describes MATCH RECOGNIZE clause.
+ */
 case class MatchRecognize(
-  input: RelNode,
-  rowType: RelDataType,
-  pattern: RexNode,
-  patternDefinitions: ImmutableMap[String, RexNode],
-  measures: ImmutableMap[String, RexNode],
-  after: RexNode,
-  subsets: ImmutableMap[String, util.SortedSet[String]],
-  allRows: Boolean,
-  partitionKeys: ImmutableBitSet,
-  orderKeys: RelCollation,
-  interval: RexNode)
+    input: RelNode,
+    rowType: RelDataType,
+    pattern: RexNode,
+    patternDefinitions: ImmutableMap[String, RexNode],
+    measures: ImmutableMap[String, RexNode],
+    after: RexNode,
+    subsets: ImmutableMap[String, util.SortedSet[String]],
+    allRows: Boolean,
+    partitionKeys: ImmutableBitSet,
+    orderKeys: RelCollation,
+    interval: RexNode)

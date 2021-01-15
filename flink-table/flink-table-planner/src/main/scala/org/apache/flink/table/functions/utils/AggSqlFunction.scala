@@ -21,9 +21,18 @@ package org.apache.flink.table.functions.utils
 import org.apache.flink.api.common.typeinfo._
 import org.apache.flink.table.api.ValidationException
 import org.apache.flink.table.calcite.FlinkTypeFactory
-import org.apache.flink.table.functions.utils.AggSqlFunction.{createOperandMetadata, createOperandTypeInference, createReturnTypeInference}
+import org.apache.flink.table.functions.utils.AggSqlFunction.{
+  createOperandMetadata,
+  createOperandTypeInference,
+  createReturnTypeInference
+}
 import org.apache.flink.table.functions.utils.UserDefinedFunctionUtils._
-import org.apache.flink.table.functions.{AggregateFunction, FunctionRequirement, ImperativeAggregateFunction, TableAggregateFunction}
+import org.apache.flink.table.functions.{
+  AggregateFunction,
+  FunctionRequirement,
+  ImperativeAggregateFunction,
+  TableAggregateFunction
+}
 
 import org.apache.calcite.rel.`type`.{RelDataType, RelDataTypeFactory}
 import org.apache.calcite.sql._
@@ -37,16 +46,16 @@ import java.util
 import java.util.Collections
 
 /**
-  * Calcite wrapper for user-defined aggregate functions. Currently, the aggregate function can be
-  * an [[AggregateFunction]] or a [[TableAggregateFunction]]
-  *
-  * @param name function name (used by SQL parser)
-  * @param displayName name to be displayed in operator name
-  * @param aggregateFunction user defined aggregate function to be called
-  * @param returnType the type information of returned value
-  * @param accType the type information of the accumulator
-  * @param typeFactory type factory for converting Flink's between Calcite's types
-  */
+ * Calcite wrapper for user-defined aggregate functions. Currently, the aggregate function can be
+ * an [[AggregateFunction]] or a [[TableAggregateFunction]]
+ *
+ * @param name function name (used by SQL parser)
+ * @param displayName name to be displayed in operator name
+ * @param aggregateFunction user defined aggregate function to be called
+ * @param returnType the type information of returned value
+ * @param accType the type information of the accumulator
+ * @param typeFactory type factory for converting Flink's between Calcite's types
+ */
 class AggSqlFunction(
     name: String,
     displayName: String,
@@ -55,19 +64,18 @@ class AggSqlFunction(
     val accType: TypeInformation[_],
     typeFactory: FlinkTypeFactory,
     requiresOver: Boolean)
-  extends SqlUserDefinedAggFunction(
-    new SqlIdentifier(name, SqlParserPos.ZERO),
-    SqlKind.OTHER_FUNCTION,
-    createReturnTypeInference(returnType, typeFactory),
-    createOperandTypeInference(aggregateFunction, typeFactory, accType),
-    createOperandMetadata(aggregateFunction, accType),
-    // Do not need to provide a calcite aggregateFunction here. Flink aggregation function
-    // will be generated when translating the calcite relnode to flink runtime execution plan
-    null,
-    false,
-    requiresOver,
-    Optionality.FORBIDDEN
-  ) {
+    extends SqlUserDefinedAggFunction(
+      new SqlIdentifier(name, SqlParserPos.ZERO),
+      SqlKind.OTHER_FUNCTION,
+      createReturnTypeInference(returnType, typeFactory),
+      createOperandTypeInference(aggregateFunction, typeFactory, accType),
+      createOperandMetadata(aggregateFunction, accType),
+      // Do not need to provide a calcite aggregateFunction here. Flink aggregation function
+      // will be generated when translating the calcite relnode to flink runtime execution plan
+      null,
+      false,
+      requiresOver,
+      Optionality.FORBIDDEN) {
 
   def getFunction: ImperativeAggregateFunction[_, _] = aggregateFunction
 
@@ -86,8 +94,7 @@ object AggSqlFunction {
       aggregateFunction: ImperativeAggregateFunction[_, _],
       returnType: TypeInformation[_],
       accType: TypeInformation[_],
-      typeFactory: FlinkTypeFactory)
-    : AggSqlFunction = {
+      typeFactory: FlinkTypeFactory): AggSqlFunction = {
 
     val requiresOver = aggregateFunction match {
       case a: AggregateFunction[_, _] =>
@@ -106,13 +113,13 @@ object AggSqlFunction {
   }
 
   private[flink] def createOperandTypeInference(
-    aggregateFunction: ImperativeAggregateFunction[_, _],
-    typeFactory: FlinkTypeFactory,
-    accType: TypeInformation[_])
-  : SqlOperandTypeInference = {
+      aggregateFunction: ImperativeAggregateFunction[_, _],
+      typeFactory: FlinkTypeFactory,
+      accType: TypeInformation[_]): SqlOperandTypeInference = {
+
     /**
-      * Operand type inference based on [[AggregateFunction]] given information.
-      */
+     * Operand type inference based on [[AggregateFunction]] given information.
+     */
     new SqlOperandTypeInference {
       override def inferOperandTypes(
           callBinding: SqlCallBinding,
@@ -149,8 +156,7 @@ object AggSqlFunction {
 
   private[flink] def createReturnTypeInference(
       resultType: TypeInformation[_],
-      typeFactory: FlinkTypeFactory)
-  : SqlReturnTypeInference = {
+      typeFactory: FlinkTypeFactory): SqlReturnTypeInference = {
 
     new SqlReturnTypeInference {
       override def inferReturnType(opBinding: SqlOperatorBinding): RelDataType = {
@@ -161,14 +167,13 @@ object AggSqlFunction {
 
   private[flink] def createOperandMetadata(
       aggregateFunction: ImperativeAggregateFunction[_, _],
-      accType: TypeInformation[_])
-    : SqlOperandMetadata = {
+      accType: TypeInformation[_]): SqlOperandMetadata = {
 
     val methods = checkAndExtractMethods(aggregateFunction, "accumulate")
 
     /**
-      * Operand type checker based on [[AggregateFunction]] given information.
-      */
+     * Operand type checker based on [[AggregateFunction]] given information.
+     */
     new SqlOperandMetadata {
       override def getAllowedSignatures(op: SqlOperator, opName: String): String = {
         s"$opName[${signaturesToString(aggregateFunction, "accumulate")}]"
@@ -178,7 +183,7 @@ object AggSqlFunction {
         var min = 253
         var max = -1
         var isVarargs = false
-        methods.foreach( m => {
+        methods.foreach(m => {
           // do not count accumulator as input
           val inputParams = m.getParameterTypes.drop(1)
           var len = inputParams.length
@@ -199,8 +204,7 @@ object AggSqlFunction {
 
       override def checkOperandTypes(
           callBinding: SqlCallBinding,
-          throwOnFailure: Boolean)
-      : Boolean = {
+          throwOnFailure: Boolean): Boolean = {
         val operandTypeInfo = getOperandTypeInfo(callBinding)
 
         val actualSignature = accType +: operandTypeInfo
@@ -232,7 +236,8 @@ object AggSqlFunction {
 
       override def paramTypes(typeFactory: RelDataTypeFactory): util.List[RelDataType] = {
         // This should be never invoked.
-        throw new UnsupportedOperationException("SqlOperandMetadata.paramTypes "
+        throw new UnsupportedOperationException(
+          "SqlOperandMetadata.paramTypes "
             + "of AggSqlFunction should never be invoked")
       }
     }

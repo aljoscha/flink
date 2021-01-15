@@ -56,7 +56,8 @@ class JoinTest extends TableTestBase {
   @Test
   def testLeftJoinNonEqui(): Unit = {
     util.verifyRelPlan(
-      "SELECT a1, b1 FROM A LEFT JOIN B ON a1 = b1 AND a2 > b2", ExplainDetail.CHANGELOG_MODE)
+      "SELECT a1, b1 FROM A LEFT JOIN B ON a1 = b1 AND a2 > b2",
+      ExplainDetail.CHANGELOG_MODE)
   }
 
   @Test
@@ -113,7 +114,8 @@ class JoinTest extends TableTestBase {
   @Test
   def testRightJoinNonEqui(): Unit = {
     util.verifyRelPlan(
-      "SELECT a1, b1 FROM A RIGHT JOIN B ON a1 = b1 AND a2 > b2", ExplainDetail.CHANGELOG_MODE)
+      "SELECT a1, b1 FROM A RIGHT JOIN B ON a1 = b1 AND a2 > b2",
+      ExplainDetail.CHANGELOG_MODE)
   }
 
   @Test
@@ -170,7 +172,8 @@ class JoinTest extends TableTestBase {
   @Test
   def testFullJoinNonEqui(): Unit = {
     util.verifyRelPlan(
-      "SELECT a1, b1 FROM A FULL JOIN B ON a1 = b1 AND a2 > b2", ExplainDetail.CHANGELOG_MODE)
+      "SELECT a1, b1 FROM A FULL JOIN B ON a1 = b1 AND a2 > b2",
+      ExplainDetail.CHANGELOG_MODE)
   }
 
   @Test

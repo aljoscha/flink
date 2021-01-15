@@ -29,8 +29,8 @@ import org.junit.runners.Parameterized
 import _root_.scala.collection.JavaConverters._
 
 @RunWith(classOf[Parameterized])
-class DegreesITCase(mode: MultipleProgramsTestBase.TestExecutionMode) extends
-MultipleProgramsTestBase(mode) {
+class DegreesITCase(mode: MultipleProgramsTestBase.TestExecutionMode)
+    extends MultipleProgramsTestBase(mode) {
 
   private var expectedResult: String = null
 
@@ -38,8 +38,11 @@ MultipleProgramsTestBase(mode) {
   @throws(classOf[Exception])
   def testInDegrees() {
     val env: ExecutionEnvironment = ExecutionEnvironment.getExecutionEnvironment
-    val graph: Graph[Long, Long, Long] = Graph.fromDataSet(TestGraphUtils
-      .getLongLongVertexData(env), TestGraphUtils.getLongLongEdgeData(env), env)
+    val graph: Graph[Long, Long, Long] = Graph.fromDataSet(
+      TestGraphUtils
+        .getLongLongVertexData(env),
+      TestGraphUtils.getLongLongEdgeData(env),
+      env)
     val res = graph.inDegrees().collect().toList
     expectedResult = "(1,1)\n" + "(2,1)\n" + "(3,2)\n" + "(4,1)\n" + "(5,2)\n"
     TestBaseUtils.compareResultAsText(res.asJava, expectedResult)
@@ -49,8 +52,11 @@ MultipleProgramsTestBase(mode) {
   @throws(classOf[Exception])
   def testOutDegrees() {
     val env: ExecutionEnvironment = ExecutionEnvironment.getExecutionEnvironment
-    val graph: Graph[Long, Long, Long] = Graph.fromDataSet(TestGraphUtils
-      .getLongLongVertexData(env), TestGraphUtils.getLongLongEdgeData(env), env)
+    val graph: Graph[Long, Long, Long] = Graph.fromDataSet(
+      TestGraphUtils
+        .getLongLongVertexData(env),
+      TestGraphUtils.getLongLongEdgeData(env),
+      env)
     val res = graph.outDegrees().collect().toList
     expectedResult = "(1,2)\n" + "(2,1)\n" + "(3,2)\n" + "(4,1)\n" + "(5,1)\n"
     TestBaseUtils.compareResultAsText(res.asJava, expectedResult)
@@ -60,8 +66,11 @@ MultipleProgramsTestBase(mode) {
   @throws(classOf[Exception])
   def testGetDegrees() {
     val env: ExecutionEnvironment = ExecutionEnvironment.getExecutionEnvironment
-    val graph: Graph[Long, Long, Long] = Graph.fromDataSet(TestGraphUtils
-      .getLongLongVertexData(env), TestGraphUtils.getLongLongEdgeData(env), env)
+    val graph: Graph[Long, Long, Long] = Graph.fromDataSet(
+      TestGraphUtils
+        .getLongLongVertexData(env),
+      TestGraphUtils.getLongLongEdgeData(env),
+      env)
     val res = graph.getDegrees().collect().toList
     expectedResult = "(1,3)\n" + "(2,2)\n" + "(3,4)\n" + "(4,2)\n" + "(5,3)\n"
     TestBaseUtils.compareResultAsText(res.asJava, expectedResult)

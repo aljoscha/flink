@@ -28,17 +28,17 @@ import org.apache.flink.types.Row
 import org.apache.flink.util.Collector
 
 /**
-  * Connect data for left stream and right stream. Only use for full outer join with non-equal
-  * predicates. An MapState of type [Row, Long] is used to record how many matched rows for the
-  * specified row. Full outer join without non-equal predicates doesn't need it because rows from
-  * one side can always join rows from the other side as long as join keys are same.
-  *
-  * @param leftType        the input type of left stream
-  * @param rightType       the input type of right stream
-  * @param genJoinFuncName the function code of other non-equi condition
-  * @param genJoinFuncCode the function name of other non-equi condition
-  * @param config          configuration that determines runtime behavior
-  */
+ * Connect data for left stream and right stream. Only use for full outer join with non-equal
+ * predicates. An MapState of type [Row, Long] is used to record how many matched rows for the
+ * specified row. Full outer join without non-equal predicates doesn't need it because rows from
+ * one side can always join rows from the other side as long as join keys are same.
+ *
+ * @param leftType        the input type of left stream
+ * @param rightType       the input type of right stream
+ * @param genJoinFuncName the function code of other non-equi condition
+ * @param genJoinFuncCode the function name of other non-equi condition
+ * @param config          configuration that determines runtime behavior
+ */
 class NonWindowFullJoinWithNonEquiPredicates(
     leftType: TypeInformation[Row],
     rightType: TypeInformation[Row],
@@ -46,14 +46,14 @@ class NonWindowFullJoinWithNonEquiPredicates(
     genJoinFuncCode: String,
     minRetentionTime: Long,
     maxRetentionTime: Long)
-  extends NonWindowOuterJoinWithNonEquiPredicates(
-    leftType,
-    rightType,
-    genJoinFuncName,
-    genJoinFuncCode,
-    false,
-    minRetentionTime,
-    maxRetentionTime) {
+    extends NonWindowOuterJoinWithNonEquiPredicates(
+      leftType,
+      rightType,
+      genJoinFuncName,
+      genJoinFuncCode,
+      false,
+      minRetentionTime,
+      maxRetentionTime) {
 
   override def open(parameters: Configuration): Unit = {
     super.open(parameters)
@@ -61,11 +61,11 @@ class NonWindowFullJoinWithNonEquiPredicates(
   }
 
   /**
-    * Puts or Retract an element from the input stream into state and search the other state to
-    * output records meet the condition. The input row will be preserved and appended with null, if
-    * there is no match. Records will be expired in state if state retention time has been
-    * specified.
-    */
+   * Puts or Retract an element from the input stream into state and search the other state to
+   * output records meet the condition. The input row will be preserved and appended with null, if
+   * there is no match. Records will be expired in state if state retention time has been
+   * specified.
+   */
   override def processElement(
       value: CRow,
       ctx: CoProcessFunction[CRow, CRow, CRow]#Context,
@@ -100,9 +100,9 @@ class NonWindowFullJoinWithNonEquiPredicates(
   }
 
   /**
-    * Called when a processing timer trigger.
-    * Expire left/right expired records and expired joinCnt state.
-    */
+   * Called when a processing timer trigger.
+   * Expire left/right expired records and expired joinCnt state.
+   */
   override def onTimer(
       timestamp: Long,
       ctx: CoProcessFunction[CRow, CRow, CRow]#OnTimerContext,
@@ -114,4 +114,3 @@ class NonWindowFullJoinWithNonEquiPredicates(
     }
   }
 }
-

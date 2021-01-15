@@ -27,14 +27,14 @@ import org.apache.calcite.rel.RelNode
 import org.apache.calcite.rel.convert.ConverterRule
 
 /**
-  * Rule that converts [[FlinkLogicalIntermediateTableScan]] to [[BatchExecIntermediateTableScan]].
-  */
+ * Rule that converts [[FlinkLogicalIntermediateTableScan]] to [[BatchExecIntermediateTableScan]].
+ */
 class BatchExecIntermediateTableScanRule
-  extends ConverterRule(
-    classOf[FlinkLogicalIntermediateTableScan],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.BATCH_PHYSICAL,
-    "BatchExecIntermediateTableScanRule") {
+    extends ConverterRule(
+      classOf[FlinkLogicalIntermediateTableScan],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.BATCH_PHYSICAL,
+      "BatchExecIntermediateTableScanRule") {
 
   def convert(rel: RelNode): RelNode = {
     val scan = rel.asInstanceOf[FlinkLogicalIntermediateTableScan]

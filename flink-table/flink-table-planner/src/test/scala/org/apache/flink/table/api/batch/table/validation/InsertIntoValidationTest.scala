@@ -36,11 +36,13 @@ class InsertIntoValidationTest extends TableTestBase {
     val fieldNames = Array("d", "e")
     val fieldTypes: Array[TypeInformation[_]] = Array(Types.INT, Types.LONG)
     val sink = new MemoryTableSourceSinkUtil.UnsafeMemoryAppendTableSink
-    util.tableEnv.asInstanceOf[TableEnvironmentInternal].registerTableSinkInternal(
-      "targetTable", sink.configure(fieldNames, fieldTypes))
+    util.tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSinkInternal("targetTable", sink.configure(fieldNames, fieldTypes))
 
     // must fail because TableSink accepts fewer fields.
-    util.tableEnv.scan("sourceTable")
+    util.tableEnv
+      .scan("sourceTable")
       .select('a, 'b, 'c)
       .insertInto("targetTable")
     // trigger validation
@@ -55,11 +57,13 @@ class InsertIntoValidationTest extends TableTestBase {
     val fieldNames = Array("d", "e", "f")
     val fieldTypes: Array[TypeInformation[_]] = Array(Types.STRING, Types.INT, Types.LONG)
     val sink = new MemoryTableSourceSinkUtil.UnsafeMemoryAppendTableSink
-    util.tableEnv.asInstanceOf[TableEnvironmentInternal].registerTableSinkInternal(
-      "targetTable", sink.configure(fieldNames, fieldTypes))
+    util.tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSinkInternal("targetTable", sink.configure(fieldNames, fieldTypes))
 
     // must fail because types of result and TableSink do not match.
-    util.tableEnv.scan("sourceTable")
+    util.tableEnv
+      .scan("sourceTable")
       .select('a, 'b, 'c)
       .insertInto("targetTable")
     // trigger validation

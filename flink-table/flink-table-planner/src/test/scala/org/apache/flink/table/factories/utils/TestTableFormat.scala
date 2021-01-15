@@ -25,8 +25,8 @@ import org.apache.flink.table.descriptors.{DescriptorProperties, FormatDescripto
 import org.apache.flink.table.factories.TableFormatFactoryServiceTest._
 
 /**
-  * Format descriptor for testing purposes.
-  */
+ * Format descriptor for testing purposes.
+ */
 class TestTableFormat extends FormatDescriptor(TEST_FORMAT_TYPE, 1) {
 
   override protected def toFormatProperties: util.Map[String, String] = {

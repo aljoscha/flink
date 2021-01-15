@@ -41,17 +41,18 @@ class FlinkLogicalTableFunctionScan(
     elementType: Type,
     rowType: RelDataType,
     columnMappings: JSet[RelColumnMapping])
-  extends TableFunctionScan(
-    cluster,
-    traitSet,
-    inputs,
-    rexCall,
-    elementType,
-    rowType,
-    columnMappings)
-  with FlinkLogicalRel {
+    extends TableFunctionScan(
+      cluster,
+      traitSet,
+      inputs,
+      rexCall,
+      elementType,
+      rowType,
+      columnMappings)
+    with FlinkLogicalRel {
 
-  override def copy(traitSet: RelTraitSet,
+  override def copy(
+      traitSet: RelTraitSet,
       inputs: JList[RelNode],
       rexCall: RexNode,
       elementType: Type,
@@ -70,26 +71,26 @@ class FlinkLogicalTableFunctionScan(
 }
 
 class FlinkLogicalTableFunctionScanConverter
-  extends ConverterRule(
-    classOf[LogicalTableFunctionScan],
-    Convention.NONE,
-    FlinkConventions.LOGICAL,
-    "FlinkLogicalTableFunctionScanConverter") {
+    extends ConverterRule(
+      classOf[LogicalTableFunctionScan],
+      Convention.NONE,
+      FlinkConventions.LOGICAL,
+      "FlinkLogicalTableFunctionScanConverter") {
 
   /**
-    * This rule do not match to [[TemporalTableFunction]]. We do not support reading from
-    * [[TemporalTableFunction]]s as TableFunctions. We expect them to be rewritten into
-    * [[org.apache.flink.table.plan.nodes.datastream.DataStreamScan]] followed by for
-    * example [[org.apache.flink.table.plan.nodes.datastream.DataStreamTemporalTableJoin]].
-    */
+   * This rule do not match to [[TemporalTableFunction]]. We do not support reading from
+   * [[TemporalTableFunction]]s as TableFunctions. We expect them to be rewritten into
+   * [[org.apache.flink.table.plan.nodes.datastream.DataStreamScan]] followed by for
+   * example [[org.apache.flink.table.plan.nodes.datastream.DataStreamTemporalTableJoin]].
+   */
   override def matches(call: RelOptRuleCall): Boolean = {
     val logicalTableFunction: LogicalTableFunctionScan = call.rel(0)
 
     !isTemporalTableFunctionCall(logicalTableFunction)
   }
 
-  private def isTemporalTableFunctionCall(logicalTableFunction: LogicalTableFunctionScan)
-    : Boolean = {
+  private def isTemporalTableFunctionCall(
+      logicalTableFunction: LogicalTableFunctionScan): Boolean = {
 
     if (!logicalTableFunction.getCall.isInstanceOf[RexCall]) {
       return false
@@ -112,8 +113,7 @@ class FlinkLogicalTableFunctionScanConverter
       scan.getCall,
       scan.getElementType,
       scan.getRowType,
-      scan.getColumnMappings
-    )
+      scan.getColumnMappings)
   }
 }
 

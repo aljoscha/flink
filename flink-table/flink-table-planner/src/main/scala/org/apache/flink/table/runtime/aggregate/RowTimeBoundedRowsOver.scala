@@ -36,10 +36,10 @@ import org.apache.flink.util.{Collector, Preconditions}
 /**
  * Process Function for ROWS clause event-time bounded OVER window
  *
-  * @param genAggregations Generated aggregate helper function
-  * @param aggregationStateType     row type info of aggregation
-  * @param inputRowType             row type info of input row
-  * @param precedingOffset          preceding offset
+ * @param genAggregations Generated aggregate helper function
+ * @param aggregationStateType     row type info of aggregation
+ * @param inputRowType             row type info of input row
+ * @param precedingOffset          preceding offset
  */
 class RowTimeBoundedRowsOver[K](
     genAggregations: GeneratedAggregationsFunction,
@@ -49,7 +49,7 @@ class RowTimeBoundedRowsOver[K](
     rowTimeIdx: Int,
     minRetentionTime: Long,
     maxRetentionTime: Long)
-  extends ProcessFunctionWithCleanupState[K, CRow, CRow](minRetentionTime, maxRetentionTime)
+    extends ProcessFunctionWithCleanupState[K, CRow, CRow](minRetentionTime, maxRetentionTime)
     with Compiler[GeneratedAggregations]
     with Logging {
 
@@ -76,12 +76,11 @@ class RowTimeBoundedRowsOver[K](
   private var function: GeneratedAggregations = _
 
   override def open(config: Configuration) {
-    LOG.debug(s"Compiling AggregateHelper: ${genAggregations.name} \n\n" +
-                s"Code:\n${genAggregations.code}")
-    val clazz = compile(
-      getRuntimeContext.getUserCodeClassLoader,
-      genAggregations.name,
-      genAggregations.code)
+    LOG.debug(
+      s"Compiling AggregateHelper: ${genAggregations.name} \n\n" +
+        s"Code:\n${genAggregations.code}")
+    val clazz =
+      compile(getRuntimeContext.getUserCodeClassLoader, genAggregations.name, genAggregations.code)
     LOG.debug("Instantiating AggregateHelper.")
     function = clazz.newInstance()
     function.open(getRuntimeContext)
@@ -117,9 +116,9 @@ class RowTimeBoundedRowsOver[K](
   }
 
   override def processElement(
-    inputC: CRow,
-    ctx: KeyedProcessFunction[K, CRow, CRow]#Context,
-    out: Collector[CRow]): Unit = {
+      inputC: CRow,
+      ctx: KeyedProcessFunction[K, CRow, CRow]#Context,
+      out: Collector[CRow]): Unit = {
 
     val input = inputC.row
 
@@ -148,9 +147,9 @@ class RowTimeBoundedRowsOver[K](
   }
 
   override def onTimer(
-    timestamp: Long,
-    ctx: KeyedProcessFunction[K, CRow, CRow]#OnTimerContext,
-    out: Collector[CRow]): Unit = {
+      timestamp: Long,
+      ctx: KeyedProcessFunction[K, CRow, CRow]#OnTimerContext,
+      out: Collector[CRow]): Unit = {
 
     if (isProcessingTimeTimer(ctx.asInstanceOf[OnTimerContext])) {
       if (stateCleaningEnabled) {
@@ -273,5 +272,3 @@ class RowTimeBoundedRowsOver[K](
     }
   }
 }
-
-

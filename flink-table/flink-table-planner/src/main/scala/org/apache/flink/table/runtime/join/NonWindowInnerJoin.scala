@@ -28,14 +28,14 @@ import org.apache.flink.types.Row
 import org.apache.flink.util.Collector
 
 /**
-  * Connect data for left stream and right stream. Only use for innerJoin.
-  *
-  * @param leftType          the input type of left stream
-  * @param rightType         the input type of right stream
-  * @param genJoinFuncName   the function code of other non-equi condition
-  * @param genJoinFuncCode   the function name of other non-equi condition
-  * @param config            configuration that determines runtime behavior
-  */
+ * Connect data for left stream and right stream. Only use for innerJoin.
+ *
+ * @param leftType          the input type of left stream
+ * @param rightType         the input type of right stream
+ * @param genJoinFuncName   the function code of other non-equi condition
+ * @param genJoinFuncCode   the function name of other non-equi condition
+ * @param config            configuration that determines runtime behavior
+ */
 class NonWindowInnerJoin(
     leftType: TypeInformation[Row],
     rightType: TypeInformation[Row],
@@ -43,13 +43,13 @@ class NonWindowInnerJoin(
     genJoinFuncCode: String,
     minRetentionTime: Long,
     maxRetentionTime: Long)
-  extends NonWindowJoin(
-    leftType,
-    rightType,
-    genJoinFuncName,
-    genJoinFuncCode,
-    minRetentionTime,
-    maxRetentionTime) {
+    extends NonWindowJoin(
+      leftType,
+      rightType,
+      genJoinFuncName,
+      genJoinFuncCode,
+      minRetentionTime,
+      maxRetentionTime) {
 
   override def open(parameters: Configuration): Unit = {
     super.open(parameters)
@@ -57,10 +57,10 @@ class NonWindowInnerJoin(
   }
 
   /**
-    * Puts or Retract an element from the input stream into state and search the other state to
-    * output records meet the condition. Records will be expired in state if state retention time
-    * has been specified.
-    */
+   * Puts or Retract an element from the input stream into state and search the other state to
+   * output records meet the condition. Records will be expired in state if state retention time
+   * has been specified.
+   */
   override def processElement(
       value: CRow,
       ctx: CoProcessFunction[CRow, CRow, CRow]#Context,

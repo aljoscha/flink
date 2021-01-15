@@ -24,7 +24,11 @@ import org.apache.flink.table.annotation.{DataTypeHint, FunctionHint}
 import org.apache.flink.table.api.DataTypes
 import org.apache.flink.table.functions.ScalarFunction
 import org.apache.flink.table.types.extraction.TypeInferenceExtractorTest.TestSpec
-import org.apache.flink.table.types.inference.{ArgumentTypeStrategy, InputTypeStrategies, TypeStrategies}
+import org.apache.flink.table.types.inference.{
+  ArgumentTypeStrategy,
+  InputTypeStrategies,
+  TypeStrategies
+}
 import org.hamcrest.CoreMatchers.equalTo
 import org.junit.Assert.assertThat
 import org.junit.rules.ExpectedException
@@ -77,7 +81,6 @@ object TypeInferenceExtractorScalaTest {
 
   @Parameters
   def testData: Array[TestSpec] = Array(
-
     // Scala function with data type hint
     TestSpec
       .forScalarFunction(classOf[ScalaScalarFunction])
@@ -94,7 +97,6 @@ object TypeInferenceExtractorScalaTest {
             InputTypeStrategies.explicit(DataTypes.STRING),
             InputTypeStrategies.explicit(DataTypes.DECIMAL(10, 4)))),
         TypeStrategies.explicit(DataTypes.BOOLEAN.notNull().bridgedTo(classOf[Boolean]))),
-
     TestSpec
       .forScalarFunction(classOf[ScalaPrimitiveVarArgScalarFunction])
       .expectOutputMapping(
@@ -105,7 +107,6 @@ object TypeInferenceExtractorScalaTest {
             InputTypeStrategies.explicit(DataTypes.STRING),
             InputTypeStrategies.explicit(DataTypes.DOUBLE().notNull().bridgedTo(classOf[Double])))),
         TypeStrategies.explicit(DataTypes.BOOLEAN.notNull().bridgedTo(classOf[Boolean]))),
-
     TestSpec
       .forScalarFunction(classOf[ScalaBoxedVarArgScalarFunction])
       .expectOutputMapping(
@@ -116,7 +117,6 @@ object TypeInferenceExtractorScalaTest {
             InputTypeStrategies.explicit(DataTypes.STRING),
             InputTypeStrategies.explicit(DataTypes.DOUBLE()))),
         TypeStrategies.explicit(DataTypes.BOOLEAN.notNull().bridgedTo(classOf[Boolean]))),
-
     TestSpec
       .forScalarFunction(classOf[ScalaHintVarArgScalarFunction])
       .expectOutputMapping(
@@ -127,7 +127,6 @@ object TypeInferenceExtractorScalaTest {
             InputTypeStrategies.explicit(DataTypes.STRING),
             InputTypeStrategies.explicit(DataTypes.DECIMAL(10, 4)))),
         TypeStrategies.explicit(DataTypes.BOOLEAN.notNull().bridgedTo(classOf[Boolean]))),
-
     // global output hint with local input overloading
     TestSpec
       .forScalarFunction(classOf[ScalaGlobalOutputFunctionHint])
@@ -136,18 +135,15 @@ object TypeInferenceExtractorScalaTest {
         TypeStrategies.explicit(DataTypes.INT))
       .expectOutputMapping(
         InputTypeStrategies.sequence(InputTypeStrategies.explicit(DataTypes.STRING)),
-        TypeStrategies.explicit(DataTypes.INT))
-  )
+        TypeStrategies.explicit(DataTypes.INT)))
 
   // ----------------------------------------------------------------------------------------------
   // Test classes for extraction
   // ----------------------------------------------------------------------------------------------
 
   private class ScalaScalarFunction extends ScalarFunction {
-    def eval(
-      i: Int,
-      s: String,
-      @DataTypeHint("DECIMAL(10, 4)") d: java.math.BigDecimal): Boolean = false
+    def eval(i: Int, s: String, @DataTypeHint("DECIMAL(10, 4)") d: java.math.BigDecimal): Boolean =
+      false
   }
 
   @FunctionHint(output = new DataTypeHint("INT"))
@@ -161,25 +157,19 @@ object TypeInferenceExtractorScalaTest {
 
   private class ScalaPrimitiveVarArgScalarFunction extends ScalarFunction {
     @varargs
-    def eval(
-      i: Int,
-      s: String,
-      d: Double*): Boolean = false
+    def eval(i: Int, s: String, d: Double*): Boolean = false
   }
 
   private class ScalaBoxedVarArgScalarFunction extends ScalarFunction {
     @varargs
-    def eval(
-      i: Int,
-      s: String,
-      d: java.lang.Double*): Boolean = false
+    def eval(i: Int, s: String, d: java.lang.Double*): Boolean = false
   }
 
   private class ScalaHintVarArgScalarFunction extends ScalarFunction {
     @varargs
     def eval(
-      i: Int,
-      s: String,
-      @DataTypeHint("ARRAY<DECIMAL(10, 4)>") d: java.math.BigDecimal*): Boolean = false
+        i: Int,
+        s: String,
+        @DataTypeHint("ARRAY<DECIMAL(10, 4)>") d: java.math.BigDecimal*): Boolean = false
   }
 }

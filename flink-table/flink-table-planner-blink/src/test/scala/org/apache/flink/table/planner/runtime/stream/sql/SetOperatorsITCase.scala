@@ -22,7 +22,11 @@ import org.apache.flink.api.scala._
 import org.apache.flink.table.api._
 import org.apache.flink.table.api.bridge.scala._
 import org.apache.flink.table.planner.runtime.utils.StreamingWithStateTestBase.StateBackendMode
-import org.apache.flink.table.planner.runtime.utils.{StreamingWithStateTestBase, TestData, TestingRetractSink}
+import org.apache.flink.table.planner.runtime.utils.{
+  StreamingWithStateTestBase,
+  TestData,
+  TestingRetractSink
+}
 import org.apache.flink.types.Row
 
 import org.junit.Assert.assertEquals
@@ -49,10 +53,7 @@ class SetOperatorsITCase(mode: StateBackendMode) extends StreamingWithStateTestB
     val sink = new TestingRetractSink
     tEnv.sqlQuery(sqlQuery).toRetractStream[Row].addSink(sink).setParallelism(1)
     env.execute()
-    val expected = mutable.MutableList(
-      "1,1,Hi",
-      "2,2,Hello",
-      "3,2,Hello world")
+    val expected = mutable.MutableList("1,1,Hi", "2,2,Hello", "3,2,Hello world")
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
 
@@ -83,9 +84,7 @@ class SetOperatorsITCase(mode: StateBackendMode) extends StreamingWithStateTestB
     val sink = new TestingRetractSink
     tEnv.sqlQuery(sqlQuery).toRetractStream[Row].addSink(sink).setParallelism(1)
     env.execute()
-    val expected = mutable.MutableList(
-      "Hi5", "Hi6", "Hi8", "Hi9"
-    )
+    val expected = mutable.MutableList("Hi5", "Hi6", "Hi8", "Hi9")
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
 
@@ -127,8 +126,7 @@ class SetOperatorsITCase(mode: StateBackendMode) extends StreamingWithStateTestB
       "Hello",
       "Hello world",
       "Hello world",
-      "Hello world"
-    )
+      "Hello world")
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
 

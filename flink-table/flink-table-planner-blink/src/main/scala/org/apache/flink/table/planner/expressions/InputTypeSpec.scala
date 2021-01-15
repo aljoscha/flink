@@ -24,28 +24,28 @@ import org.apache.flink.table.planner.validate._
 import scala.collection.mutable
 
 /**
-  * Expressions that have strict data type specification on its inputs.
-  */
+ * Expressions that have strict data type specification on its inputs.
+ */
 trait InputTypeSpec extends PlannerExpression {
 
   /**
-    * Input type specification for each child.
-    *
-    * For example, [[Power]] expecting both of the children be of double type should use:
-    * {{{
-    *   def expectedTypes: Seq[TypeInformation[_]] = DOUBLE_TYPE_INFO :: DOUBLE_TYPE_INFO :: Nil
-    * }}}
-    *
-    * Inputs that don't match the expected type will be safely casted to a higher type. Therefore,
-    * use the decimal type with caution as all numeric types would be casted to a very
-    * inefficient type.
-    */
+   * Input type specification for each child.
+   *
+   * For example, [[Power]] expecting both of the children be of double type should use:
+   * {{{
+   *   def expectedTypes: Seq[TypeInformation[_]] = DOUBLE_TYPE_INFO :: DOUBLE_TYPE_INFO :: Nil
+   * }}}
+   *
+   * Inputs that don't match the expected type will be safely casted to a higher type. Therefore,
+   * use the decimal type with caution as all numeric types would be casted to a very
+   * inefficient type.
+   */
   private[flink] def expectedTypes: Seq[TypeInformation[_]]
 
   override private[flink] def validateInput(): ValidationResult = {
     val typeMismatches = mutable.ArrayBuffer.empty[String]
 
-    if(expectedTypes.size != children.size){
+    if (expectedTypes.size != children.size) {
       return ValidationFailure(
         s"""|$this fails on input type size checking: expected types size[${expectedTypes.size}].
             |Operands types size[${children.size}].

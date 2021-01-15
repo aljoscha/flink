@@ -23,8 +23,8 @@ import org.apache.flink.table.runtime.types.CRow
 import org.apache.flink.types.Row
 
 /**
-  * Convert [[CRow]] to a [[Tuple2]].
-  */
+ * Convert [[CRow]] to a [[Tuple2]].
+ */
 class CRowToScalaTupleMapFunction extends MapFunction[CRow, (Boolean, Row)] {
 
   override def map(cRow: CRow): (Boolean, Row) = {

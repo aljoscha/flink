@@ -30,8 +30,8 @@ import org.apache.flink.table.utils.{TableFunc0, TableTestBase}
 import org.junit.Test
 
 /**
-  * Tests for column functions which includes tests for different column functions.
-  */
+ * Tests for column functions which includes tests for different column functions.
+ */
 class ColumnFunctionsTest extends TableTestBase {
 
   val util = streamTestUtil()
@@ -54,8 +54,7 @@ class ColumnFunctionsTest extends TableTestBase {
       unaryNode(
         "DataStreamCalc",
         streamTableNode(t),
-        term("select", "TestFunc$(double, long) AS _c0")
-      )
+        term("select", "TestFunc$(double, long) AS _c0"))
 
     verifyAll(tab1, tab2, expected)
   }
@@ -68,11 +67,7 @@ class ColumnFunctionsTest extends TableTestBase {
     val tab2 = t.select("withColumns(b to c), a, withColumns(5 to 6, d)")
 
     val expected =
-      unaryNode(
-        "DataStreamCalc",
-        streamTableNode(t),
-        term("select", "b", "c", "a", "e", "f", "d")
-      )
+      unaryNode("DataStreamCalc", streamTableNode(t), term("select", "b", "c", "a", "e", "f", "d"))
 
     verifyAll(tab1, tab2, expected)
   }
@@ -85,11 +80,7 @@ class ColumnFunctionsTest extends TableTestBase {
     val tab2 = t.select("withColumns(1, b, c), f")
 
     val expected =
-      unaryNode(
-        "DataStreamCalc",
-        streamTableNode(t),
-        term("select", "a", "b", "c", "f")
-      )
+      unaryNode("DataStreamCalc", streamTableNode(t), term("select", "a", "b", "c", "f"))
 
     verifyAll(tab1, tab2, expected)
   }
@@ -107,11 +98,7 @@ class ColumnFunctionsTest extends TableTestBase {
       .select("withoutColumns(1 to 2)")
 
     val expected =
-      unaryNode(
-        "DataStreamCalc",
-        streamTableNode(t),
-        term("select", "e", "f")
-      )
+      unaryNode("DataStreamCalc", streamTableNode(t), term("select", "e", "f"))
 
     verifyAll(tab1, tab2, expected)
   }
@@ -127,8 +114,7 @@ class ColumnFunctionsTest extends TableTestBase {
       unaryNode(
         "DataStreamCalc",
         streamTableNode(t),
-        term("select", "CONCAT(string1, string2) AS _c0")
-      )
+        term("select", "CONCAT(string1, string2) AS _c0"))
 
     verifyAll(tab1, tab2, expected)
   }
@@ -148,8 +134,7 @@ class ColumnFunctionsTest extends TableTestBase {
         streamTableNode(t2),
         term("where", "=(int1, int2)"),
         term("join", "int1", "long1", "string1", "int2", "long2", "string2"),
-        term("joinType", "InnerJoin")
-      )
+        term("joinType", "InnerJoin"))
 
     verifyAll(tab1, tab2, expected)
   }
@@ -170,11 +155,11 @@ class ColumnFunctionsTest extends TableTestBase {
         term("invocation", func0.functionIdentifier() + "($2)"),
         term("correlate", "table(TableFunc0(string))"),
         term("select", "int", "long", "string", "name", "age"),
-        term("rowType",
+        term(
+          "rowType",
           "RecordType(DOUBLE int, BIGINT long, VARCHAR(65536) string, VARCHAR(65536) name," +
             " INTEGER age)"),
-        term("joinType", "INNER")
-      )
+        term("joinType", "INNER"))
 
     util.verifyTable(tab1, expected)
     util.verify2Tables(tab1, tab2)
@@ -192,8 +177,7 @@ class ColumnFunctionsTest extends TableTestBase {
         "DataStreamCalc",
         streamTableNode(t),
         term("select", "int", "long", "string1", "string2"),
-        term("where", "=(CONCAT(string1, string2), 'a')")
-      )
+        term("where", "=(CONCAT(string1, string2), 'a')"))
 
     verifyAll(tab1, tab2, expected)
   }
@@ -213,14 +197,9 @@ class ColumnFunctionsTest extends TableTestBase {
     val expected =
       unaryNode(
         "DataStreamGroupAggregate",
-        unaryNode(
-          "DataStreamCalc",
-          streamTableNode(t),
-          term("select", "a", "b", "c")
-        ),
+        unaryNode("DataStreamCalc", streamTableNode(t), term("select", "a", "b", "c")),
         term("groupBy", "a", "b"),
-        term("select", "a", "b", "COUNT(c) AS EXPR$0")
-      )
+        term("select", "a", "b", "COUNT(c) AS EXPR$0"))
 
     verifyAll(tab1, tab2, expected)
   }
@@ -244,17 +223,11 @@ class ColumnFunctionsTest extends TableTestBase {
         "DataStreamCalc",
         unaryNode(
           "DataStreamGroupWindowAggregate",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(t),
-            term("select", "a", "CAST(b) AS b", "c")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(t), term("select", "a", "CAST(b) AS b", "c")),
           term("groupBy", "a", "b"),
           term("window", "SlidingGroupWindow('w, 'b, 3.millis, 10.millis)"),
-          term("select", "a", "b", "COUNT(c) AS EXPR$0")
-        ),
-        term("select", "a", "b", "EXPR$0 AS c")
-      )
+          term("select", "a", "b", "COUNT(c) AS EXPR$0")),
+        term("select", "a", "b", "EXPR$0 AS c"))
 
     verifyAll(tab1, tab2, expected)
   }
@@ -272,9 +245,9 @@ class ColumnFunctionsTest extends TableTestBase {
     util.tableEnv.registerFunction("countDist", countDist)
 
     val tab1 = table
-      .window(
-        Over partitionBy withColumns('c) orderBy 'proctime preceding UNBOUNDED_ROW as 'w)
-      .select('c,
+      .window(Over partitionBy withColumns('c) orderBy 'proctime preceding UNBOUNDED_ROW as 'w)
+      .select(
+        'c,
         countFun(withColumns('b)) over 'w as 'mycount,
         weightAvgFun(withColumns('a to 'b)) over 'w as 'wAvg,
         countDist('a) over 'w as 'countDist)
@@ -282,7 +255,8 @@ class ColumnFunctionsTest extends TableTestBase {
 
     val tab2 = table
       .window(
-        Over.partitionBy("withColumns(c)")
+        Over
+          .partitionBy("withColumns(c)")
           .orderBy("proctime")
           .preceding("UNBOUNDED_ROW")
           .as("w"))
@@ -299,11 +273,16 @@ class ColumnFunctionsTest extends TableTestBase {
           term("partitionBy", "c"),
           term("orderBy", "proctime"),
           term("rows", "BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW"),
-          term("select", "a", "b", "c", "proctime", "CountAggFunction(b) AS w0$o0",
-            "WeightedAvg(a, b) AS w0$o1", "CountDistinct(a) AS w0$o2")
-        ),
-        term("select", "c", "w0$o0 AS mycount", "w0$o1 AS wAvg", "w0$o2 AS countDist")
-      )
+          term(
+            "select",
+            "a",
+            "b",
+            "c",
+            "proctime",
+            "CountAggFunction(b) AS w0$o0",
+            "WeightedAvg(a, b) AS w0$o1",
+            "CountDistinct(a) AS w0$o2")),
+        term("select", "c", "w0$o0 AS mycount", "w0$o1 AS wAvg", "w0$o2 AS countDist"))
     verifyAll(tab1, tab2, expected)
   }
 
@@ -319,8 +298,7 @@ class ColumnFunctionsTest extends TableTestBase {
       unaryNode(
         "DataStreamCalc",
         streamTableNode(t),
-        term("select", "a", "b", "c", "TestFunc$(a, b) AS d")
-      )
+        term("select", "a", "b", "c", "TestFunc$(a, b) AS d"))
 
     verifyAll(tab1, tab2, expected)
   }
@@ -333,11 +311,7 @@ class ColumnFunctionsTest extends TableTestBase {
     val tab2 = t.renameColumns("withColumns(a) as d").select('d, 'b)
 
     val expected =
-      unaryNode(
-        "DataStreamCalc",
-        streamTableNode(t),
-        term("select", "a AS d", "b")
-      )
+      unaryNode("DataStreamCalc", streamTableNode(t), term("select", "a AS d", "b"))
 
     verifyAll(tab1, tab2, expected)
   }
@@ -350,11 +324,7 @@ class ColumnFunctionsTest extends TableTestBase {
     val tab2 = t.dropColumns("withColumns(a to b)")
 
     val expected =
-      unaryNode(
-        "DataStreamCalc",
-        streamTableNode(t),
-        term("select", "c")
-      )
+      unaryNode("DataStreamCalc", streamTableNode(t), term("select", "c"))
 
     verifyAll(tab1, tab2, expected)
   }

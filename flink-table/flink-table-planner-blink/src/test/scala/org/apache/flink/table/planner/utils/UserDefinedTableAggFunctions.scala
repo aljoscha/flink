@@ -34,10 +34,13 @@ import java.util
 
 import scala.collection.mutable.ListBuffer
 
-/**** Note: Functions in this class suffer performance problem. Only use it in tests. ****/
+/**
+ * ** Note: Functions in this class suffer performance problem. Only use it in tests. ***
+ */
 
-
-/****** Function for testing basic functionality of TableAggregateFunction ******/
+/**
+ * **** Function for testing basic functionality of TableAggregateFunction *****
+ */
 
 class Top3Accum {
   var data: util.Map[JInt, JInt] = _
@@ -128,7 +131,9 @@ class Top3 extends TableAggregateFunction[JTuple2[JInt, JInt], Top3Accum] {
   }
 }
 
-/****** Function for testing MapView ******/
+/**
+ * **** Function for testing MapView *****
+ */
 
 class Top3WithMapViewAccum {
   var data: MapView[JInt, JInt] = _
@@ -207,7 +212,9 @@ class Top3WithMapView extends TableAggregateFunction[JTuple2[JInt, JInt], Top3Wi
   }
 }
 
-/****** Function for testing retract input ******/
+/**
+ * **** Function for testing retract input *****
+ */
 
 class Top3WithRetractInputAcc {
   @DataTypeHint("RAW")
@@ -215,7 +222,7 @@ class Top3WithRetractInputAcc {
 }
 
 class Top3WithRetractInput
-  extends TableAggregateFunction[JTuple2[JInt, JInt], Top3WithRetractInputAcc] {
+    extends TableAggregateFunction[JTuple2[JInt, JInt], Top3WithRetractInputAcc] {
 
   @Override
   def createAccumulator(): Top3WithRetractInputAcc = {
@@ -244,7 +251,9 @@ class Top3WithRetractInput
   }
 }
 
-/****** Function for testing internal accumulator type ******/
+/**
+ * **** Function for testing internal accumulator type *****
+ */
 
 @FunctionHint(accumulator = new DataTypeHint(value = "ROW<i INT>", bridgedTo = classOf[RowData]))
 class TableAggSum extends TableAggregateFunction[JInt, RowData] {
@@ -270,8 +279,8 @@ class TableAggSum extends TableAggregateFunction[JInt, RowData] {
 }
 
 /**
-  * Test function for plan test.
-  */
+ * Test function for plan test.
+ */
 class EmptyTableAggFunc extends TableAggregateFunction[JTuple2[JInt, JInt], Top3Accum] {
 
   override def createAccumulator(): Top3Accum = new Top3Accum
@@ -297,8 +306,8 @@ class EmptyTableAggFuncWithIntResultType extends TableAggregateFunction[JInt, To
 }
 
 class PythonEmptyTableAggFunc
-  extends TableAggregateFunction[JTuple2[JInt, JInt], Top3Accum]
-  with PythonFunction {
+    extends TableAggregateFunction[JTuple2[JInt, JInt], Top3Accum]
+    with PythonFunction {
 
   override def getSerializedPythonFunction: Array[Byte] = Array(0)
 

@@ -48,7 +48,7 @@ trait StreamScan extends CommonScan[CRow] with DataStreamRel {
 
     val hasTimeIndicator = fieldIdxs.exists(f =>
       f == TimeIndicatorTypeInfo.ROWTIME_STREAM_MARKER ||
-      f == TimeIndicatorTypeInfo.PROCTIME_STREAM_MARKER)
+        f == TimeIndicatorTypeInfo.PROCTIME_STREAM_MARKER)
 
     if (input.getType == cRowType && !hasTimeIndicator) {
       // input is already a CRow with correct type
@@ -56,17 +56,21 @@ trait StreamScan extends CommonScan[CRow] with DataStreamRel {
 
     } else if (input.getType == internalType && !hasTimeIndicator) {
       // input is already of correct type. Only need to wrap it as CRow
-      input.asInstanceOf[DataStream[Row]].map(new RichMapFunction[Row, CRow] {
-        @transient private var outCRow: CRow = null
-        override def open(parameters: Configuration): Unit = {
-          outCRow = new CRow(null, change = true)
-        }
+      input
+        .asInstanceOf[DataStream[Row]]
+        .map(new RichMapFunction[Row, CRow] {
+          @transient private var outCRow: CRow = null
+          override def open(parameters: Configuration): Unit = {
+            outCRow = new CRow(null, change = true)
+          }
 
-        override def map(v: Row): CRow = {
-          outCRow.row = v
-          outCRow
-        }
-      }).returns(cRowType).setParallelism(input.getParallelism)
+          override def map(v: Row): CRow = {
+            outCRow.row = v
+            outCRow
+          }
+        })
+        .returns(cRowType)
+        .setParallelism(input.getParallelism)
 
     } else {
       // input needs to be converted and wrapped as CRow or time indicators need to be generated
@@ -78,13 +82,9 @@ trait StreamScan extends CommonScan[CRow] with DataStreamRel {
         "DataStreamSourceConversion",
         schema.fieldNames,
         fieldIdxs,
-        rowtimeExpression
-      )
+        rowtimeExpression)
 
-      val processFunc = new CRowOutputProcessRunner(
-        function.name,
-        function.code,
-        cRowType)
+      val processFunc = new CRowOutputProcessRunner(function.name, function.code, cRowType)
 
       val opName = s"from: (${schema.fieldNames.mkString(", ")})"
 
@@ -105,17 +105,11 @@ trait StreamScan extends CommonScan[CRow] with DataStreamRel {
       inputFieldMapping: Array[Int],
       rowtimeExpression: Option[RexNode]): GeneratedFunction[ProcessFunction[Any, Row], Row] = {
 
-    val generator = new FunctionCodeGenerator(
-      config,
-      false,
-      inputType,
-      None,
-      Some(inputFieldMapping))
+    val generator =
+      new FunctionCodeGenerator(config, false, inputType, None, Some(inputFieldMapping))
 
-    val conversion = generator.generateConverterResultExpression(
-      outputType,
-      fieldNames,
-      rowtimeExpression)
+    val conversion =
+      generator.generateConverterResultExpression(outputType, fieldNames, rowtimeExpression)
 
     val body =
       s"""

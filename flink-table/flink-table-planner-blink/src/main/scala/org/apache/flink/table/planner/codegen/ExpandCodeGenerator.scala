@@ -45,7 +45,9 @@ object ExpandCodeGenerator {
     projects.foreach { project =>
       val projectionExprs = project.map(exprGenerator.generateExpression)
       val projectionResultExpr = exprGenerator.generateResultExpression(
-        projectionExprs, outputType, classOf[BoxedWrapperRowData])
+        projectionExprs,
+        outputType,
+        classOf[BoxedWrapperRowData])
       val header = if (retainHeader) {
         s"${projectionResultExpr.resultTerm}.setRowKind($inputTerm.getRowKind());"
       } else {

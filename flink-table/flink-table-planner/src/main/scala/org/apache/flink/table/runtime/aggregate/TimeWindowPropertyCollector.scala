@@ -24,19 +24,19 @@ import org.apache.flink.types.Row
 import org.apache.flink.util.Collector
 
 /**
-  * Adds TimeWindow properties to specified fields of a row before it emits the row to a wrapped
-  * collector.
-  */
+ * Adds TimeWindow properties to specified fields of a row before it emits the row to a wrapped
+ * collector.
+ */
 abstract class TimeWindowPropertyCollector[T](
     windowStartOffset: Option[Int],
     windowEndOffset: Option[Int],
     windowRowtimeOffset: Option[Int])
-  extends Collector[T] {
+    extends Collector[T] {
 
   var wrappedCollector: Collector[T] = _
   var output: Row = _
-  var windowStart:Long = _
-  var windowEnd:Long = _
+  var windowStart: Long = _
+  var windowEnd: Long = _
 
   def getRow(record: T): Row
 
@@ -72,7 +72,7 @@ final class DataSetTimeWindowPropertyCollector(
     startOffset: Option[Int],
     endOffset: Option[Int],
     rowtimeOffset: Option[Int])
-  extends TimeWindowPropertyCollector[Row](startOffset, endOffset, rowtimeOffset) {
+    extends TimeWindowPropertyCollector[Row](startOffset, endOffset, rowtimeOffset) {
 
   override def getRow(record: Row): Row = record
 
@@ -85,7 +85,7 @@ final class DataStreamTimeWindowPropertyCollector(
     startOffset: Option[Int],
     endOffset: Option[Int],
     rowtimeOffset: Option[Int])
-  extends TimeWindowPropertyCollector[CRow](startOffset, endOffset, rowtimeOffset) {
+    extends TimeWindowPropertyCollector[CRow](startOffset, endOffset, rowtimeOffset) {
 
   override def getRow(record: CRow): Row = record.row
 

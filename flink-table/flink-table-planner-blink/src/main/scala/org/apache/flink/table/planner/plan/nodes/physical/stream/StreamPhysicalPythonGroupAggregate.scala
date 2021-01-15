@@ -31,10 +31,10 @@ import org.apache.calcite.rel.{RelNode, RelWriter}
 import java.util
 
 /**
-  * Stream physical RelNode for Python unbounded group aggregate.
-  *
-  * @see [[StreamPhysicalGroupAggregateBase]] for more info.
-  */
+ * Stream physical RelNode for Python unbounded group aggregate.
+ *
+ * @see [[StreamPhysicalGroupAggregateBase]] for more info.
+ */
 class StreamPhysicalPythonGroupAggregate(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -42,7 +42,7 @@ class StreamPhysicalPythonGroupAggregate(
     outputRowType: RelDataType,
     val grouping: Array[Int],
     val aggCalls: Seq[AggregateCall])
-  extends StreamPhysicalGroupAggregateBase(cluster, traitSet, inputRel) {
+    extends StreamPhysicalGroupAggregateBase(cluster, traitSet, inputRel) {
 
   private lazy val aggInfoList =
     AggregateUtil.deriveAggregateInfoList(this, grouping.length, aggCalls)
@@ -63,14 +63,13 @@ class StreamPhysicalPythonGroupAggregate(
 
   override def explainTerms(pw: RelWriter): RelWriter = {
     val inputRowType = getInput.getRowType
-    super.explainTerms(pw)
-      .itemIf("groupBy",
-        RelExplainUtil.fieldToString(grouping, inputRowType), grouping.nonEmpty)
-      .item("select", RelExplainUtil.streamGroupAggregationToString(
-        inputRowType,
-        getRowType,
-        aggInfoList,
-        grouping))
+    super
+      .explainTerms(pw)
+      .itemIf("groupBy", RelExplainUtil.fieldToString(grouping, inputRowType), grouping.nonEmpty)
+      .item(
+        "select",
+        RelExplainUtil
+          .streamGroupAggregationToString(inputRowType, getRowType, aggInfoList, grouping))
   }
 
   override def translateToExecNode(): ExecNode[_] = {
@@ -86,7 +85,6 @@ class StreamPhysicalPythonGroupAggregate(
       needRetraction,
       ExecEdge.DEFAULT,
       FlinkTypeFactory.toLogicalRowType(getRowType),
-      getRelDetailedDescription
-    )
+      getRelDetailedDescription)
   }
 }

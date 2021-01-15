@@ -34,8 +34,8 @@ class StreamPhysicalExchange(
     traitSet: RelTraitSet,
     relNode: RelNode,
     relDistribution: RelDistribution)
-  extends CommonPhysicalExchange(cluster, traitSet, relNode, relDistribution)
-  with StreamPhysicalRel {
+    extends CommonPhysicalExchange(cluster, traitSet, relNode, relDistribution)
+    with StreamPhysicalRel {
 
   override def requireWatermark: Boolean = false
 

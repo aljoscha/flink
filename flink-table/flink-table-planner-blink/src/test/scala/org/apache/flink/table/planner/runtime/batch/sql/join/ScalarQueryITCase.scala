@@ -36,8 +36,7 @@ class ScalarQueryITCase extends BatchTestBase {
     row(3, 3.0),
     row(null, null),
     row(null, 5.0),
-    row(6, null)
-  )
+    row(6, null))
 
   lazy val r = Seq(
     row(2, 3.0),
@@ -46,8 +45,7 @@ class ScalarQueryITCase extends BatchTestBase {
     row(4, 1.0),
     row(null, null),
     row(null, 5.0),
-    row(6, null)
-  )
+    row(6, null))
 
   @Before
   override def before(): Unit = {
@@ -58,15 +56,11 @@ class ScalarQueryITCase extends BatchTestBase {
 
   @Test
   def testScalarSubQuery(): Unit = {
-    checkResult(
-      "SELECT * FROM l WHERE a = (SELECT c FROM r where c = 3)",
-      Seq(row(3, 3.0)))
+    checkResult("SELECT * FROM l WHERE a = (SELECT c FROM r where c = 3)", Seq(row(3, 3.0)))
   }
 
   @Test(expected = classOf[RuntimeException])
   def testScalarSubQueryException(): Unit = {
-    checkResult(
-      "SELECT * FROM l WHERE a = (SELECT c FROM r)",
-      Seq(row(3, 3.0)))
+    checkResult("SELECT * FROM l WHERE a = (SELECT c FROM r)", Seq(row(3, 3.0)))
   }
 }

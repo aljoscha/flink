@@ -27,8 +27,8 @@ import org.apache.flink.table.plan.nodes.logical.FlinkLogicalTableFunctionScan
 import org.apache.flink.table.plan.schema.RowSchema
 
 /**
-  * Base RelNode for data stream correlate.
-  */
+ * Base RelNode for data stream correlate.
+ */
 abstract class DataStreamCorrelateBase(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -38,9 +38,9 @@ abstract class DataStreamCorrelateBase(
     condition: Option[RexNode],
     schema: RowSchema,
     joinType: JoinRelType)
-  extends SingleRel(cluster, traitSet, input)
-  with CommonCorrelate
-  with DataStreamRel {
+    extends SingleRel(cluster, traitSet, input)
+    with CommonCorrelate
+    with DataStreamRel {
 
   override def deriveRowType() = schema.relDataType
 
@@ -53,12 +53,12 @@ abstract class DataStreamCorrelateBase(
   override def explainTerms(pw: RelWriter): RelWriter = {
     val rexCall = scan.getCall.asInstanceOf[RexCall]
     val sqlFunction = rexCall.getOperator.asInstanceOf[TableSqlFunction]
-    super.explainTerms(pw)
+    super
+      .explainTerms(pw)
       .item("invocation", scan.getCall)
-      .item("correlate", correlateToString(
-        inputSchema.relDataType,
-        rexCall, sqlFunction,
-        getExpressionString))
+      .item(
+        "correlate",
+        correlateToString(inputSchema.relDataType, rexCall, sqlFunction, getExpressionString))
       .item("select", selectToString(schema.relDataType))
       .item("rowType", schema.relDataType)
       .item("joinType", joinType)

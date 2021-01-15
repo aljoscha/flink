@@ -30,8 +30,8 @@ class GroupWindowTableAggregateValidationTest extends TableTestBase {
   val weightedAvg = new WeightedAvgWithMerge
 
   val util = streamTestUtil()
-  val table = util.addTable[(Long, Int, String)](
-    'long, 'int, 'string, 'rowtime.rowtime, 'proctime.proctime)
+  val table =
+    util.addTable[(Long, Int, String)]('long, 'int, 'string, 'rowtime.rowtime, 'proctime.proctime)
 
   @Test
   def testGroupByWithoutWindowAlias(): Unit = {
@@ -90,8 +90,9 @@ class GroupWindowTableAggregateValidationTest extends TableTestBase {
   @Test
   def testTumbleUdAggWithInvalidArgs(): Unit = {
     expectedException.expect(classOf[ValidationException])
-    expectedException.expectMessage("Given parameters do not match any signature. \n" +
-      "Actual: (java.lang.Long) \nExpected: (int)")
+    expectedException.expectMessage(
+      "Given parameters do not match any signature. \n" +
+        "Actual: (java.lang.Long) \nExpected: (int)")
 
     table
       .window(Tumble over 2.hours on 'rowtime as 'w)
@@ -134,7 +135,7 @@ class GroupWindowTableAggregateValidationTest extends TableTestBase {
 
     table
       // row and time intervals may not be mixed
-      .window(Slide over 10 every 10.milli  on 'proctime as 'w)
+      .window(Slide over 10 every 10.milli on 'proctime as 'w)
       .groupBy('string, 'w)
       .flatAggregate(top3('int))
       .select('f0, 'f1)
@@ -143,8 +144,9 @@ class GroupWindowTableAggregateValidationTest extends TableTestBase {
   @Test
   def testSlideUdAggWithInvalidArgs(): Unit = {
     expectedException.expect(classOf[ValidationException])
-    expectedException.expectMessage("Given parameters do not match any signature. \n" +
-      "Actual: (java.lang.Long) \nExpected: (int)")
+    expectedException.expectMessage(
+      "Given parameters do not match any signature. \n" +
+        "Actual: (java.lang.Long) \nExpected: (int)")
 
     table
       .window(Slide over 2.hours every 30.minutes on 'rowtime as 'w)
@@ -184,8 +186,9 @@ class GroupWindowTableAggregateValidationTest extends TableTestBase {
   @Test
   def testInvalidWindowAliasWithExpression(): Unit = {
     expectedException.expect(classOf[ValidationException])
-    expectedException.expectMessage("Only unresolved reference supported for alias of a " +
-      "group window.")
+    expectedException.expectMessage(
+      "Only unresolved reference supported for alias of a " +
+        "group window.")
 
     table
       // expression instead of a symbol
@@ -213,8 +216,9 @@ class GroupWindowTableAggregateValidationTest extends TableTestBase {
   @Test
   def testSessionUdAggWithInvalidArgs(): Unit = {
     expectedException.expect(classOf[ValidationException])
-    expectedException.expectMessage("Given parameters do not match any signature. \n" +
-      "Actual: (java.lang.Long) \nExpected: (int)")
+    expectedException.expectMessage(
+      "Given parameters do not match any signature. \n" +
+        "Actual: (java.lang.Long) \nExpected: (int)")
 
     table
       .window(Session withGap 2.hours on 'rowtime as 'w)
@@ -226,8 +230,9 @@ class GroupWindowTableAggregateValidationTest extends TableTestBase {
   @Test
   def testInvalidWindowPropertyOnRowCountsWindow(): Unit = {
     expectedException.expect(classOf[ValidationException])
-    expectedException.expectMessage("Window start and Window end cannot be selected " +
-      "for a row-count tumble window.")
+    expectedException.expectMessage(
+      "Window start and Window end cannot be selected " +
+        "for a row-count tumble window.")
 
     val util = streamTestUtil()
     val table = util.addTable[(Long, Int, String)]('long, 'int, 'string, 'proctime.proctime)
@@ -242,8 +247,9 @@ class GroupWindowTableAggregateValidationTest extends TableTestBase {
   @Test
   def testInvalidAggregateInSelection(): Unit = {
     expectedException.expect(classOf[ValidationException])
-    expectedException.expectMessage("Aggregate functions cannot be used in the select " +
-      "right after the flatAggregate.")
+    expectedException.expectMessage(
+      "Aggregate functions cannot be used in the select " +
+        "right after the flatAggregate.")
 
     val util = streamTestUtil()
     val table = util.addTable[(Long, Int, String)]('long, 'int, 'string, 'proctime.proctime)

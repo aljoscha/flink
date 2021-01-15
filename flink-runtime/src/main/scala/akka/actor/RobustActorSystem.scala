@@ -28,8 +28,8 @@ import org.apache.flink.runtime.util.FatalExitExceptionHandler
 import scala.concurrent.ExecutionContext
 
 /**
-  * [[ActorSystemImpl]] which has a configurable [[java.lang.Thread.UncaughtExceptionHandler]].
-  */
+ * [[ActorSystemImpl]] which has a configurable [[java.lang.Thread.UncaughtExceptionHandler]].
+ */
 class RobustActorSystem(
     name: String,
     applicationConfig: Config,
@@ -62,8 +62,7 @@ object RobustActorSystem {
     apply(
       name,
       ActorSystemSetup.create(BootstrapSetup(None, Option(applicationConfig), None)),
-      uncaughtExceptionHandler
-    )
+      uncaughtExceptionHandler)
   }
 
   def apply(name: String, setup: ActorSystemSetup): RobustActorSystem = {
@@ -86,13 +85,7 @@ object RobustActorSystem {
     val appConfig = bootstrapSettings.flatMap(_.config).getOrElse(ConfigFactory.load(cl))
     val defaultEC = bootstrapSettings.flatMap(_.defaultExecutionContext)
 
-    new RobustActorSystem(
-      name,
-      appConfig,
-      cl,
-      defaultEC,
-      None,
-      setup,
-      uncaughtExceptionHandler).start()
+    new RobustActorSystem(name, appConfig, cl, defaultEC, None, setup, uncaughtExceptionHandler)
+      .start()
   }
 }

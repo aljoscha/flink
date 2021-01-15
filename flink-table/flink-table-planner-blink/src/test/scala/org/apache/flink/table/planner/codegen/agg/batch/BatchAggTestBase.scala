@@ -37,38 +37,43 @@ import java.util
 import scala.collection.JavaConverters._
 
 /**
-  * Base agg test.
-  */
+ * Base agg test.
+ */
 abstract class BatchAggTestBase extends AggTestBase(isBatchMode = true) {
 
   val globalOutputType = RowType.of(
     Array[LogicalType](
-      new VarCharType(VarCharType.MAX_LENGTH), new VarCharType(VarCharType.MAX_LENGTH),
+      new VarCharType(VarCharType.MAX_LENGTH),
+      new VarCharType(VarCharType.MAX_LENGTH),
       new BigIntType(),
       new DoubleType(),
       new BigIntType()),
-    Array(
-      "f0", "f4",
-      "agg1Output",
-      "agg2Output",
-      "agg3Output"))
+    Array("f0", "f4", "agg1Output", "agg2Output", "agg3Output"))
 
   def row(args: Any*): GenericRowData = {
-    GenericRowData.of(args.map {
-      case str: String => StringData.fromString(str)
-      case l: Long => Long.box(l)
-      case d: Double => Double.box(d)
-      case o: AnyRef => o
-    }.toArray[AnyRef]: _*)
+    GenericRowData.of(
+      args
+        .map {
+          case str: String => StringData.fromString(str)
+          case l: Long     => Long.box(l)
+          case d: Double   => Double.box(d)
+          case o: AnyRef   => o
+        }
+        .toArray[AnyRef]: _*)
   }
 
   def testOperator(
       args: (CodeGenOperatorFactory[RowData], RowType, RowType),
-      input: Array[RowData], expectedOutput: Array[GenericRowData]): Unit = {
+      input: Array[RowData],
+      expectedOutput: Array[GenericRowData]): Unit = {
     val testHarness = new OneInputStreamTaskTestHarness[RowData, RowData](
       new FunctionWithException[Environment, OneInputStreamTask[RowData, RowData], Exception] {
         override def apply(t: Environment) = new OneInputStreamTask(t)
-      }, 1, 1, InternalTypeInfo.of(args._2), InternalTypeInfo.of(args._3))
+      },
+      1,
+      1,
+      InternalTypeInfo.of(args._2),
+      InternalTypeInfo.of(args._3))
     testHarness.memorySize = 32 * 100 * 1024
 
     testHarness.setupOutputForSingletonOperatorChain()
@@ -92,8 +97,10 @@ abstract class BatchAggTestBase extends AggTestBase(isBatchMode = true) {
     val outputs = new util.ArrayList[GenericRowData]()
     val outQueue = testHarness.getOutput
     while (!outQueue.isEmpty) {
-      outputs.add(RowDataTestUtil.toGenericRowDeeply(
-        outQueue.poll().asInstanceOf[StreamRecord[RowData]].getValue, args._3.getChildren))
+      outputs.add(
+        RowDataTestUtil.toGenericRowDeeply(
+          outQueue.poll().asInstanceOf[StreamRecord[RowData]].getValue,
+          args._3.getChildren))
     }
     Assert.assertArrayEquals(expectedOutput.toArray[AnyRef], outputs.asScala.toArray[AnyRef])
   }

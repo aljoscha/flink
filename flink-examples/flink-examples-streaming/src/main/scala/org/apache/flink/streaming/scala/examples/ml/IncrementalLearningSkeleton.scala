@@ -46,7 +46,6 @@ import org.apache.flink.util.Collector
  *  - Connected streams
  *  - CoFunctions
  *  - Tuple data types
- *
  */
 object IncrementalLearningSkeleton {
 
@@ -96,7 +95,7 @@ object IncrementalLearningSkeleton {
   private class FiniteNewDataSource extends SourceFunction[Integer] {
     override def run(ctx: SourceContext[Integer]) = {
       Thread.sleep(15)
-      (0 until 50).foreach{ _ =>
+      (0 until 50).foreach { _ =>
         Thread.sleep(5)
         ctx.collect(1)
       }
@@ -113,7 +112,7 @@ object IncrementalLearningSkeleton {
    */
   private class FiniteTrainingDataSource extends SourceFunction[Integer] {
     override def run(ctx: SourceContext[Integer]) =
-      (0 until 8200).foreach( _ => ctx.collect(1) )
+      (0 until 8200).foreach(_ => ctx.collect(1))
 
     override def cancel() = {
       // No cleanup needed
@@ -142,9 +141,10 @@ object IncrementalLearningSkeleton {
     protected def buildPartialModel(values: Iterable[Integer]): Array[java.lang.Double] =
       Array[java.lang.Double](1)
 
-    override def apply(window: TimeWindow,
-                       values: Iterable[Integer],
-                       out: Collector[Array[java.lang.Double]]): Unit = {
+    override def apply(
+        window: TimeWindow,
+        values: Iterable[Integer],
+        out: Collector[Array[java.lang.Double]]): Unit = {
       out.collect(buildPartialModel(values))
     }
   }
@@ -155,7 +155,6 @@ object IncrementalLearningSkeleton {
    *
    * By default emits the Integer 0 for every newData and the Integer 1
    * for every model update.
-   *
    */
   private class Predictor extends CoMapFunction[Integer, Array[java.lang.Double], Integer] {
 

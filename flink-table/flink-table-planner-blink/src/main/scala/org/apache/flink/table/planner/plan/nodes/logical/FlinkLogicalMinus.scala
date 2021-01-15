@@ -32,16 +32,16 @@ import java.util.{List => JList}
 import scala.collection.JavaConversions._
 
 /**
-  * Sub-class of [[Minus]] that is a relational expression which returns the rows of
-  * its first input minus any matching rows from its other inputs in Flink.
-  */
+ * Sub-class of [[Minus]] that is a relational expression which returns the rows of
+ * its first input minus any matching rows from its other inputs in Flink.
+ */
 class FlinkLogicalMinus(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
     inputs: JList[RelNode],
     all: Boolean)
-  extends Minus(cluster, traitSet, inputs, all)
-  with FlinkLogicalRel {
+    extends Minus(cluster, traitSet, inputs, all)
+    with FlinkLogicalRel {
 
   override def copy(traitSet: RelTraitSet, inputs: JList[RelNode], all: Boolean): SetOp = {
     new FlinkLogicalMinus(cluster, traitSet, inputs, all)
@@ -49,28 +49,27 @@ class FlinkLogicalMinus(
 
   override def computeSelfCost(planner: RelOptPlanner, mq: RelMetadataQuery): RelOptCost = {
     val zeroCost = planner.getCostFactory.makeCost(0, 0, 0)
-    this.getInputs.foldLeft(zeroCost) {
-      (cost, input) =>
-        val rowCnt = mq.getRowCount(input)
-        val rowSize = mq.getAverageRowSize(input)
-        val inputCost = planner.getCostFactory.makeCost(rowCnt, rowCnt, rowCnt * rowSize)
-        cost.plus(inputCost)
+    this.getInputs.foldLeft(zeroCost) { (cost, input) =>
+      val rowCnt = mq.getRowCount(input)
+      val rowSize = mq.getAverageRowSize(input)
+      val inputCost = planner.getCostFactory.makeCost(rowCnt, rowCnt, rowCnt * rowSize)
+      cost.plus(inputCost)
     }
   }
 
 }
 
 private class FlinkLogicalMinusConverter
-  extends ConverterRule(
-    classOf[LogicalMinus],
-    Convention.NONE,
-    FlinkConventions.LOGICAL,
-    "FlinkLogicalMinusConverter") {
+    extends ConverterRule(
+      classOf[LogicalMinus],
+      Convention.NONE,
+      FlinkConventions.LOGICAL,
+      "FlinkLogicalMinusConverter") {
 
   override def convert(rel: RelNode): RelNode = {
     val minus = rel.asInstanceOf[LogicalMinus]
-    val newInputs = minus.getInputs.map {
-      input => RelOptRule.convert(input, FlinkConventions.LOGICAL)
+    val newInputs = minus.getInputs.map { input =>
+      RelOptRule.convert(input, FlinkConventions.LOGICAL)
     }
     FlinkLogicalMinus.create(newInputs, minus.all)
   }

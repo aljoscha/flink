@@ -24,16 +24,20 @@ import org.apache.calcite.rel.convert.ConverterRule
 import org.apache.calcite.rex.RexNode
 import org.apache.flink.table.plan.nodes.FlinkConventions
 import org.apache.flink.table.plan.nodes.datastream.DataStreamCorrelate
-import org.apache.flink.table.plan.nodes.logical.{FlinkLogicalCalc, FlinkLogicalCorrelate, FlinkLogicalTableFunctionScan}
+import org.apache.flink.table.plan.nodes.logical.{
+  FlinkLogicalCalc,
+  FlinkLogicalCorrelate,
+  FlinkLogicalTableFunctionScan
+}
 import org.apache.flink.table.plan.schema.RowSchema
 import org.apache.flink.table.plan.util.{CorrelateUtil, PythonUtil}
 
 class DataStreamCorrelateRule
-  extends ConverterRule(
-    classOf[FlinkLogicalCorrelate],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.DATASTREAM,
-    "DataStreamCorrelateRule") {
+    extends ConverterRule(
+      classOf[FlinkLogicalCorrelate],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.DATASTREAM,
+      "DataStreamCorrelateRule") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val join: FlinkLogicalCorrelate = call.rel(0).asInstanceOf[FlinkLogicalCorrelate]

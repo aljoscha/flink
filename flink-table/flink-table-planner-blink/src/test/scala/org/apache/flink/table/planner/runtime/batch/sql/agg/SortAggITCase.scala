@@ -18,16 +18,32 @@
 
 package org.apache.flink.table.planner.runtime.batch.sql.agg
 
-import org.apache.flink.api.common.typeinfo.{BasicArrayTypeInfo, PrimitiveArrayTypeInfo, TypeInformation}
-import org.apache.flink.api.java.typeutils.{MapTypeInfo, ObjectArrayTypeInfo, RowTypeInfo, TupleTypeInfo, TypeExtractor}
+import org.apache.flink.api.common.typeinfo.{
+  BasicArrayTypeInfo,
+  PrimitiveArrayTypeInfo,
+  TypeInformation
+}
+import org.apache.flink.api.java.typeutils.{
+  MapTypeInfo,
+  ObjectArrayTypeInfo,
+  RowTypeInfo,
+  TupleTypeInfo,
+  TypeExtractor
+}
 import org.apache.flink.api.scala._
 import org.apache.flink.table.api.Types
-import org.apache.flink.table.api.config.ExecutionConfigOptions.{TABLE_EXEC_DISABLED_OPERATORS, TABLE_EXEC_RESOURCE_DEFAULT_PARALLELISM}
+import org.apache.flink.table.api.config.ExecutionConfigOptions.{
+  TABLE_EXEC_DISABLED_OPERATORS,
+  TABLE_EXEC_RESOURCE_DEFAULT_PARALLELISM
+}
 import org.apache.flink.table.functions.AggregateFunction
 import org.apache.flink.table.planner.{JInt, JLong}
 import org.apache.flink.table.planner.plan.utils.JavaUserDefinedAggFunctions.WeightedAvgWithMergeAndReset
 import org.apache.flink.table.planner.runtime.utils.BatchTestBase.row
-import org.apache.flink.table.planner.runtime.utils.UserDefinedFunctionTestUtils.{MyPojo, MyToPojoFunc}
+import org.apache.flink.table.planner.runtime.utils.UserDefinedFunctionTestUtils.{
+  MyPojo,
+  MyToPojoFunc
+}
 import org.apache.flink.table.planner.utils.{CountAccumulator, CountAggFunction, IntSumAggFunction}
 
 import org.junit.Test
@@ -40,13 +56,11 @@ import scala.collection.JavaConverters._
 import scala.collection.Seq
 
 /**
-  * AggregateITCase using SortAgg Operator.
-  */
-class SortAggITCase
-    extends AggregateITCaseBase("SortAggregate") {
+ * AggregateITCase using SortAgg Operator.
+ */
+class SortAggITCase extends AggregateITCaseBase("SortAggregate") {
   override def prepareAggOp(): Unit = {
-    tEnv.getConfig.getConfiguration.setString(
-      TABLE_EXEC_DISABLED_OPERATORS, "HashAgg")
+    tEnv.getConfig.getConfiguration.setString(TABLE_EXEC_DISABLED_OPERATORS, "HashAgg")
 
     registerFunction("countFun", new CountAggFunction())
     registerFunction("intSumFun", new IntSumAggFunction())
@@ -68,73 +82,47 @@ class SortAggITCase
     registerFunction("simplePrimitiveArrayUdaf", new SimplePrimitiveArrayUdaf())
     registerRange("RangeT", 1000000)
     env.setParallelism(1)
-    checkResult(
-      "SELECT simplePrimitiveArrayUdaf(id) FROM RangeT",
-      Seq(row(499999500000L)))
+    checkResult("SELECT simplePrimitiveArrayUdaf(id) FROM RangeT", Seq(row(499999500000L)))
   }
-  
+
   @Test
   def testMultiSetAggBufferGroupBy(): Unit = {
     checkResult(
       "SELECT collect(b) FROM Table3",
       Seq(
-        row(collection.immutable.SortedMap(1 -> 1, 2 -> 2, 3 -> 3, 4 -> 4, 5 -> 5, 6 -> 6).asJava)
-      )
-    )
+        row(collection.immutable.SortedMap(1 -> 1, 2 -> 2, 3 -> 3, 4 -> 4, 5 -> 5, 6 -> 6).asJava)))
   }
 
   @Test
   def testUDAGGWithoutGroupby(): Unit = {
-    checkResult(
-      "SELECT countFun(c) FROM Table3",
-      Seq(
-        row(21)
-      )
-    )
+    checkResult("SELECT countFun(c) FROM Table3", Seq(row(21)))
   }
 
   @Test
   def testUDAGGWithGroupby(): Unit = {
     checkResult(
       "SELECT countFun(a), count(a), b FROM Table3 GROUP BY b",
-      Seq(
-        row(1, 1, 1),
-        row(2, 2, 2),
-        row(3, 3, 3),
-        row(4, 4, 4),
-        row(5, 5, 5),
-        row(6, 6, 6)
-      )
-    )
+      Seq(row(1, 1, 1), row(2, 2, 2), row(3, 3, 3), row(4, 4, 4), row(5, 5, 5), row(6, 6, 6)))
   }
 
   @Test
   def testUDAGGNullGroupKeyAggregation(): Unit = {
-    checkResult("SELECT intSumFun(d), d, count(d) FROM NullTable5 GROUP BY d",
+    checkResult(
+      "SELECT intSumFun(d), d, count(d) FROM NullTable5 GROUP BY d",
       Seq(
         row(1, 1, 1),
         row(25, 5, 5),
         row(null, null, 0),
         row(16, 4, 4),
         row(4, 2, 2),
-        row(9, 3, 3)
-      )
-    )
+        row(9, 3, 3)))
   }
 
   @Test
   def testComplexUDAGGWithGroupBy(): Unit = {
     checkResult(
       "SELECT b, weightedAvg(b, a) FROM Table3 GROUP BY b",
-      Seq(
-        row(1, 1),
-        row(2, 2),
-        row(3, 3),
-        row(4, 4),
-        row(5, 5),
-        row(6, 6)
-      )
-    )
+      Seq(row(1, 1), row(2, 2), row(3, 3), row(4, 4), row(5, 5), row(6, 6)))
   }
 
   // NOTE: Spark has agg functions collect_list(), collect_set().
@@ -143,33 +131,17 @@ class SortAggITCase
   def testListAgg(): Unit = {
     checkResult(
       "SELECT LISTAGG(c, '-'), LISTAGG(c) FROM SmallTable3",
-      Seq(
-        row("Hi-Hello-Hello world", "Hi,Hello,Hello world")
-      )
-    )
+      Seq(row("Hi-Hello-Hello world", "Hi,Hello,Hello world")))
 
     // EmptyTable5
-    checkResult(
-      "SELECT LISTAGG(g, '-'), LISTAGG(g) FROM EmptyTable5",
-      Seq(
-        row(null, null)
-      )
-    )
+    checkResult("SELECT LISTAGG(g, '-'), LISTAGG(g) FROM EmptyTable5", Seq(row(null, null)))
 
-    checkResult(
-      "SELECT LISTAGG(c, '-'), LISTAGG(c) FROM AllNullTable3",
-      Seq(
-        row(null, null)
-      )
-    )
+    checkResult("SELECT LISTAGG(c, '-'), LISTAGG(c) FROM AllNullTable3", Seq(row(null, null)))
   }
 
   @Test
   def testPojoField(): Unit = {
-    val data = Seq(
-      row(1, new MyPojo(5, 105)),
-      row(1, new MyPojo(6, 11)),
-      row(1, new MyPojo(7, 12)))
+    val data = Seq(row(1, new MyPojo(5, 105)), row(1, new MyPojo(6, 11)), row(1, new MyPojo(7, 12)))
     registerCollection(
       "MyTable",
       data,
@@ -177,18 +149,12 @@ class SortAggITCase
       "a, b")
 
     registerFunction("pojoFunc", new MyPojoAggFunction)
-    checkResult(
-      "SELECT pojoFunc(b) FROM MyTable group by a",
-      Seq(
-        row(row(128, 128))))
+    checkResult("SELECT pojoFunc(b) FROM MyTable group by a", Seq(row(row(128, 128))))
   }
 
   @Test
   def testVarArgs(): Unit = {
-    val data = Seq(
-      row(1, 1L, "5", "3"),
-      row(1, 22L, "15", "13"),
-      row(3, 33L, "25", "23"))
+    val data = Seq(row(1, 1L, "5", "3"), row(1, 22L, "15", "13"), row(3, 33L, "25", "23"))
     registerCollection(
       "MyTable",
       data,
@@ -198,16 +164,10 @@ class SortAggITCase
     registerFunction("func", func)
 
     // no group
-    checkResult(
-      "SELECT func(s, s1, s2) FROM MyTable",
-      Seq(row(140)))
+    checkResult("SELECT func(s, s1, s2) FROM MyTable", Seq(row(140)))
 
     // with group
-    checkResult(
-      "SELECT id, func(s, s1, s2) FROM MyTable group by id",
-      Seq(
-        row(1, 59),
-        row(3, 81)))
+    checkResult("SELECT id, func(s, s1, s2) FROM MyTable group by id", Seq(row(1, 59), row(3, 81)))
   }
 
   @Test
@@ -220,33 +180,16 @@ class SortAggITCase
         row("Comment#9"),
         row("Hello world"),
         row("Hi"),
-        row("Luke Skywalker")
-      )
-    )
+        row("Luke Skywalker")))
 
-    checkResult(
-      "SELECT max(c) FROM Table3",
-      Seq(
-        row("Luke Skywalker")
-      )
-    )
+    checkResult("SELECT max(c) FROM Table3", Seq(row("Luke Skywalker")))
   }
 
   @Test
   def testMaxStringAllNull(): Unit = {
-    checkResult(
-      "SELECT max(c) FROM AllNullTable3 GROUP BY b",
-      Seq(
-        row(null)
-      )
-    )
+    checkResult("SELECT max(c) FROM AllNullTable3 GROUP BY b", Seq(row(null)))
 
-    checkResult(
-      "SELECT max(c) FROM AllNullTable3",
-      Seq(
-        row(null)
-      )
-    )
+    checkResult("SELECT max(c) FROM AllNullTable3", Seq(row(null)))
   }
 
   @Test
@@ -254,67 +197,52 @@ class SortAggITCase
     checkResult(
       "SELECT first_value(c) over () FROM Table3",
       Seq(
-        row("Hi"), row("Hi"), row("Hi"), row("Hi"), row("Hi"),
-        row("Hi"), row("Hi"), row("Hi"), row("Hi"), row("Hi"),
-        row("Hi"), row("Hi"), row("Hi"), row("Hi"), row("Hi"),
-        row("Hi"), row("Hi"), row("Hi"), row("Hi"), row("Hi"),
-        row("Hi")
-      )
-    )
+        row("Hi"),
+        row("Hi"),
+        row("Hi"),
+        row("Hi"),
+        row("Hi"),
+        row("Hi"),
+        row("Hi"),
+        row("Hi"),
+        row("Hi"),
+        row("Hi"),
+        row("Hi"),
+        row("Hi"),
+        row("Hi"),
+        row("Hi"),
+        row("Hi"),
+        row("Hi"),
+        row("Hi"),
+        row("Hi"),
+        row("Hi"),
+        row("Hi"),
+        row("Hi")))
   }
 
   @Test
   def testArrayUdaf(): Unit = {
     tEnv.getConfig.getConfiguration.setInteger(TABLE_EXEC_RESOURCE_DEFAULT_PARALLELISM, 1)
     env.setParallelism(1)
-    checkResult(
-      "SELECT myPrimitiveArrayUdaf(a, b) FROM Table3",
-      Seq(row(Array(231, 91)))
-    )
+    checkResult("SELECT myPrimitiveArrayUdaf(a, b) FROM Table3", Seq(row(Array(231, 91))))
     checkResult(
       "SELECT myObjectArrayUdaf(c) FROM Table3",
-      Seq(row(Array("HHHHILCCCCCCCCCCCCCCC", "iod?.r123456789012345")))
-    )
-    checkResult(
-      "SELECT myNestedLongArrayUdaf(a, b)[2] FROM Table3",
-      Seq(row(Array(91, 231)))
-    )
+      Seq(row(Array("HHHHILCCCCCCCCCCCCCCC", "iod?.r123456789012345"))))
+    checkResult("SELECT myNestedLongArrayUdaf(a, b)[2] FROM Table3", Seq(row(Array(91, 231))))
     checkResult(
       "SELECT myNestedStringArrayUdaf(c)[2] FROM Table3",
-      Seq(row(Array("iod?.r123456789012345", "HHHHILCCCCCCCCCCCCCCC")))
-    )
+      Seq(row(Array("iod?.r123456789012345", "HHHHILCCCCCCCCCCCCCCC"))))
   }
 
   @Test
   def testMapUdaf(): Unit = {
-    checkResult(
-      "SELECT myPrimitiveMapUdaf(a, b)[3] FROM Table3",
-      Seq(row(15))
-    )
-    checkResult(
-      "SELECT myPrimitiveMapUdaf(a, b)[6] FROM Table3",
-      Seq(row(111))
-    )
-    checkResult(
-      "SELECT myObjectMapUdaf(a, c)['Co'] FROM Table3",
-      Seq(row(210))
-    )
-    checkResult(
-      "SELECT myObjectMapUdaf(a, c)['He'] FROM Table3",
-      Seq(row(9))
-    )
-    checkResult(
-      "SELECT myNestedMapUdaf(a, b, c)[6]['Co'] FROM Table3",
-      Seq(row(111))
-    )
-    checkResult(
-      "SELECT myNestedMapUdaf(a, b, c)[3]['He'] FROM Table3",
-      Seq(row(4))
-    )
-    checkResult(
-      "SELECT myNestedMapUdaf(a, b, c)[3]['Co'] FROM Table3",
-      Seq(row("null"))
-    )
+    checkResult("SELECT myPrimitiveMapUdaf(a, b)[3] FROM Table3", Seq(row(15)))
+    checkResult("SELECT myPrimitiveMapUdaf(a, b)[6] FROM Table3", Seq(row(111)))
+    checkResult("SELECT myObjectMapUdaf(a, c)['Co'] FROM Table3", Seq(row(210)))
+    checkResult("SELECT myObjectMapUdaf(a, c)['He'] FROM Table3", Seq(row(9)))
+    checkResult("SELECT myNestedMapUdaf(a, b, c)[6]['Co'] FROM Table3", Seq(row(111)))
+    checkResult("SELECT myNestedMapUdaf(a, b, c)[3]['He'] FROM Table3", Seq(row(4)))
+    checkResult("SELECT myNestedMapUdaf(a, b, c)[3]['Co'] FROM Table3", Seq(row("null")))
   }
 }
 
@@ -461,8 +389,8 @@ class MyNestedLongArrayUdaf extends AggregateFunction[Array[Array[Long]], Array[
   override def getResultType = getAccumulatorType
 }
 
-class MyNestedStringArrayUdaf extends AggregateFunction[
-    Array[Array[String]], Array[Array[String]]] {
+class MyNestedStringArrayUdaf
+    extends AggregateFunction[Array[Array[String]], Array[Array[String]]] {
 
   override def createAccumulator(): Array[Array[String]] = Array(Array("", ""), Array("", ""))
 
@@ -476,8 +404,8 @@ class MyNestedStringArrayUdaf extends AggregateFunction[
   }
 }
 
-class MyPrimitiveMapUdaf extends AggregateFunction[
-    java.util.Map[Long, Int], java.util.Map[Long, Int]] {
+class MyPrimitiveMapUdaf
+    extends AggregateFunction[java.util.Map[Long, Int], java.util.Map[Long, Int]] {
 
   override def createAccumulator(): java.util.Map[Long, Int] =
     new java.util.HashMap[Long, Int]()
@@ -492,14 +420,14 @@ class MyPrimitiveMapUdaf extends AggregateFunction[
 
   override def getAccumulatorType =
     new MapTypeInfo(Types.LONG, Types.INT)
-        .asInstanceOf[TypeInformation[java.util.Map[Long, Int]]]
+      .asInstanceOf[TypeInformation[java.util.Map[Long, Int]]]
 
   override def getResultType =
     getAccumulatorType
 }
 
-class MyObjectMapUdaf extends AggregateFunction[
-    java.util.Map[String, Int], java.util.Map[String, Int]] {
+class MyObjectMapUdaf
+    extends AggregateFunction[java.util.Map[String, Int], java.util.Map[String, Int]] {
 
   override def createAccumulator(): java.util.Map[String, Int] =
     new java.util.HashMap[String, Int]()
@@ -515,25 +443,28 @@ class MyObjectMapUdaf extends AggregateFunction[
 
   override def getAccumulatorType =
     new MapTypeInfo(Types.STRING, Types.INT)
-        .asInstanceOf[TypeInformation[java.util.Map[String, Int]]]
+      .asInstanceOf[TypeInformation[java.util.Map[String, Int]]]
 
   override def getResultType = getAccumulatorType
 }
 
-class MyNestedMapUdf extends AggregateFunction[
-    java.util.Map[JLong, java.util.Map[String, JInt]],
-    java.util.Map[JLong, java.util.Map[String, JInt]]] {
+class MyNestedMapUdf
+    extends AggregateFunction[
+      java.util.Map[JLong, java.util.Map[String, JInt]],
+      java.util.Map[JLong, java.util.Map[String, JInt]]] {
 
   override def createAccumulator(): java.util.Map[JLong, java.util.Map[String, JInt]] =
     new java.util.HashMap[JLong, java.util.Map[String, JInt]]()
 
   override def getValue(accumulator: java.util.Map[JLong, java.util.Map[String, JInt]])
-  : java.util.Map[JLong, java.util.Map[String, JInt]] =
+      : java.util.Map[JLong, java.util.Map[String, JInt]] =
     accumulator
 
   def accumulate(
       accumulator: java.util.Map[JLong, java.util.Map[String, JInt]],
-      a: JInt, b: JLong, c: String): Unit = {
+      a: JInt,
+      b: JLong,
+      c: String): Unit = {
     val key = c.substring(0, 2)
     accumulator.putIfAbsent(b, new java.util.HashMap[String, JInt]())
     accumulator.get(b).putIfAbsent(key, 0)

@@ -30,14 +30,14 @@ import org.apache.flink.table.plan.logical.rel.{LogicalTableAggregate, TableAggr
 import org.apache.flink.table.plan.nodes.FlinkConventions
 
 class FlinkLogicalTableAggregate(
-  cluster: RelOptCluster,
-  traitSet: RelTraitSet,
-  input: RelNode,
-  indicator: Boolean,
-  groupSet: ImmutableBitSet,
-  groupSets: util.List[ImmutableBitSet],
-  aggCalls: util.List[AggregateCall])
-  extends TableAggregate(cluster, traitSet, input, indicator, groupSet, groupSets, aggCalls)
+    cluster: RelOptCluster,
+    traitSet: RelTraitSet,
+    input: RelNode,
+    indicator: Boolean,
+    groupSet: ImmutableBitSet,
+    groupSets: util.List[ImmutableBitSet],
+    aggCalls: util.List[AggregateCall])
+    extends TableAggregate(cluster, traitSet, input, indicator, groupSet, groupSets, aggCalls)
     with FlinkLogicalRel {
 
   override def copy(traitSet: RelTraitSet, inputs: JList[RelNode]): RelNode = {
@@ -48,17 +48,16 @@ class FlinkLogicalTableAggregate(
       indicator,
       groupSet,
       groupSets,
-      aggCalls
-    )
+      aggCalls)
   }
 }
 
 private class FlinkLogicalTableAggregateConverter
-  extends ConverterRule(
-    classOf[LogicalTableAggregate],
-    Convention.NONE,
-    FlinkConventions.LOGICAL,
-    "FlinkLogicalTableAggregateConverter") {
+    extends ConverterRule(
+      classOf[LogicalTableAggregate],
+      Convention.NONE,
+      FlinkConventions.LOGICAL,
+      "FlinkLogicalTableAggregateConverter") {
 
   override def convert(rel: RelNode): RelNode = {
     val agg = rel.asInstanceOf[LogicalTableAggregate]

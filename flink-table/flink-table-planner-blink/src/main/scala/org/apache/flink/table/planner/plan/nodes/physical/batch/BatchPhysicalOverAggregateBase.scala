@@ -20,11 +20,18 @@ package org.apache.flink.table.planner.plan.nodes.physical.batch
 
 import org.apache.flink.table.api.TableException
 import org.apache.flink.table.planner.CalcitePair
-import org.apache.flink.table.planner.plan.`trait`.{FlinkRelDistribution, FlinkRelDistributionTraitDef}
+import org.apache.flink.table.planner.plan.`trait`.{
+  FlinkRelDistribution,
+  FlinkRelDistributionTraitDef
+}
 import org.apache.flink.table.planner.plan.cost.{FlinkCost, FlinkCostFactory}
 import org.apache.flink.table.planner.plan.rules.physical.batch.BatchExecJoinRuleBase
 import org.apache.flink.table.planner.plan.utils.OverAggregateUtil.splitOutOffsetOrInsensitiveGroup
-import org.apache.flink.table.planner.plan.utils.{FlinkRelOptUtil, OverAggregateUtil, RelExplainUtil}
+import org.apache.flink.table.planner.plan.utils.{
+  FlinkRelOptUtil,
+  OverAggregateUtil,
+  RelExplainUtil
+}
 
 import org.apache.calcite.plan._
 import org.apache.calcite.rel.RelDistribution.Type._
@@ -50,14 +57,15 @@ abstract class BatchPhysicalOverAggregateBase(
     inputRowType: RelDataType,
     windowGroups: Seq[Window.Group],
     logicWindow: Window)
-  extends SingleRel(cluster, traitSet, inputRel)
-  with BatchPhysicalRel {
+    extends SingleRel(cluster, traitSet, inputRel)
+    with BatchPhysicalRel {
 
   val partitionKeyIndices: Array[Int] = windowGroups.head.keys.toArray
   windowGroups.tail.foreach { g =>
     if (!util.Arrays.equals(partitionKeyIndices, g.keys.toArray)) {
-      throw new TableException("" +
-        "BatchPhysicalOverAggregateBase requires all groups should have same partition key.")
+      throw new TableException(
+        "" +
+          "BatchPhysicalOverAggregateBase requires all groups should have same partition key.")
     }
   }
 
@@ -81,11 +89,14 @@ abstract class BatchPhysicalOverAggregateBase(
   }
 
   override def explainTerms(pw: RelWriter): RelWriter = {
-    val writer = super.explainTerms(pw)
-      .itemIf("partitionBy",
+    val writer = super
+      .explainTerms(pw)
+      .itemIf(
+        "partitionBy",
         RelExplainUtil.fieldToString(partitionKeyIndices, inputRowType),
         partitionKeyIndices.nonEmpty)
-      .itemIf("orderBy",
+      .itemIf(
+        "orderBy",
         RelExplainUtil.collationToString(windowGroups.head.orderKeys, inputRowType),
         windowGroups.head.orderKeys.getFieldCollations.nonEmpty)
 
@@ -138,7 +149,7 @@ abstract class BatchPhysicalOverAggregateBase(
           if (isAllFieldsFromInput) {
             val tableConfig = FlinkRelOptUtil.getTableConfigFromContext(this)
             if (tableConfig.getConfiguration.getBoolean(
-              BatchExecJoinRuleBase.TABLE_OPTIMIZER_SHUFFLE_BY_PARTIAL_KEY_ENABLED)) {
+                BatchExecJoinRuleBase.TABLE_OPTIMIZER_SHUFFLE_BY_PARTIAL_KEY_ENABLED)) {
               ImmutableIntList.of(partitionKeyIndices: _*).containsAll(requiredDistribution.getKeys)
             } else {
               requiredDistribution.getKeys == ImmutableIntList.of(partitionKeyIndices: _*)
@@ -194,7 +205,8 @@ abstract class BatchPhysicalOverAggregateBase(
     // provided distribution
     val providedDistribution = if (partitionKeyIndices.nonEmpty) {
       FlinkRelDistribution.hash(
-        partitionKeyIndices.map(Integer.valueOf).toList, requireStrict = false)
+        partitionKeyIndices.map(Integer.valueOf).toList,
+        requireStrict = false)
     } else {
       FlinkRelDistribution.SINGLETON
     }

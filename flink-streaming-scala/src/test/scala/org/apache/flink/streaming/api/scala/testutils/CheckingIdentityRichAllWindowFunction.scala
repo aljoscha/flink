@@ -24,16 +24,14 @@ import org.apache.flink.streaming.api.scala.function.RichAllWindowFunction
 import org.apache.flink.streaming.api.windowing.windows.Window
 import org.apache.flink.util.Collector
 
+class CheckingIdentityRichAllWindowFunction[T, W <: Window] extends RichAllWindowFunction[T, T, W] {
 
-class CheckingIdentityRichAllWindowFunction[T, W <: Window]
-  extends RichAllWindowFunction[T, T, W] {
-  
   override def apply(window: W, input: scala.Iterable[T], out: Collector[T]): Unit = {
     for (value <- input) {
       out.collect(value)
     }
   }
-  
+
   override def open(conf: Configuration): Unit = {
     super.open(conf)
     CheckingIdentityRichAllWindowFunction.openCalled = true
@@ -49,7 +47,6 @@ class CheckingIdentityRichAllWindowFunction[T, W <: Window]
     CheckingIdentityRichAllWindowFunction.contextSet = true
   }
 }
-
 
 object CheckingIdentityRichAllWindowFunction {
 
@@ -80,5 +77,3 @@ object CheckingIdentityRichAllWindowFunction {
     }
   }
 }
-
-

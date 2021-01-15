@@ -23,11 +23,9 @@ import org.apache.flink.cep.EventComparator
 import org.apache.flink.types.Row
 
 /**
-  * Bridge between Row [[TypeComparator]] and [[EventComparator]] object
-  */
-class EventRowComparator(
-    private val rowComp: TypeComparator[Row])
-  extends EventComparator[Row] {
+ * Bridge between Row [[TypeComparator]] and [[EventComparator]] object
+ */
+class EventRowComparator(private val rowComp: TypeComparator[Row]) extends EventComparator[Row] {
 
   override def compare(arg0: Row, arg1: Row): Int = {
     rowComp.compare(arg0, arg1)

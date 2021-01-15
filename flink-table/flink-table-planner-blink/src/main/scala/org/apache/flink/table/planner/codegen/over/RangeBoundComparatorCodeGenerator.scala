@@ -22,10 +22,21 @@ import org.apache.flink.table.api.TableConfig
 import org.apache.flink.table.planner.calcite.FlinkTypeFactory
 import org.apache.flink.table.planner.codegen.CodeGenUtils.{ROW_DATA, newName}
 import org.apache.flink.table.planner.codegen.Indenter.toISC
-import org.apache.flink.table.planner.codegen.{CodeGenUtils, CodeGeneratorContext, ExprCodeGenerator, GenerateUtils}
+import org.apache.flink.table.planner.codegen.{
+  CodeGenUtils,
+  CodeGeneratorContext,
+  ExprCodeGenerator,
+  GenerateUtils
+}
 import org.apache.flink.table.planner.plan.nodes.exec.utils.SortSpec.SortFieldSpec
 import org.apache.flink.table.runtime.generated.{GeneratedRecordComparator, RecordComparator}
-import org.apache.flink.table.types.logical.{BigIntType, IntType, LogicalType, LogicalTypeRoot, RowType}
+import org.apache.flink.table.types.logical.{
+  BigIntType,
+  IntType,
+  LogicalType,
+  LogicalTypeRoot,
+  RowType
+}
 
 import org.apache.calcite.avatica.util.DateTimeUtils
 import org.apache.calcite.rex.{RexInputRef, RexWindowBound}
@@ -35,16 +46,16 @@ import org.apache.calcite.tools.RelBuilder
 import java.math.BigDecimal
 
 /**
-  * A code generator for generating [[RecordComparator]] on the [[RexWindowBound]] based range
-  * over window.
-  *
-  * @param inputType       type of the input
-  * @param bound        the bound value for the window, its type may be Long or BigDecimal.
-  * @param key          key position describe which fields are keys in what order
-  * @param keyType      type for the key field.
-  * @param keyOrder     sort order for the key field.
-  * @param isLowerBound the RexWindowBound is lower or not.
-  */
+ * A code generator for generating [[RecordComparator]] on the [[RexWindowBound]] based range
+ * over window.
+ *
+ * @param inputType       type of the input
+ * @param bound        the bound value for the window, its type may be Long or BigDecimal.
+ * @param key          key position describe which fields are keys in what order
+ * @param keyType      type for the key field.
+ * @param keyOrder     sort order for the key field.
+ * @param isLowerBound the RexWindowBound is lower or not.
+ */
 class RangeBoundComparatorCodeGenerator(
     relBuilder: RelBuilder,
     config: TableConfig,
@@ -75,7 +86,7 @@ class RangeBoundComparatorCodeGenerator(
     def boundCompareZero: Int = {
       bound match {
         case bg: BigDecimal => bg.compareTo(BigDecimal.ZERO)
-        case _ => bound.asInstanceOf[Long].compareTo(0)
+        case _              => bound.asInstanceOf[Long].compareTo(0)
       }
     }
 
@@ -99,7 +110,7 @@ class RangeBoundComparatorCodeGenerator(
         } else if (${inputExpr.nullTerm} || ${currentExpr.nullTerm}) {
            $oneIsNull
         } else {
-           ${getComparatorCode(inputExpr.resultTerm, {currentExpr.resultTerm})}
+           ${getComparatorCode(inputExpr.resultTerm, { currentExpr.resultTerm })}
         }
      """.stripMargin
 
@@ -133,9 +144,9 @@ class RangeBoundComparatorCodeGenerator(
         //the field about date is expressed based day unit. So here should keep the same unit for
         // comparator.
         (bound.asInstanceOf[Long] / DateTimeUtils.MILLIS_PER_DAY, new IntType())
-      case LogicalTypeRoot.TIME_WITHOUT_TIME_ZONE => (bound, new IntType())
+      case LogicalTypeRoot.TIME_WITHOUT_TIME_ZONE      => (bound, new IntType())
       case LogicalTypeRoot.TIMESTAMP_WITHOUT_TIME_ZONE => (bound, new BigIntType())
-      case _ => (bound, keyType)
+      case _                                           => (bound, keyType)
     }
 
     val typeFactory = relBuilder.getTypeFactory.asInstanceOf[FlinkTypeFactory]
@@ -145,11 +156,9 @@ class RangeBoundComparatorCodeGenerator(
     val ctx = CodeGeneratorContext(config)
     val exprCodeGenerator = new ExprCodeGenerator(ctx, false)
     val minusCall = if (keyOrder) {
-      relBuilder.call(
-        MINUS, new RexInputRef(0, relKeyType), new RexInputRef(1, relKeyType))
+      relBuilder.call(MINUS, new RexInputRef(0, relKeyType), new RexInputRef(1, relKeyType))
     } else {
-      relBuilder.call(
-        MINUS, new RexInputRef(1, relKeyType), new RexInputRef(0, relKeyType))
+      relBuilder.call(MINUS, new RexInputRef(1, relKeyType), new RexInputRef(0, relKeyType))
     }
     exprCodeGenerator.bindInput(realKeyType, inputValue).bindSecondInput(realKeyType, currentValue)
     val literal = relBuilder.literal(realBoundValue)

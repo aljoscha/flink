@@ -27,12 +27,8 @@ import org.junit.Test
 
 class MatchRecognizeTest extends TableTestBase {
   private val streamUtil: StreamTableTestUtil = streamTestUtil()
-  private val table = streamUtil.addTable[(Int, String, Long)](
-    "MyTable",
-    'a,
-    'b,
-    'c.rowtime,
-    'proctime.proctime)
+  private val table =
+    streamUtil.addTable[(Int, String, Long)]("MyTable", 'a, 'b, 'c.rowtime, 'proctime.proctime)
 
   @Test
   def testSimpleWithDefaults(): Unit = {
@@ -55,8 +51,7 @@ class MatchRecognizeTest extends TableTestBase {
       term("orderBy", "proctime ASC"),
       term("measures", "FINAL(A.a) AS aa"),
       term("rowsPerMatch", "ONE ROW PER MATCH"),
-      term("after",
-        "SKIP TO NEXT ROW"), //this is not SQL-standard compliant, SKIP PAST LAST
+      term("after", "SKIP TO NEXT ROW"), //this is not SQL-standard compliant, SKIP PAST LAST
       // should be the default
       term("pattern", "('A', 'B')"),
       term("define", "{A==(LAST(*.$0, 0), 1)", "B==(LAST(*.$1, 0), 'b')}"))

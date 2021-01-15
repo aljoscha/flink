@@ -35,21 +35,19 @@ import java.util.function.IntFunction
 import scala.collection.JavaConversions._
 
 /**
-  * Planner rule that pushes a [[Project]] down in a tree past a semi/anti [[Join]]
-  * by splitting the projection into a projection on top of left child of the Join.
-  */
+ * Planner rule that pushes a [[Project]] down in a tree past a semi/anti [[Join]]
+ * by splitting the projection into a projection on top of left child of the Join.
+ */
 class ProjectSemiAntiJoinTransposeRule
-  extends RelOptRule(
-    operand(classOf[LogicalProject],
-      operand(classOf[LogicalJoin], any)),
-    "ProjectSemiAntiJoinTransposeRule") {
-
+    extends RelOptRule(
+      operand(classOf[LogicalProject], operand(classOf[LogicalJoin], any)),
+      "ProjectSemiAntiJoinTransposeRule") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val join: LogicalJoin = call.rel(1)
     join.getJoinType match {
       case JoinRelType.SEMI | JoinRelType.ANTI => true
-      case _ => false
+      case _                                   => false
     }
   }
 
@@ -74,13 +72,14 @@ class ProjectSemiAntiJoinTransposeRule
     }
 
     val leftNeededFields = ImmutableBitSet.range(0, leftFieldCount).intersect(allNeededFields)
-    val rightNeededFields = ImmutableBitSet.range(leftFieldCount, allInputFieldCount)
+    val rightNeededFields = ImmutableBitSet
+      .range(leftFieldCount, allInputFieldCount)
       .intersect(allNeededFields)
 
     // 2. new join inputs
     val newLeftInput = createNewJoinInput(call.builder, join.getLeft, leftNeededFields, 0)
-    val newRightInput = createNewJoinInput(
-      call.builder, join.getRight, rightNeededFields, leftFieldCount)
+    val newRightInput =
+      createNewJoinInput(call.builder, join.getRight, rightNeededFields, leftFieldCount)
 
     // mapping origin field index to new field index,
     // used to rewrite join condition and top project
@@ -88,7 +87,8 @@ class ProjectSemiAntiJoinTransposeRule
       new IntFunction[Integer]() {
         def apply(i: Int): Integer = allNeededFields.indexOf(i)
       },
-      allInputFieldCount, allNeededFields.cardinality())
+      allInputFieldCount,
+      allNeededFields.cardinality())
 
     // 3. create new join
     val newJoin = createNewJoin(join, mapping, newLeftInput, newRightInput)
@@ -126,14 +126,16 @@ class ProjectSemiAntiJoinTransposeRule
       newLeftInput: RelNode,
       newRightInput: RelNode): Join = {
     val newCondition = rewriteJoinCondition(originJoin, mapping)
-    LogicalJoin.create(newLeftInput, newRightInput, java.util.Collections.emptyList(),
-      newCondition, originJoin.getVariablesSet,
+    LogicalJoin.create(
+      newLeftInput,
+      newRightInput,
+      java.util.Collections.emptyList(),
+      newCondition,
+      originJoin.getVariablesSet,
       originJoin.getJoinType)
   }
 
-  private def rewriteJoinCondition(
-      originJoin: Join,
-      mapping: Mappings.TargetMapping): RexNode = {
+  private def rewriteJoinCondition(originJoin: Join, mapping: Mappings.TargetMapping): RexNode = {
     val rexBuilder = originJoin.getCluster.getRexBuilder
     val rexShuttle = new RexShuttle() {
       override def visitInputRef(ref: RexInputRef): RexNode = {

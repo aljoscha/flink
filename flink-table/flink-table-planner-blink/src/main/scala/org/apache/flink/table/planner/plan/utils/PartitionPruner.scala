@@ -24,7 +24,11 @@ import org.apache.flink.configuration.Configuration
 import org.apache.flink.table.api.{TableConfig, TableException}
 import org.apache.flink.table.data.{DecimalDataUtils, GenericRowData, StringData, TimestampData}
 import org.apache.flink.table.planner.codegen.CodeGenUtils.DEFAULT_COLLECTOR_TERM
-import org.apache.flink.table.planner.codegen.{ConstantCodeGeneratorContext, ExprCodeGenerator, FunctionCodeGenerator}
+import org.apache.flink.table.planner.codegen.{
+  ConstantCodeGeneratorContext,
+  ExprCodeGenerator,
+  FunctionCodeGenerator
+}
 import org.apache.flink.table.runtime.functions.SqlDateTimeUtils
 import org.apache.flink.table.runtime.typeutils.InternalTypeInfo
 import org.apache.flink.table.types.logical.LogicalTypeRoot._
@@ -38,11 +42,11 @@ import java.util.{ArrayList => JArrayList, List => JList, Map => JMap}
 import scala.collection.JavaConversions._
 
 /**
-  * Utility class for partition pruning.
-  *
-  * Creates partition filter instance (a [[RichMapFunction]]) with partition predicates by code-gen,
-  * and then evaluates all partition values against the partition filter to get final partitions.
-  */
+ * Utility class for partition pruning.
+ *
+ * Creates partition filter instance (a [[RichMapFunction]]) with partition predicates by code-gen,
+ * and then evaluates all partition values against the partition filter to get final partitions.
+ */
 object PartitionPruner {
 
   // current supports partition field type
@@ -60,18 +64,17 @@ object PartitionPruner {
     DATE,
     TIME_WITHOUT_TIME_ZONE,
     TIMESTAMP_WITHOUT_TIME_ZONE,
-    TIMESTAMP_WITH_LOCAL_TIME_ZONE
-  )
+    TIMESTAMP_WITH_LOCAL_TIME_ZONE)
 
   /**
-    * get pruned partitions from all partitions by partition filters
-    *
-    * @param partitionFieldNames Partition field names.
-    * @param partitionFieldTypes Partition field types.
-    * @param allPartitions       All partition values.
-    * @param partitionPredicate  A predicate that will be applied against partition values.
-    * @return Pruned partitions.
-    */
+   * get pruned partitions from all partitions by partition filters
+   *
+   * @param partitionFieldNames Partition field names.
+   * @param partitionFieldTypes Partition field types.
+   * @param allPartitions       All partition values.
+   * @param partitionPredicate  A predicate that will be applied against partition values.
+   * @return Pruned partitions.
+   */
   def prunePartitions(
       config: TableConfig,
       partitionFieldNames: Array[String],
@@ -112,7 +115,7 @@ object PartitionPruner {
     val function = genFunction.newInstance(getClass.getClassLoader)
     val richMapFunction = function match {
       case r: RichMapFunction[GenericRowData, Boolean] => r
-      case _ => throw new TableException("RichMapFunction[GenericRowData, Boolean] required here")
+      case _                                           => throw new TableException("RichMapFunction[GenericRowData, Boolean] required here")
     }
 
     val results: JList[Boolean] = new JArrayList[Boolean](allPartitions.size)
@@ -128,7 +131,10 @@ object PartitionPruner {
       // do filter against all partitions
       allPartitions.foreach { partition =>
         val row = convertPartitionToRow(
-          config.getLocalTimeZone, partitionFieldNames, partitionFieldTypes, partition)
+          config.getLocalTimeZone,
+          partitionFieldNames,
+          partitionFieldTypes,
+          partition)
         collector.collect(richMapFunction.map(row))
       }
     } finally {
@@ -136,14 +142,16 @@ object PartitionPruner {
     }
 
     // get pruned partitions
-    allPartitions.zipWithIndex.filter {
-      case (_, index) => results.get(index)
-    }.map(_._1)
+    allPartitions.zipWithIndex
+      .filter { case (_, index) =>
+        results.get(index)
+      }
+      .map(_._1)
   }
 
   /**
-    * create new Row from partition, set partition values to corresponding positions of row.
-    */
+   * create new Row from partition, set partition values to corresponding positions of row.
+   */
   private def convertPartitionToRow(
       timeZone: ZoneId,
       partitionFieldNames: Array[String],
@@ -158,30 +166,28 @@ object PartitionPruner {
     row
   }
 
-  private def convertPartitionFieldValue(
-      timeZone: ZoneId,
-      v: String,
-      t: LogicalType): Any = {
+  private def convertPartitionFieldValue(timeZone: ZoneId, v: String, t: LogicalType): Any = {
     if (v == null) {
       return null
     }
     t.getTypeRoot match {
       case VARCHAR | CHAR => StringData.fromString(v)
-      case BOOLEAN => Boolean
-      case TINYINT => v.toByte
-      case SMALLINT => v.toShort
-      case INTEGER => v.toInt
-      case BIGINT => v.toLong
-      case FLOAT => v.toFloat
-      case DOUBLE => v.toDouble
+      case BOOLEAN        => Boolean
+      case TINYINT        => v.toByte
+      case SMALLINT       => v.toShort
+      case INTEGER        => v.toInt
+      case BIGINT         => v.toLong
+      case FLOAT          => v.toFloat
+      case DOUBLE         => v.toDouble
       case DECIMAL =>
         val decimalType = t.asInstanceOf[DecimalType]
         DecimalDataUtils.castFrom(v, decimalType.getPrecision, decimalType.getScale)
-      case DATE => SqlDateTimeUtils.dateStringToUnixDate(v)
-      case TIME_WITHOUT_TIME_ZONE => SqlDateTimeUtils.timeStringToUnixDate(v)
+      case DATE                        => SqlDateTimeUtils.dateStringToUnixDate(v)
+      case TIME_WITHOUT_TIME_ZONE      => SqlDateTimeUtils.timeStringToUnixDate(v)
       case TIMESTAMP_WITHOUT_TIME_ZONE => SqlDateTimeUtils.toTimestampData(v)
-      case TIMESTAMP_WITH_LOCAL_TIME_ZONE => TimestampData.fromInstant(
-        SqlDateTimeUtils.toTimestampData(v).toLocalDateTime.atZone(timeZone).toInstant)
+      case TIMESTAMP_WITH_LOCAL_TIME_ZONE =>
+        TimestampData.fromInstant(
+          SqlDateTimeUtils.toTimestampData(v).toLocalDateTime.atZone(timeZone).toInstant)
       case _ =>
         throw new TableException(s"$t is not supported in PartitionPruner")
     }

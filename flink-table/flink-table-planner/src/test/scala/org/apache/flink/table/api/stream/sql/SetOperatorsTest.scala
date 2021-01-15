@@ -36,13 +36,10 @@ class SetOperatorsTest extends TableTestBase {
       "DataStreamCalc",
       streamTableNode(table),
       term("select", "a", "b", "c"),
-      term("where", s"SEARCH(b, Sarg[$resultStr]:BIGINT)")
-    )
+      term("where", s"SEARCH(b, Sarg[$resultStr]:BIGINT)"))
 
     val inStr = (1 to 30).mkString(", ")
-    util.verifySql(
-      s"SELECT * FROM MyTable WHERE b in ($inStr)",
-      expected)
+    util.verifySql(s"SELECT * FROM MyTable WHERE b in ($inStr)", expected)
   }
 
   @Test
@@ -51,28 +48,25 @@ class SetOperatorsTest extends TableTestBase {
     val table = util.addTable[(Int, Long, String)]("MyTable", 'a, 'b, 'c)
 
     val resultStr = "SEARCH(b, Sarg[" +
-        "(-∞..1L:BIGINT), (1L:BIGINT..2L:BIGINT), (2L:BIGINT..3L:BIGINT), " +
-        "(3L:BIGINT..4L:BIGINT), (4L:BIGINT..5L:BIGINT), (5L:BIGINT..6L:BIGINT), " +
-        "(6L:BIGINT..7L:BIGINT), (7L:BIGINT..8L:BIGINT), (8L:BIGINT..9L:BIGINT), " +
-        "(9L:BIGINT..10L:BIGINT), (10L:BIGINT..11L:BIGINT), (11L:BIGINT..12L:BIGINT), " +
-        "(12L:BIGINT..13L:BIGINT), (13L:BIGINT..14L:BIGINT), (14L:BIGINT..15L:BIGINT), " +
-        "(15L:BIGINT..16L:BIGINT), (16L:BIGINT..17L:BIGINT), (17L:BIGINT..18L:BIGINT), " +
-        "(18L:BIGINT..19L:BIGINT), (19L:BIGINT..20L:BIGINT), (20L:BIGINT..21L:BIGINT), " +
-        "(21L:BIGINT..22L:BIGINT), (22L:BIGINT..23L:BIGINT), (23L:BIGINT..24L:BIGINT), " +
-        "(24L:BIGINT..25L:BIGINT), (25L:BIGINT..26L:BIGINT), (26L:BIGINT..27L:BIGINT), " +
-        "(27L:BIGINT..28L:BIGINT), (28L:BIGINT..29L:BIGINT), (29L:BIGINT..30L:BIGINT), " +
-        "(30L:BIGINT..+∞)]:BIGINT)"
+      "(-∞..1L:BIGINT), (1L:BIGINT..2L:BIGINT), (2L:BIGINT..3L:BIGINT), " +
+      "(3L:BIGINT..4L:BIGINT), (4L:BIGINT..5L:BIGINT), (5L:BIGINT..6L:BIGINT), " +
+      "(6L:BIGINT..7L:BIGINT), (7L:BIGINT..8L:BIGINT), (8L:BIGINT..9L:BIGINT), " +
+      "(9L:BIGINT..10L:BIGINT), (10L:BIGINT..11L:BIGINT), (11L:BIGINT..12L:BIGINT), " +
+      "(12L:BIGINT..13L:BIGINT), (13L:BIGINT..14L:BIGINT), (14L:BIGINT..15L:BIGINT), " +
+      "(15L:BIGINT..16L:BIGINT), (16L:BIGINT..17L:BIGINT), (17L:BIGINT..18L:BIGINT), " +
+      "(18L:BIGINT..19L:BIGINT), (19L:BIGINT..20L:BIGINT), (20L:BIGINT..21L:BIGINT), " +
+      "(21L:BIGINT..22L:BIGINT), (22L:BIGINT..23L:BIGINT), (23L:BIGINT..24L:BIGINT), " +
+      "(24L:BIGINT..25L:BIGINT), (25L:BIGINT..26L:BIGINT), (26L:BIGINT..27L:BIGINT), " +
+      "(27L:BIGINT..28L:BIGINT), (28L:BIGINT..29L:BIGINT), (29L:BIGINT..30L:BIGINT), " +
+      "(30L:BIGINT..+∞)]:BIGINT)"
     val expected = unaryNode(
       "DataStreamCalc",
       streamTableNode(table),
       term("select", "a", "b", "c"),
-      term("where", s"$resultStr")
-    )
+      term("where", s"$resultStr"))
 
     val notInStr = (1 to 30).mkString(", ")
-    util.verifySql(
-      s"SELECT * FROM MyTable WHERE b NOT IN ($notInStr)",
-      expected)
+    util.verifySql(s"SELECT * FROM MyTable WHERE b NOT IN ($notInStr)", expected)
   }
 
   @Test
@@ -95,20 +89,13 @@ class SetOperatorsTest extends TableTestBase {
           streamTableNode(table),
           unaryNode(
             "DataStreamGroupAggregate",
-            unaryNode(
-              "DataStreamCalc",
-              streamTableNode(table1),
-              term("select", "x")
-            ),
+            unaryNode("DataStreamCalc", streamTableNode(table1), term("select", "x")),
             term("groupBy", "x"),
-            term("select", "x")
-          ),
+            term("select", "x")),
           term("where", "=(a, x)"),
           term("join", "a", "b", "c", "x"),
-          term("joinType", "InnerJoin")
-        ),
-        term("select", "a", "b", "c")
-      )
+          term("joinType", "InnerJoin")),
+        term("select", "a", "b", "c"))
 
     streamUtil.verifySql(sqlQuery, expected)
   }
@@ -141,22 +128,16 @@ class SetOperatorsTest extends TableTestBase {
                   "DataStreamCalc",
                   streamTableNode(table1),
                   term("select", "y", "x"),
-                  term("where", "LIKE(y, '%Hanoi%')")
-                ),
+                  term("where", "LIKE(y, '%Hanoi%')")),
                 term("groupBy", "y"),
-                term("select", "y, SUM(x) AS EXPR$0")
-              ),
-              term("select", "EXPR$0")
-            ),
+                term("select", "y, SUM(x) AS EXPR$0")),
+              term("select", "EXPR$0")),
             term("groupBy", "EXPR$0"),
-            term("select", "EXPR$0")
-          ),
+            term("select", "EXPR$0")),
           term("where", "=(a, EXPR$0)"),
           term("join", "a", "b", "c", "EXPR$0"),
-          term("joinType", "InnerJoin")
-        ),
-        term("select", "a", "b", "c")
-      )
+          term("joinType", "InnerJoin")),
+        term("select", "a", "b", "c"))
 
     streamUtil.verifySql(sqlQuery, expected)
   }
@@ -187,36 +168,22 @@ class SetOperatorsTest extends TableTestBase {
               streamTableNode(table),
               unaryNode(
                 "DataStreamGroupAggregate",
-                unaryNode(
-                  "DataStreamCalc",
-                  streamTableNode(table1),
-                  term("select", "x")
-                ),
+                unaryNode("DataStreamCalc", streamTableNode(table1), term("select", "x")),
                 term("groupBy", "x"),
-                term("select", "x")
-              ),
+                term("select", "x")),
               term("where", "=(a, x)"),
               term("join", "a", "b", "c", "x"),
-              term("joinType", "InnerJoin")
-            ),
-            term("select", "a", "b", "c")
-          ),
+              term("joinType", "InnerJoin")),
+            term("select", "a", "b", "c")),
           unaryNode(
             "DataStreamGroupAggregate",
-            unaryNode(
-              "DataStreamCalc",
-              streamTableNode(table2),
-              term("select", "w")
-            ),
+            unaryNode("DataStreamCalc", streamTableNode(table2), term("select", "w")),
             term("groupBy", "w"),
-            term("select", "w")
-          ),
+            term("select", "w")),
           term("where", "=(b, w)"),
           term("join", "a", "b", "c", "w"),
-          term("joinType", "InnerJoin")
-      ),
-        term("select", "a", "b", "c")
-      )
+          term("joinType", "InnerJoin")),
+        term("select", "a", "b", "c"))
 
     streamUtil.verifySql(sqlQuery, expected)
   }
@@ -228,26 +195,23 @@ class SetOperatorsTest extends TableTestBase {
     val expected = naryNode(
       "DataStreamUnion",
       List(
-        unaryNode("DataStreamCalc",
-          values("DataStreamValues",
-            tuples(List("0"))),
+        unaryNode(
+          "DataStreamCalc",
+          values("DataStreamValues", tuples(List("0"))),
           term("select", "1 AS EXPR$0, 1:BIGINT AS EXPR$1")),
-        unaryNode("DataStreamCalc",
-          values("DataStreamValues",
-            tuples(List("0"))),
+        unaryNode(
+          "DataStreamCalc",
+          values("DataStreamValues", tuples(List("0"))),
           term("select", "2 AS EXPR$0, 2:BIGINT AS EXPR$1")),
-        unaryNode("DataStreamCalc",
-          values("DataStreamValues",
-            tuples(List("0"))),
-          term("select", "3 AS EXPR$0, 3:BIGINT AS EXPR$1"))
-      ),
+        unaryNode(
+          "DataStreamCalc",
+          values("DataStreamValues", tuples(List("0"))),
+          term("select", "3 AS EXPR$0, 3:BIGINT AS EXPR$1"))),
       term("all", "true"),
-      term("union all", "EXPR$0, EXPR$1")
-    )
+      term("union all", "EXPR$0, EXPR$1"))
 
     util.verifySql(
       "VALUES (1, cast(1 as BIGINT) ),(2, cast(2 as BIGINT)),(3, cast(3 as BIGINT))",
-      expected
-    )
+      expected)
   }
 }

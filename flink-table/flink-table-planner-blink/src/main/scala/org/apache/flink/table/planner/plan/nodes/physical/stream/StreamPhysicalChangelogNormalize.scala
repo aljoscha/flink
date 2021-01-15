@@ -40,24 +40,21 @@ class StreamPhysicalChangelogNormalize(
     traitSet: RelTraitSet,
     input: RelNode,
     val uniqueKeys: Array[Int])
-  extends SingleRel(cluster, traitSet, input)
-  with StreamPhysicalRel {
+    extends SingleRel(cluster, traitSet, input)
+    with StreamPhysicalRel {
 
   override def requireWatermark: Boolean = false
 
   override def deriveRowType(): RelDataType = getInput.getRowType
 
   override def copy(traitSet: RelTraitSet, inputs: util.List[RelNode]): RelNode = {
-    new StreamPhysicalChangelogNormalize(
-      cluster,
-      traitSet,
-      inputs.get(0),
-      uniqueKeys)
+    new StreamPhysicalChangelogNormalize(cluster, traitSet, inputs.get(0), uniqueKeys)
   }
 
   override def explainTerms(pw: RelWriter): RelWriter = {
     val fieldNames = getRowType.getFieldNames
-    super.explainTerms(pw)
+    super
+      .explainTerms(pw)
       .item("key", uniqueKeys.map(fieldNames.get).mkString(", "))
   }
 

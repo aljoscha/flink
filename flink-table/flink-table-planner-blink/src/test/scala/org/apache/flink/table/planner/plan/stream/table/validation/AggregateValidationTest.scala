@@ -124,7 +124,7 @@ class AggregateValidationTest extends TableTestBase {
     // If there are two parameters, second one must be character literal.
     expectExceptionThrown(
       "SELECT listagg(c, d) FROM T GROUP BY a",
-    "Supported form(s): 'LISTAGG(<CHARACTER>)'\n'LISTAGG(<CHARACTER>, <CHARACTER_LITERAL>)",
+      "Supported form(s): 'LISTAGG(<CHARACTER>)'\n'LISTAGG(<CHARACTER>, <CHARACTER_LITERAL>)",
       classOf[ValidationException])
   }
 
@@ -143,8 +143,7 @@ class AggregateValidationTest extends TableTestBase {
   private def expectExceptionThrown(
       sql: String,
       keywords: String,
-      clazz: Class[_ <: Throwable] = classOf[ValidationException])
-  : Unit = {
+      clazz: Class[_ <: Throwable] = classOf[ValidationException]): Unit = {
     try {
       util.tableEnv.toAppendStream[Row](util.tableEnv.sqlQuery(sql))
       fail(s"Expected a $clazz, but no exception is thrown.")

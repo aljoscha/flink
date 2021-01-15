@@ -20,9 +20,19 @@ package org.apache.flink.table.planner.plan.rules.logical
 import org.apache.flink.table.api.ValidationException
 import org.apache.flink.table.connector.source.LookupTableSource
 import org.apache.flink.table.planner.calcite.FlinkTypeFactory.isRowtimeIndicatorType
-import org.apache.flink.table.planner.plan.nodes.logical.{FlinkLogicalLegacyTableSourceScan, FlinkLogicalTableSourceScan}
-import org.apache.flink.table.planner.plan.nodes.physical.stream.{StreamExecLookupJoin, StreamPhysicalTemporalJoin}
-import org.apache.flink.table.planner.plan.schema.{LegacyTableSourceTable, TableSourceTable, TimeIndicatorRelDataType}
+import org.apache.flink.table.planner.plan.nodes.logical.{
+  FlinkLogicalLegacyTableSourceScan,
+  FlinkLogicalTableSourceScan
+}
+import org.apache.flink.table.planner.plan.nodes.physical.stream.{
+  StreamExecLookupJoin,
+  StreamPhysicalTemporalJoin
+}
+import org.apache.flink.table.planner.plan.schema.{
+  LegacyTableSourceTable,
+  TableSourceTable,
+  TimeIndicatorRelDataType
+}
 import org.apache.flink.table.planner.plan.utils.TemporalJoinUtil
 import org.apache.flink.table.sources.LookupableTableSource
 
@@ -38,16 +48,16 @@ import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 
 /**
-  * The initial temporal table join (FOR SYSTEM_TIME AS OF) is a Correlate, rewrite it into a Join
-  * to make join condition can be pushed-down. The join will be translated into
-  * [[StreamExecLookupJoin]] or translated into [[StreamPhysicalTemporalJoin]] in physical.
-  *
-  * Notice: This rule can only be used in [[HepPlanner]].
-  */
+ * The initial temporal table join (FOR SYSTEM_TIME AS OF) is a Correlate, rewrite it into a Join
+ * to make join condition can be pushed-down. The join will be translated into
+ * [[StreamExecLookupJoin]] or translated into [[StreamPhysicalTemporalJoin]] in physical.
+ *
+ * Notice: This rule can only be used in [[HepPlanner]].
+ */
 abstract class LogicalCorrelateToJoinFromTemporalTableRule(
     operand: RelOptRuleOperand,
     description: String)
-  extends RelOptRule(operand, description) {
+    extends RelOptRule(operand, description) {
 
   def getFilterCondition(call: RelOptRuleCall): RexNode
 
@@ -70,31 +80,35 @@ abstract class LogicalCorrelateToJoinFromTemporalTableRule(
       // validate type is event-time or processing time
       case t: TimeIndicatorRelDataType => // do nothing
       case _ =>
-        throw new ValidationException("Temporal table join currently only supports " +
-          "'FOR SYSTEM_TIME AS OF' left table's time attribute field")
+        throw new ValidationException(
+          "Temporal table join currently only supports " +
+            "'FOR SYSTEM_TIME AS OF' left table's time attribute field")
     }
 
     snapshot.getPeriod match {
       // validate period comes from left table's field
-      case r: RexFieldAccess if r.getReferenceExpr.isInstanceOf[RexCorrelVariable] &&
-        correlate.getCorrelationId.equals(r.getReferenceExpr.asInstanceOf[RexCorrelVariable].id)
-        => // do nothing
+      case r: RexFieldAccess
+          if r.getReferenceExpr.isInstanceOf[RexCorrelVariable] &&
+            correlate.getCorrelationId.equals(
+              r.getReferenceExpr.asInstanceOf[RexCorrelVariable].id
+            ) => // do nothing
       case _ =>
-        throw new ValidationException("Temporal table join currently only supports " +
-          "'FOR SYSTEM_TIME AS OF' left table's time attribute field'")
+        throw new ValidationException(
+          "Temporal table join currently only supports " +
+            "'FOR SYSTEM_TIME AS OF' left table's time attribute field'")
     }
   }
 
   protected def isLookupJoin(snapshot: LogicalSnapshot, snapshotInput: RelNode): Boolean = {
     val isProcessingTime = snapshot.getPeriod.getType match {
       case t: TimeIndicatorRelDataType if !t.isEventTime => true
-      case _ => false
+      case _                                             => false
     }
 
     val tableScan = getTableScan(snapshotInput)
     val snapshotOnLookupSource = tableScan match {
       case Some(scan) => isTableSourceScan(scan) && isLookupTableSource(scan)
-      case _ => false
+      case _          => false
     }
 
     isProcessingTime && snapshotOnLookupSource
@@ -105,7 +119,7 @@ abstract class LogicalCorrelateToJoinFromTemporalTableRule(
       case tableScan: TableScan => Some(tableScan)
       // computed column on lookup table
       case project: LogicalProject => getTableScan(trimHep(project.getInput))
-      case _ => None
+      case _                       => None
     }
   }
 
@@ -115,10 +129,10 @@ abstract class LogicalCorrelateToJoinFromTemporalTableRule(
         val table = r.getTable
         table match {
           case _: LegacyTableSourceTable[Any] | _: TableSourceTable => true
-          case _ => false
+          case _                                                    => false
         }
       case _: FlinkLogicalLegacyTableSourceScan | _: FlinkLogicalTableSourceScan => true
-      case _ => false
+      case _                                                                     => false
     }
   }
 
@@ -146,7 +160,7 @@ abstract class LogicalCorrelateToJoinFromTemporalTableRule(
 abstract class LogicalCorrelateToJoinFromLookupTemporalTableRule(
     operand: RelOptRuleOperand,
     description: String)
-  extends LogicalCorrelateToJoinFromTemporalTableRule(operand, description) {
+    extends LogicalCorrelateToJoinFromTemporalTableRule(operand, description) {
 
   override def onMatch(call: RelOptRuleCall): Unit = {
     val correlate: LogicalCorrelate = call.rel(0)
@@ -192,14 +206,14 @@ abstract class LogicalCorrelateToJoinFromLookupTemporalTableRule(
 abstract class LogicalCorrelateToJoinFromGeneralTemporalTableRule(
     operand: RelOptRuleOperand,
     description: String)
-  extends LogicalCorrelateToJoinFromTemporalTableRule(operand, description) {
+    extends LogicalCorrelateToJoinFromTemporalTableRule(operand, description) {
 
   protected def extractRightEventTimeInputRef(
       leftInput: RelNode,
       snapshot: LogicalSnapshot): Option[RexNode] = {
     val rightFields = snapshot.getRowType.getFieldList.asScala
-    val timeAttributeFields = rightFields.filter(
-      f => f.getType.isInstanceOf[TimeIndicatorRelDataType] &&
+    val timeAttributeFields = rightFields.filter(f =>
+      f.getType.isInstanceOf[TimeIndicatorRelDataType] &&
         f.getType.asInstanceOf[TimeIndicatorRelDataType].isEventTime)
 
     if (timeAttributeFields.length == 1) {
@@ -269,20 +283,24 @@ abstract class LogicalCorrelateToJoinFromGeneralTemporalTableRule(
         rexBuilder.makeInputRef(leftKeyType, leftFieldCnt + i)
       })
       if (leftJoinKey.length == 0 || rightJoinKey.length == 0) {
-        throw new ValidationException("Currently the join key in Temporal Table Join " +
-          "can not be empty.")
+        throw new ValidationException(
+          "Currently the join key in Temporal Table Join " +
+            "can not be empty.")
       }
       (leftJoinKey, rightJoinKey)
     }
 
     val snapshotTimeInputRef = extractSnapshotTimeInputRef(leftInput, snapshot)
-      .getOrElse(throw new ValidationException("Temporal Table Join requires time " +
-        "attribute in the left table, but no time attribute found."))
+      .getOrElse(
+        throw new ValidationException(
+          "Temporal Table Join requires time " +
+            "attribute in the left table, but no time attribute found."))
 
-    val temporalCondition = if(isRowTimeTemporalTableJoin(snapshot)) {
+    val temporalCondition = if (isRowTimeTemporalTableJoin(snapshot)) {
       val rightTimeInputRef = extractRightEventTimeInputRef(leftInput, snapshot)
       if (rightTimeInputRef.isEmpty || !isRowtimeIndicatorType(rightTimeInputRef.get.getType)) {
-          throw new ValidationException("Event-Time Temporal Table Join requires both" +
+        throw new ValidationException(
+          "Event-Time Temporal Table Join requires both" +
             s" primary key and row time attribute in versioned table," +
             s" but no row time attribute can be found.")
       }
@@ -314,25 +332,25 @@ abstract class LogicalCorrelateToJoinFromGeneralTemporalTableRule(
   private def isRowTimeTemporalTableJoin(snapshot: LogicalSnapshot): Boolean =
     snapshot.getPeriod.getType match {
       case t: TimeIndicatorRelDataType if t.isEventTime => true
-      case _ => false
+      case _                                            => false
     }
 }
 
 /**
-  * Planner rule that matches temporal table join which implemented by lookup join, the join
-  * condition is not true, that means the right input of the Correlate is a Filter.
-  * e.g. SELECT * FROM MyTable AS T JOIN lookupTable FOR SYSTEM_TIME AS OF T.proctime AS D
-  * ON T.a = D.id
-  */
+ * Planner rule that matches temporal table join which implemented by lookup join, the join
+ * condition is not true, that means the right input of the Correlate is a Filter.
+ * e.g. SELECT * FROM MyTable AS T JOIN lookupTable FOR SYSTEM_TIME AS OF T.proctime AS D
+ * ON T.a = D.id
+ */
 class LogicalCorrelateToJoinFromLookupTableRuleWithFilter
-  extends LogicalCorrelateToJoinFromLookupTemporalTableRule(
-    operand(classOf[LogicalCorrelate],
-      operand(classOf[RelNode], any()),
-      operand(classOf[LogicalFilter],
-        operand(classOf[LogicalSnapshot],
-          operand(classOf[RelNode], any())))),
-    "LogicalCorrelateToJoinFromLookupTableRuleWithFilter"
-  ) {
+    extends LogicalCorrelateToJoinFromLookupTemporalTableRule(
+      operand(
+        classOf[LogicalCorrelate],
+        operand(classOf[RelNode], any()),
+        operand(
+          classOf[LogicalFilter],
+          operand(classOf[LogicalSnapshot], operand(classOf[RelNode], any())))),
+      "LogicalCorrelateToJoinFromLookupTableRuleWithFilter") {
   override def matches(call: RelOptRuleCall): Boolean = {
     val snapshot: LogicalSnapshot = call.rel(3)
     val snapshotInput: RelNode = trimHep(call.rel(4))
@@ -350,19 +368,18 @@ class LogicalCorrelateToJoinFromLookupTableRuleWithFilter
 }
 
 /**
-  * Planner rule that matches temporal table join which implemented by lookup join, the join
-  * condition is true, that means the right input of the Correlate is a Snapshot.
-  * e.g. SELECT * FROM MyTable AS T JOIN temporalTable
-  * FOR SYSTEM_TIME AS OF T.proctime AS D ON true
-  */
+ * Planner rule that matches temporal table join which implemented by lookup join, the join
+ * condition is true, that means the right input of the Correlate is a Snapshot.
+ * e.g. SELECT * FROM MyTable AS T JOIN temporalTable
+ * FOR SYSTEM_TIME AS OF T.proctime AS D ON true
+ */
 class LogicalCorrelateToJoinFromLookupTableRuleWithoutFilter
-  extends LogicalCorrelateToJoinFromLookupTemporalTableRule(
-    operand(classOf[LogicalCorrelate],
-      operand(classOf[RelNode], any()),
-      operand(classOf[LogicalSnapshot],
-        operand(classOf[RelNode], any()))),
-    "LogicalCorrelateToJoinFromLookupTableRuleWithoutFilter"
-  ) {
+    extends LogicalCorrelateToJoinFromLookupTemporalTableRule(
+      operand(
+        classOf[LogicalCorrelate],
+        operand(classOf[RelNode], any()),
+        operand(classOf[LogicalSnapshot], operand(classOf[RelNode], any()))),
+      "LogicalCorrelateToJoinFromLookupTableRuleWithoutFilter") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val snapshot: LogicalSnapshot = call.rel(2)
@@ -386,14 +403,14 @@ class LogicalCorrelateToJoinFromLookupTableRuleWithoutFilter
  * ON T.a = D.id
  */
 class LogicalCorrelateToJoinFromTemporalTableRuleWithFilter
-  extends LogicalCorrelateToJoinFromGeneralTemporalTableRule(
-    operand(classOf[LogicalCorrelate],
-      operand(classOf[RelNode], any()),
-      operand(classOf[LogicalFilter],
-        operand(classOf[LogicalSnapshot],
-        operand(classOf[RelNode], any())))),
-      "LogicalCorrelateToJoinFromTemporalTableRuleWithFilter"
-  ) {
+    extends LogicalCorrelateToJoinFromGeneralTemporalTableRule(
+      operand(
+        classOf[LogicalCorrelate],
+        operand(classOf[RelNode], any()),
+        operand(
+          classOf[LogicalFilter],
+          operand(classOf[LogicalSnapshot], operand(classOf[RelNode], any())))),
+      "LogicalCorrelateToJoinFromTemporalTableRuleWithFilter") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val snapshot: LogicalSnapshot = call.rel(3)
@@ -417,13 +434,12 @@ class LogicalCorrelateToJoinFromTemporalTableRuleWithFilter
  * e.g. SELECT * FROM MyTable AS T JOIN temporalTable FOR SYSTEM_TIME AS OF T.rowtime AS D ON true
  */
 class LogicalCorrelateToJoinFromTemporalTableRuleWithoutFilter
-  extends LogicalCorrelateToJoinFromGeneralTemporalTableRule(
-    operand(classOf[LogicalCorrelate],
-      operand(classOf[RelNode], any()),
-      operand(classOf[LogicalSnapshot],
-        operand(classOf[RelNode], any()))),
-    "LogicalCorrelateToJoinFromTemporalTableRuleWithoutFilter"
-  ) {
+    extends LogicalCorrelateToJoinFromGeneralTemporalTableRule(
+      operand(
+        classOf[LogicalCorrelate],
+        operand(classOf[RelNode], any()),
+        operand(classOf[LogicalSnapshot], operand(classOf[RelNode], any()))),
+      "LogicalCorrelateToJoinFromTemporalTableRuleWithoutFilter") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val snapshot: LogicalSnapshot = call.rel(2)

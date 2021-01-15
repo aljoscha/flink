@@ -22,7 +22,11 @@ import java.util.{LinkedList => JLinkedList, Map => JMap}
 import org.apache.flink.api.common.ExecutionConfig
 import org.apache.flink.api.common.functions.MapFunction
 import org.apache.flink.api.common.io.RichOutputFormat
-import org.apache.flink.api.common.typeinfo.BasicTypeInfo.{INT_TYPE_INFO, LONG_TYPE_INFO, STRING_TYPE_INFO}
+import org.apache.flink.api.common.typeinfo.BasicTypeInfo.{
+  INT_TYPE_INFO,
+  LONG_TYPE_INFO,
+  STRING_TYPE_INFO
+}
 import org.apache.flink.api.common.typeinfo.TypeInformation
 import org.apache.flink.api.java
 import org.apache.flink.api.java.DataSet
@@ -74,13 +78,15 @@ class PartitionableSinkITCase extends AbstractTestBase {
   }
 
   def registerTableSource(name: String, data: List[Row]): Unit = {
-    val tableSchema = TableSchema.builder()
+    val tableSchema = TableSchema
+      .builder()
       .field("a", DataTypes.INT())
       .field("b", DataTypes.BIGINT())
       .field("c", DataTypes.STRING())
       .build()
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(
-      name, new CollectionTableSource(data, 100, tableSchema))
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSourceInternal(name, new CollectionTableSource(data, 100, tableSchema))
   }
 
   @Test
@@ -90,25 +96,26 @@ class PartitionableSinkITCase extends AbstractTestBase {
     tEnv.execute("testJob")
     // this sink should have been set up with static partitions
     assertEquals(testSink.getStaticPartitions.toMap, Map("a" -> "1"))
-    assertEquals(List("1,2,Hi",
-      "1,1,Hello world",
-      "1,2,Hello",
-      "1,1,Hello world, how are you?",
-      "1,3,I'm fine, thank",
-      "1,3,I'm fine, thank you",
-      "1,3,I'm fine, thank you, and you?",
-      "1,4,你好，陌生人",
-      "1,4,你好，陌生人，我是",
-      "1,4,你好，陌生人，我是中国人",
-      "1,4,你好，陌生人，我是中国人，你来自哪里？"),
+    assertEquals(
+      List(
+        "1,2,Hi",
+        "1,1,Hello world",
+        "1,2,Hello",
+        "1,1,Hello world, how are you?",
+        "1,3,I'm fine, thank",
+        "1,3,I'm fine, thank you",
+        "1,3,I'm fine, thank you, and you?",
+        "1,4,你好，陌生人",
+        "1,4,你好，陌生人，我是",
+        "1,4,你好，陌生人，我是中国人",
+        "1,4,你好，陌生人，我是中国人，你来自哪里？"),
       RESULT.toList)
   }
 
   @Test
   def testStaticPartitionNotInPartitionFields(): Unit = {
     expectedEx.expect(classOf[RuntimeException])
-    registerTableSink(tableName = "sinkTable2", rowType = type4,
-      partitionColumns = Array("a", "b"))
+    registerTableSink(tableName = "sinkTable2", rowType = type4, partitionColumns = Array("a", "b"))
     tEnv.sqlUpdate("insert into sinkTable2 partition(c=1) select a, b from sinkTable2")
     tEnv.execute("testJob")
   }
@@ -131,7 +138,7 @@ class PartitionableSinkITCase extends AbstractTestBase {
   }
 
   private class TestSink(rowType: RowTypeInfo, partitionColumns: Array[String])
-    extends BatchTableSink[Row]
+      extends BatchTableSink[Row]
       with PartitionableTableSink {
     private var staticPartitions: JMap[String, String] = _
 
@@ -144,8 +151,9 @@ class PartitionableSinkITCase extends AbstractTestBase {
       this.staticPartitions = partitions
     }
 
-    override def configure(fieldNames: Array[String],
-      fieldTypes: Array[TypeInformation[_]]): TableSink[Row] = this
+    override def configure(
+        fieldNames: Array[String],
+        fieldTypes: Array[TypeInformation[_]]): TableSink[Row] = this
 
     override def configurePartitionGrouping(s: Boolean): Boolean = {
       false
@@ -162,21 +170,23 @@ class PartitionableSinkITCase extends AbstractTestBase {
     }
 
     override def consumeDataSet(dataSet: DataSet[Row]): DataSink[_] = {
-      dataSet.map(new MapFunction[Row, String] {
-        override def map(value: Row): String = value.toString
-      }).output(new CollectionOutputFormat)
+      dataSet
+        .map(new MapFunction[Row, String] {
+          override def map(value: Row): String = value.toString
+        })
+        .output(new CollectionOutputFormat)
         .setParallelism(dataSet.getExecutionEnvironment.getParallelism)
     }
   }
 
   /**
-    * Table source of collection.
-    */
+   * Table source of collection.
+   */
   class CollectionTableSource(
-    val data: List[Row],
-    val emitIntervalMs: Long,
-    val schema: TableSchema)
-    extends BatchTableSource[Row] {
+      val data: List[Row],
+      val emitIntervalMs: Long,
+      val schema: TableSchema)
+      extends BatchTableSource[Row] {
 
     private val rowType: TypeInformation[Row] = schema.toRowType
 
@@ -187,8 +197,12 @@ class PartitionableSinkITCase extends AbstractTestBase {
     }
 
     override def getDataSet(execEnv: java.ExecutionEnvironment): DataSet[Row] = {
-      execEnv.createInput(new TestCollectionInputFormat[Row](emitIntervalMs,
-        data, rowType.createSerializer(new ExecutionConfig)), rowType)
+      execEnv.createInput(
+        new TestCollectionInputFormat[Row](
+          emitIntervalMs,
+          data,
+          rowType.createSerializer(new ExecutionConfig)),
+        rowType)
     }
   }
 }
@@ -200,7 +214,7 @@ object PartitionableSinkITCase {
     RESULT.clear()
   }
 
-  /** OutputFormat that writes data to a collection. **/
+  /** OutputFormat that writes data to a collection. * */
   class CollectionOutputFormat extends RichOutputFormat[String] {
     override def configure(parameters: Configuration): Unit = {}
 
@@ -231,8 +245,7 @@ object PartitionableSinkITCase {
     row(2, 1L, "Hello world01"),
     row(2, 1L, "Hello world02"),
     row(2, 1L, "Hello world04"),
-    row(2, 2L, "Hello world, how are you?")
-  )
+    row(2, 2L, "Hello world, how are you?"))
 
   val testData1 = Seq(
     row(2, 2L, "Hi"),
@@ -245,13 +258,12 @@ object PartitionableSinkITCase {
     row(4, 4L, "你好，陌生人"),
     row(4, 4L, "你好，陌生人，我是"),
     row(4, 4L, "你好，陌生人，我是中国人"),
-    row(4, 4L, "你好，陌生人，我是中国人，你来自哪里？")
-  )
+    row(4, 4L, "你好，陌生人，我是中国人，你来自哪里？"))
 
-  def row(args: Any*):Row = {
+  def row(args: Any*): Row = {
     val row = new Row(args.length)
-    0 until args.length foreach {
-      i => row.setField(i, args(i))
+    0 until args.length foreach { i =>
+      row.setField(i, args(i))
     }
     row
   }

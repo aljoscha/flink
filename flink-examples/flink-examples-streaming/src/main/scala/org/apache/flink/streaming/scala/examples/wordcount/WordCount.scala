@@ -41,7 +41,6 @@ import org.apache.flink.streaming.examples.wordcount.util.WordCountData
  *  - write a simple Flink Streaming program,
  *  - use tuple data types,
  *  - write and use transformation functions.
- *
  */
 object WordCount {
 
@@ -58,15 +57,15 @@ object WordCount {
 
     // get input data
     val text =
-    // read the text file from given input path
-    if (params.has("input")) {
-      env.readTextFile(params.get("input"))
-    } else {
-      println("Executing WordCount example with default inputs data set.")
-      println("Use --input to specify file input.")
-      // get default test text data
-      env.fromElements(WordCountData.WORDS: _*)
-    }
+      // read the text file from given input path
+      if (params.has("input")) {
+        env.readTextFile(params.get("input"))
+      } else {
+        println("Executing WordCount example with default inputs data set.")
+        println("Use --input to specify file input.")
+        // get default test text data
+        env.fromElements(WordCountData.WORDS: _*)
+      }
 
     val counts: DataStream[(String, Int)] = text
       // split up the lines in pairs (2-tuples) containing: (word,1)

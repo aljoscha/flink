@@ -38,9 +38,9 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
-  * Stream physical RelNode to to write data into an external sink defined by a
+ * Stream physical RelNode to to write data into an external sink defined by a
  * [[DynamicTableSink]].
-  */
+ */
 class StreamExecSink(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -48,9 +48,15 @@ class StreamExecSink(
     tableIdentifier: ObjectIdentifier,
     catalogTable: CatalogTable,
     tableSink: DynamicTableSink)
-  extends CommonPhysicalSink(cluster, traitSet, inputRel, tableIdentifier, catalogTable, tableSink)
-  with StreamPhysicalRel
-  with LegacyStreamExecNode[Any] {
+    extends CommonPhysicalSink(
+      cluster,
+      traitSet,
+      inputRel,
+      tableIdentifier,
+      catalogTable,
+      tableSink)
+    with StreamPhysicalRel
+    with LegacyStreamExecNode[Any] {
 
   override def requireWatermark: Boolean = false
 
@@ -60,17 +66,17 @@ class StreamExecSink(
 
   //~ ExecNode methods -----------------------------------------------------------
 
-  override protected def translateToPlanInternal(
-      planner: StreamPlanner): Transformation[Any] = {
+  override protected def translateToPlanInternal(planner: StreamPlanner): Transformation[Any] = {
 
     // get RowData plan
     val inputTransformation = getInputNodes.get(0) match {
       // Sink's input must be LegacyStreamExecNode[RowData] or StreamExecNode[RowData] now.
       case legacyNode: LegacyStreamExecNode[RowData] => legacyNode.translateToPlan(planner)
-      case node: StreamExecNode[RowData] => node.translateToPlan(planner)
+      case node: StreamExecNode[RowData]             => node.translateToPlan(planner)
       case _ =>
-        throw new TableException("Cannot generate DataStream due to an invalid logical plan. " +
-          "This is a bug and should not happen. Please file an issue.")
+        throw new TableException(
+          "Cannot generate DataStream due to an invalid logical plan. " +
+            "This is a bug and should not happen. Please file an issue.")
     }
     val inputLogicalType = getInput.getRowType
     val rowtimeFields = inputLogicalType.getFieldList.zipWithIndex
@@ -85,8 +91,8 @@ class StreamExecSink(
           s"DataStream by casting all other fields to TIMESTAMP.")
     }
 
-    val inputChangelogMode = ChangelogPlanUtils.getChangelogMode(
-      getInput.asInstanceOf[StreamPhysicalRel]).get
+    val inputChangelogMode =
+      ChangelogPlanUtils.getChangelogMode(getInput.asInstanceOf[StreamPhysicalRel]).get
     // tell sink the ChangelogMode of input
     val changelogMode = tableSink.getChangelogMode(inputChangelogMode)
     val rowtimeFieldIndex: Int = rowtimeFields.map(_._2).headOption.getOrElse(-1)

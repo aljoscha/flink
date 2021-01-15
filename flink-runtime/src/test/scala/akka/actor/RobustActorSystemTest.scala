@@ -56,7 +56,7 @@ class RobustActorSystemTest extends JUnitSuite with Matchers {
 
     val caughtException = testingUncaughtExceptionHandler.waitForUncaughtException()
 
-    caughtException should equal (error)
+    caughtException should equal(error)
   }
 
   @Test
@@ -68,7 +68,7 @@ class RobustActorSystemTest extends JUnitSuite with Matchers {
 
     val caughtException = testingUncaughtExceptionHandler.waitForUncaughtException()
 
-    caughtException should equal (error)
+    caughtException should equal(error)
   }
 }
 

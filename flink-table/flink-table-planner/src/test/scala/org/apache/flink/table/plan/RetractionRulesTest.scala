@@ -61,13 +61,8 @@ class RetractionRulesTest extends TableTestBase {
     val expected =
       unaryNode(
         "DataStreamCalc",
-        unaryNode(
-          "DataStreamGroupAggregate",
-          "DataStreamScan(true, Acc)",
-          s"$defaultStatus"
-        ),
-        s"$defaultStatus"
-      )
+        unaryNode("DataStreamGroupAggregate", "DataStreamScan(true, Acc)", s"$defaultStatus"),
+        s"$defaultStatus")
 
     util.verifyTableTrait(resultTable, expected)
   }
@@ -90,15 +85,9 @@ class RetractionRulesTest extends TableTestBase {
         "DataStreamGroupAggregate",
         unaryNode(
           "DataStreamCalc",
-          unaryNode(
-            "DataStreamGroupAggregate",
-            "DataStreamScan(true, Acc)",
-            "true, AccRetract"
-          ),
-          "true, AccRetract"
-        ),
-        s"$defaultStatus"
-     )
+          unaryNode("DataStreamGroupAggregate", "DataStreamScan(true, Acc)", "true, AccRetract"),
+          "true, AccRetract"),
+        s"$defaultStatus")
 
     util.verifyTableTrait(resultTable, expected)
   }
@@ -118,13 +107,8 @@ class RetractionRulesTest extends TableTestBase {
     val expected =
       unaryNode(
         "DataStreamCalc",
-        unaryNode(
-          "DataStreamGroupWindowAggregate",
-          "DataStreamScan(true, Acc)",
-          s"$defaultStatus"
-        ),
-        s"$defaultStatus"
-      )
+        unaryNode("DataStreamGroupWindowAggregate", "DataStreamScan(true, Acc)", s"$defaultStatus"),
+        s"$defaultStatus")
 
     util.verifyTableTrait(resultTable, expected)
   }
@@ -151,17 +135,10 @@ class RetractionRulesTest extends TableTestBase {
           "DataStreamGroupWindowAggregate",
           unaryNode(
             "DataStreamCalc",
-            unaryNode(
-              "DataStreamGroupAggregate",
-              "DataStreamScan(true, Acc)",
-              "true, AccRetract"
-            ),
-            "true, AccRetract"
-          ),
-          s"$defaultStatus"
-        ),
-        s"$defaultStatus"
-      )
+            unaryNode("DataStreamGroupAggregate", "DataStreamScan(true, Acc)", "true, AccRetract"),
+            "true, AccRetract"),
+          s"$defaultStatus"),
+        s"$defaultStatus")
 
     util.verifyTableTrait(resultTable, expected)
   }
@@ -183,17 +160,11 @@ class RetractionRulesTest extends TableTestBase {
     val expected =
       unaryNode(
         "DataStreamCalc",
-        unaryNode(
-          "DataStreamOverAggregate",
-          "DataStreamScan(true, Acc)",
-          s"$defaultStatus"
-        ),
-        s"$defaultStatus"
-      )
+        unaryNode("DataStreamOverAggregate", "DataStreamScan(true, Acc)", s"$defaultStatus"),
+        s"$defaultStatus")
 
     util.verifySqlTrait(sqlQuery, expected)
   }
-
 
   // over window after unbounded groupBy
   @Test
@@ -218,17 +189,10 @@ class RetractionRulesTest extends TableTestBase {
           "DataStreamOverAggregate",
           unaryNode(
             "DataStreamCalc",
-            unaryNode(
-              "DataStreamGroupAggregate",
-              "DataStreamScan(true, Acc)",
-              "true, AccRetract"
-            ),
-            "true, AccRetract"
-          ),
-          s"$defaultStatus"
-        ),
-        s"$defaultStatus"
-      )
+            unaryNode("DataStreamGroupAggregate", "DataStreamScan(true, Acc)", "true, AccRetract"),
+            "true, AccRetract"),
+          s"$defaultStatus"),
+        s"$defaultStatus")
 
     util.verifySqlTrait(sqlQuery, expected)
   }
@@ -255,18 +219,11 @@ class RetractionRulesTest extends TableTestBase {
           "DataStreamCalc",
           binaryNode(
             "DataStreamUnion",
-            unaryNode(
-              "DataStreamGroupAggregate",
-              "DataStreamScan(true, Acc)",
-              "true, AccRetract"
-            ),
+            unaryNode("DataStreamGroupAggregate", "DataStreamScan(true, Acc)", "true, AccRetract"),
             "DataStreamScan(true, Acc)",
-            "true, AccRetract"
-          ),
-          "true, AccRetract"
-        ),
-        s"$defaultStatus"
-      )
+            "true, AccRetract"),
+          "true, AccRetract"),
+        s"$defaultStatus")
 
     util.verifyTableTrait(resultTable, expected)
   }
@@ -291,16 +248,10 @@ class RetractionRulesTest extends TableTestBase {
         "DataStreamCalc",
         binaryNode(
           "DataStreamJoin",
-          unaryNode(
-            "DataStreamGroupAggregate",
-            "DataStreamScan(true, Acc)",
-            "true, AccRetract"
-          ),
+          unaryNode("DataStreamGroupAggregate", "DataStreamScan(true, Acc)", "true, AccRetract"),
           "DataStreamScan(true, Acc)",
-          "false, AccRetract"
-        ),
-        "false, AccRetract"
-      )
+          "false, AccRetract"),
+        "false, AccRetract")
     util.verifyTableTrait(resultTable, expected)
   }
 
@@ -322,10 +273,8 @@ class RetractionRulesTest extends TableTestBase {
           "DataStreamJoin",
           "DataStreamScan(true, Acc)",
           "DataStreamScan(true, Acc)",
-          "false, Acc"
-        ),
-        "false, Acc"
-      )
+          "false, Acc"),
+        "false, Acc")
     util.verifyTableTrait(resultTable, expected)
   }
 
@@ -346,10 +295,8 @@ class RetractionRulesTest extends TableTestBase {
           "DataStreamJoin",
           "DataStreamScan(true, Acc)",
           "DataStreamScan(true, Acc)",
-          "false, AccRetract"
-        ),
-        "false, AccRetract"
-      )
+          "false, AccRetract"),
+        "false, AccRetract")
     util.verifyTableTrait(resultTable, expected)
   }
 
@@ -375,12 +322,9 @@ class RetractionRulesTest extends TableTestBase {
             "DataStreamJoin",
             "DataStreamScan(true, Acc)",
             "DataStreamScan(true, Acc)",
-            "true, AccRetract"
-          ),
-          "true, AccRetract"
-        ),
-        "false, Acc"
-      )
+            "true, AccRetract"),
+          "true, AccRetract"),
+        "false, Acc")
     util.verifyTableTrait(resultTable, expected)
   }
 
@@ -401,10 +345,8 @@ class RetractionRulesTest extends TableTestBase {
           "DataStreamJoin",
           "DataStreamScan(true, Acc)",
           "DataStreamScan(true, Acc)",
-          "false, AccRetract"
-        ),
-        "false, AccRetract"
-      )
+          "false, AccRetract"),
+        "false, AccRetract")
     util.verifyTableTrait(resultTable, expected)
   }
 
@@ -430,12 +372,9 @@ class RetractionRulesTest extends TableTestBase {
             "DataStreamJoin",
             "DataStreamScan(true, Acc)",
             "DataStreamScan(true, Acc)",
-            "true, AccRetract"
-          ),
-          "true, AccRetract"
-        ),
-        "false, Acc"
-      )
+            "true, AccRetract"),
+          "true, AccRetract"),
+        "false, Acc")
     util.verifyTableTrait(resultTable, expected)
   }
 
@@ -456,10 +395,8 @@ class RetractionRulesTest extends TableTestBase {
           "DataStreamJoin",
           "DataStreamScan(true, Acc)",
           "DataStreamScan(true, Acc)",
-          "false, AccRetract"
-        ),
-        "false, AccRetract"
-      )
+          "false, AccRetract"),
+        "false, AccRetract")
     util.verifyTableTrait(resultTable, expected)
   }
 
@@ -485,12 +422,9 @@ class RetractionRulesTest extends TableTestBase {
             "DataStreamJoin",
             "DataStreamScan(true, Acc)",
             "DataStreamScan(true, Acc)",
-            "true, AccRetract"
-          ),
-          "true, AccRetract"
-        ),
-        "false, Acc"
-      )
+            "true, AccRetract"),
+          "true, AccRetract"),
+        "false, Acc")
     util.verifyTableTrait(resultTable, expected)
   }
 }
@@ -528,4 +462,3 @@ object TraitUtil {
        |""".stripMargin.stripLineEnd
   }
 }
-

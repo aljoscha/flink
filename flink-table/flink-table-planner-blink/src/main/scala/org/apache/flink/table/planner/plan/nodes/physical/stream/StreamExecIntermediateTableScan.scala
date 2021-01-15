@@ -28,15 +28,15 @@ import org.apache.calcite.rel.`type`.RelDataType
 import java.util
 
 /**
-  * Stream physical TableScan that wraps [[IntermediateRelTable]]
-  */
+ * Stream physical TableScan that wraps [[IntermediateRelTable]]
+ */
 class StreamExecIntermediateTableScan(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
     table: RelOptTable,
     outputRowType: RelDataType)
-  extends CommonIntermediateTableScan(cluster, traitSet, table)
-  with StreamPhysicalRel {
+    extends CommonIntermediateTableScan(cluster, traitSet, table)
+    with StreamPhysicalRel {
 
   override def requireWatermark: Boolean = false
 

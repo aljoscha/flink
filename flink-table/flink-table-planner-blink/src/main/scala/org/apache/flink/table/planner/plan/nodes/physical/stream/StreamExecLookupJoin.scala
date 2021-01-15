@@ -31,8 +31,8 @@ import org.apache.calcite.rex.RexProgram
 import java.util
 
 /**
-  * Stream physical RelNode for temporal table join that implemented by lookup.
-  */
+ * Stream physical RelNode for temporal table join that implemented by lookup.
+ */
 class StreamExecLookupJoin(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -41,16 +41,16 @@ class StreamExecLookupJoin(
     tableCalcProgram: Option[RexProgram],
     joinInfo: JoinInfo,
     joinType: JoinRelType)
-  extends CommonLookupJoin(
-    cluster,
-    traitSet,
-    input,
-    temporalTable,
-    tableCalcProgram,
-    joinInfo,
-    joinType)
-  with StreamPhysicalRel
-  with LegacyStreamExecNode[RowData] {
+    extends CommonLookupJoin(
+      cluster,
+      traitSet,
+      input,
+      temporalTable,
+      tableCalcProgram,
+      joinInfo,
+      joinType)
+    with StreamPhysicalRel
+    with LegacyStreamExecNode[RowData] {
 
   override def requireWatermark: Boolean = false
 
@@ -69,7 +69,9 @@ class StreamExecLookupJoin(
 
   override protected def translateToPlanInternal(
       planner: StreamPlanner): Transformation[RowData] = {
-    val inputTransformation = getInputNodes.get(0).translateToPlan(planner)
+    val inputTransformation = getInputNodes
+      .get(0)
+      .translateToPlan(planner)
       .asInstanceOf[Transformation[RowData]]
     val transformation = translateToPlanInternal(
       inputTransformation,

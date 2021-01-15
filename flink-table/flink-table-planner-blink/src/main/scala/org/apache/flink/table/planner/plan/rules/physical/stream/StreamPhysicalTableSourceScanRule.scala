@@ -22,10 +22,16 @@ import org.apache.flink.table.connector.source.ScanTableSource
 import org.apache.flink.table.planner.plan.`trait`.FlinkRelDistribution
 import org.apache.flink.table.planner.plan.nodes.FlinkConventions
 import org.apache.flink.table.planner.plan.nodes.logical.FlinkLogicalTableSourceScan
-import org.apache.flink.table.planner.plan.nodes.physical.stream.{StreamPhysicalChangelogNormalize, StreamPhysicalTableSourceScan}
+import org.apache.flink.table.planner.plan.nodes.physical.stream.{
+  StreamPhysicalChangelogNormalize,
+  StreamPhysicalTableSourceScan
+}
 import org.apache.flink.table.planner.plan.schema.TableSourceTable
 import org.apache.flink.table.planner.plan.utils.ScanUtil
-import org.apache.flink.table.planner.sources.DynamicSourceUtils.{isSourceChangeEventsDuplicate, isUpsertSource}
+import org.apache.flink.table.planner.sources.DynamicSourceUtils.{
+  isSourceChangeEventsDuplicate,
+  isUpsertSource
+}
 import org.apache.flink.table.planner.utils.ShortcutUtils
 
 import org.apache.calcite.plan.{RelOptRule, RelOptRuleCall, RelTraitSet}
@@ -34,17 +40,17 @@ import org.apache.calcite.rel.convert.ConverterRule
 import org.apache.calcite.rel.core.TableScan
 
 /**
-  * Rule that converts [[FlinkLogicalTableSourceScan]] to [[StreamPhysicalTableSourceScan]].
+ * Rule that converts [[FlinkLogicalTableSourceScan]] to [[StreamPhysicalTableSourceScan]].
  *
  * <p>Depends whether this is a scan source, this rule will also generate
  * [[StreamPhysicalChangelogNormalize]] to materialize the upsert stream.
-  */
+ */
 class StreamPhysicalTableSourceScanRule
-  extends ConverterRule(
-    classOf[FlinkLogicalTableSourceScan],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.STREAM_PHYSICAL,
-    "StreamPhysicalTableSourceScanRule") {
+    extends ConverterRule(
+      classOf[FlinkLogicalTableSourceScan],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.STREAM_PHYSICAL,
+      "StreamPhysicalTableSourceScanRule") {
 
   /** Rule must only match if TableScan targets a [[ScanTableSource]] */
   override def matches(call: RelOptRuleCall): Boolean = {
@@ -54,7 +60,7 @@ class StreamPhysicalTableSourceScanRule
       case tst: TableSourceTable =>
         tst.tableSource match {
           case _: ScanTableSource => true
-          case _ => false
+          case _                  => false
         }
       case _ => false
     }
@@ -66,13 +72,10 @@ class StreamPhysicalTableSourceScanRule
     val config = ShortcutUtils.unwrapContext(rel.getCluster).getTableConfig
     val table = scan.getTable.asInstanceOf[TableSourceTable]
 
-    val newScan = new StreamPhysicalTableSourceScan(
-      rel.getCluster,
-      traitSet,
-      table)
+    val newScan = new StreamPhysicalTableSourceScan(rel.getCluster, traitSet, table)
 
     if (isUpsertSource(table.catalogTable, table.tableSource) ||
-        isSourceChangeEventsDuplicate(table.catalogTable, table.tableSource, config)) {
+      isSourceChangeEventsDuplicate(table.catalogTable, table.tableSource, config)) {
       // generate changelog normalize node
       // primary key has been validated in CatalogSourceTable
       val primaryKey = table.catalogTable.getSchema.getPrimaryKey.get()
@@ -80,16 +83,13 @@ class StreamPhysicalTableSourceScanRule
       val inputFieldNames = newScan.getRowType.getFieldNames
       val primaryKeyIndices = ScanUtil.getPrimaryKeyIndices(inputFieldNames, keyFields)
       val requiredDistribution = FlinkRelDistribution.hash(primaryKeyIndices, requireStrict = true)
-      val requiredTraitSet = rel.getCluster.getPlanner.emptyTraitSet()
+      val requiredTraitSet = rel.getCluster.getPlanner
+        .emptyTraitSet()
         .replace(requiredDistribution)
         .replace(FlinkConventions.STREAM_PHYSICAL)
       val newInput: RelNode = RelOptRule.convert(newScan, requiredTraitSet)
 
-      new StreamPhysicalChangelogNormalize(
-        scan.getCluster,
-        traitSet,
-        newInput,
-        primaryKeyIndices)
+      new StreamPhysicalChangelogNormalize(scan.getCluster, traitSet, newInput, primaryKeyIndices)
     } else {
       newScan
     }

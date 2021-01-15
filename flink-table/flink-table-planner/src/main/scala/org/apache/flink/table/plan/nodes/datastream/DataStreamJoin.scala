@@ -33,8 +33,8 @@ import org.apache.flink.table.runtime.types.{CRow, CRowTypeInfo}
 import scala.collection.JavaConversions._
 
 /**
-  * RelNode for a non-windowed stream join.
-  */
+ * RelNode for a non-windowed stream join.
+ */
 class DataStreamJoin(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -47,9 +47,9 @@ class DataStreamJoin(
     rightSchema: RowSchema,
     schema: RowSchema,
     ruleDescription: String)
-  extends BiRel(cluster, traitSet, leftNode, rightNode)
-  with CommonJoin
-  with DataStreamRel {
+    extends BiRel(cluster, traitSet, leftNode, rightNode)
+    with CommonJoin
+    with DataStreamRel {
 
   validatePythonFunctionInJoinCondition(joinCondition)
 
@@ -80,11 +80,7 @@ class DataStreamJoin(
   def getJoinType: JoinRelType = joinType
 
   override def toString: String = {
-    joinToString(
-      schema.relDataType,
-      joinCondition,
-      joinType,
-      getExpressionString)
+    joinToString(schema.relDataType, joinCondition, joinType, getExpressionString)
   }
 
   override def explainTerms(pw: RelWriter): RelWriter = {
@@ -110,18 +106,10 @@ class DataStreamJoin(
     val joinTranslator = createTranslator(planner)
 
     val joinOpName = joinToString(getRowType, joinCondition, joinType, getExpressionString)
-    val joinOperator = joinTranslator.getJoinOperator(
-      joinType,
-      schema.fieldNames,
-      ruleDescription)
+    val joinOperator = joinTranslator.getJoinOperator(joinType, schema.fieldNames, ruleDescription)
     connectOperator
-      .keyBy(
-        joinTranslator.getLeftKeySelector(),
-        joinTranslator.getRightKeySelector())
-      .transform(
-        joinOpName,
-        CRowTypeInfo(schema.typeInfo),
-        joinOperator)
+      .keyBy(joinTranslator.getLeftKeySelector(), joinTranslator.getRightKeySelector())
+      .transform(joinOpName, CRowTypeInfo(schema.typeInfo), joinOperator)
   }
 
   private def validateKeyTypes(): Unit = {
@@ -129,24 +117,24 @@ class DataStreamJoin(
     val leftFields = left.getRowType.getFieldList
     val rightFields = right.getRowType.getFieldList
 
-    joinInfo.pairs().toList.foreach(pair => {
-      val leftKeyType = leftFields.get(pair.source).getType.getSqlTypeName
-      val rightKeyType = rightFields.get(pair.target).getType.getSqlTypeName
-      // check if keys are compatible
-      if (leftKeyType != rightKeyType) {
-        throw new TableException(
-          "Equality join predicate on incompatible types.\n" +
-            s"\tLeft: $left,\n" +
-            s"\tRight: $right,\n" +
-            s"\tCondition: (${joinConditionToString(schema.relDataType,
-              joinCondition, getExpressionString)})"
-        )
-      }
-    })
+    joinInfo
+      .pairs()
+      .toList
+      .foreach(pair => {
+        val leftKeyType = leftFields.get(pair.source).getType.getSqlTypeName
+        val rightKeyType = rightFields.get(pair.target).getType.getSqlTypeName
+        // check if keys are compatible
+        if (leftKeyType != rightKeyType) {
+          throw new TableException(
+            "Equality join predicate on incompatible types.\n" +
+              s"\tLeft: $left,\n" +
+              s"\tRight: $right,\n" +
+              s"\tCondition: (${joinConditionToString(schema.relDataType, joinCondition, getExpressionString)})")
+        }
+      })
   }
 
-  protected def createTranslator(
-      planner: StreamPlanner): DataStreamJoinToCoProcessTranslator = {
+  protected def createTranslator(planner: StreamPlanner): DataStreamJoinToCoProcessTranslator = {
     new DataStreamJoinToCoProcessTranslator(
       planner.getConfig,
       schema.typeInfo,

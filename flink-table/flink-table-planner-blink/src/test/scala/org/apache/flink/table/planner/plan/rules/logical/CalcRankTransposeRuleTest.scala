@@ -26,8 +26,8 @@ import org.apache.flink.table.planner.utils.TableTestBase
 import org.junit.{Before, Test}
 
 /**
-  * Test for [[CalcRankTransposeRule]].
-  */
+ * Test for [[CalcRankTransposeRule]].
+ */
 class CalcRankTransposeRuleTest extends TableTestBase {
   private val util = streamTestUtil()
 
@@ -127,7 +127,7 @@ class CalcRankTransposeRuleTest extends TableTestBase {
     // Push Calc into Rank, project column (a, rowtime), prune column (b, c)
     // Need a New Calc on top of Rank to keep equivalency
     val sql =
-    """
+      """
       |SELECT rank_num, rowtime, a, rank_num, a, rank_num FROM (
       |  SELECT *,
       |      ROW_NUMBER() OVER (PARTITION BY a ORDER BY rowtime DESC) as rank_num
@@ -143,7 +143,7 @@ class CalcRankTransposeRuleTest extends TableTestBase {
     // Push Calc into Rank, project column (a, rowtime), prune column (b, c)
     // Does not need a New Calc on top of Rank because it is trivial
     val sql =
-    """
+      """
       |SELECT a, rowtime, rank_num FROM (
       |  SELECT *,
       |      ROW_NUMBER() OVER (PARTITION BY a ORDER BY rowtime DESC) as rank_num

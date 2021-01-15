@@ -35,24 +35,23 @@ import org.apache.calcite.rex.{RexCall, RexNode}
 import scala.collection.JavaConverters._
 
 /**
-  * Join a user-defined table function
-  */
+ * Join a user-defined table function
+ */
 trait CommonCorrelate {
 
   /**
-    * Generates the flat map function to run the user-defined table function.
-    */
+   * Generates the flat map function to run the user-defined table function.
+   */
   private[flink] def generateFunction[T <: Function](
-    config: TableConfig,
-    inputSchema: RowSchema,
-    udtfTypeInfo: TypeInformation[Any],
-    returnSchema: RowSchema,
-    joinType: JoinRelType,
-    rexCall: RexCall,
-    pojoFieldMapping: Option[Array[Int]],
-    ruleDescription: String,
-    functionClass: Class[T]):
-  GeneratedFunction[T, Row] = {
+      config: TableConfig,
+      inputSchema: RowSchema,
+      udtfTypeInfo: TypeInformation[Any],
+      returnSchema: RowSchema,
+      joinType: JoinRelType,
+      rexCall: RexCall,
+      pojoFieldMapping: Option[Array[Int]],
+      ruleDescription: String,
+      functionClass: Class[T]): GeneratedFunction[T, Row] = {
 
     val functionGenerator = new FunctionCodeGenerator(
       config,
@@ -81,11 +80,7 @@ trait CommonCorrelate {
       // in case of left outer join and the returned row of table function is empty,
       // fill all fields of row with null
       val input2NullExprs = input2AccessExprs.map { x =>
-        GeneratedExpression(
-          primitiveDefaultValue(x.resultType),
-          ALWAYS_NULL,
-          NO_CODE,
-          x.resultType)
+        GeneratedExpression(primitiveDefaultValue(x.resultType), ALWAYS_NULL, NO_CODE, x.resultType)
       }
       val outerResultExpr = functionGenerator.generateResultExpression(
         input1AccessExprs ++ input2NullExprs,
@@ -103,24 +98,19 @@ trait CommonCorrelate {
       throw new TableException(s"Unsupported JoinRelType: $joinType for correlate join.")
     }
 
-    functionGenerator.generateFunction(
-      ruleDescription,
-      functionClass,
-      body,
-      returnSchema.typeInfo)
+    functionGenerator.generateFunction(ruleDescription, functionClass, body, returnSchema.typeInfo)
   }
 
   /**
-    * Generates table function collector.
-    */
+   * Generates table function collector.
+   */
   private[flink] def generateCollector(
-    config: TableConfig,
-    inputSchema: RowSchema,
-    udtfTypeInfo: TypeInformation[Any],
-    returnSchema: RowSchema,
-    condition: Option[RexNode],
-    pojoFieldMapping: Option[Array[Int]])
-  : GeneratedCollector = {
+      config: TableConfig,
+      inputSchema: RowSchema,
+      udtfTypeInfo: TypeInformation[Any],
+      returnSchema: RowSchema,
+      condition: Option[RexNode],
+      pojoFieldMapping: Option[Array[Int]]): GeneratedCollector = {
 
     val generator = new CollectorCodeGenerator(
       config,
@@ -137,12 +127,8 @@ trait CommonCorrelate {
       returnSchema.typeInfo,
       returnSchema.fieldNames)
 
-    val filterGenerator = new FunctionCodeGenerator(
-      config,
-      false,
-      udtfTypeInfo,
-      None,
-      pojoFieldMapping)
+    val filterGenerator =
+      new FunctionCodeGenerator(config, false, udtfTypeInfo, None, pojoFieldMapping)
 
     val collectorCode = if (condition.isEmpty) {
       s"""
@@ -180,8 +166,7 @@ trait CommonCorrelate {
       rexCall: RexCall,
       sqlFunction: TableSqlFunction,
       rowType: RelDataType,
-      expression: (RexNode, List[String], Option[List[RexNode]]) => String)
-    : String = {
+      expression: (RexNode, List[String], Option[List[RexNode]]) => String): String = {
 
     s"correlate: ${correlateToString(inputType, rexCall, sqlFunction, expression)}," +
       s" select: ${selectToString(rowType)}"

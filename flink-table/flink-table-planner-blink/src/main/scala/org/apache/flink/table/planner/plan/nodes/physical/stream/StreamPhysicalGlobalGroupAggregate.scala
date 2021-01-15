@@ -44,7 +44,7 @@ class StreamPhysicalGlobalGroupAggregate(
     val localAggInputRowType: RelDataType,
     val needRetraction: Boolean,
     val partialFinalType: PartialFinalType)
-  extends StreamPhysicalGroupAggregateBase(cluster, traitSet, inputRel) {
+    extends StreamPhysicalGroupAggregateBase(cluster, traitSet, inputRel) {
 
   lazy val localAggInfoList: AggregateInfoList = AggregateUtil.transformToStreamAggregateInfoList(
     FlinkTypeFactory.toLogicalRowType(localAggInputRowType),
@@ -79,16 +79,21 @@ class StreamPhysicalGlobalGroupAggregate(
   }
 
   override def explainTerms(pw: RelWriter): RelWriter = {
-    super.explainTerms(pw)
-      .itemIf("groupBy",
-        RelExplainUtil.fieldToString(grouping, inputRel.getRowType), grouping.nonEmpty)
+    super
+      .explainTerms(pw)
+      .itemIf(
+        "groupBy",
+        RelExplainUtil.fieldToString(grouping, inputRel.getRowType),
+        grouping.nonEmpty)
       .itemIf("partialFinalType", partialFinalType, partialFinalType != PartialFinalType.NONE)
-      .item("select", RelExplainUtil.streamGroupAggregationToString(
-        inputRel.getRowType,
-        getRowType,
-        globalAggInfoList,
-        grouping,
-        isGlobal = true))
+      .item(
+        "select",
+        RelExplainUtil.streamGroupAggregationToString(
+          inputRel.getRowType,
+          getRowType,
+          globalAggInfoList,
+          grouping,
+          isGlobal = true))
   }
 
   override def translateToExecNode(): ExecNode[_] = {
@@ -102,7 +107,6 @@ class StreamPhysicalGlobalGroupAggregate(
       needRetraction,
       ExecEdge.DEFAULT,
       FlinkTypeFactory.toLogicalRowType(getRowType),
-      getRelDetailedDescription
-    )
+      getRelDetailedDescription)
   }
 }

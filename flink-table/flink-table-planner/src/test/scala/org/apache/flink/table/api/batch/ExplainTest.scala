@@ -33,7 +33,7 @@ import org.junit.Assert.assertEquals
 import org.junit._
 
 class ExplainTest
-  extends MultipleProgramsTestBase(MultipleProgramsTestBase.TestExecutionMode.CLUSTER) {
+    extends MultipleProgramsTestBase(MultipleProgramsTestBase.TestExecutionMode.CLUSTER) {
 
   @Test
   def testFilterWithoutExtended(): Unit = {
@@ -58,8 +58,10 @@ class ExplainTest
     val scan = env.fromElements((1, "hello")).toTable(tEnv, 'a, 'b)
     val table = scan.filter($"a" % 2 === 0)
 
-    val result = tEnv.asInstanceOf[BatchTableEnvironmentImpl]
-      .explain(table, extended = true).replaceAll("\\r\\n", "\n")
+    val result = tEnv
+      .asInstanceOf[BatchTableEnvironmentImpl]
+      .explain(table, extended = true)
+      .replaceAll("\\r\\n", "\n")
     val source = readFromResource("testFilter1.out")
 
     val expected = replaceString(source, scan)
@@ -91,8 +93,10 @@ class ExplainTest
     val table2 = env.fromElements((1, "hello")).toTable(tEnv, 'c, 'd)
     val table = table1.join(table2).where($"b" === $"d").select($"a", $"c")
 
-    val result = tEnv.asInstanceOf[BatchTableEnvironmentImpl]
-      .explain(table, extended = true).replaceAll("\\r\\n", "\n")
+    val result = tEnv
+      .asInstanceOf[BatchTableEnvironmentImpl]
+      .explain(table, extended = true)
+      .replaceAll("\\r\\n", "\n")
     val source = readFromResource("testJoin1.out")
 
     val expected = replaceString(source, table1, table2)
@@ -124,8 +128,10 @@ class ExplainTest
     val table2 = env.fromElements((1, "hello")).toTable(tEnv, 'count, 'word)
     val table = table1.unionAll(table2)
 
-    val result = tEnv.asInstanceOf[BatchTableEnvironmentImpl]
-      .explain(table, extended = true).replaceAll("\\r\\n", "\n")
+    val result = tEnv
+      .asInstanceOf[BatchTableEnvironmentImpl]
+      .explain(table, extended = true)
+      .replaceAll("\\r\\n", "\n")
     val source = readFromResource("testUnion1.out")
 
     val expected = replaceString(source, table1, table2)
@@ -137,14 +143,16 @@ class ExplainTest
     val env = ExecutionEnvironment.getExecutionEnvironment
     val tEnv = BatchTableEnvironment.create(env)
 
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(
-      "sourceTable", CommonTestData.getCsvTableSource)
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSourceInternal("sourceTable", CommonTestData.getCsvTableSource)
 
     val fieldNames = Array("d", "e")
     val fieldTypes: Array[TypeInformation[_]] = Array(Types.STRING(), Types.INT())
     val sink = new MemoryTableSourceSinkUtil.UnsafeMemoryAppendTableSink
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSinkInternal(
-      "targetTable", sink.configure(fieldNames, fieldTypes))
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSinkInternal("targetTable", sink.configure(fieldNames, fieldTypes))
 
     tEnv.sqlUpdate("insert into targetTable select first, id from sourceTable")
 
@@ -158,16 +166,19 @@ class ExplainTest
     val env = ExecutionEnvironment.getExecutionEnvironment
     val tEnv = BatchTableEnvironment.create(env)
 
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(
-      "sourceTable", CommonTestData.getCsvTableSource)
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSourceInternal("sourceTable", CommonTestData.getCsvTableSource)
 
     val fieldNames = Array("d", "e")
     val fieldTypes: Array[TypeInformation[_]] = Array(Types.STRING(), Types.INT())
     val sink = new MemoryTableSourceSinkUtil.UnsafeMemoryAppendTableSink
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSinkInternal(
-      "targetTable1", sink.configure(fieldNames, fieldTypes))
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSinkInternal(
-      "targetTable2", sink.configure(fieldNames, fieldTypes))
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSinkInternal("targetTable1", sink.configure(fieldNames, fieldTypes))
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSinkInternal("targetTable2", sink.configure(fieldNames, fieldTypes))
 
     tEnv.sqlUpdate("insert into targetTable1 select first, id from sourceTable")
     tEnv.sqlUpdate("insert into targetTable2 select last, id from sourceTable")
@@ -183,20 +194,24 @@ class ExplainTest
     env.setParallelism(1)
     val tEnv = BatchTableEnvironment.create(env)
 
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(
-      "sourceTable", CommonTestData.getCsvTableSource)
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSourceInternal("sourceTable", CommonTestData.getCsvTableSource)
 
     val fieldNames = Array("d", "e")
     val fieldTypes: Array[TypeInformation[_]] = Array(Types.STRING(), Types.INT())
     val sink = new MemoryTableSourceSinkUtil.UnsafeMemoryAppendTableSink
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSinkInternal(
-      "targetTable", sink.configure(fieldNames, fieldTypes))
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSinkInternal("targetTable", sink.configure(fieldNames, fieldTypes))
 
-    val actual = tEnv.explainSql("INSERT INTO targetTable SELECT first, id FROM sourceTable",
+    val actual = tEnv.explainSql(
+      "INSERT INTO targetTable SELECT first, id FROM sourceTable",
       ExplainDetail.JSON_EXECUTION_PLAN)
     val expected = readFromResource("testBatchTableEnvironmentExecutionExplain.out")
 
-    assertEquals(replaceStreamNodeIdAndEstimatedCostValue(expected),
+    assertEquals(
+      replaceStreamNodeIdAndEstimatedCostValue(expected),
       replaceStreamNodeIdAndEstimatedCostValue(actual))
   }
 
@@ -206,14 +221,16 @@ class ExplainTest
     env.setParallelism(1)
     val tEnv = BatchTableEnvironment.create(env)
 
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(
-      "sourceTable", CommonTestData.getCsvTableSource)
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSourceInternal("sourceTable", CommonTestData.getCsvTableSource)
 
     val fieldNames = Array("d", "e")
     val fieldTypes: Array[TypeInformation[_]] = Array(Types.STRING(), Types.INT())
     val sink = new MemoryTableSourceSinkUtil.UnsafeMemoryAppendTableSink
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSinkInternal(
-      "targetTable", sink.configure(fieldNames, fieldTypes))
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSinkInternal("targetTable", sink.configure(fieldNames, fieldTypes))
 
     val statementSet = tEnv.createStatementSet()
     statementSet.addInsertSql("INSERT INTO targetTable SELECT first, id FROM sourceTable")
@@ -221,7 +238,8 @@ class ExplainTest
     val actual = statementSet.explain(ExplainDetail.JSON_EXECUTION_PLAN)
     val expected = readFromResource("testStatementSetExecutionExplain1.out")
 
-    assertEquals(replaceStreamNodeIdAndEstimatedCostValue(expected),
+    assertEquals(
+      replaceStreamNodeIdAndEstimatedCostValue(expected),
       replaceStreamNodeIdAndEstimatedCostValue(actual))
   }
 
@@ -235,7 +253,8 @@ class ExplainTest
 
   private def replaceSourceNode(s: String, t: Table, idx: Int): String = {
     s.replace(
-      s"%logicalSourceNode$idx%", batchTableNode(t)
+      s"%logicalSourceNode$idx%",
+      batchTableNode(t)
         .replace("DataSetScan", "FlinkLogicalDataSetScan"))
       .replace(s"%sourceNode$idx%", batchTableNode(t))
   }
@@ -246,6 +265,7 @@ class ExplainTest
 
   def replaceStreamNodeIdAndEstimatedCostValue(s: String): String = {
     s.replaceAll("\"id\": \\d+", "\"id\": ")
-        .replaceAll("\"value\": \"([0-9]+)(\\.[\\d]+)?\"", "\"value\": \"0.0\"").trim
+      .replaceAll("\"value\": \"([0-9]+)(\\.[\\d]+)?\"", "\"value\": \"0.0\"")
+      .trim
   }
 }

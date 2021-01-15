@@ -20,7 +20,12 @@ package org.apache.flink.table.runtime.aggregate
 import java.util
 import java.util.{List => JList}
 
-import org.apache.flink.api.common.state.{MapState, MapStateDescriptor, ValueState, ValueStateDescriptor}
+import org.apache.flink.api.common.state.{
+  MapState,
+  MapStateDescriptor,
+  ValueState,
+  ValueStateDescriptor
+}
 import org.apache.flink.api.common.typeinfo.{BasicTypeInfo, TypeInformation}
 import org.apache.flink.api.java.typeutils.{ListTypeInfo, RowTypeInfo}
 import org.apache.flink.configuration.Configuration
@@ -33,13 +38,13 @@ import org.apache.flink.types.Row
 import org.apache.flink.util.{Collector, Preconditions}
 
 /**
-  * Process Function for ROW clause processing-time bounded OVER window
-  *
-  * @param genAggregations      Generated aggregate helper function
-  * @param precedingOffset      preceding offset
-  * @param aggregatesTypeInfo   row type info of aggregation
-  * @param inputType            row type info of input row
-  */
+ * Process Function for ROW clause processing-time bounded OVER window
+ *
+ * @param genAggregations      Generated aggregate helper function
+ * @param precedingOffset      preceding offset
+ * @param aggregatesTypeInfo   row type info of aggregation
+ * @param inputType            row type info of input row
+ */
 class ProcTimeBoundedRowsOver[K](
     genAggregations: GeneratedAggregationsFunction,
     precedingOffset: Long,
@@ -47,7 +52,7 @@ class ProcTimeBoundedRowsOver[K](
     inputType: TypeInformation[CRow],
     minRetentionTime: Long,
     maxRetentionTime: Long)
-  extends ProcessFunctionWithCleanupState[K, CRow, CRow](minRetentionTime, maxRetentionTime)
+    extends ProcessFunctionWithCleanupState[K, CRow, CRow](minRetentionTime, maxRetentionTime)
     with Compiler[GeneratedAggregations]
     with Logging {
 
@@ -62,12 +67,11 @@ class ProcTimeBoundedRowsOver[K](
   private var function: GeneratedAggregations = _
 
   override def open(config: Configuration) {
-    LOG.debug(s"Compiling AggregateHelper: ${genAggregations.name} \n\n" +
-                s"Code:\n${genAggregations.code}")
-    val clazz = compile(
-      getRuntimeContext.getUserCodeClassLoader,
-      genAggregations.name,
-      genAggregations.code)
+    LOG.debug(
+      s"Compiling AggregateHelper: ${genAggregations.name} \n\n" +
+        s"Code:\n${genAggregations.code}")
+    val clazz =
+      compile(getRuntimeContext.getUserCodeClassLoader, genAggregations.name, genAggregations.code)
     LOG.debug("Instantiating AggregateHelper.")
     function = clazz.newInstance()
     function.open(getRuntimeContext)
@@ -82,29 +86,31 @@ class ProcTimeBoundedRowsOver[K](
         .asInstanceOf[TypeInformation[JList[Row]]]
 
     val mapStateDescriptor: MapStateDescriptor[Long, JList[Row]] =
-      new MapStateDescriptor[Long, JList[Row]]("windowBufferMapState",
-        BasicTypeInfo.LONG_TYPE_INFO.asInstanceOf[TypeInformation[Long]], rowListTypeInfo)
+      new MapStateDescriptor[Long, JList[Row]](
+        "windowBufferMapState",
+        BasicTypeInfo.LONG_TYPE_INFO.asInstanceOf[TypeInformation[Long]],
+        rowListTypeInfo)
     rowMapState = getRuntimeContext.getMapState(mapStateDescriptor)
 
     val aggregationStateDescriptor: ValueStateDescriptor[Row] =
       new ValueStateDescriptor[Row]("aggregationState", aggregatesTypeInfo)
     accumulatorState = getRuntimeContext.getState(aggregationStateDescriptor)
 
-    val processedCountDescriptor : ValueStateDescriptor[Long] =
-       new ValueStateDescriptor[Long]("processedCountState", classOf[Long])
+    val processedCountDescriptor: ValueStateDescriptor[Long] =
+      new ValueStateDescriptor[Long]("processedCountState", classOf[Long])
     counterState = getRuntimeContext.getState(processedCountDescriptor)
 
-    val smallestTimestampDescriptor : ValueStateDescriptor[Long] =
-       new ValueStateDescriptor[Long]("smallestTSState", classOf[Long])
+    val smallestTimestampDescriptor: ValueStateDescriptor[Long] =
+      new ValueStateDescriptor[Long]("smallestTSState", classOf[Long])
     smallestTsState = getRuntimeContext.getState(smallestTimestampDescriptor)
 
     initCleanupTimeState("ProcTimeBoundedRowsOverCleanupTime")
   }
 
   override def processElement(
-    inputC: CRow,
-    ctx: KeyedProcessFunction[K, CRow, CRow]#Context,
-    out: Collector[CRow]): Unit = {
+      inputC: CRow,
+      ctx: KeyedProcessFunction[K, CRow, CRow]#Context,
+      out: Collector[CRow]): Unit = {
 
     val input = inputC.row
 
@@ -184,9 +190,9 @@ class ProcTimeBoundedRowsOver[K](
   }
 
   override def onTimer(
-    timestamp: Long,
-    ctx: KeyedProcessFunction[K, CRow, CRow]#OnTimerContext,
-    out: Collector[CRow]): Unit = {
+      timestamp: Long,
+      ctx: KeyedProcessFunction[K, CRow, CRow]#OnTimerContext,
+      out: Collector[CRow]): Unit = {
 
     if (stateCleaningEnabled) {
       cleanupState(rowMapState, accumulatorState, counterState, smallestTsState)

@@ -35,19 +35,13 @@ class ScalarFunctionsValidationTest extends ScalarTypesTestBase {
   @Test(expected = classOf[IllegalArgumentException])
   def testInvalidLog1(): Unit = {
     // invalid arithmetic argument
-    testSqlApi(
-      "LOG(1, 100)",
-      "FAIL"
-    )
+    testSqlApi("LOG(1, 100)", "FAIL")
   }
 
   @Test(expected = classOf[IllegalArgumentException])
   def testInvalidLog2(): Unit = {
     // invalid arithmetic argument
-    testSqlApi(
-      "LOG(-1)",
-      "FAIL"
-    )
+    testSqlApi("LOG(-1)", "FAIL")
   }
 
   @Test(expected = classOf[ValidationException])
@@ -68,37 +62,25 @@ class ScalarFunctionsValidationTest extends ScalarTypesTestBase {
   @Test(expected = classOf[ValidationException])
   def testInvalidTruncate1(): Unit = {
     // All arguments are string type
-    testSqlApi(
-      "TRUNCATE('abc', 'def')",
-      "FAIL")
+    testSqlApi("TRUNCATE('abc', 'def')", "FAIL")
 
     // The second argument is of type String
-    testSqlApi(
-      "TRUNCATE(f12, f0)",
-      "FAIL")
+    testSqlApi("TRUNCATE(f12, f0)", "FAIL")
 
     // The second argument is of type Float
-    testSqlApi(
-      "TRUNCATE(f12,f12)",
-      "FAIL")
+    testSqlApi("TRUNCATE(f12,f12)", "FAIL")
 
     // The second argument is of type Double
-    testSqlApi(
-      "TRUNCATE(f12, cast(f28 as DOUBLE))",
-      "FAIL")
+    testSqlApi("TRUNCATE(f12, cast(f28 as DOUBLE))", "FAIL")
 
     // The second argument is of type BigDecimal
-    testSqlApi(
-      "TRUNCATE(f12,f15)",
-      "FAIL")
+    testSqlApi("TRUNCATE(f12,f15)", "FAIL")
   }
 
   @Test(expected = classOf[CodeGenException])
   def testInvalidTruncate2(): Unit = {
     // The one argument is of type String
-    testSqlApi(
-      "TRUNCATE('abc')",
-      "FAIL")
+    testSqlApi("TRUNCATE('abc')", "FAIL")
   }
 
   // ----------------------------------------------------------------------------------------------
@@ -138,14 +120,12 @@ class ScalarFunctionsValidationTest extends ScalarTypesTestBase {
 
   @Test(expected = classOf[ValidationException])
   def testTimestampDiffWithWrongTime(): Unit = {
-    testTableApi(
-      timestampDiff(TimePointUnit.DAY, "2016-02-24", "2016-02-27"), "FAIL", "FAIL")
+    testTableApi(timestampDiff(TimePointUnit.DAY, "2016-02-24", "2016-02-27"), "FAIL", "FAIL")
   }
 
   @Test(expected = classOf[ValidationException])
   def testTimestampDiffWithWrongTimeAndUnit(): Unit = {
-    testTableApi(
-      timestampDiff(TimePointUnit.MINUTE, "2016-02-24", "2016-02-27"), "FAIL", "FAIL")
+    testTableApi(timestampDiff(TimePointUnit.MINUTE, "2016-02-24", "2016-02-27"), "FAIL", "FAIL")
   }
 
   @Test(expected = classOf[ValidationException])
@@ -193,28 +173,16 @@ class ScalarFunctionsValidationTest extends ScalarTypesTestBase {
 
   @Test(expected = classOf[ValidationException])
   def testInValidationExceptionMoreThanOneTypes(): Unit = {
-    testTableApi(
-      'f2.in('f3, 'f4, 4),
-      "f2.in(f3, f4, 4)",
-      "true"
-    )
+    testTableApi('f2.in('f3, 'f4, 4), "f2.in(f3, f4, 4)", "true")
   }
 
   @Test(expected = classOf[ValidationException])
   def scalaInValidationExceptionDifferentOperandsTest(): Unit = {
-    testTableApi(
-      'f1.in("Hi", "Hello world", "Comment#1"),
-      "true",
-      "true"
-    )
+    testTableApi('f1.in("Hi", "Hello world", "Comment#1"), "true", "true")
   }
 
   @Test(expected = classOf[ValidationException])
   def javaInValidationExceptionDifferentOperandsTest(): Unit = {
-    testTableApi(
-      true,
-      "f1.in('Hi','Hello world','Comment#1')",
-      "true"
-    )
+    testTableApi(true, "f1.in('Hi','Hello world','Comment#1')", "true")
   }
 }

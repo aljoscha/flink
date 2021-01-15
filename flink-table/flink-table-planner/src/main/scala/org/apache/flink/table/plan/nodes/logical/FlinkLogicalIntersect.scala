@@ -35,8 +35,8 @@ class FlinkLogicalIntersect(
     traitSet: RelTraitSet,
     inputs: JList[RelNode],
     all: Boolean)
-  extends Intersect(cluster, traitSet, inputs, all)
-  with FlinkLogicalRel {
+    extends Intersect(cluster, traitSet, inputs, all)
+    with FlinkLogicalRel {
 
   override def copy(traitSet: RelTraitSet, inputs: JList[RelNode], all: Boolean): SetOp = {
     new FlinkLogicalIntersect(cluster, traitSet, inputs, all)
@@ -53,17 +53,18 @@ class FlinkLogicalIntersect(
 }
 
 private class FlinkLogicalIntersectConverter
-  extends ConverterRule(
-    classOf[LogicalIntersect],
-    Convention.NONE,
-    FlinkConventions.LOGICAL,
-    "FlinkLogicalIntersectConverter") {
+    extends ConverterRule(
+      classOf[LogicalIntersect],
+      Convention.NONE,
+      FlinkConventions.LOGICAL,
+      "FlinkLogicalIntersectConverter") {
 
   override def convert(rel: RelNode): RelNode = {
     val intersect = rel.asInstanceOf[LogicalIntersect]
     val traitSet = rel.getTraitSet.replace(FlinkConventions.LOGICAL)
     val newInputs = intersect.getInputs.asScala
-        .map(input => RelOptRule.convert(input, FlinkConventions.LOGICAL)).asJava
+      .map(input => RelOptRule.convert(input, FlinkConventions.LOGICAL))
+      .asJava
 
     new FlinkLogicalIntersect(rel.getCluster, traitSet, newInputs, intersect.all)
   }

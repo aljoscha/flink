@@ -28,17 +28,17 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
-  * Sub-class of [[Sink]] that is a relational expression
-  * which writes out data of input node into a [[TableSink]].
-  * This class corresponds to Calcite logical rel.
-  */
+ * Sub-class of [[Sink]] that is a relational expression
+ * which writes out data of input node into a [[TableSink]].
+ * This class corresponds to Calcite logical rel.
+ */
 final class LogicalSink(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
     input: RelNode,
     sink: TableSink[_],
     sinkName: String)
-  extends Sink(cluster, traitSet, input, sink, sinkName) {
+    extends Sink(cluster, traitSet, input, sink, sinkName) {
 
   override def copy(traitSet: RelTraitSet, inputs: util.List[RelNode]): RelNode = {
     new LogicalSink(cluster, traitSet, inputs.head, sink, sinkName)

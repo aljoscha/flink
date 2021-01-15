@@ -42,7 +42,8 @@ object TestSinkUtil {
     val fieldNames = rowType.getFieldNames.asScala.toArray
     val fieldTypes = rowType.getFieldList.asScala
       .map(field => FlinkTypeFactory.toLogicalType(field.getType))
-      .map(TypeInfoLogicalTypeConverter.fromLogicalTypeToTypeInfo).toArray
+      .map(TypeInfoLogicalTypeConverter.fromLogicalTypeToTypeInfo)
+      .toArray
     sink match {
       case _: TestingAppendTableSink =>
         new TestingAppendTableSink().configure(fieldNames, fieldTypes).asInstanceOf[T]
@@ -64,7 +65,7 @@ object TestSinkUtil {
 
   def rowToString(row: Row, tz: TimeZone = TimeZone.getTimeZone("UTC")): String = {
     val sb = StringBuilder.newBuilder
-    for (i <- 0 until row.getArity ) {
+    for (i <- 0 until row.getArity) {
       if (i > 0) {
         sb.append(",")
       }
@@ -110,8 +111,7 @@ object TestSinkUtil {
       case _: Time =>
         DateTimeUtils.unixTimeToString(
           ((time % DateTimeUtils.MILLIS_PER_DAY).asInstanceOf[Int] + offset)
-            % DateTimeUtils.MILLIS_PER_DAY.asInstanceOf[Int]
-        )
+            % DateTimeUtils.MILLIS_PER_DAY.asInstanceOf[Int])
       case _: Timestamp =>
         DateTimeUtils.unixTimestampToString(time + offset, 3)
       case _ =>

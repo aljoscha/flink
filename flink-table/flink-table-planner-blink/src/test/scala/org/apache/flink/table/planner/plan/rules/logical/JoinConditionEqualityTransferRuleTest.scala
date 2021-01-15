@@ -20,7 +20,11 @@ package org.apache.flink.table.planner.plan.rules.logical
 
 import org.apache.flink.api.scala._
 import org.apache.flink.table.api._
-import org.apache.flink.table.planner.plan.optimize.program.{FlinkBatchProgram, FlinkHepRuleSetProgramBuilder, HEP_RULES_EXECUTION_TYPE}
+import org.apache.flink.table.planner.plan.optimize.program.{
+  FlinkBatchProgram,
+  FlinkHepRuleSetProgramBuilder,
+  HEP_RULES_EXECUTION_TYPE
+}
 import org.apache.flink.table.planner.utils.{TableConfigUtils, TableTestBase}
 
 import org.apache.calcite.plan.hep.HepMatchOrder
@@ -28,8 +32,8 @@ import org.apache.calcite.tools.RuleSets
 import org.junit.{Before, Test}
 
 /**
-  * Test for [[JoinConditionEqualityTransferRule]].
-  */
+ * Test for [[JoinConditionEqualityTransferRule]].
+ */
 class JoinConditionEqualityTransferRuleTest extends TableTestBase {
 
   private val util = batchTestUtil()
@@ -44,8 +48,7 @@ class JoinConditionEqualityTransferRuleTest extends TableTestBase {
         .setHepRulesExecutionType(HEP_RULES_EXECUTION_TYPE.RULE_SEQUENCE)
         .setHepMatchOrder(HepMatchOrder.BOTTOM_UP)
         .add(RuleSets.ofList(JoinConditionEqualityTransferRule.INSTANCE))
-        .build()
-    )
+        .build())
 
     util.addTableSource[(Int, Int, Int)]("MyTable1", 'a, 'b, 'c)
     util.addTableSource[(Int, Int, Int)]("MyTable2", 'd, 'e, 'f)

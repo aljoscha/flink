@@ -19,7 +19,11 @@
 package org.apache.flink.table.planner.codegen.calls
 
 import org.apache.flink.table.planner.codegen.GenerateUtils.generateCallIfArgsNotNull
-import org.apache.flink.table.planner.codegen.{CodeGenUtils, CodeGeneratorContext, GeneratedExpression}
+import org.apache.flink.table.planner.codegen.{
+  CodeGenUtils,
+  CodeGeneratorContext,
+  GeneratedExpression
+}
 import org.apache.flink.table.types.logical.LogicalType
 
 class HashCodeCallGen extends CallGenerator {

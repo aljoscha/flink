@@ -24,7 +24,12 @@ import java.util.function.Supplier
 import org.apache.flink.api.common.ExecutionConfig
 import org.apache.flink.api.common.typeinfo.TypeInformation
 import org.apache.flink.api.common.typeutils.TypeSerializerUpgradeTestBase.TestSpecification
-import org.apache.flink.api.common.typeutils.{TypeSerializer, TypeSerializerMatchers, TypeSerializerSchemaCompatibility, TypeSerializerUpgradeTestBase}
+import org.apache.flink.api.common.typeutils.{
+  TypeSerializer,
+  TypeSerializerMatchers,
+  TypeSerializerSchemaCompatibility,
+  TypeSerializerUpgradeTestBase
+}
 import org.apache.flink.api.scala.createTypeInformation
 import org.apache.flink.testutils.migration.MigrationVersion
 import org.hamcrest.Matcher
@@ -39,9 +44,10 @@ import scala.collection.{BitSet, LinearSeq, mutable}
  */
 @RunWith(classOf[Parameterized])
 class TraversableSerializerUpgradeTest(
-  testSpecification: TypeSerializerUpgradeTestBase.TestSpecification[
-TraversableOnce[_], TraversableOnce[_]])
-  extends TypeSerializerUpgradeTestBase[TraversableOnce[_], TraversableOnce[_]](testSpecification)
+    testSpecification: TypeSerializerUpgradeTestBase.TestSpecification[
+      TraversableOnce[_],
+      TraversableOnce[_]])
+    extends TypeSerializerUpgradeTestBase[TraversableOnce[_], TraversableOnce[_]](testSpecification)
 
 object TraversableSerializerUpgradeTest {
 
@@ -53,7 +59,7 @@ object TraversableSerializerUpgradeTest {
       override def equals(other: Any): Boolean = {
         other match {
           case oP: Pojo => name == oP.name && count == oP.count
-          case _ => false
+          case _        => false
         }
       }
     }
@@ -144,96 +150,96 @@ object TraversableSerializerUpgradeTest {
     override def createTestData: BitSet = BitSet(3, 2, 0)
   }
 
-  final class BitsetSerializerVerifier extends
-    TypeSerializerUpgradeTestBase.UpgradeVerifier[BitSet] {
+  final class BitsetSerializerVerifier
+      extends TypeSerializerUpgradeTestBase.UpgradeVerifier[BitSet] {
     override def createUpgradedSerializer: TypeSerializer[BitSet] =
       new TypeSerializerSupplier(bitsetTypeInfo).get()
 
     override def testDataMatcher: Matcher[BitSet] = is(BitSet(3, 2, 0))
 
-    override def schemaCompatibilityMatcher(version: MigrationVersion):
-    Matcher[TypeSerializerSchemaCompatibility[BitSet]] =
+    override def schemaCompatibilityMatcher(
+        version: MigrationVersion): Matcher[TypeSerializerSchemaCompatibility[BitSet]] =
       TypeSerializerMatchers.isCompatibleAsIs[BitSet]()
   }
 
-  final class IndexedSeqSerializerSetup extends
-    TypeSerializerUpgradeTestBase.PreUpgradeSetup[IndexedSeq[Int]] {
+  final class IndexedSeqSerializerSetup
+      extends TypeSerializerUpgradeTestBase.PreUpgradeSetup[IndexedSeq[Int]] {
     override def createPriorSerializer: TypeSerializer[IndexedSeq[Int]] =
       new TypeSerializerSupplier(indexedSeqTypeInfo).get()
 
     override def createTestData: IndexedSeq[Int] = IndexedSeq(1, 2, 3)
   }
 
-  final class IndexedSeqSerializerVerifier extends
-    TypeSerializerUpgradeTestBase.UpgradeVerifier[IndexedSeq[Int]] {
+  final class IndexedSeqSerializerVerifier
+      extends TypeSerializerUpgradeTestBase.UpgradeVerifier[IndexedSeq[Int]] {
     override def createUpgradedSerializer: TypeSerializer[IndexedSeq[Int]] =
       new TypeSerializerSupplier(indexedSeqTypeInfo).get()
 
     override def testDataMatcher: Matcher[IndexedSeq[Int]] = is(IndexedSeq(1, 2, 3))
 
-    override def schemaCompatibilityMatcher(version: MigrationVersion):
-    Matcher[TypeSerializerSchemaCompatibility[IndexedSeq[Int]]] =
+    override def schemaCompatibilityMatcher(
+        version: MigrationVersion): Matcher[TypeSerializerSchemaCompatibility[IndexedSeq[Int]]] =
       TypeSerializerMatchers.isCompatibleAsIs[IndexedSeq[Int]]()
   }
 
-  final class LinearSeqSerializerSetup extends
-    TypeSerializerUpgradeTestBase.PreUpgradeSetup[LinearSeq[Int]] {
+  final class LinearSeqSerializerSetup
+      extends TypeSerializerUpgradeTestBase.PreUpgradeSetup[LinearSeq[Int]] {
     override def createPriorSerializer: TypeSerializer[LinearSeq[Int]] =
-    new TypeSerializerSupplier(linearSeqTypeInfo).get()
+      new TypeSerializerSupplier(linearSeqTypeInfo).get()
 
     override def createTestData: LinearSeq[Int] = LinearSeq(2, 3, 4)
   }
 
-  final class LinearSeqSerializerVerifier extends
-    TypeSerializerUpgradeTestBase.UpgradeVerifier[LinearSeq[Int]] {
+  final class LinearSeqSerializerVerifier
+      extends TypeSerializerUpgradeTestBase.UpgradeVerifier[LinearSeq[Int]] {
     override def createUpgradedSerializer: TypeSerializer[LinearSeq[Int]] =
       new TypeSerializerSupplier(linearSeqTypeInfo).get()
 
     override def testDataMatcher: Matcher[LinearSeq[Int]] = is(LinearSeq(2, 3, 4))
 
-    override def schemaCompatibilityMatcher(version: MigrationVersion):
-    Matcher[TypeSerializerSchemaCompatibility[LinearSeq[Int]]] =
+    override def schemaCompatibilityMatcher(
+        version: MigrationVersion): Matcher[TypeSerializerSchemaCompatibility[LinearSeq[Int]]] =
       TypeSerializerMatchers.isCompatibleAsIs[LinearSeq[Int]]()
   }
 
-  final class MapSerializerSetup extends
-    TypeSerializerUpgradeTestBase.PreUpgradeSetup[Map[String, Int]] {
+  final class MapSerializerSetup
+      extends TypeSerializerUpgradeTestBase.PreUpgradeSetup[Map[String, Int]] {
     override def createPriorSerializer: TypeSerializer[Map[String, Int]] =
       new TypeSerializerSupplier(mapTypeInfo).get()
 
     override def createTestData: Map[String, Int] = Map("Apache" -> 0, "Flink" -> 1)
   }
 
-  final class MapSerializerVerifier extends
-    TypeSerializerUpgradeTestBase.UpgradeVerifier[Map[String, Int]] {
+  final class MapSerializerVerifier
+      extends TypeSerializerUpgradeTestBase.UpgradeVerifier[Map[String, Int]] {
     override def createUpgradedSerializer: TypeSerializer[Map[String, Int]] =
       new TypeSerializerSupplier(mapTypeInfo).get()
 
     override def testDataMatcher: Matcher[Map[String, Int]] = is(Map("Apache" -> 0, "Flink" -> 1))
 
-    override def schemaCompatibilityMatcher(version: MigrationVersion):
-    Matcher[TypeSerializerSchemaCompatibility[Map[String, Int]]] =
+    override def schemaCompatibilityMatcher(
+        version: MigrationVersion): Matcher[TypeSerializerSchemaCompatibility[Map[String, Int]]] =
       TypeSerializerMatchers.isCompatibleAsIs[Map[String, Int]]()
   }
 
-  final class MutableListSerializerSetup extends
-    TypeSerializerUpgradeTestBase.PreUpgradeSetup[mutable.MutableList[Int]] {
+  final class MutableListSerializerSetup
+      extends TypeSerializerUpgradeTestBase.PreUpgradeSetup[mutable.MutableList[Int]] {
     override def createPriorSerializer: TypeSerializer[mutable.MutableList[Int]] =
       new TypeSerializerSupplier(mutableListTypeInfo).get()
 
     override def createTestData: mutable.MutableList[Int] = mutable.MutableList(1, 2, 3)
   }
 
-  final class MutableListSerializerVerifier extends
-    TypeSerializerUpgradeTestBase.UpgradeVerifier[mutable.MutableList[Int]] {
+  final class MutableListSerializerVerifier
+      extends TypeSerializerUpgradeTestBase.UpgradeVerifier[mutable.MutableList[Int]] {
     override def createUpgradedSerializer: TypeSerializer[mutable.MutableList[Int]] =
       new TypeSerializerSupplier(mutableListTypeInfo).get()
 
     override def testDataMatcher: Matcher[mutable.MutableList[Int]] =
       is(mutable.MutableList(1, 2, 3))
 
-    override def schemaCompatibilityMatcher(version: MigrationVersion):
-    Matcher[TypeSerializerSchemaCompatibility[mutable.MutableList[Int]]] =
+    override def schemaCompatibilityMatcher(version: MigrationVersion)
+        : Matcher[TypeSerializerSchemaCompatibility[mutable.MutableList[Int]]] =
       TypeSerializerMatchers.isCompatibleAsIs[mutable.MutableList[Int]]()
   }
 
@@ -244,15 +250,15 @@ object TraversableSerializerUpgradeTest {
     override def createTestData: Seq[Int] = Seq(1, 2, 3)
   }
 
-  final class SeqSerializerVerifier extends
-    TypeSerializerUpgradeTestBase.UpgradeVerifier[Seq[Int]] {
+  final class SeqSerializerVerifier
+      extends TypeSerializerUpgradeTestBase.UpgradeVerifier[Seq[Int]] {
     override def createUpgradedSerializer: TypeSerializer[Seq[Int]] =
       new TypeSerializerSupplier(seqTypeInfo).get()
 
     override def testDataMatcher: Matcher[Seq[Int]] = is(Seq(1, 2, 3))
 
-    override def schemaCompatibilityMatcher(version: MigrationVersion):
-        Matcher[TypeSerializerSchemaCompatibility[Seq[Int]]] =
+    override def schemaCompatibilityMatcher(
+        version: MigrationVersion): Matcher[TypeSerializerSchemaCompatibility[Seq[Int]]] =
       TypeSerializerMatchers.isCompatibleAsIs[Seq[Int]]()
   }
 
@@ -263,35 +269,35 @@ object TraversableSerializerUpgradeTest {
     override def createTestData: Set[Int] = Set(2, 3, 4)
   }
 
-  final class SetSerializerVerifier extends
-    TypeSerializerUpgradeTestBase.UpgradeVerifier[Set[Int]] {
+  final class SetSerializerVerifier
+      extends TypeSerializerUpgradeTestBase.UpgradeVerifier[Set[Int]] {
     override def createUpgradedSerializer: TypeSerializer[Set[Int]] =
       new TypeSerializerSupplier(setTypeInfo).get()
 
     override def testDataMatcher: Matcher[Set[Int]] = is(Set(2, 3, 4))
 
-    override def schemaCompatibilityMatcher(version: MigrationVersion):
-        Matcher[TypeSerializerSchemaCompatibility[Set[Int]]] =
+    override def schemaCompatibilityMatcher(
+        version: MigrationVersion): Matcher[TypeSerializerSchemaCompatibility[Set[Int]]] =
       TypeSerializerMatchers.isCompatibleAsIs[Set[Int]]()
   }
 
-  final class SeqWithCaseClassSetup extends
-    TypeSerializerUpgradeTestBase.PreUpgradeSetup[Seq[(Int, String)]] {
+  final class SeqWithCaseClassSetup
+      extends TypeSerializerUpgradeTestBase.PreUpgradeSetup[Seq[(Int, String)]] {
     override def createPriorSerializer: TypeSerializer[Seq[(Int, String)]] =
       new TypeSerializerSupplier(seqTupleTypeInfo).get()
 
     override def createTestData: Seq[(Int, String)] = Seq((0, "Apache"), (1, "Flink"))
   }
 
-  final class SeqWithCaseClassVerifier extends
-    TypeSerializerUpgradeTestBase.UpgradeVerifier[Seq[(Int, String)]] {
+  final class SeqWithCaseClassVerifier
+      extends TypeSerializerUpgradeTestBase.UpgradeVerifier[Seq[(Int, String)]] {
     override def createUpgradedSerializer: TypeSerializer[Seq[(Int, String)]] =
       new TypeSerializerSupplier(seqTupleTypeInfo).get()
 
     override def testDataMatcher: Matcher[Seq[(Int, String)]] = is(Seq((0, "Apache"), (1, "Flink")))
 
-    override def schemaCompatibilityMatcher(version: MigrationVersion):
-    Matcher[TypeSerializerSchemaCompatibility[Seq[(Int, String)]]] =
+    override def schemaCompatibilityMatcher(
+        version: MigrationVersion): Matcher[TypeSerializerSchemaCompatibility[Seq[(Int, String)]]] =
       TypeSerializerMatchers.isCompatibleAsIs[Seq[(Int, String)]]()
   }
 
@@ -309,13 +315,13 @@ object TraversableSerializerUpgradeTest {
     override def testDataMatcher: Matcher[Seq[Pojo]] =
       is(Seq(new Pojo("Apache", 0), new Pojo("Flink", 1)))
 
-    override def schemaCompatibilityMatcher(version: MigrationVersion):
-    Matcher[TypeSerializerSchemaCompatibility[Seq[Pojo]]] =
+    override def schemaCompatibilityMatcher(
+        version: MigrationVersion): Matcher[TypeSerializerSchemaCompatibility[Seq[Pojo]]] =
       TypeSerializerMatchers.isCompatibleAsIs[Seq[Pojo]]()
   }
 
   private class TypeSerializerSupplier[T](typeInfo: TypeInformation[T])
-    extends Supplier[TypeSerializer[T]] {
+      extends Supplier[TypeSerializer[T]] {
     override def get(): TypeSerializer[T] = {
       typeInfo
         .createSerializer(new ExecutionConfig)

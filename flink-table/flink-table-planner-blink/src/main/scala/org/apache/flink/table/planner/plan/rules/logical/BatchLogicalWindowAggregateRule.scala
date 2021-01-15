@@ -31,13 +31,13 @@ import org.apache.calcite.rex._
 import _root_.java.math.{BigDecimal => JBigDecimal}
 
 /**
-  * Planner rule that transforms simple [[LogicalAggregate]] on a [[LogicalProject]]
-  * with windowing expression to
+ * Planner rule that transforms simple [[LogicalAggregate]] on a [[LogicalProject]]
+ * with windowing expression to
  * [[org.apache.flink.table.planner.plan.nodes.calcite.LogicalWindowAggregate]]
  * for batch.
-  */
+ */
 class BatchLogicalWindowAggregateRule
-  extends LogicalWindowAggregateRuleBase("BatchLogicalWindowAggregateRule") {
+    extends LogicalWindowAggregateRuleBase("BatchLogicalWindowAggregateRule") {
 
   /** Returns the operand of the group window function. */
   override private[table] def getInAggregateGroupExpression(
@@ -58,8 +58,9 @@ class BatchLogicalWindowAggregateRule
       timeAttributeIndex: Int,
       rowType: RelDataType): FieldReferenceExpression = {
     if (FlinkTypeFactory.isProctimeIndicatorType(operand.getType)) {
-      throw new ValidationException("Window can not be defined over "
-        + "a proctime attribute column for batch mode")
+      throw new ValidationException(
+        "Window can not be defined over "
+          + "a proctime attribute column for batch mode")
     }
 
     val fieldName = rowType.getFieldList.get(timeAttributeIndex).getName
@@ -74,7 +75,7 @@ class BatchLogicalWindowAggregateRule
   def getOperandAsLong(call: RexCall, idx: Int): Long =
     call.getOperands.get(idx) match {
       case v: RexLiteral => v.getValue.asInstanceOf[JBigDecimal].longValue()
-      case _ => throw new TableException("Only constant window descriptors are supported")
+      case _             => throw new TableException("Only constant window descriptors are supported")
     }
 }
 

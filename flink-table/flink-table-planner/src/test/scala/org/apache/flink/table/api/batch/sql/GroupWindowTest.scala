@@ -41,14 +41,9 @@ class GroupWindowTest extends TableTestBase {
     val expected =
       unaryNode(
         "DataSetWindowAggregate",
-        unaryNode(
-          "DataSetCalc",
-          batchTableNode(table),
-          term("select", "ts, a, b")
-        ),
+        unaryNode("DataSetCalc", batchTableNode(table), term("select", "ts, a, b")),
         term("window", "TumblingGroupWindow('w$, 'ts, 7200000.millis)"),
-        term("select", "SUM(a) AS sumA, COUNT(b) AS cntB")
-      )
+        term("select", "SUM(a) AS sumA, COUNT(b) AS cntB"))
 
     util.verifySql(sqlQuery, expected)
   }
@@ -77,12 +72,14 @@ class GroupWindowTest extends TableTestBase {
           batchTableNode(table),
           term("groupBy", "c"),
           term("window", "TumblingGroupWindow('w$, 'ts, 240000.millis)"),
-          term("select", "c, SUM(a) AS sumA, MIN(b) AS minB, " +
-            "start('w$) AS w$start, end('w$) AS w$end, rowtime('w$) AS w$rowtime")
-        ),
-        term("select", "CAST(w$start) AS EXPR$0, CAST(w$end) AS EXPR$1, " +
-          "w$rowtime AS EXPR$2, c, sumA, minB")
-      )
+          term(
+            "select",
+            "c, SUM(a) AS sumA, MIN(b) AS minB, " +
+              "start('w$) AS w$start, end('w$) AS w$end, rowtime('w$) AS w$rowtime")),
+        term(
+          "select",
+          "CAST(w$start) AS EXPR$0, CAST(w$end) AS EXPR$1, " +
+            "w$rowtime AS EXPR$2, c, sumA, minB"))
 
     util.verifySql(sqlQuery, expected)
   }
@@ -102,14 +99,9 @@ class GroupWindowTest extends TableTestBase {
     val expected =
       unaryNode(
         "DataSetWindowAggregate",
-        unaryNode(
-          "DataSetCalc",
-          batchTableNode(table),
-          term("select", "ts, b, a")
-        ),
+        unaryNode("DataSetCalc", batchTableNode(table), term("select", "ts, b, a")),
         term("window", "TumblingGroupWindow('w$, 'ts, 240000.millis)"),
-        term("select", "weightedAvg(b, a) AS wAvg")
-      )
+        term("select", "weightedAvg(b, a) AS wAvg"))
 
     util.verifySql(sql, expected)
   }
@@ -127,14 +119,9 @@ class GroupWindowTest extends TableTestBase {
     val expected =
       unaryNode(
         "DataSetWindowAggregate",
-        unaryNode(
-          "DataSetCalc",
-          batchTableNode(table),
-          term("select", "ts, a, b")
-        ),
+        unaryNode("DataSetCalc", batchTableNode(table), term("select", "ts, a, b")),
         term("window", "SlidingGroupWindow('w$, 'ts, 5400000.millis, 900000.millis)"),
-        term("select", "SUM(a) AS sumA, COUNT(b) AS cntB")
-      )
+        term("select", "SUM(a) AS sumA, COUNT(b) AS cntB"))
 
     util.verifySql(sqlQuery, expected)
   }
@@ -163,12 +150,14 @@ class GroupWindowTest extends TableTestBase {
           batchTableNode(table),
           term("groupBy", "c, d"),
           term("window", "SlidingGroupWindow('w$, 'ts, 10800000.millis, 3600000.millis)"),
-          term("select", "c, d, SUM(a) AS sumA, AVG(b) AS avgB, " +
-            "start('w$) AS w$start, end('w$) AS w$end, rowtime('w$) AS w$rowtime")
-        ),
-        term("select", "c, CAST(w$end) AS EXPR$1, CAST(w$start) AS EXPR$2, " +
-          "w$rowtime AS EXPR$3, sumA, avgB")
-      )
+          term(
+            "select",
+            "c, d, SUM(a) AS sumA, AVG(b) AS avgB, " +
+              "start('w$) AS w$start, end('w$) AS w$end, rowtime('w$) AS w$rowtime")),
+        term(
+          "select",
+          "c, CAST(w$end) AS EXPR$1, CAST(w$start) AS EXPR$2, " +
+            "w$rowtime AS EXPR$3, sumA, avgB"))
 
     util.verifySql(sqlQuery, expected)
   }
@@ -184,14 +173,9 @@ class GroupWindowTest extends TableTestBase {
     val expected =
       unaryNode(
         "DataSetWindowAggregate",
-        unaryNode(
-          "DataSetCalc",
-          batchTableNode(table),
-          term("select", "ts")
-        ),
+        unaryNode("DataSetCalc", batchTableNode(table), term("select", "ts")),
         term("window", "SessionGroupWindow('w$, 'ts, 1800000.millis)"),
-        term("select", "COUNT(*) AS cnt")
-      )
+        term("select", "COUNT(*) AS cnt"))
 
     util.verifySql(sqlQuery, expected)
   }
@@ -220,12 +204,14 @@ class GroupWindowTest extends TableTestBase {
           batchTableNode(table),
           term("groupBy", "c, d"),
           term("window", "SessionGroupWindow('w$, 'ts, 43200000.millis)"),
-          term("select", "c, d, SUM(a) AS sumA, MIN(b) AS minB, " +
-            "start('w$) AS w$start, end('w$) AS w$end, rowtime('w$) AS w$rowtime")
-        ),
-        term("select", "c, d, CAST(w$start) AS EXPR$2, CAST(w$end) AS EXPR$3, " +
-          "w$rowtime AS EXPR$4, sumA, minB")
-      )
+          term(
+            "select",
+            "c, d, SUM(a) AS sumA, MIN(b) AS minB, " +
+              "start('w$) AS w$start, end('w$) AS w$end, rowtime('w$) AS w$rowtime")),
+        term(
+          "select",
+          "c, d, CAST(w$start) AS EXPR$2, CAST(w$end) AS EXPR$3, " +
+            "w$rowtime AS EXPR$4, sumA, minB"))
 
     util.verifySql(sqlQuery, expected)
   }
@@ -246,17 +232,11 @@ class GroupWindowTest extends TableTestBase {
         "DataSetCalc",
         unaryNode(
           "DataSetWindowAggregate",
-          unaryNode(
-            "DataSetCalc",
-            batchTableNode(table),
-            term("select", "ts, c")
-          ),
+          unaryNode("DataSetCalc", batchTableNode(table), term("select", "ts, c")),
           term("groupBy", "c"),
           term("window", "TumblingGroupWindow('w$, 'ts, 240000.millis)"),
-          term("select", "c, start('w$) AS w$start, end('w$) AS w$end, rowtime('w$) AS w$rowtime")
-        ),
-        term("select", "CAST(w$end) AS EXPR$0")
-      )
+          term("select", "c, start('w$) AS w$start, end('w$) AS w$end, rowtime('w$) AS w$rowtime")),
+        term("select", "CAST(w$end) AS EXPR$0"))
 
     util.verifySql(sqlQuery, expected)
   }
@@ -281,24 +261,20 @@ class GroupWindowTest extends TableTestBase {
         "DataSetCalc",
         unaryNode(
           "DataSetWindowAggregate",
-          unaryNode(
-            "DataSetCalc",
-            batchTableNode(table),
-            term("select", "ts, a")
-          ),
+          unaryNode("DataSetCalc", batchTableNode(table), term("select", "ts, a")),
           term("window", "SlidingGroupWindow('w$, 'ts, 60000.millis, 900000.millis)"),
-          term("select",
+          term(
+            "select",
             "COUNT(*) AS EXPR$0",
             "SUM(a) AS $f1",
             "start('w$) AS w$start",
             "end('w$) AS w$end, " +
-            "rowtime('w$) AS w$rowtime")
-        ),
+              "rowtime('w$) AS w$rowtime")),
         term("select", "EXPR$0", "CAST(w$start) AS EXPR$1"),
-        term("where",
+        term(
+          "where",
           "AND(>($f1, 0), " +
-            "=(EXTRACT(FLAG(QUARTER), w$start), 1:BIGINT))")
-      )
+            "=(EXTRACT(FLAG(QUARTER), w$start), 1:BIGINT))"))
 
     util.verifySql(sql, expected)
   }
@@ -324,26 +300,25 @@ class GroupWindowTest extends TableTestBase {
           unaryNode(
             "DataSetCalc",
             batchTableNode(table),
-            term("select", "rowtime", "c", "*(c, c) AS $f2")
-          ),
+            term("select", "rowtime", "c", "*(c, c) AS $f2")),
           term("window", "TumblingGroupWindow('w$, 'rowtime, 900000.millis)"),
-          term("select",
+          term(
+            "select",
             "SUM($f2) AS $f0",
             "SUM(c) AS $f1",
             "COUNT(c) AS $f2",
             "start('w$) AS w$start",
             "end('w$) AS w$end",
-            "rowtime('w$) AS w$rowtime")
-        ),
-        term("select",
+            "rowtime('w$) AS w$rowtime")),
+        term(
+          "select",
           "/(-($f0, /(*($f1, $f1), $f2)), $f2) AS EXPR$0",
           "/(-($f0, /(*($f1, $f1), $f2)), CASE(=($f2, 1), null:BIGINT, -($f2, 1))) AS EXPR$1",
           "CAST(POWER(/(-($f0, /(*($f1, $f1), $f2)), $f2), 0.5:DECIMAL(2, 1))) AS EXPR$2",
           "CAST(POWER(/(-($f0, /(*($f1, $f1), $f2)), CASE(=($f2, 1), null:BIGINT, " +
             "-($f2, 1))), 0.5:DECIMAL(2, 1))) AS EXPR$3",
           "CAST(w$start) AS EXPR$4",
-          "CAST(w$end) AS EXPR$5")
-      )
+          "CAST(w$end) AS EXPR$5"))
 
     util.verifySql(sql, expected)
   }
@@ -377,14 +352,13 @@ class GroupWindowTest extends TableTestBase {
           unaryNode(
             "DataSetCalc",
             batchTableNode(table),
-            term("select", "rowtime, CASE(=(a, 1), 1, 99) AS $f1")
-          ),
+            term("select", "rowtime, CASE(=(a, 1), 1, 99) AS $f1")),
           term("window", "TumblingGroupWindow('w$, 'rowtime, 900000.millis)"),
-          term("select", "SUM($f1) AS s, AVG($f1) AS a, start('w$) AS w$start,"
-            + " end('w$) AS w$end, rowtime('w$) AS w$rowtime")
-        ),
-        term("select", "CAST(s) AS s", "CAST(a) AS a", "CAST(w$start) AS wStart")
-      )
+          term(
+            "select",
+            "SUM($f1) AS s, AVG($f1) AS a, start('w$) AS w$start,"
+              + " end('w$) AS w$end, rowtime('w$) AS w$rowtime")),
+        term("select", "CAST(s) AS s", "CAST(a) AS a", "CAST(w$start) AS wStart"))
 
     util.verifySql(sqlQuery, expected)
   }
@@ -398,7 +372,7 @@ class GroupWindowTest extends TableTestBase {
     val table = util.addTable[(Timestamp)]("MyTable", 'rowtime)
 
     val sql =
-    """
+      """
       |WITH window_1h AS (
       |    SELECT 1
       |    FROM MyTable
@@ -426,10 +400,8 @@ class GroupWindowTest extends TableTestBase {
             batchTableNode(table),
             // This window is the 1hr window
             term("window", "SlidingGroupWindow('w$, 'rowtime, 3600000.millis, 3600000.millis)"),
-            term("select")
-          ),
-          term("select", "1 AS EXPR$0")
-        ),
+            term("select")),
+          term("select", "1 AS EXPR$0")),
         unaryNode(
           "DataSetCalc",
           unaryNode(
@@ -437,13 +409,10 @@ class GroupWindowTest extends TableTestBase {
             batchTableNode(table),
             // This window is the 2hr window
             term("window", "SlidingGroupWindow('w$, 'rowtime, 7200000.millis, 3600000.millis)"),
-            term("select")
-          ),
-          term("select", "1 AS EXPR$0")
-        ),
+            term("select")),
+          term("select", "1 AS EXPR$0")),
         term("all", "true"),
-        term("union", "EXPR$0")
-      )
+        term("union", "EXPR$0"))
 
     util.verifySql(sql, expected)
   }

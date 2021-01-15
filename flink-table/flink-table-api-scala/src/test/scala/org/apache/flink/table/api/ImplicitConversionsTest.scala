@@ -55,13 +55,7 @@ class ImplicitConversionsTest extends ImplicitExpressionConversions {
   def testMapConversion(): Unit = {
     val expr = Map("key1" -> List(2), "key2" -> List(1, 2)).toExpr
 
-    assertThatEquals(
-      expr,
-        map(
-          "key1", array(2),
-          "key2", array(1, 2)
-        )
-    )
+    assertThatEquals(expr, map("key1", array(2), "key2", array(1, 2)))
   }
 
   @Test

@@ -38,12 +38,7 @@ class GroupWindowTableAggregateStringExpressionTest extends TableTestBase {
       .window(Slide over 4.hours every 2.hours on 'rowtime as 'w)
       .groupBy('w, 'string)
       .flatAggregate(call("top3", 'int) as ('x, 'y))
-      .select(
-        'string,
-        'x,
-        'y + 1,
-        'w.start,
-        'w.end)
+      .select('string, 'x, 'y + 1, 'w.start, 'w.end)
 
     // String / Java API
     val resJava = t
@@ -52,10 +47,10 @@ class GroupWindowTableAggregateStringExpressionTest extends TableTestBase {
       .flatAggregate("top3(int) as (x, y)")
       .select(
         "string, " +
-        "x, " +
-        "y + 1, " +
-        "start(w)," +
-        "end(w)")
+          "x, " +
+          "y + 1, " +
+          "start(w)," +
+          "end(w)")
 
     verifyTableEquals(resJava, resScala)
   }
@@ -72,12 +67,7 @@ class GroupWindowTableAggregateStringExpressionTest extends TableTestBase {
       .window(Tumble over 4.hours on 'rowtime as 'w)
       .groupBy('w, 'string)
       .flatAggregate(call("top3", 'int) as ('x, 'y))
-      .select(
-        'string,
-        'x,
-        'y + 1,
-        'w.start,
-        'w.end)
+      .select('string, 'x, 'y + 1, 'w.start, 'w.end)
 
     // String / Java API
     val resJava = t
@@ -106,12 +96,7 @@ class GroupWindowTableAggregateStringExpressionTest extends TableTestBase {
       .window(Session withGap 4.hours on 'rowtime as 'w)
       .groupBy('w, 'string)
       .flatAggregate(call("top3", 'int) as ('x, 'y))
-      .select(
-        'string,
-        'x,
-        'y + 1,
-        'w.start,
-        'w.end)
+      .select('string, 'x, 'y + 1, 'w.start, 'w.end)
 
     // String / Java API
     val resJava = t
@@ -139,11 +124,7 @@ class GroupWindowTableAggregateStringExpressionTest extends TableTestBase {
       .window(Slide over 4.hours every 2.hours on 'proctime as 'w)
       .groupBy('w)
       .flatAggregate(call("top3", 'int) as ('x, 'y))
-      .select(
-        'x,
-        'y + 1,
-        'w.start,
-        'w.end)
+      .select('x, 'y + 1, 'w.start, 'w.end)
 
     // String / Java API
     val resJava = t
@@ -151,7 +132,7 @@ class GroupWindowTableAggregateStringExpressionTest extends TableTestBase {
       .groupBy("w")
       .flatAggregate("top3(int) as (x, y)")
       .select(
-          "x, " +
+        "x, " +
           "y + 1, " +
           "start(w)," +
           "end(w)")
@@ -162,7 +143,7 @@ class GroupWindowTableAggregateStringExpressionTest extends TableTestBase {
   @Test
   def testProcTimeTumble(): Unit = {
     val util = streamTestUtil()
-    val t = util.addTableSource[(Int, Long, String)]('int, 'long,'string, 'proctime.proctime)
+    val t = util.addTableSource[(Int, Long, String)]('int, 'long, 'string, 'proctime.proctime)
 
     util.addTemporarySystemFunction("top3", classOf[Top3])
 
@@ -171,11 +152,7 @@ class GroupWindowTableAggregateStringExpressionTest extends TableTestBase {
       .window(Tumble over 4.hours on 'proctime as 'w)
       .groupBy('w)
       .flatAggregate(call("top3", 'int) as ('x, 'y))
-      .select(
-        'x,
-        'y + 1,
-        'w.start,
-        'w.end)
+      .select('x, 'y + 1, 'w.start, 'w.end)
 
     // String / Java API
     val resJava = t
@@ -203,11 +180,7 @@ class GroupWindowTableAggregateStringExpressionTest extends TableTestBase {
       .window(Session withGap 4.hours on 'proctime as 'w)
       .groupBy('w)
       .flatAggregate(call("top3", 'int) as ('x, 'y))
-      .select(
-        'x,
-        'y + 1,
-        'w.start,
-        'w.end)
+      .select('x, 'y + 1, 'w.start, 'w.end)
 
     // String / Java API
     val resJava = t

@@ -27,10 +27,8 @@ import org.junit.{Ignore, Test}
 
 class DistinctAggregateTest extends TableTestBase {
   private val streamUtil: StreamTableTestUtil = streamTestUtil()
-  private val table = streamUtil.addTable[(Int, String, Long)](
-    "MyTable",
-    'a, 'b, 'c,
-    'proctime.proctime, 'rowtime.rowtime)
+  private val table = streamUtil
+    .addTable[(Int, String, Long)]("MyTable", 'a, 'b, 'c, 'proctime.proctime, 'rowtime.rowtime)
 
   @Test
   def testDistinct(): Unit = {
@@ -39,14 +37,9 @@ class DistinctAggregateTest extends TableTestBase {
     val expected =
       unaryNode(
         "DataStreamGroupAggregate",
-        unaryNode(
-          "DataStreamCalc",
-          streamTableNode(table),
-          term("select", "a, b, c")
-        ),
+        unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a, b, c")),
         term("groupBy", "a, b, c"),
-        term("select", "a, b, c")
-      )
+        term("select", "a, b, c"))
     streamUtil.verifySql(sql, expected)
   }
 
@@ -60,14 +53,9 @@ class DistinctAggregateTest extends TableTestBase {
     val expected =
       unaryNode(
         "DataStreamGroupAggregate",
-        unaryNode(
-          "DataStreamCalc",
-          streamTableNode(table),
-          term("select", "a")
-        ),
+        unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a")),
         term("groupBy", "a"),
-        term("select", "a")
-      )
+        term("select", "a"))
     streamUtil.verifySql(sql, expected)
   }
 
@@ -81,15 +69,14 @@ class DistinctAggregateTest extends TableTestBase {
     val expected =
       unaryNode(
         "DataStreamGroupAggregate",
-        unaryNode(
-          "DataStreamCalc",
-          streamTableNode(table),
-          term("select", "c", "a", "b")
-        ),
+        unaryNode("DataStreamCalc", streamTableNode(table), term("select", "c", "a", "b")),
         term("groupBy", "c"),
-        term("select", "c",
-          "SUM(DISTINCT a) AS EXPR$1", "SUM(a) AS EXPR$2", "COUNT(DISTINCT b) AS EXPR$3")
-      )
+        term(
+          "select",
+          "c",
+          "SUM(DISTINCT a) AS EXPR$1",
+          "SUM(a) AS EXPR$2",
+          "COUNT(DISTINCT b) AS EXPR$3"))
     streamUtil.verifySql(sqlQuery, expected)
   }
 
@@ -102,14 +89,9 @@ class DistinctAggregateTest extends TableTestBase {
 
     val expected = unaryNode(
       "DataStreamGroupWindowAggregate",
-      unaryNode(
-        "DataStreamCalc",
-        streamTableNode(table),
-        term("select", "rowtime", "a")
-      ),
+      unaryNode("DataStreamCalc", streamTableNode(table), term("select", "rowtime", "a")),
       term("window", "TumblingGroupWindow('w$, 'rowtime, 900000.millis)"),
-      term("select", "COUNT(DISTINCT a) AS EXPR$0", "SUM(a) AS EXPR$1")
-    )
+      term("select", "COUNT(DISTINCT a) AS EXPR$0", "SUM(a) AS EXPR$1"))
 
     streamUtil.verifySql(sqlQuery, expected)
   }
@@ -124,15 +106,13 @@ class DistinctAggregateTest extends TableTestBase {
 
     val expected = unaryNode(
       "DataStreamGroupWindowAggregate",
-      unaryNode(
-        "DataStreamCalc",
-        streamTableNode(table),
-        term("select", "rowtime", "a")
-      ),
+      unaryNode("DataStreamCalc", streamTableNode(table), term("select", "rowtime", "a")),
       term("window", "SlidingGroupWindow('w$, 'rowtime, 3600000.millis, 900000.millis)"),
-      term("select", "COUNT(DISTINCT a) AS EXPR$0", "SUM(DISTINCT a) AS EXPR$1",
-        "MAX(a) AS EXPR$2")
-    )
+      term(
+        "select",
+        "COUNT(DISTINCT a) AS EXPR$0",
+        "SUM(DISTINCT a) AS EXPR$1",
+        "MAX(a) AS EXPR$2"))
 
     streamUtil.verifySql(sqlQuery, expected)
   }
@@ -147,15 +127,10 @@ class DistinctAggregateTest extends TableTestBase {
 
     val expected = unaryNode(
       "DataStreamGroupWindowAggregate",
-      unaryNode(
-        "DataStreamCalc",
-        streamTableNode(table),
-        term("select", "a", "rowtime", "c")
-      ),
+      unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "rowtime", "c")),
       term("groupBy", "a"),
       term("window", "SessionGroupWindow('w$, 'rowtime, 900000.millis)"),
-      term("select", "a", "COUNT(a) AS EXPR$1", "SUM(DISTINCT c) AS EXPR$2")
-    )
+      term("select", "a", "COUNT(a) AS EXPR$1", "SUM(DISTINCT c) AS EXPR$2"))
 
     streamUtil.verifySql(sqlQuery, expected)
   }

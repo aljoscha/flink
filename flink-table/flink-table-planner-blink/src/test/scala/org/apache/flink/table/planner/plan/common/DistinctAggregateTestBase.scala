@@ -40,8 +40,9 @@ abstract class DistinctAggregateTestBase(withExecPlan: Boolean) extends TableTes
 
   @Test
   def testMultiDistinctAggOnSameColumn(): Unit = {
-    verifyPlan("SELECT COUNT(DISTINCT a), SUM(DISTINCT a) FILTER (WHERE b > 0),\n" +
-      "MAX(DISTINCT a) FROM MyTable")
+    verifyPlan(
+      "SELECT COUNT(DISTINCT a), SUM(DISTINCT a) FILTER (WHERE b > 0),\n" +
+        "MAX(DISTINCT a) FROM MyTable")
   }
 
   @Test
@@ -59,14 +60,16 @@ abstract class DistinctAggregateTestBase(withExecPlan: Boolean) extends TableTes
 
   @Test
   def testMultiDistinctAggOnDifferentColumn(): Unit = {
-    verifyPlan("SELECT COUNT(DISTINCT a), SUM(DISTINCT b),\n" +
-      "COUNT(DISTINCT c) FILTER (WHERE a > 5) FROM MyTable")
+    verifyPlan(
+      "SELECT COUNT(DISTINCT a), SUM(DISTINCT b),\n" +
+        "COUNT(DISTINCT c) FILTER (WHERE a > 5) FROM MyTable")
   }
 
   @Test
   def testMultiDistinctAndNonDistinctAggOnDifferentColumn(): Unit = {
-    verifyPlan("SELECT COUNT(DISTINCT a) FILTER (WHERE c > 0),\n" +
-      "SUM(DISTINCT b), COUNT(c) FROM MyTable")
+    verifyPlan(
+      "SELECT COUNT(DISTINCT a) FILTER (WHERE c > 0),\n" +
+        "SUM(DISTINCT b), COUNT(c) FROM MyTable")
   }
 
   @Test

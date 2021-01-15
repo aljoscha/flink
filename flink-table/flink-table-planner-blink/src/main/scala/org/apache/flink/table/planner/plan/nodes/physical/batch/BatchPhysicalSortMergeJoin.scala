@@ -23,7 +23,12 @@ import org.apache.flink.table.planner.plan.`trait`.FlinkRelDistributionTraitDef
 import org.apache.flink.table.planner.plan.cost.{FlinkCost, FlinkCostFactory}
 import org.apache.flink.table.planner.plan.nodes.exec.{ExecEdge, ExecNode}
 import org.apache.flink.table.planner.plan.nodes.exec.batch.BatchExecSortMergeJoin
-import org.apache.flink.table.planner.plan.utils.{FlinkRelMdUtil, FlinkRelOptUtil, JoinTypeUtil, JoinUtil}
+import org.apache.flink.table.planner.plan.utils.{
+  FlinkRelMdUtil,
+  FlinkRelOptUtil,
+  JoinTypeUtil,
+  JoinUtil
+}
 import org.apache.flink.table.runtime.operators.join.FlinkJoinType
 
 import org.apache.calcite.plan._
@@ -37,8 +42,8 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
-  * Batch physical RelNode for sort-merge [[Join]].
-  */
+ * Batch physical RelNode for sort-merge [[Join]].
+ */
 class BatchPhysicalSortMergeJoin(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -50,13 +55,13 @@ class BatchPhysicalSortMergeJoin(
     val leftSorted: Boolean,
     // true if RHS is sorted by right join key, else false
     val rightSorted: Boolean)
-  extends BatchPhysicalJoinBase(cluster, traitSet, leftRel, rightRel, condition, joinType) {
+    extends BatchPhysicalJoinBase(cluster, traitSet, leftRel, rightRel, condition, joinType) {
 
   protected def isMergeJoinSupportedType(joinRelType: FlinkJoinType): Boolean = {
     joinRelType == FlinkJoinType.INNER ||
-      joinRelType == FlinkJoinType.LEFT ||
-      joinRelType == FlinkJoinType.RIGHT ||
-      joinRelType == FlinkJoinType.FULL
+    joinRelType == FlinkJoinType.LEFT ||
+    joinRelType == FlinkJoinType.RIGHT ||
+    joinRelType == FlinkJoinType.FULL
   }
 
   override def copy(
@@ -78,7 +83,8 @@ class BatchPhysicalSortMergeJoin(
   }
 
   override def explainTerms(pw: RelWriter): RelWriter =
-    super.explainTerms(pw)
+    super
+      .explainTerms(pw)
       .itemIf("leftSorted", leftSorted, leftSorted)
       .itemIf("rightSorted", rightSorted, rightSorted)
 
@@ -108,7 +114,7 @@ class BatchPhysicalSortMergeJoin(
     val cpuCost = leftSortCpuCost + rightSortCpuCost + joinConditionCpuCost
     val costFactory = planner.getCostFactory.asInstanceOf[FlinkCostFactory]
     // assume memory is big enough, so sort process and mergeJoin process will not spill to disk.
-    var sortMemCost = 0D
+    var sortMemCost = 0d
     if (!leftSorted) {
       sortMemCost += FlinkRelMdUtil.computeSortMemory(mq, getLeft)
     }
@@ -172,10 +178,12 @@ class BatchPhysicalSortMergeJoin(
 
   // this method must be in sync with the behavior of SortMergeJoinOperator.
   def getInputEdges: util.List[ExecEdge] = List(
-    ExecEdge.builder()
+    ExecEdge
+      .builder()
       .damBehavior(ExecEdge.DamBehavior.END_INPUT)
       .build(),
-    ExecEdge.builder()
+    ExecEdge
+      .builder()
       .damBehavior(ExecEdge.DamBehavior.END_INPUT)
       .build())
 
@@ -193,15 +201,16 @@ class BatchPhysicalSortMergeJoin(
       joinSpec.getFilterNulls,
       condition,
       estimateOutputSize(getLeft) < estimateOutputSize(getRight),
-      ExecEdge.builder()
+      ExecEdge
+        .builder()
         .damBehavior(ExecEdge.DamBehavior.END_INPUT)
         .build(),
-      ExecEdge.builder()
+      ExecEdge
+        .builder()
         .damBehavior(ExecEdge.DamBehavior.END_INPUT)
         .build(),
       FlinkTypeFactory.toLogicalRowType(getRowType),
-      getRelDetailedDescription
-    )
+      getRelDetailedDescription)
   }
 
   private def estimateOutputSize(relNode: RelNode): Double = {

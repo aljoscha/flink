@@ -23,7 +23,10 @@ import org.apache.flink.api.common.functions.{FlatJoinFunction, JoinFunction}
 import org.apache.flink.api.common.typeinfo.TypeInformation
 import org.apache.flink.api.java.functions.KeySelector
 import org.apache.flink.api.java.typeutils.ResultTypeQueryable
-import org.apache.flink.streaming.api.datastream.{JoinedStreams => JavaJoinedStreams, CoGroupedStreams => JavaCoGroupedStreams}
+import org.apache.flink.streaming.api.datastream.{
+  JoinedStreams => JavaJoinedStreams,
+  CoGroupedStreams => JavaCoGroupedStreams
+}
 import org.apache.flink.streaming.api.windowing.assigners.WindowAssigner
 import org.apache.flink.streaming.api.windowing.evictors.Evictor
 import org.apache.flink.streaming.api.windowing.time.Time
@@ -71,18 +74,18 @@ class JoinedStreams[T1, T2](input1: DataStream[T1], input2: DataStream[T2]) {
   }
 
   /**
-    * A join operation that has a [[KeySelector]] defined for the first input.
-    *
-    * You need to specify a [[KeySelector]] for the second input using [[equalTo()]]
-    * before you can proceed with specifying a [[WindowAssigner]] using [[EqualTo.window()]].
-    *
-    * @tparam KEY Type of the key. This must be the same for both inputs
-    */
+   * A join operation that has a [[KeySelector]] defined for the first input.
+   *
+   * You need to specify a [[KeySelector]] for the second input using [[equalTo()]]
+   * before you can proceed with specifying a [[WindowAssigner]] using [[EqualTo.window()]].
+   *
+   * @tparam KEY Type of the key. This must be the same for both inputs
+   */
   class Where[KEY](keySelector1: KeySelector[T1, KEY], keyType: TypeInformation[KEY]) {
 
     /**
-      * Specifies a [[KeySelector]] for elements from the second input.
-      */
+     * Specifies a [[KeySelector]] for elements from the second input.
+     */
     def equalTo(keySelector: T2 => KEY): EqualTo = {
       val cleanFun = clean(keySelector)
       val localKeyType = keyType
@@ -94,14 +97,15 @@ class JoinedStreams[T1, T2](input1: DataStream[T1], input2: DataStream[T2]) {
     }
 
     /**
-      * A join operation that has a [[KeySelector]] defined for the first and the second input.
-      *
-      * A window can now be specified using [[window()]].
-      */
+     * A join operation that has a [[KeySelector]] defined for the first and the second input.
+     *
+     * A window can now be specified using [[window()]].
+     */
     class EqualTo(keySelector2: KeySelector[T2, KEY]) {
+
       /**
-        * Specifies the window on which the join operation works.
-        */
+       * Specifies the window on which the join operation works.
+       */
       @PublicEvolving
       def window[W <: Window](
           assigner: WindowAssigner[_ >: JavaCoGroupedStreams.TaggedUnion[T1, T2], W])
@@ -131,7 +135,7 @@ class JoinedStreams[T1, T2](input1: DataStream[T1], input2: DataStream[T2]) {
          */
         @PublicEvolving
         def trigger(newTrigger: Trigger[_ >: JavaCoGroupedStreams.TaggedUnion[T1, T2], _ >: W])
-        : WithWindow[W] = {
+            : WithWindow[W] = {
           new WithWindow[W](windowAssigner, newTrigger, evictor, allowedLateness)
         }
 
@@ -143,14 +147,14 @@ class JoinedStreams[T1, T2](input1: DataStream[T1], input2: DataStream[T2]) {
          */
         @PublicEvolving
         def evictor(newEvictor: Evictor[_ >: JavaCoGroupedStreams.TaggedUnion[T1, T2], _ >: W])
-        : WithWindow[W] = {
+            : WithWindow[W] = {
           new WithWindow[W](windowAssigner, trigger, newEvictor, allowedLateness)
         }
 
         /**
-          * Sets the time by which elements are allowed to be late.
-          * Delegates to [[WindowedStream#allowedLateness(Time)]]
-          */
+         * Sets the time by which elements are allowed to be late.
+         * Delegates to [[WindowedStream#allowedLateness(Time)]]
+         */
         @PublicEvolving
         def allowedLateness(newLateness: Time): WithWindow[W] = {
           new WithWindow[W](windowAssigner, trigger, evictor, newLateness)
@@ -196,14 +200,15 @@ class JoinedStreams[T1, T2](input1: DataStream[T1], input2: DataStream[T2]) {
 
           val join = new JavaJoinedStreams[T1, T2](input1.javaStream, input2.javaStream)
 
-          asScalaStream(join
-            .where(keySelector1)
-            .equalTo(keySelector2)
-            .window(windowAssigner)
-            .trigger(trigger)
-            .evictor(evictor)
-            .allowedLateness(allowedLateness)
-            .apply(clean(function), implicitly[TypeInformation[T]]))
+          asScalaStream(
+            join
+              .where(keySelector1)
+              .equalTo(keySelector2)
+              .window(windowAssigner)
+              .trigger(trigger)
+              .evictor(evictor)
+              .allowedLateness(allowedLateness)
+              .apply(clean(function), implicitly[TypeInformation[T]]))
         }
 
         /**
@@ -214,14 +219,15 @@ class JoinedStreams[T1, T2](input1: DataStream[T1], input2: DataStream[T2]) {
 
           val join = new JavaJoinedStreams[T1, T2](input1.javaStream, input2.javaStream)
 
-          asScalaStream(join
-            .where(keySelector1)
-            .equalTo(keySelector2)
-            .window(windowAssigner)
-            .trigger(trigger)
-            .evictor(evictor)
-            .allowedLateness(allowedLateness)
-            .apply(clean(function), implicitly[TypeInformation[T]]))
+          asScalaStream(
+            join
+              .where(keySelector1)
+              .equalTo(keySelector2)
+              .window(windowAssigner)
+              .trigger(trigger)
+              .evictor(evictor)
+              .allowedLateness(allowedLateness)
+              .apply(clean(function), implicitly[TypeInformation[T]]))
         }
       }
     }

@@ -33,20 +33,18 @@ class OverAggregateITCase extends BatchTestBase {
   @Before
   override def before(): Unit = {
     super.before()
+    registerCollection("Table1", data1, type1, "month, area, product", nullablesOfData1)
+    registerCollection("Table2", data2, type2, "d, e, f, g, h", nullablesOfData2)
+    registerCollection("NullTable2", nullData2, type2, "d, e, f, g, h", nullablesOfNullData2)
+    registerCollection("Table3", data6, type6, "a, b, c, d, e, f", nullablesOfData6)
+    registerCollection("Table4", data4, type4, "category, shopId, num", nullablesOfData4)
     registerCollection(
-      "Table1", data1, type1, "month, area, product", nullablesOfData1)
-    registerCollection(
-      "Table2", data2, type2, "d, e, f, g, h", nullablesOfData2)
-    registerCollection(
-      "NullTable2", nullData2, type2, "d, e, f, g, h", nullablesOfNullData2)
-    registerCollection(
-      "Table3", data6, type6, "a, b, c, d, e, f", nullablesOfData6)
-    registerCollection(
-      "Table4", data4, type4, "category, shopId, num", nullablesOfData4)
-    registerCollection(
-      "NullTable4", nullData4, type4, "category, shopId, num", nullablesOfNullData4)
-    registerCollection(
-      "Table5", simpleData2, simpleType2, "a, b", nullableOfSimpleData2)
+      "NullTable4",
+      nullData4,
+      type4,
+      "category, shopId, num",
+      nullablesOfNullData4)
+    registerCollection("Table5", simpleData2, simpleType2, "a, b", nullableOfSimpleData2)
   }
 
   @Test
@@ -59,39 +57,31 @@ class OverAggregateITCase extends BatchTestBase {
       row("b", 3, 7),
       row("b", 4, 8),
       row("c", 5, 9),
-      row("c", 6, 10)
-    )
+      row("c", 6, 10))
     checkTableResult(
       table
-        .window(
-          Over partitionBy 'area orderBy 'month preceding 0.rows following 0.rows as 'w)
+        .window(Over partitionBy 'area orderBy 'month preceding 0.rows following 0.rows as 'w)
         .select('area, 'month, 'product.sum over 'w),
-      expected
-    )
+      expected)
 
     checkTableResult(
       table
-        .window(
-          Over partitionBy 'area orderBy 'month preceding CURRENT_ROW following 0.rows as 'w)
+        .window(Over partitionBy 'area orderBy 'month preceding CURRENT_ROW following 0.rows as 'w)
         .select('area, 'month, 'product.sum over 'w),
-      expected
-    )
+      expected)
 
     checkTableResult(
       table
-        .window(
-          Over partitionBy 'area orderBy 'month preceding 0.rows following CURRENT_ROW as 'w)
+        .window(Over partitionBy 'area orderBy 'month preceding 0.rows following CURRENT_ROW as 'w)
         .select('area, 'month, 'product.sum over 'w),
-      expected
-    )
+      expected)
 
     checkTableResult(
       table
         .window(
           Over partitionBy 'area orderBy 'month preceding CURRENT_ROW following CURRENT_ROW as 'w)
         .select('area, 'month, 'product.sum over 'w),
-      expected
-    )
+      expected)
   }
 
   @Test
@@ -102,8 +92,7 @@ class OverAggregateITCase extends BatchTestBase {
       table
         .window(
           Over partitionBy 'area orderBy 'month
-            preceding UNBOUNDED_ROW following UNBOUNDED_ROW as 'w
-        )
+            preceding UNBOUNDED_ROW following UNBOUNDED_ROW as 'w)
         .select('area, 'month, 'product.sum over 'w),
       Seq(
         row("a", 1, 11),
@@ -111,9 +100,7 @@ class OverAggregateITCase extends BatchTestBase {
         row("b", 3, 15),
         row("b", 4, 15),
         row("c", 5, 19),
-        row("c", 6, 19)
-      )
-    )
+        row("c", 6, 19)))
   }
 
   @Test
@@ -123,8 +110,7 @@ class OverAggregateITCase extends BatchTestBase {
     checkTableResult(
       table2
         .window(
-          Over partitionBy 'd orderBy 'g.desc preceding UNBOUNDED_ROW following CURRENT_ROW as 'w
-        )
+          Over partitionBy 'd orderBy 'g.desc preceding UNBOUNDED_ROW following CURRENT_ROW as 'w)
         .select('d, 'g, 'e.count over 'w),
       Seq(
         row(1, "Hallo", 1),
@@ -141,15 +127,11 @@ class OverAggregateITCase extends BatchTestBase {
         row(5, "HIJ", 4),
         row(5, "IJK", 3),
         row(5, "JKL", 2),
-        row(5, "KLM", 1)
-      )
-    )
+        row(5, "KLM", 1)))
 
     checkTableResult(
       table2
-        .window(
-          Over partitionBy 'd orderBy 'g preceding UNBOUNDED_ROW following CURRENT_ROW as 'w
-        )
+        .window(Over partitionBy 'd orderBy 'g preceding UNBOUNDED_ROW following CURRENT_ROW as 'w)
         .select('d, 'g, 'e.count over 'w),
       Seq(
         row(1, "Hallo", 1),
@@ -166,9 +148,7 @@ class OverAggregateITCase extends BatchTestBase {
         row(5, "HIJ", 2),
         row(5, "IJK", 3),
         row(5, "JKL", 4),
-        row(5, "KLM", 5)
-      )
-    )
+        row(5, "KLM", 5)))
   }
 
   @Test
@@ -177,9 +157,7 @@ class OverAggregateITCase extends BatchTestBase {
 
     checkTableResult(
       table
-        .window(
-          Over partitionBy 'd orderBy 'e.desc as 'w
-        )
+        .window(Over partitionBy 'd orderBy 'e.desc as 'w)
         .select('d, 'e, 'e.sum over 'w),
       Seq(
         row(1, 1, 1),
@@ -196,9 +174,7 @@ class OverAggregateITCase extends BatchTestBase {
         row(5, 14, 29),
         row(5, 13, 42),
         row(5, 12, 54),
-        row(5, 11, 65)
-      )
-    )
+        row(5, 11, 65)))
   }
 
   @Test
@@ -207,9 +183,7 @@ class OverAggregateITCase extends BatchTestBase {
 
     checkTableResult(
       table
-        .window(
-          Over orderBy 'e as 'w
-        )
+        .window(Over orderBy 'e as 'w)
         .select('d, 'e, 'e.sum over 'w),
       Seq(
         row(1, 1, 1),
@@ -226,9 +200,7 @@ class OverAggregateITCase extends BatchTestBase {
         row(5, 12, 78),
         row(5, 13, 91),
         row(5, 14, 105),
-        row(5, 15, 120)
-      )
-    )
+        row(5, 15, 120)))
   }
 
   @Test
@@ -237,9 +209,7 @@ class OverAggregateITCase extends BatchTestBase {
 
     checkTableResult(
       table
-        .window(
-          Over partitionBy 'd orderBy 'e.desc as 'w
-        )
+        .window(Over partitionBy 'd orderBy 'e.desc as 'w)
         .select('d, 'e, '*.count over 'w),
       Seq(
         row(1, 1, 1),
@@ -256,9 +226,7 @@ class OverAggregateITCase extends BatchTestBase {
         row(5, 14, 2),
         row(5, 13, 3),
         row(5, 12, 4),
-        row(5, 11, 5)
-      )
-    )
+        row(5, 11, 5)))
   }
 
   @Test
@@ -267,9 +235,7 @@ class OverAggregateITCase extends BatchTestBase {
 
     checkTableResult(
       table
-        .window(
-          Over partitionBy 'd orderBy 'e.desc as 'w
-        )
+        .window(Over partitionBy 'd orderBy 'e.desc as 'w)
         .select('d, 'e, 'e.avg over 'w),
       Seq(
         row(1, 1, 1.0),
@@ -286,9 +252,7 @@ class OverAggregateITCase extends BatchTestBase {
         row(5, 14, 14.5),
         row(5, 13, 14.0),
         row(5, 12, 13.5),
-        row(5, 11, 13.0)
-      )
-    )
+        row(5, 11, 13.0)))
   }
 
   @Test
@@ -298,8 +262,7 @@ class OverAggregateITCase extends BatchTestBase {
     checkTableResult(
       table
         .window(
-          Over partitionBy 'd orderBy 'e.desc preceding UNBOUNDED_ROW following CURRENT_ROW as 'w
-        )
+          Over partitionBy 'd orderBy 'e.desc preceding UNBOUNDED_ROW following CURRENT_ROW as 'w)
         .select('d, 'e, 'e.sum over 'w),
       Seq(
         row(1, 1, 1),
@@ -316,9 +279,7 @@ class OverAggregateITCase extends BatchTestBase {
         row(5, 14, 29),
         row(5, 13, 42),
         row(5, 12, 54),
-        row(5, 11, 65)
-      )
-    )
+        row(5, 11, 65)))
   }
 
   @Test
@@ -327,44 +288,35 @@ class OverAggregateITCase extends BatchTestBase {
 
     val expected = Seq(
       row(1, 1, 1),
-
       row(2, 3, 5),
       row(2, 2, 2),
-
       row(3, 6, 15),
       row(3, 5, 9),
       row(3, 4, 4),
-
       row(4, 10, 34),
       row(4, 9, 24),
       row(4, 8, 15),
       row(4, 7, 7),
-
       row(5, 15, 65),
       row(5, 14, 50),
       row(5, 13, 36),
       row(5, 12, 23),
-      row(5, 11, 11)
-    )
+      row(5, 11, 11))
 
     checkTableResult(
       table
         .window(
-          Over partitionBy 'd orderBy 'e.desc preceding CURRENT_ROW following UNBOUNDED_ROW as 'w
-        )
+          Over partitionBy 'd orderBy 'e.desc preceding CURRENT_ROW following UNBOUNDED_ROW as 'w)
         .select('d, 'e, 'e.sum over 'w),
-      expected
-    )
+      expected)
 
     checkTableResult(
       table
         .window(
           Over partitionBy 'd orderBy 'e.desc
-            preceding CURRENT_ROW following 2147483648L.rows as 'w
-        )
+            preceding CURRENT_ROW following 2147483648L.rows as 'w)
         .select('d, 'e, 'e.sum over 'w),
-      expected
-    )
+      expected)
   }
 
   @Test
@@ -382,9 +334,10 @@ class OverAggregateITCase extends BatchTestBase {
             preceding CURRENT_RANGE following UNBOUNDED_RANGE as 'w4,
           Over partitionBy 'd orderBy 'e.desc preceding 1 following 2 as 'w5,
           Over partitionBy 'd orderBy 'e preceding 3 following 3 as 'w6,
-          Over partitionBy 'd orderBy 'h preceding 1 following 0 as 'w7
-        )
-        .select('d, 'e,
+          Over partitionBy 'd orderBy 'h preceding 1 following 0 as 'w7)
+        .select(
+          'd,
+          'e,
           'e.sum over 'w1,
           'e.sum over 'w2,
           'e.sum over 'w3,
@@ -392,8 +345,8 @@ class OverAggregateITCase extends BatchTestBase {
           'e.sum over 'w5,
           'e.sum over 'w6,
           'h.sum over 'w7,
-          'f, 'h
-        ),
+          'f,
+          'h),
       Seq(
         row(1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1),
         row(2, 3, 5, 5, 3, 5, 5, 5, 1, 2, 1),
@@ -409,9 +362,7 @@ class OverAggregateITCase extends BatchTestBase {
         row(5, 14, 42, 65, 29, 50, 54, 65, 5, 13, 2),
         row(5, 13, 54, 65, 42, 36, 50, 65, 10, 12, 3),
         row(5, 12, 65, 50, 54, 23, 36, 65, 10, 11, 3),
-        row(5, 11, 65, 36, 65, 11, 23, 50, 1, 10, 1)
-      )
-    )
+        row(5, 11, 65, 36, 65, 11, 23, 50, 1, 10, 1)))
   }
 
   @Test
@@ -424,39 +375,33 @@ class OverAggregateITCase extends BatchTestBase {
           Over partitionBy 'd orderBy 'e preceding 5.rows following 2.rows as 'w1,
           Over partitionBy 'd orderBy 'e.desc preceding 6.rows following 2.rows as 'w2,
           Over partitionBy 'd orderBy 'e preceding UNBOUNDED_ROW following CURRENT_ROW as 'w3,
-          Over partitionBy 'd orderBy 'e.desc preceding CURRENT_ROW following UNBOUNDED_ROW as 'w4
-        )
+          Over partitionBy 'd orderBy 'e.desc preceding CURRENT_ROW following UNBOUNDED_ROW as 'w4)
         .select(
-          'd, 'e, 'f,
+          'd,
+          'e,
+          'f,
           'e.sum over 'w1,
           '*.count over 'w2,
           'f.max over 'w3,
           'h.min over 'w4,
-          'h
-        ),
+          'h),
       Seq(
         //d   e   f sum cnt max min h
         row(1, 1, 0, 1, 1, 0, 1, 1),
-
         row(2, 2, 1, 5, 2, 1, 2, 2),
         row(2, 3, 2, 5, 2, 2, 1, 1),
-
         row(3, 4, 3, 15, 3, 3, 2, 2),
         row(3, 5, 4, 15, 3, 4, 2, 2),
         row(3, 6, 5, 15, 3, 5, 2, 3),
-
         row(4, 7, 6, 24, 4, 6, 2, 2),
         row(4, 8, 7, 34, 4, 7, 1, 1),
         row(4, 9, 8, 34, 4, 8, 1, 1),
         row(4, 10, 9, 34, 3, 9, 1, 2),
-
         row(5, 11, 10, 36, 5, 10, 1, 1),
         row(5, 12, 11, 50, 5, 11, 1, 3),
         row(5, 13, 12, 65, 5, 12, 1, 3),
         row(5, 14, 13, 65, 4, 13, 1, 2),
-        row(5, 15, 14, 65, 3, 14, 1, 2)
-      )
-    )
+        row(5, 15, 14, 65, 3, 14, 1, 2)))
   }
 
   @Test
@@ -465,9 +410,7 @@ class OverAggregateITCase extends BatchTestBase {
 
     checkTableResult(
       table
-        .window(
-          Over partitionBy 'd orderBy 'e.desc as 'w
-        )
+        .window(Over partitionBy 'd orderBy 'e.desc as 'w)
         .select('d, 'e, 'e.max over 'w),
       Seq(
         row(1, 1, 1),
@@ -484,9 +427,7 @@ class OverAggregateITCase extends BatchTestBase {
         row(5, 14, 15),
         row(5, 13, 15),
         row(5, 12, 15),
-        row(5, 11, 15)
-      )
-    )
+        row(5, 11, 15)))
   }
 
   @Test
@@ -495,9 +436,7 @@ class OverAggregateITCase extends BatchTestBase {
 
     checkTableResult(
       table
-        .window(
-          Over partitionBy 'd orderBy 'e.desc as 'w
-        )
+        .window(Over partitionBy 'd orderBy 'e.desc as 'w)
         .select('d, 'e, 'e.min over 'w),
       Seq(
         row(1, 1, 1),
@@ -514,9 +453,7 @@ class OverAggregateITCase extends BatchTestBase {
         row(5, 14, 14),
         row(5, 13, 13),
         row(5, 12, 12),
-        row(5, 11, 11)
-      )
-    )
+        row(5, 11, 11)))
   }
 
   @Test
@@ -526,20 +463,15 @@ class OverAggregateITCase extends BatchTestBase {
     checkTableResult(
       table
         .window(
-          Over partitionBy 'category orderBy 'num preceding UNBOUNDED_ROW following 1.rows as 'w
-        )
-        .select(
-          'category, 'num, 'num.avg over 'w
-        ),
+          Over partitionBy 'category orderBy 'num preceding UNBOUNDED_ROW following 1.rows as 'w)
+        .select('category, 'num, 'num.avg over 'w),
       Seq(
         row("book", 11, 11.5),
         row("book", 12, 14.0),
         row("book", 19, 14.0),
         row("fruit", 22, 27.5),
         row("fruit", 33, 33.0),
-        row("fruit", 44, 33.0)
-      )
-    )
+        row("fruit", 44, 33.0)))
   }
 
   @Test
@@ -549,59 +481,41 @@ class OverAggregateITCase extends BatchTestBase {
     // sliding frame case: 1 - 1
     checkTableResult(
       table
-        .window(
-          Over partitionBy 'category orderBy 'num preceding 1 following 1 as 'w
-        )
-        .select(
-          'category, 'num, 'num.sum over 'w
-        ),
+        .window(Over partitionBy 'category orderBy 'num preceding 1 following 1 as 'w)
+        .select('category, 'num, 'num.sum over 'w),
       Seq(
         row("book", 11, 23),
         row("book", 12, 23),
         row("book", 19, 19),
         row("fruit", 22, 22),
         row("fruit", 33, 33),
-        row("fruit", 44, 44)
-      )
-    )
+        row("fruit", 44, 44)))
 
     // sliding frame case: unbounded - 1
     checkTableResult(
       table
-        .window(
-          Over partitionBy 'category orderBy 'num preceding UNBOUNDED_RANGE following 1 as 'w
-        )
-        .select(
-          'category, 'num, 'num.sum over 'w
-        ),
+        .window(Over partitionBy 'category orderBy 'num preceding UNBOUNDED_RANGE following 1 as 'w)
+        .select('category, 'num, 'num.sum over 'w),
       Seq(
         row("book", 11, 23),
         row("book", 12, 23),
         row("book", 19, 42),
         row("fruit", 22, 22),
         row("fruit", 33, 55),
-        row("fruit", 44, 99)
-      )
-    )
+        row("fruit", 44, 99)))
 
     // sliding frame case: 1 - unbounded
     checkTableResult(
       table
-        .window(
-          Over partitionBy 'category orderBy 'num preceding 1 following UNBOUNDED_RANGE as 'w
-        )
-        .select(
-          'category, 'num, 'num.sum over 'w
-        ),
+        .window(Over partitionBy 'category orderBy 'num preceding 1 following UNBOUNDED_RANGE as 'w)
+        .select('category, 'num, 'num.sum over 'w),
       Seq(
         row("book", 11, 42),
         row("book", 12, 42),
         row("book", 19, 19),
         row("fruit", 22, 99),
         row("fruit", 33, 77),
-        row("fruit", 44, 44)
-      )
-    )
+        row("fruit", 44, 44)))
   }
 
   @Test
@@ -612,39 +526,29 @@ class OverAggregateITCase extends BatchTestBase {
     checkTableResult(
       table
         .window(
-          Over partitionBy 'category orderBy 'num preceding UNBOUNDED_ROW following 1.rows as 'w
-        )
-        .select(
-          'category, 'num, 'num.sum over 'w
-        ),
+          Over partitionBy 'category orderBy 'num preceding UNBOUNDED_ROW following 1.rows as 'w)
+        .select('category, 'num, 'num.sum over 'w),
       Seq(
         row("book", 11, 23),
         row("book", 12, 42),
         row("book", 19, 42),
         row("fruit", 22, 55),
         row("fruit", 33, 99),
-        row("fruit", 44, 99)
-      )
-    )
+        row("fruit", 44, 99)))
 
     // sliding frame case: 1 - unbounded
     checkTableResult(
       table
         .window(
-          Over partitionBy 'category orderBy 'num preceding 1.rows following UNBOUNDED_ROW as 'w
-        )
-        .select(
-          'category, 'num, 'num.sum over 'w
-        ),
+          Over partitionBy 'category orderBy 'num preceding 1.rows following UNBOUNDED_ROW as 'w)
+        .select('category, 'num, 'num.sum over 'w),
       Seq(
         row("book", 11, 42),
         row("book", 12, 42),
         row("book", 19, 31),
         row("fruit", 22, 99),
         row("fruit", 33, 99),
-        row("fruit", 44, 77)
-      )
-    )
+        row("fruit", 44, 77)))
   }
 
   @Test
@@ -653,21 +557,15 @@ class OverAggregateITCase extends BatchTestBase {
 
     checkTableResult(
       table
-        .window(
-          Over partitionBy 'category orderBy 'num preceding 1 following 1 as 'w
-        )
-        .select(
-          'category, 'num, 'num.sum over 'w
-        ),
+        .window(Over partitionBy 'category orderBy 'num preceding 1 following 1 as 'w)
+        .select('category, 'num, 'num.sum over 'w),
       Seq(
         row("book", 11, 23),
         row("book", 12, 23),
         row("book", null, null),
         row("fruit", 44, 44),
         row("fruit", null, null),
-        row("fruit", null, null)
-      )
-    )
+        row("fruit", null, null)))
   }
 
   @Test
@@ -676,12 +574,8 @@ class OverAggregateITCase extends BatchTestBase {
 
     checkTableResult(
       table
-        .window(
-          Over partitionBy 'd orderBy 'e preceding 3.rows following -1.rows as 'w
-        )
-        .select(
-          'd, 'e, 'e.sum over 'w
-        ),
+        .window(Over partitionBy 'd orderBy 'e preceding 3.rows following -1.rows as 'w)
+        .select('d, 'e, 'e.sum over 'w),
       Seq(
         row(1, 1, null),
         row(2, 2, null),
@@ -697,18 +591,12 @@ class OverAggregateITCase extends BatchTestBase {
         row(5, 12, 11),
         row(5, 13, 23),
         row(5, 14, 36),
-        row(5, 15, 39)
-      )
-    )
+        row(5, 15, 39)))
 
     checkTableResult(
       table
-        .window(
-          Over partitionBy 'd orderBy 'e preceding -1.rows following 3.rows as 'w
-        )
-        .select(
-          'd, 'e, 'e.sum over 'w
-        ),
+        .window(Over partitionBy 'd orderBy 'e preceding -1.rows following 3.rows as 'w)
+        .select('d, 'e, 'e.sum over 'w),
       Seq(
         row(1, 1, null),
         row(2, 2, 3),
@@ -724,18 +612,12 @@ class OverAggregateITCase extends BatchTestBase {
         row(5, 12, 42),
         row(5, 13, 29),
         row(5, 14, 15),
-        row(5, 15, null)
-      )
-    )
+        row(5, 15, null)))
 
     checkTableResult(
       table
-        .window(
-          Over partitionBy 'd orderBy 'e.desc preceding 5.rows following -4.rows as 'w
-        )
-        .select(
-          'd, 'e, 'e.sum over 'w
-        ),
+        .window(Over partitionBy 'd orderBy 'e.desc preceding 5.rows following -4.rows as 'w)
+        .select('d, 'e, 'e.sum over 'w),
       Seq(
         row(1, 1, null),
         row(2, 2, null),
@@ -751,18 +633,12 @@ class OverAggregateITCase extends BatchTestBase {
         row(5, 12, null),
         row(5, 13, null),
         row(5, 14, null),
-        row(5, 15, null)
-      )
-    )
+        row(5, 15, null)))
 
     checkTableResult(
       table
-        .window(
-          Over partitionBy 'd orderBy 'e preceding 5.rows following -4.rows as 'w
-        )
-        .select(
-          'd, 'e, 'e.sum over 'w
-        ),
+        .window(Over partitionBy 'd orderBy 'e preceding 5.rows following -4.rows as 'w)
+        .select('d, 'e, 'e.sum over 'w),
       Seq(
         row(1, 1, null),
         row(2, 2, null),
@@ -778,18 +654,12 @@ class OverAggregateITCase extends BatchTestBase {
         row(5, 12, null),
         row(5, 13, null),
         row(5, 14, null),
-        row(5, 15, 11)
-      )
-    )
+        row(5, 15, 11)))
 
     checkTableResult(
       table
-        .window(
-          Over partitionBy 'd orderBy 'e.desc preceding -4.rows following 5.rows as 'w
-        )
-        .select(
-          'd, 'e, 'e.sum over 'w
-        ),
+        .window(Over partitionBy 'd orderBy 'e.desc preceding -4.rows following 5.rows as 'w)
+        .select('d, 'e, 'e.sum over 'w),
       Seq(
         row(1, 1, null),
         row(2, 2, null),
@@ -805,18 +675,12 @@ class OverAggregateITCase extends BatchTestBase {
         row(5, 12, null),
         row(5, 13, null),
         row(5, 14, null),
-        row(5, 15, 11)
-      )
-    )
+        row(5, 15, 11)))
 
     checkTableResult(
       table
-        .window(
-          Over partitionBy 'd orderBy 'e preceding -4.rows following 5.rows as 'w
-        )
-        .select(
-          'd, 'e, 'e.sum over 'w
-        ),
+        .window(Over partitionBy 'd orderBy 'e preceding -4.rows following 5.rows as 'w)
+        .select('d, 'e, 'e.sum over 'w),
       Seq(
         row(1, 1, null),
         row(2, 2, null),
@@ -832,9 +696,7 @@ class OverAggregateITCase extends BatchTestBase {
         row(5, 12, null),
         row(5, 13, null),
         row(5, 14, null),
-        row(5, 15, null)
-      )
-    )
+        row(5, 15, null)))
   }
 
   @Test
@@ -843,12 +705,8 @@ class OverAggregateITCase extends BatchTestBase {
 
     checkTableResult(
       table
-        .window(
-          Over partitionBy 'd orderBy 'h preceding 2 following -1 as 'w
-        )
-        .select(
-          'd, 'h, 'h.sum over 'w
-        ),
+        .window(Over partitionBy 'd orderBy 'h preceding 2 following -1 as 'w)
+        .select('d, 'h, 'h.sum over 'w),
       Seq(
         row(1, 1, null),
         row(2, 1, null),
@@ -864,18 +722,12 @@ class OverAggregateITCase extends BatchTestBase {
         row(5, 2, 1),
         row(5, 2, 1),
         row(5, 3, 5),
-        row(5, 3, 5)
-      )
-    )
+        row(5, 3, 5)))
 
     checkTableResult(
       table
-        .window(
-          Over partitionBy 'd orderBy 'h preceding -1 following 2 as 'w
-        )
-        .select(
-          'd, 'h, 'h.sum over 'w
-        ),
+        .window(Over partitionBy 'd orderBy 'h preceding -1 following 2 as 'w)
+        .select('d, 'h, 'h.sum over 'w),
       Seq(
         row(1, 1, null),
         row(2, 1, 2),
@@ -891,18 +743,12 @@ class OverAggregateITCase extends BatchTestBase {
         row(5, 2, 6),
         row(5, 2, 6),
         row(5, 3, null),
-        row(5, 3, null)
-      )
-    )
+        row(5, 3, null)))
 
     checkTableResult(
       table
-        .window(
-          Over partitionBy 'd orderBy 'e.desc preceding 5 following -4 as 'w
-        )
-        .select(
-          'd, 'e, 'e.sum over 'w
-        ),
+        .window(Over partitionBy 'd orderBy 'e.desc preceding 5 following -4 as 'w)
+        .select('d, 'e, 'e.sum over 'w),
       Seq(
         row(1, 1, null),
         row(2, 2, null),
@@ -918,18 +764,12 @@ class OverAggregateITCase extends BatchTestBase {
         row(5, 12, null),
         row(5, 13, null),
         row(5, 14, null),
-        row(5, 15, null)
-      )
-    )
+        row(5, 15, null)))
 
     checkTableResult(
       table
-        .window(
-          Over partitionBy 'd orderBy 'e preceding 5 following -4 as 'w
-        )
-        .select(
-          'd, 'e, 'e.sum over 'w
-        ),
+        .window(Over partitionBy 'd orderBy 'e preceding 5 following -4 as 'w)
+        .select('d, 'e, 'e.sum over 'w),
       Seq(
         row(1, 1, null),
         row(2, 2, null),
@@ -945,18 +785,12 @@ class OverAggregateITCase extends BatchTestBase {
         row(5, 12, null),
         row(5, 13, null),
         row(5, 14, null),
-        row(5, 15, 11)
-      )
-    )
+        row(5, 15, 11)))
 
     checkTableResult(
       table
-        .window(
-          Over partitionBy 'd orderBy 'e.desc preceding -4 following 5 as 'w
-        )
-        .select(
-          'd, 'e, 'e.sum over 'w
-        ),
+        .window(Over partitionBy 'd orderBy 'e.desc preceding -4 following 5 as 'w)
+        .select('d, 'e, 'e.sum over 'w),
       Seq(
         row(1, 1, null),
         row(2, 2, null),
@@ -972,18 +806,12 @@ class OverAggregateITCase extends BatchTestBase {
         row(5, 12, null),
         row(5, 13, null),
         row(5, 14, null),
-        row(5, 15, 11)
-      )
-    )
+        row(5, 15, 11)))
 
     checkTableResult(
       table
-        .window(
-          Over partitionBy 'd orderBy 'e preceding -4 following 5 as 'w
-        )
-        .select(
-          'd, 'e, 'e.sum over 'w
-        ),
+        .window(Over partitionBy 'd orderBy 'e preceding -4 following 5 as 'w)
+        .select('d, 'e, 'e.sum over 'w),
       Seq(
         row(1, 1, null),
         row(2, 2, null),
@@ -999,9 +827,7 @@ class OverAggregateITCase extends BatchTestBase {
         row(5, 12, null),
         row(5, 13, null),
         row(5, 14, null),
-        row(5, 15, null)
-      )
-    )
+        row(5, 15, null)))
   }
 
   @Test
@@ -1010,9 +836,7 @@ class OverAggregateITCase extends BatchTestBase {
 
     checkTableResult(
       table
-        .window(
-          Over partitionBy 'a orderBy 'b preceding 0.15 following 0.05 as 'w
-        )
+        .window(Over partitionBy 'a orderBy 'b preceding 0.15 following 0.05 as 'w)
         .select('a, 'b, 'b.sum over 'w),
       Seq(
         row(1, 0.1, 0.1),
@@ -1029,15 +853,11 @@ class OverAggregateITCase extends BatchTestBase {
         row(5, 0.7, 1.4),
         row(5, 0.8, 3.0),
         row(5, 0.8, 3.0),
-        row(5, 0.9, 2.5)
-      )
-    )
+        row(5, 0.9, 2.5)))
 
     checkTableResult(
       table
-        .window(
-          Over partitionBy 'a orderBy 'b preceding 0.15 following -0.05 as 'w
-        )
+        .window(Over partitionBy 'a orderBy 'b preceding 0.15 following -0.05 as 'w)
         .select('a, 'b, 'b.sum over 'w),
       Seq(
         row(1, 0.1, null),
@@ -1054,9 +874,7 @@ class OverAggregateITCase extends BatchTestBase {
         row(5, 0.7, null),
         row(5, 0.8, 1.4),
         row(5, 0.8, 1.4),
-        row(5, 0.9, 1.6)
-      )
-    )
+        row(5, 0.9, 1.6)))
   }
 
   @Test
@@ -1065,9 +883,7 @@ class OverAggregateITCase extends BatchTestBase {
 
     checkTableResult(
       table
-        .window(
-          Over partitionBy 'd orderBy 'e preceding 1 following 10 as 'w
-        )
+        .window(Over partitionBy 'd orderBy 'e preceding 1 following 10 as 'w)
         .select('d, 'e, 'e.sum over 'w, 1.count over 'w),
       Seq(
         row(1, 1, 1, 1),
@@ -1084,15 +900,11 @@ class OverAggregateITCase extends BatchTestBase {
         row(5, 12, 65, 5),
         row(5, 13, 54, 4),
         row(5, 14, 42, 3),
-        row(5, 15, 29, 2)
-      )
-    )
+        row(5, 15, 29, 2)))
 
     checkTableResult(
       table
-        .window(
-          Over partitionBy 'd orderBy 'e.desc preceding 1 following 10 as 'w
-        )
+        .window(Over partitionBy 'd orderBy 'e.desc preceding 1 following 10 as 'w)
         .select('d, 'e, 'e.sum over 'w, 1.count over 'w),
       Seq(
         row(1, 1, 1, 1),
@@ -1109,15 +921,11 @@ class OverAggregateITCase extends BatchTestBase {
         row(5, 12, 36, 3),
         row(5, 13, 50, 4),
         row(5, 14, 65, 5),
-        row(5, 15, 65, 5)
-      )
-    )
+        row(5, 15, 65, 5)))
 
     checkTableResult(
       table
-        .window(
-          Over partitionBy 'd orderBy 'e.desc preceding -1 following 10 as 'w
-        )
+        .window(Over partitionBy 'd orderBy 'e.desc preceding -1 following 10 as 'w)
         .select('d, 'e, 'e.sum over 'w, 1.count over 'w),
       Seq(
         row(1, 1, null, 0),
@@ -1134,9 +942,7 @@ class OverAggregateITCase extends BatchTestBase {
         row(5, 12, 11, 1),
         row(5, 13, 23, 2),
         row(5, 14, 36, 3),
-        row(5, 15, 50, 4)
-      )
-    )
+        row(5, 15, 50, 4)))
   }
 
   @Test
@@ -1145,12 +951,8 @@ class OverAggregateITCase extends BatchTestBase {
 
     checkTableResult(
       table
-        .window(
-          Over partitionBy 'h orderBy 'd preceding 1 following 2 as 'w
-        )
-        .select(
-          'h, 'd, '*.count over 'w
-        ),
+        .window(Over partitionBy 'h orderBy 'd preceding 1 following 2 as 'w)
+        .select('h, 'd, '*.count over 'w),
       Seq(
         row(1, 1, 2),
         row(1, 2, 4),
@@ -1168,18 +970,12 @@ class OverAggregateITCase extends BatchTestBase {
         row(3, 5, 2),
         row(3, 5, 2),
         row(3, null, 2),
-        row(3, null, 2)
-      )
-    )
+        row(3, null, 2)))
 
     checkTableResult(
       table
-        .window(
-          Over partitionBy 'h orderBy 'd as 'w
-        )
-        .select(
-          'h, 'd, '*.count over 'w
-        ),
+        .window(Over partitionBy 'h orderBy 'd as 'w)
+        .select('h, 'd, '*.count over 'w),
       Seq(
         row(1, 1, 1),
         row(1, 2, 2),
@@ -1197,18 +993,12 @@ class OverAggregateITCase extends BatchTestBase {
         row(3, 5, 5),
         row(3, 5, 5),
         row(3, null, 2),
-        row(3, null, 2)
-      )
-    )
+        row(3, null, 2)))
 
     checkTableResult(
       table
-        .window(
-          Over partitionBy 'h orderBy 'd.desc preceding 1 following 2 as 'w
-        )
-        .select(
-          'h, 'd, '*.count over 'w
-        ),
+        .window(Over partitionBy 'h orderBy 'd.desc preceding 1 following 2 as 'w)
+        .select('h, 'd, '*.count over 'w),
       Seq(
         row(1, 1, 2),
         row(1, 2, 2),
@@ -1226,9 +1016,7 @@ class OverAggregateITCase extends BatchTestBase {
         row(3, 5, 3),
         row(3, 5, 3),
         row(3, null, 2),
-        row(3, null, 2)
-      )
-    )
+        row(3, null, 2)))
   }
 
   @Test
@@ -1237,12 +1025,8 @@ class OverAggregateITCase extends BatchTestBase {
 
     checkTableResult(
       table
-        .window(
-          Over partitionBy 'a orderBy 'd preceding 0.day following 2.day as 'w
-        )
-        .select(
-          'a, 'd, '*.count over 'w
-        ),
+        .window(Over partitionBy 'a orderBy 'd preceding 0.day following 2.day as 'w)
+        .select('a, 'd, '*.count over 'w),
       Seq(
         row(1, localDate("2017-04-08"), 1),
         row(2, localDate("2017-04-08"), 2),
@@ -1258,9 +1042,7 @@ class OverAggregateITCase extends BatchTestBase {
         row(5, localDate("2017-07-01"), 1),
         row(5, localDate("2017-07-20"), 1),
         row(5, localDate("2017-09-08"), 1),
-        row(5, localDate("2017-10-01"), 1)
-      )
-    )
+        row(5, localDate("2017-10-01"), 1)))
   }
 
   @Test
@@ -1269,12 +1051,8 @@ class OverAggregateITCase extends BatchTestBase {
 
     checkTableResult(
       table
-        .window(
-          Over partitionBy 'a orderBy 'e preceding 0.hour following 2.hour as 'w
-        )
-        .select(
-          'a, '*.count over 'w
-        ),
+        .window(Over partitionBy 'a orderBy 'e preceding 0.hour following 2.hour as 'w)
+        .select('a, '*.count over 'w),
       Seq(
         row(1, 1),
         row(2, 1),
@@ -1290,9 +1068,7 @@ class OverAggregateITCase extends BatchTestBase {
         row(5, 1),
         row(5, 1),
         row(5, 1),
-        row(5, 2)
-      )
-    )
+        row(5, 2)))
   }
 
   @Test
@@ -1301,9 +1077,7 @@ class OverAggregateITCase extends BatchTestBase {
 
     checkTableResult(
       table
-        .window(
-          Over orderBy 'h preceding UNBOUNDED_RANGE following CURRENT_RANGE as 'w
-        )
+        .window(Over orderBy 'h preceding UNBOUNDED_RANGE following CURRENT_RANGE as 'w)
         .select('h, 'h.sum over 'w),
       Seq(
         row(1, 5),
@@ -1320,15 +1094,11 @@ class OverAggregateITCase extends BatchTestBase {
         row(2, 19),
         row(3, 28),
         row(3, 28),
-        row(3, 28)
-      )
-    )
+        row(3, 28)))
 
     checkTableResult(
       table
-        .window(
-          Over orderBy 'h preceding CURRENT_RANGE following UNBOUNDED_RANGE as 'w
-        )
+        .window(Over orderBy 'h preceding CURRENT_RANGE following UNBOUNDED_RANGE as 'w)
         .select('h, 'h.sum over 'w),
       Seq(
         row(1, 28),
@@ -1345,15 +1115,11 @@ class OverAggregateITCase extends BatchTestBase {
         row(2, 23),
         row(3, 9),
         row(3, 9),
-        row(3, 9)
-      )
-    )
+        row(3, 9)))
 
     checkTableResult(
       table
-        .window(
-          Over orderBy 'h.desc preceding UNBOUNDED_RANGE following CURRENT_RANGE as 'w
-        )
+        .window(Over orderBy 'h.desc preceding UNBOUNDED_RANGE following CURRENT_RANGE as 'w)
         .select('h, 'h.sum over 'w),
       Seq(
         row(3, 9),
@@ -1370,15 +1136,11 @@ class OverAggregateITCase extends BatchTestBase {
         row(1, 28),
         row(1, 28),
         row(1, 28),
-        row(1, 28)
-      )
-    )
+        row(1, 28)))
 
     checkTableResult(
       table
-        .window(
-          Over orderBy 'h.desc preceding CURRENT_RANGE following UNBOUNDED_RANGE as 'w
-        )
+        .window(Over orderBy 'h.desc preceding CURRENT_RANGE following UNBOUNDED_RANGE as 'w)
         .select('h, 'h.sum over 'w),
       Seq(
         row(3, 28),
@@ -1395,9 +1157,7 @@ class OverAggregateITCase extends BatchTestBase {
         row(1, 5),
         row(1, 5),
         row(1, 5),
-        row(1, 5)
-      )
-    )
+        row(1, 5)))
   }
 
 }

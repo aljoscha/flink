@@ -39,7 +39,7 @@ abstract class BinaryComparison extends BinaryExpression {
 
   override private[flink] def validateInput(): ValidationResult =
     (left.resultType, right.resultType) match {
-      case (lType, rType) if isNumeric(lType) && isNumeric(rType) => ValidationSuccess
+      case (lType, rType) if isNumeric(lType) && isNumeric(rType)  => ValidationSuccess
       case (lType, rType) if isComparable(lType) && lType == rType => ValidationSuccess
       case (lType, rType) =>
         ValidationFailure(
@@ -56,7 +56,7 @@ case class EqualTo(left: PlannerExpression, right: PlannerExpression) extends Bi
   override private[flink] def validateInput(): ValidationResult =
     (left.resultType, right.resultType) match {
       case (lType, rType) if isNumeric(lType) && isNumeric(rType) => ValidationSuccess
-      case (lType, rType) if lType == rType => ValidationSuccess
+      case (lType, rType) if lType == rType                       => ValidationSuccess
       case (lType, rType) if isArray(lType) && lType.getTypeClass == rType.getTypeClass =>
         ValidationSuccess
       case (lType, rType) =>
@@ -72,7 +72,7 @@ case class NotEqualTo(left: PlannerExpression, right: PlannerExpression) extends
   override private[flink] def validateInput(): ValidationResult =
     (left.resultType, right.resultType) match {
       case (lType, rType) if isNumeric(lType) && isNumeric(rType) => ValidationSuccess
-      case (lType, rType) if lType == rType => ValidationSuccess
+      case (lType, rType) if lType == rType                       => ValidationSuccess
       case (lType, rType) if isArray(lType) && lType.getTypeClass == rType.getTypeClass =>
         ValidationSuccess
       case (lType, rType) =>
@@ -87,7 +87,7 @@ case class GreaterThan(left: PlannerExpression, right: PlannerExpression) extend
 }
 
 case class GreaterThanOrEqual(left: PlannerExpression, right: PlannerExpression)
-  extends BinaryComparison {
+    extends BinaryComparison {
   override def toString = s"$left >= $right"
 
   private[flink] val sqlOperator: SqlOperator = SqlStdOperatorTable.GREATER_THAN_OR_EQUAL
@@ -100,7 +100,7 @@ case class LessThan(left: PlannerExpression, right: PlannerExpression) extends B
 }
 
 case class LessThanOrEqual(left: PlannerExpression, right: PlannerExpression)
-  extends BinaryComparison {
+    extends BinaryComparison {
   override def toString = s"$left <= $right"
 
   private[flink] val sqlOperator: SqlOperator = SqlStdOperatorTable.LESS_THAN_OR_EQUAL
@@ -170,7 +170,7 @@ abstract class BetweenComparison(
     expr: PlannerExpression,
     lowerBound: PlannerExpression,
     upperBound: PlannerExpression)
-  extends PlannerExpression {
+    extends PlannerExpression {
 
   override private[flink] def resultType: TypeInformation[_] = BasicTypeInfo.BOOLEAN_TYPE_INFO
 
@@ -187,8 +187,7 @@ abstract class BetweenComparison(
       case (exprType, lowerType, upperType) =>
         ValidationFailure(
           s"Between is only supported for numeric types and " +
-            s"identical comparable types, but got $exprType, $lowerType and $upperType"
-        )
+            s"identical comparable types, but got $exprType, $lowerType and $upperType")
     }
   }
 }
@@ -197,7 +196,7 @@ case class Between(
     expr: PlannerExpression,
     lowerBound: PlannerExpression,
     upperBound: PlannerExpression)
-  extends BetweenComparison(expr, lowerBound, upperBound) {
+    extends BetweenComparison(expr, lowerBound, upperBound) {
 
   override def toString: String = s"($expr).between($lowerBound, $upperBound)"
 
@@ -206,14 +205,8 @@ case class Between(
       relBuilder.call(
         SqlStdOperatorTable.GREATER_THAN_OR_EQUAL,
         expr.toRexNode,
-        lowerBound.toRexNode
-      ),
-      relBuilder.call(
-        SqlStdOperatorTable.LESS_THAN_OR_EQUAL,
-        expr.toRexNode,
-        upperBound.toRexNode
-      )
-    )
+        lowerBound.toRexNode),
+      relBuilder.call(SqlStdOperatorTable.LESS_THAN_OR_EQUAL, expr.toRexNode, upperBound.toRexNode))
   }
 }
 
@@ -221,22 +214,13 @@ case class NotBetween(
     expr: PlannerExpression,
     lowerBound: PlannerExpression,
     upperBound: PlannerExpression)
-  extends BetweenComparison(expr, lowerBound, upperBound) {
+    extends BetweenComparison(expr, lowerBound, upperBound) {
 
   override def toString: String = s"($expr).notBetween($lowerBound, $upperBound)"
 
   override private[flink] def toRexNode(implicit relBuilder: RelBuilder): RexNode = {
     relBuilder.or(
-      relBuilder.call(
-        SqlStdOperatorTable.LESS_THAN,
-        expr.toRexNode,
-        lowerBound.toRexNode
-      ),
-      relBuilder.call(
-        SqlStdOperatorTable.GREATER_THAN,
-        expr.toRexNode,
-        upperBound.toRexNode
-      )
-    )
+      relBuilder.call(SqlStdOperatorTable.LESS_THAN, expr.toRexNode, lowerBound.toRexNode),
+      relBuilder.call(SqlStdOperatorTable.GREATER_THAN, expr.toRexNode, upperBound.toRexNode))
   }
 }

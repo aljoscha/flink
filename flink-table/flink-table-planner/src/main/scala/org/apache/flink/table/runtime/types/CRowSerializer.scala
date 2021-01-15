@@ -82,16 +82,16 @@ class CRowSerializer(val rowSerializer: TypeSerializer[Row]) extends TypeSeriali
 object CRowSerializer {
 
   /**
-    * [[CRowSerializer]] is not meant to be used for persisting state. In versions 1.6+ there
-    * were changes introduced that resulted in incompatibility in java serialization. Thus one
-    * cannot read state in 1.8+ from snapshot written with previous versions of Flink.
-    *
-    * Moreover this serializer is meant to be dropped once we migrate to the new planner
-    * implementation.
-    */
+   * [[CRowSerializer]] is not meant to be used for persisting state. In versions 1.6+ there
+   * were changes introduced that resulted in incompatibility in java serialization. Thus one
+   * cannot read state in 1.8+ from snapshot written with previous versions of Flink.
+   *
+   * Moreover this serializer is meant to be dropped once we migrate to the new planner
+   * implementation.
+   */
   @deprecated
   class CRowSerializerConfigSnapshot(rowSerializers: Array[TypeSerializer[Row]])
-    extends CompositeTypeSerializerConfigSnapshot[CRow](rowSerializers: _*) {
+      extends CompositeTypeSerializerConfigSnapshot[CRow](rowSerializers: _*) {
 
     def this() {
       this(Array.empty)
@@ -99,14 +99,13 @@ object CRowSerializer {
 
     override def getVersion: Int = CRowSerializerConfigSnapshot.VERSION
 
-    override def resolveSchemaCompatibility(newSerializer: TypeSerializer[CRow])
-      : TypeSerializerSchemaCompatibility[CRow] = {
+    override def resolveSchemaCompatibility(
+        newSerializer: TypeSerializer[CRow]): TypeSerializerSchemaCompatibility[CRow] = {
 
       CompositeTypeSerializerUtil.delegateCompatibilityCheckToNewSnapshot(
         newSerializer,
         new CRowSerializerSnapshot(),
-        getSingleNestedSerializerAndConfig.f1
-      )
+        getSingleNestedSerializerAndConfig.f1)
     }
   }
 

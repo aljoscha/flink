@@ -23,8 +23,8 @@ import org.apache.flink.types.Row
 import org.apache.flink.util.Collector
 
 /**
-  * The collector is used to wrap a [[Row]] to a [[CRow]]
-  */
+ * The collector is used to wrap a [[Row]] to a [[CRow]]
+ */
 class CRowWrappingCollector() extends Collector[Row] {
 
   var out: Collector[CRow] = _

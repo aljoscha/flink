@@ -28,27 +28,27 @@ import org.apache.flink.table.validate._
 object TypeCheckUtils {
 
   /**
-    * Checks if type information is an advanced type that can be converted to a
-    * SQL type but NOT vice versa.
-    */
+   * Checks if type information is an advanced type that can be converted to a
+   * SQL type but NOT vice versa.
+   */
   def isAdvanced(dataType: TypeInformation[_]): Boolean = dataType match {
-    case _: TimeIndicatorTypeInfo => false
-    case _: BasicTypeInfo[_] => false
-    case _: SqlTimeTypeInfo[_] => false
+    case _: TimeIndicatorTypeInfo   => false
+    case _: BasicTypeInfo[_]        => false
+    case _: SqlTimeTypeInfo[_]      => false
     case _: TimeIntervalTypeInfo[_] => false
-    case _ => true
+    case _                          => true
   }
 
   /**
-    * Checks if type information is a simple type that can be converted to a
-    * SQL type and vice versa.
-    */
+   * Checks if type information is a simple type that can be converted to a
+   * SQL type and vice versa.
+   */
   def isSimple(dataType: TypeInformation[_]): Boolean = !isAdvanced(dataType)
 
   def isNumeric(dataType: TypeInformation[_]): Boolean = dataType match {
     case _: NumericTypeInfo[_] => true
-    case BIG_DEC_TYPE_INFO => true
-    case _ => false
+    case BIG_DEC_TYPE_INFO     => true
+    case _                     => false
   }
 
   def isTemporal(dataType: TypeInformation[_]): Boolean =
@@ -78,9 +78,9 @@ object TypeCheckUtils {
   def isIntervalMillis(dataType: TypeInformation[_]): Boolean = dataType == INTERVAL_MILLIS
 
   def isArray(dataType: TypeInformation[_]): Boolean = dataType match {
-    case _: ObjectArrayTypeInfo[_, _] |
-         _: BasicArrayTypeInfo[_, _] |
-         _: PrimitiveArrayTypeInfo[_]  => true
+    case _: ObjectArrayTypeInfo[_, _] | _: BasicArrayTypeInfo[_, _] |
+        _: PrimitiveArrayTypeInfo[_] =>
+      true
     case _ => false
   }
 
@@ -91,32 +91,28 @@ object TypeCheckUtils {
     classOf[Comparable[_]].isAssignableFrom(dataType.getTypeClass) && !isArray(dataType)
 
   /**
-    * Types that can be easily converted into a string without ambiguity.
-    */
+   * Types that can be easily converted into a string without ambiguity.
+   */
   def isSimpleStringRepresentation(dataType: TypeInformation[_]): Boolean =
     isNumeric(dataType) || isString(dataType) || isTemporal(dataType) || isBoolean(dataType)
 
-  def assertNumericExpr(
-      dataType: TypeInformation[_],
-      caller: String)
-    : ValidationResult = dataType match {
-    case _: NumericTypeInfo[_] =>
-      ValidationSuccess
-    case BIG_DEC_TYPE_INFO =>
-      ValidationSuccess
-    case _ =>
-      ValidationFailure(s"$caller requires numeric types, get $dataType here")
-  }
+  def assertNumericExpr(dataType: TypeInformation[_], caller: String): ValidationResult =
+    dataType match {
+      case _: NumericTypeInfo[_] =>
+        ValidationSuccess
+      case BIG_DEC_TYPE_INFO =>
+        ValidationSuccess
+      case _ =>
+        ValidationFailure(s"$caller requires numeric types, get $dataType here")
+    }
 
-  def assertIntegerFamilyExpr(
-      dataType: TypeInformation[_],
-      caller: String)
-    : ValidationResult = dataType match {
-    case _: IntegerTypeInfo[_] =>
-      ValidationSuccess
-    case _ =>
-      ValidationFailure(s"$caller requires integer types but was '$dataType'.")
-  }
+  def assertIntegerFamilyExpr(dataType: TypeInformation[_], caller: String): ValidationResult =
+    dataType match {
+      case _: IntegerTypeInfo[_] =>
+        ValidationSuccess
+      case _ =>
+        ValidationFailure(s"$caller requires integer types but was '$dataType'.")
+    }
 
   def assertOrderableExpr(dataType: TypeInformation[_], caller: String): ValidationResult = {
     if (dataType.isSortKeyType) {
@@ -127,12 +123,12 @@ object TypeCheckUtils {
   }
 
   /**
-    * Checks whether a type implements own hashCode() and equals() methods for storing an instance
-    * in Flink's state or performing a keyBy operation.
-    *
-    * @param name name of the operation
-    * @param t type information to be validated
-    */
+   * Checks whether a type implements own hashCode() and equals() methods for storing an instance
+   * in Flink's state or performing a keyBy operation.
+   *
+   * @param name name of the operation
+   * @param t type information to be validated
+   */
   def validateEqualsHashCode(name: String, t: TypeInformation[_]): Unit = t match {
 
     // make sure that a POJO class is a valid state type
@@ -154,12 +150,12 @@ object TypeCheckUtils {
   }
 
   /**
-    * Checks whether a class implements own hashCode() and equals() methods for storing an instance
-    * in Flink's state or performing a keyBy operation.
-    *
-    * @param name name of the operation
-    * @param c class to be validated
-    */
+   * Checks whether a class implements own hashCode() and equals() methods for storing an instance
+   * in Flink's state or performing a keyBy operation.
+   *
+   * @param name name of the operation
+   * @param c class to be validated
+   */
   def validateEqualsHashCode(name: String, c: Class[_]): Unit = {
 
     // skip primitives
@@ -173,20 +169,20 @@ object TypeCheckUtils {
         if (c.getMethod("hashCode").getDeclaringClass eq classOf[Object]) {
           throw new ValidationException(
             s"Type '${c.getCanonicalName}' cannot be used in a $name operation because it " +
-            s"does not implement a proper hashCode() method.")
+              s"does not implement a proper hashCode() method.")
         }
         if (c.getMethod("equals", classOf[Object]).getDeclaringClass eq classOf[Object]) {
           throw new ValidationException(
             s"Type '${c.getCanonicalName}' cannot be used in a $name operation because it " +
-            s"does not implement a proper equals() method.")
+              s"does not implement a proper equals() method.")
         }
       }
     }
   }
 
   /**
-    * Checks if a class is a Java primitive wrapper.
-    */
+   * Checks if a class is a Java primitive wrapper.
+   */
   def isPrimitiveWrapper(clazz: Class[_]): Boolean = {
     clazz == classOf[java.lang.Boolean] ||
     clazz == classOf[java.lang.Byte] ||
@@ -199,11 +195,11 @@ object TypeCheckUtils {
   }
 
   /**
-    * Checks if one class can be assigned to a variable of another class.
-    *
-    * Adopted from o.a.commons.lang.ClassUtils#isAssignable(java.lang.Class[], java.lang.Class[])
-    * but without null checks.
-    */
+   * Checks if one class can be assigned to a variable of another class.
+   *
+   * Adopted from o.a.commons.lang.ClassUtils#isAssignable(java.lang.Class[], java.lang.Class[])
+   * but without null checks.
+   */
   def isAssignable(classArray: Array[Class[_]], toClassArray: Array[Class[_]]): Boolean = {
     if (classArray.length != toClassArray.length) {
       return false
@@ -219,11 +215,11 @@ object TypeCheckUtils {
   }
 
   /**
-    * Checks if one class can be assigned to a variable of another class.
-    *
-    * Adopted from o.a.commons.lang.ClassUtils#isAssignable(java.lang.Class, java.lang.Class) but
-    * without null checks.
-    */
+   * Checks if one class can be assigned to a variable of another class.
+   *
+   * Adopted from o.a.commons.lang.ClassUtils#isAssignable(java.lang.Class, java.lang.Class) but
+   * without null checks.
+   */
   def isAssignable(cls: Class[_], toClass: Class[_]): Boolean = {
     if (cls.equals(toClass)) {
       return true
@@ -248,26 +244,26 @@ object TypeCheckUtils {
         return false
       }
       if (java.lang.Float.TYPE.equals(cls)) {
-          return java.lang.Double.TYPE.equals(toClass)
+        return java.lang.Double.TYPE.equals(toClass)
       }
       if (java.lang.Character.TYPE.equals(cls)) {
-          return java.lang.Integer.TYPE.equals(toClass) ||
-            java.lang.Long.TYPE.equals(toClass) ||
-            java.lang.Float.TYPE.equals(toClass) ||
-            java.lang.Double.TYPE.equals(toClass)
+        return java.lang.Integer.TYPE.equals(toClass) ||
+          java.lang.Long.TYPE.equals(toClass) ||
+          java.lang.Float.TYPE.equals(toClass) ||
+          java.lang.Double.TYPE.equals(toClass)
       }
       if (java.lang.Short.TYPE.equals(cls)) {
-          return java.lang.Integer.TYPE.equals(toClass) ||
-            java.lang.Long.TYPE.equals(toClass) ||
-            java.lang.Float.TYPE.equals(toClass) ||
-            java.lang.Double.TYPE.equals(toClass)
+        return java.lang.Integer.TYPE.equals(toClass) ||
+          java.lang.Long.TYPE.equals(toClass) ||
+          java.lang.Float.TYPE.equals(toClass) ||
+          java.lang.Double.TYPE.equals(toClass)
       }
       if (java.lang.Byte.TYPE.equals(cls)) {
-          return java.lang.Short.TYPE.equals(toClass) ||
-            java.lang.Integer.TYPE.equals(toClass) ||
-            java.lang.Long.TYPE.equals(toClass) ||
-            java.lang.Float.TYPE.equals(toClass) ||
-            java.lang.Double.TYPE.equals(toClass)
+        return java.lang.Short.TYPE.equals(toClass) ||
+          java.lang.Integer.TYPE.equals(toClass) ||
+          java.lang.Long.TYPE.equals(toClass) ||
+          java.lang.Float.TYPE.equals(toClass) ||
+          java.lang.Double.TYPE.equals(toClass)
       }
       // should never get here
       return false

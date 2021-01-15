@@ -30,8 +30,8 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 /**
-  * ITCase for the [[org.apache.flink.api.common.state.BroadcastState]].
-  */
+ * ITCase for the [[org.apache.flink.api.common.state.BroadcastState]].
+ */
 class BroadcastStateITCase extends AbstractTestBase {
 
   @Test
@@ -81,7 +81,8 @@ class BroadcastStateITCase extends AbstractTestBase {
 
     val broadcast = srcTwo.broadcast(DESCRIPTOR)
     // the timestamp should be high enough to trigger the timer after all the elements arrive.
-    val output = srcOne.connect(broadcast)
+    val output = srcOne
+      .connect(broadcast)
       .process(new TestBroadcastProcessFunction(100000L, expected))
 
     output
@@ -92,8 +93,8 @@ class BroadcastStateITCase extends AbstractTestBase {
 }
 
 class TestBroadcastProcessFunction(
-        expectedTimestamp: Long,
-        expectedBroadcastState: Map[Long, String])
+    expectedTimestamp: Long,
+    expectedBroadcastState: Map[Long, String])
     extends KeyedBroadcastProcessFunction[Long, Long, String, String] {
 
   lazy val localDescriptor = new MapStateDescriptor[Long, String](
@@ -102,7 +103,7 @@ class TestBroadcastProcessFunction(
     BasicTypeInfo.STRING_TYPE_INFO)
 
   var timerToExpectedKey = Map[Long, Long]()
-  var nextTimerTimestamp :Long = expectedTimestamp
+  var nextTimerTimestamp: Long = expectedTimestamp
 
   @throws[Exception]
   override def processElement(

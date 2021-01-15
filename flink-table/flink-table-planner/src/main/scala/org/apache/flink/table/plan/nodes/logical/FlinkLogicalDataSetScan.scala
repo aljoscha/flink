@@ -37,12 +37,11 @@ class FlinkLogicalDataSetScan(
     val dataSet: DataSet[_],
     val fieldIdxs: Array[Int],
     val schema: RelDataType)
-  extends TableScan(
-    cluster,
-    traitSet,
-    RelOptTableImpl.create(catalog, schema, List[String]().asJava, null))
-  with FlinkLogicalRel {
-
+    extends TableScan(
+      cluster,
+      traitSet,
+      RelOptTableImpl.create(catalog, schema, List[String]().asJava, null))
+    with FlinkLogicalRel {
 
   override def estimateRowCount(mq: RelMetadataQuery): Double = 1000L
 

@@ -26,12 +26,11 @@ import org.apache.flink.table.plan.nodes.dataset.DataSetValues
 import org.apache.flink.table.plan.nodes.logical.FlinkLogicalValues
 
 class DataSetValuesRule
-  extends ConverterRule(
-    classOf[FlinkLogicalValues],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.DATASET,
-    "DataSetValuesRule")
-{
+    extends ConverterRule(
+      classOf[FlinkLogicalValues],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.DATASET,
+      "DataSetValuesRule") {
 
   def convert(rel: RelNode): RelNode = {
     val values: FlinkLogicalValues = rel.asInstanceOf[FlinkLogicalValues]

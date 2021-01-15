@@ -34,16 +34,16 @@ import java.util
 import java.util.function.Supplier
 
 /**
-  * Sub-class of [[Values]] that is a relational expression
-  * whose value is a sequence of zero or more literal row values in Flink.
-  */
+ * Sub-class of [[Values]] that is a relational expression
+ * whose value is a sequence of zero or more literal row values in Flink.
+ */
 class FlinkLogicalValues(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
     rowRelDataType: RelDataType,
     tuples: ImmutableList[ImmutableList[RexLiteral]])
-  extends Values(cluster, rowRelDataType, tuples, traitSet)
-  with FlinkLogicalRel {
+    extends Values(cluster, rowRelDataType, tuples, traitSet)
+    with FlinkLogicalRel {
 
   override def copy(traitSet: RelTraitSet, inputs: util.List[RelNode]): RelNode = {
     new FlinkLogicalValues(cluster, traitSet, rowRelDataType, tuples)
@@ -60,11 +60,11 @@ class FlinkLogicalValues(
 }
 
 private class FlinkLogicalValuesConverter
-  extends ConverterRule(
-    classOf[LogicalValues],
-    Convention.NONE,
-    FlinkConventions.LOGICAL,
-    "FlinkLogicalValuesConverter") {
+    extends ConverterRule(
+      classOf[LogicalValues],
+      Convention.NONE,
+      FlinkConventions.LOGICAL,
+      "FlinkLogicalValuesConverter") {
 
   override def convert(rel: RelNode): RelNode = {
     val values = rel.asInstanceOf[LogicalValues]
@@ -80,10 +80,14 @@ object FlinkLogicalValues {
       rowType: RelDataType,
       tuples: ImmutableList[ImmutableList[RexLiteral]]): FlinkLogicalValues = {
     val mq = cluster.getMetadataQuery
-    val traitSet = cluster.traitSetOf(FlinkConventions.LOGICAL).replaceIfs(
-      RelCollationTraitDef.INSTANCE, new Supplier[util.List[RelCollation]]() {
-        def get: util.List[RelCollation] = RelMdCollation.values(mq, rowType, tuples)
-      }).simplify()
+    val traitSet = cluster
+      .traitSetOf(FlinkConventions.LOGICAL)
+      .replaceIfs(
+        RelCollationTraitDef.INSTANCE,
+        new Supplier[util.List[RelCollation]]() {
+          def get: util.List[RelCollation] = RelMdCollation.values(mq, rowType, tuples)
+        })
+      .simplify()
     new FlinkLogicalValues(cluster, traitSet, rowType, tuples)
   }
 }

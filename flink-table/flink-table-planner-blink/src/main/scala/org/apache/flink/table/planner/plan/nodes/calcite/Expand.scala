@@ -31,19 +31,19 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
-  * Relational expression that apply a number of projects to every input row,
-  * hence we will get multiple output rows for an input row.
-  *
-  * <p/> Values of expand_id should be unique.
-  *
-  * @param cluster       cluster that this relational expression belongs to
-  * @param traits        the traits of this rel
-  * @param input         input relational expression
-  * @param outputRowType output row type
-  * @param projects      all projects, each project contains list of expressions for
-  *                      the output columns
-  * @param expandIdIndex expand_id('$e') field index
-  */
+ * Relational expression that apply a number of projects to every input row,
+ * hence we will get multiple output rows for an input row.
+ *
+ * <p/> Values of expand_id should be unique.
+ *
+ * @param cluster       cluster that this relational expression belongs to
+ * @param traits        the traits of this rel
+ * @param input         input relational expression
+ * @param outputRowType output row type
+ * @param projects      all projects, each project contains list of expressions for
+ *                      the output columns
+ * @param expandIdIndex expand_id('$e') field index
+ */
 abstract class Expand(
     cluster: RelOptCluster,
     traits: RelTraitSet,
@@ -51,7 +51,7 @@ abstract class Expand(
     outputRowType: RelDataType,
     val projects: util.List[util.List[RexNode]],
     val expandIdIndex: Int)
-  extends SingleRel(cluster, traits, input) {
+    extends SingleRel(cluster, traits, input) {
 
   isValid(Litmus.THROW, null)
 
@@ -70,7 +70,7 @@ abstract class Expand(
     for (project <- projects) {
       project.get(expandIdIndex) match {
         case literal: RexLiteral => expandIdValues.add(literal.getValue)
-        case _ => return litmus.fail("expand_id value should not be null.")
+        case _                   => return litmus.fail("expand_id value should not be null.")
       }
     }
     if (expandIdValues.size() != projects.size()) {
@@ -87,14 +87,17 @@ abstract class Expand(
       // improve the readability
       names.mkString(", ")
     } else {
-      projects.map {
-        project =>
-          project.zipWithIndex.map {
-            case (r: RexInputRef, i: Int) => s"${names.get(i)}=[${r.getName}]"
-            case (l: RexLiteral, i: Int) => s"${names.get(i)}=[${l.getValue3}]"
-            case (o, _) => s"$o"
-          }.mkString("{", ", ", "}")
-      }.mkString(", ")
+      projects
+        .map { project =>
+          project.zipWithIndex
+            .map {
+              case (r: RexInputRef, i: Int) => s"${names.get(i)}=[${r.getName}]"
+              case (l: RexLiteral, i: Int)  => s"${names.get(i)}=[${l.getValue3}]"
+              case (o, _)                   => s"$o"
+            }
+            .mkString("{", ", ", "}")
+        }
+        .mkString(", ")
     }
     super.explainTerms(pw).item("projects", terms)
   }

@@ -29,7 +29,11 @@ import org.apache.flink.table.api.bridge.scala._
 import org.apache.flink.table.functions.AggregateFunction
 import org.apache.flink.table.runtime.utils.JavaUserDefinedAggFunctions.MultiArgCount
 import org.apache.flink.table.runtime.utils.TimeTestUtil.EventTimeSourceFunction
-import org.apache.flink.table.runtime.utils.{StreamITCase, StreamTestData, StreamingWithStateTestBase}
+import org.apache.flink.table.runtime.utils.{
+  StreamITCase,
+  StreamTestData,
+  StreamingWithStateTestBase
+}
 import org.apache.flink.types.Row
 
 import org.junit.Assert._
@@ -66,7 +70,8 @@ class OverWindowITCase extends StreamingWithStateTestBase {
 
   @Test
   def testProcTimeBoundedPartitionedRowsOver(): Unit = {
-    val t = StreamTestData.get5TupleDataStream(env)
+    val t = StreamTestData
+      .get5TupleDataStream(env)
       .toTable(tEnv, 'a, 'b, 'c, 'd, 'e, 'proctime.proctime)
     tEnv.registerTable("MyTable", t)
 
@@ -102,7 +107,8 @@ class OverWindowITCase extends StreamingWithStateTestBase {
 
   @Test
   def testProcTimeBoundedNonPartitionedRowsOver(): Unit = {
-    val t = StreamTestData.get5TupleDataStream(env)
+    val t = StreamTestData
+      .get5TupleDataStream(env)
       .toTable(tEnv, 'a, 'b, 'c, 'd, 'e, 'proctime.proctime)
     tEnv.registerTable("MyTable", t)
 
@@ -153,8 +159,15 @@ class OverWindowITCase extends StreamingWithStateTestBase {
     env.execute()
 
     val expected = List(
-      "Hello World,1,7,2", "Hello World,2,15,4", "Hello World,3,35,6",
-      "Hello,1,1,2", "Hello,2,3,4", "Hello,3,6,6", "Hello,4,10,8", "Hello,5,15,10", "Hello,6,21,12")
+      "Hello World,1,7,2",
+      "Hello World,2,15,4",
+      "Hello World,3,35,6",
+      "Hello,1,1,2",
+      "Hello,2,3,4",
+      "Hello,3,6,6",
+      "Hello,4,10,8",
+      "Hello,5,15,10",
+      "Hello,6,21,12")
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
   }
 
@@ -176,8 +189,15 @@ class OverWindowITCase extends StreamingWithStateTestBase {
     env.execute()
 
     val expected = List(
-      "Hello World,1", "Hello World,2", "Hello World,3",
-      "Hello,1", "Hello,2", "Hello,3", "Hello,4", "Hello,5", "Hello,6")
+      "Hello World,1",
+      "Hello World,2",
+      "Hello World,3",
+      "Hello,1",
+      "Hello,2",
+      "Hello,3",
+      "Hello,4",
+      "Hello,5",
+      "Hello,6")
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
 
   }
@@ -199,8 +219,15 @@ class OverWindowITCase extends StreamingWithStateTestBase {
     env.execute()
 
     val expected = List(
-      "Hello World,7,28", "Hello World,8,36", "Hello World,9,56",
-      "Hello,1,1", "Hello,2,3", "Hello,3,6", "Hello,4,10", "Hello,5,15", "Hello,6,21")
+      "Hello World,7,28",
+      "Hello World,8,36",
+      "Hello World,9,56",
+      "Hello,1,1",
+      "Hello,2,3",
+      "Hello,3,6",
+      "Hello,4,10",
+      "Hello,5,15",
+      "Hello,6,21")
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
   }
 
@@ -278,14 +305,23 @@ class OverWindowITCase extends StreamingWithStateTestBase {
     env.execute()
 
     val expected = List(
-      "Hello,1,0,1,1", "Hello,15,0,2,2", "Hello,16,0,3,3",
-      "Hello,2,0,6,9", "Hello,3,0,6,9", "Hello,2,0,6,9",
+      "Hello,1,0,1,1",
+      "Hello,15,0,2,2",
+      "Hello,16,0,3,3",
+      "Hello,2,0,6,9",
+      "Hello,3,0,6,9",
+      "Hello,2,0,6,9",
       "Hello,3,0,4,9",
       "Hello,4,0,2,7",
       "Hello,5,1,2,9",
-      "Hello,6,2,2,11", "Hello,65,2,2,12",
-      "Hello,9,2,2,12", "Hello,9,2,2,12", "Hello,18,3,3,18",
-      "Hello World,7,1,1,7", "Hello World,17,3,3,21", "Hello World,77,3,3,21",
+      "Hello,6,2,2,11",
+      "Hello,65,2,2,12",
+      "Hello,9,2,2,12",
+      "Hello,9,2,2,12",
+      "Hello,18,3,3,18",
+      "Hello World,7,1,1,7",
+      "Hello World,17,3,3,21",
+      "Hello World,77,3,3,21",
       "Hello World,18,1,1,7",
       "Hello World,8,2,2,15",
       "Hello World,20,1,1,20")
@@ -337,12 +373,22 @@ class OverWindowITCase extends StreamingWithStateTestBase {
     env.execute()
 
     val expected = List(
-      "Hello,1,0,1,1", "Hello,1,0,2,2", "Hello,1,0,3,3",
-      "Hello,2,0,3,4", "Hello,2,0,3,5", "Hello,2,0,3,6",
-      "Hello,3,0,3,7", "Hello,4,0,3,9", "Hello,5,1,3,12",
+      "Hello,1,0,1,1",
+      "Hello,1,0,2,2",
+      "Hello,1,0,3,3",
+      "Hello,2,0,3,4",
+      "Hello,2,0,3,5",
+      "Hello,2,0,3,6",
+      "Hello,3,0,3,7",
+      "Hello,4,0,3,9",
+      "Hello,5,1,3,12",
       "Hello,6,2,3,15",
-      "Hello World,7,1,1,7", "Hello World,7,2,2,14", "Hello World,7,3,3,21",
-      "Hello World,7,3,3,21", "Hello World,8,3,3,22", "Hello World,20,3,3,35")
+      "Hello World,7,1,1,7",
+      "Hello World,7,2,2,14",
+      "Hello World,7,3,3,21",
+      "Hello World,7,3,3,21",
+      "Hello World,8,3,3,22",
+      "Hello World,20,3,3,35")
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
   }
 
@@ -399,14 +445,24 @@ class OverWindowITCase extends StreamingWithStateTestBase {
     env.execute()
 
     val expected = List(
-      "Hello,1,1,1", "Hello,15,2,2", "Hello,16,3,3",
-      "Hello,2,6,9", "Hello,3,6,9", "Hello,2,6,9",
+      "Hello,1,1,1",
+      "Hello,15,2,2",
+      "Hello,16,3,3",
+      "Hello,2,6,9",
+      "Hello,3,6,9",
+      "Hello,2,6,9",
       "Hello,3,4,9",
       "Hello,4,2,7",
       "Hello,5,2,9",
-      "Hello,6,2,11", "Hello,65,2,12",
-      "Hello,9,2,12", "Hello,9,2,12", "Hello,18,3,18",
-      "Hello World,7,4,25", "Hello World,17,3,21", "Hello World,77,3,21", "Hello World,18,1,7",
+      "Hello,6,2,11",
+      "Hello,65,2,12",
+      "Hello,9,2,12",
+      "Hello,9,2,12",
+      "Hello,18,3,18",
+      "Hello World,7,4,25",
+      "Hello World,17,3,21",
+      "Hello World,77,3,21",
+      "Hello World,18,1,7",
       "Hello World,8,2,15",
       "Hello World,20,1,20")
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
@@ -453,12 +509,19 @@ class OverWindowITCase extends StreamingWithStateTestBase {
     env.execute()
 
     val expected = List(
-      "Hello,1,1,1", "Hello,1,2,2", "Hello,1,3,3",
-      "Hello,2,3,4", "Hello,2,3,5", "Hello,2,3,6",
+      "Hello,1,1,1",
+      "Hello,1,2,2",
+      "Hello,1,3,3",
+      "Hello,2,3,4",
+      "Hello,2,3,5",
+      "Hello,2,3,6",
       "Hello,3,3,7",
-      "Hello,4,3,9", "Hello,5,3,12",
-      "Hello,6,3,15", "Hello World,7,3,18",
-      "Hello World,8,3,21", "Hello World,8,3,23",
+      "Hello,4,3,9",
+      "Hello,5,3,12",
+      "Hello,6,3,15",
+      "Hello World,7,3,18",
+      "Hello World,8,3,21",
+      "Hello World,8,3,23",
       "Hello World,9,3,25",
       "Hello World,20,3,37")
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
@@ -562,8 +625,9 @@ class OverWindowITCase extends StreamingWithStateTestBase {
       Left(14000022L, (1, 9L, "Hello world")),
       Right(14000030L))
 
-    val t1 = env.addSource(new EventTimeSourceFunction[(Int, Long, String)](data))
-             .toTable(tEnv, 'a, 'b, 'c, 'rowtime.rowtime)
+    val t1 = env
+      .addSource(new EventTimeSourceFunction[(Int, Long, String)](data))
+      .toTable(tEnv, 'a, 'b, 'c, 'rowtime.rowtime)
 
     tEnv.registerTable("T1", t1)
     tEnv.registerFunction("LTCNT", new LargerThanCount)
@@ -668,8 +732,7 @@ class OverWindowITCase extends StreamingWithStateTestBase {
       Left(14000008L, (6, 8L, "Hello world")),
       Right(14000020L),
       Left(14000021L, (6, 8L, "Hello world")),
-      Right(14000030L)
-    )
+      Right(14000030L))
 
     val t1 = env
       .addSource(new EventTimeSourceFunction[(Int, Long, String)](data))
@@ -693,7 +756,7 @@ class OverWindowITCase extends StreamingWithStateTestBase {
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
   }
 
-  /** test sliding event-time unbounded window with partition by **/
+  /** test sliding event-time unbounded window with partition by * */
   @Test
   def testRowTimeUnBoundedPartitionedRowsOver2(): Unit = {
     val sqlQuery = "SELECT a, b, c, " +
@@ -734,10 +797,10 @@ class OverWindowITCase extends StreamingWithStateTestBase {
       Left(14000024L, (1, 7L, "Hello world")),
       Left(14000023L, (1, 8L, "Hello world")),
       Left(14000021L, (1, 9L, "Hello world")),
-      Right(14000030L)
-    )
+      Right(14000030L))
 
-    val t1 = env.addSource(new EventTimeSourceFunction[(Int, Long, String)](data))
+    val t1 = env
+      .addSource(new EventTimeSourceFunction[(Int, Long, String)](data))
       .toTable(tEnv, 'a, 'b, 'c, 'rowtime.rowtime)
 
     tEnv.registerTable("T1", t1)
@@ -760,14 +823,14 @@ class OverWindowITCase extends StreamingWithStateTestBase {
       "1,8,Hello world,34,7,4,9,1",
       "1,7,Hello world,41,8,5,9,1",
       "2,5,Hello world,8,3,2,5,1",
-      "3,5,Hello world,8,3,2,5,1"
-    )
+      "3,5,Hello world,8,3,2,5,1")
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
   }
 
   @Test
   def testProcTimeDistinctBoundedPartitionedRowsOver(): Unit = {
-    val t = StreamTestData.get5TupleDataStream(env)
+    val t = StreamTestData
+      .get5TupleDataStream(env)
       .toTable(tEnv, 'a, 'b, 'c, 'd, 'e, 'proctime.proctime)
     tEnv.registerTable("MyTable", t)
 
@@ -805,7 +868,8 @@ class OverWindowITCase extends StreamingWithStateTestBase {
 
   @Test
   def testProcTimeDistinctUnboundedPartitionedRowsOver(): Unit = {
-    val t = StreamTestData.get5TupleDataStream(env)
+    val t = StreamTestData
+      .get5TupleDataStream(env)
       .toTable(tEnv, 'a, 'b, 'c, 'd, 'e, 'proctime.proctime)
     tEnv.registerTable("MyTable", t)
     tEnv.registerFunction("myCount", new MultiArgCount)
@@ -863,7 +927,8 @@ class OverWindowITCase extends StreamingWithStateTestBase {
     // for sum aggregation ensure that every time the order of each element is consistent
     env.setParallelism(1)
 
-    val table = env.fromCollection(data)
+    val table = env
+      .fromCollection(data)
       .assignAscendingTimestamps(_._1)
       .toTable(tEnv, 'a, 'b, 'c, 'rtime.rowtime)
 
@@ -890,9 +955,16 @@ class OverWindowITCase extends StreamingWithStateTestBase {
     env.execute()
 
     val expected = List(
-      "null,1,0,0|1,0,0", "null,1,0,0|1,0,0", "null,2,0,0|1,0,0", "null,1,2,2|1,2,2",
-      "Hello,1,1,1|1,1,1", "Hello,1,1,1|1,1,1", "Hello,2,1,1|1,1,1",
-      "Hello World,1,2,2|1,2,2", "Hello World,2,2,2|1,2,2", "Hello World,2,2,2|1,2,2")
+      "null,1,0,0|1,0,0",
+      "null,1,0,0|1,0,0",
+      "null,2,0,0|1,0,0",
+      "null,1,2,2|1,2,2",
+      "Hello,1,1,1|1,1,1",
+      "Hello,1,1,1|1,1,1",
+      "Hello,2,1,1|1,1,1",
+      "Hello World,1,2,2|1,2,2",
+      "Hello World,2,2,2|1,2,2",
+      "Hello World,2,2,2|1,2,2")
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
   }
 
@@ -941,11 +1013,11 @@ class OverWindowITCase extends StreamingWithStateTestBase {
 
 object OverWindowITCase {
 
-  class EventTimeSourceFunction[T](
-      dataWithTimestampList: Seq[Either[(Long, T), Long]]) extends SourceFunction[T] {
+  class EventTimeSourceFunction[T](dataWithTimestampList: Seq[Either[(Long, T), Long]])
+      extends SourceFunction[T] {
     override def run(ctx: SourceContext[T]): Unit = {
       dataWithTimestampList.foreach {
-        case Left(t) => ctx.collectWithTimestamp(t._2, t._1)
+        case Left(t)  => ctx.collectWithTimestamp(t._2, t._1)
         case Right(w) => ctx.emitWatermark(new Watermark(w))
       }
     }

@@ -24,12 +24,12 @@ import org.apache.flink.table.functions.AggregateFunction
 import org.apache.flink.table.functions.aggfunctions._
 
 /**
-  * Test case for built-in sum0 aggregate function
-  *
-  * @tparam T the type for the aggregation result
-  */
+ * Test case for built-in sum0 aggregate function
+ *
+ * @tparam T the type for the aggregation result
+ */
 abstract class Sum0AggFunctionTestBase[T: Numeric]
-  extends AggFunctionTestBase[T, SumAccumulator[T]] {
+    extends AggFunctionTestBase[T, SumAccumulator[T]] {
 
   private val numeric: Numeric[T] = implicitly[Numeric[T]]
 
@@ -50,22 +50,16 @@ abstract class Sum0AggFunctionTestBase[T: Numeric]
       numeric.fromInt(-20),
       numeric.fromInt(17),
       null.asInstanceOf[T],
-      maxVal
-    ),
+      maxVal),
     Seq(
       null.asInstanceOf[T],
       null.asInstanceOf[T],
       null.asInstanceOf[T],
       null.asInstanceOf[T],
       null.asInstanceOf[T],
-      null.asInstanceOf[T]
-    )
-  )
+      null.asInstanceOf[T]))
 
-  override def expectedResults: Seq[T] = Seq(
-    numeric.fromInt(2),
-    0.asInstanceOf[T]
-  )
+  override def expectedResults: Seq[T] = Seq(numeric.fromInt(2), 0.asInstanceOf[T])
 }
 
 class ByteSum0AggFunctionTest extends Sum0AggFunctionTestBase[Byte] {
@@ -116,9 +110,7 @@ class DoubleSum0AggFunctionTest extends Sum0AggFunctionTestBase[Double] {
     new DoubleSum0AggFunction
 }
 
-
-class DecimalSum0AggFunctionTest
-  extends AggFunctionTestBase[BigDecimal, DecimalSumAccumulator] {
+class DecimalSum0AggFunctionTest extends AggFunctionTestBase[BigDecimal, DecimalSumAccumulator] {
 
   override def inputValueSets: Seq[Seq[_]] = Seq(
     Seq(
@@ -135,24 +127,12 @@ class DecimalSum0AggFunctionTest
       null,
       new BigDecimal("4"),
       new BigDecimal("-999.999"),
-      null
-    ),
-    Seq(
-      null,
-      null,
-      null,
-      null,
-      null
-    )
-  )
+      null),
+    Seq(null, null, null, null, null))
 
-  override def expectedResults: Seq[BigDecimal] = Seq(
-    new BigDecimal("10.000000000001"),
-    BigDecimal.ZERO
-  )
+  override def expectedResults: Seq[BigDecimal] =
+    Seq(new BigDecimal("10.000000000001"), BigDecimal.ZERO)
 
   override def aggregator: AggregateFunction[BigDecimal, DecimalSumAccumulator] =
     new DecimalSum0AggFunction()
 }
-
-

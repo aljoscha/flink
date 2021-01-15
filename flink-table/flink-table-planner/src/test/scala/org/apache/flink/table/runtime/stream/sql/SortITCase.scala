@@ -27,7 +27,11 @@ import org.apache.flink.table.api.bridge.scala._
 import org.apache.flink.table.api.internal.TableEnvironmentInternal
 import org.apache.flink.table.runtime.stream.sql.SortITCase.StringRowSelectorSink
 import org.apache.flink.table.runtime.utils.TimeTestUtil.EventTimeSourceFunction
-import org.apache.flink.table.runtime.utils.{StreamITCase, StreamTestData, StreamingWithStateTestBase}
+import org.apache.flink.table.runtime.utils.{
+  StreamITCase,
+  StreamTestData,
+  StreamingWithStateTestBase
+}
 import org.apache.flink.table.utils.MemoryTableSourceSinkUtil
 import org.apache.flink.types.Row
 
@@ -73,7 +77,7 @@ class SortITCase extends StreamingWithStateTestBase {
       Right(14000L),
       Left((15000L, (8L, 8, "Hello World"))),
       Right(17000L),
-      Left((20000L, (20L, 20, "Hello World"))), 
+      Left((20000L, (20L, 20, "Hello World"))),
       Right(19000L))
 
     val env = StreamExecutionEnvironment.getExecutionEnvironment
@@ -82,27 +86,40 @@ class SortITCase extends StreamingWithStateTestBase {
     val tEnv = StreamTableEnvironment.create(env, settings)
     StreamITCase.clear
 
-    val t1 = env.addSource(new EventTimeSourceFunction[(Long, Int, String)](data))
+    val t1 = env
+      .addSource(new EventTimeSourceFunction[(Long, Int, String)](data))
       .toTable(tEnv, 'a, 'b, 'c, 'rowtime.rowtime)
-      
+
     tEnv.registerTable("T1", t1)
 
-    val  sqlQuery = "SELECT b FROM T1 ORDER BY rowtime, b ASC "
-      
-      
+    val sqlQuery = "SELECT b FROM T1 ORDER BY rowtime, b ASC "
+
     val result = tEnv.sqlQuery(sqlQuery).toAppendStream[Row]
     result.addSink(new StringRowSelectorSink(0)).setParallelism(1)
     env.execute()
-    
+
     val expected = mutable.MutableList(
-      "1", "15", "16",
-      "1", "2", "2", "3",
+      "1",
+      "15",
+      "16",
+      "1",
+      "2",
+      "2",
+      "3",
       "3",
       "4",
       "5",
-      "-1", "6", "6", "65", "67",
-      "18", "7", "9",
-      "7", "17", "77", 
+      "-1",
+      "6",
+      "6",
+      "65",
+      "67",
+      "18",
+      "7",
+      "9",
+      "7",
+      "17",
+      "77",
       "18",
       "8",
       "20")
@@ -116,7 +133,8 @@ class SortITCase extends StreamingWithStateTestBase {
     val tEnv = StreamTableEnvironment.create(env, settings)
     MemoryTableSourceSinkUtil.clear()
 
-    val t = StreamTestData.getSmall3TupleDataStream(env)
+    val t = StreamTestData
+      .getSmall3TupleDataStream(env)
       .assignAscendingTimestamps(x => x._2)
       .toTable(tEnv, 'a, 'b, 'c, 'rowtime.rowtime)
     tEnv.registerTable("sourceTable", t)
@@ -125,8 +143,9 @@ class SortITCase extends StreamingWithStateTestBase {
     val fieldTypes = Array(Types.INT, Types.LONG, Types.STRING, Types.SQL_TIMESTAMP)
       .asInstanceOf[Array[TypeInformation[_]]]
     val sink = new MemoryTableSourceSinkUtil.UnsafeMemoryAppendTableSink
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSinkInternal(
-      "targetTable", sink.configure(fieldNames, fieldTypes))
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSinkInternal("targetTable", sink.configure(fieldNames, fieldTypes))
 
     val sql = "INSERT INTO targetTable SELECT a, b, c, rowtime " +
       "FROM sourceTable ORDER BY rowtime, a desc"
@@ -143,13 +162,13 @@ class SortITCase extends StreamingWithStateTestBase {
 
 object SortITCase {
 
-  final class StringRowSelectorSink(private val field:Int) extends RichSinkFunction[Row]() {
+  final class StringRowSelectorSink(private val field: Int) extends RichSinkFunction[Row]() {
     override def invoke(value: Row) {
       testResults.synchronized {
         testResults += value.getField(field).toString
       }
     }
   }
-  
+
   var testResults: mutable.MutableList[String] = mutable.MutableList.empty[String]
 }

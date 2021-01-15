@@ -33,20 +33,16 @@ import scala.util.{Failure, Success, Try}
 class TrySerializer[A](
     private val elemSerializer: TypeSerializer[A],
     private val throwableSerializer: TypeSerializer[Throwable])
-  extends TypeSerializer[Try[A]] {
+    extends TypeSerializer[Try[A]] {
 
-  private[typeutils] def this(elemSerializer: TypeSerializer[A],
-                              executionConfig: ExecutionConfig) = {
-    this(
-      elemSerializer,
-      new KryoSerializer[Throwable](classOf[Throwable], executionConfig)
-    )
+  private[typeutils] def this(
+      elemSerializer: TypeSerializer[A],
+      executionConfig: ExecutionConfig) = {
+    this(elemSerializer, new KryoSerializer[Throwable](classOf[Throwable], executionConfig))
   }
 
-  override def duplicate: TrySerializer[A] = new TrySerializer[A](
-    elemSerializer.duplicate(),
-    throwableSerializer.duplicate()
-  )
+  override def duplicate: TrySerializer[A] =
+    new TrySerializer[A](elemSerializer.duplicate(), throwableSerializer.duplicate())
 
   override def createInstance: Try[A] = {
     Failure(new RuntimeException("Empty Failure"))
@@ -120,19 +116,16 @@ class TrySerializer[A](
 object TrySerializer {
 
   /**
-    * We need to keep this to be compatible with snapshots taken in Flink 1.3.0.
-    * Once Flink 1.3.x is no longer supported, this can be removed.
-    */
+   * We need to keep this to be compatible with snapshots taken in Flink 1.3.0.
+   * Once Flink 1.3.x is no longer supported, this can be removed.
+   */
   @Deprecated
-  class TrySerializerConfigSnapshot[A]()
-      extends CompositeTypeSerializerConfigSnapshot[Try[A]]() {
+  class TrySerializerConfigSnapshot[A]() extends CompositeTypeSerializerConfigSnapshot[Try[A]]() {
 
     override def getVersion: Int = TrySerializerConfigSnapshot.VERSION
 
     override def resolveSchemaCompatibility(
-      newSerializer: TypeSerializer[Try[A]]
-    ): TypeSerializerSchemaCompatibility[Try[A]] =
-
+        newSerializer: TypeSerializer[Try[A]]): TypeSerializerSchemaCompatibility[Try[A]] =
       CompositeTypeSerializerUtil.delegateCompatibilityCheckToNewSnapshot(
         newSerializer,
         new ScalaTrySerializerSnapshot[A](),

@@ -21,26 +21,29 @@ import org.apache.flink.table.planner.plan.nodes.FlinkConventions
 import org.apache.flink.table.planner.plan.nodes.common.CommonLookupJoin
 import org.apache.flink.table.planner.plan.nodes.logical._
 import org.apache.flink.table.planner.plan.nodes.physical.stream.StreamExecLookupJoin
-import org.apache.flink.table.planner.plan.rules.physical.common.{BaseSnapshotOnCalcTableScanRule, BaseSnapshotOnTableScanRule}
+import org.apache.flink.table.planner.plan.rules.physical.common.{
+  BaseSnapshotOnCalcTableScanRule,
+  BaseSnapshotOnTableScanRule
+}
 
 import org.apache.calcite.plan.{RelOptRule, RelOptTable}
 import org.apache.calcite.rex.RexProgram
 
 /**
-  * Rules that convert [[FlinkLogicalJoin]] on a [[FlinkLogicalSnapshot]]
-  * into [[StreamExecLookupJoin]]
-  *
-  * There are 2 conditions for this rule:
-  * 1. the root parent of [[FlinkLogicalSnapshot]] should be a TableSource which implements
-  *   [[org.apache.flink.table.sources.LookupableTableSource]].
-  * 2. the period of [[FlinkLogicalSnapshot]] must be left table's proctime attribute.
-  */
+ * Rules that convert [[FlinkLogicalJoin]] on a [[FlinkLogicalSnapshot]]
+ * into [[StreamExecLookupJoin]]
+ *
+ * There are 2 conditions for this rule:
+ * 1. the root parent of [[FlinkLogicalSnapshot]] should be a TableSource which implements
+ *   [[org.apache.flink.table.sources.LookupableTableSource]].
+ * 2. the period of [[FlinkLogicalSnapshot]] must be left table's proctime attribute.
+ */
 object StreamExecLookupJoinRule {
   val SNAPSHOT_ON_TABLESCAN: RelOptRule = new SnapshotOnTableScanRule
   val SNAPSHOT_ON_CALC_TABLESCAN: RelOptRule = new SnapshotOnCalcTableScanRule
 
   class SnapshotOnTableScanRule
-    extends BaseSnapshotOnTableScanRule("StreamExecSnapshotOnTableScanRule") {
+      extends BaseSnapshotOnTableScanRule("StreamExecSnapshotOnTableScanRule") {
 
     override protected def transform(
         join: FlinkLogicalJoin,
@@ -52,7 +55,7 @@ object StreamExecLookupJoinRule {
   }
 
   class SnapshotOnCalcTableScanRule
-    extends BaseSnapshotOnCalcTableScanRule("StreamExecSnapshotOnCalcTableScanRule") {
+      extends BaseSnapshotOnCalcTableScanRule("StreamExecSnapshotOnCalcTableScanRule") {
 
     override protected def transform(
         join: FlinkLogicalJoin,
@@ -64,10 +67,10 @@ object StreamExecLookupJoinRule {
   }
 
   private def doTransform(
-    join: FlinkLogicalJoin,
-    input: FlinkLogicalRel,
-    temporalTable: RelOptTable,
-    calcProgram: Option[RexProgram]): StreamExecLookupJoin = {
+      join: FlinkLogicalJoin,
+      input: FlinkLogicalRel,
+      temporalTable: RelOptTable,
+      calcProgram: Option[RexProgram]): StreamExecLookupJoin = {
 
     val joinInfo = join.analyzeCondition
 

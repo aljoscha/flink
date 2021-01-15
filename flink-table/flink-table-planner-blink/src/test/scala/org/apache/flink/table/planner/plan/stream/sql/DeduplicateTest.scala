@@ -35,7 +35,12 @@ class DeduplicateTest extends TableTestBase {
   def setUp(): Unit = {
     util = streamTestUtil()
     util.addDataStream[(Int, String, Long)](
-      "MyTable", 'a, 'b, 'c, 'proctime.proctime, 'rowtime.rowtime)
+      "MyTable",
+      'a,
+      'b,
+      'c,
+      'proctime.proctime,
+      'rowtime.rowtime)
   }
 
   @Test
@@ -72,8 +77,7 @@ class DeduplicateTest extends TableTestBase {
   def testLastRowWithWindowOnRowtime(): Unit = {
     util.tableEnv.getConfig.getConfiguration
       .set(ExecutionConfigOptions.TABLE_EXEC_MINIBATCH_ALLOW_LATENCY, Duration.ofMillis(500))
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE T (
         | `a` INT,
         | `b` STRING,
@@ -83,8 +87,7 @@ class DeduplicateTest extends TableTestBase {
         | 'connector' = 'COLLECTION',
         | 'is-bounded' = 'false'
         |)
-      """.stripMargin
-    )
+      """.stripMargin)
 
     val deduplicateSQl =
       """
@@ -106,8 +109,9 @@ class DeduplicateTest extends TableTestBase {
       """.stripMargin
 
     thrown.expect(classOf[TableException])
-    thrown.expectMessage("GroupWindowAggregate doesn't support consuming update " +
-      "and delete changes which is produced by node Deduplicate(")
+    thrown.expectMessage(
+      "GroupWindowAggregate doesn't support consuming update " +
+        "and delete changes which is produced by node Deduplicate(")
     util.verifyExplain(windowSql)
   }
 

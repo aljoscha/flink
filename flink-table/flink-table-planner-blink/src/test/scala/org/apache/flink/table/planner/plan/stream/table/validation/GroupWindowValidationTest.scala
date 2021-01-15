@@ -62,8 +62,7 @@ class GroupWindowValidationTest extends TableTestBase {
     expectedException.expectMessage("Cannot resolve field [int]")
 
     val util = streamTestUtil()
-    val table = util.addDataStream[(Long, Int, String)](
-      "T1", 'rowtime.rowtime, 'int, 'string)
+    val table = util.addDataStream[(Long, Int, String)]("T1", 'rowtime.rowtime, 'int, 'string)
 
     table
       .window(Tumble over 5.milli on 'rowtime as 'w)
@@ -80,8 +79,7 @@ class GroupWindowValidationTest extends TableTestBase {
     expectedException.expectMessage("A tumble window expects a size value literal")
 
     val util = streamTestUtil()
-    val table = util.addDataStream[(Long, Int, String)](
-      "T1", 'rowtime.rowtime, 'int, 'string)
+    val table = util.addDataStream[(Long, Int, String)]("T1", 'rowtime.rowtime, 'int, 'string)
 
     table
       .window(Tumble over "WRONG" on 'rowtime as 'w) // string is not a valid interval
@@ -96,8 +94,7 @@ class GroupWindowValidationTest extends TableTestBase {
       "Tumbling window expects a size literal of a day-time interval or BIGINT type.")
 
     val util = streamTestUtil()
-    val table = util.addDataStream[(Long, Int, String)](
-      "T1", 'rowtime.rowtime, 'int, 'string)
+    val table = util.addDataStream[(Long, Int, String)]("T1", 'rowtime.rowtime, 'int, 'string)
 
     table
       // row interval is not valid for session windows
@@ -113,8 +110,7 @@ class GroupWindowValidationTest extends TableTestBase {
 
     val util = streamTestUtil()
     val weightedAvg = new WeightedAvgWithMerge
-    val table = util.addDataStream[(Long, Int, String)](
-      "T1", 'rowtime.rowtime, 'int, 'string)
+    val table = util.addDataStream[(Long, Int, String)]("T1", 'rowtime.rowtime, 'int, 'string)
 
     table
       .window(Tumble over 2.hours on 'rowtime as 'w)
@@ -128,8 +124,7 @@ class GroupWindowValidationTest extends TableTestBase {
     expectedException.expectMessage("A sliding window expects a size value literal")
 
     val util = streamTestUtil()
-    val table = util.addDataStream[(Long, Int, String)](
-      "T1", 'rowtime.rowtime, 'int, 'string)
+    val table = util.addDataStream[(Long, Int, String)]("T1", 'rowtime.rowtime, 'int, 'string)
 
     table
       // field reference is not a valid interval
@@ -144,8 +139,7 @@ class GroupWindowValidationTest extends TableTestBase {
     expectedException.expectMessage("A sliding window expects the same type of size and slide.")
 
     val util = streamTestUtil()
-    val table = util.addDataStream[(Long, Int, String)](
-      "T1", 'rowtime.rowtime, 'int, 'string)
+    val table = util.addDataStream[(Long, Int, String)]("T1", 'rowtime.rowtime, 'int, 'string)
 
     table
       // row and time intervals may not be mixed
@@ -161,8 +155,7 @@ class GroupWindowValidationTest extends TableTestBase {
       "A sliding window expects a size literal of a day-time interval or BIGINT type.")
 
     val util = streamTestUtil()
-    val table = util.addDataStream[(Long, Int, String)](
-      "T1", 'rowtime.rowtime, 'int, 'string)
+    val table = util.addDataStream[(Long, Int, String)]("T1", 'rowtime.rowtime, 'int, 'string)
 
     table
       // row interval is not valid for session windows
@@ -178,8 +171,7 @@ class GroupWindowValidationTest extends TableTestBase {
 
     val util = streamTestUtil()
     val weightedAvg = new WeightedAvgWithMerge
-    val table = util.addDataStream[(Long, Int, String)](
-      "T1", 'rowtime.rowtime, 'int, 'string)
+    val table = util.addDataStream[(Long, Int, String)]("T1", 'rowtime.rowtime, 'int, 'string)
 
     table
       .window(Slide over 2.hours every 30.minutes on 'rowtime as 'w)
@@ -194,8 +186,7 @@ class GroupWindowValidationTest extends TableTestBase {
       "A session window expects a gap literal of a day-time interval type.")
 
     val util = streamTestUtil()
-    val table = util.addDataStream[(Long, Int, String)](
-      "T1", 'rowtime.rowtime, 'int, 'string)
+    val table = util.addDataStream[(Long, Int, String)]("T1", 'rowtime.rowtime, 'int, 'string)
 
     table
       // row interval is not valid for session windows
@@ -211,8 +202,7 @@ class GroupWindowValidationTest extends TableTestBase {
       "A session window expects a gap literal of a day-time interval type.")
 
     val util = streamTestUtil()
-    val table = util.addDataStream[(Long, Int, String)](
-      "T1", 'rowtime.rowtime, 'int, 'string)
+    val table = util.addDataStream[(Long, Int, String)]("T1", 'rowtime.rowtime, 'int, 'string)
 
     table
       // row interval is not valid for session windows
@@ -224,8 +214,9 @@ class GroupWindowValidationTest extends TableTestBase {
   @Test
   def testInvalidWindowAlias1(): Unit = {
     expectedException.expect(classOf[ValidationException])
-    expectedException.expectMessage("Only unresolved reference supported for alias of a " +
-      "group window.")
+    expectedException.expectMessage(
+      "Only unresolved reference supported for alias of a " +
+        "group window.")
 
     val util = streamTestUtil()
     val table = util.addDataStream[(Long, Int, String)]("T1", 'rowtime, 'int, 'string)
@@ -243,8 +234,7 @@ class GroupWindowValidationTest extends TableTestBase {
     expectedException.expectMessage("Cannot resolve field [string]")
 
     val util = streamTestUtil()
-    val table = util.addDataStream[(Long, Int, String)](
-      "T1", 'rowtime.rowtime, 'int, 'string)
+    val table = util.addDataStream[(Long, Int, String)]("T1", 'rowtime.rowtime, 'int, 'string)
 
     table
       // field name "string" is already present
@@ -260,8 +250,8 @@ class GroupWindowValidationTest extends TableTestBase {
 
     val util = streamTestUtil()
     val weightedAvg = new WeightedAvgWithMerge
-    val table = util.addDataStream[(Long, Int, String)](
-      "T1", 'long, 'int, 'string, 'rowtime.rowtime)
+    val table =
+      util.addDataStream[(Long, Int, String)]("T1", 'long, 'int, 'string, 'rowtime.rowtime)
 
     table
       .window(Session withGap 2.hours on 'rowtime as 'w)
@@ -272,12 +262,13 @@ class GroupWindowValidationTest extends TableTestBase {
   @Test
   def testInvalidWindowPropertyOnRowCountsTumblingWindow(): Unit = {
     expectedException.expect(classOf[ValidationException])
-    expectedException.expectMessage("Window start and Window end cannot be selected " +
-      "for a row-count tumble window.")
+    expectedException.expectMessage(
+      "Window start and Window end cannot be selected " +
+        "for a row-count tumble window.")
 
     val util = streamTestUtil()
-    val table = util.addDataStream[(Long, Int, String)](
-      "T1", 'long, 'int, 'string, 'proctime.proctime)
+    val table =
+      util.addDataStream[(Long, Int, String)]("T1", 'long, 'int, 'string, 'proctime.proctime)
 
     table
       .window(Tumble over 2.rows on 'proctime as 'w)
@@ -288,12 +279,13 @@ class GroupWindowValidationTest extends TableTestBase {
   @Test
   def testInvalidWindowPropertyOnRowCountsSlidingWindow(): Unit = {
     expectedException.expect(classOf[ValidationException])
-    expectedException.expectMessage("Window start and Window end cannot be selected for a " +
-      "row-count slide window.")
+    expectedException.expectMessage(
+      "Window start and Window end cannot be selected for a " +
+        "row-count slide window.")
 
     val util = streamTestUtil()
-    val table = util.addDataStream[(Long, Int, String)](
-      "T1", 'long, 'int, 'string, 'proctime.proctime)
+    val table =
+      util.addDataStream[(Long, Int, String)]("T1", 'long, 'int, 'string, 'proctime.proctime)
 
     table
       .window(Slide over 10.rows every 5.rows on 'proctime as 'w)

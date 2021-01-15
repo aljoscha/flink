@@ -43,9 +43,9 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
-  * Contains factory interface and default implementation for creating various
-  * flink logical rel nodes.
-  */
+ * Contains factory interface and default implementation for creating various
+ * flink logical rel nodes.
+ */
 object FlinkLogicalRelFactories {
 
   val FLINK_LOGICAL_PROJECT_FACTORY = new ProjectFactoryImpl
@@ -60,8 +60,10 @@ object FlinkLogicalRelFactories {
   val FLINK_LOGICAL_EXPAND_FACTORY = new ExpandFactoryImpl
   val FLINK_LOGICAL_RANK_FACTORY = new RankFactoryImpl
 
-  /** A [[RelBuilderFactory]] that creates a [[RelBuilder]] that will
-    * create logical relational expressions for everything. */
+  /**
+   * A [[RelBuilderFactory]] that creates a [[RelBuilder]] that will
+   * create logical relational expressions for everything.
+   */
   val FLINK_LOGICAL_REL_BUILDER: RelBuilderFactory = FlinkRelBuilder.proto(
     Contexts.of(
       FLINK_LOGICAL_PROJECT_FACTORY,
@@ -76,8 +78,8 @@ object FlinkLogicalRelFactories {
       FLINK_LOGICAL_RANK_FACTORY))
 
   /**
-    * Implementation of [[ProjectFactory]] that returns a [[FlinkLogicalCalc]].
-    */
+   * Implementation of [[ProjectFactory]] that returns a [[FlinkLogicalCalc]].
+   */
   class ProjectFactoryImpl extends ProjectFactory {
     def createProject(
         input: RelNode,
@@ -87,8 +89,8 @@ object FlinkLogicalRelFactories {
       val rexBuilder = input.getCluster.getRexBuilder
       val inputRowType = input.getRowType
       val programBuilder = new RexProgramBuilder(inputRowType, rexBuilder)
-      childExprs.zip(fieldNames).foreach {
-        case (childExpr, fieldName) => programBuilder.addProject(childExpr, fieldName)
+      childExprs.zip(fieldNames).foreach { case (childExpr, fieldName) =>
+        programBuilder.addProject(childExpr, fieldName)
       }
       val program = programBuilder.getProgram
       FlinkLogicalCalc.create(input, program)
@@ -96,8 +98,8 @@ object FlinkLogicalRelFactories {
   }
 
   /**
-    * Implementation of [[SortFactory]] that returns a [[FlinkLogicalSort]].
-    */
+   * Implementation of [[SortFactory]] that returns a [[FlinkLogicalSort]].
+   */
   class SortFactoryImpl extends SortFactory {
     def createSort(
         input: RelNode,
@@ -109,10 +111,10 @@ object FlinkLogicalRelFactories {
   }
 
   /**
-    * Implementation of [[SetOpFactory]] that
-    * returns a flink [[org.apache.calcite.rel.core.SetOp]] for the particular kind of set
-    * operation (UNION, EXCEPT, INTERSECT).
-    */
+   * Implementation of [[SetOpFactory]] that
+   * returns a flink [[org.apache.calcite.rel.core.SetOp]] for the particular kind of set
+   * operation (UNION, EXCEPT, INTERSECT).
+   */
   class SetOpFactoryImpl extends SetOpFactory {
     def createSetOp(kind: SqlKind, inputs: util.List[RelNode], all: Boolean): RelNode = {
       kind match {
@@ -129,8 +131,8 @@ object FlinkLogicalRelFactories {
   }
 
   /**
-    * Implementation of [[AggregateFactory]] that returns a [[FlinkLogicalAggregate]].
-    */
+   * Implementation of [[AggregateFactory]] that returns a [[FlinkLogicalAggregate]].
+   */
   class AggregateFactoryImpl extends AggregateFactory {
     def createAggregate(
         input: RelNode,
@@ -143,8 +145,8 @@ object FlinkLogicalRelFactories {
   }
 
   /**
-    * Implementation of [[FilterFactory]] that returns a [[FlinkLogicalCalc]].
-    */
+   * Implementation of [[FilterFactory]] that returns a [[FlinkLogicalCalc]].
+   */
   class FilterFactoryImpl extends FilterFactory {
     override def createFilter(
         input: RelNode,
@@ -163,8 +165,8 @@ object FlinkLogicalRelFactories {
   }
 
   /**
-    * Implementation of [[JoinFactory]] that returns a [[FlinkLogicalJoin]].
-    */
+   * Implementation of [[JoinFactory]] that returns a [[FlinkLogicalJoin]].
+   */
   class JoinFactoryImpl extends JoinFactory {
     def createJoin(
         left: RelNode,
@@ -179,8 +181,8 @@ object FlinkLogicalRelFactories {
   }
 
   /**
-    * Implementation of [[CorrelateFactory]] that returns a [[FlinkLogicalCorrelate]].
-    */
+   * Implementation of [[CorrelateFactory]] that returns a [[FlinkLogicalCorrelate]].
+   */
   class CorrelateFactoryImpl extends CorrelateFactory {
     def createCorrelate(
         left: RelNode,
@@ -193,22 +195,24 @@ object FlinkLogicalRelFactories {
   }
 
   /**
-    * Implementation of [[ValuesFactory]] that returns a [[FlinkLogicalValues]].
-    */
+   * Implementation of [[ValuesFactory]] that returns a [[FlinkLogicalValues]].
+   */
   class ValuesFactoryImpl extends ValuesFactory {
     def createValues(
         cluster: RelOptCluster,
         rowType: RelDataType,
         tuples: util.List[ImmutableList[RexLiteral]]): RelNode = {
       FlinkLogicalValues.create(
-        cluster, rowType, ImmutableList.copyOf[ImmutableList[RexLiteral]](tuples))
+        cluster,
+        rowType,
+        ImmutableList.copyOf[ImmutableList[RexLiteral]](tuples))
     }
   }
 
   /**
-    * Implementation of [[TableScanFactory]] that returns a
-    * [[FlinkLogicalLegacyTableSourceScan]] or [[FlinkLogicalDataStreamTableScan]].
-    */
+   * Implementation of [[TableScanFactory]] that returns a
+   * [[FlinkLogicalLegacyTableSourceScan]] or [[FlinkLogicalDataStreamTableScan]].
+   */
   class TableScanFactoryImpl extends TableScanFactory {
     def createScan(toRelContext: ToRelContext, table: RelOptTable): RelNode = {
       val cluster = toRelContext.getCluster
@@ -228,9 +232,9 @@ object FlinkLogicalRelFactories {
   }
 
   /**
-    * Implementation of [[FlinkRelFactories.ExpandFactory]] that returns a
-    * [[FlinkLogicalExpand]].
-    */
+   * Implementation of [[FlinkRelFactories.ExpandFactory]] that returns a
+   * [[FlinkLogicalExpand]].
+   */
   class ExpandFactoryImpl extends ExpandFactory {
     def createExpand(
         input: RelNode,
@@ -242,9 +246,9 @@ object FlinkLogicalRelFactories {
   }
 
   /**
-    * Implementation of [[FlinkRelFactories.RankFactory]] that returns a
-    * [[FlinkLogicalRank]].
-    */
+   * Implementation of [[FlinkRelFactories.RankFactory]] that returns a
+   * [[FlinkLogicalRank]].
+   */
   class RankFactoryImpl extends RankFactory {
     def createRank(
         input: RelNode,
@@ -254,8 +258,14 @@ object FlinkLogicalRelFactories {
         rankRange: RankRange,
         rankNumberType: RelDataTypeField,
         outputRankNumber: Boolean): RelNode = {
-      FlinkLogicalRank.create(input, partitionKey, orderKey, rankType, rankRange,
-        rankNumberType, outputRankNumber)
+      FlinkLogicalRank.create(
+        input,
+        partitionKey,
+        orderKey,
+        rankType,
+        rankRange,
+        rankNumberType,
+        outputRankNumber)
     }
   }
 }

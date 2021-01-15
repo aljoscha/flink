@@ -54,7 +54,9 @@ class SetOperatorsValidationTest extends TableTestBase {
     val tEnv = StreamTableEnvironment.create(env, TableTestUtil.STREAM_SETTING)
 
     val ds1 = env.fromCollection(TestData.smallTupleData3).toTable(tEnv, 'a, 'b, 'c)
-    val ds2 = env.fromCollection(TestData.tupleData5).toTable(tEnv, 'a, 'b, 'c, 'd, 'e)
+    val ds2 = env
+      .fromCollection(TestData.tupleData5)
+      .toTable(tEnv, 'a, 'b, 'c, 'd, 'e)
       .select('a, 'b, 'c)
 
     val unionDs = ds1.unionAll(ds2)

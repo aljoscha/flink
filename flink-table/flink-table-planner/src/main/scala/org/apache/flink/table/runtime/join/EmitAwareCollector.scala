@@ -23,21 +23,21 @@ import org.apache.flink.types.Row
 import org.apache.flink.util.Collector
 
 /**
-  * Collector to wrap a Row into a [[CRow]] and to track whether a row has been emitted by the inner
-  * collector.
-  */
-class EmitAwareCollector extends Collector[Row]{
+ * Collector to wrap a Row into a [[CRow]] and to track whether a row has been emitted by the inner
+ * collector.
+ */
+class EmitAwareCollector extends Collector[Row] {
 
   var emitted = false
   var innerCollector: Collector[CRow] = _
   private val cRow: CRow = new CRow()
 
-  /** Sets the change value of the CRow. **/
+  /** Sets the change value of the CRow. * */
   def setCRowChange(change: Boolean): Unit = {
-   cRow.change = change
+    cRow.change = change
   }
 
-  /** Resets the emitted flag. **/
+  /** Resets the emitted flag. * */
   def reset(): Unit = {
     emitted = false
   }

@@ -22,7 +22,11 @@ import org.apache.flink.api.common.functions.{MapFunction, RichMapFunction}
 import org.apache.flink.table.api.{TableConfig, TableException}
 import org.apache.flink.table.data.binary.{BinaryStringData, BinaryStringDataUtil}
 import org.apache.flink.table.data.{DecimalData, GenericRowData, TimestampData}
-import org.apache.flink.table.functions.{ConstantFunctionContext, FunctionContext, UserDefinedFunction}
+import org.apache.flink.table.functions.{
+  ConstantFunctionContext,
+  FunctionContext,
+  UserDefinedFunction
+}
 import org.apache.flink.table.planner.calcite.FlinkTypeFactory
 import org.apache.flink.table.planner.codegen.FunctionCodeGenerator.generateFunction
 import org.apache.flink.table.planner.plan.utils.PythonUtil.containsPythonCall
@@ -39,17 +43,15 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable.ListBuffer
 
 /**
-  * Evaluates constant expressions with code generator.
-  *
-  * @param allowChangeNullability If the reduced expr's nullability can be changed, e.g. a null
-  *                               literal is definitely nullable and the other literals are
-  *                               not null.
-  */
-class ExpressionReducer(
-    config: TableConfig,
-    allowChangeNullability: Boolean = false)
-  extends RexExecutor
-  with Logging {
+ * Evaluates constant expressions with code generator.
+ *
+ * @param allowChangeNullability If the reduced expr's nullability can be changed, e.g. a null
+ *                               literal is definitely nullable and the other literals are
+ *                               not null.
+ */
+class ExpressionReducer(config: TableConfig, allowChangeNullability: Boolean = false)
+    extends RexExecutor
+    with Logging {
 
   private val EMPTY_ROW_TYPE = RowType.of()
   private val EMPTY_ROW = new GenericRowData(0)
@@ -70,13 +72,10 @@ class ExpressionReducer(
         None
 
       // we don't support object literals yet, we skip those constant expressions
-      case (SqlTypeName.ANY, _) |
-           (SqlTypeName.OTHER, _) |
-           (SqlTypeName.ROW, _) |
-           (SqlTypeName.STRUCTURED, _) |
-           (SqlTypeName.ARRAY, _) |
-           (SqlTypeName.MAP, _) |
-           (SqlTypeName.MULTISET, _) => None
+      case (SqlTypeName.ANY, _) | (SqlTypeName.OTHER, _) |
+          (SqlTypeName.ROW, _) | (SqlTypeName.STRUCTURED, _) | (SqlTypeName.ARRAY, _) |
+          (SqlTypeName.MAP, _) | (SqlTypeName.MULTISET, _) =>
+        None
 
       case (_, e) => Some(e)
     }
@@ -91,8 +90,8 @@ class ExpressionReducer(
       .bindInput(EMPTY_ROW_TYPE)
 
     val literalExprs = literals.map(exprGenerator.generateExpression)
-    val result = exprGenerator.generateResultExpression(
-      literalExprs, resultType, classOf[GenericRowData])
+    val result =
+      exprGenerator.generateResultExpression(literalExprs, resultType, classOf[GenericRowData])
 
     val generatedFunction = generateFunction[MapFunction[GenericRowData, GenericRowData]](
       ctx,
@@ -113,23 +112,25 @@ class ExpressionReducer(
     }
 
     val parameters = config.getConfiguration
-    val reduced = try {
-      richMapFunction.open(parameters)
-      // execute
-      richMapFunction.map(EMPTY_ROW)
-    } catch { case t: Throwable =>
-      // maybe a function accesses some cluster specific context information
-      // skip the expression reduction and try it again during runtime
-      LOG.warn(
-        "Unable to perform constant expression reduction. " +
-          "An exception occurred during the evaluation. " +
-          "One or more expressions will be executed unreduced.",
-        t)
-      reducedValues.addAll(constExprs)
-      return
-    } finally {
-      richMapFunction.close()
-    }
+    val reduced =
+      try {
+        richMapFunction.open(parameters)
+        // execute
+        richMapFunction.map(EMPTY_ROW)
+      } catch {
+        case t: Throwable =>
+          // maybe a function accesses some cluster specific context information
+          // skip the expression reduction and try it again during runtime
+          LOG.warn(
+            "Unable to perform constant expression reduction. " +
+              "An exception occurred during the evaluation. " +
+              "One or more expressions will be executed unreduced.",
+            t)
+          reducedValues.addAll(constExprs)
+          return
+      } finally {
+        richMapFunction.close()
+      }
 
     // add the reduced results or keep them unreduced
     var i = 0
@@ -143,13 +144,8 @@ class ExpressionReducer(
       } else {
         unreduced.getType.getSqlTypeName match {
           // we insert the original expression for object literals
-          case SqlTypeName.ANY |
-               SqlTypeName.OTHER |
-               SqlTypeName.ROW |
-               SqlTypeName.STRUCTURED |
-               SqlTypeName.ARRAY |
-               SqlTypeName.MAP |
-               SqlTypeName.MULTISET =>
+          case SqlTypeName.ANY | SqlTypeName.OTHER | SqlTypeName.ROW | SqlTypeName.STRUCTURED |
+              SqlTypeName.ARRAY | SqlTypeName.MAP | SqlTypeName.MULTISET =>
             reducedValues.add(unreduced)
           case SqlTypeName.VARCHAR | SqlTypeName.CHAR =>
             val escapeVarchar = BinaryStringDataUtil.safeToString(
@@ -197,12 +193,13 @@ class ExpressionReducer(
           case _ =>
             val reducedValue = reduced.getField(reducedIdx)
             // RexBuilder handle double literal incorrectly, convert it into BigDecimal manually
-            val value = if (reducedValue != null &&
-              unreduced.getType.getSqlTypeName == SqlTypeName.DOUBLE) {
-              new java.math.BigDecimal(reducedValue.asInstanceOf[Number].doubleValue())
-            } else {
-              reducedValue
-            }
+            val value =
+              if (reducedValue != null &&
+                unreduced.getType.getSqlTypeName == SqlTypeName.DOUBLE) {
+                new java.math.BigDecimal(reducedValue.asInstanceOf[Number].doubleValue())
+              } else {
+                reducedValue
+              }
 
             reducedValues.add(maySkipNullLiteralReduce(rexBuilder, value, unreduced))
             reducedIdx += 1
@@ -225,12 +222,13 @@ class ExpressionReducer(
     }
 
     // used for table api to '+' of two strings.
-    val valueArg = if (SqlTypeName.CHAR_TYPES.contains(unreduced.getType.getSqlTypeName) &&
-      value != null) {
-      value.toString
-    } else {
-      value
-    }
+    val valueArg =
+      if (SqlTypeName.CHAR_TYPES.contains(unreduced.getType.getSqlTypeName) &&
+        value != null) {
+        value.toString
+      } else {
+        value
+      }
 
     // if allowChangeNullability is allowed, we can reduce the outer abstract cast if the unreduced
     // expr type is nullable.
@@ -239,18 +237,15 @@ class ExpressionReducer(
     } else {
       unreduced.getType
     }
-    rexBuilder.makeLiteral(
-      valueArg,
-      targetType,
-      true)
+    rexBuilder.makeLiteral(valueArg, targetType, true)
   }
 }
 
 /**
-  * Constant expression code generator context.
-  */
+ * Constant expression code generator context.
+ */
 class ConstantCodeGeneratorContext(tableConfig: TableConfig)
-  extends CodeGeneratorContext(tableConfig) {
+    extends CodeGeneratorContext(tableConfig) {
   override def addReusableFunction(
       function: UserDefinedFunction,
       functionContextClass: Class[_ <: FunctionContext] = classOf[FunctionContext],
@@ -258,10 +253,7 @@ class ConstantCodeGeneratorContext(tableConfig: TableConfig)
     super.addReusableFunction(function, classOf[ConstantFunctionContext], "parameters")
   }
 
-  override def addReusableConverter(
-      dataType: DataType,
-      classLoaderTerm: String = null)
-    : String = {
+  override def addReusableConverter(dataType: DataType, classLoaderTerm: String = null): String = {
     super.addReusableConverter(dataType, "this.getClass().getClassLoader()")
   }
 }

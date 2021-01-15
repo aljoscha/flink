@@ -70,9 +70,10 @@ object StreamITCase {
           if (idx >= 0) {
             retractedResults.remove(idx)
           } else {
-            throw new RuntimeException("Tried to retract a value that wasn't added first. " +
-              "This is probably an incorrectly implemented test. " +
-              "Try to set the parallelism of the sink to 1.")
+            throw new RuntimeException(
+              "Tried to retract a value that wasn't added first. " +
+                "This is probably an incorrectly implemented test. " +
+                "Try to set the parallelism of the sink to 1.")
           }
         }
       }

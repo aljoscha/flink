@@ -41,7 +41,7 @@ abstract class CommonPhysicalExchange(
     traitSet: RelTraitSet,
     relNode: RelNode,
     relDistribution: RelDistribution)
-  extends Exchange(cluster, traitSet, relNode, relDistribution)
+    extends Exchange(cluster, traitSet, relNode, relDistribution)
     with FlinkPhysicalRel {
 
   override def computeSelfCost(planner: RelOptPlanner, mq: RelMetadataQuery): RelOptCost = {
@@ -68,15 +68,15 @@ abstract class CommonPhysicalExchange(
         costFactory.makeCost(inputRows, cpuCost, diskIoCost, networkCost, 0)
       case RelDistribution.Type.BROADCAST_DISTRIBUTED =>
         // network cost of Broadcast = size * (parallelism of other input) which we don't have here.
-        val nParallelism = Math.max(1,
-          (inputSize / SQL_DEFAULT_PARALLELISM_WORKER_PROCESS_SIZE).toInt)
+        val nParallelism =
+          Math.max(1, (inputSize / SQL_DEFAULT_PARALLELISM_WORKER_PROCESS_SIZE).toInt)
         val cpuCost = nParallelism.toDouble * inputRows * SERIALIZE_DESERIALIZE_CPU_COST
         val networkCost = nParallelism * inputSize
         costFactory.makeCost(inputRows, cpuCost, 0, networkCost, 0)
       case RelDistribution.Type.HASH_DISTRIBUTED =>
         // hash shuffle
         val cpuCost = (HASH_CPU_COST * relDistribution.getKeys.size +
-          SERIALIZE_DESERIALIZE_CPU_COST ) * inputRows
+          SERIALIZE_DESERIALIZE_CPU_COST) * inputRows
         costFactory.makeCost(inputRows, cpuCost, 0, inputSize, 0)
       case RelDistribution.Type.ANY =>
         // the specific partitioner may be ForwardPartitioner or RebalancePartitioner
@@ -111,9 +111,9 @@ abstract class CommonPhysicalExchange(
 
   protected def getRequiredShuffle: RequiredShuffle = {
     relDistribution.getType match {
-      case Type.ANY => RequiredShuffle.any()
+      case Type.ANY                   => RequiredShuffle.any()
       case Type.BROADCAST_DISTRIBUTED => RequiredShuffle.broadcast()
-      case Type.SINGLETON => RequiredShuffle.singleton()
+      case Type.SINGLETON             => RequiredShuffle.singleton()
       case Type.HASH_DISTRIBUTED =>
         val keys = relDistribution.getKeys.asScala.map(_.intValue()).toArray
         if (keys.isEmpty) {

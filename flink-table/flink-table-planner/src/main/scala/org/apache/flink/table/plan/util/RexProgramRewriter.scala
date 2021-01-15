@@ -27,16 +27,16 @@ import scala.collection.JavaConverters._
 object RexProgramRewriter {
 
   /**
-    * Generates a new RexProgram with used input fields. The used fields maybe
-    * a subset of total input fields, so we need to convert the field index in
-    * new RexProgram based on given fields.
-    *
-    * @param rexProgram   original RexProgram
-    * @param inputRowType input row type
-    * @param rexBuilder   builder for Rex expressions
-    * @param usedFields   indices of used input fields
-    * @return A new RexProgram with only used input fields
-    */
+   * Generates a new RexProgram with used input fields. The used fields maybe
+   * a subset of total input fields, so we need to convert the field index in
+   * new RexProgram based on given fields.
+   *
+   * @param rexProgram   original RexProgram
+   * @param inputRowType input row type
+   * @param rexBuilder   builder for Rex expressions
+   * @param usedFields   indices of used input fields
+   * @return A new RexProgram with only used input fields
+   */
   def rewriteWithFieldProjection(
       rexProgram: RexProgram,
       inputRowType: RelDataType,
@@ -46,15 +46,16 @@ object RexProgramRewriter {
     val inputRewriter = new InputRewriter(usedFields)
 
     // rewrite input field in projections
-    val newProjectExpressions = rexProgram.getProjectList.map(
-      exp => rexProgram.expandLocalRef(exp).accept(inputRewriter)
-    ).toList.asJava
+    val newProjectExpressions = rexProgram.getProjectList
+      .map(exp => rexProgram.expandLocalRef(exp).accept(inputRewriter))
+      .toList
+      .asJava
 
     // rewrite input field in condition
     val newConditionExpression = {
       rexProgram.getCondition match {
         case ref: RexLocalRef => rexProgram.expandLocalRef(ref).accept(inputRewriter)
-        case _ => null // null does not match any type
+        case _                => null // null does not match any type
       }
     }
 
@@ -63,16 +64,15 @@ object RexProgramRewriter {
       newProjectExpressions,
       newConditionExpression,
       rexProgram.getOutputRowType,
-      rexBuilder
-    )
+      rexBuilder)
   }
 }
 
 /**
-  * A RexShuttle to rewrite field accesses of a RexProgram.
-  *
-  * @param fields used input fields
-  */
+ * A RexShuttle to rewrite field accesses of a RexProgram.
+ *
+ * @param fields used input fields
+ */
 class InputRewriter(fields: Array[Int]) extends RexShuttle {
 
   /** old input fields ref index -> new input fields ref index mappings */
@@ -86,6 +86,7 @@ class InputRewriter(fields: Array[Int]) extends RexShuttle {
     new RexInputRef(refNewIndex(localRef), localRef.getType)
 
   private def refNewIndex(ref: RexSlot): Int =
-    fieldMap.getOrElse(ref.getIndex,
+    fieldMap.getOrElse(
+      ref.getIndex,
       throw new IllegalArgumentException("input field contains invalid index"))
 }

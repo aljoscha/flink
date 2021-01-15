@@ -32,25 +32,48 @@ import org.apache.flink.streaming.api.functions.sink.RichSinkFunction
 import org.apache.flink.table.api.TableSchema
 import org.apache.flink.table.descriptors.ConnectorDescriptorValidator.CONNECTOR
 import org.apache.flink.table.descriptors.{DescriptorProperties, Schema}
-import org.apache.flink.table.factories.utils.TestCollectionTableFactory.{getCollectionSink, getCollectionSource}
-import org.apache.flink.table.factories.{BatchTableSinkFactory, BatchTableSourceFactory, StreamTableSinkFactory, StreamTableSourceFactory}
+import org.apache.flink.table.factories.utils.TestCollectionTableFactory.{
+  getCollectionSink,
+  getCollectionSource
+}
+import org.apache.flink.table.factories.{
+  BatchTableSinkFactory,
+  BatchTableSourceFactory,
+  StreamTableSinkFactory,
+  StreamTableSourceFactory
+}
 import org.apache.flink.table.functions.{AsyncTableFunction, TableFunction}
-import org.apache.flink.table.sinks.{AppendStreamTableSink, BatchTableSink, StreamTableSink, TableSink}
-import org.apache.flink.table.sources.{BatchTableSource, LookupableTableSource, StreamTableSource, TableSource}
+import org.apache.flink.table.sinks.{
+  AppendStreamTableSink,
+  BatchTableSink,
+  StreamTableSink,
+  TableSink
+}
+import org.apache.flink.table.sources.{
+  BatchTableSource,
+  LookupableTableSource,
+  StreamTableSource,
+  TableSource
+}
 import org.apache.flink.types.Row
 
 import java.io.IOException
 import java.util
-import java.util.{Optional, ArrayList => JArrayList, LinkedList => JLinkedList, List => JList, Map => JMap}
+import java.util.{
+  Optional,
+  ArrayList => JArrayList,
+  LinkedList => JLinkedList,
+  List => JList,
+  Map => JMap
+}
 
 import scala.collection.JavaConversions._
 
 class TestCollectionTableFactory
-  extends StreamTableSourceFactory[Row]
-  with StreamTableSinkFactory[Row]
-  with BatchTableSourceFactory[Row]
-  with BatchTableSinkFactory[Row]
-{
+    extends StreamTableSourceFactory[Row]
+    with StreamTableSinkFactory[Row]
+    with BatchTableSourceFactory[Row]
+    with BatchTableSinkFactory[Row] {
 
   override def createTableSource(properties: JMap[String, String]): TableSource[Row] = {
     getCollectionSource(properties, TestCollectionTableFactory.isStreaming)
@@ -97,22 +120,24 @@ object TestCollectionTableFactory {
   val RESULT = new JLinkedList[Row]()
   private var emitIntervalMS = -1L
 
-  def initData(sourceData: JList[Row],
+  def initData(
+      sourceData: JList[Row],
       dimData: JList[Row] = List(),
-      emitInterval: Long = -1L): Unit ={
+      emitInterval: Long = -1L): Unit = {
     SOURCE_DATA.addAll(sourceData)
     DIM_DATA.addAll(dimData)
     emitIntervalMS = emitInterval
   }
 
-  def reset(): Unit ={
+  def reset(): Unit = {
     RESULT.clear()
     SOURCE_DATA.clear()
     DIM_DATA.clear()
     emitIntervalMS = -1L
   }
 
-  def getCollectionSource(props: JMap[String, String],
+  def getCollectionSource(
+      props: JMap[String, String],
       isStreaming: Boolean): CollectionTableSource = {
     val properties = new DescriptorProperties()
     properties.putProperties(props)
@@ -129,25 +154,27 @@ object TestCollectionTableFactory {
   }
 
   /**
-    * Table source of collection.
-    */
+   * Table source of collection.
+   */
   class CollectionTableSource(
       val emitIntervalMs: Long,
       val schema: TableSchema,
       val isStreaming: Boolean,
       val parallelism: Optional[Integer])
-    extends BatchTableSource[Row]
-    with StreamTableSource[Row]
-    with LookupableTableSource[Row] {
+      extends BatchTableSource[Row]
+      with StreamTableSource[Row]
+      with LookupableTableSource[Row] {
 
     private val rowType: TypeInformation[Row] = schema.toRowType
 
     override def isBounded: Boolean = !isStreaming
 
     def getDataSet(execEnv: ExecutionEnvironment): DataSet[Row] = {
-      val dataSet = execEnv.createInput(new TestCollectionInputFormat[Row](emitIntervalMs,
-        SOURCE_DATA,
-        rowType.createSerializer(new ExecutionConfig)),
+      val dataSet = execEnv.createInput(
+        new TestCollectionInputFormat[Row](
+          emitIntervalMs,
+          SOURCE_DATA,
+          rowType.createSerializer(new ExecutionConfig)),
         rowType)
       if (parallelism.isPresent) {
         dataSet.setParallelism(parallelism.get())
@@ -156,9 +183,11 @@ object TestCollectionTableFactory {
     }
 
     override def getDataStream(streamEnv: StreamExecutionEnvironment): DataStreamSource[Row] = {
-      val dataStream = streamEnv.createInput(new TestCollectionInputFormat[Row](emitIntervalMs,
-        SOURCE_DATA,
-        rowType.createSerializer(new ExecutionConfig)),
+      val dataStream = streamEnv.createInput(
+        new TestCollectionInputFormat[Row](
+          emitIntervalMs,
+          SOURCE_DATA,
+          rowType.createSerializer(new ExecutionConfig)),
         rowType)
       if (parallelism.isPresent) {
         dataStream.setParallelism(parallelism.get())
@@ -182,8 +211,8 @@ object TestCollectionTableFactory {
   }
 
   /**
-    * Table sink of collection.
-    */
+   * Table sink of collection.
+   */
   class CollectionTableSink(val outputType: RowTypeInfo)
       extends BatchTableSink[Row]
       with AppendStreamTableSink[Row] {
@@ -203,13 +232,14 @@ object TestCollectionTableFactory {
       dataStream.addSink(new UnsafeMemorySinkFunction(outputType)).setParallelism(1)
     }
 
-    override def configure(fieldNames: Array[String],
+    override def configure(
+        fieldNames: Array[String],
         fieldTypes: Array[TypeInformation[_]]): TableSink[Row] = this
   }
 
   /**
-    * Sink function of unsafe memory.
-    */
+   * Sink function of unsafe memory.
+   */
   class UnsafeMemorySinkFunction(outputType: TypeInformation[Row]) extends RichSinkFunction[Row] {
     private var serializer: TypeSerializer[Row] = _
 
@@ -224,18 +254,17 @@ object TestCollectionTableFactory {
   }
 
   /**
-    * Collection inputFormat for testing.
-    */
+   * Collection inputFormat for testing.
+   */
   class TestCollectionInputFormat[T](
       val emitIntervalMs: Long,
       val dataSet: java.util.Collection[T],
       val serializer: TypeSerializer[T])
-    extends CollectionInputFormat[T](dataSet, serializer) {
+      extends CollectionInputFormat[T](dataSet, serializer) {
     @throws[IOException]
     override def reachedEnd: Boolean = {
       if (emitIntervalMs > 0) {
-        try
-          Thread.sleep(emitIntervalMs)
+        try Thread.sleep(emitIntervalMs)
         catch {
           case _: InterruptedException =>
         }
@@ -245,11 +274,10 @@ object TestCollectionTableFactory {
   }
 
   /**
-    * Dimension table source fetcher.
-    */
-  class TemporalTableFetcher(
-      val dimData: JLinkedList[Row],
-      val keys: Array[Int]) extends TableFunction[Row] {
+   * Dimension table source fetcher.
+   */
+  class TemporalTableFetcher(val dimData: JLinkedList[Row], val keys: Array[Int])
+      extends TableFunction[Row] {
 
     @throws[Exception]
     def eval(values: Any*): Unit = {

@@ -20,7 +20,10 @@ package org.apache.flink.table.planner.plan.nodes.physical.batch
 
 import org.apache.flink.table.functions.UserDefinedFunction
 import org.apache.flink.table.planner.calcite.FlinkTypeFactory
-import org.apache.flink.table.planner.plan.`trait`.{FlinkRelDistribution, FlinkRelDistributionTraitDef}
+import org.apache.flink.table.planner.plan.`trait`.{
+  FlinkRelDistribution,
+  FlinkRelDistributionTraitDef
+}
 import org.apache.flink.table.planner.plan.nodes.exec.{ExecEdge, ExecNode}
 import org.apache.flink.table.planner.plan.nodes.exec.batch.BatchExecPythonGroupAggregate
 import org.apache.flink.table.planner.plan.rules.physical.batch.BatchExecJoinRuleBase
@@ -51,31 +54,35 @@ class BatchPhysicalPythonGroupAggregate(
     auxGrouping: Array[Int],
     aggCalls: Seq[AggregateCall],
     aggFunctions: Array[UserDefinedFunction])
-  extends BatchPhysicalGroupAggregateBase(
-    cluster,
-    traitSet,
-    inputRel,
-    outputRowType,
-    grouping,
-    auxGrouping,
-    aggCalls.zip(aggFunctions),
-    isMerge = false,
-    isFinal = true) {
+    extends BatchPhysicalGroupAggregateBase(
+      cluster,
+      traitSet,
+      inputRel,
+      outputRowType,
+      grouping,
+      auxGrouping,
+      aggCalls.zip(aggFunctions),
+      isMerge = false,
+      isFinal = true) {
 
   override def explainTerms(pw: RelWriter): RelWriter =
-    super.explainTerms(pw)
-      .itemIf("groupBy",
-              RelExplainUtil.fieldToString(grouping, inputRowType), grouping.nonEmpty)
-      .itemIf("auxGrouping",
-              RelExplainUtil.fieldToString(auxGrouping, inputRowType), auxGrouping.nonEmpty)
-      .item("select", RelExplainUtil.groupAggregationToString(
-        inputRowType,
-        outputRowType,
-        grouping,
-        auxGrouping,
-        aggCalls.zip(aggFunctions),
-        isMerge = false,
-        isGlobal = true))
+    super
+      .explainTerms(pw)
+      .itemIf("groupBy", RelExplainUtil.fieldToString(grouping, inputRowType), grouping.nonEmpty)
+      .itemIf(
+        "auxGrouping",
+        RelExplainUtil.fieldToString(auxGrouping, inputRowType),
+        auxGrouping.nonEmpty)
+      .item(
+        "select",
+        RelExplainUtil.groupAggregationToString(
+          inputRowType,
+          outputRowType,
+          grouping,
+          auxGrouping,
+          aggCalls.zip(aggFunctions),
+          isMerge = false,
+          isGlobal = true))
 
   override def satisfyTraits(requiredTraitSet: RelTraitSet): Option[RelNode] = {
     val requiredDistribution = requiredTraitSet.getTrait(FlinkRelDistributionTraitDef.INSTANCE)
@@ -156,8 +163,6 @@ class BatchPhysicalPythonGroupAggregate(
       aggCalls.toArray,
       ExecEdge.builder().damBehavior(ExecEdge.DamBehavior.END_INPUT).build(),
       FlinkTypeFactory.toLogicalRowType(getRowType),
-      getRelDetailedDescription
-    )
+      getRelDetailedDescription)
   }
 }
-

@@ -118,7 +118,8 @@ class SetOperatorsTest extends TableTestBase {
   @Test
   def testUnionAnyType(): Unit = {
     val util = batchTestUtil()
-    util.addTableSource("A",
+    util.addTableSource(
+      "A",
       Array[TypeInformation[_]](
         new GenericTypeInfo(classOf[NonPojo]),
         new GenericTypeInfo(classOf[NonPojo])),

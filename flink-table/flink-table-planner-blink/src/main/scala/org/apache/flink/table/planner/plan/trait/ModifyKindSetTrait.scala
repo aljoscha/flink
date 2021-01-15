@@ -46,13 +46,14 @@ class ModifyKindSetTrait(val modifyKindSet: ModifyKindSet) extends RelTrait {
 
   override def equals(obj: Any): Boolean = obj match {
     case t: ModifyKindSetTrait => this.modifyKindSet.equals(t.modifyKindSet)
-    case _ => false
+    case _                     => false
   }
 
   override def toString: String = s"[${modifyKindSet.toString}]"
 }
 
 object ModifyKindSetTrait {
+
   /**
    * An empty [[ModifyKindSetTrait]] which doesn't contain any [[ModifyKind]].
    */
@@ -76,7 +77,7 @@ object ModifyKindSetTrait {
     changelogMode.getContainedKinds.foreach {
       case RowKind.INSERT => builder.addContainedKind(ModifyKind.INSERT)
       case RowKind.DELETE => builder.addContainedKind(ModifyKind.DELETE)
-      case _ => builder.addContainedKind(ModifyKind.UPDATE) // otherwise updates
+      case _              => builder.addContainedKind(ModifyKind.UPDATE) // otherwise updates
     }
     new ModifyKindSetTrait(builder.build)
   }

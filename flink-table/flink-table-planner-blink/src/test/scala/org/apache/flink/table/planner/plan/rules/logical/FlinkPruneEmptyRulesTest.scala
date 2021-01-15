@@ -20,7 +20,12 @@ package org.apache.flink.table.planner.plan.rules.logical
 
 import org.apache.flink.api.scala._
 import org.apache.flink.table.api._
-import org.apache.flink.table.planner.plan.optimize.program.{BatchOptimizeContext, FlinkChainedProgram, FlinkHepRuleSetProgramBuilder, HEP_RULES_EXECUTION_TYPE}
+import org.apache.flink.table.planner.plan.optimize.program.{
+  BatchOptimizeContext,
+  FlinkChainedProgram,
+  FlinkHepRuleSetProgramBuilder,
+  HEP_RULES_EXECUTION_TYPE
+}
 import org.apache.flink.table.planner.utils.TableTestBase
 
 import org.apache.calcite.plan.hep.HepMatchOrder
@@ -29,8 +34,8 @@ import org.apache.calcite.tools.RuleSets
 import org.junit.{Before, Test}
 
 /**
-  * Test for [[FlinkPruneEmptyRules]].
-  */
+ * Test for [[FlinkPruneEmptyRules]].
+ */
 class FlinkPruneEmptyRulesTest extends TableTestBase {
 
   private val util = batchTestUtil()
@@ -50,8 +55,7 @@ class FlinkPruneEmptyRulesTest extends TableTestBase {
           PruneEmptyRules.FILTER_INSTANCE,
           PruneEmptyRules.PROJECT_INSTANCE,
           FlinkPruneEmptyRules.JOIN_RIGHT_INSTANCE))
-        .build()
-    )
+        .build())
     util.replaceBatchProgram(programs)
 
     util.addTableSource[(Int, Long, String)]("T1", 'a, 'b, 'c)

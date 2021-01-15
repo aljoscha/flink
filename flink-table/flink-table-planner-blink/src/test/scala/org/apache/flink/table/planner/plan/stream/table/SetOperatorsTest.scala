@@ -32,7 +32,8 @@ class SetOperatorsTest extends TableTestBase {
     val left = util.addTableSource[(Int, Long, String)]("left", 'a, 'b, 'c)
     val right = util.addTableSource[(Int, Long, String)]("right", 'a, 'b, 'c)
 
-    val result = left.unionAll(right)
+    val result = left
+      .unionAll(right)
       .where('a > 0)
       .groupBy('b)
       .select('a.sum as 'a, 'b as 'b, 'c.count as 'c)
@@ -45,7 +46,8 @@ class SetOperatorsTest extends TableTestBase {
     val left = util.addTableSource[(Int, Long, String)]("left", 'a, 'b, 'c)
     val right = util.addTableSource[(Int, Long, String)]("right", 'a, 'b, 'c)
 
-    val result = left.select('a, 'b, 'c)
+    val result = left
+      .select('a, 'b, 'c)
       .unionAll(right.select('a, 'b, 'c))
       .select('b, 'c)
 

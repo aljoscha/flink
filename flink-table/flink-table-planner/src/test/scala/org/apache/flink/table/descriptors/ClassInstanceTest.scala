@@ -43,9 +43,8 @@ class ClassInstanceTest extends DescriptorTestBase {
             new ClassInstance()
               .of("class3")
               .parameterString("StarryNight")
-              .parameter(
-                new ClassInstance()
-                    .of("class4"))))
+              .parameter(new ClassInstance()
+                .of("class4"))))
       .parameter(2L)
 
     val desc2 = new ClassInstance()
@@ -76,12 +75,9 @@ class ClassInstanceTest extends DescriptorTestBase {
       "constructor.1.constructor.0.constructor.0" -> "StarryNight",
       "constructor.1.constructor.0.constructor.1.class" -> "class4",
       "constructor.2.type" -> "BIGINT",
-      "constructor.2.value" -> "2"
-    )
+      "constructor.2.value" -> "2")
 
-    val props2 = Map(
-      "class" -> "class2"
-    )
+    val props2 = Map("class" -> "class2")
 
     val props3 = Map(
       "class" -> "org.example.Function",
@@ -94,8 +90,7 @@ class ClassInstanceTest extends DescriptorTestBase {
       "constructor.3.type" -> "DOUBLE",
       "constructor.3.value" -> "222.2222",
       "constructor.4.type" -> "FLOAT",
-      "constructor.4.value" -> "222.2222"
-    )
+      "constructor.4.value" -> "222.2222")
 
     JArrays.asList(props1.asJava, props2.asJava, props3.asJava)
   }

@@ -18,7 +18,12 @@
 
 package org.apache.flink.table.planner.plan.rules.logical
 
-import org.apache.flink.table.planner.plan.nodes.logical.{FlinkLogicalCalc, FlinkLogicalCorrelate, FlinkLogicalRel, FlinkLogicalTableFunctionScan}
+import org.apache.flink.table.planner.plan.nodes.logical.{
+  FlinkLogicalCalc,
+  FlinkLogicalCorrelate,
+  FlinkLogicalRel,
+  FlinkLogicalTableFunctionScan
+}
 import org.apache.flink.table.planner.plan.rules.physical.stream.StreamPhysicalCorrelateRule
 import org.apache.flink.table.planner.plan.utils.PythonUtil.{containsPythonCall, isNonPythonCall}
 import org.apache.flink.table.planner.plan.utils.RexDefaultVisitor
@@ -32,22 +37,22 @@ import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 
 /**
-  * Rule will split a [[FlinkLogicalCalc]] which is the upstream of a [[FlinkLogicalCorrelate]]
-  * and contains Python Functions in condition into two [[FlinkLogicalCalc]]s. One of the
-  * [[FlinkLogicalCalc]] without python function condition is the upstream of the
-  * [[FlinkLogicalCorrelate]], but the other [[[FlinkLogicalCalc]] with python function conditions
-  * is the downstream of the [[FlinkLogicalCorrelate]]. Currently, only inner join is supported.
-  *
-  * After this rule is applied, there will be no Python Functions in the condition of the upstream
-  * [[FlinkLogicalCalc]].
-  */
+ * Rule will split a [[FlinkLogicalCalc]] which is the upstream of a [[FlinkLogicalCorrelate]]
+ * and contains Python Functions in condition into two [[FlinkLogicalCalc]]s. One of the
+ * [[FlinkLogicalCalc]] without python function condition is the upstream of the
+ * [[FlinkLogicalCorrelate]], but the other [[[FlinkLogicalCalc]] with python function conditions
+ * is the downstream of the [[FlinkLogicalCorrelate]]. Currently, only inner join is supported.
+ *
+ * After this rule is applied, there will be no Python Functions in the condition of the upstream
+ * [[FlinkLogicalCalc]].
+ */
 class SplitPythonConditionFromCorrelateRule
-  extends RelOptRule(
-    operand(
-      classOf[FlinkLogicalCorrelate],
-      operand(classOf[FlinkLogicalRel], any),
-      operand(classOf[FlinkLogicalCalc], any)),
-    "SplitPythonConditionFromCorrelateRule") {
+    extends RelOptRule(
+      operand(
+        classOf[FlinkLogicalCorrelate],
+        operand(classOf[FlinkLogicalRel], any),
+        operand(classOf[FlinkLogicalCalc], any)),
+      "SplitPythonConditionFromCorrelateRule") {
   override def matches(call: RelOptRuleCall): Boolean = {
     val correlate: FlinkLogicalCorrelate = call.rel(0).asInstanceOf[FlinkLogicalCorrelate]
     val right: FlinkLogicalCalc = call.rel(2).asInstanceOf[FlinkLogicalCalc]
@@ -57,10 +62,10 @@ class SplitPythonConditionFromCorrelateRule
       .getTableScan(mergedCalc)
       .asInstanceOf[FlinkLogicalTableFunctionScan]
     joinType == JoinRelType.INNER &&
-      isNonPythonCall(tableScan.getCall) &&
-      Option(mergedCalc.getProgram.getCondition)
-        .map(mergedCalc.getProgram.expandLocalRef)
-        .exists(containsPythonCall(_))
+    isNonPythonCall(tableScan.getCall) &&
+    Option(mergedCalc.getProgram.getCondition)
+      .map(mergedCalc.getProgram.expandLocalRef)
+      .exists(containsPythonCall(_))
   }
 
   override def onMatch(call: RelOptRuleCall): Unit = {
@@ -124,14 +129,13 @@ class SplitPythonConditionFromCorrelateRule
 }
 
 /**
-  * Because the inputRef is from the upstream calc node of the correlate node, so after the inputRef
-  * is pushed to the downstream calc node of the correlate node, the inputRef need to rewrite the
-  * index.
-  *
-  * @param offset the start offset of the inputRef in the downstream calc.
-  */
-private class InputRefRewriter(offset: Int)
-  extends RexDefaultVisitor[RexNode] {
+ * Because the inputRef is from the upstream calc node of the correlate node, so after the inputRef
+ * is pushed to the downstream calc node of the correlate node, the inputRef need to rewrite the
+ * index.
+ *
+ * @param offset the start offset of the inputRef in the downstream calc.
+ */
+private class InputRefRewriter(offset: Int) extends RexDefaultVisitor[RexNode] {
 
   override def visitInputRef(inputRef: RexInputRef): RexNode = {
     new RexInputRef(inputRef.getIndex + offset, inputRef.getType)

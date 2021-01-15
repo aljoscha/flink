@@ -44,7 +44,6 @@ import org.apache.flink.util.Collector
  *           );
  * }}}
  *
- *
  * Input files are plain text CSV files using the pipe character ('|') as field separator.
  * The tables referenced in the query can be generated using the
  * [org.apache.flink.examples.java.relational.util.WebLogDataGenerator]] and
@@ -72,7 +71,6 @@ import org.apache.flink.util.Collector
  *                duration INT );
  * }}}
  *
- *
  * Usage
  * {{{
  *   WebLogAnalysis --documents <path> --ranks <path> --visits <path> --output <path>
@@ -86,7 +84,6 @@ import org.apache.flink.util.Collector
  *  - tuple data types
  *  - projection and join projection
  *  - the CoGroup transformation for an anti-join
- *
  */
 object WebLogAnalysis {
 
@@ -113,17 +110,25 @@ object WebLogAnalysis {
     val filteredVisits = visits
       .filter(visit => visit._2.substring(0, 4).toInt == 2007)
 
-    val joinDocsRanks = filteredDocs.join(filteredRanks).where(0).equalTo(1) {
-      (doc, rank) => rank
-    }.withForwardedFieldsSecond("*")
+    val joinDocsRanks = filteredDocs
+      .join(filteredRanks)
+      .where(0)
+      .equalTo(1) { (doc, rank) =>
+        rank
+      }
+      .withForwardedFieldsSecond("*")
 
-    val result = joinDocsRanks.coGroup(filteredVisits).where(1).equalTo(0) {
-      (
-        ranks: Iterator[(Int, String, Int)],
-        visits: Iterator[(String, String)],
-        out: Collector[(Int, String, Int)]) =>
+    val result = joinDocsRanks
+      .coGroup(filteredVisits)
+      .where(1)
+      .equalTo(0) {
+        (
+            ranks: Iterator[(Int, String, Int)],
+            visits: Iterator[(String, String)],
+            out: Collector[(Int, String, Int)]) =>
           if (visits.isEmpty) for (rank <- ranks) out.collect(rank)
-    }.withForwardedFieldsFirst("*")
+      }
+      .withForwardedFieldsFirst("*")
 
     // emit result
     if (params.has("output")) {
@@ -136,8 +141,9 @@ object WebLogAnalysis {
 
   }
 
-  private def getDocumentsDataSet(env: ExecutionEnvironment, params: ParameterTool):
-  DataSet[(String, String)] = {
+  private def getDocumentsDataSet(
+      env: ExecutionEnvironment,
+      params: ParameterTool): DataSet[(String, String)] = {
     if (params.has("documents")) {
       env.readCsvFile[(String, String)](
         params.get("documents"),
@@ -146,15 +152,16 @@ object WebLogAnalysis {
     } else {
       println("Executing WebLogAnalysis example with default documents data set.")
       println("Use --documents to specify file input.")
-      val documents = WebLogData.DOCUMENTS map {
-        case Array(x, y) => (x.asInstanceOf[String], y.asInstanceOf[String])
+      val documents = WebLogData.DOCUMENTS map { case Array(x, y) =>
+        (x.asInstanceOf[String], y.asInstanceOf[String])
       }
       env.fromCollection(documents)
     }
   }
 
-  private def getRanksDataSet(env: ExecutionEnvironment, params: ParameterTool):
-  DataSet[(Int, String, Int)] = {
+  private def getRanksDataSet(
+      env: ExecutionEnvironment,
+      params: ParameterTool): DataSet[(Int, String, Int)] = {
     if (params.has("ranks")) {
       env.readCsvFile[(Int, String, Int)](
         params.get("ranks"),
@@ -163,15 +170,16 @@ object WebLogAnalysis {
     } else {
       println("Executing WebLogAnalysis example with default ranks data set.")
       println("Use --ranks to specify file input.")
-      val ranks = WebLogData.RANKS map {
-        case Array(x, y, z) => (x.asInstanceOf[Int], y.asInstanceOf[String], z.asInstanceOf[Int])
+      val ranks = WebLogData.RANKS map { case Array(x, y, z) =>
+        (x.asInstanceOf[Int], y.asInstanceOf[String], z.asInstanceOf[Int])
       }
       env.fromCollection(ranks)
     }
   }
 
-  private def getVisitsDataSet(env: ExecutionEnvironment, params: ParameterTool):
-  DataSet[(String, String)] = {
+  private def getVisitsDataSet(
+      env: ExecutionEnvironment,
+      params: ParameterTool): DataSet[(String, String)] = {
     if (params.has("visits")) {
       env.readCsvFile[(String, String)](
         params.get("visits"),
@@ -180,8 +188,8 @@ object WebLogAnalysis {
     } else {
       println("Executing WebLogAnalysis example with default visits data set.")
       println("Use --visits to specify file input.")
-      val visits = WebLogData.VISITS map {
-        case Array(x, y) => (x.asInstanceOf[String], y.asInstanceOf[String])
+      val visits = WebLogData.VISITS map { case Array(x, y) =>
+        (x.asInstanceOf[String], y.asInstanceOf[String])
       }
       env.fromCollection(visits)
     }

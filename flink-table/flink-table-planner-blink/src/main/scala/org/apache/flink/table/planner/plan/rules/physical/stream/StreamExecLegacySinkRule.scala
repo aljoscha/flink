@@ -32,11 +32,12 @@ import org.apache.calcite.rel.convert.ConverterRule
 
 import scala.collection.JavaConversions._
 
-class StreamExecLegacySinkRule extends ConverterRule(
-    classOf[FlinkLogicalLegacySink],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.STREAM_PHYSICAL,
-    "StreamExecLegacySinkRule") {
+class StreamExecLegacySinkRule
+    extends ConverterRule(
+      classOf[FlinkLogicalLegacySink],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.STREAM_PHYSICAL,
+      "StreamExecLegacySinkRule") {
 
   def convert(rel: RelNode): RelNode = {
     val sinkNode = rel.asInstanceOf[FlinkLogicalLegacySink]
@@ -47,40 +48,37 @@ class StreamExecLegacySinkRule extends ConverterRule(
         case partitionSink: PartitionableTableSink =>
           partitionSink.setStaticPartition(sinkNode.staticPartitions)
           val dynamicPartFields = sinkNode.catalogTable.getPartitionKeys
-              .filter(!sinkNode.staticPartitions.contains(_))
+            .filter(!sinkNode.staticPartitions.contains(_))
 
           if (dynamicPartFields.nonEmpty) {
             val dynamicPartIndices =
               dynamicPartFields.map(partitionSink.getTableSchema.getFieldNames.indexOf(_))
 
-            val shuffleEnable = sinkNode
-                .catalogTable
-                .getProperties
-                .get(FileSystemOptions.SINK_SHUFFLE_BY_PARTITION.key())
+            val shuffleEnable = sinkNode.catalogTable.getProperties
+              .get(FileSystemOptions.SINK_SHUFFLE_BY_PARTITION.key())
 
             if (shuffleEnable != null && shuffleEnable.toBoolean) {
               requiredTraitSet = requiredTraitSet.plus(
-                FlinkRelDistribution.hash(dynamicPartIndices
-                    .map(Integer.valueOf), requireStrict = false))
+                FlinkRelDistribution.hash(
+                  dynamicPartIndices
+                    .map(Integer.valueOf),
+                  requireStrict = false))
             }
 
             if (partitionSink.configurePartitionGrouping(false)) {
               throw new TableException("Partition grouping in stream mode is not supported yet!")
             }
           }
-        case _ => throw new TableException("We need PartitionableTableSink to write data to" +
-            s" partitioned table: ${sinkNode.sinkName}")
+        case _ =>
+          throw new TableException(
+            "We need PartitionableTableSink to write data to" +
+              s" partitioned table: ${sinkNode.sinkName}")
       }
     }
 
     val newInput = RelOptRule.convert(sinkNode.getInput, requiredTraitSet)
 
-    new StreamExecLegacySink(
-      rel.getCluster,
-      newTrait,
-      newInput,
-      sinkNode.sink,
-      sinkNode.sinkName)
+    new StreamExecLegacySink(rel.getCluster, newTrait, newInput, sinkNode.sink, sinkNode.sinkName)
   }
 }
 

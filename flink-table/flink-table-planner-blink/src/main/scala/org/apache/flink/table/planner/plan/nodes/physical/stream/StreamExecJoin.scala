@@ -27,7 +27,10 @@ import org.apache.flink.table.planner.plan.nodes.common.CommonPhysicalJoin
 import org.apache.flink.table.planner.plan.nodes.exec.LegacyStreamExecNode
 import org.apache.flink.table.planner.plan.utils.{JoinUtil, KeySelectorUtil}
 import org.apache.flink.table.runtime.operators.join.stream.state.JoinInputSideSpec
-import org.apache.flink.table.runtime.operators.join.stream.{StreamingJoinOperator, StreamingSemiAntiJoinOperator}
+import org.apache.flink.table.runtime.operators.join.stream.{
+  StreamingJoinOperator,
+  StreamingSemiAntiJoinOperator
+}
 import org.apache.flink.table.runtime.typeutils.InternalTypeInfo
 import org.apache.flink.table.types.logical.RowType
 
@@ -40,11 +43,11 @@ import org.apache.calcite.rex.RexNode
 import scala.collection.JavaConversions._
 
 /**
-  * Stream physical RelNode for regular [[Join]].
-  *
-  * Regular joins are the most generic type of join in which any new records or changes to
-  * either side of the join input are visible and are affecting the whole join result.
-  */
+ * Stream physical RelNode for regular [[Join]].
+ *
+ * Regular joins are the most generic type of join in which any new records or changes to
+ * either side of the join input are visible and are affecting the whole join result.
+ */
 class StreamExecJoin(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -52,9 +55,9 @@ class StreamExecJoin(
     rightRel: RelNode,
     condition: RexNode,
     joinType: JoinRelType)
-  extends CommonPhysicalJoin(cluster, traitSet, leftRel, rightRel, condition, joinType)
-  with StreamPhysicalRel
-  with LegacyStreamExecNode[RowData] {
+    extends CommonPhysicalJoin(cluster, traitSet, leftRel, rightRel, condition, joinType)
+    with StreamPhysicalRel
+    with LegacyStreamExecNode[RowData] {
 
   /**
    * This is mainly used in `FlinkChangelogModeInferenceProgram.SatisfyUpdateKindTraitVisitor`.
@@ -77,8 +80,8 @@ class StreamExecJoin(
     val inputUniqueKeys = getCluster.getMetadataQuery.getUniqueKeys(input)
     if (inputUniqueKeys != null) {
       val joinKeys = if (inputOrdinal == 0) joinSpec.getLeftKeys else joinSpec.getRightKeys
-      inputUniqueKeys.exists {
-        uniqueKey => joinKeys.forall(uniqueKey.toArray.contains(_))
+      inputUniqueKeys.exists { uniqueKey =>
+        joinKeys.forall(uniqueKey.toArray.contains(_))
       }
     } else {
       false
@@ -117,19 +120,23 @@ class StreamExecJoin(
     val tableConfig = planner.getTableConfig
     val returnType = InternalTypeInfo.of(FlinkTypeFactory.toLogicalRowType(getRowType))
 
-    val leftTransform = getInputNodes.get(0).translateToPlan(planner)
+    val leftTransform = getInputNodes
+      .get(0)
+      .translateToPlan(planner)
       .asInstanceOf[Transformation[RowData]]
-    val rightTransform = getInputNodes.get(1).translateToPlan(planner)
+    val rightTransform = getInputNodes
+      .get(1)
+      .translateToPlan(planner)
       .asInstanceOf[Transformation[RowData]]
 
     val leftType = leftTransform.getOutputType.asInstanceOf[InternalTypeInfo[RowData]]
     val rightType = rightTransform.getOutputType.asInstanceOf[InternalTypeInfo[RowData]]
 
     JoinUtil.validateJoinSpec(
-        joinSpec,
-        getInputNodes.get(0).getOutputType.asInstanceOf[RowType],
-        getInputNodes.get(1).getOutputType.asInstanceOf[RowType],
-        allowEmptyKey = true)
+      joinSpec,
+      getInputNodes.get(0).getOutputType.asInstanceOf[RowType],
+      getInputNodes.get(1).getOutputType.asInstanceOf[RowType],
+      allowEmptyKey = true)
     val leftJoinKey = joinSpec.getLeftKeys
     val rightJoinKey = joinSpec.getRightKeys
 

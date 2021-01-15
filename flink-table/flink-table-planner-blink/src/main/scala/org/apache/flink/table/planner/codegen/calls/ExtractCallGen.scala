@@ -21,15 +21,18 @@ package org.apache.flink.table.planner.codegen.calls
 import org.apache.flink.table.api.ValidationException
 import org.apache.flink.table.planner.codegen.CodeGenUtils._
 import org.apache.flink.table.planner.codegen.GenerateUtils.generateCallIfArgsNotNull
-import org.apache.flink.table.planner.codegen.{CodeGenException, CodeGeneratorContext, GeneratedExpression}
+import org.apache.flink.table.planner.codegen.{
+  CodeGenException,
+  CodeGeneratorContext,
+  GeneratedExpression
+}
 import org.apache.flink.table.types.logical.{LogicalType, LogicalTypeRoot}
 
 import org.apache.calcite.avatica.util.{TimeUnit, TimeUnitRange}
 
 import java.lang.reflect.Method
 
-class ExtractCallGen(method: Method)
-  extends MethodCallGen(method) {
+class ExtractCallGen(method: Method) extends MethodCallGen(method) {
 
   override def generate(
       ctx: CodeGeneratorContext,
@@ -38,20 +41,12 @@ class ExtractCallGen(method: Method)
     val unit = getEnum(operands.head).asInstanceOf[TimeUnitRange].startUnit
     val tpe = operands(1).resultType
     unit match {
-      case TimeUnit.YEAR |
-           TimeUnit.MONTH |
-           TimeUnit.DAY |
-           TimeUnit.QUARTER |
-           TimeUnit.DOY |
-           TimeUnit.DOW |
-           TimeUnit.WEEK |
-           TimeUnit.CENTURY |
-           TimeUnit.MILLENNIUM =>
+      case TimeUnit.YEAR | TimeUnit.MONTH | TimeUnit.DAY | TimeUnit.QUARTER | TimeUnit.DOY |
+          TimeUnit.DOW | TimeUnit.WEEK | TimeUnit.CENTURY | TimeUnit.MILLENNIUM =>
         tpe.getTypeRoot match {
           case LogicalTypeRoot.TIMESTAMP_WITHOUT_TIME_ZONE =>
-            return generateCallIfArgsNotNull(ctx, returnType, operands) {
-              (terms) =>
-                s"""
+            return generateCallIfArgsNotNull(ctx, returnType, operands) { (terms) =>
+              s"""
                    |${qualifyMethod(method)}(${terms.head},
                    |    ${terms(1)}.getMillisecond() / ${TimeUnit.DAY.multiplier.intValue()})
                    |""".stripMargin
@@ -68,12 +63,12 @@ class ExtractCallGen(method: Method)
 
       case _ => // do nothing
     }
-    generateCallIfArgsNotNull(ctx, returnType, operands) {
-      (terms) => {
+    generateCallIfArgsNotNull(ctx, returnType, operands) { (terms) =>
+      {
         val factor = getFactor(unit)
         val longTerm = tpe.getTypeRoot match {
           case LogicalTypeRoot.TIMESTAMP_WITHOUT_TIME_ZONE => s"${terms(1)}.getMillisecond()"
-          case _ => s"${terms(1)}"
+          case _                                           => s"${terms(1)}"
         }
         unit match {
           case TimeUnit.QUARTER =>
@@ -133,9 +128,7 @@ class ExtractCallGen(method: Method)
         TimeUnit.YEAR.multiplier.longValue()
       case TimeUnit.QUARTER =>
         TimeUnit.YEAR.multiplier.longValue()
-      case TimeUnit.YEAR |
-           TimeUnit.CENTURY |
-           TimeUnit.MILLENNIUM => 1L
+      case TimeUnit.YEAR | TimeUnit.CENTURY | TimeUnit.MILLENNIUM => 1L
       case _ =>
         throw new CodeGenException(s"Unit '$unit' is not supported.")
     }

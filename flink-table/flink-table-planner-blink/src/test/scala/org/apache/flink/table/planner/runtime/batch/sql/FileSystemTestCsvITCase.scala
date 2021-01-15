@@ -19,8 +19,8 @@
 package org.apache.flink.table.planner.runtime.batch.sql
 
 /**
-  * Test for file system table factory with testcsv format.
-  */
+ * Test for file system table factory with testcsv format.
+ */
 class FileSystemTestCsvITCase extends BatchFileSystemITCaseBase {
 
   override def formatProperties(): Array[String] = {

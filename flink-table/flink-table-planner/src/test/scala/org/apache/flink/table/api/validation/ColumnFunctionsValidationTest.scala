@@ -25,9 +25,9 @@ import org.apache.flink.table.utils.{StreamTableTestUtil, TableTestBase}
 import org.junit.Test
 
 /**
-  * Tests to validate exceptions for column functions. This test can also cover the batch
-  * scenarios.
-  */
+ * Tests to validate exceptions for column functions. This test can also cover the batch
+ * scenarios.
+ */
 class ColumnFunctionsValidationTest extends TableTestBase {
 
   val util = new StreamTableTestUtil()
@@ -71,8 +71,7 @@ class ColumnFunctionsValidationTest extends TableTestBase {
   @Test
   def testInvalidRenameColumns(): Unit = {
     expectedException.expect(classOf[ValidationException])
-    expectedException.expectMessage(
-      "Invalid AS, parameters are: [a, b, 'a'].")
+    expectedException.expectMessage("Invalid AS, parameters are: [a, b, 'a'].")
 
     val t = util.addTable[(Int, Long, String, Int, Long, String)]('a, 'b, 'c, 'd, 'e, 'f)
     val tab = t.renameColumns(withColumns(1 to 2) as 'a) // failed, invalid as
@@ -82,8 +81,7 @@ class ColumnFunctionsValidationTest extends TableTestBase {
   @Test
   def testInvalidWindowTimeField(): Unit = {
     expectedException.expect(classOf[ValidationException])
-    expectedException.expectMessage(
-      "A group window only supports a single time field column.")
+    expectedException.expectMessage("A group window only supports a single time field column.")
 
     val t = util.addTable[(Int, Long, String, Int)]('a, 'b.rowtime, 'c, 'd)
     val tab = t

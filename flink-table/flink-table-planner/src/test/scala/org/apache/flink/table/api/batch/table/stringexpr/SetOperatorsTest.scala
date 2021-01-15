@@ -48,16 +48,12 @@ class SetOperatorsTest extends TableTestBase {
             "DataSetCalc",
             batchTableNode(t),
             term("select", "a AS a1"),
-            term("where", "=(b, 'two')")
-          ),
-          term("distinct", "a1")
-        ),
+            term("where", "=(b, 'two')")),
+          term("distinct", "a1")),
         term("where", "=(c, a1)"),
         term("join", "a", "b", "c", "a1"),
-        term("joinType", "InnerJoin")
-      ),
-      term("select", "a", "b", "c")
-    )
+        term("joinType", "InnerJoin")),
+      term("select", "a", "b", "c"))
 
     util.verifyTable(in, expected)
   }
@@ -72,8 +68,7 @@ class SetOperatorsTest extends TableTestBase {
     val expected = unaryNode(
       "DataSetCalc",
       batchTableNode(t),
-      term("select", "=(b, 1972-02-22 07:12:00.333:TIMESTAMP(3)) AS b2")
-    )
+      term("select", "=(b, 1972-02-22 07:12:00.333:TIMESTAMP(3)) AS b2"))
 
     util.verifyTable(in, expected)
   }

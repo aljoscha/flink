@@ -26,9 +26,7 @@ class MultisetRelDataType(
     val typeInfo: TypeInformation[_],
     elementType: RelDataType,
     isNullable: Boolean)
-  extends MultisetSqlType(
-    elementType,
-    isNullable) {
+    extends MultisetSqlType(elementType, isNullable) {
 
   override def toString = s"MULTISET($elementType)"
 

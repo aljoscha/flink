@@ -38,9 +38,9 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
-  * Sub-class of [[TableFunctionScan]] that is a relational expression
-  * which calls a table-valued function in Flink.
-  */
+ * Sub-class of [[TableFunctionScan]] that is a relational expression
+ * which calls a table-valued function in Flink.
+ */
 class FlinkLogicalTableFunctionScan(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -49,15 +49,15 @@ class FlinkLogicalTableFunctionScan(
     elementType: Type,
     rowType: RelDataType,
     columnMappings: util.Set[RelColumnMapping])
-  extends TableFunctionScan(
-    cluster,
-    traitSet,
-    inputs,
-    rexCall,
-    elementType,
-    rowType,
-    columnMappings)
-  with FlinkLogicalRel {
+    extends TableFunctionScan(
+      cluster,
+      traitSet,
+      inputs,
+      rexCall,
+      elementType,
+      rowType,
+      columnMappings)
+    with FlinkLogicalRel {
 
   override def copy(
       traitSet: RelTraitSet,
@@ -80,11 +80,11 @@ class FlinkLogicalTableFunctionScan(
 }
 
 class FlinkLogicalTableFunctionScanConverter
-  extends ConverterRule(
-    classOf[LogicalTableFunctionScan],
-    Convention.NONE,
-    FlinkConventions.LOGICAL,
-    "FlinkLogicalTableFunctionScanConverter") {
+    extends ConverterRule(
+      classOf[LogicalTableFunctionScan],
+      Convention.NONE,
+      FlinkConventions.LOGICAL,
+      "FlinkLogicalTableFunctionScanConverter") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val logicalTableFunction: LogicalTableFunctionScan = call.rel(0)
@@ -100,9 +100,9 @@ class FlinkLogicalTableFunctionScanConverter
     }
     val rexCall = logicalTableFunction.getCall.asInstanceOf[RexCall]
     val functionDefinition = rexCall.getOperator match {
-      case tsf: TableSqlFunction => tsf.udtf
+      case tsf: TableSqlFunction    => tsf.udtf
       case bsf: BridgingSqlFunction => bsf.getDefinition
-      case _ => return false
+      case _                        => return false
     }
     functionDefinition.isInstanceOf[TemporalTableFunction]
   }
@@ -119,8 +119,7 @@ class FlinkLogicalTableFunctionScanConverter
       scan.getCall,
       scan.getElementType,
       scan.getRowType,
-      scan.getColumnMappings
-    )
+      scan.getColumnMappings)
   }
 
 }

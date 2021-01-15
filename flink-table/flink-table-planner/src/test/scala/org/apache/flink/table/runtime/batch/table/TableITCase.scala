@@ -44,7 +44,8 @@ class TableITCase {
     assertTrue(tableResult.getJobClient.isPresent)
     assertEquals(ResultKind.SUCCESS_WITH_CONTENT, tableResult.getResultKind)
     assertEquals(
-      TableSchema.builder()
+      TableSchema
+        .builder()
         .field("a", DataTypes.INT())
         .field("c", DataTypes.STRING())
         .build(),

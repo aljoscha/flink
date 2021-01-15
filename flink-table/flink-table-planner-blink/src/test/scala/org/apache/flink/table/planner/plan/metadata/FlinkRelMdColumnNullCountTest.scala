@@ -101,7 +101,10 @@ class FlinkRelMdColumnNullCountTest extends FlinkRelMdHandlerTestBase {
   def testGetColumnNullCountOnCalc(): Unit = {
     // only project
     val calc1 = createLogicalCalc(
-      studentLogicalScan, logicalProject.getRowType, logicalProject.getProjects, null)
+      studentLogicalScan,
+      logicalProject.getRowType,
+      logicalProject.getProjects,
+      null)
     assertEquals(0.0, mq.getColumnNullCount(calc1, 0))
     assertEquals(0.0, mq.getColumnNullCount(calc1, 1))
     assertNull(mq.getColumnNullCount(calc1, 2))
@@ -120,7 +123,10 @@ class FlinkRelMdColumnNullCountTest extends FlinkRelMdHandlerTestBase {
     // id <= 2
     val expr1 = relBuilder.call(LESS_THAN_OR_EQUAL, relBuilder.field(0), relBuilder.literal(2))
     val calc2 = createLogicalCalc(
-      studentLogicalScan, studentLogicalScan.getRowType, relBuilder.fields(), List(expr1))
+      studentLogicalScan,
+      studentLogicalScan.getRowType,
+      relBuilder.fields(),
+      List(expr1))
     assertEquals(0.0, mq.getColumnNullCount(calc2, 0))
     assertEquals(0.0, mq.getColumnNullCount(calc2, 1))
     assertNull(mq.getColumnNullCount(calc2, 2))
@@ -132,7 +138,10 @@ class FlinkRelMdColumnNullCountTest extends FlinkRelMdHandlerTestBase {
     // height is not null
     val expr2 = relBuilder.isNotNull(relBuilder.field(4))
     val calc3 = createLogicalCalc(
-      studentLogicalScan, studentLogicalScan.getRowType, relBuilder.fields(), List(expr2))
+      studentLogicalScan,
+      studentLogicalScan.getRowType,
+      relBuilder.fields(),
+      List(expr2))
     assertEquals(0.0, mq.getColumnNullCount(calc3, 0))
     assertEquals(0.0, mq.getColumnNullCount(calc3, 1))
     assertNull(mq.getColumnNullCount(calc3, 2))
@@ -144,7 +153,10 @@ class FlinkRelMdColumnNullCountTest extends FlinkRelMdHandlerTestBase {
     // project + filter
     // id <= 2
     val calc4 = createLogicalCalc(
-      studentLogicalScan, logicalProject.getRowType, logicalProject.getProjects, List(expr1))
+      studentLogicalScan,
+      logicalProject.getRowType,
+      logicalProject.getProjects,
+      List(expr1))
     assertEquals(0.0, mq.getColumnNullCount(calc4, 0))
     assertEquals(0.0, mq.getColumnNullCount(calc4, 1))
     assertNull(mq.getColumnNullCount(calc4, 2))
@@ -160,7 +172,10 @@ class FlinkRelMdColumnNullCountTest extends FlinkRelMdHandlerTestBase {
 
     // height is not null
     val calc5 = createLogicalCalc(
-      studentLogicalScan, logicalProject.getRowType, logicalProject.getProjects, List(expr2))
+      studentLogicalScan,
+      logicalProject.getRowType,
+      logicalProject.getProjects,
+      List(expr2))
     assertEquals(0.0, mq.getColumnNullCount(calc5, 0))
     assertEquals(0.0, mq.getColumnNullCount(calc5, 1))
     assertNull(mq.getColumnNullCount(calc5, 2))
@@ -177,32 +192,43 @@ class FlinkRelMdColumnNullCountTest extends FlinkRelMdHandlerTestBase {
 
   @Test
   def testGetColumnNullCountOnExchange(): Unit = {
-    Array(batchExchange, streamExchange).foreach {
-      exchange =>
-        assertEquals(0.0, mq.getColumnNullCount(exchange, 0))
-        assertEquals(0.0, mq.getColumnNullCount(exchange, 1))
-        assertEquals(6.0, mq.getColumnNullCount(exchange, 2))
-        assertEquals(0.0, mq.getColumnNullCount(exchange, 3))
-        assertNull(mq.getColumnNullCount(exchange, 4))
-        assertEquals(0.0, mq.getColumnNullCount(exchange, 5))
-        assertNull(mq.getColumnNullCount(exchange, 6))
+    Array(batchExchange, streamExchange).foreach { exchange =>
+      assertEquals(0.0, mq.getColumnNullCount(exchange, 0))
+      assertEquals(0.0, mq.getColumnNullCount(exchange, 1))
+      assertEquals(6.0, mq.getColumnNullCount(exchange, 2))
+      assertEquals(0.0, mq.getColumnNullCount(exchange, 3))
+      assertNull(mq.getColumnNullCount(exchange, 4))
+      assertEquals(0.0, mq.getColumnNullCount(exchange, 5))
+      assertNull(mq.getColumnNullCount(exchange, 6))
     }
   }
 
   @Test
   def testGetColumnNullCountOnSort(): Unit = {
-    Array(logicalSort, flinkLogicalSort, batchSort, streamSort,
-      logicalLimit, flinkLogicalLimit, batchLimit, batchLocalLimit, batchGlobalLimit, streamLimit,
-      logicalSortLimit, flinkLogicalSortLimit, batchSortLimit, batchLocalSortLimit,
-      batchGlobalSortLimit, streamSortLimit).foreach {
-      sort =>
-        assertEquals(0.0, mq.getColumnNullCount(sort, 0))
-        assertEquals(0.0, mq.getColumnNullCount(sort, 1))
-        assertEquals(6.0, mq.getColumnNullCount(sort, 2))
-        assertEquals(0.0, mq.getColumnNullCount(sort, 3))
-        assertNull(mq.getColumnNullCount(sort, 4))
-        assertEquals(0.0, mq.getColumnNullCount(sort, 5))
-        assertNull(mq.getColumnNullCount(sort, 6))
+    Array(
+      logicalSort,
+      flinkLogicalSort,
+      batchSort,
+      streamSort,
+      logicalLimit,
+      flinkLogicalLimit,
+      batchLimit,
+      batchLocalLimit,
+      batchGlobalLimit,
+      streamLimit,
+      logicalSortLimit,
+      flinkLogicalSortLimit,
+      batchSortLimit,
+      batchLocalSortLimit,
+      batchGlobalSortLimit,
+      streamSortLimit).foreach { sort =>
+      assertEquals(0.0, mq.getColumnNullCount(sort, 0))
+      assertEquals(0.0, mq.getColumnNullCount(sort, 1))
+      assertEquals(6.0, mq.getColumnNullCount(sort, 2))
+      assertEquals(0.0, mq.getColumnNullCount(sort, 3))
+      assertNull(mq.getColumnNullCount(sort, 4))
+      assertEquals(0.0, mq.getColumnNullCount(sort, 5))
+      assertNull(mq.getColumnNullCount(sort, 6))
     }
   }
 
@@ -210,21 +236,33 @@ class FlinkRelMdColumnNullCountTest extends FlinkRelMdHandlerTestBase {
   def testGetColumnNullCountOnJoin(): Unit = {
     val left = relBuilder.scan("student").build()
     // right is age <= 15 and score > 4.0
-    val right = relBuilder.push(left).filter(
-      relBuilder.call(LESS_THAN_OR_EQUAL, relBuilder.field(3), relBuilder.literal(15)),
-      relBuilder.call(GREATER_THAN, relBuilder.field(2), relBuilder.literal(4.0))).build()
+    val right = relBuilder
+      .push(left)
+      .filter(
+        relBuilder.call(LESS_THAN_OR_EQUAL, relBuilder.field(3), relBuilder.literal(15)),
+        relBuilder.call(GREATER_THAN, relBuilder.field(2), relBuilder.literal(4.0)))
+      .build()
     // join condition is left.id=right.id
     // inner join
-    val innerJoin = relBuilder.push(left).push(right).join(JoinRelType.INNER,
-      relBuilder.call(EQUALS, relBuilder.field(2, 0, 0), relBuilder.field(2, 1, 0))).build
+    val innerJoin = relBuilder
+      .push(left)
+      .push(right)
+      .join(
+        JoinRelType.INNER,
+        relBuilder.call(EQUALS, relBuilder.field(2, 0, 0), relBuilder.field(2, 1, 0)))
+      .build
     (0 until innerJoin.getRowType.getFieldCount).foreach { idx =>
       assertNull(mq.getColumnNullCount(innerJoin, idx))
     }
 
     // left join
-    val leftJoin = relBuilder.push(left).push(right).join(
-      JoinRelType.LEFT,
-      relBuilder.call(EQUALS, relBuilder.field(2, 0, 0), relBuilder.field(2, 1, 0))).build
+    val leftJoin = relBuilder
+      .push(left)
+      .push(right)
+      .join(
+        JoinRelType.LEFT,
+        relBuilder.call(EQUALS, relBuilder.field(2, 0, 0), relBuilder.field(2, 1, 0)))
+      .build
     assertEquals(0.0, mq.getColumnNullCount(leftJoin, 0))
     assertEquals(0.0, mq.getColumnNullCount(leftJoin, 1))
     assertEquals(6.0, mq.getColumnNullCount(leftJoin, 2))
@@ -243,9 +281,13 @@ class FlinkRelMdColumnNullCountTest extends FlinkRelMdHandlerTestBase {
     assertNull(mq.getColumnNullCount(leftJoin, 13))
 
     // right join
-    val rightJoin = relBuilder.push(left).push(right).join(
-      JoinRelType.RIGHT,
-      relBuilder.call(EQUALS, relBuilder.field(2, 0, 0), relBuilder.field(2, 1, 0))).build
+    val rightJoin = relBuilder
+      .push(left)
+      .push(right)
+      .join(
+        JoinRelType.RIGHT,
+        relBuilder.call(EQUALS, relBuilder.field(2, 0, 0), relBuilder.field(2, 1, 0)))
+      .build
     val expectedNullCnt2 = mq.getRowCount(right) - mq.getRowCount(innerJoin)
     assertEquals(expectedNullCnt2, mq.getColumnNullCount(rightJoin, 0))
     assertEquals(expectedNullCnt2, mq.getColumnNullCount(rightJoin, 1))
@@ -263,9 +305,13 @@ class FlinkRelMdColumnNullCountTest extends FlinkRelMdHandlerTestBase {
     assertNull(mq.getColumnNullCount(rightJoin, 13))
 
     // full join
-    val fullJoin = relBuilder.push(left).push(right).join(
-      JoinRelType.FULL,
-      relBuilder.call(EQUALS, relBuilder.field(2, 0, 0), relBuilder.field(2, 1, 0))).build
+    val fullJoin = relBuilder
+      .push(left)
+      .push(right)
+      .join(
+        JoinRelType.FULL,
+        relBuilder.call(EQUALS, relBuilder.field(2, 0, 0), relBuilder.field(2, 1, 0)))
+      .build
     (0 until fullJoin.getRowType.getFieldCount).foreach { idx =>
       assertNull(mq.getColumnNullCount(fullJoin, idx))
     }

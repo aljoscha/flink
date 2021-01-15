@@ -51,12 +51,14 @@ abstract class ScalaAPICompletenessTestBase extends TestLogger {
     val javaMethods = javaClass.getMethods
       .filterNot(_.isAccessible)
       .filterNot(isExcludedByName)
-      .map(m => m.getName).toSet
+      .map(m => m.getName)
+      .toSet
 
     val scalaMethods = scalaClass.getMethods
       .filterNot(_.isAccessible)
       .filterNot(isExcludedByName)
-      .map(m => m.getName).toSet
+      .map(m => m.getName)
+      .toSet
 
     val missingMethods = javaMethods -- scalaMethods
 
@@ -77,7 +79,7 @@ abstract class ScalaAPICompletenessTestBase extends TestLogger {
       false
     }
   }
-  
+
   /**
    * Tests to be performed to ensure API completeness.
    */

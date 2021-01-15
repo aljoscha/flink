@@ -23,19 +23,35 @@ import org.apache.flink.api.dag.Transformation
 import org.apache.flink.api.scala._
 import org.apache.flink.streaming.api.TimeCharacteristic
 import org.apache.flink.streaming.api.datastream.{DataStream => JDataStream}
-import org.apache.flink.streaming.api.environment.{StreamExecutionEnvironment => JStreamExecutionEnvironment}
+import org.apache.flink.streaming.api.environment.{
+  StreamExecutionEnvironment => JStreamExecutionEnvironment
+}
 import org.apache.flink.streaming.api.scala.{DataStream, StreamExecutionEnvironment}
 import org.apache.flink.table.api._
 import org.apache.flink.table.api.bridge.scala.StreamTableEnvironment
 import org.apache.flink.table.api.internal.TableEnvironmentImpl
-import org.apache.flink.table.catalog.{CatalogManager, FunctionCatalog, GenericInMemoryCatalog, ObjectIdentifier}
+import org.apache.flink.table.catalog.{
+  CatalogManager,
+  FunctionCatalog,
+  GenericInMemoryCatalog,
+  ObjectIdentifier
+}
 import org.apache.flink.table.delegation.{Executor, ExecutorFactory, Planner, PlannerFactory}
 import org.apache.flink.table.descriptors.{ConnectorDescriptor, StreamTableDescriptor}
 import org.apache.flink.table.expressions.Expression
 import org.apache.flink.table.factories.ComponentFactoryService
-import org.apache.flink.table.functions.{AggregateFunction, TableAggregateFunction, TableFunction, UserDefinedFunctionHelper}
+import org.apache.flink.table.functions.{
+  AggregateFunction,
+  TableAggregateFunction,
+  TableFunction,
+  UserDefinedFunctionHelper
+}
 import org.apache.flink.table.module.ModuleManager
-import org.apache.flink.table.operations.{OutputConversionModifyOperation, QueryOperation, ScalaDataStreamQueryOperation}
+import org.apache.flink.table.operations.{
+  OutputConversionModifyOperation,
+  QueryOperation,
+  ScalaDataStreamQueryOperation
+}
 import org.apache.flink.table.sources.{TableSource, TableSourceValidation}
 import org.apache.flink.table.types.utils.TypeConversions
 import org.apache.flink.table.typeutils.FieldInfoUtils
@@ -46,11 +62,11 @@ import java.util.{Collections, List => JList, Map => JMap}
 import scala.collection.JavaConverters._
 
 /**
-  * The implementation for a Scala [[StreamTableEnvironment]]. This enables conversions from/to
-  * [[DataStream]]. It is bound to a given [[StreamExecutionEnvironment]].
-  */
+ * The implementation for a Scala [[StreamTableEnvironment]]. This enables conversions from/to
+ * [[DataStream]]. It is bound to a given [[StreamExecutionEnvironment]].
+ */
 @Internal
-class StreamTableEnvironmentImpl (
+class StreamTableEnvironmentImpl(
     catalogManager: CatalogManager,
     moduleManager: ModuleManager,
     functionCatalog: FunctionCatalog,
@@ -60,16 +76,16 @@ class StreamTableEnvironmentImpl (
     executor: Executor,
     isStreaming: Boolean,
     userClassLoader: ClassLoader)
-  extends TableEnvironmentImpl(
-    catalogManager,
-    moduleManager,
-    config,
-    executor,
-    functionCatalog,
-    planner,
-    isStreaming,
-    userClassLoader)
-  with org.apache.flink.table.api.bridge.scala.StreamTableEnvironment {
+    extends TableEnvironmentImpl(
+      catalogManager,
+      moduleManager,
+      config,
+      executor,
+      functionCatalog,
+      planner,
+      isStreaming,
+      userClassLoader)
+    with org.apache.flink.table.api.bridge.scala.StreamTableEnvironment {
 
   override def fromDataStream[T](dataStream: DataStream[T]): Table = {
     val queryOperation = asQueryOperation(dataStream, None)
@@ -88,8 +104,7 @@ class StreamTableEnvironmentImpl (
   override def registerDataStream[T](
       name: String,
       dataStream: DataStream[T],
-      fields: Expression*)
-    : Unit = {
+      fields: Expression*): Unit = {
     registerTable(name, fromDataStream(dataStream, fields: _*))
   }
 
@@ -116,85 +131,69 @@ class StreamTableEnvironmentImpl (
   override def registerFunction[T: TypeInformation](name: String, tf: TableFunction[T]): Unit = {
     val typeInfo = UserDefinedFunctionHelper
       .getReturnTypeOfTableFunction(tf, implicitly[TypeInformation[T]])
-    functionCatalog.registerTempSystemTableFunction(
-      name,
-      tf,
-      typeInfo
-    )
+    functionCatalog.registerTempSystemTableFunction(name, tf, typeInfo)
   }
 
   override def registerFunction[T: TypeInformation, ACC: TypeInformation](
       name: String,
-      f: AggregateFunction[T, ACC])
-    : Unit = {
+      f: AggregateFunction[T, ACC]): Unit = {
     val typeInfo = UserDefinedFunctionHelper
       .getReturnTypeOfAggregateFunction(f, implicitly[TypeInformation[T]])
     val accTypeInfo = UserDefinedFunctionHelper
       .getAccumulatorTypeOfAggregateFunction(f, implicitly[TypeInformation[ACC]])
-    functionCatalog.registerTempSystemAggregateFunction(
-      name,
-      f,
-      typeInfo,
-      accTypeInfo
-    )
+    functionCatalog.registerTempSystemAggregateFunction(name, f, typeInfo, accTypeInfo)
   }
 
   override def registerFunction[T: TypeInformation, ACC: TypeInformation](
       name: String,
-      f: TableAggregateFunction[T, ACC])
-    : Unit = {
+      f: TableAggregateFunction[T, ACC]): Unit = {
     val typeInfo = UserDefinedFunctionHelper
       .getReturnTypeOfAggregateFunction(f, implicitly[TypeInformation[T]])
     val accTypeInfo = UserDefinedFunctionHelper
       .getAccumulatorTypeOfAggregateFunction(f, implicitly[TypeInformation[ACC]])
-    functionCatalog.registerTempSystemAggregateFunction(
-      name,
-      f,
-      typeInfo,
-      accTypeInfo
-    )
+    functionCatalog.registerTempSystemAggregateFunction(name, f, typeInfo, accTypeInfo)
   }
 
   override def connect(connectorDescriptor: ConnectorDescriptor): StreamTableDescriptor = super
-    .connect(connectorDescriptor).asInstanceOf[StreamTableDescriptor]
-
+    .connect(connectorDescriptor)
+    .asInstanceOf[StreamTableDescriptor]
 
   override protected def validateTableSource(tableSource: TableSource[_]): Unit = {
     super.validateTableSource(tableSource)
     // check that event-time is enabled if table source includes rowtime attributes
     if (TableSourceValidation.hasRowtimeAttribute(tableSource) &&
       scalaExecutionEnvironment.getStreamTimeCharacteristic != TimeCharacteristic.EventTime) {
-      throw new TableException(String.format(
-        "A rowtime attribute requires an EventTime time characteristic in stream " +
-          "environment. But is: %s}", scalaExecutionEnvironment.getStreamTimeCharacteristic))
+      throw new TableException(
+        String.format(
+          "A rowtime attribute requires an EventTime time characteristic in stream " +
+            "environment. But is: %s}",
+          scalaExecutionEnvironment.getStreamTimeCharacteristic))
     }
   }
 
   private def toDataStream[T](
       table: Table,
-      modifyOperation: OutputConversionModifyOperation)
-    : DataStream[T] = {
+      modifyOperation: OutputConversionModifyOperation): DataStream[T] = {
     val transformations = planner
       .translate(Collections.singletonList(modifyOperation))
-    val streamTransformation: Transformation[T] = getTransformation(
-      table,
-      transformations)
+    val streamTransformation: Transformation[T] = getTransformation(table, transformations)
     scalaExecutionEnvironment.getWrappedStreamExecutionEnvironment.addOperator(streamTransformation)
-    new DataStream[T](new JDataStream[T](
-      scalaExecutionEnvironment
-        .getWrappedStreamExecutionEnvironment, streamTransformation))
+    new DataStream[T](
+      new JDataStream[T](
+        scalaExecutionEnvironment.getWrappedStreamExecutionEnvironment,
+        streamTransformation))
   }
 
   private def getTransformation[T](
       table: Table,
-      transformations: util.List[Transformation[_]])
-    : Transformation[T] = {
+      transformations: util.List[Transformation[_]]): Transformation[T] = {
     if (transformations.size != 1) {
-      throw new TableException(String
-        .format(
-          "Expected a single transformation for query: %s\n Got: %s",
-          table.getQueryOperation.asSummaryString,
-          transformations))
+      throw new TableException(
+        String
+          .format(
+            "Expected a single transformation for query: %s\n Got: %s",
+            table.getQueryOperation.asSummaryString,
+            transformations))
     }
     transformations.get(0).asInstanceOf[Transformation[T]]
   }
@@ -204,18 +203,22 @@ class StreamTableEnvironmentImpl (
       fields: Option[util.List[Expression]]) = {
     val streamType = dataStream.javaStream.getType
     // get field names and types for all non-replaced fields
-    val typeInfoSchema = fields.map((f: JList[Expression]) => {
-      val fieldsInfo = FieldInfoUtils.getFieldsInfo(streamType, f.toArray(new Array[Expression](0)))
-      // check if event-time is enabled
-      if (fieldsInfo.isRowtimeDefined &&
-        (scalaExecutionEnvironment.getStreamTimeCharacteristic ne TimeCharacteristic.EventTime)) {
-        throw new ValidationException(String.format(
-          "A rowtime attribute requires an EventTime time characteristic in stream " +
-            "environment. But is: %s",
-          scalaExecutionEnvironment.getStreamTimeCharacteristic))
-      }
-      fieldsInfo
-    }).getOrElse(FieldInfoUtils.getFieldsInfo(streamType))
+    val typeInfoSchema = fields
+      .map((f: JList[Expression]) => {
+        val fieldsInfo =
+          FieldInfoUtils.getFieldsInfo(streamType, f.toArray(new Array[Expression](0)))
+        // check if event-time is enabled
+        if (fieldsInfo.isRowtimeDefined &&
+          (scalaExecutionEnvironment.getStreamTimeCharacteristic ne TimeCharacteristic.EventTime)) {
+          throw new ValidationException(
+            String.format(
+              "A rowtime attribute requires an EventTime time characteristic in stream " +
+                "environment. But is: %s",
+              scalaExecutionEnvironment.getStreamTimeCharacteristic))
+        }
+        fieldsInfo
+      })
+      .getOrElse(FieldInfoUtils.getFieldsInfo(streamType))
     new ScalaDataStreamQueryOperation[T](
       dataStream.javaStream,
       typeInfoSchema.getIndices,
@@ -223,22 +226,19 @@ class StreamTableEnvironmentImpl (
   }
 
   override protected def qualifyQueryOperation(
-    identifier: ObjectIdentifier,
-    queryOperation: QueryOperation): QueryOperation = queryOperation match {
+      identifier: ObjectIdentifier,
+      queryOperation: QueryOperation): QueryOperation = queryOperation match {
     case qo: ScalaDataStreamQueryOperation[Any] =>
       new ScalaDataStreamQueryOperation[Any](
         identifier,
         qo.getDataStream,
         qo.getFieldIndices,
-        qo.getTableSchema
-      )
+        qo.getTableSchema)
     case _ =>
       queryOperation
   }
 
-  override def createTemporaryView[T](
-      path: String,
-      dataStream: DataStream[T]): Unit = {
+  override def createTemporaryView[T](path: String, dataStream: DataStream[T]): Unit = {
     createTemporaryView(path, fromDataStream(dataStream))
   }
 
@@ -255,8 +255,7 @@ object StreamTableEnvironmentImpl {
   def create(
       executionEnvironment: StreamExecutionEnvironment,
       settings: EnvironmentSettings,
-      tableConfig: TableConfig)
-    : StreamTableEnvironmentImpl = {
+      tableConfig: TableConfig): StreamTableEnvironmentImpl = {
 
     if (!settings.isStreamingMode) {
       throw new TableException(
@@ -273,9 +272,7 @@ object StreamTableEnvironmentImpl {
       .config(tableConfig.getConfiguration)
       .defaultCatalog(
         settings.getBuiltInCatalogName,
-        new GenericInMemoryCatalog(
-          settings.getBuiltInCatalogName,
-          settings.getBuiltInDatabaseName))
+        new GenericInMemoryCatalog(settings.getBuiltInCatalogName, settings.getBuiltInDatabaseName))
       .executionConfig(executionEnvironment.getConfig)
       .build
 
@@ -285,13 +282,9 @@ object StreamTableEnvironmentImpl {
     val executor = lookupExecutor(executorProperties, executionEnvironment)
 
     val plannerProperties = settings.toPlannerProperties
-    val planner = ComponentFactoryService.find(classOf[PlannerFactory], plannerProperties)
-      .create(
-        plannerProperties,
-        executor,
-        tableConfig,
-        functionCatalog,
-        catalogManager)
+    val planner = ComponentFactoryService
+      .find(classOf[PlannerFactory], plannerProperties)
+      .create(plannerProperties, executor, tableConfig, functionCatalog, catalogManager)
 
     new StreamTableEnvironmentImpl(
       catalogManager,
@@ -302,14 +295,12 @@ object StreamTableEnvironmentImpl {
       planner,
       executor,
       settings.isStreamingMode,
-      classLoader
-    )
+      classLoader)
   }
 
   private def lookupExecutor(
       executorProperties: JMap[String, String],
-      executionEnvironment: StreamExecutionEnvironment)
-    :Executor =
+      executionEnvironment: StreamExecutionEnvironment): Executor =
     try {
       val executorFactory = ComponentFactoryService
         .find(classOf[ExecutorFactory], executorProperties)
@@ -327,7 +318,9 @@ object StreamTableEnvironmentImpl {
         .asInstanceOf[Executor]
     } catch {
       case e: Exception =>
-        throw new TableException("Could not instantiate the executor. Make sure a planner module " +
-          "is on the classpath", e)
+        throw new TableException(
+          "Could not instantiate the executor. Make sure a planner module " +
+            "is on the classpath",
+          e)
     }
 }

@@ -36,8 +36,8 @@ class StreamPhysicalTableSourceScan(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
     tableSourceTable: TableSourceTable)
-  extends CommonPhysicalTableSourceScan(cluster, traitSet, tableSourceTable)
-  with StreamPhysicalRel {
+    extends CommonPhysicalTableSourceScan(cluster, traitSet, tableSourceTable)
+    with StreamPhysicalRel {
 
   override def requireWatermark: Boolean = false
 

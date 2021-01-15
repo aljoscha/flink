@@ -31,21 +31,21 @@ class MatchRecognizeValidationTest extends TableTestBase {
   private val streamUtil: StreamTableTestUtil = streamTestUtil()
   streamUtil.addTable[(Int, String, Long)]("MyTable", 'a, 'b, 'c.rowtime, 'proctime.proctime)
 
-  /** Function 'MATCH_ROWTIME()' can only be used in MATCH_RECOGNIZE **/
+  /** Function 'MATCH_ROWTIME()' can only be used in MATCH_RECOGNIZE * */
   @Test(expected = classOf[ValidationException])
   def testMatchRowtimeInSelect() = {
     val sql = "SELECT MATCH_ROWTIME() FROM MyTable"
     streamUtil.verifySql(sql, "n/a")
   }
 
-  /** Function 'MATCH_PROCTIME()' can only be used in MATCH_RECOGNIZE **/
+  /** Function 'MATCH_PROCTIME()' can only be used in MATCH_RECOGNIZE * */
   @Test(expected = classOf[ValidationException])
   def testMatchProctimeInSelect() = {
     val sql = "SELECT MATCH_PROCTIME() FROM MyTable"
     streamUtil.verifySql(sql, "n/a")
   }
 
-  /** Python Function can not be used in MATCH_RECOGNIZE for now **/
+  /** Python Function can not be used in MATCH_RECOGNIZE for now * */
   @Test
   def testMatchPythonFunction() = {
     expectedException.expectCause(Matchers.isA(classOf[TableException]))

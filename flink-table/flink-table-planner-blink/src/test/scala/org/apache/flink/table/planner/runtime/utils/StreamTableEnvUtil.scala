@@ -29,13 +29,13 @@ object StreamTableEnvUtil {
 
   //  TODO unify BatchTableEnvUtil and StreamTableEnvUtil
   /**
-    * Registers a [[DataStream]] as a table under a given name in the [[TableEnvironment]]'s
-    * catalog.
-    *
-    * @param name     The name under which the table is registered in the catalog.
-    * @param dataStream The [[DataStream]] to register as table in the catalog.
-    * @tparam T the type of the [[DataStream]].
-    */
+   * Registers a [[DataStream]] as a table under a given name in the [[TableEnvironment]]'s
+   * catalog.
+   *
+   * @param name     The name under which the table is registered in the catalog.
+   * @param dataStream The [[DataStream]] to register as table in the catalog.
+   * @tparam T the type of the [[DataStream]].
+   */
   def createTemporaryViewInternal[T](
       tEnv: StreamTableEnvironment,
       name: String,
@@ -45,7 +45,7 @@ object StreamTableEnvUtil {
       statistic: Option[FlinkStatistic]): Unit = {
     val fields: Option[Array[Expression]] = fieldNames match {
       case Some(names) => Some(names.map(ExpressionParser.parseExpression))
-      case _ => None
+      case _           => None
     }
     TableTestUtil.createTemporaryView(tEnv, name, dataStream, fields, fieldNullables, statistic)
   }

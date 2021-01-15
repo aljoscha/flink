@@ -37,8 +37,8 @@ import java.util.Collections
 import scala.collection.JavaConversions._
 
 /**
-  * Base physical class for flink [[Join]].
-  */
+ * Base physical class for flink [[Join]].
+ */
 abstract class CommonPhysicalJoin(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -46,14 +46,22 @@ abstract class CommonPhysicalJoin(
     rightRel: RelNode,
     condition: RexNode,
     joinType: JoinRelType)
-  extends Join(cluster, traitSet, Collections.emptyList(), leftRel, rightRel, condition,
-    Set.empty[CorrelationId], joinType)
-  with FlinkPhysicalRel {
+    extends Join(
+      cluster,
+      traitSet,
+      Collections.emptyList(),
+      leftRel,
+      rightRel,
+      condition,
+      Set.empty[CorrelationId],
+      joinType)
+    with FlinkPhysicalRel {
 
   if (containsPythonCall(condition)) {
-    throw new TableException("Only inner join condition with equality predicates supports the " +
-      "Python UDF taking the inputs from the left table and the right table at the same time, " +
-      "e.g., ON T1.id = T2.id && pythonUdf(T1.a, T2.b)")
+    throw new TableException(
+      "Only inner join condition with equality predicates supports the " +
+        "Python UDF taking the inputs from the left table and the right table at the same time, " +
+        "e.g., ON T1.id = T2.id && pythonUdf(T1.a, T2.b)")
   }
 
   lazy val joinSpec: JoinSpec = JoinUtil.createJoinSpec(this)
@@ -66,17 +74,22 @@ abstract class CommonPhysicalJoin(
         getLeft.getRowType,
         getRight.getRowType,
         null,
-        Collections.emptyList[RelDataTypeField]
-      )
+        Collections.emptyList[RelDataTypeField])
     case _ =>
       getRowType
   }
 
   override def explainTerms(pw: RelWriter): RelWriter = {
-    pw.input("left", getLeft).input("right", getRight)
+    pw.input("left", getLeft)
+      .input("right", getRight)
       .item("joinType", joinSpec.getJoinType.toString)
-      .item("where", getExpressionString(
-        getCondition, inputRowType.getFieldNames.toList, None, preferExpressionFormat(pw)))
+      .item(
+        "where",
+        getExpressionString(
+          getCondition,
+          inputRowType.getFieldNames.toList,
+          None,
+          preferExpressionFormat(pw)))
       .item("select", getRowType.getFieldNames.mkString(", "))
   }
 

@@ -37,7 +37,7 @@ import org.apache.flink.util.Collector
  * vertices. Because we see all vertices initially as changed, the initial workset and the initial
  * solution set are identical. Also, the delta to the solution set is consequently also the next
  * workset.
- * 
+ *
  * Input files are plain text files and must be formatted as follows:
  *
  *   - Vertices represented as IDs and separated by new-line characters. For example,
@@ -50,16 +50,14 @@ import org.apache.flink.util.Collector
  * {{{
  *   ConnectedComponents --vertices <path> --edges <path> --result <path> --iterations <n>
  * }}}
- *   
+ *
  * If no parameters are provided, the program is run with default data from
  * [[org.apache.flink.examples.java.graph.util.ConnectedComponentsData]] and 10 iterations.
- * 
  *
  * This example shows how to use:
  *
  *   - Delta Iterations
- *   - Generic-typed Functions 
- *   
+ *   - Generic-typed Functions
  */
 object ConnectedComponents {
 
@@ -88,20 +86,27 @@ object ConnectedComponents {
     // open a delta iteration
     val verticesWithComponents = vertices.iterateDelta(vertices, maxIterations, Array("_1")) {
       (s, ws) =>
-
         // apply the step logic: join with the edges
-        val allNeighbors = ws.join(edges).where(0).equalTo(0) { (vertex, edge) =>
-          (edge._2, vertex._2)
-        }.withForwardedFieldsFirst("_2->_2").withForwardedFieldsSecond("_2->_1")
+        val allNeighbors = ws
+          .join(edges)
+          .where(0)
+          .equalTo(0) { (vertex, edge) =>
+            (edge._2, vertex._2)
+          }
+          .withForwardedFieldsFirst("_2->_2")
+          .withForwardedFieldsSecond("_2->_1")
 
         // select the minimum neighbor
         val minNeighbors = allNeighbors.groupBy(0).min(1)
 
         // update if the component of the candidate is smaller
-        val updatedComponents = minNeighbors.join(s).where(0).equalTo(0) {
-          (newVertex, oldVertex, out: Collector[(Long, Long)]) =>
+        val updatedComponents = minNeighbors
+          .join(s)
+          .where(0)
+          .equalTo(0) { (newVertex, oldVertex, out: Collector[(Long, Long)]) =>
             if (newVertex._2 < oldVertex._2) out.collect(newVertex)
-        }.withForwardedFieldsFirst("*")
+          }
+          .withForwardedFieldsFirst("*")
 
         // delta and new workset are identical
         (updatedComponents, updatedComponents)
@@ -119,32 +124,31 @@ object ConnectedComponents {
 
   private def getVertexDataSet(env: ExecutionEnvironment, params: ParameterTool): DataSet[Long] = {
     if (params.has("vertices")) {
-      env.readCsvFile[Tuple1[Long]](
-        params.get("vertices"),
-        includedFields = Array(0))
+      env
+        .readCsvFile[Tuple1[Long]](params.get("vertices"), includedFields = Array(0))
         .map { x => x._1 }
-    }
-    else {
+    } else {
       println("Executing ConnectedComponents example with default vertices data set.")
       println("Use --vertices to specify file input.")
       env.fromCollection(ConnectedComponentsData.VERTICES)
     }
   }
 
-  private def getEdgeDataSet(env: ExecutionEnvironment, params: ParameterTool):
-                     DataSet[(Long, Long)] = {
+  private def getEdgeDataSet(
+      env: ExecutionEnvironment,
+      params: ParameterTool): DataSet[(Long, Long)] = {
     if (params.has("edges")) {
-      env.readCsvFile[(Long, Long)](
-        params.get("edges"),
-        fieldDelimiter = " ",
-        includedFields = Array(0, 1))
-        .map { x => (x._1, x._2)}
-    }
-    else {
+      env
+        .readCsvFile[(Long, Long)](
+          params.get("edges"),
+          fieldDelimiter = " ",
+          includedFields = Array(0, 1))
+        .map { x => (x._1, x._2) }
+    } else {
       println("Executing ConnectedComponents example with default edges data set.")
       println("Use --edges to specify file input.")
-      val edgeData = ConnectedComponentsData.EDGES map {
-        case Array(x, y) => (x.asInstanceOf[Long], y.asInstanceOf[Long])
+      val edgeData = ConnectedComponentsData.EDGES map { case Array(x, y) =>
+        (x.asInstanceOf[Long], y.asInstanceOf[Long])
       }
       env.fromCollection(edgeData)
     }

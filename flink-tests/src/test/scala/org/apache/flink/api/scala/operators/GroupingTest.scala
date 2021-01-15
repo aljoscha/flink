@@ -27,7 +27,6 @@ import org.junit.Test
 
 import org.apache.flink.api.scala._
 
-
 class GroupingTest {
 
   private val emptyTupleData = Array[(Int, Long, String, Long, Int)]()
@@ -42,8 +41,7 @@ class GroupingTest {
     // should work
     try {
       tupleDs.groupBy(0)
-    }
-    catch {
+    } catch {
       case e: Exception => Assert.fail()
     }
   }
@@ -92,8 +90,7 @@ class GroupingTest {
     // should work
     try {
       tupleDs.groupBy("_1")
-    }
-    catch {
+    } catch {
       case e: Exception => Assert.fail()
     }
   }
@@ -142,8 +139,7 @@ class GroupingTest {
     // should work
     try {
       ds.groupBy("myInt")
-    }
-    catch {
+    } catch {
       case e: Exception => Assert.fail()
     }
   }
@@ -181,8 +177,7 @@ class GroupingTest {
     try {
       val customDs = env.fromCollection(customTypeData)
       customDs.groupBy { _.myLong }
-    }
-    catch {
+    } catch {
       case e: Exception => Assert.fail()
     }
   }
@@ -193,8 +188,7 @@ class GroupingTest {
     val tupleDs = env.fromCollection(emptyTupleData)
     try {
       tupleDs.groupBy(0).sortGroup(0, Order.ASCENDING)
-    }
-    catch {
+    } catch {
       case e: Exception => Assert.fail()
     }
   }
@@ -212,7 +206,7 @@ class GroupingTest {
   def testGroupSortKeyFields3(): Unit = {
     val env = ExecutionEnvironment.getExecutionEnvironment
     val longDs = env.fromCollection(emptyLongData)
-    longDs.groupBy { x: Long => x } .sortGroup(0, Order.ASCENDING)
+    longDs.groupBy { x: Long => x }.sortGroup(0, Order.ASCENDING)
   }
 
   @Test
@@ -221,8 +215,7 @@ class GroupingTest {
     val tupleDs = env.fromCollection(emptyTupleData)
     try {
       tupleDs.groupBy(0).sortGroup(0, Order.ASCENDING).sortGroup(2, Order.DESCENDING)
-    }
-    catch {
+    } catch {
       case e: Exception => Assert.fail()
     }
   }
@@ -259,4 +252,3 @@ class GroupingTest {
     ds.groupBy("*")
   }
 }
-

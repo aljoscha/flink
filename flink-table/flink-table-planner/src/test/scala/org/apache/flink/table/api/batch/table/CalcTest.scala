@@ -21,7 +21,12 @@ package org.apache.flink.table.api.batch.table
 import org.apache.flink.api.common.typeinfo.TypeInformation
 import org.apache.flink.api.scala.createTypeInformation
 import org.apache.flink.table.api._
-import org.apache.flink.table.api.batch.table.CalcTest.{MyHashCode, TestCaseClass, WC, giveMeCaseClass}
+import org.apache.flink.table.api.batch.table.CalcTest.{
+  MyHashCode,
+  TestCaseClass,
+  WC,
+  giveMeCaseClass
+}
 import org.apache.flink.table.functions.ScalarFunction
 import org.apache.flink.table.utils.TableTestBase
 import org.apache.flink.table.utils.TableTestUtil._
@@ -43,14 +48,7 @@ class CalcTest extends TableTestBase {
     val expected = unaryNode(
       "DataSetCalc",
       batchTableNode(table),
-      term("select",
-        "a._1 AS a$_1",
-        "a._2 AS a$_2",
-        "c",
-        "b._1 AS b$_1",
-        "b._2 AS b$_2"
-      )
-    )
+      term("select", "a._1 AS a$_1", "a._2 AS a$_2", "c", "b._1 AS b$_1", "b._2 AS b$_2"))
 
     util.verifyTable(result, expected)
   }
@@ -66,12 +64,7 @@ class CalcTest extends TableTestBase {
     val expected = unaryNode(
       "DataSetCalc",
       batchTableNode(table),
-      term("select",
-        "a._1 AS a$_1",
-        "a._2 AS a$_2",
-        "b"
-      )
-    )
+      term("select", "a._1 AS a$_1", "a._2 AS a$_2", "b"))
 
     util.verifyTable(result, expected)
   }
@@ -90,13 +83,12 @@ class CalcTest extends TableTestBase {
     val expected = unaryNode(
       "DataSetCalc",
       batchTableNode(table),
-      term("select",
+      term(
+        "select",
         "giveMeCaseClass$().my AS _c0",
         "giveMeCaseClass$().clazz AS _c1",
         "giveMeCaseClass$().my AS _c2",
-        "giveMeCaseClass$().clazz AS _c3"
-      )
-    )
+        "giveMeCaseClass$().clazz AS _c3"))
 
     util.verifyTable(result, expected)
   }
@@ -112,11 +104,7 @@ class CalcTest extends TableTestBase {
     val sourceTable = util.addTable[(Int, Long, String, Double)]("MyTable", 'a, 'b, 'c, 'd)
     val resultTable = sourceTable.select('a, 'b)
 
-    val expected = unaryNode(
-      "DataSetCalc",
-      batchTableNode(sourceTable),
-      term("select", "a", "b")
-    )
+    val expected = unaryNode("DataSetCalc", batchTableNode(sourceTable), term("select", "a", "b"))
 
     util.verifyTable(resultTable, expected)
   }
@@ -132,9 +120,11 @@ class CalcTest extends TableTestBase {
     val expected = unaryNode(
       "DataSetCalc",
       batchTableNode(sourceTable),
-      term("select", "'ABC' AS _c0", "1234:DECIMAL(1073741823, 0) AS _c1",
-        "0001-01-01 01:01:00:TIMESTAMP(3) AS _c2")
-    )
+      term(
+        "select",
+        "'ABC' AS _c0",
+        "1234:DECIMAL(1073741823, 0) AS _c1",
+        "0001-01-01 01:01:00:TIMESTAMP(3) AS _c2"))
 
     util.verifyTable(resultTable, expected)
   }
@@ -152,11 +142,8 @@ class CalcTest extends TableTestBase {
       "DataSetCalc",
       unaryNode(
         "DataSetDistinct",
-        unaryNode(
-          "DataSetCalc",
-          batchTableNode(sourceTable),
-          term("select", "'ABC' AS _c0")
-        ), term("distinct", "_c0")),
+        unaryNode("DataSetCalc", batchTableNode(sourceTable), term("select", "'ABC' AS _c0")),
+        term("distinct", "_c0")),
       term("select", "'ABC' AS _c0"))
 
     util.verifyTable(resultTable, expected)
@@ -183,13 +170,8 @@ class CalcTest extends TableTestBase {
 
     val expected = unaryNode(
       "DataSetAggregate",
-      unaryNode(
-        "DataSetCalc",
-        batchTableNode(sourceTable),
-        term("select", "a", "b")
-      ),
-      term("select", "SUM(a) AS EXPR$0", "MAX(b) AS EXPR$1")
-    )
+      unaryNode("DataSetCalc", batchTableNode(sourceTable), term("select", "a", "b")),
+      term("select", "SUM(a) AS EXPR$0", "MAX(b) AS EXPR$1"))
 
     util.verifyTable(resultTable, expected)
   }
@@ -206,8 +188,7 @@ class CalcTest extends TableTestBase {
     val expected = unaryNode(
       "DataSetCalc",
       batchTableNode(sourceTable),
-      term("select", "MyHashCode$(c) AS _c0", "b")
-    )
+      term("select", "MyHashCode$(c) AS _c0", "b"))
 
     util.verifyTable(resultTable, expected)
   }
@@ -222,15 +203,9 @@ class CalcTest extends TableTestBase {
       "DataSetCalc",
       unaryNode(
         "DataSetDistinct",
-        unaryNode(
-          "DataSetCalc",
-          batchTableNode(sourceTable),
-          term("select", "a", "c")
-        ),
-        term("distinct", "a", "c")
-      ),
-      term("select", "a")
-    )
+        unaryNode("DataSetCalc", batchTableNode(sourceTable), term("select", "a", "c")),
+        term("distinct", "a", "c")),
+      term("select", "a"))
 
     util.verifyTable(resultTable, expected)
   }
@@ -243,13 +218,8 @@ class CalcTest extends TableTestBase {
 
     val expected = unaryNode(
       "DataSetDistinct",
-      unaryNode(
-        "DataSetCalc",
-        batchTableNode(sourceTable),
-        term("select", "a", "c")
-      ),
-      term("distinct", "a", "c")
-    )
+      unaryNode("DataSetCalc", batchTableNode(sourceTable), term("select", "a", "c")),
+      term("distinct", "a", "c"))
 
     util.verifyTable(resultTable, expected)
   }
@@ -265,16 +235,10 @@ class CalcTest extends TableTestBase {
         "DataSetCalc",
         unaryNode(
           "DataSetAggregate",
-          unaryNode(
-            "DataSetCalc",
-            batchTableNode(sourceTable),
-            term("select", "a", "c")
-          ),
+          unaryNode("DataSetCalc", batchTableNode(sourceTable), term("select", "a", "c")),
           term("groupBy", "c"),
-          term("select", "c", "SUM(a) AS EXPR$0")
-        ),
-        term("select", "EXPR$0")
-      )
+          term("select", "c", "SUM(a) AS EXPR$0")),
+        term("select", "EXPR$0"))
 
     util.verifyTable(resultTable, expected)
   }
@@ -295,13 +259,10 @@ class CalcTest extends TableTestBase {
             batchTableNode(sourceTable),
             // As stated in https://issues.apache.org/jira/browse/CALCITE-1584
             // Calcite planner doesn't promise to retain field names.
-            term("select", "a", "UPPER(c) AS k")
-          ),
+            term("select", "a", "UPPER(c) AS k")),
           term("groupBy", "k"),
-          term("select", "k", "SUM(a) AS EXPR$0")
-        ),
-        term("select", "EXPR$0")
-      )
+          term("select", "k", "SUM(a) AS EXPR$0")),
+        term("select", "EXPR$0"))
 
     util.verifyTable(resultTable, expected)
   }
@@ -322,13 +283,10 @@ class CalcTest extends TableTestBase {
             batchTableNode(sourceTable),
             // As stated in https://issues.apache.org/jira/browse/CALCITE-1584
             // Calcite planner doesn't promise to retain field names.
-            term("select", "a", "MyHashCode$(c) AS k")
-          ),
+            term("select", "a", "MyHashCode$(c) AS k")),
           term("groupBy", "k"),
-          term("select", "k", "SUM(a) AS EXPR$0")
-        ),
-        term("select", "EXPR$0")
-      )
+          term("select", "k", "SUM(a) AS EXPR$0")),
+        term("select", "EXPR$0"))
 
     util.verifyTable(resultTable, expected)
   }
@@ -348,11 +306,9 @@ class CalcTest extends TableTestBase {
           "DataSetAggregate",
           batchTableNode(sourceTable),
           term("groupBy", "word"),
-          term("select", "word", "SUM(frequency) AS EXPR$0")
-        ),
+          term("select", "word", "SUM(frequency) AS EXPR$0")),
         term("select", "word, EXPR$0"),
-        term("where", "=(EXPR$0, 2)")
-      )
+        term("where", "=(EXPR$0, 2)"))
 
     util.verifyTable(resultTable, expected)
   }
@@ -361,7 +317,8 @@ class CalcTest extends TableTestBase {
   def testMultiFilter(): Unit = {
     val util = batchTestUtil()
     val sourceTable = util.addTable[(Int, Long, String, Double)]("MyTable", 'a, 'b, 'c, 'd)
-    val resultTable = sourceTable.select('a, 'b)
+    val resultTable = sourceTable
+      .select('a, 'b)
       .filter('a > 0)
       .filter('b < 2)
       .filter(('a % 2) === 1)
@@ -370,8 +327,7 @@ class CalcTest extends TableTestBase {
       "DataSetCalc",
       batchTableNode(sourceTable),
       term("select", "a", "b"),
-      term("where", "AND(>(a, 0), AND(<(b, 2), =(MOD(a, 2), 1)))")
-    )
+      term("where", "AND(>(a, 0), AND(<(b, 2), =(MOD(a, 2), 1)))"))
 
     util.verifyTable(resultTable, expected)
   }

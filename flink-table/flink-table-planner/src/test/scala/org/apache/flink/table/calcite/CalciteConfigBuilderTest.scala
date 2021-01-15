@@ -128,8 +128,8 @@ class CalciteConfigBuilderTest {
 
     val cc: CalciteConfig = new CalciteConfigBuilder()
       .addNormRuleSet(RuleSets.ofList(CoreRules.FILTER_REDUCE_EXPRESSIONS))
-      .addNormRuleSet(RuleSets.ofList(CoreRules.PROJECT_REDUCE_EXPRESSIONS,
-        CoreRules.CALC_REDUCE_EXPRESSIONS))
+      .addNormRuleSet(
+        RuleSets.ofList(CoreRules.PROJECT_REDUCE_EXPRESSIONS, CoreRules.CALC_REDUCE_EXPRESSIONS))
       .build()
 
     assertEquals(false, cc.replacesNormRuleSet)
@@ -145,8 +145,8 @@ class CalciteConfigBuilderTest {
   def testReplaceLogicalOptimizationRules(): Unit = {
 
     val cc: CalciteConfig = new CalciteConfigBuilder()
-        .replaceLogicalOptRuleSet(RuleSets.ofList(CoreRules.FILTER_MERGE))
-        .build()
+      .replaceLogicalOptRuleSet(RuleSets.ofList(CoreRules.FILTER_MERGE))
+      .build()
 
     assertEquals(true, cc.replacesLogicalOptRuleSet)
     assertTrue(cc.logicalOptRuleSet.isDefined)
@@ -159,9 +159,9 @@ class CalciteConfigBuilderTest {
   def testReplaceLogicalOptimizationAddRules(): Unit = {
 
     val cc: CalciteConfig = new CalciteConfigBuilder()
-        .replaceLogicalOptRuleSet(RuleSets.ofList(CoreRules.FILTER_MERGE))
-        .addLogicalOptRuleSet(RuleSets.ofList(CoreRules.CALC_MERGE, CoreRules.CALC_SPLIT))
-        .build()
+      .replaceLogicalOptRuleSet(RuleSets.ofList(CoreRules.FILTER_MERGE))
+      .addLogicalOptRuleSet(RuleSets.ofList(CoreRules.CALC_MERGE, CoreRules.CALC_SPLIT))
+      .build()
 
     assertEquals(true, cc.replacesLogicalOptRuleSet)
     assertTrue(cc.logicalOptRuleSet.isDefined)
@@ -176,9 +176,9 @@ class CalciteConfigBuilderTest {
   def testAddLogicalOptimizationRules(): Unit = {
 
     val cc: CalciteConfig = new CalciteConfigBuilder()
-        .addLogicalOptRuleSet(RuleSets.ofList(CoreRules.FILTER_MERGE))
-        .addLogicalOptRuleSet(RuleSets.ofList(CoreRules.CALC_MERGE, CoreRules.CALC_SPLIT))
-        .build()
+      .addLogicalOptRuleSet(RuleSets.ofList(CoreRules.FILTER_MERGE))
+      .addLogicalOptRuleSet(RuleSets.ofList(CoreRules.CALC_MERGE, CoreRules.CALC_SPLIT))
+      .build()
 
     assertEquals(false, cc.replacesLogicalOptRuleSet)
     assertTrue(cc.logicalOptRuleSet.isDefined)
@@ -241,8 +241,8 @@ class CalciteConfigBuilderTest {
   def testReplacePhysicalOptimizationRules(): Unit = {
 
     val cc: CalciteConfig = new CalciteConfigBuilder()
-        .replacePhysicalOptRuleSet(RuleSets.ofList(CoreRules.FILTER_MERGE))
-        .build()
+      .replacePhysicalOptRuleSet(RuleSets.ofList(CoreRules.FILTER_MERGE))
+      .build()
 
     assertEquals(true, cc.replacesPhysicalOptRuleSet)
     assertTrue(cc.physicalOptRuleSet.isDefined)
@@ -255,9 +255,9 @@ class CalciteConfigBuilderTest {
   def testReplacePhysicalOptimizationAddRules(): Unit = {
 
     val cc: CalciteConfig = new CalciteConfigBuilder()
-        .replacePhysicalOptRuleSet(RuleSets.ofList(CoreRules.FILTER_MERGE))
-        .addPhysicalOptRuleSet(RuleSets.ofList(CoreRules.CALC_MERGE, CoreRules.CALC_SPLIT))
-        .build()
+      .replacePhysicalOptRuleSet(RuleSets.ofList(CoreRules.FILTER_MERGE))
+      .addPhysicalOptRuleSet(RuleSets.ofList(CoreRules.CALC_MERGE, CoreRules.CALC_SPLIT))
+      .build()
 
     assertEquals(true, cc.replacesPhysicalOptRuleSet)
     assertTrue(cc.physicalOptRuleSet.isDefined)
@@ -272,9 +272,9 @@ class CalciteConfigBuilderTest {
   def testAddPhysicalOptimizationRules(): Unit = {
 
     val cc: CalciteConfig = new CalciteConfigBuilder()
-        .addPhysicalOptRuleSet(RuleSets.ofList(CoreRules.FILTER_MERGE))
-        .addPhysicalOptRuleSet(RuleSets.ofList(CoreRules.CALC_MERGE, CoreRules.CALC_SPLIT))
-        .build()
+      .addPhysicalOptRuleSet(RuleSets.ofList(CoreRules.FILTER_MERGE))
+      .addPhysicalOptRuleSet(RuleSets.ofList(CoreRules.CALC_MERGE, CoreRules.CALC_SPLIT))
+      .build()
 
     assertEquals(false, cc.replacesPhysicalOptRuleSet)
     assertTrue(cc.physicalOptRuleSet.isDefined)
@@ -334,8 +334,10 @@ class CalciteConfigBuilderTest {
 
     val cc: CalciteConfig = new CalciteConfigBuilder()
       .addDecoRuleSet(RuleSets.ofList(DataStreamRetractionRules.DEFAULT_RETRACTION_INSTANCE))
-      .addDecoRuleSet(RuleSets.ofList(DataStreamRetractionRules.UPDATES_AS_RETRACTION_INSTANCE,
-                                      DataStreamRetractionRules.ACCMODE_INSTANCE))
+      .addDecoRuleSet(
+        RuleSets.ofList(
+          DataStreamRetractionRules.UPDATES_AS_RETRACTION_INSTANCE,
+          DataStreamRetractionRules.ACCMODE_INSTANCE))
       .build()
 
     assertEquals(false, cc.replacesDecoRuleSet)
@@ -370,8 +372,7 @@ class CalciteConfigBuilderTest {
 
     assertEquals(true, cc.replacesSqlOperatorTable)
     assertTrue(cc.sqlOperatorTable.isDefined)
-    val ops = cc.sqlOperatorTable.get.getOperatorList
-      .asScala.toSet
+    val ops = cc.sqlOperatorTable.get.getOperatorList.asScala.toSet
     assertEquals(oracleOps.size, ops.size)
     for (o <- oracleOps) {
       assertTrue(ops.contains(o))
@@ -394,8 +395,7 @@ class CalciteConfigBuilderTest {
 
     assertEquals(true, cc.replacesSqlOperatorTable)
     assertTrue(cc.sqlOperatorTable.isDefined)
-    val ops = cc.sqlOperatorTable.get.getOperatorList
-      .asScala.toSet
+    val ops = cc.sqlOperatorTable.get.getOperatorList.asScala.toSet
     assertEquals(oracleOps.size + stdOps.size, ops.size)
     for (o <- oracleOps) {
       assertTrue(ops.contains(o))
@@ -419,8 +419,7 @@ class CalciteConfigBuilderTest {
 
     assertEquals(false, cc.replacesSqlOperatorTable)
     assertTrue(cc.sqlOperatorTable.isDefined)
-    val ops = cc.sqlOperatorTable.get.getOperatorList
-      .asScala.toSet
+    val ops = cc.sqlOperatorTable.get.getOperatorList.asScala.toSet
     assertEquals(oracleOps.size, ops.size)
     for (o <- oracleOps) {
       assertTrue(ops.contains(o))
@@ -443,8 +442,7 @@ class CalciteConfigBuilderTest {
 
     assertEquals(false, cc.replacesSqlOperatorTable)
     assertTrue(cc.sqlOperatorTable.isDefined)
-    val ops = cc.sqlOperatorTable.get.getOperatorList
-      .asScala.toSet
+    val ops = cc.sqlOperatorTable.get.getOperatorList.asScala.toSet
     assertEquals(oracleOps.size + stdOps.size, ops.size)
     for (o <- oracleOps) {
       assertTrue(ops.contains(o))
@@ -457,7 +455,8 @@ class CalciteConfigBuilderTest {
 
   @Test
   def testReplaceSqlToRelConverterConfig(): Unit = {
-    val config = SqlToRelConverter.config()
+    val config = SqlToRelConverter
+      .config()
       .withTrimUnusedFields(false)
       .withInSubQueryThreshold(Integer.MAX_VALUE)
 
@@ -472,7 +471,8 @@ class CalciteConfigBuilderTest {
   @Test
   def testUnWrap(): Unit = {
 
-    val config = SqlToRelConverter.config()
+    val config = SqlToRelConverter
+      .config()
       .withTrimUnusedFields(false)
       .withInSubQueryThreshold(Integer.MAX_VALUE)
 

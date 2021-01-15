@@ -33,63 +33,61 @@ import scala.collection.JavaConverters._
 
 trait CommonMatchRecognize {
 
-  private def partitionKeysToString(
-      keys: ImmutableBitSet,
-      fieldNames: Seq[String])
-    : String =
+  private def partitionKeysToString(keys: ImmutableBitSet, fieldNames: Seq[String]): String =
     keys.toArray.map(k => fieldNames(k)).mkString(", ")
 
   private def orderingToString(orders: RelCollation, fieldNames: Seq[String]): String =
-    orders.getFieldCollations.asScala.map {
-      x => s"${fieldNames(x.getFieldIndex)} ${directionToOrder(x.direction).getShortName}"
-    }.mkString(", ")
+    orders.getFieldCollations.asScala
+      .map { x =>
+        s"${fieldNames(x.getFieldIndex)} ${directionToOrder(x.direction).getShortName}"
+      }
+      .mkString(", ")
 
   private def measuresDefineToString(
       measures: ImmutableMap[String, RexNode],
       fieldNames: Seq[String],
-      expression: (RexNode, Seq[String], Option[Seq[RexNode]]) => String)
-    : String =
-    measures.asScala.map {
-      case (k, v) => s"${expression(v, fieldNames, None)} AS $k"
-    }.mkString(", ")
+      expression: (RexNode, Seq[String], Option[Seq[RexNode]]) => String): String =
+    measures.asScala
+      .map { case (k, v) =>
+        s"${expression(v, fieldNames, None)} AS $k"
+      }
+      .mkString(", ")
 
   private def rowsPerMatchToString(isAll: Boolean): String =
     if (isAll) "ALL ROWS PER MATCH" else "ONE ROW PER MATCH"
 
   private def subsetToString(subset: ImmutableMap[String, JSortedSet[String]]): String =
-    subset.asScala.map {
-      case (k, v) => s"$k = (${v.asScala.mkString(", ")})"
-    }.mkString(", ")
-
-  private def afterMatchToString(
-      after: RexNode,
-      fieldNames: Seq[String])
-    : String =
-    after.getKind match {
-      case SqlKind.SKIP_TO_FIRST => s"SKIP TO FIRST ${
-        after.asInstanceOf[RexCall].operands.get(0).toString
-      }"
-      case SqlKind.SKIP_TO_LAST => s"SKIP TO LAST ${
-        after.asInstanceOf[RexCall].operands.get(0).toString
-      }"
-      case SqlKind.LITERAL => after.asInstanceOf[RexLiteral]
-        .getValueAs(classOf[AfterOption]) match {
-        case AfterOption.SKIP_PAST_LAST_ROW => "SKIP PAST LAST ROW"
-        case AfterOption.SKIP_TO_NEXT_ROW => "SKIP TO NEXT ROW"
+    subset.asScala
+      .map { case (k, v) =>
+        s"$k = (${v.asScala.mkString(", ")})"
       }
-      case _ => throw new IllegalStateException(s"Corrupted query tree. Unexpected $after for " +
-        s"after match strategy.")
+      .mkString(", ")
+
+  private def afterMatchToString(after: RexNode, fieldNames: Seq[String]): String =
+    after.getKind match {
+      case SqlKind.SKIP_TO_FIRST =>
+        s"SKIP TO FIRST ${after.asInstanceOf[RexCall].operands.get(0).toString}"
+      case SqlKind.SKIP_TO_LAST =>
+        s"SKIP TO LAST ${after.asInstanceOf[RexCall].operands.get(0).toString}"
+      case SqlKind.LITERAL =>
+        after
+          .asInstanceOf[RexLiteral]
+          .getValueAs(classOf[AfterOption]) match {
+          case AfterOption.SKIP_PAST_LAST_ROW => "SKIP PAST LAST ROW"
+          case AfterOption.SKIP_TO_NEXT_ROW   => "SKIP TO NEXT ROW"
+        }
+      case _ =>
+        throw new IllegalStateException(
+          s"Corrupted query tree. Unexpected $after for " +
+            s"after match strategy.")
     }
 
   private[flink] def matchToString(
       logicalMatch: MatchRecognize,
       fieldNames: Seq[String],
-      expression: (RexNode, Seq[String], Option[Seq[RexNode]]) => String)
-    : String = {
+      expression: (RexNode, Seq[String], Option[Seq[RexNode]]) => String): String = {
     val partitionBy = if (!logicalMatch.partitionKeys.isEmpty) {
-      s"PARTITION BY: ${
-        partitionKeysToString(logicalMatch.partitionKeys, fieldNames)
-      }"
+      s"PARTITION BY: ${partitionKeysToString(logicalMatch.partitionKeys, fieldNames)}"
     } else {
       ""
     }
@@ -118,9 +116,8 @@ trait CommonMatchRecognize {
       ""
     }
 
-    val define = s"DEFINE: ${
-      measuresDefineToString(logicalMatch.patternDefinitions, fieldNames, expression)
-    }"
+    val define =
+      s"DEFINE: ${measuresDefineToString(logicalMatch.patternDefinitions, fieldNames, expression)}"
 
     val body = Seq(partitionBy, orderBy, measures, allRows, afterMatch, pattern, subset, define)
       .filterNot(_.isEmpty)
@@ -133,23 +130,23 @@ trait CommonMatchRecognize {
       pw: RelWriter,
       logicalMatch: MatchRecognize,
       fieldNames: Seq[String],
-      expression: (RexNode, Seq[String], Option[Seq[RexNode]]) => String)
-    : RelWriter = {
-    pw.itemIf("partitionBy",
+      expression: (RexNode, Seq[String], Option[Seq[RexNode]]) => String): RelWriter = {
+    pw.itemIf(
+      "partitionBy",
       partitionKeysToString(logicalMatch.partitionKeys, fieldNames),
       !logicalMatch.partitionKeys.isEmpty)
-      .itemIf("orderBy",
+      .itemIf(
+        "orderBy",
         orderingToString(logicalMatch.orderKeys, fieldNames),
         !logicalMatch.orderKeys.getFieldCollations.isEmpty)
-      .itemIf("measures",
+      .itemIf(
+        "measures",
         measuresDefineToString(logicalMatch.measures, fieldNames, expression),
         !logicalMatch.measures.isEmpty)
       .item("rowsPerMatch", rowsPerMatchToString(logicalMatch.allRows))
       .item("after", afterMatchToString(logicalMatch.after, fieldNames))
       .item("pattern", logicalMatch.pattern.toString)
-      .itemIf("subset",
-        subsetToString(logicalMatch.subsets),
-        !logicalMatch.subsets.isEmpty)
+      .itemIf("subset", subsetToString(logicalMatch.subsets), !logicalMatch.subsets.isEmpty)
       .item("define", logicalMatch.patternDefinitions)
   }
 }

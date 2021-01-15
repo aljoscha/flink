@@ -32,8 +32,9 @@ abstract class OuterJoinGroupReduceRunner(
     name: String,
     code: String,
     @transient var returnType: TypeInformation[Row])
-  extends RichGroupReduceFunction[Row, Row]
-    with Compiler[JoinFunction[Row, Row, Row]] with Logging {
+    extends RichGroupReduceFunction[Row, Row]
+    with Compiler[JoinFunction[Row, Row, Row]]
+    with Logging {
 
   protected var function: JoinFunction[Row, Row, Row] = null
 
@@ -51,11 +52,8 @@ abstract class OuterJoinGroupReduceRunner(
   }
 }
 
-class LeftOuterJoinGroupReduceRunner(
-    name: String,
-    code: String,
-    returnType: TypeInformation[Row])
-  extends OuterJoinGroupReduceRunner(name, code, returnType) {
+class LeftOuterJoinGroupReduceRunner(name: String, code: String, returnType: TypeInformation[Row])
+    extends OuterJoinGroupReduceRunner(name, code, returnType) {
 
   override final def reduce(pairs: Iterable[Row], out: Collector[Row]): Unit = {
 
@@ -98,11 +96,8 @@ class LeftOuterJoinGroupReduceRunner(
   }
 }
 
-class RightOuterJoinGroupReduceRunner(
-  name: String,
-  code: String,
-  returnType: TypeInformation[Row])
-  extends OuterJoinGroupReduceRunner(name, code, returnType) {
+class RightOuterJoinGroupReduceRunner(name: String, code: String, returnType: TypeInformation[Row])
+    extends OuterJoinGroupReduceRunner(name, code, returnType) {
 
   override final def reduce(pairs: Iterable[Row], out: Collector[Row]): Unit = {
 
@@ -146,18 +141,18 @@ class RightOuterJoinGroupReduceRunner(
 }
 
 /**
-  * Emits a part of the results of a full outer join:
-  *
-  * - join result from matching join pairs (left + right)
-  * - preserved left rows (left + null)
-  *
-  * Preserved right rows (null, right) are emitted by RightFullOuterJoinGroupReduceRunner.
-  */
+ * Emits a part of the results of a full outer join:
+ *
+ * - join result from matching join pairs (left + right)
+ * - preserved left rows (left + null)
+ *
+ * Preserved right rows (null, right) are emitted by RightFullOuterJoinGroupReduceRunner.
+ */
 class LeftFullOuterJoinGroupReduceRunner(
-  name: String,
-  code: String,
-  returnType: TypeInformation[Row])
-  extends OuterJoinGroupReduceRunner(name, code, returnType) {
+    name: String,
+    code: String,
+    returnType: TypeInformation[Row])
+    extends OuterJoinGroupReduceRunner(name, code, returnType) {
 
   override final def reduce(pairs: Iterable[Row], out: Collector[Row]): Unit = {
 
@@ -202,18 +197,18 @@ class LeftFullOuterJoinGroupReduceRunner(
 }
 
 /**
-  * Emits a part of the results of a full outer join:
-  *
-  * - preserved right rows (null, right)
-  *
-  * Join result from matching join pairs (left + right) and preserved left rows (left + null) are
-  * emitted by LeftFullOuterJoinGroupReduceRunner.
-  */
+ * Emits a part of the results of a full outer join:
+ *
+ * - preserved right rows (null, right)
+ *
+ * Join result from matching join pairs (left + right) and preserved left rows (left + null) are
+ * emitted by LeftFullOuterJoinGroupReduceRunner.
+ */
 class RightFullOuterJoinGroupReduceRunner(
-  name: String,
-  code: String,
-  returnType: TypeInformation[Row])
-  extends OuterJoinGroupReduceRunner(name, code, returnType) {
+    name: String,
+    code: String,
+    returnType: TypeInformation[Row])
+    extends OuterJoinGroupReduceRunner(name, code, returnType) {
 
   override final def reduce(pairs: Iterable[Row], out: Collector[Row]): Unit = {
 

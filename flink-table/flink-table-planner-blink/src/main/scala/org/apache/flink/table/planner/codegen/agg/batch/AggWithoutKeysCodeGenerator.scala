@@ -32,8 +32,8 @@ import org.apache.flink.table.types.logical.RowType
 import org.apache.calcite.tools.RelBuilder
 
 /**
-  * Generate a agg operator without keys, auxGrouping must be empty too.
-  */
+ * Generate a agg operator without keys, auxGrouping must be empty too.
+ */
 object AggWithoutKeysCodeGenerator {
 
   def genWithoutKeys(
@@ -44,8 +44,7 @@ object AggWithoutKeysCodeGenerator {
       outputType: RowType,
       isMerge: Boolean,
       isFinal: Boolean,
-      prefix: String)
-    : GeneratedOperator[OneInputStreamOperator[RowData, RowData]] = {
+      prefix: String): GeneratedOperator[OneInputStreamOperator[RowData, RowData]] = {
 
     // prepare for aggregation
     val auxGrouping = Array[Int]()

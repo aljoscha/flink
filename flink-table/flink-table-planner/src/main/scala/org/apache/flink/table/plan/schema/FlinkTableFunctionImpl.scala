@@ -29,25 +29,23 @@ import org.apache.flink.table.api.TableException
 import org.apache.flink.table.calcite.FlinkTypeFactory
 
 /**
-  * This is heavily inspired by Calcite's [[org.apache.calcite.schema.impl.TableFunctionImpl]].
-  * We need it in order to create a [[org.apache.flink.table.functions.utils.TableSqlFunction]].
-  * The main difference is that we override the [[getRowType()]] and [[getElementType()]].
-  */
+ * This is heavily inspired by Calcite's [[org.apache.calcite.schema.impl.TableFunctionImpl]].
+ * We need it in order to create a [[org.apache.flink.table.functions.utils.TableSqlFunction]].
+ * The main difference is that we override the [[getRowType()]] and [[getElementType()]].
+ */
 class FlinkTableFunctionImpl[T](
     val typeInfo: TypeInformation[T],
     val fieldIndexes: Array[Int],
     val fieldNames: Array[String])
-  extends TableFunction {
+    extends TableFunction {
 
   if (fieldIndexes.length != fieldNames.length) {
-    throw new TableException(
-      "Number of field indexes and field names must be equal.")
+    throw new TableException("Number of field indexes and field names must be equal.")
   }
 
   // check uniqueness of field names
   if (fieldNames.length != fieldNames.toSet.size) {
-    throw new TableException(
-      "Table field names must be unique.")
+    throw new TableException("Table field names must be unique.")
   }
 
   val fieldTypes: Array[TypeInformation[_]] =
@@ -74,8 +72,9 @@ class FlinkTableFunctionImpl[T](
   // we do never use the FunctionParameters, so return an empty list
   override def getParameters: util.List[FunctionParameter] = Collections.emptyList()
 
-  override def getRowType(typeFactory: RelDataTypeFactory,
-                          arguments: util.List[AnyRef]): RelDataType = {
+  override def getRowType(
+      typeFactory: RelDataTypeFactory,
+      arguments: util.List[AnyRef]): RelDataType = {
     val flinkTypeFactory = typeFactory.asInstanceOf[FlinkTypeFactory]
     val builder = flinkTypeFactory.builder
     fieldNames

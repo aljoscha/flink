@@ -32,8 +32,8 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
 /**
-  * tests for retraction
-  */
+ * tests for retraction
+ */
 @RunWith(classOf[Parameterized])
 class RetractionITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mode) {
   // input data
@@ -47,8 +47,7 @@ class RetractionITCase(mode: StateBackendMode) extends StreamingWithStateTestBas
     ("bark", 1),
     ("bark", 1),
     ("bark", 1),
-    ("flink", 1)
-  )
+    ("flink", 1))
 
   // keyed groupby + keyed groupby
   @Test
@@ -123,8 +122,7 @@ class RetractionITCase(mode: StateBackendMode) extends StreamingWithStateTestBas
       (6, 6L),
       (6, 6L),
       (6, 6L),
-      (7, 8L)
-    )
+      (7, 8L))
 
     val stream = env.fromCollection(data)
     val table = stream.toTable(tEnv, 'pk, 'value)
@@ -139,9 +137,23 @@ class RetractionITCase(mode: StateBackendMode) extends StreamingWithStateTestBas
     env.execute()
 
     val expected = Seq(
-      "(true,1,1)", "(true,2,1)", "(true,3,1)", "(false,3,1)", "(true,6,1)", "(false,1,1)",
-      "(true,1,2)", "(false,1,2)", "(true,1,3)", "(false,6,1)", "(true,6,2)", "(false,6,2)",
-      "(true,6,1)", "(true,12,1)", "(false,12,1)", "(true,18,1)", "(true,8,1)")
+      "(true,1,1)",
+      "(true,2,1)",
+      "(true,3,1)",
+      "(false,3,1)",
+      "(true,6,1)",
+      "(false,1,1)",
+      "(true,1,2)",
+      "(false,1,2)",
+      "(true,1,3)",
+      "(false,6,1)",
+      "(true,6,2)",
+      "(false,6,2)",
+      "(true,6,1)",
+      "(true,12,1)",
+      "(false,12,1)",
+      "(true,18,1)",
+      "(true,8,1)")
     assertEquals(expected.sorted, sink.getRawResults.sorted)
   }
 

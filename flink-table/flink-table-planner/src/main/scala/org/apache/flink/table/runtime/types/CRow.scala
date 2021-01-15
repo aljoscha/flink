@@ -21,21 +21,21 @@ package org.apache.flink.table.runtime.types
 import org.apache.flink.types.Row
 
 /**
-  * Wrapper for a [[Row]] to add retraction information.
-  *
-  * If [[change]] is true, the [[CRow]] is an accumulate message, if it is false it is a
-  * retraction message.
-  *
-  * @param row The wrapped [[Row]].
-  * @param change true for an accumulate message, false for a retraction message.
-  */
+ * Wrapper for a [[Row]] to add retraction information.
+ *
+ * If [[change]] is true, the [[CRow]] is an accumulate message, if it is false it is a
+ * retraction message.
+ *
+ * @param row The wrapped [[Row]].
+ * @param change true for an accumulate message, false for a retraction message.
+ */
 class CRow(var row: Row, var change: Boolean) {
 
   def this() {
     this(null, true)
   }
 
-  override def toString: String = s"${if(change) "+" else "-"}$row"
+  override def toString: String = s"${if (change) "+" else "-"}$row"
 
   override def equals(other: scala.Any): Boolean = {
     val otherCRow = other.asInstanceOf[CRow]

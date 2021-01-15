@@ -45,12 +45,9 @@ class CorrelateTest extends TableTestBase {
         term("invocation", "func1($cor0.c)"),
         term("correlate", s"table(func1($$cor0.c))"),
         term("select", "a", "b", "c", "f0"),
-        term("rowType",
-             "RecordType(INTEGER a, BIGINT b, VARCHAR(65536) c, VARCHAR(65536) f0)"),
-        term("joinType", "INNER")
-      ),
-      term("select", "c", "f0 AS s")
-    )
+        term("rowType", "RecordType(INTEGER a, BIGINT b, VARCHAR(65536) c, VARCHAR(65536) f0)"),
+        term("joinType", "INNER")),
+      term("select", "c", "f0 AS s"))
 
     util.verifySql(sqlQuery, expected)
 
@@ -66,12 +63,9 @@ class CorrelateTest extends TableTestBase {
         term("invocation", "func1($cor0.c, '$')"),
         term("correlate", s"table(func1($$cor0.c, '$$'))"),
         term("select", "a", "b", "c", "f0"),
-        term("rowType",
-             "RecordType(INTEGER a, BIGINT b, VARCHAR(65536) c, VARCHAR(65536) f0)"),
-        term("joinType", "INNER")
-      ),
-      term("select", "c", "f0 AS s")
-    )
+        term("rowType", "RecordType(INTEGER a, BIGINT b, VARCHAR(65536) c, VARCHAR(65536) f0)"),
+        term("joinType", "INNER")),
+      term("select", "c", "f0 AS s"))
 
     util.verifySql(sqlQuery2, expected2)
   }
@@ -93,12 +87,9 @@ class CorrelateTest extends TableTestBase {
         term("invocation", "func1($cor0.c)"),
         term("correlate", s"table(func1($$cor0.c))"),
         term("select", "a", "b", "c", "f0"),
-        term("rowType",
-             "RecordType(INTEGER a, BIGINT b, VARCHAR(65536) c, VARCHAR(65536) f0)"),
-        term("joinType", "LEFT")
-      ),
-      term("select", "c", "f0 AS s")
-    )
+        term("rowType", "RecordType(INTEGER a, BIGINT b, VARCHAR(65536) c, VARCHAR(65536) f0)"),
+        term("joinType", "LEFT")),
+      term("select", "c", "f0 AS s"))
 
     util.verifySql(sqlQuery, expected)
   }
@@ -112,7 +103,7 @@ class CorrelateTest extends TableTestBase {
     util.addFunction("func1", func1)
 
     val sqlQuery =
-    """
+      """
       | SELECT *
       | FROM MyTable2 LEFT OUTER JOIN
       |  (SELECT c, s
@@ -125,20 +116,17 @@ class CorrelateTest extends TableTestBase {
       unaryNode(
         "DataSetCalc",
         unaryNode(
-         "DataSetCorrelate",
+          "DataSetCorrelate",
           batchTableNode(table),
           term("invocation", "func1($cor0.c)"),
           term("correlate", "table(func1($cor0.c))"),
           term("select", "a", "b", "c", "f0"),
           term("rowType", "RecordType(INTEGER a, BIGINT b, VARCHAR(65536) c, VARCHAR(65536) f0)"),
-          term("joinType","LEFT")
-        ),
-        term("select", "c", "f0 AS s")
-      ),
+          term("joinType", "LEFT")),
+        term("select", "c", "f0 AS s")),
       term("where", "=(c2, s)"),
       term("join", "a2", "b2", "c2", "c", "s"),
-      term("joinType", "LeftOuterJoin")
-    )
+      term("joinType", "LeftOuterJoin"))
 
     util.verifySql(sqlQuery, expected)
   }
@@ -160,13 +148,12 @@ class CorrelateTest extends TableTestBase {
         term("invocation", "func2($cor0.c)"),
         term("correlate", s"table(func2($$cor0.c))"),
         term("select", "a", "b", "c", "f0", "f1"),
-        term("rowType",
-             "RecordType(INTEGER a, BIGINT b, VARCHAR(65536) c, " +
-               "VARCHAR(65536) f0, INTEGER f1)"),
-        term("joinType", "INNER")
-      ),
-      term("select", "c", "f0 AS name", "f1 AS len")
-    )
+        term(
+          "rowType",
+          "RecordType(INTEGER a, BIGINT b, VARCHAR(65536) c, " +
+            "VARCHAR(65536) f0, INTEGER f1)"),
+        term("joinType", "INNER")),
+      term("select", "c", "f0 AS name", "f1 AS len"))
 
     util.verifySql(sqlQuery, expected)
   }
@@ -188,13 +175,12 @@ class CorrelateTest extends TableTestBase {
         term("invocation", "hierarchy($cor0.c)"),
         term("correlate", s"table(hierarchy($$cor0.c))"),
         term("select", "a", "b", "c", "f0", "f1", "f2"),
-        term("rowType",
-             "RecordType(INTEGER a, BIGINT b, VARCHAR(65536) c," +
-               " VARCHAR(65536) f0, BOOLEAN f1, INTEGER f2)"),
-        term("joinType", "INNER")
-      ),
-      term("select", "c", "f0 AS name", "f1 AS adult", "f2 AS len")
-    )
+        term(
+          "rowType",
+          "RecordType(INTEGER a, BIGINT b, VARCHAR(65536) c," +
+            " VARCHAR(65536) f0, BOOLEAN f1, INTEGER f2)"),
+        term("joinType", "INNER")),
+      term("select", "c", "f0 AS name", "f1 AS adult", "f2 AS len"))
 
     util.verifySql(sqlQuery, expected)
   }
@@ -216,13 +202,12 @@ class CorrelateTest extends TableTestBase {
         term("invocation", "pojo($cor0.c)"),
         term("correlate", s"table(pojo($$cor0.c))"),
         term("select", "a", "b", "c", "age", "name"),
-        term("rowType",
-             "RecordType(INTEGER a, BIGINT b, VARCHAR(65536) c," +
-               " INTEGER age, VARCHAR(65536) name)"),
-        term("joinType", "INNER")
-      ),
-      term("select", "c", "name", "age")
-    )
+        term(
+          "rowType",
+          "RecordType(INTEGER a, BIGINT b, VARCHAR(65536) c," +
+            " INTEGER age, VARCHAR(65536) name)"),
+        term("joinType", "INNER")),
+      term("select", "c", "name", "age"))
 
     util.verifySql(sqlQuery, expected)
   }
@@ -245,14 +230,13 @@ class CorrelateTest extends TableTestBase {
         term("invocation", "func2($cor0.c)"),
         term("correlate", s"table(func2($$cor0.c))"),
         term("select", "a", "b", "c", "f0", "f1"),
-        term("rowType",
-             "RecordType(INTEGER a, BIGINT b, VARCHAR(65536) c, " +
-               "VARCHAR(65536) f0, INTEGER f1)"),
+        term(
+          "rowType",
+          "RecordType(INTEGER a, BIGINT b, VARCHAR(65536) c, " +
+            "VARCHAR(65536) f0, INTEGER f1)"),
         term("joinType", "INNER"),
-        term("condition", ">($1, 2)")
-      ),
-      term("select", "c", "f0 AS name", "f1 AS len")
-    )
+        term("condition", ">($1, 2)")),
+      term("select", "c", "f0 AS name", "f1 AS len"))
 
     util.verifySql(sqlQuery, expected)
   }
@@ -274,12 +258,9 @@ class CorrelateTest extends TableTestBase {
         term("invocation", "func1(SUBSTRING($cor0.c, 2))"),
         term("correlate", s"table(func1(SUBSTRING($$cor0.c, 2)))"),
         term("select", "a", "b", "c", "f0"),
-        term("rowType",
-             "RecordType(INTEGER a, BIGINT b, VARCHAR(65536) c, VARCHAR(65536) f0)"),
-        term("joinType", "INNER")
-      ),
-      term("select", "c", "f0 AS s")
-    )
+        term("rowType", "RecordType(INTEGER a, BIGINT b, VARCHAR(65536) c, VARCHAR(65536) f0)"),
+        term("joinType", "INNER")),
+      term("select", "c", "f0 AS s"))
 
     util.verifySql(sqlQuery, expected)
   }
@@ -301,12 +282,9 @@ class CorrelateTest extends TableTestBase {
         term("invocation", "func1('hello', 'world', $cor0.c)"),
         term("correlate", s"table(func1('hello', 'world', $$cor0.c))"),
         term("select", "a", "b", "c", "f0"),
-        term("rowType",
-          "RecordType(INTEGER a, BIGINT b, VARCHAR(65536) c, VARCHAR(65536) f0)"),
-        term("joinType", "INNER")
-      ),
-      term("select", "c", "f0 AS s")
-    )
+        term("rowType", "RecordType(INTEGER a, BIGINT b, VARCHAR(65536) c, VARCHAR(65536) f0)"),
+        term("joinType", "INNER")),
+      term("select", "c", "f0 AS s"))
 
     util.verifySql(sqlQuery, expected)
 
@@ -324,12 +302,9 @@ class CorrelateTest extends TableTestBase {
         term("invocation", "func2('hello', 'world', $cor0.c)"),
         term("correlate", s"table(func2('hello', 'world', $$cor0.c))"),
         term("select", "a", "b", "c", "f0"),
-        term("rowType",
-          "RecordType(INTEGER a, BIGINT b, VARCHAR(65536) c, VARCHAR(65536) f0)"),
-        term("joinType", "INNER")
-      ),
-      term("select", "c", "f0 AS s")
-    )
+        term("rowType", "RecordType(INTEGER a, BIGINT b, VARCHAR(65536) c, VARCHAR(65536) f0)"),
+        term("joinType", "INNER")),
+      term("select", "c", "f0 AS s"))
 
     util.verifySql(sqlQuery, expected)
   }

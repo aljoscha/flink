@@ -47,7 +47,8 @@ trait FlinkRelNode extends RelNode {
         l.toString
 
       case l: RexLocalRef if localExprsTable.isEmpty =>
-        throw new IllegalArgumentException("Encountered RexLocalRef without " +
+        throw new IllegalArgumentException(
+          "Encountered RexLocalRef without " +
             "local expression table")
 
       case l: RexLocalRef =>
@@ -58,8 +59,8 @@ trait FlinkRelNode extends RelNode {
         val op = c.getOperator.toString
         val ops = c.getOperands.map(getExpressionString(_, inFields, localExprsTable))
         c.getOperator match {
-          case _ : SqlAsOperator => ops.head
-          case _ => s"$op(${ops.mkString(", ")})"
+          case _: SqlAsOperator => ops.head
+          case _                => s"$op(${ops.mkString(", ")})"
         }
 
       case fa: RexFieldAccess =>
@@ -82,27 +83,27 @@ trait FlinkRelNode extends RelNode {
   }
 
   private[flink] def estimateDataTypeSize(t: RelDataType): Double = t.getSqlTypeName match {
-    case SqlTypeName.TINYINT => 1
-    case SqlTypeName.SMALLINT => 2
-    case SqlTypeName.INTEGER => 4
-    case SqlTypeName.BIGINT => 8
-    case SqlTypeName.BOOLEAN => 1
-    case SqlTypeName.FLOAT => 4
-    case SqlTypeName.DOUBLE => 8
-    case SqlTypeName.VARCHAR => 12
-    case SqlTypeName.CHAR => 1
-    case SqlTypeName.DECIMAL => 12
+    case SqlTypeName.TINYINT                                            => 1
+    case SqlTypeName.SMALLINT                                           => 2
+    case SqlTypeName.INTEGER                                            => 4
+    case SqlTypeName.BIGINT                                             => 8
+    case SqlTypeName.BOOLEAN                                            => 1
+    case SqlTypeName.FLOAT                                              => 4
+    case SqlTypeName.DOUBLE                                             => 8
+    case SqlTypeName.VARCHAR                                            => 12
+    case SqlTypeName.CHAR                                               => 1
+    case SqlTypeName.DECIMAL                                            => 12
     case typeName if SqlTypeName.YEAR_INTERVAL_TYPES.contains(typeName) => 8
-    case typeName if SqlTypeName.DAY_INTERVAL_TYPES.contains(typeName) => 4
-    case SqlTypeName.TIME | SqlTypeName.TIMESTAMP | SqlTypeName.DATE => 12
-    case SqlTypeName.ROW => estimateRowSize(t)
-    case SqlTypeName.ARRAY =>
+    case typeName if SqlTypeName.DAY_INTERVAL_TYPES.contains(typeName)  => 4
+    case SqlTypeName.TIME | SqlTypeName.TIMESTAMP | SqlTypeName.DATE    => 12
+    case SqlTypeName.ROW                                                => estimateRowSize(t)
+    case SqlTypeName.ARRAY                                              =>
       // 16 is an arbitrary estimate
       estimateDataTypeSize(t.getComponentType) * 16
     case SqlTypeName.MAP | SqlTypeName.MULTISET =>
       // 16 is an arbitrary estimate
       (estimateDataTypeSize(t.getKeyType) + estimateDataTypeSize(t.getValueType)) * 16
     case SqlTypeName.ANY => 128 // 128 is an arbitrary estimate
-    case _ => throw new TableException(s"Unsupported data type encountered: $t")
+    case _               => throw new TableException(s"Unsupported data type encountered: $t")
   }
 }

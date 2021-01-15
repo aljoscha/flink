@@ -31,18 +31,18 @@ import org.apache.calcite.rex.RexNode
 import scala.collection.JavaConversions._
 
 /**
-  * Stream physical RelNode for time-ascending-order [[Sort]] without `limit`.
-  *
-  * @see [[StreamPhysicalRank]] which must be with `limit` order by.
-  * @see [[StreamPhysicalSort]] which can be used for testing now, its sort key can be any type.
-  */
+ * Stream physical RelNode for time-ascending-order [[Sort]] without `limit`.
+ *
+ * @see [[StreamPhysicalRank]] which must be with `limit` order by.
+ * @see [[StreamPhysicalSort]] which can be used for testing now, its sort key can be any type.
+ */
 class StreamPhysicalTemporalSort(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
     inputRel: RelNode,
     sortCollation: RelCollation)
-  extends Sort(cluster, traitSet, inputRel, sortCollation)
-  with StreamPhysicalRel {
+    extends Sort(cluster, traitSet, inputRel, sortCollation)
+    with StreamPhysicalRel {
 
   override def requireWatermark: Boolean = false
 
@@ -65,7 +65,6 @@ class StreamPhysicalTemporalSort(
       SortUtil.getSortSpec(sortCollation.getFieldCollations),
       ExecEdge.DEFAULT,
       FlinkTypeFactory.toLogicalRowType(getRowType),
-      getRelDetailedDescription
-    )
+      getRelDetailedDescription)
   }
 }

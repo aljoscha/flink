@@ -26,21 +26,19 @@ import org.apache.flink.table.codegen.{FunctionCodeGenerator, GeneratedFunction}
 import org.apache.flink.table.typeutils.TimeIndicatorTypeInfo
 import org.apache.flink.types.Row
 
-
 object Conversions {
 
   /**
-    * Utility method for generating converter [[MapFunction]] that converts from
-    * given input [[TypeInformation]] of type [[Row]] to requested type, based on a
-    * logical [[TableSchema]] of the input type.
-    */
+   * Utility method for generating converter [[MapFunction]] that converts from
+   * given input [[TypeInformation]] of type [[Row]] to requested type, based on a
+   * logical [[TableSchema]] of the input type.
+   */
   def generateRowConverterFunction[OUT](
-    physicalInputType: TypeInformation[Row],
-    logicalInputSchema: TableSchema,
-    requestedOutputType: TypeInformation[OUT],
-    functionName: String,
-    config: TableConfig)
-  : Option[GeneratedFunction[MapFunction[Row, OUT], OUT]] = {
+      physicalInputType: TypeInformation[Row],
+      logicalInputSchema: TableSchema,
+      requestedOutputType: TypeInformation[OUT],
+      functionName: String,
+      config: TableConfig): Option[GeneratedFunction[MapFunction[Row, OUT], OUT]] = {
 
     // validate that at least the field types of physical and logical type match
     // we do that here to make sure that plan translation was correct
@@ -79,43 +77,45 @@ object Conversions {
     requestedOutputType match {
       // POJO type requested
       case pt: PojoTypeInfo[_] =>
-        fieldNames.zip(fieldTypes) foreach {
-          case (fName, fType) =>
-            val pojoIdx = pt.getFieldIndex(fName)
-            if (pojoIdx < 0) {
-              throw new TableException(s"POJO does not define field name: $fName")
-            }
-            val requestedTypeInfo = pt.getTypeAt(pojoIdx)
-            validateFieldType(requestedTypeInfo)
-            if (fType != requestedTypeInfo) {
-              throw new TableException(s"Result field does not match requested type. " +
+        fieldNames.zip(fieldTypes) foreach { case (fName, fType) =>
+          val pojoIdx = pt.getFieldIndex(fName)
+          if (pojoIdx < 0) {
+            throw new TableException(s"POJO does not define field name: $fName")
+          }
+          val requestedTypeInfo = pt.getTypeAt(pojoIdx)
+          validateFieldType(requestedTypeInfo)
+          if (fType != requestedTypeInfo) {
+            throw new TableException(
+              s"Result field does not match requested type. " +
                 s"Requested: $requestedTypeInfo; Actual: $fType")
-            }
+          }
         }
 
       // Tuple/Case class/Row type requested
       case tt: TupleTypeInfoBase[_] =>
-        fieldTypes.zipWithIndex foreach {
-          case (fieldTypeInfo, i) =>
-            val requestedTypeInfo = tt.getTypeAt(i)
-            validateFieldType(requestedTypeInfo)
-            if (fieldTypeInfo != requestedTypeInfo) {
-              throw new TableException(s"Result field does not match requested type. " +
+        fieldTypes.zipWithIndex foreach { case (fieldTypeInfo, i) =>
+          val requestedTypeInfo = tt.getTypeAt(i)
+          validateFieldType(requestedTypeInfo)
+          if (fieldTypeInfo != requestedTypeInfo) {
+            throw new TableException(
+              s"Result field does not match requested type. " +
                 s"Requested: $requestedTypeInfo; Actual: $fieldTypeInfo")
-            }
+          }
         }
 
       // atomic type requested
       case t: TypeInformation[_] =>
         if (fieldTypes.size != 1) {
-          throw new TableException(s"Requested result type is an atomic type but " +
-            s"result[$fieldTypes] has more or less than a single field.")
+          throw new TableException(
+            s"Requested result type is an atomic type but " +
+              s"result[$fieldTypes] has more or less than a single field.")
         }
         val requestedTypeInfo = fieldTypes.head
         validateFieldType(requestedTypeInfo)
         if (requestedTypeInfo != t) {
-          throw new TableException(s"Result field does not match requested type. " +
-            s"Requested: $t; Actual: $requestedTypeInfo")
+          throw new TableException(
+            s"Result field does not match requested type. " +
+              s"Requested: $t; Actual: $requestedTypeInfo")
         }
 
       case _ =>
@@ -123,16 +123,9 @@ object Conversions {
     }
 
     // code generate MapFunction
-    val generator = new FunctionCodeGenerator(
-      config,
-      false,
-      physicalInputType,
-      None,
-      None)
+    val generator = new FunctionCodeGenerator(config, false, physicalInputType, None, None)
 
-    val conversion = generator.generateConverterResultExpression(
-      requestedOutputType,
-      fieldNames)
+    val conversion = generator.generateConverterResultExpression(requestedOutputType, fieldNames)
 
     val body =
       s"""

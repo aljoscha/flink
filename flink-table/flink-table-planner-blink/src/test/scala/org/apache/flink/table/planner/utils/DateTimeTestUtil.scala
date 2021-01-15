@@ -18,7 +18,10 @@
 
 package org.apache.flink.table.planner.utils
 
-import org.apache.flink.table.data.util.DataFormatConverters.{LocalDateConverter, LocalTimeConverter}
+import org.apache.flink.table.data.util.DataFormatConverters.{
+  LocalDateConverter,
+  LocalTimeConverter
+}
 import org.apache.flink.table.runtime.functions.SqlDateTimeUtils
 
 import org.apache.calcite.avatica.util.DateTimeUtils

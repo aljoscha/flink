@@ -41,8 +41,8 @@ class StreamPhysicalDeduplicate(
     uniqueKeys: Array[Int],
     val isRowtime: Boolean,
     val keepLastRow: Boolean)
-  extends SingleRel(cluster, traitSet, inputRel)
-  with StreamPhysicalRel {
+    extends SingleRel(cluster, traitSet, inputRel)
+    with StreamPhysicalRel {
 
   def getUniqueKeys: Array[Int] = uniqueKeys
 
@@ -64,7 +64,8 @@ class StreamPhysicalDeduplicate(
     val fieldNames = getRowType.getFieldNames
     val orderString = if (isRowtime) "ROWTIME" else "PROCTIME"
     val keep = if (keepLastRow) "LastRow" else "FirstRow"
-    super.explainTerms(pw)
+    super
+      .explainTerms(pw)
       .item("keep", keep)
       .item("key", uniqueKeys.map(fieldNames.get).mkString(", "))
       .item("order", orderString)
@@ -79,7 +80,6 @@ class StreamPhysicalDeduplicate(
       generateUpdateBefore,
       ExecEdge.DEFAULT,
       FlinkTypeFactory.toLogicalRowType(getRowType),
-      getRelDetailedDescription
-    )
+      getRelDetailedDescription)
   }
 }

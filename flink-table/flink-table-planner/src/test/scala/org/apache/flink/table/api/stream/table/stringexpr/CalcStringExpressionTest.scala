@@ -128,7 +128,7 @@ class CalcStringExpressionTest extends TableTestBase {
   @Test
   def testAddColumns(): Unit = {
     val util = streamTestUtil()
-    val t = util.addTable[(Int, Long, String)]("Table3",'a, 'b, 'c)
+    val t = util.addTable[(Int, Long, String)]("Table3", 'a, 'b, 'c)
 
     val t1 = t.addColumns(concat('c, "Sunny") as 'kid).addColumns('b + 1)
     val t2 = t.addColumns("concat(c, 'Sunny') as kid").addColumns("b + 1")
@@ -139,7 +139,7 @@ class CalcStringExpressionTest extends TableTestBase {
   @Test
   def addOrReplaceColumns(): Unit = {
     val util = streamTestUtil()
-    val t = util.addTable[(Int, Long, String)]("Table3",'a, 'b, 'c)
+    val t = util.addTable[(Int, Long, String)]("Table3", 'a, 'b, 'c)
 
     var t1 = t.addOrReplaceColumns(concat('c, "Sunny") as 'kid).addColumns('b + 1)
     var t2 = t.addOrReplaceColumns("concat(c, 'Sunny') as kid").addColumns("b + 1")
@@ -150,7 +150,7 @@ class CalcStringExpressionTest extends TableTestBase {
   @Test
   def testRenameColumns(): Unit = {
     val util = streamTestUtil()
-    val t = util.addTable[(Int, Long, String)]("Table3",'a, 'b, 'c)
+    val t = util.addTable[(Int, Long, String)]("Table3", 'a, 'b, 'c)
 
     val t1 = t.renameColumns('a as 'a2, 'c as 'c2)
     val t2 = t.renameColumns("a as a2, c as c2")
@@ -161,7 +161,7 @@ class CalcStringExpressionTest extends TableTestBase {
   @Test
   def testDropColumns(): Unit = {
     val util = streamTestUtil()
-    val t = util.addTable[(Int, Long, String)]("Table3",'a, 'b, 'c)
+    val t = util.addTable[(Int, Long, String)]("Table3", 'a, 'b, 'c)
 
     val t1 = t.dropColumns('a, 'c)
     val t2 = t.dropColumns("a,c")
@@ -172,7 +172,7 @@ class CalcStringExpressionTest extends TableTestBase {
   @Test
   def testMap(): Unit = {
     val util = streamTestUtil()
-    val t = util.addTable[(Int, Long, String)]("Table3",'a, 'b, 'c)
+    val t = util.addTable[(Int, Long, String)]("Table3", 'a, 'b, 'c)
     util.tableEnv.registerFunction("func", Func23)
 
     val t1 = t.map("func(a, b, c)")

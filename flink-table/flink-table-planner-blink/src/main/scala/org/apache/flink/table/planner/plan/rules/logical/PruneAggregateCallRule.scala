@@ -34,13 +34,13 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
-  * Planner rule that removes unreferenced AggregateCall from Aggregate
-  */
-abstract class PruneAggregateCallRule[T <: RelNode](topClass: Class[T]) extends RelOptRule(
-  operand(topClass,
-    operand(classOf[Aggregate], any)),
-  RelFactories.LOGICAL_BUILDER,
-  s"PruneAggregateCallRule_${topClass.getCanonicalName}") {
+ * Planner rule that removes unreferenced AggregateCall from Aggregate
+ */
+abstract class PruneAggregateCallRule[T <: RelNode](topClass: Class[T])
+    extends RelOptRule(
+      operand(topClass, operand(classOf[Aggregate], any)),
+      RelFactories.LOGICAL_BUILDER,
+      s"PruneAggregateCallRule_${topClass.getCanonicalName}") {
 
   protected def getInputRefs(relOnAgg: T): ImmutableBitSet
 
@@ -57,18 +57,18 @@ abstract class PruneAggregateCallRule[T <: RelNode](topClass: Class[T]) extends 
     unrefAggCallIndices.nonEmpty
   }
 
-  private def getUnrefAggCallIndices(
-      inputRefs: ImmutableBitSet,
-      agg: Aggregate): Array[Int] = {
+  private def getUnrefAggCallIndices(inputRefs: ImmutableBitSet, agg: Aggregate): Array[Int] = {
     val groupCount = agg.getGroupCount
-    agg.getAggCallList.indices.flatMap { index =>
-      val aggCallOutputIndex = groupCount + index
-      if (inputRefs.get(aggCallOutputIndex)) {
-        Array.empty[Int]
-      } else {
-        Array(index)
+    agg.getAggCallList.indices
+      .flatMap { index =>
+        val aggCallOutputIndex = groupCount + index
+        if (inputRefs.get(aggCallOutputIndex)) {
+          Array.empty[Int]
+        } else {
+          Array(index)
+        }
       }
-    }.toArray[Int]
+      .toArray[Int]
   }
 
   override def onMatch(call: RelOptRuleCall): Unit = {
@@ -94,8 +94,7 @@ abstract class PruneAggregateCallRule[T <: RelNode](topClass: Class[T]) extends 
       agg.indicator,
       agg.getGroupSet,
       ImmutableList.of(agg.getGroupSet),
-      newAggCalls
-    )
+      newAggCalls)
 
     var newFieldIndex = 0
     // map old agg output index to new agg output index
@@ -115,10 +114,7 @@ abstract class PruneAggregateCallRule[T <: RelNode](topClass: Class[T]) extends 
     call.transformTo(newRelOnAgg)
   }
 
-  protected def createNewRel(
-      mapping: Mappings.TargetMapping,
-      project: T,
-      newAgg: RelNode): RelNode
+  protected def createNewRel(mapping: Mappings.TargetMapping, project: T, newAgg: RelNode): RelNode
 }
 
 class ProjectPruneAggregateCallRule extends PruneAggregateCallRule(classOf[Project]) {
@@ -139,18 +135,15 @@ class ProjectPruneAggregateCallRule extends PruneAggregateCallRule(classOf[Proje
     }
   }
 
-  private def projectsOnlyIdentity(
-      projects: util.List[RexNode],
-      inputFieldCount: Int): Boolean = {
+  private def projectsOnlyIdentity(projects: util.List[RexNode], inputFieldCount: Int): Boolean = {
     if (projects.size != inputFieldCount) {
       return false
     }
-    projects.zipWithIndex.forall {
-      case (project, index) =>
-        project match {
-          case r: RexInputRef => r.getIndex == index
-          case _ => false
-        }
+    projects.zipWithIndex.forall { case (project, index) =>
+      project match {
+        case r: RexInputRef => r.getIndex == index
+        case _              => false
+      }
     }
   }
 }
@@ -184,8 +177,7 @@ class CalcPruneAggregateCallRule extends PruneAggregateCallRule(classOf[Calc]) {
       newProjects,
       newCondition,
       program.getOutputRowType.getFieldNames,
-      calc.getCluster.getRexBuilder
-    )
+      calc.getCluster.getRexBuilder)
     if (newProgram.isTrivial &&
       Utilities.compare(calc.getRowType.getFieldNames, newAgg.getRowType.getFieldNames) == 0) {
       newAgg

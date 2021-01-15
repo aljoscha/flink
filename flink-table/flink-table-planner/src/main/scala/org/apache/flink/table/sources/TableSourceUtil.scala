@@ -22,7 +22,11 @@ import org.apache.flink.api.common.typeinfo.TypeInformation
 import org.apache.flink.table.api.{DataTypes, Types, ValidationException}
 import org.apache.flink.table.calcite.{FlinkRelBuilder, FlinkTypeFactory}
 import org.apache.flink.table.expressions.ApiExpressionUtils.{typeLiteral, unresolvedCall}
-import org.apache.flink.table.expressions.{Expression, PlannerExpressionConverter, ResolvedFieldReference}
+import org.apache.flink.table.expressions.{
+  Expression,
+  PlannerExpressionConverter,
+  ResolvedFieldReference
+}
 import org.apache.flink.table.functions.BuiltInFunctionDefinitions.CAST
 import org.apache.flink.table.sources.tsextractors.{TimestampExtractor, TimestampExtractorUtils}
 import org.apache.flink.table.types.DataType
@@ -39,14 +43,14 @@ import java.util.function.{Function => JFunction}
 object TableSourceUtil {
 
   /**
-    * Returns the [[RowtimeAttributeDescriptor]] of a [[TableSource]].
-    *
-    * @param tableSource The [[TableSource]] for which the [[RowtimeAttributeDescriptor]] is
-    *                    returned.
-    * @param selectedFields The fields which are selected from the [[TableSource]].
-    *                       If None, all fields are selected.
-    * @return The [[RowtimeAttributeDescriptor]] of the [[TableSource]].
-    */
+   * Returns the [[RowtimeAttributeDescriptor]] of a [[TableSource]].
+   *
+   * @param tableSource The [[TableSource]] for which the [[RowtimeAttributeDescriptor]] is
+   *                    returned.
+   * @param selectedFields The fields which are selected from the [[TableSource]].
+   *                       If None, all fields are selected.
+   * @return The [[RowtimeAttributeDescriptor]] of the [[TableSource]].
+   */
   def getRowtimeAttributeDescriptor(
       tableSource: TableSource[_],
       selectedFields: Option[Array[Int]]): Option[RowtimeAttributeDescriptor] = {
@@ -66,8 +70,8 @@ object TableSourceUtil {
           } else {
             val descriptor = descriptors.get(0)
             // look up index of row time attribute in schema
-            val fieldIdx = tableSource.getTableSchema.getFieldNames.indexOf(
-              descriptor.getAttributeName)
+            val fieldIdx =
+              tableSource.getTableSchema.getFieldNames.indexOf(descriptor.getAttributeName)
             // is field among selected fields?
             if (selectedFields.get.contains(fieldIdx)) {
               Some(descriptor)
@@ -98,19 +102,13 @@ object TableSourceUtil {
       physicalInputType: DataType,
       expectedDataType: DataType,
       relBuilder: FlinkRelBuilder,
-      nameMapping: JFunction[String, String])
-    : RexNode = {
-    val accessedFields = TimestampExtractorUtils.getAccessedFields(
-      extractor,
-      physicalInputType,
-      nameMapping)
+      nameMapping: JFunction[String, String]): RexNode = {
+    val accessedFields =
+      TimestampExtractorUtils.getAccessedFields(extractor, physicalInputType, nameMapping)
 
     relBuilder.push(createSchemaRelNode(accessedFields, relBuilder.getCluster))
-    val expr = constructExpression(
-      expectedDataType,
-      extractor,
-      accessedFields
-    ).accept(PlannerExpressionConverter.INSTANCE)
+    val expr = constructExpression(expectedDataType, extractor, accessedFields)
+      .accept(PlannerExpressionConverter.INSTANCE)
       .toRexNode(relBuilder)
     relBuilder.clear()
     expr
@@ -118,27 +116,23 @@ object TableSourceUtil {
 
   private def createSchemaRelNode(
       fields: Array[ResolvedFieldReference],
-      cluster: RelOptCluster)
-    : RelNode = {
+      cluster: RelOptCluster): RelNode = {
     val maxIdx = fields.map(_.fieldIndex()).max
     val idxMap: Map[Int, (String, TypeInformation[_])] = Map(
       fields.map(f => f.fieldIndex() -> (f.name(), f.resultType())): _*)
     val (physicalFields, physicalTypes) = (0 to maxIdx)
-      .map(i => idxMap.getOrElse(i, ("", Types.BYTE))).unzip
-    val physicalSchema: RelDataType = cluster.getTypeFactory.asInstanceOf[FlinkTypeFactory]
-      .buildLogicalRowType(
-        physicalFields,
-        physicalTypes)
-    LogicalValues.createEmpty(
-      cluster,
-      physicalSchema)
+      .map(i => idxMap.getOrElse(i, ("", Types.BYTE)))
+      .unzip
+    val physicalSchema: RelDataType = cluster.getTypeFactory
+      .asInstanceOf[FlinkTypeFactory]
+      .buildLogicalRowType(physicalFields, physicalTypes)
+    LogicalValues.createEmpty(cluster, physicalSchema)
   }
 
   private def constructExpression(
       expectedType: DataType,
       timestampExtractor: TimestampExtractor,
-      fieldAccesses: Array[ResolvedFieldReference])
-    : Expression = {
+      fieldAccesses: Array[ResolvedFieldReference]): Expression = {
     val expression = timestampExtractor.getExpression(fieldAccesses)
     // add cast to requested type and convert expression to RexNode
     // If resultType is TimeIndicatorTypeInfo, its internal format is long, but cast

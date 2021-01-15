@@ -31,14 +31,13 @@ import org.junit.runners.Parameterized
 import scala.collection.JavaConversions._
 
 @RunWith(classOf[Parameterized])
-class PartitionableSourceTest(
-  val sourceFetchPartitions: Boolean,
-  val useCatalogFilter: Boolean) extends TableTestBase{
+class PartitionableSourceTest(val sourceFetchPartitions: Boolean, val useCatalogFilter: Boolean)
+    extends TableTestBase {
 
   private val util = streamTestUtil()
 
   @Before
-  def setup() : Unit = {
+  def setup(): Unit = {
     val ddlTemp =
       """
         |CREATE TABLE MyTable (
@@ -68,14 +67,13 @@ class PartitionableSourceTest(
       val mytablePath = ObjectPath.fromString("test_database.MyTable")
       // partition map
       val partitions = Seq(
-        Map("part1"->"A", "part2"->"1"),
-        Map("part1"->"A", "part2"->"2"),
-        Map("part1"->"B", "part2"->"3"),
-        Map("part1"->"C", "part2"->"1"))
+        Map("part1" -> "A", "part2" -> "1"),
+        Map("part1" -> "A", "part2" -> "2"),
+        Map("part1" -> "B", "part2" -> "3"),
+        Map("part1" -> "C", "part2" -> "1"))
       partitions.foreach(partition => {
         val catalogPartitionSpec = new CatalogPartitionSpec(partition)
-        val catalogPartition = new CatalogPartitionImpl(
-          new java.util.HashMap[String, String](), "")
+        val catalogPartition = new CatalogPartitionImpl(new java.util.HashMap[String, String](), "")
         catalog.createPartition(mytablePath, catalogPartitionSpec, catalogPartition, true)
       })
     }
@@ -106,10 +104,6 @@ class PartitionableSourceTest(
 object PartitionableSourceTest {
   @Parameterized.Parameters(name = "sourceFetchPartitions={0}, useCatalogFilter={1}")
   def parameters(): util.Collection[Array[Any]] = {
-    Seq[Array[Any]](
-      Array(true, false),
-      Array(false, false),
-      Array(false, true)
-    )
+    Seq[Array[Any]](Array(true, false), Array(false, false), Array(false, true))
   }
 }

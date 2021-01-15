@@ -30,8 +30,8 @@ import org.apache.calcite.rel.core.{Correlate, JoinRelType}
 import org.apache.calcite.rex.{RexCall, RexNode}
 
 /**
-  * Batch physical RelNode for [[Correlate]] (Python user defined table function).
-  */
+ * Batch physical RelNode for [[Correlate]] (Python user defined table function).
+ */
 class BatchPhysicalPythonCorrelate(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -40,19 +40,16 @@ class BatchPhysicalPythonCorrelate(
     condition: Option[RexNode],
     outputRowType: RelDataType,
     joinType: JoinRelType)
-  extends BatchPhysicalCorrelateBase(
-    cluster,
-    traitSet,
-    inputRel,
-    scan,
-    condition,
-    outputRowType,
-    joinType) {
+    extends BatchPhysicalCorrelateBase(
+      cluster,
+      traitSet,
+      inputRel,
+      scan,
+      condition,
+      outputRowType,
+      joinType) {
 
-  def copy(
-      traitSet: RelTraitSet,
-      child: RelNode,
-      outputType: RelDataType): RelNode = {
+  def copy(traitSet: RelTraitSet, child: RelNode, outputType: RelDataType): RelNode = {
     new BatchPhysicalPythonCorrelate(
       cluster,
       traitSet,
@@ -70,7 +67,6 @@ class BatchPhysicalPythonCorrelate(
       condition.orNull,
       ExecEdge.DEFAULT,
       FlinkTypeFactory.toLogicalRowType(getRowType),
-      getRelDetailedDescription
-    )
+      getRelDetailedDescription)
   }
 }

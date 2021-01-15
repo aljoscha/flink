@@ -28,13 +28,11 @@ import org.apache.flink.table.runtime.types.CRow
 import org.apache.flink.util.Collector
 
 /**
-  * Wraps a ProcessFunction and sets a Timestamp field of a CRow as
-  * [[org.apache.flink.streaming.runtime.streamrecord.StreamRecord]] timestamp.
-  */
-class OutputRowtimeProcessFunction[OUT](
-    function: MapFunction[CRow, OUT],
-    rowtimeIdx: Int)
-  extends ProcessFunction[CRow, OUT] {
+ * Wraps a ProcessFunction and sets a Timestamp field of a CRow as
+ * [[org.apache.flink.streaming.runtime.streamrecord.StreamRecord]] timestamp.
+ */
+class OutputRowtimeProcessFunction[OUT](function: MapFunction[CRow, OUT], rowtimeIdx: Int)
+    extends ProcessFunction[CRow, OUT] {
 
   override def open(parameters: Configuration): Unit = {
     FunctionUtils.setFunctionRuntimeContext(function, getRuntimeContext)

@@ -24,7 +24,12 @@ import org.apache.flink.table.catalog.{CatalogViewImpl, ObjectPath}
 import org.apache.flink.table.planner.JHashMap
 import org.apache.flink.table.planner.plan.hint.OptionsHintTest.{IS_BOUNDED, Param}
 import org.apache.flink.table.planner.plan.nodes.calcite.LogicalLegacySink
-import org.apache.flink.table.planner.utils.{OptionsTableSink, TableTestBase, TableTestUtil, TestingStatementSet}
+import org.apache.flink.table.planner.utils.{
+  OptionsTableSink,
+  TableTestBase,
+  TableTestUtil,
+  TestingStatementSet
+}
 
 import org.hamcrest.Matchers._
 import org.junit.Assert.{assertEquals, assertThat}
@@ -36,18 +41,15 @@ import org.junit.{Before, Test}
 import scala.collection.JavaConversions._
 
 @RunWith(classOf[Parameterized])
-class OptionsHintTest(param: Param)
-    extends TableTestBase {
+class OptionsHintTest(param: Param) extends TableTestBase {
   private val util = param.utilSupplier.apply(this)
   private val is_bounded = param.isBounded
 
   @Before
   def before(): Unit = {
-    util.tableEnv.getConfig.getConfiguration.setBoolean(
-      TableConfigOptions.TABLE_DYNAMIC_TABLE_OPTIONS_ENABLED,
-      true)
-    util.addTable(
-      s"""
+    util.tableEnv.getConfig.getConfiguration
+      .setBoolean(TableConfigOptions.TABLE_DYNAMIC_TABLE_OPTIONS_ENABLED, true)
+    util.addTable(s"""
          |create table t1(
          |  a int,
          |  b varchar,
@@ -60,8 +62,7 @@ class OptionsHintTest(param: Param)
          |)
        """.stripMargin)
 
-    util.addTable(
-      s"""
+    util.addTable(s"""
          |create table t2(
          |  d int,
          |  e varchar,
@@ -77,12 +78,12 @@ class OptionsHintTest(param: Param)
 
   @Test
   def testOptionsWithGlobalConfDisabled(): Unit = {
-    util.tableEnv.getConfig.getConfiguration.setBoolean(
-      TableConfigOptions.TABLE_DYNAMIC_TABLE_OPTIONS_ENABLED,
-      false)
+    util.tableEnv.getConfig.getConfiguration
+      .setBoolean(TableConfigOptions.TABLE_DYNAMIC_TABLE_OPTIONS_ENABLED, false)
     expectedException.expect(isA(classOf[ValidationException]))
-    expectedException.expectMessage(s"OPTIONS hint is allowed only when "
-      + s"${TableConfigOptions.TABLE_DYNAMIC_TABLE_OPTIONS_ENABLED.key} is set to true")
+    expectedException.expectMessage(
+      s"OPTIONS hint is allowed only when "
+        + s"${TableConfigOptions.TABLE_DYNAMIC_TABLE_OPTIONS_ENABLED.key} is set to true")
     util.verifyExecPlan("select * from t1/*+ OPTIONS(connector='COLLECTION', k2='#v2') */")
   }
 
@@ -100,8 +101,7 @@ class OptionsHintTest(param: Param)
     assertThat(relNodes.length, is(1))
     assert(relNodes.head.isInstanceOf[LogicalLegacySink])
     val sink = relNodes.head.asInstanceOf[LogicalLegacySink]
-    assertEquals("{k1=#v1, k2=v2, k5=v5}",
-      sink.sink.asInstanceOf[OptionsTableSink].props.toString)
+    assertEquals("{k1=#v1, k2=v2, k5=v5}", sink.sink.asInstanceOf[OptionsTableSink].props.toString)
   }
 
   @Test
@@ -161,7 +161,8 @@ class OptionsHintTest(param: Param)
     val view1 = new CatalogViewImpl(
       "select * from t1 join t2 on t1.a = t2.d",
       "select * from t1 join t2 on t1.a = t2.d",
-      TableSchema.builder()
+      TableSchema
+        .builder()
         .field("a", DataTypes.INT())
         .field("b", DataTypes.STRING())
         .field("c", DataTypes.INT())
@@ -170,13 +171,9 @@ class OptionsHintTest(param: Param)
         .field("f", DataTypes.BIGINT())
         .build(),
       props,
-      "a view table"
-    )
+      "a view table")
     val catalog = util.tableEnv.getCatalog(util.tableEnv.getCurrentCatalog).get()
-    catalog.createTable(
-      new ObjectPath(util.tableEnv.getCurrentDatabase, "view1"),
-      view1,
-      false)
+    catalog.createTable(new ObjectPath(util.tableEnv.getCurrentDatabase, "view1"), view1, false)
     // The table hints on view expect to be ignored.
     val sql = "select * from view1/*+ OPTIONS(k1='#v1', k2='#v2', k3='#v3', k4='#v4') */"
     util.verifyExecPlan(sql)
@@ -192,8 +189,6 @@ object OptionsHintTest {
 
   @Parameters(name = "{index}: {0}")
   def parameters(): Array[Param] = {
-    Array(
-      Param(_.batchTestUtil(), isBounded = true),
-      Param(_.streamTestUtil(), isBounded = false))
+    Array(Param(_.batchTestUtil(), isBounded = true), Param(_.streamTestUtil(), isBounded = false))
   }
 }

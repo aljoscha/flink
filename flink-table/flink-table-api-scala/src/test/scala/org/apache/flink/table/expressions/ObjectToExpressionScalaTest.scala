@@ -31,9 +31,9 @@ class ObjectToExpressionScalaTest extends ImplicitExpressionConversions {
 
   @Test
   def testSeqConversion(): Unit = {
-      val expr = ApiExpressionUtils.objectToExpression(Seq(1, 2));
+    val expr = ApiExpressionUtils.objectToExpression(Seq(1, 2));
 
-      assertThatEquals(expr, array(1, 2));
+    assertThatEquals(expr, array(1, 2));
   }
 
   @Test

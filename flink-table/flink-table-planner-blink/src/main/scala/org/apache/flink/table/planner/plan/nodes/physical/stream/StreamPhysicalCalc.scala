@@ -37,7 +37,7 @@ class StreamPhysicalCalc(
     inputRel: RelNode,
     calcProgram: RexProgram,
     outputRowType: RelDataType)
-  extends StreamPhysicalCalcBase(cluster, traitSet, inputRel, calcProgram, outputRowType) {
+    extends StreamPhysicalCalcBase(cluster, traitSet, inputRel, calcProgram, outputRowType) {
 
   override def copy(traitSet: RelTraitSet, child: RelNode, program: RexProgram): Calc = {
     new StreamPhysicalCalc(cluster, traitSet, child, program, outputRowType)

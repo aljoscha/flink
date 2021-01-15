@@ -38,6 +38,7 @@ import org.apache.flink.api.scala._
  * This covers only the constant fields annotations currently !!!
  */
 class SemanticPropertiesTranslationTest {
+
   /**
    * A mapper that preserves all fields over a tuple data set.
    */
@@ -47,7 +48,8 @@ class SemanticPropertiesTranslationTest {
       val env = ExecutionEnvironment.getExecutionEnvironment
 
       val input = env.fromElements((3L, "test", 42))
-      input.map(new WildcardForwardMapper[(Long, String, Int)])
+      input
+        .map(new WildcardForwardMapper[(Long, String, Int)])
         .output(new DiscardingOutputFormat[(Long, String, Int)])
 
       val plan = env.createProgramPlan()
@@ -85,7 +87,8 @@ class SemanticPropertiesTranslationTest {
       val env = ExecutionEnvironment.getExecutionEnvironment
 
       val input = env.fromElements((3L, "test", 42))
-      input.map(new IndividualForwardMapper[Long, String, Int])
+      input
+        .map(new IndividualForwardMapper[Long, String, Int])
         .output(new DiscardingOutputFormat[(Long, String, Int)])
 
       val plan = env.createProgramPlan()
@@ -123,7 +126,8 @@ class SemanticPropertiesTranslationTest {
       val env = ExecutionEnvironment.getExecutionEnvironment
 
       val input = env.fromElements((3L, "test", 42))
-      input.map(new FieldTwoForwardMapper[Long, String, Int])
+      input
+        .map(new FieldTwoForwardMapper[Long, String, Int])
         .output(new DiscardingOutputFormat[(Long, String, Int)])
 
       val plan = env.createProgramPlan()
@@ -163,8 +167,10 @@ class SemanticPropertiesTranslationTest {
       val input1 = env.fromElements((3L, "test"))
       val input2 = env.fromElements((3L, 3.1415))
 
-      input1.join(input2).where(0).equalTo(0)(
-        new ForwardingTupleJoin[Long, String, Long, Double])
+      input1
+        .join(input2)
+        .where(0)
+        .equalTo(0)(new ForwardingTupleJoin[Long, String, Long, Double])
         .output(new DiscardingOutputFormat[(String, Long)])
 
       val plan = env.createProgramPlan()
@@ -187,8 +193,7 @@ class SemanticPropertiesTranslationTest {
       assertEquals(0, fw22.size)
       assertTrue(fw12.contains(0))
       assertTrue(fw21.contains(1))
-    }
-    catch {
+    } catch {
       case e: Exception => {
         System.err.println(e.getMessage)
         e.printStackTrace()
@@ -208,8 +213,10 @@ class SemanticPropertiesTranslationTest {
       val input1 = env.fromElements((3L, "test"))
       val input2 = env.fromElements((3L, 42))
 
-      input1.join(input2).where(0).equalTo(0)(
-        new ForwardingBasicJoin[(Long, String), (Long, Int)])
+      input1
+        .join(input2)
+        .where(0)
+        .equalTo(0)(new ForwardingBasicJoin[(Long, String), (Long, Int)])
         .output(new DiscardingOutputFormat[((Long, String), (Long, Int))])
 
       val plan = env.createProgramPlan()
@@ -232,8 +239,7 @@ class SemanticPropertiesTranslationTest {
       assertTrue(fw12.contains(1))
       assertTrue(fw21.contains(2))
       assertTrue(fw22.contains(3))
-    }
-    catch {
+    } catch {
       case e: Exception => {
         System.err.println(e.getMessage)
         e.printStackTrace()
@@ -242,7 +248,6 @@ class SemanticPropertiesTranslationTest {
     }
   }
 }
-
 
 @ForwardedFields(Array("*"))
 class WildcardForwardMapper[T] extends RichMapFunction[T, T] {
@@ -260,14 +265,14 @@ class IndividualForwardMapper[X, Y, Z] extends RichMapFunction[(X, Y, Z), (X, Y,
 
 @ForwardedFields(Array("_2"))
 class FieldTwoForwardMapper[X, Y, Z] extends RichMapFunction[(X, Y, Z), (X, Y, Z)] {
-  def map(value: (X, Y ,Z)): (X, Y, Z) = {
+  def map(value: (X, Y, Z)): (X, Y, Z) = {
     value
   }
 }
 
 @ForwardedFieldsFirst(Array("_2 -> _1"))
 @ForwardedFieldsSecond(Array("_1 -> _2"))
-class ForwardingTupleJoin[A, B, C, D] extends RichJoinFunction[(A, B),  (C, D), (B, C)] {
+class ForwardingTupleJoin[A, B, C, D] extends RichJoinFunction[(A, B), (C, D), (B, C)] {
   def join(first: (A, B), second: (C, D)): (B, C) = {
     (first._2, second._1)
   }

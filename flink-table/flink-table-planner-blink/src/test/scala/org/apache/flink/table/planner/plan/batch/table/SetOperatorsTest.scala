@@ -57,16 +57,17 @@ class SetOperatorsTest extends TableTestBase {
     val util = batchTestUtil()
     val t = util.addTableSource[((Int, String), (Int, String), Int)]("A", 'a, 'b, 'c)
 
-    val in = t.select('a)
-      .unionAll(
-        t.select(('c > 0) ? ('b, nullOf(createTypeInformation[(Int, String)]))))
+    val in = t
+      .select('a)
+      .unionAll(t.select(('c > 0) ? ('b, nullOf(createTypeInformation[(Int, String)]))))
     util.verifyExecPlan(in)
   }
 
   @Test
   def testUnionAnyType(): Unit = {
     val util = batchTestUtil()
-    val t = util.addTableSource("A",
+    val t = util.addTableSource(
+      "A",
       Array[TypeInformation[_]](
         new GenericTypeInfo(classOf[NonPojo]),
         new GenericTypeInfo(classOf[NonPojo])),
@@ -81,7 +82,8 @@ class SetOperatorsTest extends TableTestBase {
     val left = util.addTableSource[(Int, Long, String)]("left", 'a, 'b, 'c)
     val right = util.addTableSource[(Int, Long, String)]("right", 'a, 'b, 'c)
 
-    val result = left.unionAll(right)
+    val result = left
+      .unionAll(right)
       .where('a > 0)
       .groupBy('b)
       .select('a.sum as 'a, 'b as 'b, 'c.count as 'c)
@@ -95,7 +97,8 @@ class SetOperatorsTest extends TableTestBase {
     val left = util.addTableSource[(Int, Long, String)]("left", 'a, 'b, 'c)
     val right = util.addTableSource[(Int, Long, String)]("right", 'a, 'b, 'c)
 
-    val result = left.minusAll(right)
+    val result = left
+      .minusAll(right)
       .where('a > 0)
       .groupBy('b)
       .select('a.sum as 'a, 'b as 'b, 'c.count as 'c)
@@ -109,9 +112,10 @@ class SetOperatorsTest extends TableTestBase {
     val left = util.addTableSource[(Int, Long, String)]("left", 'a, 'b, 'c)
     val right = util.addTableSource[(Int, Long, String)]("right", 'a, 'b, 'c)
 
-    val result = left.select('a, 'b, 'c)
-                 .unionAll(right.select('a, 'b, 'c))
-                 .select('b, 'c)
+    val result = left
+      .select('a, 'b, 'c)
+      .unionAll(right.select('a, 'b, 'c))
+      .select('b, 'c)
 
     util.verifyExecPlan(result)
 
@@ -123,9 +127,10 @@ class SetOperatorsTest extends TableTestBase {
     val left = util.addTableSource[(Int, Long, String)]("left", 'a, 'b, 'c)
     val right = util.addTableSource[(Int, Long, String)]("right", 'a, 'b, 'c)
 
-    val result = left.select('a, 'b, 'c)
-                 .minusAll(right.select('a, 'b, 'c))
-                 .select('b, 'c)
+    val result = left
+      .select('a, 'b, 'c)
+      .minusAll(right.select('a, 'b, 'c))
+      .select('b, 'c)
 
     util.verifyExecPlan(result)
 

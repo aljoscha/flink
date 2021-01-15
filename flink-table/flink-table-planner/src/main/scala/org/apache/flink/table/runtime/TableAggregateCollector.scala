@@ -21,8 +21,8 @@ package org.apache.flink.table.runtime
 import org.apache.flink.types.Row
 
 /**
-  * The collector is used to concat group keys and table aggregate function output.
-  */
+ * The collector is used to concat group keys and table aggregate function output.
+ */
 class TableAggregateCollector(val groupKeySize: Int) extends CRowWrappingCollector {
 
   // reused output row

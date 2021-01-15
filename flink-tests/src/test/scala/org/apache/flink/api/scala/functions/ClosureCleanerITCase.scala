@@ -182,10 +182,10 @@ object TestObjectWithBogusReturns {
 
     // this return is invalid since it will transfer control outside the closure
     try {
-      nums.map { x => return 1; x * 2}.print()
+      nums.map { x => return 1; x * 2 }.print()
     } catch {
       case inv: ReturnStatementInClosureException => // all good
-      case _: Throwable => fail("Bogus return statement not detected.")
+      case _: Throwable                           => fail("Bogus return statement not detected.")
     }
 
     nums.writeAsText(resultPath, WriteMode.OVERWRITE)
@@ -205,7 +205,7 @@ object TestObjectWithNestedReturns {
     nums.map { x =>
       // this return is fine since it will not transfer control outside the closure
       def foo(): Int = { return 5; 1 }
-        foo()
+      foo()
     }
 
     nums.writeAsText(resultPath, WriteMode.OVERWRITE)
@@ -223,11 +223,10 @@ object TestObjectWithNesting {
     val nums = env.fromElements(1, 1)
     var y = 1
 
-    val result = nums.iterate(4) {
-      in =>
-        var nonSer2 = new NonSerializable
-        var x = y + 3
-        in.map(_ + x + y).reduce(_ + _).withBroadcastSet(nums, "nums")
+    val result = nums.iterate(4) { in =>
+      var nonSer2 = new NonSerializable
+      var x = y + 3
+      in.map(_ + x + y).reduce(_ + _).withBroadcastSet(nums, "nums")
     }
 
     result.writeAsText(resultPath, WriteMode.OVERWRITE)
@@ -247,11 +246,10 @@ class TestClassWithNesting(val y: Int) extends Serializable {
     val env = ExecutionEnvironment.getExecutionEnvironment
     val nums = env.fromElements(1, 1)
 
-    val result = nums.iterate(4) {
-      in =>
-        var nonSer2 = new NonSerializable
-        var x = y + 3
-        in.map(_ + x + getY).reduce(_ + _).withBroadcastSet(nums, "nums")
+    val result = nums.iterate(4) { in =>
+      var nonSer2 = new NonSerializable
+      var x = y + 3
+      in.map(_ + x + getY).reduce(_ + _).withBroadcastSet(nums, "nums")
     }
 
     result.writeAsText(resultPath, WriteMode.OVERWRITE)

@@ -27,14 +27,14 @@ import org.apache.flink.table.planner.utils.TableTestBase
 import org.junit.Test
 
 /**
-  * Test for [[SplitAggregateRule]].
-  */
+ * Test for [[SplitAggregateRule]].
+ */
 class SplitAggregateRuleTest extends TableTestBase {
   private val util = streamTestUtil()
   util.addTableSource[(Long, Int, String)]("MyTable", 'a, 'b, 'c)
   util.buildStreamProgram(FlinkStreamProgram.PHYSICAL)
-  util.tableEnv.getConfig.getConfiguration.setBoolean(
-    OptimizerConfigOptions.TABLE_OPTIMIZER_DISTINCT_AGG_SPLIT_ENABLED, true)
+  util.tableEnv.getConfig.getConfiguration
+    .setBoolean(OptimizerConfigOptions.TABLE_OPTIMIZER_DISTINCT_AGG_SPLIT_ENABLED, true)
 
   @Test
   def testSingleDistinctAgg(): Unit = {
@@ -163,8 +163,8 @@ class SplitAggregateRuleTest extends TableTestBase {
 
   @Test
   def testBucketsConfiguration(): Unit = {
-    util.tableEnv.getConfig.getConfiguration.setInteger(
-      OptimizerConfigOptions.TABLE_OPTIMIZER_DISTINCT_AGG_SPLIT_BUCKET_NUM, 100)
+    util.tableEnv.getConfig.getConfiguration
+      .setInteger(OptimizerConfigOptions.TABLE_OPTIMIZER_DISTINCT_AGG_SPLIT_BUCKET_NUM, 100)
     val sqlQuery = "SELECT COUNT(DISTINCT c) FROM MyTable"
     util.verifyRelPlan(sqlQuery)
   }

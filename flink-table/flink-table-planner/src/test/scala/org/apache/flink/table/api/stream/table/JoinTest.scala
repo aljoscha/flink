@@ -28,8 +28,8 @@ import org.apache.flink.table.utils.TableTestUtil._
 import org.junit.Test
 
 /**
-  * Tests for both windowed and non-windowed joins.
-  */
+ * Tests for both windowed and non-windowed joins.
+ */
 class JoinTest extends TableTestBase {
 
   // Tests for inner join
@@ -39,7 +39,8 @@ class JoinTest extends TableTestBase {
     val left = util.addTable[(Long, Int, String)]('a, 'b, 'c, 'lrtime.rowtime)
     val right = util.addTable[(Long, Int, String)]('d, 'e, 'f, 'rrtime.rowtime)
 
-    val resultTable = left.join(right)
+    val resultTable = left
+      .join(right)
       .where('a === 'd && 'lrtime >= 'rrtime - 5.minutes && 'lrtime < 'rrtime + 3.seconds)
       .select('a, 'e, 'lrtime)
 
@@ -48,24 +49,16 @@ class JoinTest extends TableTestBase {
         "DataStreamCalc",
         binaryNode(
           "DataStreamWindowJoin",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(left),
-            term("select", "a", "lrtime")
-          ),
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(right),
-            term("select", "d", "e", "rrtime")
-          ),
-          term("where", "AND(=(a, d), >=(CAST(lrtime)," +
-            " -(CAST(rrtime), 300000:INTERVAL DAY TO SECOND))," +
-            " <(CAST(lrtime), +(CAST(rrtime), 3000:INTERVAL DAY TO SECOND)))"),
+          unaryNode("DataStreamCalc", streamTableNode(left), term("select", "a", "lrtime")),
+          unaryNode("DataStreamCalc", streamTableNode(right), term("select", "d", "e", "rrtime")),
+          term(
+            "where",
+            "AND(=(a, d), >=(CAST(lrtime)," +
+              " -(CAST(rrtime), 300000:INTERVAL DAY TO SECOND))," +
+              " <(CAST(lrtime), +(CAST(rrtime), 3000:INTERVAL DAY TO SECOND)))"),
           term("join", "a", "lrtime", "d", "e", "rrtime"),
-          term("joinType", "InnerJoin")
-        ),
-        term("select", "a", "e", "lrtime")
-      )
+          term("joinType", "InnerJoin")),
+        term("select", "a", "e", "lrtime"))
     util.verifyTable(resultTable, expected)
   }
 
@@ -75,7 +68,8 @@ class JoinTest extends TableTestBase {
     val left = util.addTable[(Long, Int, String)]('a, 'b, 'c, 'lptime.proctime)
     val right = util.addTable[(Long, Int, String)]('d, 'e, 'f, 'rptime.proctime)
 
-    val resultTable = left.join(right)
+    val resultTable = left
+      .join(right)
       .where('a === 'd && 'lptime >= 'rptime - 1.second && 'lptime < 'rptime)
       .select('a, 'e, 'lptime)
 
@@ -84,24 +78,16 @@ class JoinTest extends TableTestBase {
         "DataStreamCalc",
         binaryNode(
           "DataStreamWindowJoin",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(left),
-            term("select", "a", "lptime")
-          ),
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(right),
-            term("select", "d", "e", "rptime")
-          ),
-          term("where", "AND(=(a, d), >=(PROCTIME(lptime), " +
-            "-(PROCTIME(rptime), 1000:INTERVAL DAY TO SECOND)), " +
-            "<(PROCTIME(lptime), PROCTIME(rptime)))"),
+          unaryNode("DataStreamCalc", streamTableNode(left), term("select", "a", "lptime")),
+          unaryNode("DataStreamCalc", streamTableNode(right), term("select", "d", "e", "rptime")),
+          term(
+            "where",
+            "AND(=(a, d), >=(PROCTIME(lptime), " +
+              "-(PROCTIME(rptime), 1000:INTERVAL DAY TO SECOND)), " +
+              "<(PROCTIME(lptime), PROCTIME(rptime)))"),
           term("join", "a", "lptime", "d", "e", "rptime"),
-          term("joinType", "InnerJoin")
-        ),
-        term("select", "a", "e", "PROCTIME(lptime) AS lptime")
-      )
+          term("joinType", "InnerJoin")),
+        term("select", "a", "e", "PROCTIME(lptime) AS lptime"))
     util.verifyTable(resultTable, expected)
   }
 
@@ -111,7 +97,8 @@ class JoinTest extends TableTestBase {
     val left = util.addTable[(Long, Int, String)]('a, 'b, 'c, 'lptime.proctime)
     val right = util.addTable[(Long, Int, String)]('d, 'e, 'f, 'rptime.proctime)
 
-    val resultTable = left.join(right)
+    val resultTable = left
+      .join(right)
       .where('a === 'd && 'lptime === 'rptime)
       .select('a, 'e, 'lptime)
 
@@ -120,48 +107,39 @@ class JoinTest extends TableTestBase {
         "DataStreamCalc",
         binaryNode(
           "DataStreamWindowJoin",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(left),
-            term("select", "a", "lptime")
-          ),
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(right),
-            term("select", "d", "e", "rptime")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(left), term("select", "a", "lptime")),
+          unaryNode("DataStreamCalc", streamTableNode(right), term("select", "d", "e", "rptime")),
           term("where", "AND(=(a, d), =(PROCTIME(lptime), PROCTIME(rptime)))"),
           term("join", "a", "lptime", "d", "e", "rptime"),
-          term("joinType", "InnerJoin")
-        ),
-        term("select", "a", "e", "PROCTIME(lptime) AS lptime")
-      )
+          term("joinType", "InnerJoin")),
+        term("select", "a", "e", "PROCTIME(lptime) AS lptime"))
     util.verifyTable(resultTable, expected)
   }
 
   /**
-    * The time indicator can be accessed from non-time predicates now.
-    */
+   * The time indicator can be accessed from non-time predicates now.
+   */
   @Test
   def testRowTimeInnerJoinWithTimeAccessed(): Unit = {
     val util = streamTestUtil()
     val left = util.addTable[(Long, Int, Timestamp)]('a, 'b, 'c, 'lrtime.rowtime)
     val right = util.addTable[(Long, Int, Timestamp)]('d, 'e, 'f, 'rrtime.rowtime)
 
-    val resultTable = left.join(right)
-      .where('a ==='d && 'lrtime >= 'rrtime - 5.minutes && 'lrtime < 'rrtime && 'lrtime > 'f)
+    val resultTable = left
+      .join(right)
+      .where('a === 'd && 'lrtime >= 'rrtime - 5.minutes && 'lrtime < 'rrtime && 'lrtime > 'f)
 
     val expected =
       binaryNode(
         "DataStreamWindowJoin",
         streamTableNode(left),
         streamTableNode(right),
-        term("where",
+        term(
+          "where",
           "AND(=(a, d), >=(CAST(lrtime), -(CAST(rrtime), 300000:INTERVAL DAY TO SECOND)), " +
             "<(CAST(lrtime), CAST(rrtime)), >(CAST(lrtime), f))"),
         term("join", "a", "b", "c", "lrtime", "d", "e", "f", "rrtime"),
-        term("joinType", "InnerJoin")
-      )
+        term("joinType", "InnerJoin"))
     util.verifyTable(resultTable, expected)
   }
 
@@ -183,24 +161,16 @@ class JoinTest extends TableTestBase {
         "DataStreamCalc",
         binaryNode(
           "DataStreamWindowJoin",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(left),
-            term("select", "a", "lrtime")
-          ),
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(right),
-            term("select", "d", "e", "rrtime")
-          ),
-          term("where", "AND(=(a, d), >=(CAST(lrtime), " +
-            "-(CAST(rrtime), 300000:INTERVAL DAY TO SECOND)), " +
-            "<(CAST(lrtime), +(CAST(rrtime), 3000:INTERVAL DAY TO SECOND)))"),
+          unaryNode("DataStreamCalc", streamTableNode(left), term("select", "a", "lrtime")),
+          unaryNode("DataStreamCalc", streamTableNode(right), term("select", "d", "e", "rrtime")),
+          term(
+            "where",
+            "AND(=(a, d), >=(CAST(lrtime), " +
+              "-(CAST(rrtime), 300000:INTERVAL DAY TO SECOND)), " +
+              "<(CAST(lrtime), +(CAST(rrtime), 3000:INTERVAL DAY TO SECOND)))"),
           term("join", "a", "lrtime", "d", "e", "rrtime"),
-          term("joinType", "LeftOuterJoin")
-        ),
-        term("select", "a", "e", "lrtime")
-      )
+          term("joinType", "LeftOuterJoin")),
+        term("select", "a", "e", "lrtime"))
     util.verifyTable(resultTable, expected)
   }
 
@@ -219,24 +189,16 @@ class JoinTest extends TableTestBase {
         "DataStreamCalc",
         binaryNode(
           "DataStreamWindowJoin",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(left),
-            term("select", "a", "lptime")
-          ),
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(right),
-            term("select", "d", "e", "rptime")
-          ),
-          term("where", "AND(=(a, d), >=(PROCTIME(lptime), " +
-            "-(PROCTIME(rptime), 1000:INTERVAL DAY TO SECOND)), " +
-            "<(PROCTIME(lptime), PROCTIME(rptime)))"),
+          unaryNode("DataStreamCalc", streamTableNode(left), term("select", "a", "lptime")),
+          unaryNode("DataStreamCalc", streamTableNode(right), term("select", "d", "e", "rptime")),
+          term(
+            "where",
+            "AND(=(a, d), >=(PROCTIME(lptime), " +
+              "-(PROCTIME(rptime), 1000:INTERVAL DAY TO SECOND)), " +
+              "<(PROCTIME(lptime), PROCTIME(rptime)))"),
           term("join", "a", "lptime", "d", "e", "rptime"),
-          term("joinType", "LeftOuterJoin")
-        ),
-        term("select", "a", "e", "PROCTIME(lptime) AS lptime")
-      )
+          term("joinType", "LeftOuterJoin")),
+        term("select", "a", "e", "PROCTIME(lptime) AS lptime"))
     util.verifyTable(resultTable, expected)
   }
 
@@ -258,24 +220,16 @@ class JoinTest extends TableTestBase {
         "DataStreamCalc",
         binaryNode(
           "DataStreamWindowJoin",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(left),
-            term("select", "a", "lrtime")
-          ),
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(right),
-            term("select", "d", "e", "rrtime")
-          ),
-          term("where", "AND(=(a, d), >=(CAST(lrtime)," +
-            " -(CAST(rrtime), 300000:INTERVAL DAY TO SECOND))," +
-            " <(CAST(lrtime), +(CAST(rrtime), 3000:INTERVAL DAY TO SECOND)))"),
+          unaryNode("DataStreamCalc", streamTableNode(left), term("select", "a", "lrtime")),
+          unaryNode("DataStreamCalc", streamTableNode(right), term("select", "d", "e", "rrtime")),
+          term(
+            "where",
+            "AND(=(a, d), >=(CAST(lrtime)," +
+              " -(CAST(rrtime), 300000:INTERVAL DAY TO SECOND))," +
+              " <(CAST(lrtime), +(CAST(rrtime), 3000:INTERVAL DAY TO SECOND)))"),
           term("join", "a", "lrtime", "d", "e", "rrtime"),
-          term("joinType", "RightOuterJoin")
-        ),
-        term("select", "a", "e", "lrtime")
-      )
+          term("joinType", "RightOuterJoin")),
+        term("select", "a", "e", "lrtime"))
     util.verifyTable(resultTable, expected)
   }
 
@@ -294,24 +248,16 @@ class JoinTest extends TableTestBase {
         "DataStreamCalc",
         binaryNode(
           "DataStreamWindowJoin",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(left),
-            term("select", "a", "lptime")
-          ),
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(right),
-            term("select", "d", "e", "rptime")
-          ),
-          term("where", "AND(=(a, d), >=(PROCTIME(lptime), " +
-            "-(PROCTIME(rptime), 1000:INTERVAL DAY TO SECOND)), " +
-            "<(PROCTIME(lptime), PROCTIME(rptime)))"),
+          unaryNode("DataStreamCalc", streamTableNode(left), term("select", "a", "lptime")),
+          unaryNode("DataStreamCalc", streamTableNode(right), term("select", "d", "e", "rptime")),
+          term(
+            "where",
+            "AND(=(a, d), >=(PROCTIME(lptime), " +
+              "-(PROCTIME(rptime), 1000:INTERVAL DAY TO SECOND)), " +
+              "<(PROCTIME(lptime), PROCTIME(rptime)))"),
           term("join", "a", "lptime", "d", "e", "rptime"),
-          term("joinType", "RightOuterJoin")
-        ),
-        term("select", "a", "e", "PROCTIME(lptime) AS lptime")
-      )
+          term("joinType", "RightOuterJoin")),
+        term("select", "a", "e", "PROCTIME(lptime) AS lptime"))
     util.verifyTable(resultTable, expected)
   }
 
@@ -333,24 +279,16 @@ class JoinTest extends TableTestBase {
         "DataStreamCalc",
         binaryNode(
           "DataStreamWindowJoin",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(left),
-            term("select", "a", "lrtime")
-          ),
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(right),
-            term("select", "d", "e", "rrtime")
-          ),
-          term("where", "AND(=(a, d), >=(CAST(lrtime), " +
-            "-(CAST(rrtime), 300000:INTERVAL DAY TO SECOND))," +
-            " <(CAST(lrtime), +(CAST(rrtime), 3000:INTERVAL DAY TO SECOND)))"),
+          unaryNode("DataStreamCalc", streamTableNode(left), term("select", "a", "lrtime")),
+          unaryNode("DataStreamCalc", streamTableNode(right), term("select", "d", "e", "rrtime")),
+          term(
+            "where",
+            "AND(=(a, d), >=(CAST(lrtime), " +
+              "-(CAST(rrtime), 300000:INTERVAL DAY TO SECOND))," +
+              " <(CAST(lrtime), +(CAST(rrtime), 3000:INTERVAL DAY TO SECOND)))"),
           term("join", "a", "lrtime", "d", "e", "rrtime"),
-          term("joinType", "FullOuterJoin")
-        ),
-        term("select", "a", "e", "lrtime")
-      )
+          term("joinType", "FullOuterJoin")),
+        term("select", "a", "e", "lrtime"))
     util.verifyTable(resultTable, expected)
   }
 
@@ -369,24 +307,16 @@ class JoinTest extends TableTestBase {
         "DataStreamCalc",
         binaryNode(
           "DataStreamWindowJoin",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(left),
-            term("select", "a", "lptime")
-          ),
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(right),
-            term("select", "d", "e", "rptime")
-          ),
-          term("where", "AND(=(a, d), >=(PROCTIME(lptime), -(PROCTIME(rptime), " +
-            "1000:INTERVAL DAY TO SECOND)), " +
-            "<(PROCTIME(lptime), PROCTIME(rptime)))"),
+          unaryNode("DataStreamCalc", streamTableNode(left), term("select", "a", "lptime")),
+          unaryNode("DataStreamCalc", streamTableNode(right), term("select", "d", "e", "rptime")),
+          term(
+            "where",
+            "AND(=(a, d), >=(PROCTIME(lptime), -(PROCTIME(rptime), " +
+              "1000:INTERVAL DAY TO SECOND)), " +
+              "<(PROCTIME(lptime), PROCTIME(rptime)))"),
           term("join", "a", "lptime", "d", "e", "rptime"),
-          term("joinType", "FullOuterJoin")
-        ),
-        term("select", "a", "e", "PROCTIME(lptime) AS lptime")
-      )
+          term("joinType", "FullOuterJoin")),
+        term("select", "a", "e", "PROCTIME(lptime) AS lptime"))
     util.verifyTable(resultTable, expected)
   }
 
@@ -397,7 +327,8 @@ class JoinTest extends TableTestBase {
     val left = util.addTable[(Long, Int, String)]('a, 'b, 'c, 'lrtime.rowtime)
     val right = util.addTable[(Long, Int, String)]('d, 'e, 'f, 'rrtime.rowtime)
 
-    val resultTable = left.leftOuterJoin(right)
+    val resultTable = left
+      .leftOuterJoin(right)
       .where('a === 'd && 'lrtime >= 'rrtime - 5.minutes && 'lrtime < 'rrtime + 3.seconds)
       .select('a, 'e, 'lrtime)
 
@@ -406,29 +337,21 @@ class JoinTest extends TableTestBase {
         "DataStreamCalc",
         binaryNode(
           "DataStreamWindowJoin",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(left),
-            term("select", "a", "lrtime")
-          ),
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(right),
-            term("select", "d", "e", "rrtime")
-          ),
-          term("where", "AND(=(a, d), >=(CAST(lrtime)," +
-            " -(CAST(rrtime), 300000:INTERVAL DAY TO SECOND))," +
-            " <(CAST(lrtime), +(CAST(rrtime), 3000:INTERVAL DAY TO SECOND)))"),
+          unaryNode("DataStreamCalc", streamTableNode(left), term("select", "a", "lrtime")),
+          unaryNode("DataStreamCalc", streamTableNode(right), term("select", "d", "e", "rrtime")),
+          term(
+            "where",
+            "AND(=(a, d), >=(CAST(lrtime)," +
+              " -(CAST(rrtime), 300000:INTERVAL DAY TO SECOND))," +
+              " <(CAST(lrtime), +(CAST(rrtime), 3000:INTERVAL DAY TO SECOND)))"),
           term("join", "a", "lrtime", "d", "e", "rrtime"),
           // Since we filter on attributes of the left table after the join, the left outer join
           // will be automatically optimized to inner join.
-          term("joinType", "InnerJoin")
-        ),
-        term("select", "a", "e", "lrtime")
-      )
+          term("joinType", "InnerJoin")),
+        term("select", "a", "e", "lrtime"))
     util.verifyTable(resultTable, expected)
   }
-  
+
   @Test
   def testLeftOuterJoinEquiPred(): Unit = {
     val util = streamTestUtil()
@@ -441,22 +364,12 @@ class JoinTest extends TableTestBase {
       "DataStreamCalc",
       binaryNode(
         "DataStreamJoin",
-        unaryNode(
-          "DataStreamCalc",
-          streamTableNode(t),
-          term("select", "a", "b")
-        ),
-        unaryNode(
-          "DataStreamCalc",
-          streamTableNode(s),
-          term("select", "y", "z")
-        ),
+        unaryNode("DataStreamCalc", streamTableNode(t), term("select", "a", "b")),
+        unaryNode("DataStreamCalc", streamTableNode(s), term("select", "y", "z")),
         term("where", "=(a, z)"),
         term("join", "a", "b", "y", "z"),
-        term("joinType", "LeftOuterJoin")
-      ),
-      term("select", "b", "y")
-    )
+        term("joinType", "LeftOuterJoin")),
+      term("select", "b", "y"))
 
     util.verifyTable(joined, expected)
   }
@@ -473,22 +386,12 @@ class JoinTest extends TableTestBase {
       "DataStreamCalc",
       binaryNode(
         "DataStreamJoin",
-        unaryNode(
-          "DataStreamCalc",
-          streamTableNode(t),
-          term("select", "a", "b")
-        ),
-        unaryNode(
-          "DataStreamCalc",
-          streamTableNode(s),
-          term("select", "y", "z")
-        ),
+        unaryNode("DataStreamCalc", streamTableNode(t), term("select", "a", "b")),
+        unaryNode("DataStreamCalc", streamTableNode(s), term("select", "y", "z")),
         term("where", "AND(=(a, z), <(b, 2))"),
         term("join", "a", "b", "y", "z"),
-        term("joinType", "LeftOuterJoin")
-      ),
-      term("select", "b", "y")
-    )
+        term("joinType", "LeftOuterJoin")),
+      term("select", "b", "y"))
 
     util.verifyTable(joined, expected)
   }
@@ -505,18 +408,12 @@ class JoinTest extends TableTestBase {
       "DataStreamCalc",
       binaryNode(
         "DataStreamJoin",
-        unaryNode(
-          "DataStreamCalc",
-          streamTableNode(t),
-          term("select", "a", "b")
-        ),
+        unaryNode("DataStreamCalc", streamTableNode(t), term("select", "a", "b")),
         streamTableNode(s),
         term("where", "AND(=(a, z), <(b, x))"),
         term("join", "a", "b", "x", "y", "z"),
-        term("joinType", "LeftOuterJoin")
-      ),
-      term("select", "b", "y")
-    )
+        term("joinType", "LeftOuterJoin")),
+      term("select", "b", "y"))
 
     util.verifyTable(joined, expected)
   }
@@ -533,22 +430,12 @@ class JoinTest extends TableTestBase {
       "DataStreamCalc",
       binaryNode(
         "DataStreamJoin",
-        unaryNode(
-          "DataStreamCalc",
-          streamTableNode(t),
-          term("select", "a", "b")
-        ),
-        unaryNode(
-          "DataStreamCalc",
-          streamTableNode(s),
-          term("select", "y", "z")
-        ),
+        unaryNode("DataStreamCalc", streamTableNode(t), term("select", "a", "b")),
+        unaryNode("DataStreamCalc", streamTableNode(s), term("select", "y", "z")),
         term("where", "=(a, z)"),
         term("join", "a", "b", "y", "z"),
-        term("joinType", "RightOuterJoin")
-      ),
-      term("select", "b", "y")
-    )
+        term("joinType", "RightOuterJoin")),
+      term("select", "b", "y"))
 
     util.verifyTable(joined, expected)
   }
@@ -565,22 +452,12 @@ class JoinTest extends TableTestBase {
       "DataStreamCalc",
       binaryNode(
         "DataStreamJoin",
-        unaryNode(
-          "DataStreamCalc",
-          streamTableNode(t),
-          term("select", "a", "b")
-        ),
-        unaryNode(
-          "DataStreamCalc",
-          streamTableNode(s),
-          term("select", "x", "z")
-        ),
+        unaryNode("DataStreamCalc", streamTableNode(t), term("select", "a", "b")),
+        unaryNode("DataStreamCalc", streamTableNode(s), term("select", "x", "z")),
         term("where", "AND(=(a, z), <(x, 2))"),
         term("join", "a", "b", "x", "z"),
-        term("joinType", "RightOuterJoin")
-      ),
-      term("select", "b", "x")
-    )
+        term("joinType", "RightOuterJoin")),
+      term("select", "b", "x"))
 
     util.verifyTable(joined, expected)
   }
@@ -597,18 +474,12 @@ class JoinTest extends TableTestBase {
       "DataStreamCalc",
       binaryNode(
         "DataStreamJoin",
-        unaryNode(
-          "DataStreamCalc",
-          streamTableNode(t),
-          term("select", "a", "b")
-        ),
+        unaryNode("DataStreamCalc", streamTableNode(t), term("select", "a", "b")),
         streamTableNode(s),
         term("where", "AND(=(a, z), <(b, x))"),
         term("join", "a", "b", "x", "y", "z"),
-        term("joinType", "RightOuterJoin")
-      ),
-      term("select", "b", "y")
-    )
+        term("joinType", "RightOuterJoin")),
+      term("select", "b", "y"))
 
     util.verifyTable(joined, expected)
   }

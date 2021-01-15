@@ -17,7 +17,12 @@
  */
 package org.apache.flink.table.planner.expressions
 
-import org.apache.flink.api.common.typeinfo.{BasicTypeInfo, LocalTimeTypeInfo, SqlTimeTypeInfo, TypeInformation}
+import org.apache.flink.api.common.typeinfo.{
+  BasicTypeInfo,
+  LocalTimeTypeInfo,
+  SqlTimeTypeInfo,
+  TypeInformation
+}
 import org.apache.flink.table.typeutils.TimeIntervalTypeInfo
 
 import java.sql.{Date, Time, Timestamp}
@@ -28,44 +33,44 @@ object Literal {
   private[flink] val UTC = TimeZone.getTimeZone("UTC")
 
   private[flink] def apply(l: Any): Literal = l match {
-    case i: Int => Literal(i, BasicTypeInfo.INT_TYPE_INFO)
-    case s: Short => Literal(s, BasicTypeInfo.SHORT_TYPE_INFO)
-    case b: Byte => Literal(b, BasicTypeInfo.BYTE_TYPE_INFO)
-    case l: Long => Literal(l, BasicTypeInfo.LONG_TYPE_INFO)
-    case d: Double => Literal(d, BasicTypeInfo.DOUBLE_TYPE_INFO)
-    case f: Float => Literal(f, BasicTypeInfo.FLOAT_TYPE_INFO)
-    case str: String => Literal(str, BasicTypeInfo.STRING_TYPE_INFO)
-    case bool: Boolean => Literal(bool, BasicTypeInfo.BOOLEAN_TYPE_INFO)
+    case i: Int                        => Literal(i, BasicTypeInfo.INT_TYPE_INFO)
+    case s: Short                      => Literal(s, BasicTypeInfo.SHORT_TYPE_INFO)
+    case b: Byte                       => Literal(b, BasicTypeInfo.BYTE_TYPE_INFO)
+    case l: Long                       => Literal(l, BasicTypeInfo.LONG_TYPE_INFO)
+    case d: Double                     => Literal(d, BasicTypeInfo.DOUBLE_TYPE_INFO)
+    case f: Float                      => Literal(f, BasicTypeInfo.FLOAT_TYPE_INFO)
+    case str: String                   => Literal(str, BasicTypeInfo.STRING_TYPE_INFO)
+    case bool: Boolean                 => Literal(bool, BasicTypeInfo.BOOLEAN_TYPE_INFO)
     case javaDec: java.math.BigDecimal => Literal(javaDec, BasicTypeInfo.BIG_DEC_TYPE_INFO)
     case scalaDec: scala.math.BigDecimal =>
       Literal(scalaDec.bigDecimal, BasicTypeInfo.BIG_DEC_TYPE_INFO)
-    case sqlDate: Date => Literal(sqlDate, SqlTimeTypeInfo.DATE)
-    case sqlTime: Time => Literal(sqlTime, SqlTimeTypeInfo.TIME)
-    case sqlTimestamp: Timestamp => Literal(sqlTimestamp, SqlTimeTypeInfo.TIMESTAMP)
-    case localDate: LocalDate => Literal(localDate, LocalTimeTypeInfo.LOCAL_DATE)
-    case localTime: jLocalTime => Literal(localTime, LocalTimeTypeInfo.LOCAL_TIME)
+    case sqlDate: Date                => Literal(sqlDate, SqlTimeTypeInfo.DATE)
+    case sqlTime: Time                => Literal(sqlTime, SqlTimeTypeInfo.TIME)
+    case sqlTimestamp: Timestamp      => Literal(sqlTimestamp, SqlTimeTypeInfo.TIMESTAMP)
+    case localDate: LocalDate         => Literal(localDate, LocalTimeTypeInfo.LOCAL_DATE)
+    case localTime: jLocalTime        => Literal(localTime, LocalTimeTypeInfo.LOCAL_TIME)
     case localDateTime: LocalDateTime => Literal(localDateTime, LocalTimeTypeInfo.LOCAL_DATE_TIME)
   }
 }
 
 case class Literal(value: Any, resultType: TypeInformation[_]) extends LeafExpression {
   override def toString: String = resultType match {
-    case _: BasicTypeInfo[_] => value.toString
-    case _@SqlTimeTypeInfo.DATE => value.toString + ".toDate"
-    case _@SqlTimeTypeInfo.TIME => value.toString + ".toTime"
-    case _@SqlTimeTypeInfo.TIMESTAMP => value.toString + ".toTimestamp"
-    case _@TimeIntervalTypeInfo.INTERVAL_MILLIS => value.toString + ".millis"
-    case _@TimeIntervalTypeInfo.INTERVAL_MONTHS => value.toString + ".months"
-    case _ => s"Literal($value, $resultType)"
+    case _: BasicTypeInfo[_]                     => value.toString
+    case _ @SqlTimeTypeInfo.DATE                 => value.toString + ".toDate"
+    case _ @SqlTimeTypeInfo.TIME                 => value.toString + ".toTime"
+    case _ @SqlTimeTypeInfo.TIMESTAMP            => value.toString + ".toTimestamp"
+    case _ @TimeIntervalTypeInfo.INTERVAL_MILLIS => value.toString + ".millis"
+    case _ @TimeIntervalTypeInfo.INTERVAL_MONTHS => value.toString + ".months"
+    case _                                       => s"Literal($value, $resultType)"
   }
 
   /**
-    * Convert a Date value to a Calendar. Calcite's fromCalendarField functions use the
-    * Calendar.get methods, so the raw values of the individual fields are preserved when
-    * converted to the String formats.
-    *
-    * @return get the Calendar value
-    */
+   * Convert a Date value to a Calendar. Calcite's fromCalendarField functions use the
+   * Calendar.get methods, so the raw values of the individual fields are preserved when
+   * converted to the String formats.
+   *
+   * @return get the Calendar value
+   */
   private def valueAsCalendar: Calendar = {
     val date = value.asInstanceOf[java.util.Date]
     val cal = Calendar.getInstance

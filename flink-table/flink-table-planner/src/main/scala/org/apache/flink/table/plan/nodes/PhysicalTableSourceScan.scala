@@ -34,11 +34,12 @@ abstract class PhysicalTableSourceScan(
     tableSchema: TableSchema,
     tableSource: TableSource[_],
     val selectedFields: Option[Array[Int]])
-  extends TableScan(cluster, traitSet, table) {
+    extends TableScan(cluster, traitSet, table) {
 
   override def explainTerms(pw: RelWriter): RelWriter = {
-    val terms = super.explainTerms(pw)
-        .item("fields", deriveRowType().getFieldNames.asScala.mkString(", "))
+    val terms = super
+      .explainTerms(pw)
+      .item("fields", deriveRowType().getFieldNames.asScala.mkString(", "))
 
     val sourceDesc = tableSource.explainSource()
     if (sourceDesc.nonEmpty) {

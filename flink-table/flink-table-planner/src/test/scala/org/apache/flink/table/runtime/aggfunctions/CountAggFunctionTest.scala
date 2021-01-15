@@ -24,14 +24,13 @@ import org.apache.flink.table.functions.AggregateFunction
 import org.apache.flink.table.functions.aggfunctions.{CountAccumulator, CountAggFunction}
 
 /**
-  * Test case for built-in count aggregate function
-  */
+ * Test case for built-in count aggregate function
+ */
 class CountAggFunctionTest extends AggFunctionTestBase[JLong, CountAccumulator] {
 
   override def inputValueSets: Seq[Seq[_]] = Seq(
     Seq("a", "b", null, "c", null, "d", "e", null, "f"),
-    Seq(null, null, null, null, null, null)
-  )
+    Seq(null, null, null, null, null, null))
 
   override def expectedResults: Seq[JLong] = Seq(6L, 0L)
 

@@ -26,17 +26,15 @@ import org.apache.flink.types.IntValue
 
 object Tasks {
 
-  class Forwarder(environment: Environment)
-    extends AbstractInvokable(environment) {
+  class Forwarder(environment: Environment) extends AbstractInvokable(environment) {
 
     override def invoke(): Unit = {
       val reader = new RecordReader[IntValue](
         getEnvironment.getInputGate(0),
         classOf[IntValue],
         getEnvironment.getTaskManagerInfo.getTmpDirectories)
-      
-      val writer = new RecordWriterBuilder[IntValue]().build(
-        getEnvironment.getWriter(0))
+
+      val writer = new RecordWriterBuilder[IntValue]().build(getEnvironment.getWriter(0))
 
       try {
         while (true) {
@@ -56,40 +54,37 @@ object Tasks {
     }
   }
 
-  class AgnosticReceiver(environment: Environment)
-    extends AbstractInvokable(environment) {
+  class AgnosticReceiver(environment: Environment) extends AbstractInvokable(environment) {
 
     override def invoke(): Unit = {
-      val reader= new RecordReader[IntValue](
+      val reader = new RecordReader[IntValue](
         getEnvironment.getInputGate(0),
         classOf[IntValue],
         getEnvironment.getTaskManagerInfo.getTmpDirectories)
 
-      while(reader.next() != null){}
+      while (reader.next() != null) {}
     }
   }
 
-  class AgnosticBinaryReceiver(environment: Environment)
-    extends AbstractInvokable(environment) {
+  class AgnosticBinaryReceiver(environment: Environment) extends AbstractInvokable(environment) {
 
     override def invoke(): Unit = {
       val reader1 = new RecordReader[IntValue](
         getEnvironment.getInputGate(0),
         classOf[IntValue],
         getEnvironment.getTaskManagerInfo.getTmpDirectories)
-      
+
       val reader2 = new RecordReader[IntValue](
         getEnvironment.getInputGate(1),
         classOf[IntValue],
         getEnvironment.getTaskManagerInfo.getTmpDirectories)
 
-      while(reader1.next() != null){}
-      while(reader2.next() != null){}
+      while (reader1.next() != null) {}
+      while (reader2.next() != null) {}
     }
   }
 
-  class AgnosticTertiaryReceiver(environment: Environment)
-    extends AbstractInvokable(environment) {
+  class AgnosticTertiaryReceiver(environment: Environment) extends AbstractInvokable(environment) {
 
     override def invoke(): Unit = {
       val env = getEnvironment
@@ -98,54 +93,47 @@ object Tasks {
         env.getInputGate(0),
         classOf[IntValue],
         getEnvironment.getTaskManagerInfo.getTmpDirectories)
-      
+
       val reader2 = new RecordReader[IntValue](
         env.getInputGate(1),
         classOf[IntValue],
         getEnvironment.getTaskManagerInfo.getTmpDirectories)
-      
+
       val reader3 = new RecordReader[IntValue](
         env.getInputGate(2),
         classOf[IntValue],
         getEnvironment.getTaskManagerInfo.getTmpDirectories)
 
-      while(reader1.next() != null){}
-      while(reader2.next() != null){}
-      while(reader3.next() != null){}
+      while (reader1.next() != null) {}
+      while (reader2.next() != null) {}
+      while (reader3.next() != null) {}
     }
   }
 
-  class ExceptionSender(environment: Environment)
-    extends AbstractInvokable(environment) {
+  class ExceptionSender(environment: Environment) extends AbstractInvokable(environment) {
 
     override def invoke(): Unit = {
       throw new Exception("Test exception")
     }
   }
 
-  class ExceptionReceiver(environment: Environment)
-    extends AbstractInvokable(environment) {
+  class ExceptionReceiver(environment: Environment) extends AbstractInvokable(environment) {
 
     override def invoke(): Unit = {
       throw new Exception("Test exception")
     }
   }
 
-  class InstantiationErrorSender(environment: Environment)
-    extends AbstractInvokable(environment) {
+  class InstantiationErrorSender(environment: Environment) extends AbstractInvokable(environment) {
     throw new RuntimeException("Test exception in constructor")
 
-    override def invoke(): Unit = {
-    }
+    override def invoke(): Unit = {}
   }
 
-  class BlockingReceiver(environment: Environment)
-    extends AbstractInvokable(environment) {
+  class BlockingReceiver(environment: Environment) extends AbstractInvokable(environment) {
     override def invoke(): Unit = {
       val o = new Object
-      o.synchronized(
-        o.wait()
-      )
+      o.synchronized(o.wait())
     }
   }
 }

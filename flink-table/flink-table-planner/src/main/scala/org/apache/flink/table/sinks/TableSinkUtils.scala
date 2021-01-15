@@ -27,22 +27,21 @@ import java.util.{Map => JMap}
 object TableSinkUtils {
 
   /**
-    * Checks if the given [[QueryOperation]] can be written to the given [[TableSink]].
-    * It checks if the names & the field types match. If this sink is a [[PartitionableTableSink]],
-    * it will also validate the partitions.
-    *
-    * @param staticPartitions Static partitions of the sink if there exists any.
-    * @param query            The query that is supposed to be written.
-    * @param objectIdentifier The path of the sink. It is needed just for logging. It does not
-    *                         participate in the validation.
-    * @param sink             The sink that we want to write to.
-    */
+   * Checks if the given [[QueryOperation]] can be written to the given [[TableSink]].
+   * It checks if the names & the field types match. If this sink is a [[PartitionableTableSink]],
+   * it will also validate the partitions.
+   *
+   * @param staticPartitions Static partitions of the sink if there exists any.
+   * @param query            The query that is supposed to be written.
+   * @param objectIdentifier The path of the sink. It is needed just for logging. It does not
+   *                         participate in the validation.
+   * @param sink             The sink that we want to write to.
+   */
   def validateSink(
       staticPartitions: JMap[String, String],
       query: QueryOperation,
       objectIdentifier: ObjectIdentifier,
-      sink: TableSink[_])
-    : Unit = {
+      sink: TableSink[_]): Unit = {
     // validate schema of source table and table sink
     val srcFieldTypes = query.getTableSchema.getFieldTypes
     val sinkFieldTypes = sink.getTableSchema.getFieldTypes
@@ -54,10 +53,12 @@ object TableSinkUtils {
       val sinkFieldNames = sink.getTableSchema.getFieldNames
 
       // format table and table sink schema strings
-      val srcSchema = srcFieldNames.zip(srcFieldTypes)
+      val srcSchema = srcFieldNames
+        .zip(srcFieldTypes)
         .map { case (n, t) => s"$n: $t" }
         .mkString("[", ", ", "]")
-      val sinkSchema = sinkFieldNames.zip(sinkFieldTypes)
+      val sinkSchema = sinkFieldNames
+        .zip(sinkFieldTypes)
         .map { case (n, t) => s"$n: $t" }
         .mkString("[", ", ", "]")
 
@@ -73,7 +74,7 @@ object TableSinkUtils {
         "A partitioned sink should implement 'PartitionableTableSink'."
       sink match {
         case _: PartitionableTableSink =>
-        case _ => throw new ValidationException(invalidMsg)
+        case _                         => throw new ValidationException(invalidMsg)
       }
     }
   }

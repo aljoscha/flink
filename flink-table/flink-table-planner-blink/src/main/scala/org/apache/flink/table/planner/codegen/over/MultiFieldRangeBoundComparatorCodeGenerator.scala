@@ -27,8 +27,8 @@ import org.apache.flink.table.runtime.generated.{GeneratedRecordComparator, Reco
 import org.apache.flink.table.types.logical.RowType
 
 /**
-  * RANGE allow the compound ORDER BY and the random type when the bound is current row.
-  */
+ * RANGE allow the compound ORDER BY and the random type when the bound is current row.
+ */
 class MultiFieldRangeBoundComparatorCodeGenerator(
     conf: TableConfig,
     inputType: RowType,
@@ -77,4 +77,3 @@ class MultiFieldRangeBoundComparatorCodeGenerator(
     new GeneratedRecordComparator(className, code, ctx.references.toArray)
   }
 }
-

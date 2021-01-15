@@ -43,19 +43,19 @@ abstract class BatchPhysicalSortWindowAggregateBase(
     enableAssignPane: Boolean = false,
     isMerge: Boolean,
     isFinal: Boolean)
-  extends BatchPhysicalWindowAggregateBase(
-    cluster,
-    traitSet,
-    inputRel,
-    outputRowType,
-    grouping,
-    auxGrouping,
-    aggCallToAggFunction,
-    window,
-    namedProperties,
-    enableAssignPane,
-    isMerge,
-    isFinal) {
+    extends BatchPhysicalWindowAggregateBase(
+      cluster,
+      traitSet,
+      inputRel,
+      outputRowType,
+      grouping,
+      auxGrouping,
+      aggCallToAggFunction,
+      window,
+      namedProperties,
+      enableAssignPane,
+      isMerge,
+      isFinal) {
 
   override def computeSelfCost(planner: RelOptPlanner, mq: RelMetadataQuery): RelOptCost = {
     val inputRowCnt = mq.getRowCount(getInput)

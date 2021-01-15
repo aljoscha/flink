@@ -55,28 +55,26 @@ class CatalogViewITCase(isStreamingMode: Boolean) extends AbstractTestBase {
 
   @Before
   def before(): Unit = {
-    tableEnv.getConfig.getConfiguration.setBoolean(
-      TableConfigOptions.TABLE_DYNAMIC_TABLE_OPTIONS_ENABLED,
-      true)
+    tableEnv.getConfig.getConfiguration
+      .setBoolean(TableConfigOptions.TABLE_DYNAMIC_TABLE_OPTIONS_ENABLED, true)
 
-    tableEnv.getConfig
-      .getConfiguration
+    tableEnv.getConfig.getConfiguration
       .setInteger(ExecutionConfigOptions.TABLE_EXEC_RESOURCE_DEFAULT_PARALLELISM, 1)
     TestCollectionTableFactory.reset()
   }
 
   //~ Tools ------------------------------------------------------------------
 
-  implicit def rowOrdering: Ordering[Row] = Ordering.by((r : Row) => {
+  implicit def rowOrdering: Ordering[Row] = Ordering.by((r: Row) => {
     val builder = new StringBuilder
-    0 until r.getArity foreach(idx => builder.append(r.getField(idx)))
+    0 until r.getArity foreach (idx => builder.append(r.getField(idx)))
     builder.toString()
   })
 
-  def toRow(args: Any*):Row = {
+  def toRow(args: Any*): Row = {
     val row = new Row(args.length)
-    0 until args.length foreach {
-      i => row.setField(i, args(i))
+    0 until args.length foreach { i =>
+      row.setField(i, args(i))
     }
     row
   }
@@ -319,4 +317,3 @@ object CatalogViewITCase {
     util.Arrays.asList(true, false)
   }
 }
-

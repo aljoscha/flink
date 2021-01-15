@@ -31,7 +31,7 @@ import scala.collection.JavaConverters._
  * Sample data for the [[WindowJoin]] example.
  */
 object WindowJoinSampleData {
-  
+
   private[join] val NAMES = Array("tom", "jerry", "alice", "bob", "john", "grace")
   private[join] val GRADE_COUNT = 5
   private[join] val SALARY_MAX = 10000
@@ -40,7 +40,7 @@ object WindowJoinSampleData {
    * Continuously generates (name, grade).
    */
   def getGradeSource(env: StreamExecutionEnvironment, rate: Long): DataStream[Grade] = {
-      env.fromCollection(new ThrottledIterator(new GradeSource().asJava, rate).asScala)
+    env.fromCollection(new ThrottledIterator(new GradeSource().asJava, rate).asScala)
   }
 
   /**
@@ -49,11 +49,11 @@ object WindowJoinSampleData {
   def getSalarySource(env: StreamExecutionEnvironment, rate: Long): DataStream[Salary] = {
     env.fromCollection(new ThrottledIterator(new SalarySource().asJava, rate).asScala)
   }
-  
+
   // --------------------------------------------------------------------------
-  
+
   class GradeSource extends Iterator[Grade] with Serializable {
-    
+
     private[this] val rnd = new Random(hashCode())
 
     def hasNext: Boolean = true
@@ -62,7 +62,7 @@ object WindowJoinSampleData {
       Grade(NAMES(rnd.nextInt(NAMES.length)), rnd.nextInt(GRADE_COUNT) + 1)
     }
   }
-  
+
   class SalarySource extends Iterator[Salary] with Serializable {
 
     private[this] val rnd = new Random(hashCode())

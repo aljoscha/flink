@@ -91,7 +91,10 @@ class FlinkRelMdColumnOriginNullCountTest extends FlinkRelMdHandlerTestBase {
     // id <= 2
     val expr = relBuilder.call(LESS_THAN_OR_EQUAL, relBuilder.field(0), relBuilder.literal(2))
     val calc1 = createLogicalCalc(
-      studentLogicalScan, studentLogicalScan.getRowType, relBuilder.fields(), List(expr))
+      studentLogicalScan,
+      studentLogicalScan.getRowType,
+      relBuilder.fields(),
+      List(expr))
     (0 until calc1.getRowType.getFieldCount).foreach { idx =>
       assertNull(mq.getColumnOriginNullCount(calc1, idx))
     }
@@ -115,8 +118,11 @@ class FlinkRelMdColumnOriginNullCountTest extends FlinkRelMdHandlerTestBase {
 
   @Test
   def testGetColumnOriginNullCountOnJoin(): Unit = {
-    val innerJoin1 = relBuilder.scan("MyTable3").scan("MyTable4")
-      .join(JoinRelType.INNER,
+    val innerJoin1 = relBuilder
+      .scan("MyTable3")
+      .scan("MyTable4")
+      .join(
+        JoinRelType.INNER,
         relBuilder.call(EQUALS, relBuilder.field(2, 0, 1), relBuilder.field(2, 1, 1)))
       .build
     assertEquals(1.0, mq.getColumnOriginNullCount(innerJoin1, 0))
@@ -124,8 +130,11 @@ class FlinkRelMdColumnOriginNullCountTest extends FlinkRelMdHandlerTestBase {
     assertEquals(0.0, mq.getColumnOriginNullCount(innerJoin1, 2))
     assertEquals(0.0, mq.getColumnOriginNullCount(innerJoin1, 3))
 
-    val innerJoin2 = relBuilder.scan("MyTable3").scan("MyTable4")
-      .join(JoinRelType.INNER,
+    val innerJoin2 = relBuilder
+      .scan("MyTable3")
+      .scan("MyTable4")
+      .join(
+        JoinRelType.INNER,
         relBuilder.call(EQUALS, relBuilder.field(2, 0, 0), relBuilder.field(2, 1, 0)))
       .build
     assertEquals(0.0, mq.getColumnOriginNullCount(innerJoin2, 0))
@@ -133,8 +142,11 @@ class FlinkRelMdColumnOriginNullCountTest extends FlinkRelMdHandlerTestBase {
     assertEquals(0.0, mq.getColumnOriginNullCount(innerJoin2, 2))
     assertEquals(0.0, mq.getColumnOriginNullCount(innerJoin2, 3))
 
-    Array(logicalLeftJoinOnUniqueKeys, logicalRightJoinNotOnUniqueKeys,
-      logicalFullJoinWithEquiAndNonEquiCond, logicalSemiJoinNotOnUniqueKeys,
+    Array(
+      logicalLeftJoinOnUniqueKeys,
+      logicalRightJoinNotOnUniqueKeys,
+      logicalFullJoinWithEquiAndNonEquiCond,
+      logicalSemiJoinNotOnUniqueKeys,
       logicalSemiJoinWithEquiAndNonEquiCond).foreach { join =>
       (0 until join.getRowType.getFieldCount).foreach { idx =>
         assertNull(mq.getColumnOriginNullCount(join, idx))

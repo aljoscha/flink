@@ -37,11 +37,11 @@ import scala.collection.JavaConverters._
  * else throw exception now
  */
 class StreamPhysicalOverAggregateRule
-  extends ConverterRule(
-    classOf[FlinkLogicalOverAggregate],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.STREAM_PHYSICAL,
-    "StreamPhysicalOverAggregateRule") {
+    extends ConverterRule(
+      classOf[FlinkLogicalOverAggregate],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.STREAM_PHYSICAL,
+      "StreamPhysicalOverAggregateRule") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val logicWindow: FlinkLogicalOverAggregate =

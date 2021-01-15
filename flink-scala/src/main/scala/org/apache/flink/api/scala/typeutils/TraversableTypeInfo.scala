@@ -31,7 +31,7 @@ import scala.collection.JavaConverters._
 abstract class TraversableTypeInfo[T <: TraversableOnce[E], E](
     val clazz: Class[T],
     val elementTypeInfo: TypeInformation[E])
-  extends TypeInformation[T] {
+    extends TypeInformation[T] {
 
   @PublicEvolving
   override def isBasicType: Boolean = false
@@ -56,8 +56,8 @@ abstract class TraversableTypeInfo[T <: TraversableOnce[E], E](
     other match {
       case traversable: TraversableTypeInfo[_, _] =>
         traversable.canEqual(this) &&
-        clazz == traversable.clazz &&
-        elementTypeInfo.equals(traversable.elementTypeInfo)
+          clazz == traversable.clazz &&
+          elementTypeInfo.equals(traversable.elementTypeInfo)
       case _ => false
     }
   }

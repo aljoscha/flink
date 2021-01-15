@@ -45,25 +45,14 @@ class SplitPythonConditionFromJoinRuleTest extends TableTestBase {
         "DataStreamPythonCalc",
         binaryNode(
           "DataStreamJoin",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(left),
-            term("select", "a", "b")
-          ),
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(right),
-            term("select", "d")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(left), term("select", "a", "b")),
+          unaryNode("DataStreamCalc", streamTableNode(right), term("select", "d")),
           term("where", "=(a, d)"),
           term("join", "a, b, d"),
-          term("joinType", "InnerJoin")
-        ),
-        term("select", "a", "b", "d", "pyFunc(a, d) AS f0")
-      ),
+          term("joinType", "InnerJoin")),
+        term("select", "a", "b", "d", "pyFunc(a, d) AS f0")),
       term("select", "a", "b", "d"),
-      term("where", "=(f0, b)")
-    )
+      term("where", "=(f0, b)"))
     util.verifyTable(result, expected)
   }
 
@@ -86,24 +75,14 @@ class SplitPythonConditionFromJoinRuleTest extends TableTestBase {
         "DataStreamPythonCalc",
         binaryNode(
           "DataStreamJoin",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(left),
-            term("select", "a", "b")),
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(right),
-            term("select", "d")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(left), term("select", "a", "b")),
+          unaryNode("DataStreamCalc", streamTableNode(right), term("select", "d")),
           term("where", "=(a, d)"),
           term("join", "a, b, d"),
-          term("joinType", "InnerJoin")
-        ),
-        term("select", "a", "b", "d", "pyFunc(a, d) AS f0", "pyFunc(a, b) AS f1")
-      ),
+          term("joinType", "InnerJoin")),
+        term("select", "a", "b", "d", "pyFunc(a, d) AS f0", "pyFunc(a, b) AS f1")),
       term("select", "+(a, 1) AS _c0, b, d"),
-      term("where", "AND(=(f0, +(a, b)), =(f1, *(b, d)))")
-    )
+      term("where", "AND(=(f0, +(a, b)), =(f1, *(b, d)))"))
 
     util.verifyTable(result, expected)
   }

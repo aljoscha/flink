@@ -26,7 +26,11 @@ import org.apache.flink.table.api.bridge.scala._
 import org.apache.flink.table.api.internal.TableEnvironmentInternal
 import org.apache.flink.table.runtime.utils.CommonTestData
 import org.apache.flink.table.utils.MemoryTableSourceSinkUtil
-import org.apache.flink.table.utils.TableTestUtil.{readFromResource, replaceStageId, streamTableNode}
+import org.apache.flink.table.utils.TableTestUtil.{
+  readFromResource,
+  replaceStageId,
+  streamTableNode
+}
 import org.apache.flink.test.util.AbstractTestBase
 
 import org.junit.Assert.assertEquals
@@ -73,14 +77,16 @@ class ExplainTest extends AbstractTestBase {
     val settings = EnvironmentSettings.newInstance().useOldPlanner().build()
     val tEnv = StreamTableEnvironment.create(env, settings)
 
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(
-      "sourceTable", CommonTestData.getCsvTableSource)
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSourceInternal("sourceTable", CommonTestData.getCsvTableSource)
 
     val fieldNames = Array("d", "e")
     val fieldTypes: Array[TypeInformation[_]] = Array(Types.STRING(), Types.INT())
     val sink = new MemoryTableSourceSinkUtil.UnsafeMemoryAppendTableSink
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSinkInternal(
-      "targetTable", sink.configure(fieldNames, fieldTypes))
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSinkInternal("targetTable", sink.configure(fieldNames, fieldTypes))
 
     tEnv.sqlUpdate("INSERT INTO targetTable SELECT first, id FROM sourceTable")
 
@@ -95,16 +101,19 @@ class ExplainTest extends AbstractTestBase {
     val settings = EnvironmentSettings.newInstance().useOldPlanner().build()
     val tEnv = StreamTableEnvironment.create(env, settings)
 
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(
-      "sourceTable", CommonTestData.getCsvTableSource)
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSourceInternal("sourceTable", CommonTestData.getCsvTableSource)
 
     val fieldNames = Array("d", "e")
     val fieldTypes: Array[TypeInformation[_]] = Array(Types.STRING(), Types.INT())
     val sink = new MemoryTableSourceSinkUtil.UnsafeMemoryAppendTableSink
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSinkInternal(
-      "targetTable1", sink.configure(fieldNames, fieldTypes))
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSinkInternal(
-      "targetTable2", sink.configure(fieldNames, fieldTypes))
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSinkInternal("targetTable1", sink.configure(fieldNames, fieldTypes))
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSinkInternal("targetTable2", sink.configure(fieldNames, fieldTypes))
 
     tEnv.sqlUpdate("INSERT INTO targetTable1 SELECT first, id FROM sourceTable")
     tEnv.sqlUpdate("INSERT INTO targetTable2 SELECT last, id FROM sourceTable")
@@ -121,16 +130,19 @@ class ExplainTest extends AbstractTestBase {
     val settings = EnvironmentSettings.newInstance().useOldPlanner().build()
     val tEnv = StreamTableEnvironment.create(env, settings)
 
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(
-      "sourceTable", CommonTestData.getCsvTableSource)
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSourceInternal("sourceTable", CommonTestData.getCsvTableSource)
 
     val fieldNames = Array("d", "e")
     val fieldTypes: Array[TypeInformation[_]] = Array(Types.STRING(), Types.INT())
     val sink = new MemoryTableSourceSinkUtil.UnsafeMemoryAppendTableSink
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSinkInternal(
-      "targetTable", sink.configure(fieldNames, fieldTypes))
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSinkInternal("targetTable", sink.configure(fieldNames, fieldTypes))
 
-    val actual = tEnv.explainSql("INSERT INTO targetTable SELECT first, id FROM sourceTable",
+    val actual = tEnv.explainSql(
+      "INSERT INTO targetTable SELECT first, id FROM sourceTable",
       ExplainDetail.JSON_EXECUTION_PLAN)
     val expected = readFromResource("testStreamTableEnvironmentExecutionExplain.out")
 
@@ -144,14 +156,16 @@ class ExplainTest extends AbstractTestBase {
     val settings = EnvironmentSettings.newInstance().useOldPlanner().build()
     val tEnv = StreamTableEnvironment.create(env, settings)
 
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(
-      "sourceTable", CommonTestData.getCsvTableSource)
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSourceInternal("sourceTable", CommonTestData.getCsvTableSource)
 
     val fieldNames = Array("d", "e")
     val fieldTypes: Array[TypeInformation[_]] = Array(Types.STRING(), Types.INT())
     val sink = new MemoryTableSourceSinkUtil.UnsafeMemoryAppendTableSink
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSinkInternal(
-      "targetTable", sink.configure(fieldNames, fieldTypes))
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSinkInternal("targetTable", sink.configure(fieldNames, fieldTypes))
 
     val statementSet = tEnv.createStatementSet()
     statementSet.addInsertSql("INSERT INTO targetTable SELECT first, id FROM sourceTable")
@@ -173,7 +187,8 @@ class ExplainTest extends AbstractTestBase {
   private def replaceSourceNode(s: String, t: Table, idx: Int): String = {
     replaceStageId(s)
       .replace(
-        s"%logicalSourceNode$idx%", streamTableNode(t)
+        s"%logicalSourceNode$idx%",
+        streamTableNode(t)
           .replace("DataStreamScan", "FlinkLogicalDataStreamScan"))
       .replace(s"%sourceNode$idx%", streamTableNode(t))
   }

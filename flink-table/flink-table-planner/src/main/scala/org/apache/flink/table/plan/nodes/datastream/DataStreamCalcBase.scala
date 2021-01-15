@@ -28,8 +28,8 @@ import org.apache.flink.table.plan.nodes.CommonCalc
 import org.apache.flink.table.plan.schema.RowSchema
 
 /**
-  * Base RelNode for data stream calc.
-  */
+ * Base RelNode for data stream calc.
+ */
 abstract class DataStreamCalcBase(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -38,9 +38,9 @@ abstract class DataStreamCalcBase(
     schema: RowSchema,
     calcProgram: RexProgram,
     ruleDescription: String)
-  extends Calc(cluster, traitSet, input, calcProgram)
-  with CommonCalc
-  with DataStreamRel {
+    extends Calc(cluster, traitSet, input, calcProgram)
+    with CommonCalc
+    with DataStreamRel {
 
   override def deriveRowType(): RelDataType = schema.relDataType
 
@@ -49,7 +49,8 @@ abstract class DataStreamCalcBase(
   override def explainTerms(pw: RelWriter): RelWriter = {
     pw.input("input", getInput)
       .item("select", selectionToString(calcProgram, getExpressionString))
-      .itemIf("where",
+      .itemIf(
+        "where",
         conditionToString(calcProgram, getExpressionString),
         calcProgram.getCondition != null)
   }

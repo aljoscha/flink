@@ -35,12 +35,12 @@ import org.apache.flink.util.Collector
 trait AllWindowFunction[IN, OUT, W <: Window] extends Function with Serializable {
 
   /**
-    * Evaluates the window and outputs none or several elements.
-    *
-    * @param window The window that is being evaluated.
-    * @param input  The elements in the window being evaluated.
-    * @param out    A collector for emitting elements.
-    * @throws Exception The function may throw exceptions to fail the program and trigger recovery.
-    */
+   * Evaluates the window and outputs none or several elements.
+   *
+   * @param window The window that is being evaluated.
+   * @param input  The elements in the window being evaluated.
+   * @param out    A collector for emitting elements.
+   * @throws Exception The function may throw exceptions to fail the program and trigger recovery.
+   */
   def apply(window: W, input: Iterable[IN], out: Collector[OUT])
 }

@@ -30,14 +30,14 @@ import org.apache.calcite.rel.RelNode
 import org.apache.calcite.rel.metadata.RelMetadataQuery
 
 /**
-  * Stream physical RelNode to read data from an external source defined by a [[StreamTableSource]].
-  */
+ * Stream physical RelNode to read data from an external source defined by a [[StreamTableSource]].
+ */
 class StreamPhysicalLegacyTableSourceScan(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
     tableSourceTable: LegacyTableSourceTable[_])
-  extends CommonPhysicalLegacyTableSourceScan(cluster, traitSet, tableSourceTable)
-  with StreamPhysicalRel {
+    extends CommonPhysicalLegacyTableSourceScan(cluster, traitSet, tableSourceTable)
+    with StreamPhysicalRel {
 
   override def requireWatermark: Boolean = false
 

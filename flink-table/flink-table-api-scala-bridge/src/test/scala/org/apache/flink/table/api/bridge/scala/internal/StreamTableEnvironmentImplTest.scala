@@ -48,12 +48,8 @@ class StreamTableEnvironmentImplTest {
     val table = tEnv.fromDataStream(elements)
     tEnv.toAppendStream[Row](table)
 
-    assertThat(
-      tEnv.getConfig.getMinIdleStateRetentionTime,
-      equalTo(retention.toMillis))
-    assertThat(
-      tEnv.getConfig.getMaxIdleStateRetentionTime,
-      equalTo(retention.toMillis * 3 / 2))
+    assertThat(tEnv.getConfig.getMinIdleStateRetentionTime, equalTo(retention.toMillis))
+    assertThat(tEnv.getConfig.getMaxIdleStateRetentionTime, equalTo(retention.toMillis * 3 / 2))
   }
 
   @Test
@@ -67,12 +63,8 @@ class StreamTableEnvironmentImplTest {
     val table = tEnv.fromDataStream(elements)
     tEnv.toRetractStream[Row](table)
 
-    assertThat(
-      tEnv.getConfig.getMinIdleStateRetentionTime,
-      equalTo(retention.toMillis))
-    assertThat(
-      tEnv.getConfig.getMaxIdleStateRetentionTime,
-      equalTo(retention.toMillis * 3 / 2))
+    assertThat(tEnv.getConfig.getMinIdleStateRetentionTime, equalTo(retention.toMillis))
+    assertThat(tEnv.getConfig.getMaxIdleStateRetentionTime, equalTo(retention.toMillis * 3 / 2))
   }
 
   private def getStreamTableEnvironment(
@@ -94,8 +86,7 @@ class StreamTableEnvironmentImplTest {
   }
 
   private class TestPlanner(transformation: Transformation[_]) extends PlannerMock {
-    override def translate(modifyOperations: JList[ModifyOperation])
-      : JList[Transformation[_]] = {
+    override def translate(modifyOperations: JList[ModifyOperation]): JList[Transformation[_]] = {
       Collections.singletonList(transformation)
     }
   }

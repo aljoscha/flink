@@ -25,17 +25,32 @@ import org.apache.flink.streaming.api.TimeCharacteristic
 import org.apache.flink.streaming.api.environment.LocalStreamEnvironment
 import org.apache.flink.streaming.api.functions.source.SourceFunction
 import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
-import org.apache.flink.table.api.bridge.java.internal.{BatchTableEnvironmentImpl => JavaBatchTableEnvironmentImpl, StreamTableEnvironmentImpl => JavaStreamTableEnvironmentImpl}
+import org.apache.flink.table.api.bridge.java.internal.{
+  BatchTableEnvironmentImpl => JavaBatchTableEnvironmentImpl,
+  StreamTableEnvironmentImpl => JavaStreamTableEnvironmentImpl
+}
 import org.apache.flink.table.api.bridge.scala._
-import org.apache.flink.table.api.bridge.scala.internal.{BatchTableEnvironmentImpl => ScalaBatchTableEnvironmentImpl, StreamTableEnvironmentImpl => ScalaStreamTableEnvironmentImpl}
-import org.apache.flink.table.api.internal.{TableEnvImpl, TableEnvironmentImpl, TableImpl, BatchTableEnvImpl => _}
+import org.apache.flink.table.api.bridge.scala.internal.{
+  BatchTableEnvironmentImpl => ScalaBatchTableEnvironmentImpl,
+  StreamTableEnvironmentImpl => ScalaStreamTableEnvironmentImpl
+}
+import org.apache.flink.table.api.internal.{
+  TableEnvImpl,
+  TableEnvironmentImpl,
+  TableImpl,
+  BatchTableEnvImpl => _
+}
 import org.apache.flink.table.api.{ApiExpression, Table, TableConfig, TableSchema}
 import org.apache.flink.table.catalog.{CatalogManager, FunctionCatalog}
 import org.apache.flink.table.executor.StreamExecutor
 import org.apache.flink.table.expressions.Expression
 import org.apache.flink.table.functions.{AggregateFunction, ScalarFunction, TableFunction}
 import org.apache.flink.table.module.ModuleManager
-import org.apache.flink.table.operations.{DataSetQueryOperation, JavaDataStreamQueryOperation, ScalaDataStreamQueryOperation}
+import org.apache.flink.table.operations.{
+  DataSetQueryOperation,
+  JavaDataStreamQueryOperation,
+  ScalaDataStreamQueryOperation
+}
 import org.apache.flink.table.planner.StreamPlanner
 
 import org.apache.calcite.plan.RelOptUtil
@@ -49,8 +64,8 @@ import scala.io.Source
 import scala.util.control.Breaks._
 
 /**
-  * Test base for testing Table API / SQL plans.
-  */
+ * Test base for testing Table API / SQL plans.
+ */
 class TableTestBase {
 
   @Rule
@@ -73,10 +88,10 @@ class TableTestBase {
   def verifyTableEquals(expected: Table, actual: Table): Unit = {
     assertEquals(
       "Logical plans do not match",
-      LogicalPlanFormatUtils.formatTempTableId(RelOptUtil.toString(
-        TableTestUtil.toRelNode(expected))),
-      LogicalPlanFormatUtils.formatTempTableId(RelOptUtil.toString(
-        TableTestUtil.toRelNode(actual))))
+      LogicalPlanFormatUtils.formatTempTableId(
+        RelOptUtil.toString(TableTestUtil.toRelNode(expected))),
+      LogicalPlanFormatUtils.formatTempTableId(
+        RelOptUtil.toString(TableTestUtil.toRelNode(actual))))
   }
 }
 
@@ -114,8 +129,11 @@ abstract class TableTestUtil(verifyCatalogPath: Boolean = false) {
     val actual = RelOptUtil.toString(optimized)
     // we remove the charset for testing because it
     // depends on the native machine (Little/Big Endian)
-    val actualNoCharset = actual.replace("_UTF-16LE'", "'").replace("_UTF-16BE'", "'")
-      .replace(" CHARACTER SET \"UTF-16LE\"", "").replace(" CHARACTER SET \"UTF-16BE\"", "")
+    val actualNoCharset = actual
+      .replace("_UTF-16LE'", "'")
+      .replace("_UTF-16BE'", "'")
+      .replace(" CHARACTER SET \"UTF-16LE\"", "")
+      .replace(" CHARACTER SET \"UTF-16BE\"", "")
 
     val expectedLines = expected.split("\n").map(_.trim)
     val actualLines = actualNoCharset.split("\n").map(_.trim)
@@ -125,9 +143,7 @@ abstract class TableTestUtil(verifyCatalogPath: Boolean = false) {
 
     breakable {
       for ((expectedLine, actualLine) <- expectedLines.zip(actualLines)) {
-        if (expectedLine == TableTestUtil.ANY_NODE) {
-        }
-        else if (expectedLine == TableTestUtil.ANY_SUBTREE) {
+        if (expectedLine == TableTestUtil.ANY_NODE) {} else if (expectedLine == TableTestUtil.ANY_SUBTREE) {
           break
         } else if (expectedLine != actualLine) {
           throw new ComparisonFailure(null, expectedMessage, actualMessage)
@@ -148,8 +164,11 @@ object TableTestUtil {
     expected.asInstanceOf[TableImpl].getTableEnvironment match {
       case t: TableEnvImpl => t.getRelBuilder.tableOperation(expected.getQueryOperation).build()
       case t: TableEnvironmentImpl =>
-        t.getPlanner.asInstanceOf[StreamPlanner].getRelBuilder
-          .tableOperation(expected.getQueryOperation).build()
+        t.getPlanner
+          .asInstanceOf[StreamPlanner]
+          .getRelBuilder
+          .tableOperation(expected.getQueryOperation)
+          .build()
       case _ =>
         throw new AssertionError()
     }
@@ -229,9 +248,7 @@ object TableTestUtil {
   }
 }
 
-case class BatchTableTestUtil(
-    catalogManager: Option[CatalogManager] = None)
-  extends TableTestUtil {
+case class BatchTableTestUtil(catalogManager: Option[CatalogManager] = None) extends TableTestUtil {
   val javaEnv = new LocalEnvironment()
 
   val javaTableEnv = new JavaBatchTableEnvironmentImpl(
@@ -248,10 +265,7 @@ case class BatchTableTestUtil(
       .getOrElse(CatalogManagerMocks.createEmptyCatalogManager()),
     new ModuleManager)
 
-  def addTable[T: TypeInformation](
-      name: String,
-      fields: Expression*)
-    : Table = {
+  def addTable[T: TypeInformation](name: String, fields: Expression*): Table = {
     val ds = mock(classOf[DataSet[T]])
     val jDs = mock(classOf[JDataSet[T]])
     when(ds.javaSet).thenReturn(jDs)
@@ -273,8 +287,7 @@ case class BatchTableTestUtil(
 
   def addFunction[T: TypeInformation](
       name: String,
-      function: TableFunction[T])
-    : TableFunction[T] = {
+      function: TableFunction[T]): TableFunction[T] = {
     tableEnv.registerFunction(name, function)
     function
   }
@@ -328,9 +341,8 @@ case class BatchTableTestUtil(
   }
 }
 
-case class StreamTableTestUtil(
-    catalogManager: Option[CatalogManager] = None)
-  extends TableTestUtil {
+case class StreamTableTestUtil(catalogManager: Option[CatalogManager] = None)
+    extends TableTestUtil {
   val javaEnv = new LocalStreamEnvironment()
   javaEnv.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
 
@@ -365,10 +377,7 @@ case class StreamTableTestUtil(
     true,
     Thread.currentThread().getContextClassLoader)
 
-  def addTable[T: TypeInformation](
-      name: String,
-      fields: Expression*)
-    : Table = {
+  def addTable[T: TypeInformation](name: String, fields: Expression*): Table = {
 
     val table = env.fromElements().toTable(tableEnv, fields: _*)
     tableEnv.registerTable(name, table)
@@ -384,8 +393,7 @@ case class StreamTableTestUtil(
 
   def addFunction[T: TypeInformation](
       name: String,
-      function: TableFunction[T])
-    : TableFunction[T] = {
+      function: TableFunction[T]): TableFunction[T] = {
     tableEnv.registerFunction(name, function)
     function
   }
@@ -444,14 +452,20 @@ case class StreamTableTestUtil(
   }
 
   def toRelNode(table: Table): RelNode = {
-    tableEnv.getPlanner.asInstanceOf[StreamPlanner]
-        .getRelBuilder.tableOperation(table.getQueryOperation).build()
+    tableEnv.getPlanner
+      .asInstanceOf[StreamPlanner]
+      .getRelBuilder
+      .tableOperation(table.getQueryOperation)
+      .build()
   }
 
   protected def optimize(resultTable1: Table): RelNode = {
-    val planner = resultTable1.asInstanceOf[TableImpl]
-      .getTableEnvironment.asInstanceOf[TableEnvironmentImpl]
-      .getPlanner.asInstanceOf[StreamPlanner]
+    val planner = resultTable1
+      .asInstanceOf[TableImpl]
+      .getTableEnvironment
+      .asInstanceOf[TableEnvironmentImpl]
+      .getPlanner
+      .asInstanceOf[StreamPlanner]
     val relNode = planner.getRelBuilder.tableOperation(resultTable1.getQueryOperation).build()
     val optimized = planner.optimizer
       .optimize(relNode, updatesAsRetraction = false, planner.getRelBuilder)
@@ -460,9 +474,7 @@ case class StreamTableTestUtil(
 }
 
 class EmptySource[T]() extends SourceFunction[T] {
-  override def run(ctx: SourceFunction.SourceContext[T]): Unit = {
-  }
+  override def run(ctx: SourceFunction.SourceContext[T]): Unit = {}
 
-  override def cancel(): Unit = {
-  }
+  override def cancel(): Unit = {}
 }

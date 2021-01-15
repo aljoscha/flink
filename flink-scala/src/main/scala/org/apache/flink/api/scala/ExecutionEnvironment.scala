@@ -89,34 +89,34 @@ class ExecutionEnvironment(javaEnv: JavaEnv) {
   def getParallelism = javaEnv.getParallelism
 
   /**
-    * Sets the restart strategy configuration. The configuration specifies which restart strategy
-    * will be used for the execution graph in case of a restart.
-    *
-    * @param restartStrategyConfiguration Restart strategy configuration to be set
-    */
+   * Sets the restart strategy configuration. The configuration specifies which restart strategy
+   * will be used for the execution graph in case of a restart.
+   *
+   * @param restartStrategyConfiguration Restart strategy configuration to be set
+   */
   @PublicEvolving
   def setRestartStrategy(restartStrategyConfiguration: RestartStrategyConfiguration): Unit = {
     javaEnv.setRestartStrategy(restartStrategyConfiguration)
   }
 
   /**
-    * Returns the specified restart strategy configuration.
-    *
-    * @return The restart strategy configuration to be used
-    */
+   * Returns the specified restart strategy configuration.
+   *
+   * @return The restart strategy configuration to be used
+   */
   @PublicEvolving
   def getRestartStrategy: RestartStrategyConfiguration = {
     javaEnv.getRestartStrategy
   }
 
   /**
-    * Sets the number of times that failed tasks are re-executed. A value of zero
-    * effectively disables fault tolerance. A value of "-1" indicates that the system
-    * default value (as defined in the configuration) should be used.
-    *
-    * @deprecated This method will be replaced by [[setRestartStrategy()]]. The
-    *            FixedDelayRestartStrategyConfiguration contains the number of execution retries.
-    */
+   * Sets the number of times that failed tasks are re-executed. A value of zero
+   * effectively disables fault tolerance. A value of "-1" indicates that the system
+   * default value (as defined in the configuration) should be used.
+   *
+   * @deprecated This method will be replaced by [[setRestartStrategy()]]. The
+   *            FixedDelayRestartStrategyConfiguration contains the number of execution retries.
+   */
   @Deprecated
   @PublicEvolving
   def setNumberOfExecutionRetries(numRetries: Int): Unit = {
@@ -124,13 +124,13 @@ class ExecutionEnvironment(javaEnv: JavaEnv) {
   }
 
   /**
-    * Gets the number of times the system will try to re-execute failed tasks. A value
-    * of "-1" indicates that the system default value (as defined in the configuration)
-    * should be used.
-    *
-    * @deprecated This method will be replaced by [[getRestartStrategy]]. The
-    *            FixedDelayRestartStrategyConfiguration contains the number of execution retries.
-    */
+   * Gets the number of times the system will try to re-execute failed tasks. A value
+   * of "-1" indicates that the system default value (as defined in the configuration)
+   * should be used.
+   *
+   * @deprecated This method will be replaced by [[getRestartStrategy]]. The
+   *            FixedDelayRestartStrategyConfiguration contains the number of execution retries.
+   */
   @Deprecated
   @PublicEvolving
   def getNumberOfExecutionRetries = javaEnv.getNumberOfExecutionRetries
@@ -148,8 +148,7 @@ class ExecutionEnvironment(javaEnv: JavaEnv) {
    */
   def registerTypeWithKryoSerializer[T <: Serializer[_] with Serializable](
       clazz: Class[_],
-      serializer: T)
-    : Unit = {
+      serializer: T): Unit = {
     javaEnv.registerTypeWithKryoSerializer(clazz, serializer)
   }
 
@@ -159,7 +158,6 @@ class ExecutionEnvironment(javaEnv: JavaEnv) {
   def registerTypeWithKryoSerializer(clazz: Class[_], serializer: Class[_ <: Serializer[_]]) {
     javaEnv.registerTypeWithKryoSerializer(clazz, serializer)
   }
-
 
   /**
    * Registers a default serializer for the given class and its sub-classes at Kryo.
@@ -176,8 +174,7 @@ class ExecutionEnvironment(javaEnv: JavaEnv) {
    */
   def addDefaultKryoSerializer[T <: Serializer[_] with Serializable](
       clazz: Class[_],
-      serializer: T)
-    : Unit = {
+      serializer: T): Unit = {
     javaEnv.addDefaultKryoSerializer(clazz, serializer)
   }
 
@@ -186,7 +183,6 @@ class ExecutionEnvironment(javaEnv: JavaEnv) {
    * serialized as a POJO, then the type is registered with the POJO serializer. If the
    * type ends up being serialized with Kryo, then it will be registered at Kryo to make
    * sure that only tags are written.
-   *
    */
   def registerType(typeClass: Class[_]) {
     javaEnv.registerType(typeClass)
@@ -220,8 +216,8 @@ class ExecutionEnvironment(javaEnv: JavaEnv) {
     require(filePath != null, "The file path may not be null.")
     val format = new TextInputFormat(new Path(filePath))
     format.setCharsetName(charsetName)
-    val source = new DataSource[String](javaEnv, format, BasicTypeInfo.STRING_TYPE_INFO,
-      getCallLocationName())
+    val source =
+      new DataSource[String](javaEnv, format, BasicTypeInfo.STRING_TYPE_INFO, getCallLocationName())
     wrap(source)
   }
 
@@ -242,7 +238,10 @@ class ExecutionEnvironment(javaEnv: JavaEnv) {
     val format = new TextValueInputFormat(new Path(filePath))
     format.setCharsetName(charsetName)
     val source = new DataSource[StringValue](
-      javaEnv, format, new ValueTypeInfo[StringValue](classOf[StringValue]), getCallLocationName())
+      javaEnv,
+      format,
+      new ValueTypeInfo[StringValue](classOf[StringValue]),
+      getCallLocationName())
     wrap(source)
   }
 
@@ -264,7 +263,7 @@ class ExecutionEnvironment(javaEnv: JavaEnv) {
    *                       are read.
    * @param pojoFields The fields of the POJO which are mapped to CSV fields.
    */
-  def readCsvFile[T : ClassTag : TypeInformation](
+  def readCsvFile[T: ClassTag: TypeInformation](
       filePath: String,
       lineDelimiter: String = "\n",
       fieldDelimiter: String = ",",
@@ -323,9 +322,9 @@ class ExecutionEnvironment(javaEnv: JavaEnv) {
    *                 "hdfs://host:port/file/path").
    * @param delimiter The string that separates primitives , defaults to newline.
    */
-  def readFileOfPrimitives[T : ClassTag : TypeInformation](
-      filePath : String,
-      delimiter : String = "\n") : DataSet[T] = {
+  def readFileOfPrimitives[T: ClassTag: TypeInformation](
+      filePath: String,
+      delimiter: String = "\n"): DataSet[T] = {
     require(filePath != null, "File path must not be null.")
     val typeInfo = implicitly[TypeInformation[T]]
     val datasource = new DataSource[T](
@@ -340,7 +339,7 @@ class ExecutionEnvironment(javaEnv: JavaEnv) {
    * Creates a new DataSource by reading the specified file using the custom
    * [[org.apache.flink.api.common.io.FileInputFormat]].
    */
-  def readFile[T : ClassTag : TypeInformation](
+  def readFile[T: ClassTag: TypeInformation](
       inputFormat: FileInputFormat[T],
       filePath: String): DataSet[T] = {
     require(inputFormat != null, "InputFormat must not be null.")
@@ -353,7 +352,7 @@ class ExecutionEnvironment(javaEnv: JavaEnv) {
    * Generic method to create an input DataSet with an
    * [[org.apache.flink.api.common.io.InputFormat]].
    */
-  def createInput[T : ClassTag : TypeInformation](inputFormat: InputFormat[T, _]): DataSet[T] = {
+  def createInput[T: ClassTag: TypeInformation](inputFormat: InputFormat[T, _]): DataSet[T] = {
     if (inputFormat == null) {
       throw new IllegalArgumentException("InputFormat must not be null.")
     }
@@ -380,8 +379,7 @@ class ExecutionEnvironment(javaEnv: JavaEnv) {
    * Note that this operation will result in a non-parallel data source, i.e. a data source with
    * a parallelism of one.
    */
-  def fromCollection[T: ClassTag : TypeInformation](
-      data: Iterable[T]): DataSet[T] = {
+  def fromCollection[T: ClassTag: TypeInformation](data: Iterable[T]): DataSet[T] = {
     require(data != null, "Data must not be null.")
 
     val typeInfo = implicitly[TypeInformation[T]]
@@ -400,8 +398,7 @@ class ExecutionEnvironment(javaEnv: JavaEnv) {
    * Note that this operation will result in a non-parallel data source, i.e. a data source with
    * a parallelism of one.
    */
-  def fromCollection[T: ClassTag : TypeInformation] (
-    data: Iterator[T]): DataSet[T] = {
+  def fromCollection[T: ClassTag: TypeInformation](data: Iterator[T]): DataSet[T] = {
     require(data != null, "Data must not be null.")
 
     val typeInfo = implicitly[TypeInformation[T]]
@@ -419,7 +416,7 @@ class ExecutionEnvironment(javaEnv: JavaEnv) {
    * * Note that this operation will result in a non-parallel data source, i.e. a data source with
    * a parallelism of one.
    */
-  def fromElements[T: ClassTag : TypeInformation](data: T*): DataSet[T] = {
+  def fromElements[T: ClassTag: TypeInformation](data: T*): DataSet[T] = {
     require(data != null, "Data must not be null.")
     val typeInfo = implicitly[TypeInformation[T]]
     fromCollection(data)(implicitly[ClassTag[T]], typeInfo)
@@ -430,13 +427,15 @@ class ExecutionEnvironment(javaEnv: JavaEnv) {
    * allowing the framework to create a parallel data source that returns the elements in the
    * iterator.
    */
-  def fromParallelCollection[T: ClassTag : TypeInformation](
+  def fromParallelCollection[T: ClassTag: TypeInformation](
       iterator: SplittableIterator[T]): DataSet[T] = {
     val typeInfo = implicitly[TypeInformation[T]]
-    wrap(new DataSource[T](javaEnv,
-      new ParallelIteratorInputFormat[T](iterator),
-      typeInfo,
-      getCallLocationName()))
+    wrap(
+      new DataSource[T](
+        javaEnv,
+        new ParallelIteratorInputFormat[T](iterator),
+        typeInfo,
+        getCallLocationName()))
   }
 
   /**
@@ -457,7 +456,7 @@ class ExecutionEnvironment(javaEnv: JavaEnv) {
   }
 
   def union[T](sets: Seq[DataSet[T]]): DataSet[T] = {
-    sets.reduce( (l, r) => l.union(r) )
+    sets.reduce((l, r) => l.union(r))
   }
 
   /**
@@ -600,7 +599,7 @@ object ExecutionEnvironment {
    * @param parallelism The default parallelism to use for local execution.
    */
   @PublicEvolving
-  def setDefaultLocalParallelism(parallelism: Int) : Unit =
+  def setDefaultLocalParallelism(parallelism: Int): Unit =
     JavaEnv.setDefaultLocalParallelism(parallelism)
 
   /**
@@ -635,8 +634,8 @@ object ExecutionEnvironment {
    * This method sets the environment's default parallelism to given parameter, which
    * defaults to the value set via [[setDefaultLocalParallelism(Int)]].
    */
-  def createLocalEnvironment(parallelism: Int = JavaEnv.getDefaultLocalParallelism): 
-      ExecutionEnvironment = {
+  def createLocalEnvironment(
+      parallelism: Int = JavaEnv.getDefaultLocalParallelism): ExecutionEnvironment = {
     new ExecutionEnvironment(JavaEnv.createLocalEnvironment(parallelism))
   }
 
@@ -757,4 +756,3 @@ object ExecutionEnvironment {
     new ExecutionEnvironment(javaEnv)
   }
 }
-

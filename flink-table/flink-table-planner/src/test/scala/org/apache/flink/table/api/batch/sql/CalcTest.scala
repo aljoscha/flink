@@ -35,18 +35,9 @@ class CalcTest extends TableTestBase {
     val expected = unaryNode(
       "DataSetCalc",
       batchTableNode(table),
-      term("select",
-        "a._1 AS _1",
-        "a._2 AS _2",
-        "c",
-        "b._1 AS _10",
-        "b._2 AS _20"
-      )
-    )
+      term("select", "a._1 AS _1", "a._2 AS _2", "c", "b._1 AS _10", "b._2 AS _20"))
 
-    util.verifySql(
-      "SELECT MyTable.a.*, c, MyTable.b.* FROM MyTable",
-      expected)
+    util.verifySql("SELECT MyTable.a.*, c, MyTable.b.* FROM MyTable", expected)
   }
 
   @Test
@@ -59,13 +50,10 @@ class CalcTest extends TableTestBase {
       "DataSetCalc",
       batchTableNode(table),
       term("select", "a", "b", "c"),
-      term("where", s"SEARCH(b, $resultStr)")
-    )
+      term("where", s"SEARCH(b, $resultStr)"))
 
     val inStr = (1 to 30).mkString(", ")
-    util.verifySql(
-      s"SELECT * FROM MyTable WHERE b in ($inStr)",
-      expected)
+    util.verifySql(s"SELECT * FROM MyTable WHERE b in ($inStr)", expected)
   }
 
   @Test
@@ -74,18 +62,16 @@ class CalcTest extends TableTestBase {
     val table = util.addTable[(Int, Long, String)]("MyTable", 'a, 'b, 'c)
 
     val partialStr = (1 to 29)
-        .map(i => s"(${i}L:BIGINT..${i + 1}L:BIGINT)").mkString(", ")
+      .map(i => s"(${i}L:BIGINT..${i + 1}L:BIGINT)")
+      .mkString(", ")
     val resultStr = s"Sarg[(-∞..1L:BIGINT), $partialStr, (30L:BIGINT..+∞)]:BIGINT"
     val expected = unaryNode(
       "DataSetCalc",
       batchTableNode(table),
       term("select", "a", "b", "c"),
-      term("where", s"SEARCH(b, $resultStr)")
-    )
+      term("where", s"SEARCH(b, $resultStr)"))
 
     val notInStr = (1 to 30).mkString(", ")
-    util.verifySql(
-      s"SELECT * FROM MyTable WHERE b NOT IN ($notInStr)",
-      expected)
+    util.verifySql(s"SELECT * FROM MyTable WHERE b NOT IN ($notInStr)", expected)
   }
 }

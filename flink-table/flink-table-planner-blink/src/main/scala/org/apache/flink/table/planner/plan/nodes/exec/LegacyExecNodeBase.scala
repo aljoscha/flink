@@ -116,7 +116,7 @@ trait LegacyExecNodeBase[P <: Planner, T] extends ExecNode[T] {
   protected def inputsContainSingleton(): Boolean = {
     getInputNodes.exists { node =>
       node.isInstanceOf[Exchange] &&
-        node.asInstanceOf[Exchange].getDistribution.getType == RelDistribution.Type.SINGLETON
+      node.asInstanceOf[Exchange].getDistribution.getType == RelDistribution.Type.SINGLETON
     }
   }
 }

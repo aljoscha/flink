@@ -22,19 +22,24 @@ import java.util
 
 import org.apache.flink.api.common.serialization.{DeserializationSchema, SerializationSchema}
 import org.apache.flink.table.factories.TableFormatFactoryBase.deriveSchema
-import org.apache.flink.table.factories.{DeserializationSchemaFactory, SerializationSchemaFactory, TableFormatFactoryBase, TableFormatFactoryServiceTest}
+import org.apache.flink.table.factories.{
+  DeserializationSchemaFactory,
+  SerializationSchemaFactory,
+  TableFormatFactoryBase,
+  TableFormatFactoryServiceTest
+}
 import org.apache.flink.types.Row
 
 /**
-  * Table format factory for testing.
-  *
-  * It has the same context as [[TestAmbiguousTableFormatFactory]] and both support COMMON_PATH.
-  * This format does not support SPECIAL_PATH but supports schema derivation.
-  */
+ * Table format factory for testing.
+ *
+ * It has the same context as [[TestAmbiguousTableFormatFactory]] and both support COMMON_PATH.
+ * This format does not support SPECIAL_PATH but supports schema derivation.
+ */
 class TestTableFormatFactory
-  extends TableFormatFactoryBase[Row](TableFormatFactoryServiceTest.TEST_FORMAT_TYPE, 1, true)
-  with DeserializationSchemaFactory[Row]
-  with SerializationSchemaFactory[Row] {
+    extends TableFormatFactoryBase[Row](TableFormatFactoryServiceTest.TEST_FORMAT_TYPE, 1, true)
+    with DeserializationSchemaFactory[Row]
+    with SerializationSchemaFactory[Row] {
 
   override def supportedFormatProperties(): util.List[String] = {
     val properties = new util.ArrayList[String]()
@@ -44,15 +49,13 @@ class TestTableFormatFactory
   }
 
   override def createDeserializationSchema(
-      properties: util.Map[String, String])
-    : DeserializationSchema[Row] = {
+      properties: util.Map[String, String]): DeserializationSchema[Row] = {
 
     new TestDeserializationSchema(deriveSchema(properties).toRowType)
   }
 
   override def createSerializationSchema(
-      properties: util.Map[String, String])
-    : SerializationSchema[Row] = {
+      properties: util.Map[String, String]): SerializationSchema[Row] = {
 
     new TestSerializationSchema(deriveSchema(properties).toRowType)
   }

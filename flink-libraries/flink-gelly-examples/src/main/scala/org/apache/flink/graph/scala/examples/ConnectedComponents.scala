@@ -30,8 +30,8 @@ import org.apache.flink.types.NullValue
 
 /**
  * This example shows how to use Gelly's library methods.
- * You can find all available library methods in [[org.apache.flink.graph.library]]. 
- * 
+ * You can find all available library methods in [[org.apache.flink.graph.library]].
+ *
  * In particular, this example uses the
  * [[GSAConnectedComponents]]
  * library method to compute the connected components of the input graph.
@@ -60,7 +60,6 @@ object ConnectedComponents {
 
     val components = graph.run(new GSAConnectedComponents[Long, Long, NullValue](maxIterations))
 
-
     // emit result
     if (fileOutput) {
       components.writeAsCsv(outputPath, "\n", ",")
@@ -78,44 +77,47 @@ object ConnectedComponents {
   // UTIL METHODS
   // ***********************************************************************
 
-    private var fileOutput = false
-    private var edgesInputPath: String = null
-    private var outputPath: String = null
-    private var maxIterations = ConnectedComponentsDefaultData.MAX_ITERATIONS
+  private var fileOutput = false
+  private var edgesInputPath: String = null
+  private var outputPath: String = null
+  private var maxIterations = ConnectedComponentsDefaultData.MAX_ITERATIONS
 
-    private def parseParameters(args: Array[String]): Boolean = {
-      if(args.length > 0) {
-        if(args.length != 3) {
-          System.err.println("Usage ConnectedComponents <edge path> <output path> " +
+  private def parseParameters(args: Array[String]): Boolean = {
+    if (args.length > 0) {
+      if (args.length != 3) {
+        System.err.println(
+          "Usage ConnectedComponents <edge path> <output path> " +
             "<num iterations>")
-        }
-        fileOutput = true
-        edgesInputPath = args(0)
-        outputPath = args(1)
-        maxIterations = 2
-      } else {
-        System.out.println("Executing ConnectedComponents example with default parameters" +
+      }
+      fileOutput = true
+      edgesInputPath = args(0)
+      outputPath = args(1)
+      maxIterations = 2
+    } else {
+      System.out.println(
+        "Executing ConnectedComponents example with default parameters" +
           " and built-in default data.")
-        System.out.println("  Provide parameters to read input data from files.")
-        System.out.println("  See the documentation for the correct format of input files.")
-        System.out.println("Usage ConnectedComponents <edge path> <output path> " +
+      System.out.println("  Provide parameters to read input data from files.")
+      System.out.println("  See the documentation for the correct format of input files.")
+      System.out.println(
+        "Usage ConnectedComponents <edge path> <output path> " +
           "<num iterations>")
-      }
-      true
     }
+    true
+  }
 
-    private def getEdgesDataSet(env: ExecutionEnvironment): DataSet[Edge[Long, NullValue]] = {
-      if (fileOutput) {
-        env.readCsvFile[(Long, Long)](edgesInputPath,
-          lineDelimiter = "\n",
-          fieldDelimiter = "\t")
-          .map(edge => new Edge[Long, NullValue](edge._1, edge._2, NullValue.getInstance))
-      } else {
-        val edgeData = ConnectedComponentsDefaultData.DEFAULT_EDGES map {
-          case Array(x, y) => (x.asInstanceOf[Long], y.asInstanceOf[Long])
-        }
-        env.fromCollection(edgeData).map(
-        edge => new Edge[Long, NullValue](edge._1, edge._2, NullValue.getInstance))
+  private def getEdgesDataSet(env: ExecutionEnvironment): DataSet[Edge[Long, NullValue]] = {
+    if (fileOutput) {
+      env
+        .readCsvFile[(Long, Long)](edgesInputPath, lineDelimiter = "\n", fieldDelimiter = "\t")
+        .map(edge => new Edge[Long, NullValue](edge._1, edge._2, NullValue.getInstance))
+    } else {
+      val edgeData = ConnectedComponentsDefaultData.DEFAULT_EDGES map { case Array(x, y) =>
+        (x.asInstanceOf[Long], y.asInstanceOf[Long])
       }
+      env
+        .fromCollection(edgeData)
+        .map(edge => new Edge[Long, NullValue](edge._1, edge._2, NullValue.getInstance))
     }
+  }
 }

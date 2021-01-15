@@ -40,9 +40,9 @@ class TemporalProcessTimeJoin(
     genJoinFuncCode: String,
     minRetentionTime: Long,
     maxRetentionTime: Long)
-  extends BaseTwoInputStreamOperatorWithStateRetention(minRetentionTime, maxRetentionTime)
-  with Compiler[FlatJoinFunction[Row, Row, Row]]
-  with Logging {
+    extends BaseTwoInputStreamOperatorWithStateRetention(minRetentionTime, maxRetentionTime)
+    with Compiler[FlatJoinFunction[Row, Row, Row]]
+    with Logging {
 
   validateEqualsHashCode("join", leftType)
   validateEqualsHashCode("join", rightType)
@@ -55,10 +55,7 @@ class TemporalProcessTimeJoin(
 
   override def open(): Unit = {
     LOG.debug(s"Compiling FlatJoinFunction: $genJoinFuncName \n\n Code:\n$genJoinFuncCode")
-    val clazz = compile(
-      getRuntimeContext.getUserCodeClassLoader,
-      genJoinFuncName,
-      genJoinFuncCode)
+    val clazz = compile(getRuntimeContext.getUserCodeClassLoader, genJoinFuncName, genJoinFuncCode)
 
     LOG.debug("Instantiating FlatJoinFunction.")
     joinFunction = clazz.newInstance()
@@ -105,16 +102,16 @@ class TemporalProcessTimeJoin(
   }
 
   /**
-    * The method to be called when a cleanup timer fires.
-    *
-    * @param time The timestamp of the fired timer.
-    */
+   * The method to be called when a cleanup timer fires.
+   *
+   * @param time The timestamp of the fired timer.
+   */
   override def cleanUpState(time: Long): Unit = {
     rightState.clear()
   }
 
   /**
-    * Invoked when an event-time timer fires.
-    */
+   * Invoked when an event-time timer fires.
+   */
   override def onEventTime(timer: InternalTimer[Any, VoidNamespace]): Unit = ???
 }

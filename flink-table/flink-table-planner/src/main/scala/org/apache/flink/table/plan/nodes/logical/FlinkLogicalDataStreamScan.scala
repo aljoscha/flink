@@ -38,11 +38,11 @@ class FlinkLogicalDataStreamScan(
     val dataStream: DataStream[_],
     val fieldIdxs: Array[Int],
     val schema: RowSchema)
-  extends TableScan(
-    cluster,
-    traitSet,
-    RelOptTableImpl.create(catalog, schema.relDataType, List[String]().asJava, null))
-  with FlinkLogicalRel {
+    extends TableScan(
+      cluster,
+      traitSet,
+      RelOptTableImpl.create(catalog, schema.relDataType, List[String]().asJava, null))
+    with FlinkLogicalRel {
 
   override def deriveRowType(): RelDataType = schema.relDataType
 

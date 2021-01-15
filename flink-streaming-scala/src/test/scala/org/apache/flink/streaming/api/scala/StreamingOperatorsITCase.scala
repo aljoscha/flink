@@ -67,16 +67,14 @@ class StreamingOperatorsITCase extends AbstractTestBase {
       StreamingOperatorsITCase.Outer(1, StreamingOperatorsITCase.Inner(3, "alma"), true),
       StreamingOperatorsITCase.Outer(1, StreamingOperatorsITCase.Inner(6, "alma"), true),
       StreamingOperatorsITCase.Outer(2, StreamingOperatorsITCase.Inner(7, "alma"), true),
-      StreamingOperatorsITCase.Outer(2, StreamingOperatorsITCase.Inner(8, "alma"), true)
-    )
+      StreamingOperatorsITCase.Outer(2, StreamingOperatorsITCase.Inner(8, "alma"), true))
 
     inp
       .keyBy("a")
       .sum("i.c")
-        .writeAsText(resultPath3, FileSystem.WriteMode.OVERWRITE)
+      .writeAsText(resultPath3, FileSystem.WriteMode.OVERWRITE)
 
-    expected3 =
-      "Outer(1,Inner(3,alma),true)\n" +
+    expected3 = "Outer(1,Inner(3,alma),true)\n" +
       "Outer(1,Inner(9,alma),true)\n" +
       "Outer(2,Inner(15,alma),true)\n" +
       "Outer(2,Inner(7,alma),true)"
@@ -89,4 +87,3 @@ object StreamingOperatorsITCase {
   case class Inner(c: Short, d: String)
   case class Outer(a: Int, i: StreamingOperatorsITCase.Inner, b: Boolean)
 }
-

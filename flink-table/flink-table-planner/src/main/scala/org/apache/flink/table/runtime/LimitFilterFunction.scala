@@ -23,12 +23,8 @@ import org.apache.flink.configuration.Configuration
 
 import scala.collection.JavaConverters._
 
-
-class LimitFilterFunction[T](
-    limitStart: Long,
-    limitEnd: Long,
-    broadcastName: String)
-  extends RichFilterFunction[T] {
+class LimitFilterFunction[T](limitStart: Long, limitEnd: Long, broadcastName: String)
+    extends RichFilterFunction[T] {
 
   var partitionIndex: Int = _
   var elementCount: Long = _
@@ -42,13 +38,17 @@ class LimitFilterFunction[T](
       .asScala
 
     // sort by partition index, extract number per partition, sum with intermediate results
-    countList = countPartitionResult.sortWith(_._1 < _._1).map(_._2).scanLeft(0L) { case (a, b) =>
+    countList = countPartitionResult
+      .sortWith(_._1 < _._1)
+      .map(_._2)
+      .scanLeft(0L) { case (a, b) =>
         val sum = a + b
         if (sum < 0L) { // prevent overflow
           Long.MaxValue
         }
         sum
-    }.toArray
+      }
+      .toArray
 
     elementCount = 0
   }
@@ -59,6 +59,6 @@ class LimitFilterFunction[T](
     }
     // we filter out records that are not within the limit (Long.MaxValue is unlimited)
     limitStart - countList(partitionIndex) < elementCount &&
-      (limitEnd == Long.MaxValue || limitEnd - countList(partitionIndex) >= elementCount)
+    (limitEnd == Long.MaxValue || limitEnd - countList(partitionIndex) >= elementCount)
   }
 }

@@ -30,7 +30,12 @@ import org.apache.flink.table.delegation.Executor
 import org.apache.flink.table.functions.{AggregateFunction, AggregateFunctionDefinition}
 import org.apache.flink.table.module.ModuleManager
 import org.apache.flink.table.utils.TableTestUtil.{streamTableNode, term, unaryNode}
-import org.apache.flink.table.utils.{CatalogManagerMocks, PlannerMock, StreamTableTestUtil, TableTestBase}
+import org.apache.flink.table.utils.{
+  CatalogManagerMocks,
+  PlannerMock,
+  StreamTableTestUtil,
+  TableTestBase
+}
 import org.apache.flink.types.Row
 
 import org.junit.Assert.{assertEquals, assertTrue}
@@ -40,8 +45,8 @@ import org.mockito.Mockito
 class AggregateTest extends TableTestBase {
 
   private val streamUtil: StreamTableTestUtil = streamTestUtil()
-  private val table = streamUtil.addTable[(Int, String, Long)](
-    "MyTable", 'a, 'b, 'c, 'proctime.proctime, 'rowtime.rowtime)
+  private val table = streamUtil
+    .addTable[(Int, String, Long)]("MyTable", 'a, 'b, 'c, 'proctime.proctime, 'rowtime.rowtime)
 
   @Test
   def testGroupbyWithoutWindow() = {
@@ -52,16 +57,10 @@ class AggregateTest extends TableTestBase {
         "DataStreamCalc",
         unaryNode(
           "DataStreamGroupAggregate",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(table),
-            term("select", "b", "a")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(table), term("select", "b", "a")),
           term("groupBy", "b"),
-          term("select", "b", "COUNT(a) AS EXPR$0")
-        ),
-        term("select", "EXPR$0")
-      )
+          term("select", "b", "COUNT(a) AS EXPR$0")),
+        term("select", "EXPR$0"))
     streamUtil.verifySql(sql, expected)
   }
 
@@ -80,12 +79,12 @@ class AggregateTest extends TableTestBase {
       new PlannerMock,
       Mockito.mock(classOf[Executor]),
       true,
-      Thread.currentThread().getContextClassLoader
-    )
+      Thread.currentThread().getContextClassLoader)
 
     tablEnv.registerFunction("udag", new MyAgg)
     val aggFunctionDefinition = functionCatalog
-      .lookupFunction(UnresolvedIdentifier.of("udag")).get()
+      .lookupFunction(UnresolvedIdentifier.of("udag"))
+      .get()
       .getFunctionDefinition
       .asInstanceOf[AggregateFunctionDefinition]
 
@@ -98,7 +97,8 @@ class AggregateTest extends TableTestBase {
 
     tablEnv.registerFunction("udag2", new MyAgg2)
     val aggFunctionDefinition2 = functionCatalog
-      .lookupFunction(UnresolvedIdentifier.of("udag2")).get()
+      .lookupFunction(UnresolvedIdentifier.of("udag2"))
+      .get()
       .getFunctionDefinition
       .asInstanceOf[AggregateFunctionDefinition]
 
@@ -116,8 +116,7 @@ case class MyAccumulator(var sum: Long, var count: Long)
 class MyAgg extends AggregateFunction[Long, MyAccumulator] {
 
   //Overloaded accumulate method
-  def accumulate(acc: MyAccumulator, value: Long): Unit = {
-  }
+  def accumulate(acc: MyAccumulator, value: Long): Unit = {}
 
   override def createAccumulator(): MyAccumulator = MyAccumulator(0, 0)
 

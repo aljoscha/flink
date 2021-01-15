@@ -32,21 +32,22 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
-  * Description of the physical distribution of a relational expression.
-  * See [[RelDistribution]] for more details.
-  *
-  * NOTE: it's intended to have a private constructor for this class.
-  */
+ * Description of the physical distribution of a relational expression.
+ * See [[RelDistribution]] for more details.
+ *
+ * NOTE: it's intended to have a private constructor for this class.
+ */
 class FlinkRelDistribution private (
     private val distributionType: RelDistribution.Type,
     private val keys: ImmutableIntList,
     private val fieldCollations: Option[ImmutableList[RelFieldCollation]] = None,
     val requireStrict: Boolean = true)
-  extends RelDistribution {
+    extends RelDistribution {
 
-  require((distributionType == Type.HASH_DISTRIBUTED)
-    || (distributionType == Type.RANGE_DISTRIBUTED)
-    || keys.isEmpty)
+  require(
+    (distributionType == Type.HASH_DISTRIBUTED)
+      || (distributionType == Type.RANGE_DISTRIBUTED)
+      || keys.isEmpty)
 
   require((distributionType != Type.RANGE_DISTRIBUTED) || fieldCollations.nonEmpty)
 
@@ -86,8 +87,8 @@ class FlinkRelDistribution private (
       } else if (other.distributionType == Type.RANDOM_DISTRIBUTED) {
         // RANDOM is satisfied by HASH, ROUND-ROBIN, RANDOM, RANGE;
         distributionType == Type.HASH_DISTRIBUTED ||
-          distributionType == Type.ROUND_ROBIN_DISTRIBUTED ||
-          distributionType == Type.RANGE_DISTRIBUTED
+        distributionType == Type.ROUND_ROBIN_DISTRIBUTED ||
+        distributionType == Type.RANGE_DISTRIBUTED
       } else {
         false
       }
@@ -137,9 +138,9 @@ class FlinkRelDistribution private (
   override def equals(other: Any): Boolean = other match {
     case that: FlinkRelDistribution =>
       (that canEqual this) &&
-      distributionType == that.distributionType &&
-      keys == that.keys && fieldCollations == that.fieldCollations &&
-      requireStrict == that.requireStrict
+        distributionType == that.distributionType &&
+        keys == that.keys && fieldCollations == that.fieldCollations &&
+        requireStrict == that.requireStrict
     case _ => false
   }
 
@@ -206,16 +207,16 @@ object FlinkRelDistribution {
   val SINGLETON = new FlinkRelDistribution(RelDistribution.Type.SINGLETON, EMPTY)
 
   /** The singleton broadcast distribution. */
-  val BROADCAST_DISTRIBUTED = new FlinkRelDistribution(
-    RelDistribution.Type.BROADCAST_DISTRIBUTED, EMPTY)
+  val BROADCAST_DISTRIBUTED =
+    new FlinkRelDistribution(RelDistribution.Type.BROADCAST_DISTRIBUTED, EMPTY)
 
   /** The singleton random distribution. */
-  val RANDOM_DISTRIBUTED: RelDistribution = new FlinkRelDistribution(
-    RelDistribution.Type.RANDOM_DISTRIBUTED, EMPTY)
+  val RANDOM_DISTRIBUTED: RelDistribution =
+    new FlinkRelDistribution(RelDistribution.Type.RANDOM_DISTRIBUTED, EMPTY)
 
   /** The singleton round-robin distribution. */
-  val ROUND_ROBIN_DISTRIBUTED: RelDistribution = new FlinkRelDistribution(
-    RelDistribution.Type.ROUND_ROBIN_DISTRIBUTED, EMPTY)
+  val ROUND_ROBIN_DISTRIBUTED: RelDistribution =
+    new FlinkRelDistribution(RelDistribution.Type.ROUND_ROBIN_DISTRIBUTED, EMPTY)
 
   def hash(
       columns: util.Collection[_ <: Number],
@@ -234,8 +235,11 @@ object FlinkRelDistribution {
   def range(collations: util.List[RelFieldCollation]): FlinkRelDistribution = {
     val keys = collations.map(i => Integer.valueOf(i.getFieldIndex)).toList
     val fieldCollations = ImmutableList.copyOf[RelFieldCollation](collations)
-    canonize(new FlinkRelDistribution(RelDistribution.Type.RANGE_DISTRIBUTED,
-      ImmutableIntList.copyOf(keys: _*), Some(fieldCollations)))
+    canonize(
+      new FlinkRelDistribution(
+        RelDistribution.Type.RANGE_DISTRIBUTED,
+        ImmutableIntList.copyOf(keys: _*),
+        Some(fieldCollations)))
   }
 
   def range(collations: RelFieldCollation*): FlinkRelDistribution = range(collations)
@@ -245,13 +249,13 @@ object FlinkRelDistribution {
     val collations = new util.ArrayList[RelFieldCollation]()
     columns.foreach(f => collations.add(FlinkRelOptUtil.ofRelFieldCollation(f.intValue())))
     val fieldCollations = ImmutableList.copyOf[RelFieldCollation](collations)
-    canonize(new FlinkRelDistribution(
-      RelDistribution.Type.RANGE_DISTRIBUTED, keys, Some(fieldCollations)))
+    canonize(
+      new FlinkRelDistribution(RelDistribution.Type.RANGE_DISTRIBUTED, keys, Some(fieldCollations)))
   }
 
   /**
-    * NOTE: All creation of FlinkRelDistribution should be canonized
-    */
+   * NOTE: All creation of FlinkRelDistribution should be canonized
+   */
   private def canonize(in: FlinkRelDistribution): FlinkRelDistribution = {
     FlinkRelDistributionTraitDef.INSTANCE.canonize(in)
   }

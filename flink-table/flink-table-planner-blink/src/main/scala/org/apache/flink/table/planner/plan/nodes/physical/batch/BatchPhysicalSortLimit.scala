@@ -33,14 +33,14 @@ import org.apache.calcite.rex.{RexLiteral, RexNode}
 import scala.collection.JavaConversions._
 
 /**
-  * Batch physical RelNode for [[Sort]].
-  *
-  * This RelNode take the `limit` elements beginning with the first `offset` elements.
-  *
-  * Firstly it take the first `offset + limit` elements of each child partition, secondly the child
-  * partition will forward elements to a single partition, lastly it take the `limit` elements
-  * beginning with the first `offset` elements from the single output partition.
-  **/
+ * Batch physical RelNode for [[Sort]].
+ *
+ * This RelNode take the `limit` elements beginning with the first `offset` elements.
+ *
+ * Firstly it take the first `offset + limit` elements of each child partition, secondly the child
+ * partition will forward elements to a single partition, lastly it take the `limit` elements
+ * beginning with the first `offset` elements from the single output partition.
+ */
 class BatchPhysicalSortLimit(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -49,8 +49,8 @@ class BatchPhysicalSortLimit(
     offset: RexNode,
     fetch: RexNode,
     isGlobal: Boolean)
-  extends Sort(cluster, traitSet, inputRel, sortCollation, offset, fetch)
-  with BatchPhysicalRel {
+    extends Sort(cluster, traitSet, inputRel, sortCollation, offset, fetch)
+    with BatchPhysicalRel {
 
   private val limitStart: Long = SortUtil.getLimitStart(offset)
   private val limitEnd: Long = SortUtil.getLimitEnd(offset, fetch)
@@ -106,7 +106,6 @@ class BatchPhysicalSortLimit(
       isGlobal,
       ExecEdge.builder().damBehavior(ExecEdge.DamBehavior.END_INPUT).build(),
       FlinkTypeFactory.toLogicalRowType(getRowType),
-      getRelDetailedDescription
-    )
+      getRelDetailedDescription)
   }
 }

@@ -26,9 +26,9 @@ import org.apache.flink.table.api.UnresolvedException
 import org.apache.flink.table.validate.{ValidationFailure, ValidationResult, ValidationSuccess}
 
 /**
-  * Flattening of composite types. All flattenings are resolved into
-  * `GetCompositeField` expressions.
-  */
+ * Flattening of composite types. All flattenings are resolved into
+ * `GetCompositeField` expressions.
+ */
 case class Flattening(child: PlannerExpression) extends UnaryExpression {
 
   override def toString = s"$child.flatten()"
@@ -79,8 +79,7 @@ case class GetCompositeField(child: PlannerExpression, key: Any) extends UnaryEx
     child.resultType.asInstanceOf[CompositeType[_]].getTypeAt(fieldIndex.get)
 
   override private[flink] def toRexNode(implicit relBuilder: RelBuilder): RexNode = {
-    relBuilder
-      .getRexBuilder
+    relBuilder.getRexBuilder
       .makeFieldAccess(child.toRexNode, fieldIndex.get)
   }
 
@@ -90,8 +89,8 @@ case class GetCompositeField(child: PlannerExpression, key: Any) extends UnaryEx
   }
 
   /**
-    * Gives a meaningful alias if possible (e.g. a$mypojo$field).
-    */
+   * Gives a meaningful alias if possible (e.g. a$mypojo$field).
+   */
   private[flink] def aliasName(): Option[String] = child match {
     case gcf: GetCompositeField =>
       val alias = gcf.aliasName()

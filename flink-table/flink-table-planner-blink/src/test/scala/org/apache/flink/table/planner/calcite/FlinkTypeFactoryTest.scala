@@ -38,31 +38,23 @@ class FlinkTypeFactoryTest {
     def test(t: LogicalType): Unit = {
       Assert.assertEquals(
         t.copy(true),
-        FlinkTypeFactory.toLogicalType(
-          typeFactory.createFieldTypeFromLogicalType(t.copy(true)))
-      )
+        FlinkTypeFactory.toLogicalType(typeFactory.createFieldTypeFromLogicalType(t.copy(true))))
 
       if (!hasRoot(t, LogicalTypeRoot.NULL)) {
         Assert.assertEquals(
           t.copy(false),
-          FlinkTypeFactory.toLogicalType(
-            typeFactory.createFieldTypeFromLogicalType(t.copy(false)))
-        )
+          FlinkTypeFactory.toLogicalType(typeFactory.createFieldTypeFromLogicalType(t.copy(false))))
       }
 
       // twice for cache.
       Assert.assertEquals(
         t.copy(true),
-        FlinkTypeFactory.toLogicalType(
-          typeFactory.createFieldTypeFromLogicalType(t.copy(true)))
-      )
+        FlinkTypeFactory.toLogicalType(typeFactory.createFieldTypeFromLogicalType(t.copy(true))))
 
       if (!hasRoot(t, LogicalTypeRoot.NULL)) {
         Assert.assertEquals(
           t.copy(false),
-          FlinkTypeFactory.toLogicalType(
-            typeFactory.createFieldTypeFromLogicalType(t.copy(false)))
-        )
+          FlinkTypeFactory.toLogicalType(typeFactory.createFieldTypeFromLogicalType(t.copy(false))))
       }
     }
 
@@ -84,9 +76,10 @@ class FlinkTypeFactoryTest {
     test(new ArrayType(new DoubleType()))
     test(new MapType(new DoubleType(), new VarCharType(VarCharType.MAX_LENGTH)))
     test(RowType.of(new DoubleType(), new VarCharType(VarCharType.MAX_LENGTH)))
-    test(new RawType[DayOfWeek](
-      classOf[DayOfWeek],
-      new KryoSerializer[DayOfWeek](classOf[DayOfWeek], new ExecutionConfig)))
+    test(
+      new RawType[DayOfWeek](
+        classOf[DayOfWeek],
+        new KryoSerializer[DayOfWeek](classOf[DayOfWeek], new ExecutionConfig)))
   }
 
   @Test def testDecimalInferType(): Unit = {
@@ -101,17 +94,18 @@ class FlinkTypeFactoryTest {
     val genericTypeInfo = Types.GENERIC(classOf[TestClass])
     val genericTypeInfo2 = Types.GENERIC(classOf[TestClass2])
     val genericRelType = typeFactory
-        .createFieldTypeFromLogicalType(new TypeInformationRawType(genericTypeInfo))
+      .createFieldTypeFromLogicalType(new TypeInformationRawType(genericTypeInfo))
     val genericRelType2 = typeFactory
-        .createFieldTypeFromLogicalType(new TypeInformationRawType(genericTypeInfo))
+      .createFieldTypeFromLogicalType(new TypeInformationRawType(genericTypeInfo))
     val genericRelType3 = typeFactory
-        .createFieldTypeFromLogicalType(new TypeInformationRawType(genericTypeInfo2))
+      .createFieldTypeFromLogicalType(new TypeInformationRawType(genericTypeInfo2))
 
     assertTrue("The type expect to be canonized", genericRelType eq genericRelType2)
     assertFalse("The type expect to be not canonized", genericRelType eq genericRelType3)
-    assertFalse("The type expect to be not canonized",
+    assertFalse(
+      "The type expect to be not canonized",
       typeFactory.builder().add("f0", genericRelType).build()
-          eq typeFactory.builder().add("f0", genericRelType3).build())
+        eq typeFactory.builder().add("f0", genericRelType3).build())
   }
 
   case class TestClass(f0: Int, f1: String)

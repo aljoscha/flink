@@ -51,15 +51,14 @@ object CorrelateCodeGenerator {
       parallelism: Int,
       retainHeader: Boolean,
       opName: String,
-      transformationName: String)
-    : Transformation[RowData] = {
+      transformationName: String): Transformation[RowData] = {
 
     // according to the SQL standard, every scalar function should also be a table function
     // but we don't allow that for now
     invocation.getOperator match {
       case func: BridgingSqlFunction if func.getDefinition.getKind == FunctionKind.TABLE => // ok
-      case _: TableSqlFunction => // ok
-      case f@_ =>
+      case _: TableSqlFunction                                                           => // ok
+      case f @ _ =>
         throw new ValidationException(
           s"Invalid use of function '$f'. " +
             s"Currently, only table functions can be used in a correlate operation.")
@@ -93,8 +92,8 @@ object CorrelateCodeGenerator {
   }
 
   /**
-    * Generates the flat map operator to run the user-defined table function.
-    */
+   * Generates the flat map operator to run the user-defined table function.
+   */
   private[flink] def generateOperator[T <: Function](
       ctx: CodeGeneratorContext,
       config: TableConfig,
@@ -104,8 +103,7 @@ object CorrelateCodeGenerator {
       joinType: FlinkJoinType,
       rexCall: RexCall,
       ruleDescription: String,
-      retainHeader: Boolean = true)
-    : CodeGenOperatorFactory[RowData] = {
+      retainHeader: Boolean = true): CodeGenOperatorFactory[RowData] = {
 
     val functionResultType = FlinkTypeFactory.toLogicalRowType(rexCall.getType)
 
@@ -130,7 +128,7 @@ object CorrelateCodeGenerator {
       s"""
          |$correlateCollectorTerm.setCollector(
          | new ${classOf[StreamRecordCollector[_]].getCanonicalName}(
-         |     ${CodeGenUtils.DEFAULT_OPERATOR_COLLECTOR_TERM }));
+         |     ${CodeGenUtils.DEFAULT_OPERATOR_COLLECTOR_TERM}));
          |$resultCollectorTerm.setCollector($correlateCollectorTerm);
          |""".stripMargin
     ctx.addReusableOpenStatement(setCollectors)
@@ -171,7 +169,10 @@ object CorrelateCodeGenerator {
     }
 
     val genOperator = OperatorCodeGenerator.generateOneInputStreamOperator[RowData, RowData](
-      ctx, ruleDescription, body, inputType)
+      ctx,
+      ruleDescription,
+      body,
+      inputType)
     new CodeGenOperatorFactory(genOperator)
   }
 
@@ -186,8 +187,7 @@ object CorrelateCodeGenerator {
       functionResultType: RowType,
       resultType: RowType,
       condition: Option[RexNode],
-      retainHeader: Boolean = true)
-    : String = {
+      retainHeader: Boolean = true): String = {
 
     val correlateCollectorTerm = newName("correlateCollector")
     val inputTerm = CodeGenUtils.DEFAULT_INPUT1_TERM

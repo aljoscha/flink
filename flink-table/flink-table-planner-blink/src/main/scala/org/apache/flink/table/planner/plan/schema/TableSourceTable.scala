@@ -52,18 +52,19 @@ class TableSourceTable(
     val isStreamingMode: Boolean,
     val catalogTable: CatalogTable,
     val extraDigests: Array[String] = Array.empty)
-  extends FlinkPreparingTableBase(
-    relOptSchema,
-    rowType,
-    util.Arrays.asList(
-      tableIdentifier.getCatalogName,
-      tableIdentifier.getDatabaseName,
-      tableIdentifier.getObjectName),
-    statistic) {
+    extends FlinkPreparingTableBase(
+      relOptSchema,
+      rowType,
+      util.Arrays.asList(
+        tableIdentifier.getCatalogName,
+        tableIdentifier.getDatabaseName,
+        tableIdentifier.getObjectName),
+      statistic) {
 
   override def getQualifiedName: util.List[String] = {
-    val builder = ImmutableList.builder[String]()
-        .addAll(super.getQualifiedName)
+    val builder = ImmutableList
+      .builder[String]()
+      .addAll(super.getQualifiedName)
     extraDigests.foreach(builder.add)
     builder.build()
   }

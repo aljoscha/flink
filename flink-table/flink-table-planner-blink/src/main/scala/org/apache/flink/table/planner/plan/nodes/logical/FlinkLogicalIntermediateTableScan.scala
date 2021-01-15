@@ -33,14 +33,14 @@ import java.util
 import java.util.function.Supplier
 
 /**
-  * A flink TableScan that wraps [[IntermediateRelTable]].
-  */
+ * A flink TableScan that wraps [[IntermediateRelTable]].
+ */
 class FlinkLogicalIntermediateTableScan(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
     table: RelOptTable)
-  extends CommonIntermediateTableScan(cluster, traitSet, table)
-  with FlinkLogicalRel {
+    extends CommonIntermediateTableScan(cluster, traitSet, table)
+    with FlinkLogicalRel {
 
   override def copy(traitSet: RelTraitSet, inputs: util.List[RelNode]): RelNode = {
     new FlinkLogicalIntermediateTableScan(cluster, traitSet, getTable)
@@ -49,11 +49,11 @@ class FlinkLogicalIntermediateTableScan(
 }
 
 class FlinkLogicalIntermediateTableScanConverter
-  extends ConverterRule(
-    classOf[LogicalTableScan],
-    Convention.NONE,
-    FlinkConventions.LOGICAL,
-    "FlinkLogicalIntermediateTableScanConverter") {
+    extends ConverterRule(
+      classOf[LogicalTableScan],
+      Convention.NONE,
+      FlinkConventions.LOGICAL,
+      "FlinkLogicalIntermediateTableScanConverter") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val scan: TableScan = call.rel(0)
@@ -76,16 +76,20 @@ object FlinkLogicalIntermediateTableScan {
       relOptTable: RelOptTable): FlinkLogicalIntermediateTableScan = {
     val table: IntermediateRelTable = relOptTable.unwrap(classOf[IntermediateRelTable])
     require(table != null)
-    val traitSet = cluster.traitSetOf(FlinkConventions.LOGICAL)
-      .replaceIfs(RelCollationTraitDef.INSTANCE, new Supplier[util.List[RelCollation]]() {
-        def get: util.List[RelCollation] = {
-          if (table != null) {
-            table.getStatistic.getCollations
-          } else {
-            ImmutableList.of[RelCollation]
+    val traitSet = cluster
+      .traitSetOf(FlinkConventions.LOGICAL)
+      .replaceIfs(
+        RelCollationTraitDef.INSTANCE,
+        new Supplier[util.List[RelCollation]]() {
+          def get: util.List[RelCollation] = {
+            if (table != null) {
+              table.getStatistic.getCollations
+            } else {
+              ImmutableList.of[RelCollation]
+            }
           }
-        }
-      }).simplify()
+        })
+      .simplify()
 
     new FlinkLogicalIntermediateTableScan(cluster, traitSet, relOptTable)
   }

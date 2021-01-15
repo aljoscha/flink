@@ -26,11 +26,11 @@ import org.apache.flink.table.plan.nodes.dataset.DataSetIntersect
 import org.apache.flink.table.plan.nodes.logical.FlinkLogicalIntersect
 
 class DataSetIntersectRule
-  extends ConverterRule(
-    classOf[FlinkLogicalIntersect],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.DATASET,
-    "DataSetIntersectRule") {
+    extends ConverterRule(
+      classOf[FlinkLogicalIntersect],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.DATASET,
+      "DataSetIntersectRule") {
 
   def convert(rel: RelNode): RelNode = {
 

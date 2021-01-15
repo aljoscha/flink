@@ -24,9 +24,9 @@ import org.apache.calcite.rex.RexBuilder
 import org.apache.flink.table.plan.cost.FlinkDefaultRelMetadataProvider
 
 /**
-  * The utility class is to create special [[RelOptCluster]] instance which use
-  * [[FlinkDefaultRelMetadataProvider]] instead of [[DefaultRelMetadataProvider]].
-  */
+ * The utility class is to create special [[RelOptCluster]] instance which use
+ * [[FlinkDefaultRelMetadataProvider]] instead of [[DefaultRelMetadataProvider]].
+ */
 object FlinkRelOptClusterFactory {
 
   def create(planner: RelOptPlanner, rexBuilder: RexBuilder): RelOptCluster = {

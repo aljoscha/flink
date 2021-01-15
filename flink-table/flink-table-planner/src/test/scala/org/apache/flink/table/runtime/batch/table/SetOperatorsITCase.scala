@@ -36,9 +36,8 @@ import scala.collection.mutable
 import scala.util.Random
 
 @RunWith(classOf[Parameterized])
-class SetOperatorsITCase(
-    configMode: TableConfigMode)
-  extends TableProgramsCollectionTestBase(configMode) {
+class SetOperatorsITCase(configMode: TableConfigMode)
+    extends TableProgramsCollectionTestBase(configMode) {
 
   @Test
   def testUnionAll(): Unit = {
@@ -112,8 +111,11 @@ class SetOperatorsITCase(
     val ds1 = CollectionDataSets.getSmall3TupleDataSet(env).toTable(tEnv, 'a, 'b, 'c)
     val ds2 = env.fromElements((1, 1L, "Hi")).toTable(tEnv, 'a, 'b, 'c)
 
-    val minusDs = ds1.unionAll(ds1).unionAll(ds1)
-      .minusAll(ds2.unionAll(ds2)).select('c)
+    val minusDs = ds1
+      .unionAll(ds1)
+      .unionAll(ds1)
+      .minusAll(ds2.unionAll(ds2))
+      .select('c)
 
     val results = minusDs.toDataSet[Row].collect()
     val expected = "Hi\n" +
@@ -131,8 +133,11 @@ class SetOperatorsITCase(
     val ds1 = CollectionDataSets.getSmall3TupleDataSet(env).toTable(tEnv, 'a, 'b, 'c)
     val ds2 = env.fromElements((1, 1L, "Hi")).toTable(tEnv, 'a, 'b, 'c)
 
-    val minusDs = ds1.unionAll(ds1).unionAll(ds1)
-      .minus(ds2.unionAll(ds2)).select('c)
+    val minusDs = ds1
+      .unionAll(ds1)
+      .unionAll(ds1)
+      .minus(ds2.unionAll(ds2))
+      .select('c)
 
     val results = minusDs.toDataSet[Row].collect()
     val expected = "Hello\n" + "Hello world\n"
@@ -147,8 +152,11 @@ class SetOperatorsITCase(
     val ds1 = CollectionDataSets.getSmall3TupleDataSet(env).toTable(tEnv, 'a, 'b, 'c)
     val ds2 = env.fromElements((1, 1L, "Hi")).toTable(tEnv, 'd, 'e, 'f)
 
-    val minusDs = ds1.unionAll(ds1).unionAll(ds1)
-      .minus(ds2.unionAll(ds2)).select('c)
+    val minusDs = ds1
+      .unionAll(ds1)
+      .unionAll(ds1)
+      .minus(ds2.unionAll(ds2))
+      .select('c)
 
     val results = minusDs.toDataSet[Row].collect()
     val expected = "Hello\n" + "Hello world\n"
@@ -215,9 +223,13 @@ class SetOperatorsITCase(
     val env: ExecutionEnvironment = ExecutionEnvironment.getExecutionEnvironment
     val tEnv = BatchTableEnvironment.create(env, config)
 
-    val ds1 = CollectionDataSets.getSmall3TupleDataSet(env).toTable(tEnv, 'a, 'b, 'c)
+    val ds1 = CollectionDataSets
+      .getSmall3TupleDataSet(env)
+      .toTable(tEnv, 'a, 'b, 'c)
       .select('a + 1, 'b, 'c)
-    val ds2 = CollectionDataSets.get3TupleDataSet(env).toTable(tEnv, 'a, 'b, 'c)
+    val ds2 = CollectionDataSets
+      .get3TupleDataSet(env)
+      .toTable(tEnv, 'a, 'b, 'c)
       .select('a + 1, 'b, 'c)
 
     val intersectDs = ds1.intersect(ds2)

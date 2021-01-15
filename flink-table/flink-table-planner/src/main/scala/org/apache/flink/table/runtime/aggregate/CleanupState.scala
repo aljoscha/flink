@@ -26,8 +26,8 @@ import java.lang.{Long => JLong}
 import org.apache.flink.streaming.api.TimerService
 
 /**
-  * Base class for clean up state, both for [[ProcessFunction]] and [[CoProcessFunction]].
-  */
+ * Base class for clean up state, both for [[ProcessFunction]] and [[CoProcessFunction]].
+ */
 trait CleanupState {
 
   def registerProcessingCleanupTimer(

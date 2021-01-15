@@ -36,8 +36,7 @@ class TableSinkTest extends TableTestBase {
 
   @Test
   def testSingleSink(): Unit = {
-    util.addTable(
-      s"""
+    util.addTable(s"""
          |CREATE TABLE sink (
          |  `a` BIGINT
          |) WITH (
@@ -51,16 +50,14 @@ class TableSinkTest extends TableTestBase {
 
   @Test
   def testMultiSinks(): Unit = {
-    util.addTable(
-      s"""
+    util.addTable(s"""
          |CREATE TABLE sink1 (
          |  `total_sum` INT
          |) WITH (
          |  'connector' = 'values'
          |)
          |""".stripMargin)
-    util.addTable(
-      s"""
+    util.addTable(s"""
          |CREATE TABLE sink2 (
          |  `total_min` INT
          |) WITH (
@@ -69,7 +66,8 @@ class TableSinkTest extends TableTestBase {
          |""".stripMargin)
 
     util.tableEnv.getConfig.getConfiguration.setBoolean(
-      RelNodeBlockPlanBuilder.TABLE_OPTIMIZER_REUSE_OPTIMIZE_BLOCK_WITH_DIGEST_ENABLED, true)
+      RelNodeBlockPlanBuilder.TABLE_OPTIMIZER_REUSE_OPTIMIZE_BLOCK_WITH_DIGEST_ENABLED,
+      true)
     val table1 = util.tableEnv.sqlQuery("SELECT SUM(a) AS sum_a, c FROM MyTable GROUP BY c")
     util.tableEnv.createTemporaryView("table1", table1)
     val stmtSet = util.tableEnv.createStatementSet()
@@ -81,8 +79,7 @@ class TableSinkTest extends TableTestBase {
 
   @Test
   def testDynamicPartWithOrderBy(): Unit = {
-    util.addTable(
-      s"""
+    util.addTable(s"""
          |CREATE TABLE sink (
          |  `a` INT,
          |  `b` BIGINT

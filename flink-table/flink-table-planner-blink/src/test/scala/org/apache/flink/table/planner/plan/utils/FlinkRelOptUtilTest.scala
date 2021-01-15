@@ -17,7 +17,11 @@
  */
 package org.apache.flink.table.planner.plan.utils
 
-import org.apache.flink.api.common.typeinfo.BasicTypeInfo.{DOUBLE_TYPE_INFO, INT_TYPE_INFO, STRING_TYPE_INFO}
+import org.apache.flink.api.common.typeinfo.BasicTypeInfo.{
+  DOUBLE_TYPE_INFO,
+  INT_TYPE_INFO,
+  STRING_TYPE_INFO
+}
 import org.apache.flink.api.java.typeutils.RowTypeInfo
 import org.apache.flink.api.scala._
 import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
@@ -54,7 +58,7 @@ class FlinkRelOptUtilTest {
 
   @Test
   def testToString(): Unit = {
-    val env  = StreamExecutionEnvironment.createLocalEnvironment()
+    val env = StreamExecutionEnvironment.createLocalEnvironment()
     val tableEnv = StreamTableEnvironment.create(env, TableTestUtil.STREAM_SETTING)
 
     val table = env.fromElements[(Int, Long, String)]().toTable(tableEnv, 'a, 'b, 'c)
@@ -99,8 +103,7 @@ class FlinkRelOptUtilTest {
 
   @Test
   def testGetDigestWithDynamicFunction(): Unit = {
-    val table = tableEnv.sqlQuery(
-      """
+    val table = tableEnv.sqlQuery("""
         |(SELECT id AS random FROM MyTable ORDER BY rand() LIMIT 1)
         |INTERSECT
         |(SELECT id AS random FROM MyTable ORDER BY rand() LIMIT 1)
@@ -116,8 +119,7 @@ class FlinkRelOptUtilTest {
   def testGetDigestWithDynamicFunctionView(): Unit = {
     val view = tableEnv.sqlQuery("SELECT id AS random FROM MyTable ORDER BY rand() LIMIT 1")
     tableEnv.registerTable("MyView", view)
-    val table = tableEnv.sqlQuery(
-      """
+    val table = tableEnv.sqlQuery("""
         |(SELECT * FROM MyView)
         |INTERSECT
         |(SELECT * FROM MyView)
@@ -125,8 +127,8 @@ class FlinkRelOptUtilTest {
         |(SELECT * FROM MyView)
       """.stripMargin)
     val rel = TableTestUtil.toRelNode(table).accept(new ExpandTableScanShuttle())
-    val expected = TableTestUtil.readFromResource(
-      "/digest/testGetDigestWithDynamicFunctionView.out")
+    val expected =
+      TableTestUtil.readFromResource("/digest/testGetDigestWithDynamicFunctionView.out")
     assertEquals(expected, FlinkRelOptUtil.getDigest(rel))
   }
 
@@ -172,24 +174,34 @@ class FlinkRelOptUtilTest {
 
   @Test
   def testMergeWithNoneMiniBatch(): Unit = {
-    assertEquals(MiniBatchInterval.NO_MINIBATCH,
+    assertEquals(
+      MiniBatchInterval.NO_MINIBATCH,
       FlinkRelOptUtil.mergeMiniBatchInterval(
-        MiniBatchInterval.NO_MINIBATCH, MiniBatchInterval.NONE))
-    assertEquals(MiniBatchInterval.NO_MINIBATCH,
+        MiniBatchInterval.NO_MINIBATCH,
+        MiniBatchInterval.NONE))
+    assertEquals(
+      MiniBatchInterval.NO_MINIBATCH,
       FlinkRelOptUtil.mergeMiniBatchInterval(
-        MiniBatchInterval.NONE, MiniBatchInterval.NO_MINIBATCH))
-    assertEquals(MiniBatchInterval.NO_MINIBATCH,
+        MiniBatchInterval.NONE,
+        MiniBatchInterval.NO_MINIBATCH))
+    assertEquals(
+      MiniBatchInterval.NO_MINIBATCH,
       FlinkRelOptUtil.mergeMiniBatchInterval(
-        MiniBatchInterval.NO_MINIBATCH, MiniBatchInterval.NO_MINIBATCH))
+        MiniBatchInterval.NO_MINIBATCH,
+        MiniBatchInterval.NO_MINIBATCH))
     val rowtime = MiniBatchInterval(3000L, MiniBatchMode.RowTime)
-    assertEquals(MiniBatchInterval.NO_MINIBATCH,
+    assertEquals(
+      MiniBatchInterval.NO_MINIBATCH,
       FlinkRelOptUtil.mergeMiniBatchInterval(MiniBatchInterval.NO_MINIBATCH, rowtime))
-    assertEquals(MiniBatchInterval.NO_MINIBATCH,
+    assertEquals(
+      MiniBatchInterval.NO_MINIBATCH,
       FlinkRelOptUtil.mergeMiniBatchInterval(rowtime, MiniBatchInterval.NO_MINIBATCH))
     val proctime = MiniBatchInterval(1000L, MiniBatchMode.ProcTime)
-    assertEquals(MiniBatchInterval.NO_MINIBATCH,
+    assertEquals(
+      MiniBatchInterval.NO_MINIBATCH,
       FlinkRelOptUtil.mergeMiniBatchInterval(MiniBatchInterval.NO_MINIBATCH, proctime))
-    assertEquals(MiniBatchInterval.NO_MINIBATCH,
+    assertEquals(
+      MiniBatchInterval.NO_MINIBATCH,
       FlinkRelOptUtil.mergeMiniBatchInterval(proctime, MiniBatchInterval.NO_MINIBATCH))
   }
 

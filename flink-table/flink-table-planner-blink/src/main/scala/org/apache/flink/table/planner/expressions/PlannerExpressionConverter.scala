@@ -31,14 +31,15 @@ import org.apache.flink.table.types.logical.utils.LogicalTypeChecks._
 import _root_.scala.collection.JavaConverters._
 
 /**
-  * Visitor implementation for converting [[Expression]]s to [[PlannerExpression]]s.
-  */
+ * Visitor implementation for converting [[Expression]]s to [[PlannerExpression]]s.
+ */
 class PlannerExpressionConverter private extends ApiExpressionVisitor[PlannerExpression] {
 
   override def visit(call: CallExpression): PlannerExpression = {
     val definition = call.getFunctionDefinition
     translateCall(
-      definition, call.getChildren.asScala,
+      definition,
+      call.getChildren.asScala,
       () =>
         definition match {
           case ROW | ARRAY | MAP => ApiResolvedExpression(call.getOutputDataType)
@@ -63,8 +64,7 @@ class PlannerExpressionConverter private extends ApiExpressionVisitor[PlannerExp
   private def translateCall(
       func: FunctionDefinition,
       children: Seq[Expression],
-      unknownFunctionHandler: () => PlannerExpression)
-    : PlannerExpression = {
+      unknownFunctionHandler: () => PlannerExpression): PlannerExpression = {
 
     // special case: requires individual handling of child expressions
     func match {
@@ -73,8 +73,7 @@ class PlannerExpressionConverter private extends ApiExpressionVisitor[PlannerExp
         assert(children.size == 3)
         return Reinterpret(
           children.head.accept(this),
-          fromDataTypeToTypeInfo(
-            children(1).asInstanceOf[TypeLiteralExpression].getOutputDataType),
+          fromDataTypeToTypeInfo(children(1).asInstanceOf[TypeLiteralExpression].getOutputDataType),
           getValue[Boolean](children(2).accept(this)))
 
       case WINDOW_START =>
@@ -101,8 +100,7 @@ class PlannerExpressionConverter private extends ApiExpressionVisitor[PlannerExp
         assert(children.size == 2)
         return ThrowException(
           children.head.accept(this),
-          fromDataTypeToTypeInfo(
-            children(1).asInstanceOf[TypeLiteralExpression].getOutputDataType))
+          fromDataTypeToTypeInfo(children(1).asInstanceOf[TypeLiteralExpression].getOutputDataType))
 
       case _ =>
     }
@@ -111,19 +109,13 @@ class PlannerExpressionConverter private extends ApiExpressionVisitor[PlannerExp
 
     func match {
       case sfd: ScalarFunctionDefinition =>
-        val call = PlannerScalarFunctionCall(
-          sfd.getScalarFunction,
-          args)
+        val call = PlannerScalarFunctionCall(sfd.getScalarFunction, args)
         //it configures underlying state
         call.validateInput()
         call
 
       case tfd: TableFunctionDefinition =>
-        PlannerTableFunctionCall(
-          tfd.toString,
-          tfd.getTableFunction,
-          args,
-          tfd.getResultType)
+        PlannerTableFunctionCall(tfd.toString, tfd.getTableFunction, args, tfd.getResultType)
 
       case afd: AggregateFunctionDefinition =>
         AggFunctionCall(
@@ -220,11 +212,7 @@ class PlannerExpressionConverter private extends ApiExpressionVisitor[PlannerExp
 
           case TEMPORAL_OVERLAPS =>
             assert(args.size == 4)
-            TemporalOverlaps(
-              args.head,
-              args(1),
-              args(2),
-              args.last)
+            TemporalOverlaps(args.head, args(1), args(2), args.last)
 
           case DATE_FORMAT =>
             assert(args.size == 2)
@@ -256,13 +244,7 @@ class PlannerExpressionConverter private extends ApiExpressionVisitor[PlannerExp
 
           case OVER =>
             assert(args.size >= 4)
-            OverCall(
-              args.head,
-              args.slice(4, args.size),
-              args(1),
-              args(2),
-              args(3)
-            )
+            OverCall(args.head, args.slice(4, args.size), args(1), args(2), args(3))
 
           case UNBOUNDED_RANGE =>
             assert(args.isEmpty)
@@ -300,15 +282,13 @@ class PlannerExpressionConverter private extends ApiExpressionVisitor[PlannerExp
     if (literal.isNull) {
       Null(typeInfo)
     } else {
-      Literal(
-        literal.getValueAs(typeInfo.getTypeClass).get(),
-        typeInfo)
+      Literal(literal.getValueAs(typeInfo.getTypeClass).get(), typeInfo)
     }
   }
 
   /**
-    * This method makes the planner more lenient for new data types defined for literals.
-    */
+   * This method makes the planner more lenient for new data types defined for literals.
+   */
   private def getLiteralTypeInfo(literal: ValueLiteralExpression): TypeInformation[_] = {
     val logicalType = literal.getOutputDataType.getLogicalType
 
@@ -320,9 +300,7 @@ class PlannerExpressionConverter private extends ApiExpressionVisitor[PlannerExp
       if (hasPrecision(logicalType, value.precision()) && hasScale(logicalType, value.scale())) {
         return Types.BIG_DEC
       }
-    }
-
-    else if (hasRoot(logicalType, CHAR)) {
+    } else if (hasRoot(logicalType, CHAR)) {
       if (literal.isNull) {
         return Types.STRING
       }
@@ -336,31 +314,31 @@ class PlannerExpressionConverter private extends ApiExpressionVisitor[PlannerExp
   }
 
   private def getSymbol(symbol: TableSymbol): PlannerSymbol = symbol match {
-    case TimeIntervalUnit.YEAR => PlannerTimeIntervalUnit.YEAR
-    case TimeIntervalUnit.YEAR_TO_MONTH => PlannerTimeIntervalUnit.YEAR_TO_MONTH
-    case TimeIntervalUnit.QUARTER => PlannerTimeIntervalUnit.QUARTER
-    case TimeIntervalUnit.MONTH => PlannerTimeIntervalUnit.MONTH
-    case TimeIntervalUnit.WEEK => PlannerTimeIntervalUnit.WEEK
-    case TimeIntervalUnit.DAY => PlannerTimeIntervalUnit.DAY
-    case TimeIntervalUnit.DAY_TO_HOUR => PlannerTimeIntervalUnit.DAY_TO_HOUR
-    case TimeIntervalUnit.DAY_TO_MINUTE => PlannerTimeIntervalUnit.DAY_TO_MINUTE
-    case TimeIntervalUnit.DAY_TO_SECOND => PlannerTimeIntervalUnit.DAY_TO_SECOND
-    case TimeIntervalUnit.HOUR => PlannerTimeIntervalUnit.HOUR
-    case TimeIntervalUnit.SECOND => PlannerTimeIntervalUnit.SECOND
-    case TimeIntervalUnit.HOUR_TO_MINUTE => PlannerTimeIntervalUnit.HOUR_TO_MINUTE
-    case TimeIntervalUnit.HOUR_TO_SECOND => PlannerTimeIntervalUnit.HOUR_TO_SECOND
-    case TimeIntervalUnit.MINUTE => PlannerTimeIntervalUnit.MINUTE
+    case TimeIntervalUnit.YEAR             => PlannerTimeIntervalUnit.YEAR
+    case TimeIntervalUnit.YEAR_TO_MONTH    => PlannerTimeIntervalUnit.YEAR_TO_MONTH
+    case TimeIntervalUnit.QUARTER          => PlannerTimeIntervalUnit.QUARTER
+    case TimeIntervalUnit.MONTH            => PlannerTimeIntervalUnit.MONTH
+    case TimeIntervalUnit.WEEK             => PlannerTimeIntervalUnit.WEEK
+    case TimeIntervalUnit.DAY              => PlannerTimeIntervalUnit.DAY
+    case TimeIntervalUnit.DAY_TO_HOUR      => PlannerTimeIntervalUnit.DAY_TO_HOUR
+    case TimeIntervalUnit.DAY_TO_MINUTE    => PlannerTimeIntervalUnit.DAY_TO_MINUTE
+    case TimeIntervalUnit.DAY_TO_SECOND    => PlannerTimeIntervalUnit.DAY_TO_SECOND
+    case TimeIntervalUnit.HOUR             => PlannerTimeIntervalUnit.HOUR
+    case TimeIntervalUnit.SECOND           => PlannerTimeIntervalUnit.SECOND
+    case TimeIntervalUnit.HOUR_TO_MINUTE   => PlannerTimeIntervalUnit.HOUR_TO_MINUTE
+    case TimeIntervalUnit.HOUR_TO_SECOND   => PlannerTimeIntervalUnit.HOUR_TO_SECOND
+    case TimeIntervalUnit.MINUTE           => PlannerTimeIntervalUnit.MINUTE
     case TimeIntervalUnit.MINUTE_TO_SECOND => PlannerTimeIntervalUnit.MINUTE_TO_SECOND
-    case TimePointUnit.YEAR => PlannerTimePointUnit.YEAR
-    case TimePointUnit.MONTH => PlannerTimePointUnit.MONTH
-    case TimePointUnit.DAY => PlannerTimePointUnit.DAY
-    case TimePointUnit.HOUR => PlannerTimePointUnit.HOUR
-    case TimePointUnit.MINUTE => PlannerTimePointUnit.MINUTE
-    case TimePointUnit.SECOND => PlannerTimePointUnit.SECOND
-    case TimePointUnit.QUARTER => PlannerTimePointUnit.QUARTER
-    case TimePointUnit.WEEK => PlannerTimePointUnit.WEEK
-    case TimePointUnit.MILLISECOND => PlannerTimePointUnit.MILLISECOND
-    case TimePointUnit.MICROSECOND => PlannerTimePointUnit.MICROSECOND
+    case TimePointUnit.YEAR                => PlannerTimePointUnit.YEAR
+    case TimePointUnit.MONTH               => PlannerTimePointUnit.MONTH
+    case TimePointUnit.DAY                 => PlannerTimePointUnit.DAY
+    case TimePointUnit.HOUR                => PlannerTimePointUnit.HOUR
+    case TimePointUnit.MINUTE              => PlannerTimePointUnit.MINUTE
+    case TimePointUnit.SECOND              => PlannerTimePointUnit.SECOND
+    case TimePointUnit.QUARTER             => PlannerTimePointUnit.QUARTER
+    case TimePointUnit.WEEK                => PlannerTimePointUnit.WEEK
+    case TimePointUnit.MILLISECOND         => PlannerTimePointUnit.MILLISECOND
+    case TimePointUnit.MICROSECOND         => PlannerTimePointUnit.MICROSECOND
 
     case _ =>
       throw new TableException("Unsupported symbol: " + symbol)
@@ -372,8 +350,7 @@ class PlannerExpressionConverter private extends ApiExpressionVisitor[PlannerExp
       fromDataTypeToTypeInfo(fieldReference.getOutputDataType))
   }
 
-  override def visit(fieldReference: UnresolvedReferenceExpression)
-    : PlannerExpression = {
+  override def visit(fieldReference: UnresolvedReferenceExpression): PlannerExpression = {
     UnresolvedFieldReference(fieldReference.getName)
   }
 
@@ -384,8 +361,7 @@ class PlannerExpressionConverter private extends ApiExpressionVisitor[PlannerExp
   override def visit(tableRef: TableReferenceExpression): PlannerExpression = {
     TableReference(
       tableRef.asInstanceOf[TableReferenceExpression].getName,
-      tableRef.asInstanceOf[TableReferenceExpression].getQueryOperation
-    )
+      tableRef.asInstanceOf[TableReferenceExpression].getQueryOperation)
   }
 
   override def visit(local: LocalReferenceExpression): PlannerExpression =
@@ -398,7 +374,7 @@ class PlannerExpressionConverter private extends ApiExpressionVisitor[PlannerExp
     other match {
       // already converted planner expressions will pass this visitor without modification
       case plannerExpression: PlannerExpression => plannerExpression
-      case expr: RexNodeExpression => RexPlannerExpression(expr.getRexNode)
+      case expr: RexNodeExpression              => RexPlannerExpression(expr.getRexNode)
       case _ =>
         throw new TableException("Unrecognized expression: " + other)
     }
@@ -415,7 +391,7 @@ class PlannerExpressionConverter private extends ApiExpressionVisitor[PlannerExp
   }
 
   private def translateWindowReference(reference: Expression): PlannerExpression = reference match {
-    case expr : LocalReferenceExpression =>
+    case expr: LocalReferenceExpression =>
       WindowReference(expr.getName, Some(fromDataTypeToTypeInfo(expr.getOutputDataType)))
     //just because how the datastream is converted to table
     case expr: UnresolvedReferenceExpression =>

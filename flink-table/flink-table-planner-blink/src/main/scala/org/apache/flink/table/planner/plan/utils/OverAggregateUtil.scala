@@ -50,8 +50,7 @@ object OverAggregateUtil {
       partition,
       groups.map(createGroupSpec(_, logicalWindow)),
       logicalWindow.constants.asList(),
-      calcOriginalInputFields(logicalWindow)
-    )
+      calcOriginalInputFields(logicalWindow))
   }
 
   /**
@@ -162,9 +161,10 @@ object OverAggregateUtil {
       val flag = if (windowBound.isPreceding) -1 else 1
       val literal = constants.get(boundIndex)
       literal.getType.getSqlTypeName match {
-        case _@SqlTypeName.DECIMAL =>
-          literal.getValue3.asInstanceOf[java.math.BigDecimal].multiply(
-            new java.math.BigDecimal(flag))
+        case _ @SqlTypeName.DECIMAL =>
+          literal.getValue3
+            .asInstanceOf[java.math.BigDecimal]
+            .multiply(new java.math.BigDecimal(flag))
         case _ => literal.getValueAs(classOf[java.lang.Long]) * flag
       }
     }
@@ -187,11 +187,13 @@ object OverAggregateUtil {
         }
       }
       // orderCollation should filter those order keys which are contained by groupSet.
-      val orderCollation = collations.filter { c =>
-        !intersectIds.contains(c.getFieldIndex)
-      }.map { c =>
-        (c.getFieldIndex, c.getDirection, c.nullDirection)
-      }
+      val orderCollation = collations
+        .filter { c =>
+          !intersectIds.contains(c.getFieldIndex)
+        }
+        .map { c =>
+          (c.getFieldIndex, c.getDirection, c.nullDirection)
+        }
       val fields = new JArrayList[RelFieldCollation]()
       for (field <- groupCollation ++ orderCollation) {
         fields.add(FlinkRelOptUtil.ofRelFieldCollation(field._1, field._2, field._3))

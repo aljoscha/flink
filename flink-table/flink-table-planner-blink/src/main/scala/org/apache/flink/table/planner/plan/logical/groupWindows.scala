@@ -22,11 +22,11 @@ import org.apache.flink.table.expressions._
 import org.apache.flink.table.planner.expressions.PlannerWindowReference
 
 /**
-  * Logical super class for group windows.
-  *
-  * @param aliasAttribute window alias
-  * @param timeAttribute time field indicating event-time or processing-time
-  */
+ * Logical super class for group windows.
+ *
+ * @param aliasAttribute window alias
+ * @param timeAttribute time field indicating event-time or processing-time
+ */
 abstract class LogicalWindow(
     val aliasAttribute: PlannerWindowReference,
     val timeAttribute: FieldReferenceExpression) {
@@ -42,9 +42,7 @@ case class TumblingGroupWindow(
     alias: PlannerWindowReference,
     timeField: FieldReferenceExpression,
     size: ValueLiteralExpression)
-  extends LogicalWindow(
-    alias,
-    timeField) {
+    extends LogicalWindow(alias, timeField) {
 
   override def toString: String = s"TumblingGroupWindow($alias, $timeField, $size)"
 }
@@ -58,9 +56,7 @@ case class SlidingGroupWindow(
     timeField: FieldReferenceExpression,
     size: ValueLiteralExpression,
     slide: ValueLiteralExpression)
-  extends LogicalWindow(
-    alias,
-    timeField) {
+    extends LogicalWindow(alias, timeField) {
 
   override def toString: String = s"SlidingGroupWindow($alias, $timeField, $size, $slide)"
 }
@@ -73,9 +69,7 @@ case class SessionGroupWindow(
     alias: PlannerWindowReference,
     timeField: FieldReferenceExpression,
     gap: ValueLiteralExpression)
-  extends LogicalWindow(
-    alias,
-    timeField) {
+    extends LogicalWindow(alias, timeField) {
 
   override def toString: String = s"SessionGroupWindow($alias, $timeField, $gap)"
 }

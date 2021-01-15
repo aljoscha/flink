@@ -65,7 +65,8 @@ class TableSourceTest extends TableTestBase {
        """.stripMargin
     util.tableEnv.executeSql(ddl)
 
-    val t = util.tableEnv.from("rowTimeT")
+    val t = util.tableEnv
+      .from("rowTimeT")
       .where($"val" > 100)
       .window(Tumble over 10.minutes on 'rowtime as 'w)
       .groupBy('name, 'w)
@@ -90,7 +91,8 @@ class TableSourceTest extends TableTestBase {
        """.stripMargin
     util.tableEnv.executeSql(ddl)
 
-    val t = util.tableEnv.from("rowTimeT")
+    val t = util.tableEnv
+      .from("rowTimeT")
       .where($"val" > 100)
       .window(Tumble over 10.minutes on 'rowtime as 'w)
       .groupBy('name, 'w)
@@ -114,7 +116,8 @@ class TableSourceTest extends TableTestBase {
        """.stripMargin
     util.tableEnv.executeSql(ddl)
 
-    val t = util.tableEnv.from("procTimeT")
+    val t = util.tableEnv
+      .from("procTimeT")
       .window(Over partitionBy 'id orderBy 'proctime preceding 2.hours as 'w)
       .select('id, 'name, 'val.sum over 'w as 'valSum)
       .filter('valSum > 100)
@@ -232,7 +235,8 @@ class TableSourceTest extends TableTestBase {
 
     val t = util.tableEnv
       .from("T")
-      .select('id,
+      .select(
+        'id,
         'deepNested.get("nested1").get("name") as 'nestedName,
         'nested.get("value") as 'nestedValue,
         'deepNested.get("nested2").get("flag") as 'nestedFlag,

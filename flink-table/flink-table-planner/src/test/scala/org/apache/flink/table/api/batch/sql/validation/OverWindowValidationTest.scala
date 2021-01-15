@@ -30,8 +30,8 @@ import java.sql.Timestamp
 class OverWindowValidationTest extends TableTestBase {
 
   /**
-    * OVER clause is necessary for [[OverAgg0]] window function.
-    */
+   * OVER clause is necessary for [[OverAgg0]] window function.
+   */
   @Test(expected = classOf[ValidationException])
   def testInvalidOverAggregation(): Unit = {
 
@@ -45,8 +45,8 @@ class OverWindowValidationTest extends TableTestBase {
   }
 
   /**
-    * OVER clause is necessary for [[OverAgg0]] window function.
-    */
+   * OVER clause is necessary for [[OverAgg0]] window function.
+   */
   @Test(expected = classOf[ValidationException])
   def testInvalidOverAggregation2(): Unit = {
     val util = batchTestUtil()

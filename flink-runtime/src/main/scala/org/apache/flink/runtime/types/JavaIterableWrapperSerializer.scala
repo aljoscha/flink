@@ -67,7 +67,8 @@ private object JavaIterableWrapperSerializer {
 
   // Get the underlying method so we can use it to get the Scala collection for serialization.
   private val underlyingMethodOpt = {
-    try Some(wrapperClass.getDeclaredMethod("underlying")) catch {
+    try Some(wrapperClass.getDeclaredMethod("underlying"))
+    catch {
       case e: Exception =>
         None
     }

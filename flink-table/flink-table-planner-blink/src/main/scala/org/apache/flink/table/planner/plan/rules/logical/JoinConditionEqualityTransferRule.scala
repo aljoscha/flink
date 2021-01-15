@@ -31,18 +31,17 @@ import scala.collection.JavaConversions._
 import scala.collection.mutable
 
 /**
-  * Planner rule that converts Join's conditions to the left or right table's own
-  * independent filter as much as possible, so that the rules of filter-push-down can push down
-  * the filter to below.
-  *
-  * <p>e.g. join condition: l_a = r_b and l_a = r_c.
-  * The l_a is a field from left input, both r_b and r_c are fields from the right input.
-  * After rewrite, condition will be: l_a = r_b and r_b = r_c.
-  * r_b = r_c can be pushed down to the right input.
-  */
-class JoinConditionEqualityTransferRule extends RelOptRule(
-  operand(classOf[Join], any),
-  "JoinConditionEqualityTransferRule") {
+ * Planner rule that converts Join's conditions to the left or right table's own
+ * independent filter as much as possible, so that the rules of filter-push-down can push down
+ * the filter to below.
+ *
+ * <p>e.g. join condition: l_a = r_b and l_a = r_c.
+ * The l_a is a field from left input, both r_b and r_c are fields from the right input.
+ * After rewrite, condition will be: l_a = r_b and r_b = r_c.
+ * r_b = r_c can be pushed down to the right input.
+ */
+class JoinConditionEqualityTransferRule
+    extends RelOptRule(operand(classOf[Join], any), "JoinConditionEqualityTransferRule") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val join: Join = call.rel(0)
@@ -91,8 +90,9 @@ class JoinConditionEqualityTransferRule extends RelOptRule(
       rexCalls.foreach(call => newEquiJoinFilters += call)
     }
 
-    val newJoinFilter = builder.and(remainFilters :+
-      FlinkRexUtil.simplify(rexBuilder, builder.and(newEquiJoinFilters)))
+    val newJoinFilter = builder.and(
+      remainFilters :+
+        FlinkRexUtil.simplify(rexBuilder, builder.and(newEquiJoinFilters)))
     val newJoin = join.copy(
       join.getTraitSet,
       newJoinFilter,
@@ -105,16 +105,16 @@ class JoinConditionEqualityTransferRule extends RelOptRule(
   }
 
   /**
-    * Returns true if the given input ref is from join left, else false.
-    */
+   * Returns true if the given input ref is from join left, else false.
+   */
   private def fromJoinLeft(join: Join, ref: RexInputRef): Boolean = {
     require(join.getSystemFieldList.size() == 0)
     ref.getIndex < join.getLeft.getRowType.getFieldCount
   }
 
   /**
-    * Partition join condition to leftRef-rightRef equals and others.
-    */
+   * Partition join condition to leftRef-rightRef equals and others.
+   */
   def partitionJoinFilters(join: Join): (Seq[RexNode], Seq[RexNode]) = {
     val conjunctions = RelOptUtil.conjunctions(join.getCondition)
     conjunctions.partition {
@@ -131,32 +131,31 @@ class JoinConditionEqualityTransferRule extends RelOptRule(
   }
 
   /**
-    * Put fields to a group that have equivalence relationships.
-    */
+   * Put fields to a group that have equivalence relationships.
+   */
   def getEquiFilterRelationshipGroup(equiJoinFilters: Seq[RexNode]): Seq[Seq[RexInputRef]] = {
     val filterSets = mutable.ArrayBuffer[mutable.HashSet[RexInputRef]]()
-    equiJoinFilters.foreach {
-      case call: RexCall =>
-        require(call.isA(SqlKind.EQUALS))
-        val left = call.operands.head.asInstanceOf[RexInputRef]
-        val right = call.operands.last.asInstanceOf[RexInputRef]
-        val set = filterSets.find(set => set.contains(left) || set.contains(right)) match {
-          case Some(s) => s
-          case None =>
-            val s = new mutable.HashSet[RexInputRef]()
-            filterSets += s
-            s
-        }
-        set += left
-        set += right
+    equiJoinFilters.foreach { case call: RexCall =>
+      require(call.isA(SqlKind.EQUALS))
+      val left = call.operands.head.asInstanceOf[RexInputRef]
+      val right = call.operands.last.asInstanceOf[RexInputRef]
+      val set = filterSets.find(set => set.contains(left) || set.contains(right)) match {
+        case Some(s) => s
+        case None =>
+          val s = new mutable.HashSet[RexInputRef]()
+          filterSets += s
+          s
+      }
+      set += left
+      set += right
     }
 
     filterSets.map(_.toSeq)
   }
 
   /**
-    * Make calls to a number of inputRefs, make sure that they both have a relationship.
-    */
+   * Make calls to a number of inputRefs, make sure that they both have a relationship.
+   */
   def makeCalls(rexBuilder: RexBuilder, nodes: Seq[RexInputRef]): Seq[RexNode] = {
     val calls = new mutable.ArrayBuffer[RexNode]()
     if (nodes.length > 1) {

@@ -20,8 +20,6 @@ package org.apache.flink.api.scala.operators.translation
 
 import org.apache.flink.api.common.functions.Partitioner
 
-
-
 class TestPartitionerInt extends Partitioner[Int] {
   override def partition(key: Int, numPartitions: Int): Int = 0
 }

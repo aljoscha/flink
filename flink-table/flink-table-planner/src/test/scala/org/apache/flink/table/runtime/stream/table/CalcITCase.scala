@@ -24,7 +24,11 @@ import org.apache.flink.table.api._
 import org.apache.flink.table.api.bridge.scala._
 import org.apache.flink.table.expressions.utils._
 import org.apache.flink.table.functions.ScalarFunction
-import org.apache.flink.table.runtime.utils.{StreamITCase, StreamTestData, UserDefinedFunctionTestUtils}
+import org.apache.flink.table.runtime.utils.{
+  StreamITCase,
+  StreamTestData,
+  UserDefinedFunctionTestUtils
+}
 import org.apache.flink.table.utils.LegacyRowResource
 import org.apache.flink.test.util.AbstractTestBase
 import org.apache.flink.types.Row
@@ -52,17 +56,16 @@ class CalcITCase extends AbstractTestBase {
     results.addSink(new StreamITCase.StringSink[Row])
     env.execute()
 
-    val expected = mutable.MutableList(
-        "1,1,Hi",
-        "2,2,Hello",
-        "3,2,Hello world")
+    val expected = mutable.MutableList("1,1,Hi", "2,2,Hello", "3,2,Hello world")
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
   }
 
   @Test
   def testSimpleSelectEmpty(): Unit = {
     StreamITCase.testResults = mutable.MutableList()
-    val ds = StreamTestData.getSmall3TupleDataStream(env).toTable(tEnv)
+    val ds = StreamTestData
+      .getSmall3TupleDataStream(env)
+      .toTable(tEnv)
       .select()
       .select(1.count)
 
@@ -104,7 +107,9 @@ class CalcITCase extends AbstractTestBase {
   def testSimpleSelectWithNaming(): Unit = {
     // verify ProjectMergeRule.
     StreamITCase.testResults = mutable.MutableList()
-    val ds = StreamTestData.get3TupleDataStream(env).toTable(tEnv)
+    val ds = StreamTestData
+      .get3TupleDataStream(env)
+      .toTable(tEnv)
       .select('_1 as 'a, '_2 as 'b, '_1 as 'c)
       .select('a, 'b)
 
@@ -113,30 +118,47 @@ class CalcITCase extends AbstractTestBase {
     env.execute()
 
     val expected = mutable.MutableList(
-      "1,1", "2,2", "3,2", "4,3", "5,3", "6,3", "7,4",
-      "8,4", "9,4", "10,4", "11,5", "12,5", "13,5", "14,5", "15,5",
-      "16,6", "17,6", "18,6", "19,6", "20,6", "21,6")
+      "1,1",
+      "2,2",
+      "3,2",
+      "4,3",
+      "5,3",
+      "6,3",
+      "7,4",
+      "8,4",
+      "9,4",
+      "10,4",
+      "11,5",
+      "12,5",
+      "13,5",
+      "14,5",
+      "15,5",
+      "16,6",
+      "17,6",
+      "18,6",
+      "19,6",
+      "20,6",
+      "21,6")
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
   }
 
   @Test
   def testSimpleSelectAllWithAs(): Unit = {
     StreamITCase.testResults = mutable.MutableList()
-    val ds = StreamTestData.getSmall3TupleDataStream(env).toTable(tEnv, 'a, 'b, 'c)
+    val ds = StreamTestData
+      .getSmall3TupleDataStream(env)
+      .toTable(tEnv, 'a, 'b, 'c)
       .select('a, 'b, 'c)
 
     val results = ds.toAppendStream[Row]
     results.addSink(new StreamITCase.StringSink[Row])
     env.execute()
 
-    val expected = mutable.MutableList(
-        "1,1,Hi",
-        "2,2,Hello",
-        "3,2,Hello world")
+    val expected = mutable.MutableList("1,1,Hi", "2,2,Hello", "3,2,Hello world")
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
   }
 
- @Test
+  @Test
   def testSimpleFilter(): Unit = {
     StreamITCase.testResults = mutable.MutableList()
     val ds = StreamTestData.getSmall3TupleDataStream(env).toTable(tEnv, 'a, 'b, 'c)
@@ -173,10 +195,7 @@ class CalcITCase extends AbstractTestBase {
     results.addSink(new StreamITCase.StringSink[Row])
     env.execute()
 
-    val expected = mutable.MutableList(
-        "1,1,Hi",
-        "2,2,Hello",
-        "3,2,Hello world")
+    val expected = mutable.MutableList("1,1,Hi", "2,2,Hello", "3,2,Hello world")
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
   }
 
@@ -185,15 +204,20 @@ class CalcITCase extends AbstractTestBase {
     StreamITCase.testResults = mutable.MutableList()
     val ds = StreamTestData.get3TupleDataStream(env).toTable(tEnv, 'a, 'b, 'c)
 
-    val filterDs = ds.filter( 'a % 2 === 0 )
+    val filterDs = ds
+      .filter('a % 2 === 0)
       .where($"b" === 3 || $"b" === 4 || $"b" === 5)
     val results = filterDs.toAppendStream[Row]
     results.addSink(new StreamITCase.StringSink[Row])
     env.execute()
 
     val expected = mutable.MutableList(
-      "4,3,Hello world, how are you?", "6,3,Luke Skywalker",
-      "8,4,Comment#2", "10,4,Comment#4", "12,5,Comment#6", "14,5,Comment#8")
+      "4,3,Hello world, how are you?",
+      "6,3,Luke Skywalker",
+      "8,4,Comment#2",
+      "10,4,Comment#4",
+      "12,5,Comment#6",
+      "14,5,Comment#8")
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
   }
 
@@ -202,15 +226,21 @@ class CalcITCase extends AbstractTestBase {
     StreamITCase.testResults = mutable.MutableList()
     val ds = StreamTestData.get3TupleDataStream(env).toTable(tEnv, 'a, 'b, 'c)
 
-    val filterDs = ds.filter( 'a % 2 !== 0)
+    val filterDs = ds
+      .filter('a % 2 !== 0)
       .where(($"b" !== 1) && ($"b" !== 2) && ($"b" !== 3))
     val results = filterDs.toAppendStream[Row]
     results.addSink(new StreamITCase.StringSink[Row])
     env.execute()
     val expected = mutable.MutableList(
-      "7,4,Comment#1", "9,4,Comment#3",
-      "11,5,Comment#5", "13,5,Comment#7", "15,5,Comment#9",
-      "17,6,Comment#11", "19,6,Comment#13", "21,6,Comment#15")
+      "7,4,Comment#1",
+      "9,4,Comment#3",
+      "11,5,Comment#5",
+      "13,5,Comment#7",
+      "15,5,Comment#9",
+      "17,6,Comment#11",
+      "19,6,Comment#13",
+      "21,6,Comment#15")
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
   }
 
@@ -221,7 +251,8 @@ class CalcITCase extends AbstractTestBase {
 
     StreamITCase.testResults = mutable.MutableList()
 
-    val result = StreamTestData.get3TupleDataStream(env)
+    val result = StreamTestData
+      .get3TupleDataStream(env)
       .toTable(tEnv, 'a, 'b, 'c)
       .where(call("RichFunc2", $"c") === "ABC#Hello")
       .select('c)
@@ -242,11 +273,13 @@ class CalcITCase extends AbstractTestBase {
 
     StreamITCase.testResults = mutable.MutableList()
 
-    val result = StreamTestData.get3TupleDataStream(env)
+    val result = StreamTestData
+      .get3TupleDataStream(env)
       .toTable(tEnv, 'a, 'b, 'c)
-      .where(call("RichFunc2", $"c") === "Abc#Hello" ||
-             (call("RichFunc1", $"a") === 3) &&
-             ($"b" === 2))
+      .where(
+        call("RichFunc2", $"c") === "Abc#Hello" ||
+          (call("RichFunc1", $"a") === 3) &&
+          ($"b" === 2))
       .select('c)
 
     val results = result.toAppendStream[Row]
@@ -281,8 +314,7 @@ class CalcITCase extends AbstractTestBase {
       "default-Anna#44,Sunny-Anna#44,kevin2-Anna#44",
       "default-Jack#22,Sunny-Jack#22,kevin2-Jack#22",
       "default-John#19,Sunny-John#19,kevin2-John#19",
-      "default-nosharp,Sunny-nosharp,kevin2-nosharp"
-    )
+      "default-nosharp,Sunny-nosharp,kevin2-nosharp")
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
   }
 
@@ -292,22 +324,16 @@ class CalcITCase extends AbstractTestBase {
 
     val t = env.fromElements(1, 2, 3, 4).toTable(tEnv).as("a")
 
-    val result = t.select(
-      (new ScalarFunction() {
-        def eval(i: Int, suffix: String): String = {
-          suffix + i
-        }
-      })('a, ">>"))
+    val result = t.select((new ScalarFunction() {
+      def eval(i: Int, suffix: String): String = {
+        suffix + i
+      }
+    })('a, ">>"))
 
     result.addSink(new StreamITCase.StringSink[Row])
     env.execute()
 
-    val expected = mutable.MutableList(
-      ">>1",
-      ">>2",
-      ">>3",
-      ">>4"
-    )
+    val expected = mutable.MutableList(">>1", ">>2", ">>3", ">>4")
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
   }
 
@@ -322,12 +348,7 @@ class CalcITCase extends AbstractTestBase {
     result.addSink(new StreamITCase.StringSink[Row])
     env.execute()
 
-    val expected = mutable.MutableList(
-      ">>1",
-      ">>2",
-      ">>3",
-      ">>4"
-    )
+    val expected = mutable.MutableList(">>1", ">>2", ">>3", ">>4")
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
   }
 
@@ -348,12 +369,7 @@ class CalcITCase extends AbstractTestBase {
     result.addSink(new StreamITCase.StringSink[Row])
     env.execute()
 
-    val expected = mutable.MutableList(
-      ">>1",
-      ">>2",
-      ">>3",
-      ">>4"
-    )
+    val expected = mutable.MutableList(">>1", ">>2", ">>3", ">>4")
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
   }
 
@@ -366,7 +382,8 @@ class CalcITCase extends AbstractTestBase {
   @Test
   def testMapType(): Unit = {
     StreamITCase.testResults = mutable.MutableList()
-    val ds = StreamTestData.get3TupleDataStream(env)
+    val ds = StreamTestData
+      .get3TupleDataStream(env)
       .toTable(tEnv)
       .select(map('_1, '_3))
 
@@ -432,10 +449,8 @@ class CalcITCase extends AbstractTestBase {
     result.addSink(new StreamITCase.StringSink[Row])
     env.execute()
 
-    val expected = mutable.MutableList(
-      "1,Kevin is a kid,1,str,last,3",
-      "2,Sunny is a kid,1,str,last,4"
-    )
+    val expected =
+      mutable.MutableList("1,Kevin is a kid,1,str,last,3", "2,Sunny is a kid,1,str,last,4")
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
   }
 
@@ -443,19 +458,20 @@ class CalcITCase extends AbstractTestBase {
   def testMap(): Unit = {
     StreamITCase.testResults = mutable.MutableList()
 
-    val ds = StreamTestData.getSmall3TupleDataStream(env).toTable(tEnv, 'a, 'b, 'c)
-      .map(Func23('a, 'b, 'c)).as("a", "b", "c", "d")
-      .map(Func24('a, 'b, 'c, 'd)).as("a", "b", "c", "d")
+    val ds = StreamTestData
+      .getSmall3TupleDataStream(env)
+      .toTable(tEnv, 'a, 'b, 'c)
+      .map(Func23('a, 'b, 'c))
+      .as("a", "b", "c", "d")
+      .map(Func24('a, 'b, 'c, 'd))
+      .as("a", "b", "c", "d")
       .map(Func1('b))
 
     val results = ds.toAppendStream[Row]
     results.addSink(new StreamITCase.StringSink[Row])
     env.execute()
 
-    val expected = mutable.MutableList(
-      "3",
-      "4",
-      "5")
+    val expected = mutable.MutableList("3", "4", "5")
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
   }
 
@@ -464,7 +480,9 @@ class CalcITCase extends AbstractTestBase {
   def testNonDeterministic(): Unit = {
     StreamITCase.testResults = mutable.MutableList()
 
-    val ds = StreamTestData.getSmall3TupleDataStream(env).toTable(tEnv, 'a, 'b, 'c)
+    val ds = StreamTestData
+      .getSmall3TupleDataStream(env)
+      .toTable(tEnv, 'a, 'b, 'c)
       .map(Func25('a))
 
     val results = ds.toAppendStream[Row]

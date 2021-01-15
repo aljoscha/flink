@@ -62,8 +62,7 @@ class TableAggregateHarnessTest(mode: StateBackendMode) extends HarnessTestBase(
       .select('a, 'b1, 'b2)
 
     tEnv.getConfig.setIdleStateRetention(Duration.ofSeconds(2))
-    val testHarness = createHarnessTester(
-      resultTable.toRetractStream[Row], "GroupTableAggregate")
+    val testHarness = createHarnessTester(resultTable.toRetractStream[Row], "GroupTableAggregate")
     val assertor = new RowDataHarnessAssertor(
       Array(
         DataTypes.INT().getLogicalType,
@@ -127,12 +126,9 @@ class TableAggregateHarnessTest(mode: StateBackendMode) extends HarnessTestBase(
       .select('b1, 'b2)
 
     tEnv.getConfig.setIdleStateRetention(Duration.ofSeconds(2))
-    val testHarness = createHarnessTester(
-      resultTable.toRetractStream[Row], "GroupTableAggregate")
+    val testHarness = createHarnessTester(resultTable.toRetractStream[Row], "GroupTableAggregate")
     val assertor = new RowDataHarnessAssertor(
-      Array(
-        DataTypes.INT().getLogicalType,
-        DataTypes.INT().getLogicalType))
+      Array(DataTypes.INT().getLogicalType, DataTypes.INT().getLogicalType))
 
     testHarness.open()
     val expectedOutput = new ConcurrentLinkedQueue[Object]()

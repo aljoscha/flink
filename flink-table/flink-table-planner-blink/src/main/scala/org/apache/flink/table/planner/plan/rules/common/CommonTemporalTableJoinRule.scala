@@ -20,9 +20,21 @@ package org.apache.flink.table.planner.plan.rules.common
 
 import org.apache.flink.table.api.TableException
 import org.apache.flink.table.connector.source.LookupTableSource
-import org.apache.flink.table.planner.plan.nodes.logical.{FlinkLogicalLegacyTableSourceScan, FlinkLogicalRel, FlinkLogicalSnapshot, FlinkLogicalTableSourceScan}
-import org.apache.flink.table.planner.plan.nodes.physical.stream.{StreamExecLookupJoin, StreamPhysicalTemporalJoin}
-import org.apache.flink.table.planner.plan.schema.{LegacyTableSourceTable, TableSourceTable, TimeIndicatorRelDataType}
+import org.apache.flink.table.planner.plan.nodes.logical.{
+  FlinkLogicalLegacyTableSourceScan,
+  FlinkLogicalRel,
+  FlinkLogicalSnapshot,
+  FlinkLogicalTableSourceScan
+}
+import org.apache.flink.table.planner.plan.nodes.physical.stream.{
+  StreamExecLookupJoin,
+  StreamPhysicalTemporalJoin
+}
+import org.apache.flink.table.planner.plan.schema.{
+  LegacyTableSourceTable,
+  TableSourceTable,
+  TimeIndicatorRelDataType
+}
 import org.apache.flink.table.sources.LookupableTableSource
 
 import org.apache.calcite.plan.hep.HepRelVertex
@@ -32,12 +44,12 @@ import org.apache.calcite.rel.logical.{LogicalProject, LogicalTableScan}
 import org.apache.calcite.rex.{RexCorrelVariable, RexFieldAccess}
 
 /**
-  * Base implementation that matches temporal join node.
-  *
-  * <p> The initial temporal table join (FOR SYSTEM_TIME AS OF) is a Correlate, rewrite it into
-  * a Join to make join condition can be pushed-down. The join will be translated into
-  * [[StreamExecLookupJoin]] in physical or translated into [[StreamPhysicalTemporalJoin]].
-  */
+ * Base implementation that matches temporal join node.
+ *
+ * <p> The initial temporal table join (FOR SYSTEM_TIME AS OF) is a Correlate, rewrite it into
+ * a Join to make join condition can be pushed-down. The join will be translated into
+ * [[StreamExecLookupJoin]] in physical or translated into [[StreamPhysicalTemporalJoin]].
+ */
 trait CommonTemporalTableJoinRule {
 
   protected def matches(snapshot: FlinkLogicalSnapshot): Boolean = {
@@ -46,11 +58,12 @@ trait CommonTemporalTableJoinRule {
     snapshot.getPeriod match {
       // it should be left table's field and is a time attribute
       case r: RexFieldAccess
-        if r.getType.isInstanceOf[TimeIndicatorRelDataType] &&
-          r.getReferenceExpr.isInstanceOf[RexCorrelVariable] => // pass
+          if r.getType.isInstanceOf[TimeIndicatorRelDataType] &&
+            r.getReferenceExpr.isInstanceOf[RexCorrelVariable] => // pass
       case _ =>
-        throw new TableException("Temporal table join currently only supports " +
-          "'FOR SYSTEM_TIME AS OF' left table's time attribute field.")
+        throw new TableException(
+          "Temporal table join currently only supports " +
+            "'FOR SYSTEM_TIME AS OF' left table's time attribute field.")
     }
 
     true
@@ -61,13 +74,13 @@ trait CommonTemporalTableJoinRule {
       snapshotInput: FlinkLogicalRel): Boolean = {
     val isProcessingTime = snapshot.getPeriod.getType match {
       case t: TimeIndicatorRelDataType if !t.isEventTime => true
-      case _ => false
+      case _                                             => false
     }
 
     val tableScan = getTableScan(snapshotInput)
     val snapshotOnLookupSource = tableScan match {
       case Some(scan) => isTableSourceScan(scan) && isLookupTableSource(scan)
-      case _ => false
+      case _          => false
     }
 
     isProcessingTime && snapshotOnLookupSource
@@ -75,11 +88,10 @@ trait CommonTemporalTableJoinRule {
 
   private def getTableScan(snapshotInput: RelNode): Option[TableScan] = {
     snapshotInput match {
-      case tableScan: TableScan
-      => Some(tableScan)
+      case tableScan: TableScan => Some(tableScan)
       // computed column on lookup table
-      case project: LogicalProject if trimHep(project.getInput).isInstanceOf[TableScan]
-      => Some(trimHep(project.getInput).asInstanceOf[TableScan])
+      case project: LogicalProject if trimHep(project.getInput).isInstanceOf[TableScan] =>
+        Some(trimHep(project.getInput).asInstanceOf[TableScan])
       case _ => None
     }
   }
@@ -90,10 +102,10 @@ trait CommonTemporalTableJoinRule {
         val table = r.getTable
         table match {
           case _: LegacyTableSourceTable[Any] | _: TableSourceTable => true
-          case _ => false
+          case _                                                    => false
         }
       case _: FlinkLogicalLegacyTableSourceScan | _: FlinkLogicalTableSourceScan => true
-      case _ => false
+      case _                                                                     => false
     }
   }
 

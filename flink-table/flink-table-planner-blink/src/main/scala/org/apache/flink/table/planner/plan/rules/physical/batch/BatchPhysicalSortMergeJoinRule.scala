@@ -40,15 +40,14 @@ import java.lang.{Boolean => JBoolean}
 import scala.collection.JavaConversions._
 
 /**
-  * Rule that converts [[FlinkLogicalJoin]] to [[BatchPhysicalSortMergeJoin]]
-  * if there exists at least one equal-join condition and SortMergeJoin is enabled.
-  */
+ * Rule that converts [[FlinkLogicalJoin]] to [[BatchPhysicalSortMergeJoin]]
+ * if there exists at least one equal-join condition and SortMergeJoin is enabled.
+ */
 class BatchPhysicalSortMergeJoinRule
-  extends RelOptRule(
-    operand(classOf[FlinkLogicalJoin],
-      operand(classOf[RelNode], any)),
-    "BatchPhysicalSortMergeJoinRule")
-  with BatchExecJoinRuleBase {
+    extends RelOptRule(
+      operand(classOf[FlinkLogicalJoin], operand(classOf[RelNode], any)),
+      "BatchPhysicalSortMergeJoinRule")
+    with BatchExecJoinRuleBase {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val join: Join = call.rel(0)
@@ -68,7 +67,8 @@ class BatchPhysicalSortMergeJoinRule
         shuffleKeys: ImmutableIntList,
         requireStrict: Boolean,
         requireCollation: Boolean): RelTraitSet = {
-      var traitSet = call.getPlanner.emptyTraitSet()
+      var traitSet = call.getPlanner
+        .emptyTraitSet()
         .replace(FlinkConventions.BATCH_PHYSICAL)
         .replace(FlinkRelDistribution.hash(shuffleKeys, requireStrict))
       if (requireCollation) {
@@ -85,10 +85,10 @@ class BatchPhysicalSortMergeJoinRule
         requireLeftSorted: Boolean,
         requireRightSorted: Boolean): Unit = {
 
-      val leftRequiredTrait = getTraitSetByShuffleKeys(
-        leftRequiredShuffleKeys, requireStrict = true, requireLeftSorted)
-      val rightRequiredTrait = getTraitSetByShuffleKeys(
-        rightRequiredShuffleKeys, requireStrict = true, requireRightSorted)
+      val leftRequiredTrait =
+        getTraitSetByShuffleKeys(leftRequiredShuffleKeys, requireStrict = true, requireLeftSorted)
+      val rightRequiredTrait =
+        getTraitSetByShuffleKeys(rightRequiredShuffleKeys, requireStrict = true, requireRightSorted)
 
       val newLeft = RelOptRule.convert(left, leftRequiredTrait)
       val newRight = RelOptRule.convert(right, rightRequiredTrait)
@@ -109,21 +109,17 @@ class BatchPhysicalSortMergeJoinRule
     }
 
     val tableConfig = call.getPlanner.getContext.unwrap(classOf[FlinkContext]).getTableConfig
-    val candidates = if (tableConfig.getConfiguration.getBoolean(
-      BatchPhysicalSortMergeJoinRule.TABLE_OPTIMIZER_SMJ_REMOVE_SORT_ENABLED)) {
-      // add more possibility to remove redundant sort, and longer optimization time
-      Array((false, false), (true, false), (false, true), (true, true))
-    } else {
-      // will not try to remove redundant sort, and shorter optimization time
-      Array((false, false))
-    }
-    candidates.foreach {
-      case (requireLeftSorted, requireRightSorted) =>
-        transformToEquiv(
-          joinInfo.leftKeys,
-          joinInfo.rightKeys,
-          requireLeftSorted,
-          requireRightSorted)
+    val candidates =
+      if (tableConfig.getConfiguration.getBoolean(
+          BatchPhysicalSortMergeJoinRule.TABLE_OPTIMIZER_SMJ_REMOVE_SORT_ENABLED)) {
+        // add more possibility to remove redundant sort, and longer optimization time
+        Array((false, false), (true, false), (false, true), (true, true))
+      } else {
+        // will not try to remove redundant sort, and shorter optimization time
+        Array((false, false))
+      }
+    candidates.foreach { case (requireLeftSorted, requireRightSorted) =>
+      transformToEquiv(joinInfo.leftKeys, joinInfo.rightKeys, requireLeftSorted, requireRightSorted)
     }
 
     // add more possibility to only shuffle by partial joinKeys, now only single one
@@ -150,8 +146,9 @@ object BatchPhysicalSortMergeJoinRule {
   @Experimental
   val TABLE_OPTIMIZER_SMJ_REMOVE_SORT_ENABLED: ConfigOption[JBoolean] =
     key("table.optimizer.smj.remove-sort-enabled")
-        .defaultValue(JBoolean.FALSE)
-        .withDescription("When true, the optimizer will try to remove redundant sort " +
-            "for sort merge join. However that will increase optimization time. " +
-            "Default value is false.")
+      .defaultValue(JBoolean.FALSE)
+      .withDescription(
+        "When true, the optimizer will try to remove redundant sort " +
+          "for sort merge join. However that will increase optimization time. " +
+          "Default value is false.")
 }

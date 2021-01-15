@@ -24,7 +24,11 @@ import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
 import org.apache.flink.streaming.api.watermark.Watermark
 import org.apache.flink.table.api._
 import org.apache.flink.table.api.bridge.scala._
-import org.apache.flink.table.runtime.utils.{StreamITCase, StreamTestData, StreamingWithStateTestBase}
+import org.apache.flink.table.runtime.utils.{
+  StreamITCase,
+  StreamTestData,
+  StreamingWithStateTestBase
+}
 import org.apache.flink.types.Row
 
 import org.junit.Assert.assertEquals
@@ -42,7 +46,7 @@ class JoinITCase extends StreamingWithStateTestBase {
   }
 
   // Tests for inner join.
-  /** test proctime inner join **/
+  /** test proctime inner join * */
   @Test
   def testProcessTimeInnerJoin(): Unit = {
     val env = StreamExecutionEnvironment.getExecutionEnvironment
@@ -72,10 +76,14 @@ class JoinITCase extends StreamingWithStateTestBase {
     data2.+=((1, 1L, "HiHi"))
     data2.+=((2, 2L, "HeHe"))
 
-    val t1 = env.fromCollection(data1).toTable(tEnv, 'a, 'b, 'c, 'proctime.proctime)
-      .select(('a === 1)?(nullOf(Types.INT), 'a) as 'a, 'b, 'c, 'proctime) // test null values
-    val t2 = env.fromCollection(data2).toTable(tEnv, 'a, 'b, 'c, 'proctime.proctime)
-      .select(('a === 1)?(nullOf(Types.INT), 'a) as 'a, 'b, 'c, 'proctime) // test null values
+    val t1 = env
+      .fromCollection(data1)
+      .toTable(tEnv, 'a, 'b, 'c, 'proctime.proctime)
+      .select(('a === 1) ? (nullOf(Types.INT), 'a) as 'a, 'b, 'c, 'proctime) // test null values
+    val t2 = env
+      .fromCollection(data2)
+      .toTable(tEnv, 'a, 'b, 'c, 'proctime.proctime)
+      .select(('a === 1) ? (nullOf(Types.INT), 'a) as 'a, 'b, 'c, 'proctime) // test null values
 
     tEnv.registerTable("T1", t1)
     tEnv.registerTable("T2", t2)
@@ -85,7 +93,7 @@ class JoinITCase extends StreamingWithStateTestBase {
     env.execute()
   }
 
-  /** test proctime inner join with other condition **/
+  /** test proctime inner join with other condition * */
   @Test
   def testProcessTimeInnerJoinWithOtherConditions(): Unit = {
     val env = StreamExecutionEnvironment.getExecutionEnvironment
@@ -134,7 +142,7 @@ class JoinITCase extends StreamingWithStateTestBase {
     Assert.assertFalse(StreamITCase.testResults.toString().contains("null"))
   }
 
-  /** test rowtime inner join **/
+  /** test rowtime inner join * */
   @Test
   def testRowTimeInnerJoin(): Unit = {
     val env = StreamExecutionEnvironment.getExecutionEnvironment
@@ -169,10 +177,12 @@ class JoinITCase extends StreamingWithStateTestBase {
     // test null key
     data2.+=((null.asInstanceOf[String], "RIGHT10", 10000L))
 
-    val t1 = env.fromCollection(data1)
+    val t1 = env
+      .fromCollection(data1)
       .assignTimestampsAndWatermarks(new Row3WatermarkExtractor2)
       .toTable(tEnv, 'key, 'id, 'rt.rowtime)
-    val t2 = env.fromCollection(data2)
+    val t2 = env
+      .fromCollection(data2)
       .assignTimestampsAndWatermarks(new Row3WatermarkExtractor2)
       .toTable(tEnv, 'key, 'id, 'rt.rowtime)
 
@@ -192,7 +202,7 @@ class JoinITCase extends StreamingWithStateTestBase {
     StreamITCase.compareWithList(expected)
   }
 
-  /** test rowtime inner join with equi-times **/
+  /** test rowtime inner join with equi-times * */
   @Test
   def testRowTimeInnerJoinWithEquiTimeAttrs(): Unit = {
     val env = StreamExecutionEnvironment.getExecutionEnvironment
@@ -219,10 +229,12 @@ class JoinITCase extends StreamingWithStateTestBase {
     data2.+=(("A", "R-5", 5000L))
     data2.+=(("B", "R-6", 6000L))
 
-    val t1 = env.fromCollection(data1)
+    val t1 = env
+      .fromCollection(data1)
       .assignTimestampsAndWatermarks(new Row4WatermarkExtractor)
       .toTable(tEnv, 'id, 'tm, 'key, 'rt.rowtime)
-    val t2 = env.fromCollection(data2)
+    val t2 = env
+      .fromCollection(data2)
       .assignTimestampsAndWatermarks(new Row3WatermarkExtractor2)
       .toTable(tEnv, 'key, 'id, 'rt.rowtime)
 
@@ -238,7 +250,7 @@ class JoinITCase extends StreamingWithStateTestBase {
     StreamITCase.compareWithList(expected)
   }
 
-  /** test rowtime inner join with other conditions **/
+  /** test rowtime inner join with other conditions * */
   @Test
   def testRowTimeInnerJoinWithOtherConditions(): Unit = {
     val env = StreamExecutionEnvironment.getExecutionEnvironment
@@ -277,10 +289,12 @@ class JoinITCase extends StreamingWithStateTestBase {
     data2.+=((2, 14L, "RIGHT7", 7000L))
     data2.+=((1, 4L, "RIGHT8", 8000L))
 
-    val t1 = env.fromCollection(data1)
+    val t1 = env
+      .fromCollection(data1)
       .assignTimestampsAndWatermarks(new Row4WatermarkExtractor)
       .toTable(tEnv, 'a, 'b, 'c, 'rt.rowtime)
-    val t2 = env.fromCollection(data2)
+    val t2 = env
+      .fromCollection(data2)
       .assignTimestampsAndWatermarks(new Row4WatermarkExtractor)
       .toTable(tEnv, 'a, 'b, 'c, 'rt.rowtime)
 
@@ -300,7 +314,7 @@ class JoinITCase extends StreamingWithStateTestBase {
     StreamITCase.compareWithList(expected)
   }
 
-  /** test rowtime inner join with another time condition **/
+  /** test rowtime inner join with another time condition * */
   @Test
   def testRowTimeInnerJoinWithOtherTimeCondition(): Unit = {
     val env = StreamExecutionEnvironment.getExecutionEnvironment
@@ -332,10 +346,12 @@ class JoinITCase extends StreamingWithStateTestBase {
     data2.+=((2, 8, "RIGHT7", 7000L))
     data2.+=((1, 4L, "RIGHT8", 8000L))
 
-    val t1 = env.fromCollection(data1)
+    val t1 = env
+      .fromCollection(data1)
       .assignTimestampsAndWatermarks(new Row4WatermarkExtractor)
       .toTable(tEnv, 'a, 'b, 'c, 'rt.rowtime)
-    val t2 = env.fromCollection(data2)
+    val t2 = env
+      .fromCollection(data2)
       .assignTimestampsAndWatermarks(new Row4WatermarkExtractor)
       .toTable(tEnv, 'a, 'b, 'c, 'rt.rowtime)
 
@@ -354,7 +370,7 @@ class JoinITCase extends StreamingWithStateTestBase {
     StreamITCase.compareWithList(expected)
   }
 
-  /** test rowtime inner join with window aggregation **/
+  /** test rowtime inner join with window aggregation * */
   @Test
   def testRowTimeInnerJoinWithWindowAggregateOnFirstTime(): Unit = {
     val env = StreamExecutionEnvironment.getExecutionEnvironment
@@ -373,11 +389,11 @@ class JoinITCase extends StreamingWithStateTestBase {
         |""".stripMargin
 
     val data1 = new mutable.MutableList[(String, String, Long)]
-    data1.+=(("A", "L-1", 1000L))  // no joining record
-    data1.+=(("A", "L-2", 2000L))  // 1 joining record
-    data1.+=(("A", "L-3", 3000L))  // 2 joining records
-    data1.+=(("B", "L-4", 4000L))  // 1 joining record
-    data1.+=(("C", "L-5", 4000L))  // no joining record
+    data1.+=(("A", "L-1", 1000L)) // no joining record
+    data1.+=(("A", "L-2", 2000L)) // 1 joining record
+    data1.+=(("A", "L-3", 3000L)) // 2 joining records
+    data1.+=(("B", "L-4", 4000L)) // 1 joining record
+    data1.+=(("C", "L-5", 4000L)) // no joining record
     data1.+=(("A", "L-6", 10000L)) // 2 joining records
     data1.+=(("A", "L-7", 13000L)) // 1 joining record
 
@@ -387,10 +403,12 @@ class JoinITCase extends StreamingWithStateTestBase {
     data2.+=(("A", "R-3", 8000L)) // 3 joining records
     data2.+=(("D", "R-2", 8000L)) // no joining record
 
-    val t1 = env.fromCollection(data1)
+    val t1 = env
+      .fromCollection(data1)
       .assignTimestampsAndWatermarks(new Row3WatermarkExtractor2)
       .toTable(tEnv, 'key, 'id, 'rt.rowtime)
-    val t2 = env.fromCollection(data2)
+    val t2 = env
+      .fromCollection(data2)
       .assignTimestampsAndWatermarks(new Row3WatermarkExtractor2)
       .toTable(tEnv, 'key, 'id, 'rt.rowtime)
 
@@ -408,7 +426,7 @@ class JoinITCase extends StreamingWithStateTestBase {
     StreamITCase.compareWithList(expected)
   }
 
-  /** test rowtime inner join with window aggregation **/
+  /** test rowtime inner join with window aggregation * */
   @Test
   def testRowTimeInnerJoinWithWindowAggregateOnSecondTime(): Unit = {
     val env = StreamExecutionEnvironment.getExecutionEnvironment
@@ -427,11 +445,11 @@ class JoinITCase extends StreamingWithStateTestBase {
         |""".stripMargin
 
     val data1 = new mutable.MutableList[(String, String, Long)]
-    data1.+=(("A", "L-1", 1000L))  // no joining record
-    data1.+=(("A", "L-2", 2000L))  // 1 joining record
-    data1.+=(("A", "L-3", 3000L))  // 2 joining records
-    data1.+=(("B", "L-4", 4000L))  // 1 joining record
-    data1.+=(("C", "L-5", 4000L))  // no joining record
+    data1.+=(("A", "L-1", 1000L)) // no joining record
+    data1.+=(("A", "L-2", 2000L)) // 1 joining record
+    data1.+=(("A", "L-3", 3000L)) // 2 joining records
+    data1.+=(("B", "L-4", 4000L)) // 1 joining record
+    data1.+=(("C", "L-5", 4000L)) // no joining record
     data1.+=(("A", "L-6", 10000L)) // 2 joining records
     data1.+=(("A", "L-7", 13000L)) // 1 joining record
 
@@ -441,10 +459,12 @@ class JoinITCase extends StreamingWithStateTestBase {
     data2.+=(("A", "R-3", 8000L)) // 3 joining records
     data2.+=(("D", "R-2", 8000L)) // no joining record
 
-    val t1 = env.fromCollection(data1)
+    val t1 = env
+      .fromCollection(data1)
       .assignTimestampsAndWatermarks(new Row3WatermarkExtractor2)
       .toTable(tEnv, 'key, 'id, 'rt.rowtime)
-    val t2 = env.fromCollection(data2)
+    val t2 = env
+      .fromCollection(data2)
       .assignTimestampsAndWatermarks(new Row3WatermarkExtractor2)
       .toTable(tEnv, 'key, 'id, 'rt.rowtime)
 
@@ -489,9 +509,13 @@ class JoinITCase extends StreamingWithStateTestBase {
     data2.+=((1, 1L, "HiHi"))
     data2.+=((2, 2L, "HeHe"))
 
-    val t1 = env.fromCollection(data1).toTable(tEnv, 'a, 'b, 'c, 'proctime.proctime)
+    val t1 = env
+      .fromCollection(data1)
+      .toTable(tEnv, 'a, 'b, 'c, 'proctime.proctime)
       .select('a, 'b, 'c, 'proctime)
-    val t2 = env.fromCollection(data2).toTable(tEnv, 'a, 'b, 'c, 'proctime.proctime)
+    val t2 = env
+      .fromCollection(data2)
+      .toTable(tEnv, 'a, 'b, 'c, 'proctime.proctime)
       .select('a, 'b, 'c, 'proctime)
 
     tEnv.registerTable("T1", t1)
@@ -537,10 +561,12 @@ class JoinITCase extends StreamingWithStateTestBase {
     data2.+=(("D", "R-8", 8000L))
     data2.+=(("A", "R-11", 11000L))
 
-    val t1 = env.fromCollection(data1)
+    val t1 = env
+      .fromCollection(data1)
       .assignTimestampsAndWatermarks(new Row3WatermarkExtractor2)
       .toTable(tEnv, 'key, 'id, 'rt.rowtime)
-    val t2 = env.fromCollection(data2)
+    val t2 = env
+      .fromCollection(data2)
       .assignTimestampsAndWatermarks(new Row3WatermarkExtractor2)
       .toTable(tEnv, 'key, 'id, 'rt.rowtime)
 
@@ -593,10 +619,12 @@ class JoinITCase extends StreamingWithStateTestBase {
     data2.+=(("B", "R-7", 7000L))
     data2.+=(("D", "R-8", 8000L))
 
-    val t1 = env.fromCollection(data1)
+    val t1 = env
+      .fromCollection(data1)
       .assignTimestampsAndWatermarks(new Row3WatermarkExtractor2)
       .toTable(tEnv, 'key, 'id, 'rt.rowtime)
-    val t2 = env.fromCollection(data2)
+    val t2 = env
+      .fromCollection(data2)
       .assignTimestampsAndWatermarks(new Row3WatermarkExtractor2)
       .toTable(tEnv, 'key, 'id, 'rt.rowtime)
 
@@ -641,9 +669,13 @@ class JoinITCase extends StreamingWithStateTestBase {
     data2.+=((1, 1L, "HiHi"))
     data2.+=((2, 2L, "HeHe"))
 
-    val t1 = env.fromCollection(data1).toTable(tEnv, 'a, 'b, 'c, 'proctime.proctime)
+    val t1 = env
+      .fromCollection(data1)
+      .toTable(tEnv, 'a, 'b, 'c, 'proctime.proctime)
       .select('a, 'b, 'c, 'proctime)
-    val t2 = env.fromCollection(data2).toTable(tEnv, 'a, 'b, 'c, 'proctime.proctime)
+    val t2 = env
+      .fromCollection(data2)
+      .toTable(tEnv, 'a, 'b, 'c, 'proctime.proctime)
       .select('a, 'b, 'c, 'proctime)
 
     tEnv.registerTable("T1", t1)
@@ -688,10 +720,12 @@ class JoinITCase extends StreamingWithStateTestBase {
     data2.+=(("D", "R-8", 8000L))
     data2.+=(("A", "R-20", 20000L))
 
-    val t1 = env.fromCollection(data1)
+    val t1 = env
+      .fromCollection(data1)
       .assignTimestampsAndWatermarks(new Row3WatermarkExtractor2)
       .toTable(tEnv, 'key, 'id, 'rt.rowtime)
-    val t2 = env.fromCollection(data2)
+    val t2 = env
+      .fromCollection(data2)
       .assignTimestampsAndWatermarks(new Row3WatermarkExtractor2)
       .toTable(tEnv, 'key, 'id, 'rt.rowtime)
 
@@ -741,10 +775,12 @@ class JoinITCase extends StreamingWithStateTestBase {
     data2.+=(("B", "R-7", 7000L))
     data2.+=(("D", "R-8", 8000L))
 
-    val t1 = env.fromCollection(data1)
+    val t1 = env
+      .fromCollection(data1)
       .assignTimestampsAndWatermarks(new Row3WatermarkExtractor2)
       .toTable(tEnv, 'key, 'id, 'rt.rowtime)
-    val t2 = env.fromCollection(data2)
+    val t2 = env
+      .fromCollection(data2)
       .assignTimestampsAndWatermarks(new Row3WatermarkExtractor2)
       .toTable(tEnv, 'key, 'id, 'rt.rowtime)
 
@@ -789,9 +825,13 @@ class JoinITCase extends StreamingWithStateTestBase {
     data2.+=((1, 1L, "HiHi"))
     data2.+=((2, 2L, "HeHe"))
 
-    val t1 = env.fromCollection(data1).toTable(tEnv, 'a, 'b, 'c, 'proctime.proctime)
+    val t1 = env
+      .fromCollection(data1)
+      .toTable(tEnv, 'a, 'b, 'c, 'proctime.proctime)
       .select('a, 'b, 'c, 'proctime)
-    val t2 = env.fromCollection(data2).toTable(tEnv, 'a, 'b, 'c, 'proctime.proctime)
+    val t2 = env
+      .fromCollection(data2)
+      .toTable(tEnv, 'a, 'b, 'c, 'proctime.proctime)
       .select('a, 'b, 'c, 'proctime)
 
     tEnv.registerTable("T1", t1)
@@ -837,10 +877,12 @@ class JoinITCase extends StreamingWithStateTestBase {
     data2.+=(("B", "R-7", 7000L))
     data2.+=(("D", "R-8", 8000L))
 
-    val t1 = env.fromCollection(data1)
+    val t1 = env
+      .fromCollection(data1)
       .assignTimestampsAndWatermarks(new Row3WatermarkExtractor2)
       .toTable(tEnv, 'key, 'id, 'rt.rowtime)
-    val t2 = env.fromCollection(data2)
+    val t2 = env
+      .fromCollection(data2)
       .assignTimestampsAndWatermarks(new Row3WatermarkExtractor2)
       .toTable(tEnv, 'key, 'id, 'rt.rowtime)
 
@@ -892,10 +934,12 @@ class JoinITCase extends StreamingWithStateTestBase {
     data2.+=(("B", "R-7", 7000L))
     data2.+=(("D", "R-8", 8000L))
 
-    val t1 = env.fromCollection(data1)
+    val t1 = env
+      .fromCollection(data1)
       .assignTimestampsAndWatermarks(new Row3WatermarkExtractor2)
       .toTable(tEnv, 'key, 'id, 'rt.rowtime)
-    val t2 = env.fromCollection(data2)
+    val t2 = env
+      .fromCollection(data2)
       .assignTimestampsAndWatermarks(new Row3WatermarkExtractor2)
       .toTable(tEnv, 'key, 'id, 'rt.rowtime)
 
@@ -915,7 +959,7 @@ class JoinITCase extends StreamingWithStateTestBase {
     StreamITCase.compareWithList(expected)
   }
 
-  /** test non-window inner join **/
+  /** test non-window inner join * */
   @Test
   def testNonWindowInnerJoin(): Unit = {
     val env = StreamExecutionEnvironment.getExecutionEnvironment
@@ -938,9 +982,13 @@ class JoinITCase extends StreamingWithStateTestBase {
     data2.+=((2, 2L, "HeHe"))
     data2.+=((3, 2L, "HeHe"))
 
-    val t1 = env.fromCollection(data1).toTable(tEnv, 'a, 'b, 'c)
+    val t1 = env
+      .fromCollection(data1)
+      .toTable(tEnv, 'a, 'b, 'c)
       .select(('a === 3) ? (nullOf(Types.INT), 'a) as 'a, 'b, 'c)
-    val t2 = env.fromCollection(data2).toTable(tEnv, 'a, 'b, 'c)
+    val t2 = env
+      .fromCollection(data2)
+      .toTable(tEnv, 'a, 'b, 'c)
       .select(('a === 3) ? (nullOf(Types.INT), 'a) as 'a, 'b, 'c)
 
     tEnv.registerTable("T1", t1)
@@ -1055,8 +1103,12 @@ class JoinITCase extends StreamingWithStateTestBase {
     val result = tEnv.sqlQuery(sqlQuery)
 
     val expected = Seq(
-      "Hi,Hallo", "Hello,Hallo Welt", "Hello world,Hallo Welt wie gehts?", "Hello world,ABC",
-      "I am fine.,HIJ", "I am fine.,IJK")
+      "Hi,Hallo",
+      "Hello,Hallo Welt",
+      "Hello world,Hallo Welt wie gehts?",
+      "Hello world,ABC",
+      "I am fine.,HIJ",
+      "I am fine.,IJK")
     val results = result.toRetractStream[Row]
     results.addSink(new StreamITCase.RetractingSink)
     env.execute()
@@ -1081,8 +1133,8 @@ class JoinITCase extends StreamingWithStateTestBase {
 
     val result = tEnv.sqlQuery(sqlQuery)
 
-    val expected = Seq("1,Hi", "2,Hello", "1,Hello",
-      "2,Hello world", "2,Hello world", "3,Hello world")
+    val expected =
+      Seq("1,Hi", "2,Hello", "1,Hello", "2,Hello world", "2,Hello world", "3,Hello world")
     val results = result.toRetractStream[Row]
     results.addSink(new StreamITCase.RetractingSink)
     env.execute()
@@ -1130,10 +1182,23 @@ class JoinITCase extends StreamingWithStateTestBase {
 
     val result = tEnv.sqlQuery(sqlQuery)
 
-    val expected = Seq("Hi,Hallo", "Hello,Hallo Welt", "Hello world,Hallo Welt",
-      "null,Hallo Welt wie", "null,Hallo Welt wie gehts?", "null,ABC", "null,BCD",
-      "null,CDE", "null,DEF", "null,EFG", "null,FGH", "null,GHI", "null,HIJ",
-      "null,IJK", "null,JKL", "null,KLM")
+    val expected = Seq(
+      "Hi,Hallo",
+      "Hello,Hallo Welt",
+      "Hello world,Hallo Welt",
+      "null,Hallo Welt wie",
+      "null,Hallo Welt wie gehts?",
+      "null,ABC",
+      "null,BCD",
+      "null,CDE",
+      "null,DEF",
+      "null,EFG",
+      "null,FGH",
+      "null,GHI",
+      "null,HIJ",
+      "null,IJK",
+      "null,JKL",
+      "null,KLM")
     val results = result.toRetractStream[Row]
     results.addSink(new StreamITCase.RetractingSink)
     env.execute()
@@ -1156,10 +1221,23 @@ class JoinITCase extends StreamingWithStateTestBase {
 
     val result = tEnv.sqlQuery(sqlQuery)
 
-    val expected = Seq("Hi,Hallo", "Hello,Hallo Welt", "Hello world,Hallo Welt",
-      "null,Hallo Welt wie", "null,Hallo Welt wie gehts?", "null,ABC", "null,BCD",
-      "null,CDE", "null,DEF", "null,EFG", "null,FGH", "null,GHI", "null,HIJ",
-      "null,IJK", "null,JKL", "null,KLM")
+    val expected = Seq(
+      "Hi,Hallo",
+      "Hello,Hallo Welt",
+      "Hello world,Hallo Welt",
+      "null,Hallo Welt wie",
+      "null,Hallo Welt wie gehts?",
+      "null,ABC",
+      "null,BCD",
+      "null,CDE",
+      "null,DEF",
+      "null,EFG",
+      "null,FGH",
+      "null,GHI",
+      "null,HIJ",
+      "null,IJK",
+      "null,JKL",
+      "null,KLM")
     val results = result.toRetractStream[Row]
     results.addSink(new StreamITCase.RetractingSink)
     env.execute()
@@ -1184,8 +1262,22 @@ class JoinITCase extends StreamingWithStateTestBase {
     val result = tEnv.sqlQuery(sqlQuery)
 
     val expected = Seq(
-      "1,null", "2,null", "2,null", "3,3", "3,3", "3,3", "4,null", "4,null", "4," +
-      "null", "4,null", "5,null", "5,null", "5,null", "5,null", "5,null")
+      "1,null",
+      "2,null",
+      "2,null",
+      "3,3",
+      "3,3",
+      "3,3",
+      "4,null",
+      "4,null",
+      "4," +
+        "null",
+      "4,null",
+      "5,null",
+      "5,null",
+      "5,null",
+      "5,null",
+      "5,null")
     val results = result.toRetractStream[Row]
     results.addSink(new StreamITCase.RetractingSink)
     env.execute()
@@ -1208,10 +1300,23 @@ class JoinITCase extends StreamingWithStateTestBase {
 
     val result = tEnv.sqlQuery(sqlQuery)
 
-    val expected = Seq("Hi,Hallo", "Hello,Hallo Welt", "Hello world,Hallo Welt",
-      "null,Hallo Welt wie", "null,Hallo Welt wie gehts?", "null,ABC", "null,BCD",
-      "null,CDE", "null,DEF", "null,EFG", "null,FGH", "null,GHI", "null,HIJ",
-      "null,IJK", "null,JKL", "null,KLM")
+    val expected = Seq(
+      "Hi,Hallo",
+      "Hello,Hallo Welt",
+      "Hello world,Hallo Welt",
+      "null,Hallo Welt wie",
+      "null,Hallo Welt wie gehts?",
+      "null,ABC",
+      "null,BCD",
+      "null,CDE",
+      "null,DEF",
+      "null,EFG",
+      "null,FGH",
+      "null,GHI",
+      "null,HIJ",
+      "null,IJK",
+      "null,JKL",
+      "null,KLM")
     val results = result.toRetractStream[Row]
     results.addSink(new StreamITCase.RetractingSink)
     env.execute()
@@ -1220,7 +1325,7 @@ class JoinITCase extends StreamingWithStateTestBase {
 }
 
 private class Row4WatermarkExtractor
-  extends AssignerWithPunctuatedWatermarks[(Int, Long, String, Long)] {
+    extends AssignerWithPunctuatedWatermarks[(Int, Long, String, Long)] {
 
   override def checkAndGetNextWatermark(
       lastElement: (Int, Long, String, Long),
@@ -1236,17 +1341,17 @@ private class Row4WatermarkExtractor
 }
 
 private class Row3WatermarkExtractor2
-  extends AssignerWithPunctuatedWatermarks[(String, String, Long)] {
+    extends AssignerWithPunctuatedWatermarks[(String, String, Long)] {
 
   override def checkAndGetNextWatermark(
-    lastElement: (String, String, Long),
-    extractedTimestamp: Long): Watermark = {
+      lastElement: (String, String, Long),
+      extractedTimestamp: Long): Watermark = {
     new Watermark(extractedTimestamp - 1)
   }
 
   override def extractTimestamp(
-    element: (String, String, Long),
-    previousElementTimestamp: Long): Long = {
+      element: (String, String, Long),
+      previousElementTimestamp: Long): Long = {
     element._3
   }
 }

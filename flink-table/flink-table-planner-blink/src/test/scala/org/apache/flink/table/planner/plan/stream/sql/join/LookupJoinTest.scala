@@ -43,7 +43,13 @@ import org.junit.{Assume, Before, Test}
 import _root_.java.lang.{Boolean => JBoolean}
 import _root_.java.sql.Timestamp
 import _root_.java.util
-import _root_.java.util.{ArrayList => JArrayList, Collection => JCollection, HashMap => JHashMap, List => JList, Map => JMap}
+import _root_.java.util.{
+  ArrayList => JArrayList,
+  Collection => JCollection,
+  HashMap => JHashMap,
+  List => JList,
+  Map => JMap
+}
 
 import _root_.scala.collection.JavaConversions._
 
@@ -57,17 +63,21 @@ class LookupJoinTest(legacyTableSource: Boolean) extends TableTestBase with Seri
   private val util = streamTestUtil()
 
   @Before
-  def before(): Unit ={
+  def before(): Unit = {
     util.addDataStream[(Int, String, Long)](
-      "MyTable", 'a, 'b, 'c, 'proctime.proctime, 'rowtime.rowtime)
+      "MyTable",
+      'a,
+      'b,
+      'c,
+      'proctime.proctime,
+      'rowtime.rowtime)
     util.addDataStream[(Int, String, Long, Double)]("T1", 'a, 'b, 'c, 'd)
     util.addDataStream[(Int, String, Int)]("nonTemporal", 'id, 'name, 'age)
 
     if (legacyTableSource) {
       TestTemporalTable.createTemporaryTable(util.tableEnv, "LookupTable")
     } else {
-      util.addTable(
-        """
+      util.addTable("""
           |CREATE TABLE LookupTable (
           |  `id` INT,
           |  `name` STRING,
@@ -77,8 +87,7 @@ class LookupJoinTest(legacyTableSource: Boolean) extends TableTestBase with Seri
           |)
           |""".stripMargin)
 
-      util.addTable(
-        """
+      util.addTable("""
           |CREATE TABLE LookupTableWithComputedColumn (
           |  `id` INT,
           |  `name` STRING,
@@ -107,16 +116,14 @@ class LookupJoinTest(legacyTableSource: Boolean) extends TableTestBase with Seri
         "'FOR SYSTEM_TIME AS OF' left table's time attribute field.\n" +
         "Querying a temporal table using 'FOR SYSTEM TIME AS OF' syntax with a constant " +
         "timestamp '2017-08-09 14:36:11' is not supported yet",
-      classOf[AssertionError]
-    )
+      classOf[AssertionError])
 
     // only support left or inner join
     expectExceptionThrown(
       "SELECT * FROM MyTable AS T RIGHT JOIN LookupTable " +
         "FOR SYSTEM_TIME AS OF T.proctime AS D ON T.a = D.id",
       "Correlate has invalid join type RIGHT",
-      classOf[AssertionError]
-    )
+      classOf[AssertionError])
 
     // only support join on raw key of right table
     expectExceptionThrown(
@@ -124,8 +131,7 @@ class LookupJoinTest(legacyTableSource: Boolean) extends TableTestBase with Seri
         "FOR SYSTEM_TIME AS OF T.proctime AS D ON T.a + 1 = D.id + 2",
       "Temporal table join requires an equality condition on fields of table " +
         "[default_catalog.default_database.LookupTable].",
-      classOf[TableException]
-    )
+      classOf[TableException])
 
     // only support "FOR SYSTEM_TIME AS OF" left table's proctime
     expectExceptionThrown(
@@ -135,8 +141,7 @@ class LookupJoinTest(legacyTableSource: Boolean) extends TableTestBase with Seri
         "'FOR SYSTEM_TIME AS OF' left table's time attribute field.\n" +
         "Querying a temporal table using 'FOR SYSTEM TIME AS OF' syntax with " +
         "an expression call 'PROCTIME()' is not supported yet.",
-      classOf[AssertionError]
-    )
+      classOf[AssertionError])
   }
 
   @Test
@@ -148,8 +153,7 @@ class LookupJoinTest(legacyTableSource: Boolean) extends TableTestBase with Seri
         "FOR SYSTEM_TIME AS OF T.proctime AS D ON T.a IS NOT  DISTINCT FROM D.id",
       "LookupJoin doesn't support join condition contains 'a IS NOT DISTINCT FROM b' (or " +
         "alternative '(a = b) or (a IS NULL AND b IS NULL)')",
-      classOf[TableException]
-    )
+      classOf[TableException])
 
     // does not support join condition contains `IS NOT  DISTINCT` and similar syntax
     expectExceptionThrown(
@@ -157,8 +161,7 @@ class LookupJoinTest(legacyTableSource: Boolean) extends TableTestBase with Seri
         "FOR SYSTEM_TIME AS OF T.proctime AS D ON T.a = D.id OR (T.a IS NULL AND D.id IS NULL)",
       "LookupJoin doesn't support join condition contains 'a IS NOT DISTINCT FROM b' (or " +
         "alternative '(a = b) or (a IS NULL AND b IS NULL)')",
-      classOf[TableException]
-    )
+      classOf[TableException])
   }
 
   @Test
@@ -166,91 +169,90 @@ class LookupJoinTest(legacyTableSource: Boolean) extends TableTestBase with Seri
     if (legacyTableSource) {
       return
     }
-    util.addDataStream[(Int, String, Long, Timestamp)](
-      "T", 'a, 'b, 'c, 'ts, 'proctime.proctime)
+    util.addDataStream[(Int, String, Long, Timestamp)]("T", 'a, 'b, 'c, 'ts, 'proctime.proctime)
     createLookupTable("LookupTable1", new InvalidTableFunctionResultType)
     expectExceptionThrown(
       "SELECT * FROM T JOIN LookupTable1 " +
         "FOR SYSTEM_TIME AS OF T.proctime AS D ON T.a = D.id AND T.b = D.name AND T.ts = D.ts",
       s"output class can simply be a Row or RowData class",
-      classOf[ValidationException]
-    )
+      classOf[ValidationException])
 
     createLookupTable("LookupTable2", new InvalidTableFunctionEvalSignature)
     expectExceptionThrown(
       "SELECT * FROM T JOIN LookupTable2 " +
         "FOR SYSTEM_TIME AS OF T.proctime AS D ON T.a = D.id AND T.b = D.name AND T.ts = D.ts",
       "Could not find an implementation method 'eval' in class " +
-          "'org.apache.flink.table.planner.plan.utils.InvalidTableFunctionEvalSignature' " +
-          "for function 'default_catalog.default_database.LookupTable2' that matches the " +
-          "following signature:\n" +
-          "void eval(java.lang.Integer, org.apache.flink.table.data.StringData, " +
-          "org.apache.flink.table.data.TimestampData)",
-      classOf[ValidationException]
-    )
+        "'org.apache.flink.table.planner.plan.utils.InvalidTableFunctionEvalSignature' " +
+        "for function 'default_catalog.default_database.LookupTable2' that matches the " +
+        "following signature:\n" +
+        "void eval(java.lang.Integer, org.apache.flink.table.data.StringData, " +
+        "org.apache.flink.table.data.TimestampData)",
+      classOf[ValidationException])
 
     createLookupTable("LookupTable3", new TableFunctionWithRowDataVarArg)
-    verifyTranslationSuccess("SELECT * FROM T JOIN LookupTable3 " +
-      "FOR SYSTEM_TIME AS OF T.proctime AS D " +
-      "ON T.a = D.id AND T.b = D.name AND T.ts = D.ts")
+    verifyTranslationSuccess(
+      "SELECT * FROM T JOIN LookupTable3 " +
+        "FOR SYSTEM_TIME AS OF T.proctime AS D " +
+        "ON T.a = D.id AND T.b = D.name AND T.ts = D.ts")
 
     createLookupTable("LookupTable4", new TableFunctionWithRow)
-    verifyTranslationSuccess("SELECT * FROM T JOIN LookupTable4 " +
-      "FOR SYSTEM_TIME AS OF T.proctime AS D " +
-      "ON T.a = D.id AND T.b = D.name AND T.ts = D.ts")
+    verifyTranslationSuccess(
+      "SELECT * FROM T JOIN LookupTable4 " +
+        "FOR SYSTEM_TIME AS OF T.proctime AS D " +
+        "ON T.a = D.id AND T.b = D.name AND T.ts = D.ts")
 
     createLookupTable("LookupTable5", new AsyncTableFunctionWithRowDataVarArg)
-    verifyTranslationSuccess("SELECT * FROM T JOIN LookupTable5 " +
-      "FOR SYSTEM_TIME AS OF T.proctime AS D " +
-      "ON T.a = D.id AND T.b = D.name AND T.ts = D.ts")
+    verifyTranslationSuccess(
+      "SELECT * FROM T JOIN LookupTable5 " +
+        "FOR SYSTEM_TIME AS OF T.proctime AS D " +
+        "ON T.a = D.id AND T.b = D.name AND T.ts = D.ts")
 
     createLookupTable("LookupTable6", new AsyncTableFunctionWithRow)
-    verifyTranslationSuccess("SELECT * FROM T JOIN LookupTable6 " +
-      "FOR SYSTEM_TIME AS OF T.proctime AS D ON T.a = D.id AND T.b = D.name AND T.ts = D.ts")
+    verifyTranslationSuccess(
+      "SELECT * FROM T JOIN LookupTable6 " +
+        "FOR SYSTEM_TIME AS OF T.proctime AS D ON T.a = D.id AND T.b = D.name AND T.ts = D.ts")
 
     createLookupTable("LookupTable7", new InvalidAsyncTableFunctionEvalSignature1)
     expectExceptionThrown(
       "SELECT * FROM T JOIN LookupTable7 " +
         "FOR SYSTEM_TIME AS OF T.proctime AS D ON T.a = D.id AND T.b = D.name AND T.ts = D.ts",
       "Could not find an implementation method 'eval' in class " +
-          "'org.apache.flink.table.planner.plan.utils.InvalidAsyncTableFunctionEvalSignature1' " +
-          "for function 'default_catalog.default_database.LookupTable7' that matches the " +
-          "following signature:\n" +
-          "void eval(java.util.concurrent.CompletableFuture, java.lang.Integer, " +
-          "org.apache.flink.table.data.StringData, org.apache.flink.table.data.TimestampData)",
-      classOf[ValidationException]
-    )
+        "'org.apache.flink.table.planner.plan.utils.InvalidAsyncTableFunctionEvalSignature1' " +
+        "for function 'default_catalog.default_database.LookupTable7' that matches the " +
+        "following signature:\n" +
+        "void eval(java.util.concurrent.CompletableFuture, java.lang.Integer, " +
+        "org.apache.flink.table.data.StringData, org.apache.flink.table.data.TimestampData)",
+      classOf[ValidationException])
 
     createLookupTable("LookupTable8", new InvalidAsyncTableFunctionEvalSignature2)
     expectExceptionThrown(
       "SELECT * FROM T JOIN LookupTable8 " +
         "FOR SYSTEM_TIME AS OF T.proctime AS D ON T.a = D.id AND T.b = D.name AND T.ts = D.ts",
       "Could not find an implementation method 'eval' in class " +
-          "'org.apache.flink.table.planner.plan.utils.InvalidAsyncTableFunctionEvalSignature2' " +
-          "for function 'default_catalog.default_database.LookupTable8' that matches the " +
-          "following signature:\nvoid eval(java.util.concurrent.CompletableFuture, " +
-          "java.lang.Integer, java.lang.String, " +
-          "java.time.LocalDateTime)",
-      classOf[ValidationException]
-    )
+        "'org.apache.flink.table.planner.plan.utils.InvalidAsyncTableFunctionEvalSignature2' " +
+        "for function 'default_catalog.default_database.LookupTable8' that matches the " +
+        "following signature:\nvoid eval(java.util.concurrent.CompletableFuture, " +
+        "java.lang.Integer, java.lang.String, " +
+        "java.time.LocalDateTime)",
+      classOf[ValidationException])
 
     createLookupTable("LookupTable9", new AsyncTableFunctionWithRowDataVarArg)
-    verifyTranslationSuccess("SELECT * FROM T JOIN LookupTable9 " +
-      "FOR SYSTEM_TIME AS OF T.proctime AS D " +
-      "ON T.a = D.id AND T.b = D.name AND T.ts = D.ts")
+    verifyTranslationSuccess(
+      "SELECT * FROM T JOIN LookupTable9 " +
+        "FOR SYSTEM_TIME AS OF T.proctime AS D " +
+        "ON T.a = D.id AND T.b = D.name AND T.ts = D.ts")
 
     createLookupTable("LookupTable10", new InvalidAsyncTableFunctionEvalSignature3)
     expectExceptionThrown(
       "SELECT * FROM T JOIN LookupTable10 " +
         "FOR SYSTEM_TIME AS OF T.proctime AS D ON T.a = D.id AND T.b = D.name AND T.ts = D.ts",
       "Could not find an implementation method 'eval' in class " +
-          "'org.apache.flink.table.planner.plan.utils.InvalidAsyncTableFunctionEvalSignature3' " +
-          "for function 'default_catalog.default_database.LookupTable10' that matches the " +
-          "following signature:\n" +
-          "void eval(java.util.concurrent.CompletableFuture, java.lang.Integer, " +
-          "org.apache.flink.table.data.StringData, org.apache.flink.table.data.TimestampData)",
-      classOf[ValidationException]
-    )
+        "'org.apache.flink.table.planner.plan.utils.InvalidAsyncTableFunctionEvalSignature3' " +
+        "for function 'default_catalog.default_database.LookupTable10' that matches the " +
+        "following signature:\n" +
+        "void eval(java.util.concurrent.CompletableFuture, java.lang.Integer, " +
+        "org.apache.flink.table.data.StringData, org.apache.flink.table.data.TimestampData)",
+      classOf[ValidationException])
   }
 
   @Test
@@ -258,8 +260,9 @@ class LookupJoinTest(legacyTableSource: Boolean) extends TableTestBase with Seri
     // Will do implicit type coercion.
     thrown.expect(classOf[TableException])
     thrown.expectMessage("VARCHAR(2147483647) and INTEGER does not have common type now")
-    util.verifyExecPlan("SELECT * FROM MyTable AS T JOIN LookupTable "
-      + "FOR SYSTEM_TIME AS OF T.proctime AS D ON T.b = D.id")
+    util.verifyExecPlan(
+      "SELECT * FROM MyTable AS T JOIN LookupTable "
+        + "FOR SYSTEM_TIME AS OF T.proctime AS D ON T.b = D.id")
   }
 
   @Test
@@ -469,19 +472,12 @@ class LookupJoinTest(legacyTableSource: Boolean) extends TableTestBase with Seri
     if (legacyTableSource) {
       lookupFunction match {
         case tf: TableFunction[_] =>
-          TestInvalidTemporalTable.createTemporaryTable(
-            util.tableEnv,
-            tableName,
-            tf)
+          TestInvalidTemporalTable.createTemporaryTable(util.tableEnv, tableName, tf)
         case atf: AsyncTableFunction[_] =>
-          TestInvalidTemporalTable.createTemporaryTable(
-            util.tableEnv,
-            tableName,
-            atf)
+          TestInvalidTemporalTable.createTemporaryTable(util.tableEnv, tableName, atf)
       }
     } else {
-      util.addTable(
-        s"""
+      util.addTable(s"""
            |CREATE TABLE $tableName (
            |  `id` INT,
            |  `name` STRING,
@@ -496,14 +492,14 @@ class LookupJoinTest(legacyTableSource: Boolean) extends TableTestBase with Seri
   }
 
   private def expectExceptionThrown(
-    sql: String,
-    message: String,
-    clazz: Class[_ <: Throwable] = classOf[ValidationException])
-  : Unit = {
+      sql: String,
+      message: String,
+      clazz: Class[_ <: Throwable] = classOf[ValidationException]): Unit = {
     try {
       verifyTranslationSuccess(sql)
       fail(s"Expected a $clazz, but no exception is thrown.")
-    } catch { case e: Throwable =>
+    } catch {
+      case e: Throwable =>
         assertTrue(clazz.isAssignableFrom(e.getClass))
         assertThat(e, containsMessage(message))
     }
@@ -521,9 +517,9 @@ object LookupJoinTest {
   }
 }
 
-
 class TestTemporalTable(bounded: Boolean = false)
-  extends LookupableTableSource[RowData] with StreamTableSource[RowData] {
+    extends LookupableTableSource[RowData]
+    with StreamTableSource[RowData] {
 
   val fieldNames: Array[String] = Array("id", "name", "age")
   val fieldTypes: Array[TypeInformation[_]] = Array(Types.INT, Types.STRING, Types.INT)
@@ -537,8 +533,9 @@ class TestTemporalTable(bounded: Boolean = false)
   }
 
   override def getDataStream(execEnv: StreamExecutionEnvironment): DataStream[RowData] = {
-    throw new UnsupportedOperationException("This TableSource is only used for unit test, " +
-      "this method should never be called.")
+    throw new UnsupportedOperationException(
+      "This TableSource is only used for unit test, " +
+        "this method should never be called.")
   }
 
   override def isAsyncEnabled: Boolean = false
@@ -551,7 +548,8 @@ class TestTemporalTable(bounded: Boolean = false)
 }
 
 object TestTemporalTable {
-  lazy val tableSchema = TableSchema.builder()
+  lazy val tableSchema = TableSchema
+    .builder()
     .field("id", DataTypes.INT())
     .field("name", DataTypes.STRING())
     .field("age", DataTypes.INT())
@@ -565,7 +563,8 @@ object TestTemporalTable {
     if (isBounded) {
       desc.property("is-bounded", "true")
     }
-    tEnv.connect(desc)
+    tEnv
+      .connect(desc)
       .withSchema(new Schema().schema(TestTemporalTable.tableSchema))
       .createTemporaryTable(tableName)
   }
@@ -593,11 +592,12 @@ class TestTemporalTableFactory extends TableSourceFactory[RowData] {
   }
 }
 
-class TestInvalidTemporalTable private(
+class TestInvalidTemporalTable private (
     async: Boolean,
     fetcher: TableFunction[_],
     asyncFetcher: AsyncTableFunction[_])
-  extends LookupableTableSource[RowData] with StreamTableSource[RowData] {
+    extends LookupableTableSource[RowData]
+    with StreamTableSource[RowData] {
 
   def this(fetcher: TableFunction[_]) {
     this(false, fetcher, null)
@@ -621,17 +621,18 @@ class TestInvalidTemporalTable private(
     asyncFetcher.asInstanceOf[AsyncTableFunction[RowData]]
   }
 
-
   override def getDataStream(execEnv: StreamExecutionEnvironment): DataStream[RowData] = {
-    throw new UnsupportedOperationException("This TableSource is only used for unit test, " +
-      "this method should never be called.")
+    throw new UnsupportedOperationException(
+      "This TableSource is only used for unit test, " +
+        "this method should never be called.")
   }
 
   override def isAsyncEnabled: Boolean = async
 }
 
 object TestInvalidTemporalTable {
-  lazy val tableScheam = TableSchema.builder()
+  lazy val tableScheam = TableSchema
+    .builder()
     .field("id", DataTypes.INT())
     .field("name", DataTypes.STRING())
     .field("age", DataTypes.INT())
@@ -639,31 +640,27 @@ object TestInvalidTemporalTable {
     .build()
 
   def createTemporaryTable(
-    tEnv: TableEnvironment,
-    tableName: String,
-    fetcher: TableFunction[_]): Unit = {
+      tEnv: TableEnvironment,
+      tableName: String,
+      fetcher: TableFunction[_]): Unit = {
     tEnv
       .connect(
         new CustomConnectorDescriptor("TestInvalidTemporalTable", 1, false)
           .property("is-async", "false")
-          .property(
-            "fetcher",
-            EncodingUtils.encodeObjectToString(fetcher)))
+          .property("fetcher", EncodingUtils.encodeObjectToString(fetcher)))
       .withSchema(new Schema().schema(TestInvalidTemporalTable.tableScheam))
       .createTemporaryTable(tableName)
   }
 
   def createTemporaryTable(
-    tEnv: TableEnvironment,
-    tableName: String,
-    asyncFetcher: AsyncTableFunction[_]): Unit = {
+      tEnv: TableEnvironment,
+      tableName: String,
+      asyncFetcher: AsyncTableFunction[_]): Unit = {
     tEnv
       .connect(
         new CustomConnectorDescriptor("TestInvalidTemporalTable", 1, false)
           .property("is-async", "true")
-          .property(
-            "async-fetcher",
-            EncodingUtils.encodeObjectToString(asyncFetcher)))
+          .property("async-fetcher", EncodingUtils.encodeObjectToString(asyncFetcher)))
       .withSchema(new Schema().schema(TestInvalidTemporalTable.tableScheam))
       .createTemporaryTable(tableName)
   }
@@ -676,23 +673,23 @@ class TestInvalidTemporalTableFactory extends TableSourceFactory[RowData] {
     dp.putProperties(properties)
     val async = dp.getOptionalBoolean("is-async").orElse(false)
     if (!async) {
-      val fetcherBase64 = dp.getOptionalString("fetcher")
-        .orElseThrow(
-          new util.function.Supplier[Throwable] {
-            override def get() = new TableException(
-              "Synchronous LookupableTableSource should provide a TableFunction.")
-          })
+      val fetcherBase64 = dp
+        .getOptionalString("fetcher")
+        .orElseThrow(new util.function.Supplier[Throwable] {
+          override def get() =
+            new TableException("Synchronous LookupableTableSource should provide a TableFunction.")
+        })
       val fetcher = EncodingUtils.decodeStringToObject(fetcherBase64, classOf[TableFunction[_]])
       new TestInvalidTemporalTable(fetcher)
     } else {
-      val asyncFetcherBase64 = dp.getOptionalString("async-fetcher")
-        .orElseThrow(
-          new util.function.Supplier[Throwable] {
-            override def get() = new TableException(
-              "Asynchronous LookupableTableSource should provide a AsyncTableFunction.")
-          })
-      val asyncFetcher = EncodingUtils.decodeStringToObject(
-        asyncFetcherBase64, classOf[AsyncTableFunction[_]])
+      val asyncFetcherBase64 = dp
+        .getOptionalString("async-fetcher")
+        .orElseThrow(new util.function.Supplier[Throwable] {
+          override def get() = new TableException(
+            "Asynchronous LookupableTableSource should provide a AsyncTableFunction.")
+        })
+      val asyncFetcher =
+        EncodingUtils.decodeStringToObject(asyncFetcherBase64, classOf[AsyncTableFunction[_]])
       new TestInvalidTemporalTable(asyncFetcher)
     }
   }

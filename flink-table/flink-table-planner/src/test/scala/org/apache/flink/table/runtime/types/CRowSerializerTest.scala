@@ -36,8 +36,8 @@ import org.junit.{Assert, Test}
 class CRowSerializerTest extends TestLogger {
 
   /**
-    * This empty constructor is required for deserializing the configuration.
-    */
+   * This empty constructor is required for deserializing the configuration.
+   */
   @Test
   def testDefaultConstructor(): Unit = {
     new CRowSerializer.CRowSerializerConfigSnapshot()
@@ -51,11 +51,12 @@ class CRowSerializerTest extends TestLogger {
     class IKeyedProcessFunction extends KeyedProcessFunction[Integer, Integer, Integer] {
       var state: ListState[CRow] = _
       override def open(parameters: Configuration): Unit = {
-        val stateDesc = new ListStateDescriptor[CRow]("CRow",
-          new CRowTypeInfo(new RowTypeInfo(Types.INT)))
+        val stateDesc =
+          new ListStateDescriptor[CRow]("CRow", new CRowTypeInfo(new RowTypeInfo(Types.INT)))
         state = getRuntimeContext.getListState(stateDesc)
       }
-      override def processElement(value: Integer,
+      override def processElement(
+          value: Integer,
           ctx: KeyedProcessFunction[Integer, Integer, Integer]#Context,
           out: Collector[Integer]): Unit = {
         state.add(new CRow(Row.of(value), true))
@@ -67,9 +68,12 @@ class CRowSerializerTest extends TestLogger {
     var testHarness = new KeyedOneInputStreamOperatorTestHarness[Integer, Integer, Integer](
       operator,
       new KeySelector[Integer, Integer] {
-        override def getKey(value: Integer): Integer= -1
+        override def getKey(value: Integer): Integer = -1
       },
-      Types.INT, 1, 1, 0)
+      Types.INT,
+      1,
+      1,
+      0)
     testHarness.setup()
     testHarness.open()
 
@@ -85,9 +89,12 @@ class CRowSerializerTest extends TestLogger {
     testHarness = new KeyedOneInputStreamOperatorTestHarness[Integer, Integer, Integer](
       operator,
       new KeySelector[Integer, Integer] {
-        override def getKey(value: Integer): Integer= -1
+        override def getKey(value: Integer): Integer = -1
       },
-      Types.INT, 1, 1, 0)
+      Types.INT,
+      1,
+      1,
+      0)
     testHarness.setup()
 
     testHarness.initializeState(snapshot)
@@ -103,7 +110,7 @@ class CRowSerializerTest extends TestLogger {
     val keyedStateBackend = operator.getKeyedStateBackend
     keyedStateBackend match {
       case hksb: HeapKeyedStateBackend[_] => hksb.numKeyValueStateEntries
-      case _ => throw new UnsupportedOperationException
+      case _                              => throw new UnsupportedOperationException
     }
   }
 

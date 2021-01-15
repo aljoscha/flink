@@ -32,27 +32,24 @@ class LegacyLimitITCase extends BatchTestBase {
     super.before()
 
     TestLegacyLimitableTableSource.createTemporaryTable(
-      tEnv, data3, new TableSchema(Array("a", "b", "c"), type3.getFieldTypes), "LimitTable")
+      tEnv,
+      data3,
+      new TableSchema(Array("a", "b", "c"), type3.getFieldTypes),
+      "LimitTable")
   }
 
   @Test
   def testFetch(): Unit = {
-    assertEquals(
-      executeQuery(tEnv.from("LimitTable").fetch(5)).size,
-      5)
+    assertEquals(executeQuery(tEnv.from("LimitTable").fetch(5)).size, 5)
   }
 
   @Test
   def testOffset(): Unit = {
-    assertEquals(
-      executeQuery(tEnv.from("LimitTable").offset(5)).size,
-      16)
+    assertEquals(executeQuery(tEnv.from("LimitTable").offset(5)).size, 16)
   }
 
   @Test
   def testOffsetAndFetch(): Unit = {
-    assertEquals(
-      executeQuery(tEnv.from("LimitTable").limit(5, 5)).size,
-      5)
+    assertEquals(executeQuery(tEnv.from("LimitTable").limit(5, 5)).size, 5)
   }
 }

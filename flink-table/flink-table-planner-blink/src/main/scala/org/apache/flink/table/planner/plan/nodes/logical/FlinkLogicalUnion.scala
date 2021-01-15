@@ -32,26 +32,25 @@ import java.util.{List => JList}
 import scala.collection.JavaConversions._
 
 /**
-  * Sub-class of [[Union]] that is a relational expression
-  * which returns the union of the rows of its inputs in Flink.
-  */
+ * Sub-class of [[Union]] that is a relational expression
+ * which returns the union of the rows of its inputs in Flink.
+ */
 class FlinkLogicalUnion(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
     inputs: JList[RelNode],
     all: Boolean)
-  extends Union(cluster, traitSet, inputs, all)
-  with FlinkLogicalRel {
+    extends Union(cluster, traitSet, inputs, all)
+    with FlinkLogicalRel {
 
   override def copy(traitSet: RelTraitSet, inputs: JList[RelNode], all: Boolean): SetOp = {
     new FlinkLogicalUnion(cluster, traitSet, inputs, all)
   }
 
   override def computeSelfCost(planner: RelOptPlanner, mq: RelMetadataQuery): RelOptCost = {
-    val rowCnt = this.getInputs.foldLeft(0D) {
-      (rows, input) =>
-        val inputRowCount = mq.getRowCount(input)
-        rows + inputRowCount
+    val rowCnt = this.getInputs.foldLeft(0d) { (rows, input) =>
+      val inputRowCount = mq.getRowCount(input)
+      rows + inputRowCount
     }
     planner.getCostFactory.makeCost(rowCnt, 0, 0)
   }
@@ -59,15 +58,15 @@ class FlinkLogicalUnion(
 }
 
 private class FlinkLogicalUnionConverter
-  extends ConverterRule(
-    classOf[LogicalUnion],
-    Convention.NONE,
-    FlinkConventions.LOGICAL,
-    "FlinkLogicalUnionConverter") {
+    extends ConverterRule(
+      classOf[LogicalUnion],
+      Convention.NONE,
+      FlinkConventions.LOGICAL,
+      "FlinkLogicalUnionConverter") {
 
   /**
-    * Only translate UNION ALL.
-    */
+   * Only translate UNION ALL.
+   */
   override def matches(call: RelOptRuleCall): Boolean = {
     val union: LogicalUnion = call.rel(0)
     union.all
@@ -75,8 +74,8 @@ private class FlinkLogicalUnionConverter
 
   override def convert(rel: RelNode): RelNode = {
     val union = rel.asInstanceOf[LogicalUnion]
-    val newInputs = union.getInputs.map {
-      input => RelOptRule.convert(input, FlinkConventions.LOGICAL)
+    val newInputs = union.getInputs.map { input =>
+      RelOptRule.convert(input, FlinkConventions.LOGICAL)
     }
     FlinkLogicalUnion.create(newInputs, union.all)
   }

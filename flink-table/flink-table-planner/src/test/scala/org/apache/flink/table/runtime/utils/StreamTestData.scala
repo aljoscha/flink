@@ -65,8 +65,8 @@ object StreamTestData {
     env.fromCollection(data)
   }
 
-  def get5TupleDataStream(env: StreamExecutionEnvironment):
-      DataStream[(Int, Long, Int, String, Long)] = {
+  def get5TupleDataStream(
+      env: StreamExecutionEnvironment): DataStream[(Int, Long, Int, String, Long)] = {
 
     val data = new mutable.MutableList[(Int, Long, Int, String, Long)]
     data.+=((1, 1L, 0, "Hallo", 1L))
@@ -87,8 +87,8 @@ object StreamTestData {
     env.fromCollection(data)
   }
 
-  def getSmallNestedTupleDataStream(env: StreamExecutionEnvironment):
-      DataStream[((Int, Int), String)] = {
+  def getSmallNestedTupleDataStream(
+      env: StreamExecutionEnvironment): DataStream[((Int, Int), String)] = {
     val data = new mutable.MutableList[((Int, Int), String)]
     data.+=(((1, 1), "one"))
     data.+=(((2, 2), "two"))

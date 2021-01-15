@@ -31,12 +31,17 @@ import org.junit.Test
 class IntervalJoinTest extends TableTestBase {
 
   private val util: StreamTableTestUtil = streamTestUtil()
+  util
+    .addDataStream[(Int, String, Long)]("MyTable", 'a, 'b, 'c, 'proctime.proctime, 'rowtime.rowtime)
   util.addDataStream[(Int, String, Long)](
-    "MyTable", 'a, 'b, 'c, 'proctime.proctime, 'rowtime.rowtime)
-  util.addDataStream[(Int, String, Long)](
-    "MyTable2", 'a, 'b, 'c, 'proctime.proctime, 'rowtime.rowtime)
+    "MyTable2",
+    'a,
+    'b,
+    'c,
+    'proctime.proctime,
+    'rowtime.rowtime)
 
-  /** There should exist exactly two time conditions **/
+  /** There should exist exactly two time conditions * */
   @Test(expected = classOf[TableException])
   def testInteravlJoinSingleTimeCondition(): Unit = {
     val sql =
@@ -47,7 +52,7 @@ class IntervalJoinTest extends TableTestBase {
     util.verifyExecPlan(sql)
   }
 
-  /** Both time attributes in a join condition must be of the same type **/
+  /** Both time attributes in a join condition must be of the same type * */
   @Test(expected = classOf[TableException])
   def testInteravalDiffTimeIndicator(): Unit = {
     val sql =
@@ -60,7 +65,7 @@ class IntervalJoinTest extends TableTestBase {
     util.verifyExecPlan(sql)
   }
 
-  /** The time conditions should be an And condition **/
+  /** The time conditions should be an And condition * */
   @Test(expected = classOf[TableException])
   def testInteravalNotCnfCondition(): Unit = {
     val sql =
@@ -73,7 +78,7 @@ class IntervalJoinTest extends TableTestBase {
     util.verifyExecPlan(sql)
   }
 
-  /** Validates that no rowtime attribute is in the output schema **/
+  /** Validates that no rowtime attribute is in the output schema * */
   @Test(expected = classOf[TableException])
   def testNoRowtimeAttributeInResult(): Unit = {
     val sql =
@@ -87,9 +92,9 @@ class IntervalJoinTest extends TableTestBase {
   }
 
   /**
-    * Currently only the inner join condition can support the Python UDF taking the inputs from
-    * the left table and the right table at the same time.
-    */
+   * Currently only the inner join condition can support the Python UDF taking the inputs from
+   * the left table and the right table at the same time.
+   */
   @Test(expected = classOf[TableException])
   def testWindowOuterJoinWithPythonFunctionInCondition(): Unit = {
     util.addFunction("pyFunc", new PythonScalarFunction("pyFunc"))
@@ -409,9 +414,7 @@ class IntervalJoinTest extends TableTestBase {
         |    t1.rowtime <= t2.rowtime - INTERVAL '5' SECOND AND
         |    t1.c > t2.c
       """.stripMargin
-    verifyRemainConditionConvert(
-      query,
-      ">($2, $6)")
+    verifyRemainConditionConvert(query, ">($2, $6)")
 
     val query1 =
       """
@@ -420,9 +423,7 @@ class IntervalJoinTest extends TableTestBase {
         |    t1.rowtime >= t2.rowtime - INTERVAL '10' SECOND AND
         |    t1.rowtime <= t2.rowtime - INTERVAL '5' SECOND
       """.stripMargin
-    verifyRemainConditionConvert(
-      query1,
-      "")
+    verifyRemainConditionConvert(query1, "")
 
     util.addDataStream[(Int, Long, Int)]("MyTable5", 'a, 'b, 'c, 'proctime.proctime)
     util.addDataStream[(Int, Long, Int)]("MyTable6", 'a, 'b, 'c, 'proctime.proctime)
@@ -434,9 +435,7 @@ class IntervalJoinTest extends TableTestBase {
         |    t1.proctime <= t2.proctime - INTERVAL '5' SECOND AND
         |    t1.c > t2.c
       """.stripMargin
-    verifyRemainConditionConvert(
-      query2,
-      ">($2, $6)")
+    verifyRemainConditionConvert(query2, ">($2, $6)")
   }
 
   private def verifyTimeBoundary(
@@ -468,9 +467,7 @@ class IntervalJoinTest extends TableTestBase {
     assertEquals(expTimeType, timeTypeStr)
   }
 
-  private def verifyRemainConditionConvert(
-      sqlQuery: String,
-      expectConditionStr: String): Unit = {
+  private def verifyRemainConditionConvert(sqlQuery: String, expectConditionStr: String): Unit = {
 
     val table = util.tableEnv.sqlQuery(sqlQuery)
     val relNode = TableTestUtil.toRelNode(table)

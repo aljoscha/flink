@@ -31,11 +31,11 @@ import org.apache.calcite.util.{BuiltInMethod, Util}
 import scala.collection.JavaConversions._
 
 /**
-  * FlinkRelMdPercentageOriginalRows supplies a implementation of
-  * [[RelMetadataQuery#getPercentageOriginalRows]] for the standard logical algebra.
-  */
+ * FlinkRelMdPercentageOriginalRows supplies a implementation of
+ * [[RelMetadataQuery#getPercentageOriginalRows]] for the standard logical algebra.
+ */
 class FlinkRelMdPercentageOriginalRows private
-  extends MetadataHandler[BuiltInMetadata.PercentageOriginalRows] {
+    extends MetadataHandler[BuiltInMetadata.PercentageOriginalRows] {
 
   def getDef: MetadataDef[BuiltInMetadata.PercentageOriginalRows] =
     BuiltInMetadata.PercentageOriginalRows.DEF
@@ -92,8 +92,8 @@ class FlinkRelMdPercentageOriginalRows private
   }
 
   /**
-    * Catch-all rule when none of the others apply.
-    */
+   * Catch-all rule when none of the others apply.
+   */
   def getPercentageOriginalRows(rel: RelNode, mq: RelMetadataQuery): JDouble = {
     if (rel.getInputs.size > 1) {
       // No generic formula available for multiple inputs.
@@ -143,6 +143,7 @@ object FlinkRelMdPercentageOriginalRows {
   private val INSTANCE = new FlinkRelMdPercentageOriginalRows
 
   val SOURCE: RelMetadataProvider = ReflectiveRelMetadataProvider.reflectiveSource(
-    BuiltInMethod.PERCENTAGE_ORIGINAL_ROWS.method, INSTANCE)
+    BuiltInMethod.PERCENTAGE_ORIGINAL_ROWS.method,
+    INSTANCE)
 
 }

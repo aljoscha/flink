@@ -41,18 +41,19 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable.ListBuffer
 
 /**
-  * Evaluates constant expressions using Flink's [[ConstantFunctionCodeGenerator]].
-  */
+ * Evaluates constant expressions using Flink's [[ConstantFunctionCodeGenerator]].
+ */
 class ExpressionReducer(config: TableConfig)
-  extends RelOptPlanner.Executor with Compiler[MapFunction[Row, Row]] {
+    extends RelOptPlanner.Executor
+    with Compiler[MapFunction[Row, Row]] {
 
   private val EMPTY_ROW_INFO = new RowTypeInfo()
   private val EMPTY_ROW = new Row(0)
 
   override def reduce(
-    rexBuilder: RexBuilder,
-    constExprs: util.List[RexNode],
-    reducedValues: util.List[RexNode]): Unit = {
+      rexBuilder: RexBuilder,
+      constExprs: util.List[RexNode],
+      reducedValues: util.List[RexNode]): Unit = {
 
     val typeFactory = rexBuilder.getTypeFactory.asInstanceOf[FlinkTypeFactory]
 
@@ -71,27 +72,22 @@ class ExpressionReducer(config: TableConfig)
         Some(
           rexBuilder.makeCast(
             typeFactory.createTypeFromTypeInfo(BasicTypeInfo.INT_TYPE_INFO, e.getType.isNullable),
-            e)
-        )
+            e))
       case (SqlTypeName.TIME, e) =>
         Some(
           rexBuilder.makeCast(
             typeFactory.createTypeFromTypeInfo(BasicTypeInfo.INT_TYPE_INFO, e.getType.isNullable),
-            e)
-        )
+            e))
       case (SqlTypeName.TIMESTAMP, e) =>
         Some(
           rexBuilder.makeCast(
             typeFactory.createTypeFromTypeInfo(BasicTypeInfo.LONG_TYPE_INFO, e.getType.isNullable),
-            e)
-        )
+            e))
 
       // we don't support object literals yet, we skip those constant expressions
-      case (SqlTypeName.ANY, _) |
-           (SqlTypeName.ROW, _) |
-           (SqlTypeName.ARRAY, _) |
-           (SqlTypeName.MAP, _) |
-           (SqlTypeName.MULTISET, _) => None
+      case (SqlTypeName.ANY, _) | (SqlTypeName.ROW, _) |
+          (SqlTypeName.ARRAY, _) | (SqlTypeName.MAP, _) | (SqlTypeName.MULTISET, _) =>
+        None
 
       case (_, e) => Some(e)
     }
@@ -102,10 +98,7 @@ class ExpressionReducer(config: TableConfig)
     // generate MapFunction
     val generator = new ConstantFunctionCodeGenerator(config, false, EMPTY_ROW_INFO)
 
-    val result = generator.generateResultExpression(
-      resultType,
-      resultType.getFieldNames,
-      literals)
+    val result = generator.generateResultExpression(resultType, resultType.getFieldNames, literals)
 
     val generatedFunction = generator.generateFunction[MapFunction[Row, Row], Row](
       "ExpressionReducer",
@@ -122,19 +115,18 @@ class ExpressionReducer(config: TableConfig)
       generatedFunction.code)
     val function = clazz.newInstance()
 
-    val reduced = try {
-      val parameters = config.getConfiguration.getOptional(PipelineOptions.GLOBAL_JOB_PARAMETERS)
-      val configuration = new Configuration()
-      if (parameters.isPresent) {
-        parameters.get().asScala.foreach(e =>
-          configuration.setString(e._1, e._2)
-        )
+    val reduced =
+      try {
+        val parameters = config.getConfiguration.getOptional(PipelineOptions.GLOBAL_JOB_PARAMETERS)
+        val configuration = new Configuration()
+        if (parameters.isPresent) {
+          parameters.get().asScala.foreach(e => configuration.setString(e._1, e._2))
+        }
+        FunctionUtils.openFunction(function, configuration)
+        function.map(EMPTY_ROW)
+      } finally {
+        FunctionUtils.closeFunction(function)
       }
-      FunctionUtils.openFunction(function, configuration)
-      function.map(EMPTY_ROW)
-    } finally {
-      FunctionUtils.closeFunction(function)
-    }
 
     // add the reduced results or keep them unreduced
     var i = 0
@@ -148,11 +140,8 @@ class ExpressionReducer(config: TableConfig)
       } else {
         unreduced.getType.getSqlTypeName match {
           // we insert the original expression for object literals
-          case SqlTypeName.ANY |
-               SqlTypeName.ROW |
-               SqlTypeName.ARRAY |
-               SqlTypeName.MAP |
-               SqlTypeName.MULTISET =>
+          case SqlTypeName.ANY | SqlTypeName.ROW | SqlTypeName.ARRAY | SqlTypeName.MAP |
+              SqlTypeName.MULTISET =>
             reducedValues.add(unreduced)
 
           case _ =>
@@ -168,10 +157,7 @@ class ExpressionReducer(config: TableConfig)
               reducedValue
             }
 
-            val literal = rexBuilder.makeLiteral(
-              value,
-              unreduced.getType,
-              true)
+            val literal = rexBuilder.makeLiteral(value, unreduced.getType, true)
             reducedValues.add(literal)
             reducedIdx += 1
         }
@@ -182,11 +168,11 @@ class ExpressionReducer(config: TableConfig)
 }
 
 /**
-  * A [[ConstantFunctionContext]] allows to obtain user-defined configuration information set
-  * in [[TableConfig]].
-  *
-  * @param parameters User-defined configuration set in [[TableConfig]].
-  */
+ * A [[ConstantFunctionContext]] allows to obtain user-defined configuration information set
+ * in [[TableConfig]].
+ *
+ * @param parameters User-defined configuration set in [[TableConfig]].
+ */
 class ConstantFunctionContext(parameters: Configuration) extends FunctionContext(null) {
 
   override def getMetricGroup: MetricGroup = {
@@ -198,36 +184,37 @@ class ConstantFunctionContext(parameters: Configuration) extends FunctionContext
   }
 
   /**
-    * Gets the user-defined configuration value associated with the given key as a string.
-    *
-    * @param key          key pointing to the associated value
-    * @param defaultValue default value which is returned in case user-defined configuration
-    *                     value is null or there is no value associated with the given key
-    * @return (default) value associated with the given key
-    */
+   * Gets the user-defined configuration value associated with the given key as a string.
+   *
+   * @param key          key pointing to the associated value
+   * @param defaultValue default value which is returned in case user-defined configuration
+   *                     value is null or there is no value associated with the given key
+   * @return (default) value associated with the given key
+   */
   override def getJobParameter(key: String, defaultValue: String): String = {
     parameters.getString(key, defaultValue)
   }
 }
 
 /**
-  * A [[ConstantFunctionCodeGenerator]] used for constant expression code generator
-  * @param config configuration that determines runtime behavior
-  * @param nullableInput input(s) can be null.
-  * @param input1 type information about the first input of the Function
-  */
+ * A [[ConstantFunctionCodeGenerator]] used for constant expression code generator
+ * @param config configuration that determines runtime behavior
+ * @param nullableInput input(s) can be null.
+ * @param input1 type information about the first input of the Function
+ */
 class ConstantFunctionCodeGenerator(
     config: TableConfig,
     nullableInput: Boolean,
     input1: TypeInformation[_ <: Any])
-  extends FunctionCodeGenerator(config, nullableInput, input1) {
+    extends FunctionCodeGenerator(config, nullableInput, input1) {
+
   /**
-    * Adds a reusable [[UserDefinedFunction]] to the member area of the generated [[Function]].
-    *
-    * @param function    [[UserDefinedFunction]] object to be instantiated during runtime
-    * @param contextTerm term to access the Context
-    * @return member variable term
-    */
+   * Adds a reusable [[UserDefinedFunction]] to the member area of the generated [[Function]].
+   *
+   * @param function    [[UserDefinedFunction]] object to be instantiated during runtime
+   * @param contextTerm term to access the Context
+   * @return member variable term
+   */
   override def addReusableFunction(
       function: UserDefinedFunction,
       contextTerm: String = null,

@@ -31,7 +31,10 @@ import org.apache.flink.table.expressions.Expression
 import org.apache.flink.table.planner.calcite.FlinkPlannerImpl
 import org.apache.flink.table.planner.delegation.PlannerBase
 import org.apache.flink.table.planner.plan.nodes.exec.stream.StreamExecMatch
-import org.apache.flink.table.planner.plan.nodes.physical.stream.{StreamPhysicalDataStreamScan, StreamPhysicalMatch}
+import org.apache.flink.table.planner.plan.nodes.physical.stream.{
+  StreamPhysicalDataStreamScan,
+  StreamPhysicalMatch
+}
 import org.apache.flink.table.planner.plan.utils.MatchUtil
 import org.apache.flink.table.planner.utils.TableTestUtil
 import org.apache.flink.table.types.logical.{IntType, RowType}
@@ -60,8 +63,8 @@ abstract class PatternTranslatorTestBase extends TestLogger {
   private val calcitePlanner: FlinkPlannerImpl = context._2.createFlinkPlanner
   private val parser = context._2.plannerContext.createCalciteParser()
 
-  private def prepareContext(typeInfo: TypeInformation[Row])
-  : (RelBuilder, PlannerBase, StreamExecutionEnvironment) = {
+  private def prepareContext(
+      typeInfo: TypeInformation[Row]): (RelBuilder, PlannerBase, StreamExecutionEnvironment) = {
     // create DataStreamTable
     val dataStreamMock = mock(classOf[DataStream[Row]])
     val jDataStreamMock = mock(classOf[JDataStream[Row]])
@@ -72,7 +75,10 @@ abstract class PatternTranslatorTestBase extends TestLogger {
     val env = StreamExecutionEnvironment.getExecutionEnvironment
     val tEnv = StreamTableEnvironment.create(env, TableTestUtil.STREAM_SETTING)
     TableTestUtil.createTemporaryView(
-      tEnv, tableName, dataStreamMock.javaStream, Some(Array[Expression]('f0, 'proctime.proctime)))
+      tEnv,
+      tableName,
+      dataStreamMock.javaStream,
+      Some(Array[Expression]('f0, 'proctime.proctime)))
 
     // prepare RelBuilder
     val planner = tEnv.asInstanceOf[TableEnvironmentImpl].getPlanner.asInstanceOf[PlannerBase]
@@ -84,8 +90,7 @@ abstract class PatternTranslatorTestBase extends TestLogger {
 
   def verifyPattern(matchRecognize: String, expected: Pattern[RowData, _ <: RowData]): Unit = {
     // create RelNode from SQL expression
-    val parsed = parser.parse(
-      s"""
+    val parsed = parser.parse(s"""
          |SELECT *
          |FROM $tableName
          |$matchRecognize
@@ -103,11 +108,13 @@ abstract class PatternTranslatorTestBase extends TestLogger {
     }
 
     val dataMatch = optimized.asInstanceOf[StreamPhysicalMatch]
-    val p = StreamExecMatch.translatePattern(
-      MatchUtil.createMatchSpec(dataMatch.logicalMatch),
-      new TableConfig,
-      context._1,
-      testTableRowType).f0
+    val p = StreamExecMatch
+      .translatePattern(
+        MatchUtil.createMatchSpec(dataMatch.logicalMatch),
+        new TableConfig,
+        context._1,
+        testTableRowType)
+      .f0
 
     compare(expected, p)
   }
@@ -134,7 +141,8 @@ abstract class PatternTranslatorTestBase extends TestLogger {
       currentRight = currentRight.getPrevious
 
       if (!sameName || !sameQuantifier || !sameTimes || !sameSkipStrategy || !sameTimeWindow) {
-        throw new ComparisonFailure("Compiled different pattern.",
+        throw new ComparisonFailure(
+          "Compiled different pattern.",
           expected.toString,
           actual.toString)
       }

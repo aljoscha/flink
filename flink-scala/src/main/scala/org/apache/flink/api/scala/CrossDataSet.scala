@@ -49,7 +49,7 @@ class CrossDataSet[L, R](
     defaultCross: CrossOperator[L, R, (L, R)],
     leftInput: DataSet[L],
     rightInput: DataSet[R])
-  extends DataSet(defaultCross) {
+    extends DataSet(defaultCross) {
 
   /**
    * Creates a new [[DataSet]] where the result for each pair of elements is the result
@@ -104,7 +104,7 @@ private[flink] object CrossDataSet {
       leftInput: DataSet[L],
       rightInput: DataSet[R],
       crossHint: CrossHint) = {
-    
+
     val crosser = new CrossFunction[L, R, (L, R)] {
       def cross(left: L, right: R) = {
         (left, right)

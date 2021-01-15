@@ -29,10 +29,10 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
-  * Sub-class of [[Sink]] that is a relational expression
-  * which writes out data of input node into a [[DynamicTableSink]].
-  * This class corresponds to Calcite logical rel.
-  */
+ * Sub-class of [[Sink]] that is a relational expression
+ * which writes out data of input node into a [[DynamicTableSink]].
+ * This class corresponds to Calcite logical rel.
+ */
 final class LogicalSink(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -41,11 +41,17 @@ final class LogicalSink(
     catalogTable: CatalogTable,
     tableSink: DynamicTableSink,
     val staticPartitions: Map[String, String])
-  extends Sink(cluster, traitSet, input, tableIdentifier, catalogTable, tableSink) {
+    extends Sink(cluster, traitSet, input, tableIdentifier, catalogTable, tableSink) {
 
   override def copy(traitSet: RelTraitSet, inputs: util.List[RelNode]): RelNode = {
     new LogicalSink(
-      cluster, traitSet, inputs.head, tableIdentifier, catalogTable, tableSink, staticPartitions)
+      cluster,
+      traitSet,
+      inputs.head,
+      tableIdentifier,
+      catalogTable,
+      tableSink,
+      staticPartitions)
   }
 }
 
@@ -68,7 +74,3 @@ object LogicalSink {
       staticPartitions.toMap)
   }
 }
-
-
-
-

@@ -29,14 +29,14 @@ import org.apache.calcite.rel.metadata.RelMetadataQuery
 import scala.collection.JavaConversions._
 
 /**
-  * Base class that wraps [[IntermediateRelTable]].
-  */
+ * Base class that wraps [[IntermediateRelTable]].
+ */
 abstract class CommonIntermediateTableScan(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
     table: RelOptTable)
-  extends TableScan(cluster, traitSet, table)
-  with FlinkRelNode {
+    extends TableScan(cluster, traitSet, table)
+    with FlinkRelNode {
 
   val intermediateTable: IntermediateRelTable = getTable.unwrap(classOf[IntermediateRelTable])
 
@@ -51,8 +51,8 @@ abstract class CommonIntermediateTableScan(
   }
 
   override def explainTerms(pw: RelWriter): RelWriter = {
-    super.explainTerms(pw)
+    super
+      .explainTerms(pw)
       .item("fields", getRowType.getFieldNames.mkString(", "))
   }
 }
-

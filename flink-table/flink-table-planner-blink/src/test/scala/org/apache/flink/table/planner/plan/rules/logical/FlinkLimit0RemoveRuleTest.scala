@@ -20,7 +20,12 @@ package org.apache.flink.table.planner.plan.rules.logical
 
 import org.apache.flink.api.scala._
 import org.apache.flink.table.api._
-import org.apache.flink.table.planner.plan.optimize.program.{BatchOptimizeContext, FlinkChainedProgram, FlinkHepRuleSetProgramBuilder, HEP_RULES_EXECUTION_TYPE}
+import org.apache.flink.table.planner.plan.optimize.program.{
+  BatchOptimizeContext,
+  FlinkChainedProgram,
+  FlinkHepRuleSetProgramBuilder,
+  HEP_RULES_EXECUTION_TYPE
+}
 import org.apache.flink.table.planner.utils.TableTestBase
 
 import org.apache.calcite.plan.hep.HepMatchOrder
@@ -28,8 +33,8 @@ import org.apache.calcite.tools.RuleSets
 import org.junit.{Before, Test}
 
 /**
-  * Test for [[FlinkLimit0RemoveRule]].
-  */
+ * Test for [[FlinkLimit0RemoveRule]].
+ */
 class FlinkLimit0RemoveRuleTest extends TableTestBase {
 
   private val util = batchTestUtil()
@@ -42,11 +47,8 @@ class FlinkLimit0RemoveRuleTest extends TableTestBase {
       FlinkHepRuleSetProgramBuilder.newBuilder
         .setHepRulesExecutionType(HEP_RULES_EXECUTION_TYPE.RULE_SEQUENCE)
         .setHepMatchOrder(HepMatchOrder.BOTTOM_UP)
-        .add(RuleSets.ofList(
-          FlinkSubQueryRemoveRule.FILTER,
-          FlinkLimit0RemoveRule.INSTANCE))
-        .build()
-    )
+        .add(RuleSets.ofList(FlinkSubQueryRemoveRule.FILTER, FlinkLimit0RemoveRule.INSTANCE))
+        .build())
     util.replaceBatchProgram(programs)
 
     util.addTableSource[(Int, Long, String)]("MyTable", 'a, 'b, 'c)

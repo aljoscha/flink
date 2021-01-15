@@ -26,10 +26,10 @@ import org.apache.calcite.rex.RexNode
 import java.util
 
 /**
-  * Sub-class of [[Expand]] that is a relational expression
-  * which returns multiple rows expanded from one input row.
-  * This class corresponds to Calcite logical rel.
-  */
+ * Sub-class of [[Expand]] that is a relational expression
+ * which returns multiple rows expanded from one input row.
+ * This class corresponds to Calcite logical rel.
+ */
 final class LogicalExpand(
     cluster: RelOptCluster,
     traits: RelTraitSet,
@@ -37,7 +37,7 @@ final class LogicalExpand(
     outputRowType: RelDataType,
     projects: util.List[util.List[RexNode]],
     expandIdIndex: Int)
-  extends Expand(cluster, traits, input, outputRowType, projects, expandIdIndex) {
+    extends Expand(cluster, traits, input, outputRowType, projects, expandIdIndex) {
 
   override def copy(traitSet: RelTraitSet, inputs: util.List[RelNode]): RelNode = {
     new LogicalExpand(cluster, traitSet, inputs.get(0), outputRowType, projects, expandIdIndex)
@@ -55,4 +55,3 @@ object LogicalExpand {
     new LogicalExpand(input.getCluster, traits, input, outputRowType, projects, expandIdIndex)
   }
 }
-

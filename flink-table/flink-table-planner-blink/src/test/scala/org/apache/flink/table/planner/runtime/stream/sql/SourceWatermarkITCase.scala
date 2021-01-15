@@ -45,8 +45,7 @@ class SourceWatermarkITCase extends StreamingTestBase {
   def testSimpleWatermarkPushDown(): Unit = {
     val data = Seq(
       row(1, 2L, LocalDateTime.parse("2020-11-21T19:00:05.23")),
-      row(2, 3L, LocalDateTime.parse("2020-11-21T21:00:05.23"))
-    )
+      row(2, 3L, LocalDateTime.parse("2020-11-21T21:00:05.23")))
 
     val dataId = TestValuesTableFactory.registerData(data)
 
@@ -69,13 +68,8 @@ class SourceWatermarkITCase extends StreamingTestBase {
 
     tEnv.executeSql(ddl)
 
-    val expectedWatermarkOutput = Seq(
-      "2020-11-21T19:00:05.230",
-      "2020-11-21T21:00:05.230")
-    val expectedData = Seq(
-      "1,2,2020-11-21T19:00:05.230",
-      "2,3,2020-11-21T21:00:05.230"
-    )
+    val expectedWatermarkOutput = Seq("2020-11-21T19:00:05.230", "2020-11-21T21:00:05.230")
+    val expectedData = Seq("1,2,2020-11-21T19:00:05.230", "2,3,2020-11-21T21:00:05.230")
 
     val query = "SELECT a, b, c FROM VirtualTable"
     val result = tEnv.sqlQuery(query).toAppendStream[Row]
@@ -83,7 +77,8 @@ class SourceWatermarkITCase extends StreamingTestBase {
     result.addSink(sink)
     env.execute()
 
-    val actualWatermark = TestValuesTableFactory.getWatermarkOutput("VirtualTable")
+    val actualWatermark = TestValuesTableFactory
+      .getWatermarkOutput("VirtualTable")
       .asScala
       .map(x => TimestampData.fromEpochMillis(x.getTimestamp).toLocalDateTime.toString)
       .toList
@@ -98,8 +93,7 @@ class SourceWatermarkITCase extends StreamingTestBase {
       row(0, 0L, row("h1", row("h2", null))),
       row(1, 2L, row("i1", row("i2", LocalDateTime.parse("2020-11-21T19:00:05.23")))),
       row(2, 3L, row("j1", row("j2", LocalDateTime.parse("2020-11-21T21:00:05.23")))),
-      row(3, 4L, row("k1", row("k2", null)))
-    )
+      row(3, 4L, row("k1", row("k2", null))))
 
     val dataId = TestValuesTableFactory.registerData(data)
 
@@ -131,8 +125,7 @@ class SourceWatermarkITCase extends StreamingTestBase {
       "0,0,h2,null",
       "1,2,i2,2020-11-21T19:00:05.230",
       "2,3,j2,2020-11-21T21:00:05.230",
-      "3,4,k2,null"
-    )
+      "3,4,k2,null")
 
     val query = "SELECT a, b, c.d FROM NestedTable"
     val result = tEnv.sqlQuery(query).toAppendStream[Row]
@@ -140,7 +133,8 @@ class SourceWatermarkITCase extends StreamingTestBase {
     result.addSink(sink)
     env.execute()
 
-    val actualWatermark = TestValuesTableFactory.getWatermarkOutput("NestedTable")
+    val actualWatermark = TestValuesTableFactory
+      .getWatermarkOutput("NestedTable")
       .asScala
       .map(x => TimestampData.fromEpochMillis(x.getTimestamp).toLocalDateTime.toString)
       .toList
@@ -156,8 +150,7 @@ class SourceWatermarkITCase extends StreamingTestBase {
     tEnv.createTemporarySystemFunction("func", new JavaFunc5)
     val data = Seq(
       row(1000, 2L, LocalDateTime.parse("2020-11-21T19:00:05.23")),
-      row(2000, 3L, LocalDateTime.parse("2020-11-21T21:00:05.23"))
-    )
+      row(2000, 3L, LocalDateTime.parse("2020-11-21T21:00:05.23")))
 
     val dataId = TestValuesTableFactory.registerData(data)
 
@@ -180,12 +173,8 @@ class SourceWatermarkITCase extends StreamingTestBase {
 
     tEnv.executeSql(ddl)
 
-    val expectedWatermarkOutput = Seq(
-      "2020-11-21T19:00:02.230", "2020-11-21T20:59:59.230"
-    )
-    val expectedData = Seq(
-      "2000,3,2020-11-21T21:00:03.230"
-    )
+    val expectedWatermarkOutput = Seq("2020-11-21T19:00:02.230", "2020-11-21T20:59:59.230")
+    val expectedData = Seq("2000,3,2020-11-21T21:00:03.230")
 
     val query = "SELECT a, b, d FROM UdfTable WHERE b > 2"
     val result = tEnv.sqlQuery(query).toAppendStream[Row]
@@ -193,7 +182,8 @@ class SourceWatermarkITCase extends StreamingTestBase {
     result.addSink(sink)
     env.execute()
 
-    val actualWatermark = TestValuesTableFactory.getWatermarkOutput("UdfTable")
+    val actualWatermark = TestValuesTableFactory
+      .getWatermarkOutput("UdfTable")
       .asScala
       .map(x => TimestampData.fromEpochMillis(x.getTimestamp).toLocalDateTime.toString)
       .toList
@@ -206,8 +196,7 @@ class SourceWatermarkITCase extends StreamingTestBase {
   def testWatermarkWithMetadata(): Unit = {
     val data = Seq(
       row(1, 2L, Timestamp.valueOf("2020-11-21 19:00:05.23").toInstant.toEpochMilli),
-      row(1, 3L, Timestamp.valueOf("2020-11-21 21:00:05.23").toInstant.toEpochMilli)
-    )
+      row(1, 3L, Timestamp.valueOf("2020-11-21 21:00:05.23").toInstant.toEpochMilli))
 
     val dataId = TestValuesTableFactory.registerData(data)
 
@@ -231,10 +220,7 @@ class SourceWatermarkITCase extends StreamingTestBase {
 
     tEnv.executeSql(ddl)
 
-    val expectedWatermarkOutput = List(
-      "2020-11-21T19:00:05",
-      "2020-11-21T21:00:05"
-    )
+    val expectedWatermarkOutput = List("2020-11-21T19:00:05", "2020-11-21T21:00:05")
     val expectedData = Seq("1")
 
     val query = "SELECT a FROM MetadataTable WHERE b > 2"
@@ -243,9 +229,11 @@ class SourceWatermarkITCase extends StreamingTestBase {
     result.addSink(sink)
     env.execute()
 
-    val actualWatermark = TestValuesTableFactory.getWatermarkOutput("MetadataTable")
+    val actualWatermark = TestValuesTableFactory
+      .getWatermarkOutput("MetadataTable")
       .asScala
-      .map(x => TimestampData.fromEpochMillis(x.getTimestamp).toLocalDateTime.toString).toList
+      .map(x => TimestampData.fromEpochMillis(x.getTimestamp).toLocalDateTime.toString)
+      .toList
 
     assertEquals(expectedWatermarkOutput, actualWatermark)
     assertEquals(expectedData.sorted, sink.getAppendResults.sorted)

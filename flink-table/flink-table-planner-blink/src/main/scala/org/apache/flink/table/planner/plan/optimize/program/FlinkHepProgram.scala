@@ -27,25 +27,25 @@ import org.apache.calcite.plan.hep.{HepPlanner, HepProgram}
 import org.apache.calcite.rel.RelNode
 
 /**
-  * A FlinkOptimizeProgram that runs with [[HepPlanner]].
-  *
-  * <p>In most case, [[FlinkHepRuleSetProgram]] could meet our requirements.
-  * Otherwise we could choose this program for some advanced features,
-  * and use [[org.apache.calcite.plan.hep.HepProgramBuilder]] to create [[HepProgram]].
-  *
-  * @tparam OC OptimizeContext
-  */
+ * A FlinkOptimizeProgram that runs with [[HepPlanner]].
+ *
+ * <p>In most case, [[FlinkHepRuleSetProgram]] could meet our requirements.
+ * Otherwise we could choose this program for some advanced features,
+ * and use [[org.apache.calcite.plan.hep.HepProgramBuilder]] to create [[HepProgram]].
+ *
+ * @tparam OC OptimizeContext
+ */
 class FlinkHepProgram[OC <: FlinkOptimizeContext] extends FlinkOptimizeProgram[OC] {
 
   /**
-    * [[HepProgram]] instance for [[HepPlanner]],
-    * this must not be None when doing optimize.
-    */
+   * [[HepProgram]] instance for [[HepPlanner]],
+   * this must not be None when doing optimize.
+   */
   private var hepProgram: Option[HepProgram] = None
 
   /**
-    * Requested root traits, it's an optional item.
-    */
+   * Requested root traits, it's an optional item.
+   */
   private var requestedRootTraits: Option[Array[RelTrait]] = None
 
   override def optimize(root: RelNode, context: OC): RelNode = {
@@ -67,22 +67,22 @@ class FlinkHepProgram[OC <: FlinkOptimizeContext] extends FlinkOptimizeProgram[O
       }
 
       planner.findBestExp
-    }  finally {
+    } finally {
       FlinkRelMdNonCumulativeCost.THREAD_PLANNER.remove()
     }
   }
 
   /**
-    * Sets hep program instance.
-    */
+   * Sets hep program instance.
+   */
   def setHepProgram(hepProgram: HepProgram): Unit = {
     Preconditions.checkNotNull(hepProgram)
     this.hepProgram = Some(hepProgram)
   }
 
   /**
-    * Sets requested root traits.
-    */
+   * Sets requested root traits.
+   */
   def setRequestedRootTraits(relTraits: Array[RelTrait]): Unit = {
     requestedRootTraits = Option.apply(relTraits)
   }

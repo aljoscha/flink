@@ -27,21 +27,21 @@ import org.apache.calcite.rel.`type`.RelDataType
 import org.apache.calcite.rel.{RelNode, RelWriter, SingleRel}
 
 /**
-  * Relational expression that writes out data of input node into a [[TableSink]].
-  *
-  * @param cluster  cluster that this relational expression belongs to
-  * @param traitSet the traits of this rel
-  * @param input    input relational expression
-  * @param sink     Table sink to write into
-  * @param sinkName Name of tableSink, which is not required property, that is, it could be null
-  */
+ * Relational expression that writes out data of input node into a [[TableSink]].
+ *
+ * @param cluster  cluster that this relational expression belongs to
+ * @param traitSet the traits of this rel
+ * @param input    input relational expression
+ * @param sink     Table sink to write into
+ * @param sinkName Name of tableSink, which is not required property, that is, it could be null
+ */
 abstract class LegacySink(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
     input: RelNode,
     val sink: TableSink[_],
     val sinkName: String)
-  extends SingleRel(cluster, traitSet, input) {
+    extends SingleRel(cluster, traitSet, input) {
 
   override def deriveRowType(): RelDataType = {
     val typeFactory = getCluster.getTypeFactory.asInstanceOf[FlinkTypeFactory]
@@ -50,7 +50,8 @@ abstract class LegacySink(
   }
 
   override def explainTerms(pw: RelWriter): RelWriter = {
-    super.explainTerms(pw)
+    super
+      .explainTerms(pw)
       .itemIf("name", sinkName, sinkName != null)
       .item("fields", sink.getTableSchema.getFieldNames.mkString(", "))
   }

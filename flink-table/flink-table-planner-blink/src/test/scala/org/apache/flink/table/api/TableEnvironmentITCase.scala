@@ -21,14 +21,23 @@ package org.apache.flink.table.api
 import org.apache.flink.api.common.typeinfo.Types.STRING
 import org.apache.flink.api.scala._
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment
-import org.apache.flink.streaming.api.scala.{StreamExecutionEnvironment => ScalaStreamExecutionEnvironment}
+import org.apache.flink.streaming.api.scala.{
+  StreamExecutionEnvironment => ScalaStreamExecutionEnvironment
+}
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment
-import org.apache.flink.table.api.bridge.scala.{StreamTableEnvironment => ScalaStreamTableEnvironment, _}
+import org.apache.flink.table.api.bridge.scala.{
+  StreamTableEnvironment => ScalaStreamTableEnvironment,
+  _
+}
 import org.apache.flink.table.api.internal.{TableEnvironmentImpl, TableEnvironmentInternal}
 import org.apache.flink.table.planner.factories.utils.TestCollectionTableFactory
 import org.apache.flink.table.planner.runtime.utils.TestingAppendSink
 import org.apache.flink.table.planner.utils.TableTestUtil.{readFromResource, replaceStageId}
-import org.apache.flink.table.planner.utils.{TableTestUtil, TestTableSourceSinks, TestTableSourceWithTime}
+import org.apache.flink.table.planner.utils.{
+  TableTestUtil,
+  TestTableSourceSinks,
+  TestTableSourceWithTime
+}
 import org.apache.flink.types.{Row, RowKind}
 import org.apache.flink.util.{CollectionUtil, FileUtils, TestLogger}
 
@@ -73,7 +82,8 @@ class TableEnvironmentITCase(tableEnvName: String, isStreaming: Boolean) extends
         tEnv = TableEnvironmentImpl.create(settings)
       case "StreamTableEnvironment" =>
         tEnv = StreamTableEnvironment.create(
-          StreamExecutionEnvironment.getExecutionEnvironment, settings)
+          StreamExecutionEnvironment.getExecutionEnvironment,
+          settings)
       case _ => throw new UnsupportedOperationException("unsupported tableEnvName: " + tableEnvName)
     }
     TestTableSourceSinks.createPersonCsvTemporaryTable(tEnv, "MyTable")
@@ -82,11 +92,14 @@ class TableEnvironmentITCase(tableEnvName: String, isStreaming: Boolean) extends
   @Test
   def testExecuteTwiceUsingSameTableEnv(): Unit = {
     val sink1Path = TestTableSourceSinks.createCsvTemporarySinkTable(
-      tEnv, new TableSchema(Array("first"), Array(STRING)), "MySink1")
+      tEnv,
+      new TableSchema(Array("first"), Array(STRING)),
+      "MySink1")
 
     val sink2Path = TestTableSourceSinks.createCsvTemporarySinkTable(
-      tEnv, new TableSchema(Array("first"), Array(STRING)), "MySink2")
-
+      tEnv,
+      new TableSchema(Array("first"), Array(STRING)),
+      "MySink2")
 
     checkEmptyFile(sink1Path)
     checkEmptyFile(sink2Path)
@@ -111,7 +124,9 @@ class TableEnvironmentITCase(tableEnvName: String, isStreaming: Boolean) extends
   @Test
   def testExplainAndExecuteSingleSink(): Unit = {
     val sinkPath = TestTableSourceSinks.createCsvTemporarySinkTable(
-      tEnv, new TableSchema(Array("first"), Array(STRING)), "MySink1")
+      tEnv,
+      new TableSchema(Array("first"), Array(STRING)),
+      "MySink1")
 
     val table1 = tEnv.sqlQuery("select first from MyTable")
     tEnv.insertInto(table1, "MySink1")
@@ -124,10 +139,14 @@ class TableEnvironmentITCase(tableEnvName: String, isStreaming: Boolean) extends
   @Test
   def testExplainAndExecuteMultipleSink(): Unit = {
     val sink1Path = TestTableSourceSinks.createCsvTemporarySinkTable(
-      tEnv, new TableSchema(Array("first"), Array(STRING)), "MySink1")
+      tEnv,
+      new TableSchema(Array("first"), Array(STRING)),
+      "MySink1")
 
     val sink2Path = TestTableSourceSinks.createCsvTemporarySinkTable(
-      tEnv, new TableSchema(Array("first"), Array(STRING)), "MySink2")
+      tEnv,
+      new TableSchema(Array("first"), Array(STRING)),
+      "MySink2")
 
     val table1 = tEnv.sqlQuery("select first from MyTable")
     tEnv.insertInto(table1, "MySink1")
@@ -143,10 +162,14 @@ class TableEnvironmentITCase(tableEnvName: String, isStreaming: Boolean) extends
   @Test
   def testExplainTwice(): Unit = {
     val sink1Path = TestTableSourceSinks.createCsvTemporarySinkTable(
-      tEnv, new TableSchema(Array("first"), Array(STRING)), "MySink1")
+      tEnv,
+      new TableSchema(Array("first"), Array(STRING)),
+      "MySink1")
 
     val sink2Path = TestTableSourceSinks.createCsvTemporarySinkTable(
-      tEnv, new TableSchema(Array("first"), Array(STRING)), "MySink2")
+      tEnv,
+      new TableSchema(Array("first"), Array(STRING)),
+      "MySink2")
 
     val table1 = tEnv.sqlQuery("select first from MyTable")
     tEnv.insertInto(table1, "MySink1")
@@ -167,7 +190,9 @@ class TableEnvironmentITCase(tableEnvName: String, isStreaming: Boolean) extends
     val streamTableEnv = StreamTableEnvironment.create(streamEnv, settings)
     TestTableSourceSinks.createPersonCsvTemporaryTable(streamTableEnv, "MyTable")
     val sink1Path = TestTableSourceSinks.createCsvTemporarySinkTable(
-      streamTableEnv, new TableSchema(Array("first"), Array(STRING)), "MySink1")
+      streamTableEnv,
+      new TableSchema(Array("first"), Array(STRING)),
+      "MySink1")
     checkEmptyFile(sink1Path)
 
     streamTableEnv.sqlUpdate("insert into MySink1 select first from MyTable")
@@ -205,7 +230,9 @@ class TableEnvironmentITCase(tableEnvName: String, isStreaming: Boolean) extends
     val streamTableEnv = StreamTableEnvironment.create(streamEnv, settings)
     TestTableSourceSinks.createPersonCsvTemporaryTable(streamTableEnv, "MyTable")
     val sink1Path = TestTableSourceSinks.createCsvTemporarySinkTable(
-      streamTableEnv, new TableSchema(Array("first"), Array(STRING)), "MySink1")
+      streamTableEnv,
+      new TableSchema(Array("first"), Array(STRING)),
+      "MySink1")
     checkEmptyFile(sink1Path)
 
     val table = streamTableEnv.sqlQuery("select last from MyTable where id > 0")
@@ -238,11 +265,14 @@ class TableEnvironmentITCase(tableEnvName: String, isStreaming: Boolean) extends
     }
     val streamEnv = ScalaStreamExecutionEnvironment.getExecutionEnvironment
     val streamTableEnv = ScalaStreamTableEnvironment.create(streamEnv, settings)
-    val t = streamEnv.fromCollection(getPersonData)
+    val t = streamEnv
+      .fromCollection(getPersonData)
       .toTable(streamTableEnv, 'first, 'id, 'score, 'last)
     streamTableEnv.registerTable("MyTable", t)
     val sink1Path = TestTableSourceSinks.createCsvTemporarySinkTable(
-      streamTableEnv, new TableSchema(Array("first"), Array(STRING)), "MySink1")
+      streamTableEnv,
+      new TableSchema(Array("first"), Array(STRING)),
+      "MySink1")
     checkEmptyFile(sink1Path)
 
     val table = streamTableEnv.sqlQuery("select last from MyTable where id > 0")
@@ -271,7 +301,9 @@ class TableEnvironmentITCase(tableEnvName: String, isStreaming: Boolean) extends
   @Test
   def testExecuteSqlWithInsertInto(): Unit = {
     val sinkPath = TestTableSourceSinks.createCsvTemporarySinkTable(
-      tEnv, new TableSchema(Array("first"), Array(STRING)), "MySink1")
+      tEnv,
+      new TableSchema(Array("first"), Array(STRING)),
+      "MySink1")
     checkEmptyFile(sinkPath)
     val tableResult = tEnv.executeSql("insert into MySink1 select first from MyTable")
     checkInsertTableResult(tableResult, "default_catalog.default_database.MySink1")
@@ -280,14 +312,13 @@ class TableEnvironmentITCase(tableEnvName: String, isStreaming: Boolean) extends
 
   @Test
   def testExecuteSqlWithInsertOverwrite(): Unit = {
-    if(isStreaming) {
+    if (isStreaming) {
       // Streaming mode not support overwrite for FileSystemTableSink.
       return
     }
 
     val sinkPath = _tempFolder.newFolder().toString
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |create table MySink (
          |  first string
          |) with (
@@ -295,14 +326,13 @@ class TableEnvironmentITCase(tableEnvName: String, isStreaming: Boolean) extends
          |  'path' = '$sinkPath',
          |  'format' = 'testcsv'
          |)
-       """.stripMargin
-    )
+       """.stripMargin)
 
     val tableResult1 = tEnv.executeSql("insert overwrite MySink select first from MyTable")
     checkInsertTableResult(tableResult1, "default_catalog.default_database.MySink")
     assertFirstValues(sinkPath)
 
-    val tableResult2 =  tEnv.executeSql("insert overwrite MySink select first from MyTable")
+    val tableResult2 = tEnv.executeSql("insert overwrite MySink select first from MyTable")
     checkInsertTableResult(tableResult2, "default_catalog.default_database.MySink")
     assertFirstValues(sinkPath)
   }
@@ -310,9 +340,13 @@ class TableEnvironmentITCase(tableEnvName: String, isStreaming: Boolean) extends
   @Test
   def testExecuteSqlAndSqlUpdate(): Unit = {
     val sink1Path = TestTableSourceSinks.createCsvTemporarySinkTable(
-      tEnv, new TableSchema(Array("first"), Array(STRING)), "MySink1")
+      tEnv,
+      new TableSchema(Array("first"), Array(STRING)),
+      "MySink1")
     val sink2Path = TestTableSourceSinks.createCsvTemporarySinkTable(
-      tEnv, new TableSchema(Array("last"), Array(STRING)), "MySink2")
+      tEnv,
+      new TableSchema(Array("last"), Array(STRING)),
+      "MySink2")
     checkEmptyFile(sink1Path)
     checkEmptyFile(sink2Path)
 
@@ -342,7 +376,9 @@ class TableEnvironmentITCase(tableEnvName: String, isStreaming: Boolean) extends
     val streamTableEnv = StreamTableEnvironment.create(streamEnv, settings)
     TestTableSourceSinks.createPersonCsvTemporaryTable(streamTableEnv, "MyTable")
     val sink1Path = TestTableSourceSinks.createCsvTemporarySinkTable(
-      streamTableEnv, new TableSchema(Array("first"), Array(STRING)), "MySink1")
+      streamTableEnv,
+      new TableSchema(Array("first"), Array(STRING)),
+      "MySink1")
     checkEmptyFile(sink1Path)
 
     val table = streamTableEnv.sqlQuery("select last from MyTable where id > 0")
@@ -368,7 +404,9 @@ class TableEnvironmentITCase(tableEnvName: String, isStreaming: Boolean) extends
   @Test
   def testExecuteInsert(): Unit = {
     val sinkPath = TestTableSourceSinks.createCsvTemporarySinkTable(
-      tEnv, new TableSchema(Array("first"), Array(STRING)), "MySink")
+      tEnv,
+      new TableSchema(Array("first"), Array(STRING)),
+      "MySink")
     checkEmptyFile(sinkPath)
     val table = tEnv.sqlQuery("select first from MyTable")
     val tableResult = table.executeInsert("MySink")
@@ -378,13 +416,12 @@ class TableEnvironmentITCase(tableEnvName: String, isStreaming: Boolean) extends
 
   @Test
   def testExecuteInsertOverwrite(): Unit = {
-    if(isStreaming) {
+    if (isStreaming) {
       // Streaming mode not support overwrite for FileSystemTableSink.
       return
     }
     val sinkPath = _tempFolder.newFolder().toString
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |create table MySink (
          |  first string
          |) with (
@@ -392,8 +429,7 @@ class TableEnvironmentITCase(tableEnvName: String, isStreaming: Boolean) extends
          |  'path' = '$sinkPath',
          |  'format' = 'testcsv'
          |)
-       """.stripMargin
-    )
+       """.stripMargin)
     val tableResult1 = tEnv.sqlQuery("select first from MyTable").executeInsert("MySink", true)
     checkInsertTableResult(tableResult1, "default_catalog.default_database.MySink")
     assertFirstValues(sinkPath)
@@ -406,13 +442,18 @@ class TableEnvironmentITCase(tableEnvName: String, isStreaming: Boolean) extends
   @Test
   def testStatementSet(): Unit = {
     val sink1Path = TestTableSourceSinks.createCsvTemporarySinkTable(
-      tEnv, new TableSchema(Array("first"), Array(STRING)), "MySink1")
+      tEnv,
+      new TableSchema(Array("first"), Array(STRING)),
+      "MySink1")
 
     val sink2Path = TestTableSourceSinks.createCsvTemporarySinkTable(
-      tEnv, new TableSchema(Array("last"), Array(STRING)), "MySink2")
+      tEnv,
+      new TableSchema(Array("last"), Array(STRING)),
+      "MySink2")
 
     val stmtSet = tEnv.createStatementSet()
-    stmtSet.addInsert("MySink1", tEnv.sqlQuery("select first from MyTable"))
+    stmtSet
+      .addInsert("MySink1", tEnv.sqlQuery("select first from MyTable"))
       .addInsertSql("insert into MySink2 select last from MyTable")
 
     val actual = stmtSet.explain()
@@ -431,13 +472,12 @@ class TableEnvironmentITCase(tableEnvName: String, isStreaming: Boolean) extends
 
   @Test
   def testStatementSetWithOverwrite(): Unit = {
-    if(isStreaming) {
+    if (isStreaming) {
       // Streaming mode not support overwrite for FileSystemTableSink.
       return
     }
     val sink1Path = _tempFolder.newFolder().toString
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |create table MySink1 (
          |  first string
          |) with (
@@ -445,12 +485,10 @@ class TableEnvironmentITCase(tableEnvName: String, isStreaming: Boolean) extends
          |  'path' = '$sink1Path',
          |  'format' = 'testcsv'
          |)
-       """.stripMargin
-    )
+       """.stripMargin)
 
     val sink2Path = _tempFolder.newFolder().toString
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |create table MySink2 (
          |  last string
          |) with (
@@ -458,8 +496,7 @@ class TableEnvironmentITCase(tableEnvName: String, isStreaming: Boolean) extends
          |  'path' = '$sink2Path',
          |  'format' = 'testcsv'
          |)
-       """.stripMargin
-    )
+       """.stripMargin)
 
     val stmtSet = tEnv.createStatementSet()
     stmtSet.addInsert("MySink1", tEnv.sqlQuery("select first from MyTable"), true)
@@ -475,7 +512,8 @@ class TableEnvironmentITCase(tableEnvName: String, isStreaming: Boolean) extends
     assertLastValues(sink2Path)
 
     // execute again using same StatementSet instance
-    stmtSet.addInsert("MySink1", tEnv.sqlQuery("select first from MyTable"), true)
+    stmtSet
+      .addInsert("MySink1", tEnv.sqlQuery("select first from MyTable"), true)
       .addInsertSql("insert overwrite MySink2 select last from MyTable")
 
     val tableResult2 = stmtSet.execute()
@@ -490,13 +528,12 @@ class TableEnvironmentITCase(tableEnvName: String, isStreaming: Boolean) extends
 
   @Test
   def testStatementSetWithSameSinkTableNames(): Unit = {
-    if(isStreaming) {
+    if (isStreaming) {
       // Streaming mode not support overwrite for FileSystemTableSink.
       return
     }
     val sinkPath = _tempFolder.newFolder().toString
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |create table MySink (
          |  first string
          |) with (
@@ -504,8 +541,7 @@ class TableEnvironmentITCase(tableEnvName: String, isStreaming: Boolean) extends
          |  'path' = '$sinkPath',
          |  'format' = 'testcsv'
          |)
-       """.stripMargin
-    )
+       """.stripMargin)
 
     val stmtSet = tEnv.createStatementSet()
     stmtSet.addInsert("MySink", tEnv.sqlQuery("select first from MyTable"), true)
@@ -530,7 +566,8 @@ class TableEnvironmentITCase(tableEnvName: String, isStreaming: Boolean) extends
     assertTrue(tableResult.getJobClient.isPresent)
     assertEquals(ResultKind.SUCCESS_WITH_CONTENT, tableResult.getResultKind)
     assertEquals(
-      TableSchema.builder()
+      TableSchema
+        .builder()
         .field("id", DataTypes.INT())
         .field("full name", DataTypes.STRING())
         .build(),
@@ -573,8 +610,7 @@ class TableEnvironmentITCase(tableEnvName: String, isStreaming: Boolean) extends
         Row.ofKind(RowKind.UPDATE_BEFORE, JLong.valueOf(6)),
         Row.ofKind(RowKind.UPDATE_AFTER, JLong.valueOf(7)),
         Row.ofKind(RowKind.UPDATE_BEFORE, JLong.valueOf(7)),
-        Row.ofKind(RowKind.UPDATE_AFTER, JLong.valueOf(8))
-      )
+        Row.ofKind(RowKind.UPDATE_AFTER, JLong.valueOf(8)))
     } else {
       util.Arrays.asList(Row.of(JLong.valueOf(8)))
     }
@@ -595,7 +631,8 @@ class TableEnvironmentITCase(tableEnvName: String, isStreaming: Boolean) extends
     assertTrue(tableResult.getJobClient.isPresent)
     assertEquals(ResultKind.SUCCESS_WITH_CONTENT, tableResult.getResultKind)
     assertEquals(
-      TableSchema.builder()
+      TableSchema
+        .builder()
         .field("name", DataTypes.STRING())
         .field("pt", DataTypes.TIMESTAMP(3))
         .build(),
@@ -686,9 +723,13 @@ class TableEnvironmentITCase(tableEnvName: String, isStreaming: Boolean) extends
   private def readFile(csvFilePath: String): List[String] = {
     val file = new File(csvFilePath)
     if (file.isDirectory) {
-      file.listFiles(new FileFilter() {
-        override def accept(f: File): Boolean = f.isFile
-      }).map(FileUtils.readFileUtf8).flatMap(_.split("\n")).toList
+      file
+        .listFiles(new FileFilter() {
+          override def accept(f: File): Boolean = f.isFile
+        })
+        .map(FileUtils.readFileUtf8)
+        .flatMap(_.split("\n"))
+        .toList
     } else {
       FileUtils.readFileUtf8(file).split("\n").toList
     }
@@ -701,7 +742,6 @@ object TableEnvironmentITCase {
     util.Arrays.asList(
       Array("TableEnvironment", true),
       Array("TableEnvironment", false),
-      Array("StreamTableEnvironment", true)
-    )
+      Array("StreamTableEnvironment", true))
   }
 }

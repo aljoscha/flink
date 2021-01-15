@@ -29,15 +29,16 @@ import scala.collection.JavaConverters._
 
 /**
  * A wrapper function that exposes a Scala WindowFunction as a JavaWindow function.
- * 
+ *
  * The Scala and Java Window functions differ in their type of "Iterable":
  *   - Scala WindowFunction: scala.Iterable
  *   - Java WindowFunction: java.lang.Iterable
  */
-final class ScalaWindowFunctionWrapper[IN, OUT, KEY, W <: Window]
-(func: WindowFunction[IN, OUT, KEY, W])
-  extends WrappingFunction[WindowFunction[IN, OUT, KEY, W]](func)
-  with JWindowFunction[IN, OUT, KEY, W] with RichFunction {
+final class ScalaWindowFunctionWrapper[IN, OUT, KEY, W <: Window](
+    func: WindowFunction[IN, OUT, KEY, W])
+    extends WrappingFunction[WindowFunction[IN, OUT, KEY, W]](func)
+    with JWindowFunction[IN, OUT, KEY, W]
+    with RichFunction {
 
   @throws(classOf[Exception])
   override def apply(key: KEY, window: W, input: java.lang.Iterable[IN], out: Collector[OUT]) {

@@ -29,11 +29,12 @@ abstract class BinaryPredicate extends BinaryExpression {
 
   override private[flink] def validateInput(): ValidationResult = {
     if (left.resultType == BasicTypeInfo.BOOLEAN_TYPE_INFO &&
-        right.resultType == BasicTypeInfo.BOOLEAN_TYPE_INFO) {
+      right.resultType == BasicTypeInfo.BOOLEAN_TYPE_INFO) {
       ValidationSuccess
     } else {
-      ValidationFailure(s"$this only accepts children of Boolean type, " +
-        s"get $left : ${left.resultType} and $right : ${right.resultType}")
+      ValidationFailure(
+        s"$this only accepts children of Boolean type, " +
+          s"get $left : ${left.resultType} and $right : ${right.resultType}")
     }
   }
 }
@@ -52,8 +53,9 @@ case class Not(child: PlannerExpression) extends UnaryExpression {
     if (child.resultType == BasicTypeInfo.BOOLEAN_TYPE_INFO) {
       ValidationSuccess
     } else {
-      ValidationFailure(s"Not operator requires a boolean expression as input, " +
-        s"but $child is of type ${child.resultType}")
+      ValidationFailure(
+        s"Not operator requires a boolean expression as input, " +
+          s"but $child is of type ${child.resultType}")
     }
   }
 }
@@ -76,14 +78,9 @@ case class Or(left: PlannerExpression, right: PlannerExpression) extends BinaryP
   }
 }
 
-@deprecated(
-  "Use ifThenElse(...) instead. It is available through the implicit Scala DSL.",
-  "1.8.0")
-case class If(
-    condition: PlannerExpression,
-    ifTrue: PlannerExpression,
-    ifFalse: PlannerExpression)
-  extends PlannerExpression {
+@deprecated("Use ifThenElse(...) instead. It is available through the implicit Scala DSL.", "1.8.0")
+case class If(condition: PlannerExpression, ifTrue: PlannerExpression, ifFalse: PlannerExpression)
+    extends PlannerExpression {
   private[flink] def children = Seq(condition, ifTrue, ifFalse)
 
   override private[flink] def resultType = ifTrue.resultType
@@ -99,7 +96,7 @@ case class If(
 
   override private[flink] def validateInput(): ValidationResult = {
     if (condition.resultType == BasicTypeInfo.BOOLEAN_TYPE_INFO &&
-        ifTrue.resultType == ifFalse.resultType) {
+      ifTrue.resultType == ifFalse.resultType) {
       ValidationSuccess
     } else {
       ValidationFailure(

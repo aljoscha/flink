@@ -39,14 +39,19 @@ class StreamPhysicalExpand(
     outputRowType: RelDataType,
     projects: util.List[util.List[RexNode]],
     expandIdIndex: Int)
-  extends Expand(cluster, traitSet, inputRel, outputRowType, projects, expandIdIndex)
-  with StreamPhysicalRel {
+    extends Expand(cluster, traitSet, inputRel, outputRowType, projects, expandIdIndex)
+    with StreamPhysicalRel {
 
   override def requireWatermark: Boolean = false
 
   override def copy(traitSet: RelTraitSet, inputs: util.List[RelNode]): RelNode = {
     new StreamPhysicalExpand(
-      cluster, traitSet, inputs.get(0), outputRowType, projects, expandIdIndex)
+      cluster,
+      traitSet,
+      inputs.get(0),
+      outputRowType,
+      projects,
+      expandIdIndex)
   }
 
   override def translateToExecNode(): ExecNode[_] = {
@@ -54,7 +59,6 @@ class StreamPhysicalExpand(
       projects,
       ExecEdge.DEFAULT,
       FlinkTypeFactory.toLogicalRowType(getRowType),
-      getRelDetailedDescription
-    )
+      getRelDetailedDescription)
   }
 }

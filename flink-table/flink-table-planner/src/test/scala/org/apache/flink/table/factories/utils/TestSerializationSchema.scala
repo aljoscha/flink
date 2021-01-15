@@ -23,8 +23,8 @@ import org.apache.flink.api.common.typeinfo.TypeInformation
 import org.apache.flink.types.Row
 
 /**
-  * Serialization schema for testing purposes.
-  */
+ * Serialization schema for testing purposes.
+ */
 class TestSerializationSchema(val typeInfo: TypeInformation[Row]) extends SerializationSchema[Row] {
 
   override def serialize(element: Row): Array[Byte] = throw new UnsupportedOperationException()

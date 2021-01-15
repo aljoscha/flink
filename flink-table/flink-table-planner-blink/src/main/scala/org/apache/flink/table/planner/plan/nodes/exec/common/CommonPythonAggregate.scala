@@ -28,7 +28,11 @@ import org.apache.flink.table.planner.functions.bridging.BridgingSqlAggFunction
 import org.apache.flink.table.planner.functions.utils.AggSqlFunction
 import org.apache.flink.table.planner.plan.nodes.common.CommonPythonBase
 import org.apache.flink.table.planner.plan.utils.AggregateInfoList
-import org.apache.flink.table.planner.typeutils.DataViewUtils.{DataViewSpec, ListViewSpec, MapViewSpec}
+import org.apache.flink.table.planner.typeutils.DataViewUtils.{
+  DataViewSpec,
+  ListViewSpec,
+  MapViewSpec
+}
 import org.apache.flink.table.types.logical.{RowType, StructuredType}
 import org.apache.flink.table.types.{DataType, FieldsDataType}
 
@@ -38,13 +42,13 @@ import scala.collection.JavaConversions._
 import scala.collection.mutable
 
 /**
-  * This trait will be removed when all Python Aggregate Nodes has been port to Java.
-  */
+ * This trait will be removed when all Python Aggregate Nodes has been port to Java.
+ */
 trait CommonPythonAggregate extends CommonPythonBase {
 
   /**
-    * For batch execution we extract the PythonFunctionInfo from AggregateCall.
-    */
+   * For batch execution we extract the PythonFunctionInfo from AggregateCall.
+   */
   protected def extractPythonAggregateFunctionInfosFromAggregateCall(
       aggCalls: Seq[AggregateCall]): (Array[Int], Array[PythonFunctionInfo]) = {
     val inputNodes = new mutable.LinkedHashMap[Integer, Integer]()
@@ -55,7 +59,8 @@ trait CommonPythonAggregate extends CommonPythonBase {
         for (arg <- argList) {
           inputNodes.get(arg) match {
             case Some(existing) => inputs.append(existing)
-            case None => val inputOffset = Integer.valueOf(inputNodes.size)
+            case None =>
+              val inputOffset = Integer.valueOf(inputNodes.size)
               inputs.append(inputOffset)
               inputNodes.put(arg, inputOffset)
           }
@@ -67,29 +72,34 @@ trait CommonPythonAggregate extends CommonPythonBase {
             function.getDefinition.asInstanceOf[PythonFunction]
         }
         new PythonAggregateFunctionInfo(
-          pythonFunction, inputs.toArray, aggregateCall.filterArg, aggregateCall.isDistinct)
+          pythonFunction,
+          inputs.toArray,
+          aggregateCall.filterArg,
+          aggregateCall.isDistinct)
     }
     val udafInputOffsets = inputNodes.toArray.map(_._1.toInt)
     (udafInputOffsets, pythonFunctionInfos.toArray)
   }
 
   /**
-    * For streaming execution we extract the PythonFunctionInfo from both AggregateInfo and
-    * AggregateCall.
-    */
+   * For streaming execution we extract the PythonFunctionInfo from both AggregateInfo and
+   * AggregateCall.
+   */
   protected def extractPythonAggregateFunctionInfos(
-      pythonAggregateInfoList: AggregateInfoList, aggCalls: Seq[AggregateCall]):
-  (Array[PythonAggregateFunctionInfo], Array[Array[DataViewSpec]]) = {
+      pythonAggregateInfoList: AggregateInfoList,
+      aggCalls: Seq[AggregateCall])
+      : (Array[PythonAggregateFunctionInfo], Array[Array[DataViewSpec]]) = {
     val pythonAggregateFunctionInfoList = new mutable.ArrayBuffer[PythonAggregateFunctionInfo]
     val dataViewSpecList = new mutable.ArrayBuffer[Array[DataViewSpec]]
     for (i <- pythonAggregateInfoList.aggInfos.indices) {
       pythonAggregateInfoList.aggInfos(i).function match {
         case function: PythonFunction =>
-          pythonAggregateFunctionInfoList.add(new PythonAggregateFunctionInfo(
-            function,
-            pythonAggregateInfoList.aggInfos(i).argIndexes.map(_.asInstanceOf[AnyRef]),
-            aggCalls(i).filterArg,
-            aggCalls(i).isDistinct))
+          pythonAggregateFunctionInfoList.add(
+            new PythonAggregateFunctionInfo(
+              function,
+              pythonAggregateInfoList.aggInfos(i).argIndexes.map(_.asInstanceOf[AnyRef]),
+              aggCalls(i).filterArg,
+              aggCalls(i).isDistinct))
           val typeInference = function match {
             case aggregateFunction: PythonAggregateFunction =>
               aggregateFunction.getTypeInference(null)
@@ -107,11 +117,12 @@ trait CommonPythonAggregate extends CommonPythonBase {
             filterArg = aggCalls(i).filterArg
             distinct = aggCalls(i).isDistinct
           }
-          pythonAggregateFunctionInfoList.add(new PythonAggregateFunctionInfo(
-            getBuiltInPythonAggregateFunction(function),
-            pythonAggregateInfoList.aggInfos(i).argIndexes.map(_.asInstanceOf[AnyRef]),
-            filterArg,
-            distinct))
+          pythonAggregateFunctionInfoList.add(
+            new PythonAggregateFunctionInfo(
+              getBuiltInPythonAggregateFunction(function),
+              pythonAggregateInfoList.aggInfos(i).argIndexes.map(_.asInstanceOf[AnyRef]),
+              filterArg,
+              distinct))
           // The data views of the built in Python Aggregate Function are different from Java side,
           // we will create the spec at Python side.
           dataViewSpecList.add(Array())
@@ -124,9 +135,7 @@ trait CommonPythonAggregate extends CommonPythonBase {
     (pythonAggregateFunctionInfoList.toArray, dataViewSpecList.toArray)
   }
 
-  protected def extractDataViewSpecs(
-      index: Int,
-      accType: DataType): Array[DataViewSpec] = {
+  protected def extractDataViewSpecs(index: Int, accType: DataType): Array[DataViewSpec] = {
     if (!accType.isInstanceOf[FieldsDataType]) {
       return Array()
     }
@@ -141,42 +150,55 @@ trait CommonPythonAggregate extends CommonPythonBase {
           case structuredType: StructuredType =>
             classOf[DataView].isAssignableFrom(structuredType.getImplementationClass.get())
           case _ => false
-        }
-      )
+        })
     }
 
     if (includesDataView(compositeAccType)) {
       compositeAccType.getLogicalType match {
         case rowType: RowType =>
-            (0 until compositeAccType.getChildren.size()).flatMap(i => {
+          (0 until compositeAccType.getChildren.size())
+            .flatMap(i => {
               compositeAccType.getChildren.get(i).getLogicalType match {
-                case _: RowType if includesDataView(
-                  compositeAccType.getChildren.get(i).asInstanceOf[FieldsDataType]) =>
+                case _: RowType
+                    if includesDataView(
+                      compositeAccType.getChildren.get(i).asInstanceOf[FieldsDataType]) =>
                   throw new TableException(
                     "For Python AggregateFunction, DataView cannot be used in the nested columns " +
                       "of the accumulator. ")
-                case listViewType: StructuredType if classOf[ListView[_]].isAssignableFrom(
-                  listViewType.getImplementationClass.get()) =>
-                  Some(new ListViewSpec(
-                    "agg" + index + "$" + rowType.getFieldNames()(i),
-                    i,
-                    compositeAccType.getChildren.get(i).asInstanceOf[FieldsDataType]
-                      .getChildren.get(0)))
-                case mapViewType: StructuredType if classOf[MapView[_, _]].isAssignableFrom(
-                  mapViewType.getImplementationClass.get()) =>
-                  Some(new MapViewSpec(
-                    "agg" + index + "$" + rowType.getFieldNames()(i),
-                    i,
-                    compositeAccType.getChildren.get(i).asInstanceOf[FieldsDataType]
-                      .getChildren.get(0),
-                    false).asInstanceOf[DataViewSpec])
+                case listViewType: StructuredType
+                    if classOf[ListView[_]].isAssignableFrom(
+                      listViewType.getImplementationClass.get()) =>
+                  Some(
+                    new ListViewSpec(
+                      "agg" + index + "$" + rowType.getFieldNames()(i),
+                      i,
+                      compositeAccType.getChildren
+                        .get(i)
+                        .asInstanceOf[FieldsDataType]
+                        .getChildren
+                        .get(0)))
+                case mapViewType: StructuredType
+                    if classOf[MapView[_, _]].isAssignableFrom(
+                      mapViewType.getImplementationClass.get()) =>
+                  Some(
+                    new MapViewSpec(
+                      "agg" + index + "$" + rowType.getFieldNames()(i),
+                      i,
+                      compositeAccType.getChildren
+                        .get(i)
+                        .asInstanceOf[FieldsDataType]
+                        .getChildren
+                        .get(0),
+                      false).asInstanceOf[DataViewSpec])
                 case _ =>
                   None
               }
-            }).toArray
+            })
+            .toArray
         case _ =>
-          throw new TableException("For Python AggregateFunction you can only use DataView in " +
-            "Row type.")
+          throw new TableException(
+            "For Python AggregateFunction you can only use DataView in " +
+              "Row type.")
       }
     } else {
       Array()
@@ -217,7 +239,7 @@ trait CommonPythonAggregate extends CommonPythonBase {
       case _: SumAggFunction =>
         BuiltInPythonAggregateFunction.SUM
       case _: IntSum0AggFunction | _: ByteSum0AggFunction | _: ShortSum0AggFunction |
-           _: LongSum0AggFunction =>
+          _: LongSum0AggFunction =>
         BuiltInPythonAggregateFunction.INT_SUM0
       case _: FloatSum0AggFunction | _: DoubleSum0AggFunction =>
         BuiltInPythonAggregateFunction.FLOAT_SUM0
@@ -226,8 +248,9 @@ trait CommonPythonAggregate extends CommonPythonBase {
       case _: SumWithRetractAggFunction =>
         BuiltInPythonAggregateFunction.SUM_RETRACT
       case _ =>
-        throw new TableException("Aggregate function " + javaBuiltInAggregateFunction +
-          " is still not supported to be mixed with Python UDAF.")
+        throw new TableException(
+          "Aggregate function " + javaBuiltInAggregateFunction +
+            " is still not supported to be mixed with Python UDAF.")
     }
   }
 }

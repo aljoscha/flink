@@ -26,14 +26,12 @@ import org.apache.flink.table.runtime.types.CRow
 import org.apache.flink.util.Collector
 
 /**
-  * ProcessFunction to copy a timestamp from a [[org.apache.flink.types.Row]] field into the
-  * [[org.apache.flink.streaming.runtime.streamrecord.StreamRecord]].
-  */
-class RowtimeProcessFunction(
-    val rowtimeIdx: Int,
-    @transient var returnType: TypeInformation[CRow])
-  extends ProcessFunction[CRow, CRow]
-  with ResultTypeQueryable[CRow] {
+ * ProcessFunction to copy a timestamp from a [[org.apache.flink.types.Row]] field into the
+ * [[org.apache.flink.streaming.runtime.streamrecord.StreamRecord]].
+ */
+class RowtimeProcessFunction(val rowtimeIdx: Int, @transient var returnType: TypeInformation[CRow])
+    extends ProcessFunction[CRow, CRow]
+    with ResultTypeQueryable[CRow] {
 
   override def processElement(
       in: CRow,

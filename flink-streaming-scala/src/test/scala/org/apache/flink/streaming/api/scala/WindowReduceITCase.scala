@@ -25,7 +25,12 @@ import org.apache.flink.api.java.tuple.Tuple
 import org.apache.flink.streaming.api.functions.AssignerWithPunctuatedWatermarks
 import org.apache.flink.streaming.api.functions.sink.SinkFunction
 import org.apache.flink.streaming.api.functions.source.SourceFunction
-import org.apache.flink.streaming.api.scala.testutils.{CheckingIdentityRichAllWindowFunction, CheckingIdentityRichProcessAllWindowFunction, CheckingIdentityRichProcessWindowFunction, CheckingIdentityRichWindowFunction}
+import org.apache.flink.streaming.api.scala.testutils.{
+  CheckingIdentityRichAllWindowFunction,
+  CheckingIdentityRichProcessAllWindowFunction,
+  CheckingIdentityRichProcessWindowFunction,
+  CheckingIdentityRichWindowFunction
+}
 import org.apache.flink.streaming.api.watermark.Watermark
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows
 import org.apache.flink.streaming.api.windowing.time.Time
@@ -49,29 +54,30 @@ class WindowReduceITCase extends AbstractTestBase {
     val env = StreamExecutionEnvironment.getExecutionEnvironment
     env.setParallelism(1)
 
-    val source1 = env.addSource(new SourceFunction[(String, Int)]() {
-      def run(ctx: SourceFunction.SourceContext[(String, Int)]) {
-        ctx.collect(("a", 0))
-        ctx.collect(("a", 1))
-        ctx.collect(("a", 2))
-        ctx.collect(("b", 3))
-        ctx.collect(("b", 4))
-        ctx.collect(("b", 5))
-        ctx.collect(("a", 6))
-        ctx.collect(("a", 7))
-        ctx.collect(("a", 8))
+    val source1 = env
+      .addSource(new SourceFunction[(String, Int)]() {
+        def run(ctx: SourceFunction.SourceContext[(String, Int)]) {
+          ctx.collect(("a", 0))
+          ctx.collect(("a", 1))
+          ctx.collect(("a", 2))
+          ctx.collect(("b", 3))
+          ctx.collect(("b", 4))
+          ctx.collect(("b", 5))
+          ctx.collect(("a", 6))
+          ctx.collect(("a", 7))
+          ctx.collect(("a", 8))
 
-        // source is finite, so it will have an implicit MAX watermark when it finishes
-      }
+          // source is finite, so it will have an implicit MAX watermark when it finishes
+        }
 
-      def cancel() {
-      }
-    }).assignTimestampsAndWatermarks(new WindowReduceITCase.Tuple2TimestampExtractor)
+        def cancel() {}
+      })
+      .assignTimestampsAndWatermarks(new WindowReduceITCase.Tuple2TimestampExtractor)
 
     source1
       .keyBy(0)
       .window(TumblingEventTimeWindows.of(Time.of(3, TimeUnit.MILLISECONDS)))
-      .reduce( (a, b) => (a._1 + b._1, a._2 + b._2) )
+      .reduce((a, b) => (a._1 + b._1, a._2 + b._2))
       .addSink(new SinkFunction[(String, Int)]() {
         override def invoke(value: (String, Int)) {
           WindowReduceITCase.testResults += value.toString
@@ -80,10 +86,7 @@ class WindowReduceITCase extends AbstractTestBase {
 
     env.execute("Reduce Window Test")
 
-    val expectedResult = mutable.MutableList(
-      "(aaa,3)",
-      "(aaa,21)",
-      "(bbb,12)")
+    val expectedResult = mutable.MutableList("(aaa,3)", "(aaa,21)", "(bbb,12)")
 
     assertEquals(expectedResult.sorted, WindowReduceITCase.testResults.sorted)
   }
@@ -98,29 +101,30 @@ class WindowReduceITCase extends AbstractTestBase {
         (a._1 + b._1, a._2 + b._2)
       }
     }
-    
+
     val env = StreamExecutionEnvironment.getExecutionEnvironment
     env.setParallelism(1)
 
-    val source1 = env.addSource(new SourceFunction[(String, Int)]() {
-      def run(ctx: SourceFunction.SourceContext[(String, Int)]) {
-        ctx.collect(("a", 0))
-        ctx.collect(("a", 1))
-        ctx.collect(("a", 2))
-        ctx.collect(("b", 3))
-        ctx.collect(("b", 4))
-        ctx.collect(("b", 5))
-        ctx.collect(("a", 6))
-        ctx.collect(("a", 7))
-        ctx.collect(("a", 8))
+    val source1 = env
+      .addSource(new SourceFunction[(String, Int)]() {
+        def run(ctx: SourceFunction.SourceContext[(String, Int)]) {
+          ctx.collect(("a", 0))
+          ctx.collect(("a", 1))
+          ctx.collect(("a", 2))
+          ctx.collect(("b", 3))
+          ctx.collect(("b", 4))
+          ctx.collect(("b", 5))
+          ctx.collect(("a", 6))
+          ctx.collect(("a", 7))
+          ctx.collect(("a", 8))
 
-        // source is finite, so it will have an implicit MAX watermark when it finishes
-      }
+          // source is finite, so it will have an implicit MAX watermark when it finishes
+        }
 
-      def cancel() {
-      }
-    }).assignTimestampsAndWatermarks(new WindowReduceITCase.Tuple2TimestampExtractor)
-    
+        def cancel() {}
+      })
+      .assignTimestampsAndWatermarks(new WindowReduceITCase.Tuple2TimestampExtractor)
+
     source1
       .keyBy(0)
       .window(TumblingEventTimeWindows.of(Time.of(3, TimeUnit.MILLISECONDS)))
@@ -135,10 +139,7 @@ class WindowReduceITCase extends AbstractTestBase {
 
     env.execute("Reduce Window Test")
 
-    val expectedResult = mutable.MutableList(
-      "(aaa,3)",
-      "(aaa,21)",
-      "(bbb,12)")
+    val expectedResult = mutable.MutableList("(aaa,3)", "(aaa,21)", "(bbb,12)")
 
     assertEquals(expectedResult.sorted, WindowReduceITCase.testResults.sorted)
 
@@ -159,24 +160,25 @@ class WindowReduceITCase extends AbstractTestBase {
     val env = StreamExecutionEnvironment.getExecutionEnvironment
     env.setParallelism(1)
 
-    val source1 = env.addSource(new SourceFunction[(String, Int)]() {
-      def run(ctx: SourceFunction.SourceContext[(String, Int)]) {
-        ctx.collect(("a", 0))
-        ctx.collect(("a", 1))
-        ctx.collect(("a", 2))
-        ctx.collect(("b", 3))
-        ctx.collect(("b", 4))
-        ctx.collect(("b", 5))
-        ctx.collect(("a", 6))
-        ctx.collect(("a", 7))
-        ctx.collect(("a", 8))
+    val source1 = env
+      .addSource(new SourceFunction[(String, Int)]() {
+        def run(ctx: SourceFunction.SourceContext[(String, Int)]) {
+          ctx.collect(("a", 0))
+          ctx.collect(("a", 1))
+          ctx.collect(("a", 2))
+          ctx.collect(("b", 3))
+          ctx.collect(("b", 4))
+          ctx.collect(("b", 5))
+          ctx.collect(("a", 6))
+          ctx.collect(("a", 7))
+          ctx.collect(("a", 8))
 
-        // source is finite, so it will have an implicit MAX watermark when it finishes
-      }
+          // source is finite, so it will have an implicit MAX watermark when it finishes
+        }
 
-      def cancel() {
-      }
-    }).assignTimestampsAndWatermarks(new WindowReduceITCase.Tuple2TimestampExtractor)
+        def cancel() {}
+      })
+      .assignTimestampsAndWatermarks(new WindowReduceITCase.Tuple2TimestampExtractor)
 
     source1
       .keyBy(0)
@@ -192,10 +194,7 @@ class WindowReduceITCase extends AbstractTestBase {
 
     env.execute("Reduce Process Window Test")
 
-    val expectedResult = mutable.MutableList(
-      "(aaa,3)",
-      "(aaa,21)",
-      "(bbb,12)")
+    val expectedResult = mutable.MutableList("(aaa,3)", "(aaa,21)", "(bbb,12)")
 
     assertEquals(expectedResult.sorted, WindowReduceITCase.testResults.sorted)
 
@@ -205,43 +204,42 @@ class WindowReduceITCase extends AbstractTestBase {
   @Test
   def testReduceAllWindow(): Unit = {
     WindowReduceITCase.testResults = mutable.MutableList()
-    
+
     val env = StreamExecutionEnvironment.getExecutionEnvironment
     env.setParallelism(1)
 
-    val source1 = env.addSource(new SourceFunction[(String, Int)]() {
-      def run(ctx: SourceFunction.SourceContext[(String, Int)]) {
-        ctx.collect(("a", 0))
-        ctx.collect(("a", 1))
-        ctx.collect(("a", 2))
-        ctx.collect(("b", 3))
-        ctx.collect(("a", 3))
-        ctx.collect(("b", 4))
-        ctx.collect(("a", 4))
-        ctx.collect(("b", 5))
-        ctx.collect(("a", 5))
+    val source1 = env
+      .addSource(new SourceFunction[(String, Int)]() {
+        def run(ctx: SourceFunction.SourceContext[(String, Int)]) {
+          ctx.collect(("a", 0))
+          ctx.collect(("a", 1))
+          ctx.collect(("a", 2))
+          ctx.collect(("b", 3))
+          ctx.collect(("a", 3))
+          ctx.collect(("b", 4))
+          ctx.collect(("a", 4))
+          ctx.collect(("b", 5))
+          ctx.collect(("a", 5))
 
-        // source is finite, so it will have an implicit MAX watermark when it finishes
-      }
+          // source is finite, so it will have an implicit MAX watermark when it finishes
+        }
 
-      def cancel() {
-      }
-    }).assignTimestampsAndWatermarks(new WindowReduceITCase.Tuple2TimestampExtractor)
+        def cancel() {}
+      })
+      .assignTimestampsAndWatermarks(new WindowReduceITCase.Tuple2TimestampExtractor)
 
     source1
       .windowAll(TumblingEventTimeWindows.of(Time.of(3, TimeUnit.MILLISECONDS)))
-      .reduce( (a, b) => (a._1 + b._1, a._2 + b._2) )
+      .reduce((a, b) => (a._1 + b._1, a._2 + b._2))
       .addSink(new SinkFunction[(String, Int)]() {
-      override def invoke(value: (String, Int)) {
-        WindowReduceITCase.testResults += value.toString
-      }
-    })
+        override def invoke(value: (String, Int)) {
+          WindowReduceITCase.testResults += value.toString
+        }
+      })
 
     env.execute("Fold All-Window Test")
 
-    val expectedResult = mutable.MutableList(
-      "(aaa,3)",
-      "(bababa,24)")
+    val expectedResult = mutable.MutableList("(aaa,3)", "(bababa,24)")
 
     assertEquals(expectedResult.sorted, WindowReduceITCase.testResults.sorted)
   }
@@ -256,34 +254,33 @@ class WindowReduceITCase extends AbstractTestBase {
         (a._1 + b._1, a._2 + b._2)
       }
     }
-    
+
     val env = StreamExecutionEnvironment.getExecutionEnvironment
     env.setParallelism(1)
 
-    val source1 = env.addSource(new SourceFunction[(String, Int)]() {
-      def run(ctx: SourceFunction.SourceContext[(String, Int)]) {
-        ctx.collect(("a", 0))
-        ctx.collect(("a", 1))
-        ctx.collect(("a", 2))
-        ctx.collect(("b", 3))
-        ctx.collect(("a", 3))
-        ctx.collect(("b", 4))
-        ctx.collect(("a", 4))
-        ctx.collect(("b", 5))
-        ctx.collect(("a", 5))
+    val source1 = env
+      .addSource(new SourceFunction[(String, Int)]() {
+        def run(ctx: SourceFunction.SourceContext[(String, Int)]) {
+          ctx.collect(("a", 0))
+          ctx.collect(("a", 1))
+          ctx.collect(("a", 2))
+          ctx.collect(("b", 3))
+          ctx.collect(("a", 3))
+          ctx.collect(("b", 4))
+          ctx.collect(("a", 4))
+          ctx.collect(("b", 5))
+          ctx.collect(("a", 5))
 
-        // source is finite, so it will have an implicit MAX watermark when it finishes
-      }
+          // source is finite, so it will have an implicit MAX watermark when it finishes
+        }
 
-      def cancel() {
-      }
-    }).assignTimestampsAndWatermarks(new WindowReduceITCase.Tuple2TimestampExtractor)
+        def cancel() {}
+      })
+      .assignTimestampsAndWatermarks(new WindowReduceITCase.Tuple2TimestampExtractor)
 
     source1
       .windowAll(TumblingEventTimeWindows.of(Time.of(3, TimeUnit.MILLISECONDS)))
-      .reduce(
-        reduceFunc,
-        new CheckingIdentityRichAllWindowFunction[(String, Int), TimeWindow]())
+      .reduce(reduceFunc, new CheckingIdentityRichAllWindowFunction[(String, Int), TimeWindow]())
       .addSink(new SinkFunction[(String, Int)]() {
         override def invoke(value: (String, Int)) {
           WindowReduceITCase.testResults += value.toString
@@ -292,9 +289,7 @@ class WindowReduceITCase extends AbstractTestBase {
 
     env.execute("Fold All-Window Test")
 
-    val expectedResult = mutable.MutableList(
-      "(aaa,3)",
-      "(bababa,24)")
+    val expectedResult = mutable.MutableList("(aaa,3)", "(bababa,24)")
 
     assertEquals(expectedResult.sorted, WindowReduceITCase.testResults.sorted)
 
@@ -315,24 +310,25 @@ class WindowReduceITCase extends AbstractTestBase {
     val env = StreamExecutionEnvironment.getExecutionEnvironment
     env.setParallelism(1)
 
-    val source1 = env.addSource(new SourceFunction[(String, Int)]() {
-      def run(ctx: SourceFunction.SourceContext[(String, Int)]) {
-        ctx.collect(("a", 0))
-        ctx.collect(("a", 1))
-        ctx.collect(("a", 2))
-        ctx.collect(("b", 3))
-        ctx.collect(("a", 3))
-        ctx.collect(("b", 4))
-        ctx.collect(("a", 4))
-        ctx.collect(("b", 5))
-        ctx.collect(("a", 5))
+    val source1 = env
+      .addSource(new SourceFunction[(String, Int)]() {
+        def run(ctx: SourceFunction.SourceContext[(String, Int)]) {
+          ctx.collect(("a", 0))
+          ctx.collect(("a", 1))
+          ctx.collect(("a", 2))
+          ctx.collect(("b", 3))
+          ctx.collect(("a", 3))
+          ctx.collect(("b", 4))
+          ctx.collect(("a", 4))
+          ctx.collect(("b", 5))
+          ctx.collect(("a", 5))
 
-        // source is finite, so it will have an implicit MAX watermark when it finishes
-      }
+          // source is finite, so it will have an implicit MAX watermark when it finishes
+        }
 
-      def cancel() {
-      }
-    }).assignTimestampsAndWatermarks(new WindowReduceITCase.Tuple2TimestampExtractor)
+        def cancel() {}
+      })
+      .assignTimestampsAndWatermarks(new WindowReduceITCase.Tuple2TimestampExtractor)
 
     source1
       .windowAll(TumblingEventTimeWindows.of(Time.of(3, TimeUnit.MILLISECONDS)))
@@ -347,9 +343,7 @@ class WindowReduceITCase extends AbstractTestBase {
 
     env.execute("Fold All-Window Test")
 
-    val expectedResult = mutable.MutableList(
-      "(aaa,3)",
-      "(bababa,24)")
+    val expectedResult = mutable.MutableList("(aaa,3)", "(bababa,24)")
 
     assertEquals(expectedResult.sorted, WindowReduceITCase.testResults.sorted)
 
@@ -358,7 +352,7 @@ class WindowReduceITCase extends AbstractTestBase {
 }
 
 object WindowReduceITCase {
-  
+
   private var testResults: mutable.MutableList[String] = null
 
   private class Tuple2TimestampExtractor extends AssignerWithPunctuatedWatermarks[(String, Int)] {
@@ -377,6 +371,3 @@ object WindowReduceITCase {
     }
   }
 }
-
-
-

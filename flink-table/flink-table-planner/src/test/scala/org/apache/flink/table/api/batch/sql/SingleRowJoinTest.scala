@@ -34,29 +34,22 @@ class SingleRowJoinTest extends TableTestBase {
 
     val query =
       "SELECT a1, asum " +
-      "FROM A, (SELECT sum(a1) + sum(a2) AS asum FROM A)"
+        "FROM A, (SELECT sum(a1) + sum(a2) AS asum FROM A)"
 
     val expected =
       binaryNode(
         "DataSetSingleRowJoin",
-        unaryNode(
-          "DataSetCalc",
-          batchTableNode(table),
-          term("select", "a1")
-        ),
+        unaryNode("DataSetCalc", batchTableNode(table), term("select", "a1")),
         unaryNode(
           "DataSetCalc",
           unaryNode(
             "DataSetAggregate",
             batchTableNode(table),
-            term("select", "SUM(a1) AS $f0", "SUM(a2) AS $f1")
-          ),
-          term("select", "+($f0, $f1) AS asum")
-        ),
+            term("select", "SUM(a1) AS $f0", "SUM(a2) AS $f1")),
+          term("select", "+($f0, $f1) AS asum")),
         term("where", "true"),
         term("join", "a1", "asum"),
-        term("joinType", "NestedLoopInnerJoin")
-      )
+        term("joinType", "NestedLoopInnerJoin"))
 
     util.verifySql(query, expected)
   }
@@ -68,8 +61,8 @@ class SingleRowJoinTest extends TableTestBase {
 
     val query =
       "SELECT a1, a2 " +
-      "FROM A, (SELECT count(a1) AS cnt FROM A) " +
-      "WHERE a1 = cnt"
+        "FROM A, (SELECT count(a1) AS cnt FROM A) " +
+        "WHERE a1 = cnt"
 
     val expected =
       unaryNode(
@@ -79,19 +72,12 @@ class SingleRowJoinTest extends TableTestBase {
           batchTableNode(table),
           unaryNode(
             "DataSetAggregate",
-            unaryNode(
-              "DataSetCalc",
-              batchTableNode(table),
-              term("select", "a1")
-            ),
-            term("select", "COUNT(a1) AS cnt")
-          ),
+            unaryNode("DataSetCalc", batchTableNode(table), term("select", "a1")),
+            term("select", "COUNT(a1) AS cnt")),
           term("where", "=(CAST(a1), cnt)"),
           term("join", "a1", "a2", "cnt"),
-          term("joinType", "NestedLoopInnerJoin")
-        ),
-        term("select", "a1", "a2")
-      )
+          term("joinType", "NestedLoopInnerJoin")),
+        term("select", "a1", "a2"))
 
     util.verifySql(query, expected)
   }
@@ -103,8 +89,8 @@ class SingleRowJoinTest extends TableTestBase {
 
     val query =
       "SELECT a1, a2 " +
-      "FROM A, (SELECT count(a1) AS cnt FROM A) " +
-      "WHERE a1 < cnt"
+        "FROM A, (SELECT count(a1) AS cnt FROM A) " +
+        "WHERE a1 < cnt"
 
     val expected =
       unaryNode(
@@ -114,19 +100,12 @@ class SingleRowJoinTest extends TableTestBase {
           batchTableNode(table),
           unaryNode(
             "DataSetAggregate",
-            unaryNode(
-              "DataSetCalc",
-              batchTableNode(table),
-              term("select", "a1")
-            ),
-            term("select", "COUNT(a1) AS cnt")
-          ),
+            unaryNode("DataSetCalc", batchTableNode(table), term("select", "a1")),
+            term("select", "COUNT(a1) AS cnt")),
           term("where", "<(a1, cnt)"),
           term("join", "a1", "a2", "cnt"),
-          term("joinType", "NestedLoopInnerJoin")
-        ),
-        term("select", "a1", "a2")
-      )
+          term("joinType", "NestedLoopInnerJoin")),
+        term("select", "a1", "a2"))
 
     util.verifySql(query, expected)
   }
@@ -148,12 +127,10 @@ class SingleRowJoinTest extends TableTestBase {
       unaryNode(
         "DataSetAggregate",
         batchTableNode(table1),
-        term("select", "MIN(b1) AS b1", "MAX(b2) AS b2")
-      ),
+        term("select", "MIN(b1) AS b1", "MAX(b2) AS b2")),
       term("where", "AND(<(a1, b1)", "=(a2, b2))"),
       term("join", "a1", "a2", "b1", "b2"),
-      term("joinType", "NestedLoopInnerJoin")
-    )
+      term("joinType", "NestedLoopInnerJoin"))
 
     util.verifySql(query, expected)
   }
@@ -179,18 +156,12 @@ class SingleRowJoinTest extends TableTestBase {
           batchTableNode(table),
           term("where", "=(a1, cnt)"),
           term("join", "a1", "a2", "cnt"),
-          term("joinType", "NestedLoopLeftJoin")
-        ),
-        term("select", "a2")
-      ) + "\n" +
+          term("joinType", "NestedLoopLeftJoin")),
+        term("select", "a2")) + "\n" +
         unaryNode(
           "DataSetAggregate",
-          unaryNode(
-            "DataSetCalc",
-            batchTableNode(table1),
-            term("select", "")),
-          term("select", "COUNT(*) AS cnt")
-        )
+          unaryNode("DataSetCalc", batchTableNode(table1), term("select", "")),
+          term("select", "COUNT(*) AS cnt"))
 
     util.verifySql(queryLeftJoin, expected)
   }
@@ -216,18 +187,12 @@ class SingleRowJoinTest extends TableTestBase {
           batchTableNode(table),
           term("where", ">(a1, cnt)"),
           term("join", "a1", "a2", "cnt"),
-          term("joinType", "NestedLoopLeftJoin")
-        ),
-        term("select", "a2")
-      ) + "\n" +
+          term("joinType", "NestedLoopLeftJoin")),
+        term("select", "a2")) + "\n" +
         unaryNode(
           "DataSetAggregate",
-          unaryNode(
-            "DataSetCalc",
-            batchTableNode(table1),
-            term("select", "")),
-          term("select", "COUNT(*) AS cnt")
-        )
+          unaryNode("DataSetCalc", batchTableNode(table1), term("select", "")),
+          term("select", "COUNT(*) AS cnt"))
 
     util.verifySql(queryLeftJoin, expected)
   }
@@ -253,17 +218,11 @@ class SingleRowJoinTest extends TableTestBase {
           "",
           term("where", "=(cnt, a2)"),
           term("join", "cnt", "a1", "a2"),
-          term("joinType", "NestedLoopRightJoin")
-        ),
-        term("select", "a1")
-      ) + unaryNode(
+          term("joinType", "NestedLoopRightJoin")),
+        term("select", "a1")) + unaryNode(
         "DataSetAggregate",
-        unaryNode(
-          "DataSetCalc",
-          batchTableNode(table1),
-          term("select", "")),
-        term("select", "COUNT(*) AS cnt")
-      ) + "\n" +
+        unaryNode("DataSetCalc", batchTableNode(table1), term("select", "")),
+        term("select", "COUNT(*) AS cnt")) + "\n" +
         batchTableNode(table)
 
     util.verifySql(queryRightJoin, expected)
@@ -290,18 +249,12 @@ class SingleRowJoinTest extends TableTestBase {
           "",
           term("where", "<(cnt, a2)"),
           term("join", "cnt", "a1", "a2"),
-          term("joinType", "NestedLoopRightJoin")
-        ),
-        term("select", "a1")
-      ) +
+          term("joinType", "NestedLoopRightJoin")),
+        term("select", "a1")) +
         unaryNode(
           "DataSetAggregate",
-          unaryNode(
-            "DataSetCalc",
-            batchTableNode(table1),
-            term("select", "")),
-          term("select", "COUNT(*) AS cnt")
-        ) + "\n" +
+          unaryNode("DataSetCalc", batchTableNode(table1), term("select", "")),
+          term("select", "COUNT(*) AS cnt")) + "\n" +
         batchTableNode(table)
 
     util.verifySql(queryRightJoin, expected)
@@ -326,27 +279,18 @@ class SingleRowJoinTest extends TableTestBase {
             "DataSetAggregate",
             batchTableNode(table),
             term("groupBy", "a2"),
-            term("select", "a2", "SUM(a1) AS EXPR$1")
-          ),
+            term("select", "a2", "SUM(a1) AS EXPR$1")),
           term("where", ">(EXPR$1, EXPR$0)"),
           term("join", "a2", "EXPR$1", "EXPR$0"),
-          term("joinType", "NestedLoopInnerJoin")
-        ),
-        term("select", "a2", "EXPR$1")
-      ) + "\n" +
+          term("joinType", "NestedLoopInnerJoin")),
+        term("select", "a2", "EXPR$1")) + "\n" +
         unaryNode(
           "DataSetCalc",
           unaryNode(
             "DataSetAggregate",
-            unaryNode(
-              "DataSetCalc",
-              batchTableNode(table),
-              term("select", "a1")
-            ),
-            term("select", "SUM(a1) AS $f0")
-          ),
-          term("select", "*($f0, 0.1:DECIMAL(2, 1)) AS EXPR$0")
-        )
+            unaryNode("DataSetCalc", batchTableNode(table), term("select", "a1")),
+            term("select", "SUM(a1) AS $f0")),
+          term("select", "*($f0, 0.1:DECIMAL(2, 1)) AS EXPR$0"))
 
     util.verifySql(query, expected)
   }

@@ -35,14 +35,14 @@ import org.apache.flink.types.Row
 import org.apache.flink.util.Collector
 
 /**
-  * Connect data for left stream and right stream. Base class for stream-stream non-window Join.
-  *
-  * @param leftType          the input type of left stream
-  * @param rightType         the input type of right stream
-  * @param genJoinFuncName   the function code of other non-equi condition
-  * @param genJoinFuncCode   the function name of other non-equi condition
-  * @param config            configuration that determines runtime behavior
-  */
+ * Connect data for left stream and right stream. Base class for stream-stream non-window Join.
+ *
+ * @param leftType          the input type of left stream
+ * @param rightType         the input type of right stream
+ * @param genJoinFuncName   the function code of other non-equi condition
+ * @param genJoinFuncCode   the function name of other non-equi condition
+ * @param config            configuration that determines runtime behavior
+ */
 abstract class NonWindowJoin(
     leftType: TypeInformation[Row],
     rightType: TypeInformation[Row],
@@ -50,9 +50,9 @@ abstract class NonWindowJoin(
     genJoinFuncCode: String,
     minRetentionTime: Long,
     maxRetentionTime: Long)
-  extends CoProcessFunctionWithCleanupState[CRow, CRow, CRow](minRetentionTime, maxRetentionTime)
-  with Compiler[FlatJoinFunction[Row, Row, Row]]
-  with Logging {
+    extends CoProcessFunctionWithCleanupState[CRow, CRow, CRow](minRetentionTime, maxRetentionTime)
+    with Compiler[FlatJoinFunction[Row, Row, Row]]
+    with Logging {
 
   // check if input types implement proper equals/hashCode
   validateEqualsHashCode("join", leftType)
@@ -71,12 +71,10 @@ abstract class NonWindowJoin(
   protected var curProcessTime: Long = _
 
   override def open(parameters: Configuration): Unit = {
-    LOG.debug(s"Compiling JoinFunction: $genJoinFuncName \n\n " +
-                s"Code:\n$genJoinFuncCode")
-    val clazz = compile(
-      getRuntimeContext.getUserCodeClassLoader,
-      genJoinFuncName,
-      genJoinFuncCode)
+    LOG.debug(
+      s"Compiling JoinFunction: $genJoinFuncName \n\n " +
+        s"Code:\n$genJoinFuncCode")
+    val clazz = compile(getRuntimeContext.getUserCodeClassLoader, genJoinFuncName, genJoinFuncCode)
 
     LOG.debug("Instantiating JoinFunction.")
     joinFunction = clazz.newInstance()
@@ -86,10 +84,10 @@ abstract class NonWindowJoin(
     // initialize left and right state, the first element of tuple2 indicates how many rows of
     // this row, while the second element represents the expired time of this row.
     val tupleTypeInfo = new TupleTypeInfo[JTuple2[Long, Long]](Types.LONG, Types.LONG)
-    val leftStateDescriptor = new MapStateDescriptor[Row, JTuple2[Long, Long]](
-      "left", leftType, tupleTypeInfo)
-    val rightStateDescriptor = new MapStateDescriptor[Row, JTuple2[Long, Long]](
-      "right", rightType, tupleTypeInfo)
+    val leftStateDescriptor =
+      new MapStateDescriptor[Row, JTuple2[Long, Long]]("left", leftType, tupleTypeInfo)
+    val rightStateDescriptor =
+      new MapStateDescriptor[Row, JTuple2[Long, Long]]("right", rightType, tupleTypeInfo)
     leftState = getRuntimeContext.getMapState(leftStateDescriptor)
     rightState = getRuntimeContext.getMapState(rightStateDescriptor)
 
@@ -101,13 +99,12 @@ abstract class NonWindowJoin(
   }
 
   /**
-    * Process left stream records
-    *
-    * @param valueC The input value.
-    * @param ctx    The ctx to register timer or get current time
-    * @param out    The collector for returning result values.
-    *
-    */
+   * Process left stream records
+   *
+   * @param valueC The input value.
+   * @param ctx    The ctx to register timer or get current time
+   * @param out    The collector for returning result values.
+   */
   override def processElement1(
       valueC: CRow,
       ctx: CoProcessFunction[CRow, CRow, CRow]#Context,
@@ -117,13 +114,12 @@ abstract class NonWindowJoin(
   }
 
   /**
-    * Process right stream records
-    *
-    * @param valueC The input value.
-    * @param ctx    The ctx to register timer or get current time
-    * @param out    The collector for returning result values.
-    *
-    */
+   * Process right stream records
+   *
+   * @param valueC The input value.
+   * @param ctx    The ctx to register timer or get current time
+   * @param out    The collector for returning result values.
+   */
   override def processElement2(
       valueC: CRow,
       ctx: CoProcessFunction[CRow, CRow, CRow]#Context,
@@ -133,13 +129,13 @@ abstract class NonWindowJoin(
   }
 
   /**
-    * Called when a processing timer trigger.
-    * Expire left/right records which are expired in left and right state.
-    *
-    * @param timestamp The timestamp of the firing timer.
-    * @param ctx       The ctx to register timer or get current time
-    * @param out       The collector for returning result values.
-    */
+   * Called when a processing timer trigger.
+   * Expire left/right records which are expired in left and right state.
+   *
+   * @param timestamp The timestamp of the firing timer.
+   * @param ctx       The ctx to register timer or get current time
+   * @param out       The collector for returning result values.
+   */
   override def onTimer(
       timestamp: Long,
       ctx: CoProcessFunction[CRow, CRow, CRow]#OnTimerContext,
@@ -160,10 +156,10 @@ abstract class NonWindowJoin(
   }
 
   /**
-    * Puts or Retract an element from the input stream into state and search the other state to
-    * output records meet the condition. Records will be expired in state if state retention time
-    * has been specified.
-    */
+   * Puts or Retract an element from the input stream into state and search the other state to
+   * output records meet the condition. Records will be expired in state if state retention time
+   * has been specified.
+   */
   protected def processElement(
       value: CRow,
       ctx: CoProcessFunction[CRow, CRow, CRow]#Context,
@@ -173,14 +169,14 @@ abstract class NonWindowJoin(
       isLeft: Boolean): Unit
 
   /**
-    * Update current side state. Put row and it's number and expired time into row state. Also,
-    * register a timer if state retention time has been specified.
-    *
-    * @param value            The input CRow
-    * @param ctx              The ctx to register timer or get current time
-    * @param currentSideState The state to hold current side stream element
-    * @return The row number and expired time for current input row
-    */
+   * Update current side state. Put row and it's number and expired time into row state. Also,
+   * register a timer if state retention time has been specified.
+   *
+   * @param value            The input CRow
+   * @param ctx              The ctx to register timer or get current time
+   * @param currentSideState The state to hold current side stream element
+   * @return The row number and expired time for current input row
+   */
   protected def updateCurrentSide(
       value: CRow,
       ctx: CoProcessFunction[CRow, CRow, CRow]#Context,

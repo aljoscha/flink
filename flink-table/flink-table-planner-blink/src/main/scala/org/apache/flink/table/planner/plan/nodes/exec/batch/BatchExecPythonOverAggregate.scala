@@ -52,38 +52,41 @@ class BatchExecPythonOverAggregate(
     inputEdge: ExecEdge,
     outputType: RowType,
     description: String)
-  extends BatchExecOverAggregateBase(over, inputEdge, outputType, description)
-  with CommonPythonAggregate {
+    extends BatchExecOverAggregateBase(over, inputEdge, outputType, description)
+    with CommonPythonAggregate {
 
   override protected def translateToPlanInternal(planner: PlannerBase): Transformation[RowData] = {
     val inputNode = getInputNodes.get(0).asInstanceOf[ExecNode[RowData]]
     val input = inputNode.translateToPlan(planner)
     val windowBoundary = ArrayBuffer[(Long, Long, Boolean)]()
-    val aggCallToWindowIndex = over.getGroups.zipWithIndex.flatMap {
-      case (group, index) =>
-        val mode = inferGroupMode(group)
-        val boundary = mode match {
-          case OverWindowMode.ROW if isUnboundedWindow(group) =>
-            (Long.MinValue, Long.MaxValue, false)
-          case OverWindowMode.ROW if isUnboundedPrecedingWindow(group) =>
-            (Long.MinValue, getLongBoundary(over, group.getUpperBound), false)
-          case OverWindowMode.ROW if isUnboundedFollowingWindow(group) =>
-            (getLongBoundary(over, group.getLowerBound), Long.MaxValue, false)
-          case OverWindowMode.ROW if isSlidingWindow(group) =>
-            (getLongBoundary(over, group.getLowerBound),
-              getLongBoundary(over, group.getUpperBound), false)
-          case OverWindowMode.RANGE if isUnboundedWindow(group) =>
-            (Long.MinValue, Long.MaxValue, true)
-          case OverWindowMode.RANGE if isUnboundedPrecedingWindow(group) =>
-            (Long.MinValue, getLongBoundary(over, group.getUpperBound), true)
-          case OverWindowMode.RANGE if isUnboundedFollowingWindow(group) =>
-            (getLongBoundary(over, group.getLowerBound), Long.MaxValue, true)
-          case OverWindowMode.RANGE if isSlidingWindow(group) =>
-            (getLongBoundary(over, group.getLowerBound),
-              getLongBoundary(over, group.getUpperBound), true)
-        }
-        windowBoundary.append(boundary)
-        group.getAggCalls.map((_, index))
+    val aggCallToWindowIndex = over.getGroups.zipWithIndex.flatMap { case (group, index) =>
+      val mode = inferGroupMode(group)
+      val boundary = mode match {
+        case OverWindowMode.ROW if isUnboundedWindow(group) =>
+          (Long.MinValue, Long.MaxValue, false)
+        case OverWindowMode.ROW if isUnboundedPrecedingWindow(group) =>
+          (Long.MinValue, getLongBoundary(over, group.getUpperBound), false)
+        case OverWindowMode.ROW if isUnboundedFollowingWindow(group) =>
+          (getLongBoundary(over, group.getLowerBound), Long.MaxValue, false)
+        case OverWindowMode.ROW if isSlidingWindow(group) =>
+          (
+            getLongBoundary(over, group.getLowerBound),
+            getLongBoundary(over, group.getUpperBound),
+            false)
+        case OverWindowMode.RANGE if isUnboundedWindow(group) =>
+          (Long.MinValue, Long.MaxValue, true)
+        case OverWindowMode.RANGE if isUnboundedPrecedingWindow(group) =>
+          (Long.MinValue, getLongBoundary(over, group.getUpperBound), true)
+        case OverWindowMode.RANGE if isUnboundedFollowingWindow(group) =>
+          (getLongBoundary(over, group.getLowerBound), Long.MaxValue, true)
+        case OverWindowMode.RANGE if isSlidingWindow(group) =>
+          (
+            getLongBoundary(over, group.getLowerBound),
+            getLongBoundary(over, group.getUpperBound),
+            true)
+      }
+      windowBoundary.append(boundary)
+      group.getAggCalls.map((_, index))
     }
     val transform = createPythonOneInputTransformation(
       input,
@@ -156,20 +159,21 @@ class BatchExecPythonOverAggregate(
 
     val partitionSpec = overSpec.getPartition
     val sortSpec = overSpec.getGroups.last.getSort
-    ctor.newInstance(
-      config,
-      pythonFunctionInfos,
-      inputRowType,
-      outputRowType,
-      lowerBinary,
-      upperBinary,
-      windowType,
-      aggWindowIndex,
-      partitionSpec.getFieldIndices,
-      partitionSpec.getFieldIndices,
-      udafInputOffsets,
-      java.lang.Integer.valueOf(sortSpec.getFieldIndices()(0)),
-      java.lang.Boolean.valueOf(sortSpec.getAscendingOrders()(0)))
+    ctor
+      .newInstance(
+        config,
+        pythonFunctionInfos,
+        inputRowType,
+        outputRowType,
+        lowerBinary,
+        upperBinary,
+        windowType,
+        aggWindowIndex,
+        partitionSpec.getFieldIndices,
+        partitionSpec.getFieldIndices,
+        udafInputOffsets,
+        java.lang.Integer.valueOf(sortSpec.getFieldIndices()(0)),
+        java.lang.Boolean.valueOf(sortSpec.getAscendingOrders()(0)))
       .asInstanceOf[OneInputStreamOperator[RowData, RowData]]
   }
 }

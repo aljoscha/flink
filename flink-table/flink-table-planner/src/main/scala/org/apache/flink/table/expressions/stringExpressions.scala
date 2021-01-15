@@ -29,8 +29,8 @@ import org.apache.flink.table.validate._
 import scala.collection.JavaConversions._
 
 /**
-  * Returns the length of this `str`.
-  */
+ * Returns the length of this `str`.
+ */
 case class CharLength(child: PlannerExpression) extends UnaryExpression {
   override private[flink] def resultType: TypeInformation[_] = INT_TYPE_INFO
 
@@ -38,8 +38,9 @@ case class CharLength(child: PlannerExpression) extends UnaryExpression {
     if (child.resultType == STRING_TYPE_INFO) {
       ValidationSuccess
     } else {
-      ValidationFailure(s"CharLength operator requires String input, " +
-        s"but $child is of type ${child.resultType}")
+      ValidationFailure(
+        s"CharLength operator requires String input, " +
+          s"but $child is of type ${child.resultType}")
     }
   }
 
@@ -51,9 +52,9 @@ case class CharLength(child: PlannerExpression) extends UnaryExpression {
 }
 
 /**
-  * Returns str with the first letter of each word in uppercase.
-  * All other letters are in lowercase. Words are delimited by white space.
-  */
+ * Returns str with the first letter of each word in uppercase.
+ * All other letters are in lowercase. Words are delimited by white space.
+ */
 case class InitCap(child: PlannerExpression) extends UnaryExpression {
   override private[flink] def resultType: TypeInformation[_] = STRING_TYPE_INFO
 
@@ -61,8 +62,9 @@ case class InitCap(child: PlannerExpression) extends UnaryExpression {
     if (child.resultType == STRING_TYPE_INFO) {
       ValidationSuccess
     } else {
-      ValidationFailure(s"InitCap operator requires String input, " +
-        s"but $child is of type ${child.resultType}")
+      ValidationFailure(
+        s"InitCap operator requires String input, " +
+          s"but $child is of type ${child.resultType}")
     }
   }
 
@@ -74,8 +76,8 @@ case class InitCap(child: PlannerExpression) extends UnaryExpression {
 }
 
 /**
-  * Returns true if `str` matches `pattern`.
-  */
+ * Returns true if `str` matches `pattern`.
+ */
 case class Like(str: PlannerExpression, pattern: PlannerExpression) extends BinaryExpression {
   private[flink] def left: PlannerExpression = str
   private[flink] def right: PlannerExpression = pattern
@@ -86,8 +88,9 @@ case class Like(str: PlannerExpression, pattern: PlannerExpression) extends Bina
     if (str.resultType == STRING_TYPE_INFO && pattern.resultType == STRING_TYPE_INFO) {
       ValidationSuccess
     } else {
-      ValidationFailure(s"Like operator requires (String, String) input, " +
-        s"but ($str, $pattern) is of type (${str.resultType}, ${pattern.resultType})")
+      ValidationFailure(
+        s"Like operator requires (String, String) input, " +
+          s"but ($str, $pattern) is of type (${str.resultType}, ${pattern.resultType})")
     }
   }
 
@@ -99,8 +102,8 @@ case class Like(str: PlannerExpression, pattern: PlannerExpression) extends Bina
 }
 
 /**
-  * Returns str with all characters changed to lowercase.
-  */
+ * Returns str with all characters changed to lowercase.
+ */
 case class Lower(child: PlannerExpression) extends UnaryExpression {
   override private[flink] def resultType: TypeInformation[_] = STRING_TYPE_INFO
 
@@ -108,8 +111,9 @@ case class Lower(child: PlannerExpression) extends UnaryExpression {
     if (child.resultType == STRING_TYPE_INFO) {
       ValidationSuccess
     } else {
-      ValidationFailure(s"Lower operator requires String input, " +
-        s"but $child is of type ${child.resultType}")
+      ValidationFailure(
+        s"Lower operator requires String input, " +
+          s"but $child is of type ${child.resultType}")
     }
   }
 
@@ -121,8 +125,8 @@ case class Lower(child: PlannerExpression) extends UnaryExpression {
 }
 
 /**
-  * Returns true if `str` is similar to `pattern`.
-  */
+ * Returns true if `str` is similar to `pattern`.
+ */
 case class Similar(str: PlannerExpression, pattern: PlannerExpression) extends BinaryExpression {
   private[flink] def left: PlannerExpression = str
   private[flink] def right: PlannerExpression = pattern
@@ -133,8 +137,9 @@ case class Similar(str: PlannerExpression, pattern: PlannerExpression) extends B
     if (str.resultType == STRING_TYPE_INFO && pattern.resultType == STRING_TYPE_INFO) {
       ValidationSuccess
     } else {
-      ValidationFailure(s"Similar operator requires (String, String) input, " +
-        s"but ($str, $pattern) is of type (${str.resultType}, ${pattern.resultType})")
+      ValidationFailure(
+        s"Similar operator requires (String, String) input, " +
+          s"but ($str, $pattern) is of type (${str.resultType}, ${pattern.resultType})")
     }
   }
 
@@ -146,12 +151,11 @@ case class Similar(str: PlannerExpression, pattern: PlannerExpression) extends B
 }
 
 /**
-  * Returns substring of `str` from `begin`(inclusive) for `length`.
-  */
-case class Substring(
-    str: PlannerExpression,
-    begin: PlannerExpression,
-    length: PlannerExpression) extends PlannerExpression with InputTypeSpec {
+ * Returns substring of `str` from `begin`(inclusive) for `length`.
+ */
+case class Substring(str: PlannerExpression, begin: PlannerExpression, length: PlannerExpression)
+    extends PlannerExpression
+    with InputTypeSpec {
 
   def this(str: PlannerExpression, begin: PlannerExpression) = this(str, begin, CharLength(str))
 
@@ -170,12 +174,10 @@ case class Substring(
 }
 
 /**
-  * Trim `trimString` from `str` according to `trimMode`.
-  */
-case class Trim(
-    trimMode: PlannerExpression,
-    trimString: PlannerExpression,
-    str: PlannerExpression) extends PlannerExpression {
+ * Trim `trimString` from `str` according to `trimMode`.
+ */
+case class Trim(trimMode: PlannerExpression, trimString: PlannerExpression, str: PlannerExpression)
+    extends PlannerExpression {
 
   override private[flink] def children: Seq[PlannerExpression] =
     trimMode :: trimString :: str :: Nil
@@ -204,15 +206,15 @@ case class Trim(
 }
 
 /**
-  * Enumeration of trim flags.
-  */
+ * Enumeration of trim flags.
+ */
 object TrimConstants {
   val TRIM_DEFAULT_CHAR = Literal(" ")
 }
 
 /**
-  * Returns str with all characters changed to uppercase.
-  */
+ * Returns str with all characters changed to uppercase.
+ */
 case class Upper(child: PlannerExpression) extends UnaryExpression with InputTypeSpec {
 
   override private[flink] def resultType: TypeInformation[_] = STRING_TYPE_INFO
@@ -228,10 +230,11 @@ case class Upper(child: PlannerExpression) extends UnaryExpression with InputTyp
 }
 
 /**
-  * Returns the position of string needle in string haystack.
-  */
+ * Returns the position of string needle in string haystack.
+ */
 case class Position(needle: PlannerExpression, haystack: PlannerExpression)
-    extends PlannerExpression with InputTypeSpec {
+    extends PlannerExpression
+    with InputTypeSpec {
 
   override private[flink] def children: Seq[PlannerExpression] = Seq(needle, haystack)
 
@@ -248,15 +251,16 @@ case class Position(needle: PlannerExpression, haystack: PlannerExpression)
 }
 
 /**
-  * Replaces a substring of a string with a replacement string.
-  * Starting at a position for a given length.
-  */
+ * Replaces a substring of a string with a replacement string.
+ * Starting at a position for a given length.
+ */
 case class Overlay(
     str: PlannerExpression,
     replacement: PlannerExpression,
     starting: PlannerExpression,
     position: PlannerExpression)
-  extends PlannerExpression with InputTypeSpec {
+    extends PlannerExpression
+    with InputTypeSpec {
 
   def this(str: PlannerExpression, replacement: PlannerExpression, starting: PlannerExpression) =
     this(str, replacement, starting, CharLength(replacement))
@@ -282,9 +286,9 @@ case class Overlay(
 }
 
 /**
-  * Returns the string that results from concatenating the arguments.
-  * Returns NULL if any argument is NULL.
-  */
+ * Returns the string that results from concatenating the arguments.
+ * Returns NULL if any argument is NULL.
+ */
 case class Concat(strings: Seq[PlannerExpression]) extends PlannerExpression with InputTypeSpec {
 
   override private[flink] def children: Seq[PlannerExpression] = strings
@@ -302,14 +306,15 @@ case class Concat(strings: Seq[PlannerExpression]) extends PlannerExpression wit
 }
 
 /**
-  * Returns the string that results from concatenating the arguments and separator.
-  * Returns NULL If the separator is NULL.
-  *
-  * Note: this user-defined function does not skip empty strings. However, it does skip any NULL
-  * values after the separator argument.
-  **/
+ * Returns the string that results from concatenating the arguments and separator.
+ * Returns NULL If the separator is NULL.
+ *
+ * Note: this user-defined function does not skip empty strings. However, it does skip any NULL
+ * values after the separator argument.
+ */
 case class ConcatWs(separator: PlannerExpression, strings: Seq[PlannerExpression])
-  extends PlannerExpression with InputTypeSpec {
+    extends PlannerExpression
+    with InputTypeSpec {
 
   override private[flink] def children: Seq[PlannerExpression] = Seq(separator) ++ strings
 
@@ -326,7 +331,8 @@ case class ConcatWs(separator: PlannerExpression, strings: Seq[PlannerExpression
 }
 
 case class Lpad(text: PlannerExpression, len: PlannerExpression, pad: PlannerExpression)
-  extends PlannerExpression with InputTypeSpec {
+    extends PlannerExpression
+    with InputTypeSpec {
 
   override private[flink] def children: Seq[PlannerExpression] = Seq(text, len, pad)
 
@@ -343,7 +349,8 @@ case class Lpad(text: PlannerExpression, len: PlannerExpression, pad: PlannerExp
 }
 
 case class Rpad(text: PlannerExpression, len: PlannerExpression, pad: PlannerExpression)
-  extends PlannerExpression with InputTypeSpec {
+    extends PlannerExpression
+    with InputTypeSpec {
 
   override private[flink] def children: Seq[PlannerExpression] = Seq(text, len, pad)
 
@@ -360,14 +367,15 @@ case class Rpad(text: PlannerExpression, len: PlannerExpression, pad: PlannerExp
 }
 
 /**
-  * Returns a string with all substrings that match the regular expression consecutively
-  * being replaced.
-  */
+ * Returns a string with all substrings that match the regular expression consecutively
+ * being replaced.
+ */
 case class RegexpReplace(
     str: PlannerExpression,
     regex: PlannerExpression,
     replacement: PlannerExpression)
-  extends PlannerExpression with InputTypeSpec {
+    extends PlannerExpression
+    with InputTypeSpec {
 
   override private[flink] def resultType: TypeInformation[_] = BasicTypeInfo.STRING_TYPE_INFO
 
@@ -387,13 +395,14 @@ case class RegexpReplace(
 }
 
 /**
-  * Returns a string extracted with a specified regular expression and a regex match group index.
-  */
+ * Returns a string extracted with a specified regular expression and a regex match group index.
+ */
 case class RegexpExtract(
     str: PlannerExpression,
     regex: PlannerExpression,
     extractIndex: PlannerExpression)
-  extends PlannerExpression with InputTypeSpec {
+    extends PlannerExpression
+    with InputTypeSpec {
   def this(str: PlannerExpression, regex: PlannerExpression) = this(str, regex, null)
 
   override private[flink] def resultType: TypeInformation[_] = BasicTypeInfo.STRING_TYPE_INFO
@@ -430,9 +439,9 @@ object RegexpExtract {
 }
 
 /**
-  * Returns the base string decoded with base64.
-  * Returns NULL If the input string is NULL.
-  */
+ * Returns the base string decoded with base64.
+ * Returns NULL If the input string is NULL.
+ */
 case class FromBase64(child: PlannerExpression) extends UnaryExpression with InputTypeSpec {
 
   override private[flink] def expectedTypes: Seq[TypeInformation[_]] = Seq(STRING_TYPE_INFO)
@@ -443,8 +452,9 @@ case class FromBase64(child: PlannerExpression) extends UnaryExpression with Inp
     if (child.resultType == STRING_TYPE_INFO) {
       ValidationSuccess
     } else {
-      ValidationFailure(s"FromBase64 operator requires String input, " +
-        s"but $child is of type ${child.resultType}")
+      ValidationFailure(
+        s"FromBase64 operator requires String input, " +
+          s"but $child is of type ${child.resultType}")
     }
   }
 
@@ -457,8 +467,8 @@ case class FromBase64(child: PlannerExpression) extends UnaryExpression with Inp
 }
 
 /**
-  * Returns the base64-encoded result of the input string.
-  */
+ * Returns the base64-encoded result of the input string.
+ */
 case class ToBase64(child: PlannerExpression) extends UnaryExpression with InputTypeSpec {
 
   override private[flink] def expectedTypes: Seq[TypeInformation[_]] = Seq(STRING_TYPE_INFO)
@@ -469,8 +479,9 @@ case class ToBase64(child: PlannerExpression) extends UnaryExpression with Input
     if (child.resultType == STRING_TYPE_INFO) {
       ValidationSuccess
     } else {
-      ValidationFailure(s"ToBase64 operator requires a String input, " +
-        s"but $child is of type ${child.resultType}")
+      ValidationFailure(
+        s"ToBase64 operator requires a String input, " +
+          s"but $child is of type ${child.resultType}")
     }
   }
 
@@ -483,8 +494,8 @@ case class ToBase64(child: PlannerExpression) extends UnaryExpression with Input
 }
 
 /**
-  * Returns a string that removes the left whitespaces from the given string.
-  */
+ * Returns a string that removes the left whitespaces from the given string.
+ */
 case class LTrim(child: PlannerExpression) extends UnaryExpression with InputTypeSpec {
   override private[flink] def expectedTypes: Seq[TypeInformation[_]] = Seq(STRING_TYPE_INFO)
 
@@ -494,8 +505,9 @@ case class LTrim(child: PlannerExpression) extends UnaryExpression with InputTyp
     if (child.resultType == STRING_TYPE_INFO) {
       ValidationSuccess
     } else {
-      ValidationFailure(s"LTrim operator requires a String input, " +
-        s"but $child is of type ${child.resultType}")
+      ValidationFailure(
+        s"LTrim operator requires a String input, " +
+          s"but $child is of type ${child.resultType}")
     }
   }
 
@@ -507,8 +519,8 @@ case class LTrim(child: PlannerExpression) extends UnaryExpression with InputTyp
 }
 
 /**
-  * Returns a string that removes the right whitespaces from the given string.
-  */
+ * Returns a string that removes the right whitespaces from the given string.
+ */
 case class RTrim(child: PlannerExpression) extends UnaryExpression with InputTypeSpec {
 
   override private[flink] def expectedTypes: Seq[TypeInformation[_]] = Seq(STRING_TYPE_INFO)
@@ -519,8 +531,9 @@ case class RTrim(child: PlannerExpression) extends UnaryExpression with InputTyp
     if (child.resultType == STRING_TYPE_INFO) {
       ValidationSuccess
     } else {
-      ValidationFailure(s"RTrim operator requires a String input, " +
-        s"but $child is of type ${child.resultType}")
+      ValidationFailure(
+        s"RTrim operator requires a String input, " +
+          s"but $child is of type ${child.resultType}")
     }
   }
 
@@ -532,10 +545,11 @@ case class RTrim(child: PlannerExpression) extends UnaryExpression with InputTyp
 }
 
 /**
-  * Returns a string that repeats the base str n times.
-  */
+ * Returns a string that repeats the base str n times.
+ */
 case class Repeat(str: PlannerExpression, n: PlannerExpression)
-  extends PlannerExpression with InputTypeSpec {
+    extends PlannerExpression
+    with InputTypeSpec {
 
   override private[flink] def resultType: TypeInformation[_] = STRING_TYPE_INFO
 
@@ -552,8 +566,9 @@ case class Repeat(str: PlannerExpression, n: PlannerExpression)
     if (str.resultType == STRING_TYPE_INFO && n.resultType == INT_TYPE_INFO) {
       ValidationSuccess
     } else {
-      ValidationFailure(s"Repeat operator requires (String, Int) input, " +
-        s"but ($str, $n) is of type (${str.resultType}, ${n.resultType})")
+      ValidationFailure(
+        s"Repeat operator requires (String, Int) input, " +
+          s"but ($str, $n) is of type (${str.resultType}, ${n.resultType})")
     }
   }
 
@@ -561,13 +576,15 @@ case class Repeat(str: PlannerExpression, n: PlannerExpression)
 }
 
 /**
-  * Returns a new string which replaces all the occurrences of the search target
-  * with the replacement string (non-overlapping).
-  */
+ * Returns a new string which replaces all the occurrences of the search target
+ * with the replacement string (non-overlapping).
+ */
 case class Replace(
     str: PlannerExpression,
     search: PlannerExpression,
-    replacement: PlannerExpression) extends PlannerExpression with InputTypeSpec {
+    replacement: PlannerExpression)
+    extends PlannerExpression
+    with InputTypeSpec {
 
   override private[flink] def children: Seq[PlannerExpression] = str :: search :: replacement :: Nil
 

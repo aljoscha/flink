@@ -25,7 +25,7 @@ import org.apache.flink.api.common.functions.ReduceFunction
  */
 final class ScalaReduceFunction[T](private[this] val function: (T, T) => T)
     extends ReduceFunction[T] {
-  
+
   @throws(classOf[Exception])
   override def reduce(a: T, b: T): T = {
     function(a, b)

@@ -22,8 +22,18 @@ import org.apache.calcite.rex.RexNode
 import org.apache.calcite.sql.fun.SqlStdOperatorTable
 import org.apache.calcite.tools.RelBuilder
 import org.apache.flink.api.common.typeinfo.BasicTypeInfo.INT_TYPE_INFO
-import org.apache.flink.api.common.typeinfo.{BasicArrayTypeInfo, BasicTypeInfo, PrimitiveArrayTypeInfo, TypeInformation}
-import org.apache.flink.api.java.typeutils.{GenericTypeInfo, MapTypeInfo, ObjectArrayTypeInfo, RowTypeInfo}
+import org.apache.flink.api.common.typeinfo.{
+  BasicArrayTypeInfo,
+  BasicTypeInfo,
+  PrimitiveArrayTypeInfo,
+  TypeInformation
+}
+import org.apache.flink.api.java.typeutils.{
+  GenericTypeInfo,
+  MapTypeInfo,
+  ObjectArrayTypeInfo,
+  RowTypeInfo
+}
 import org.apache.flink.table.calcite.FlinkRelBuilder
 import org.apache.flink.table.typeutils.TypeCheckUtils.{isArray, isMap}
 import org.apache.flink.table.validate.{ValidationFailure, ValidationResult, ValidationSuccess}
@@ -40,16 +50,14 @@ case class RowConstructor(elements: Seq[PlannerExpression]) extends PlannerExpre
       .getTypeFactory
       .createTypeFromTypeInfo(resultType, isNullable = false)
     val values = elements.map(_.toRexNode).toList.asJava
-    relBuilder
-      .getRexBuilder
+    relBuilder.getRexBuilder
       .makeCall(relDataType, SqlStdOperatorTable.ROW, values)
   }
 
   override def toString = s"row(${elements.mkString(", ")})"
 
   override private[flink] def resultType: TypeInformation[_] = new RowTypeInfo(
-    elements.map(e => e.resultType):_*
-  )
+    elements.map(e => e.resultType): _*)
 
   override private[flink] def validateInput(): ValidationResult = {
     if (elements.isEmpty) {
@@ -69,8 +77,7 @@ case class ArrayConstructor(elements: Seq[PlannerExpression]) extends PlannerExp
       .getTypeFactory
       .createTypeFromTypeInfo(resultType, isNullable = false)
     val values = elements.map(_.toRexNode).toList.asJava
-    relBuilder
-      .getRexBuilder
+    relBuilder.getRexBuilder
       .makeCall(relDataType, SqlStdOperatorTable.ARRAY_VALUE_CONSTRUCTOR, values)
   }
 
@@ -98,22 +105,19 @@ case class MapConstructor(elements: Seq[PlannerExpression]) extends PlannerExpre
     val typeFactory = relBuilder.asInstanceOf[FlinkRelBuilder].getTypeFactory
     val relDataType = typeFactory.createMapType(
       typeFactory.createTypeFromTypeInfo(elements.head.resultType, isNullable = true),
-      typeFactory.createTypeFromTypeInfo(elements.last.resultType, isNullable = true)
-    )
+      typeFactory.createTypeFromTypeInfo(elements.last.resultType, isNullable = true))
     val values = elements.map(_.toRexNode).toList.asJava
-    relBuilder
-      .getRexBuilder
+    relBuilder.getRexBuilder
       .makeCall(relDataType, SqlStdOperatorTable.MAP_VALUE_CONSTRUCTOR, values)
   }
 
   override def toString = s"map(${elements
     .grouped(2)
-    .map(x => s"[${x.mkString(": ")}]").mkString(", ")})"
+    .map(x => s"[${x.mkString(": ")}]")
+    .mkString(", ")})"
 
-  override private[flink] def resultType: TypeInformation[_] = new MapTypeInfo(
-    elements.head.resultType,
-    elements.last.resultType
-  )
+  override private[flink] def resultType: TypeInformation[_] =
+    new MapTypeInfo(elements.head.resultType, elements.last.resultType)
 
   override private[flink] def validateInput(): ValidationResult = {
     if (elements.isEmpty) {
@@ -137,8 +141,7 @@ case class ArrayElement(array: PlannerExpression) extends PlannerExpression {
   override private[flink] def children: Seq[PlannerExpression] = Seq(array)
 
   override private[flink] def toRexNode(implicit relBuilder: RelBuilder): RexNode = {
-    relBuilder
-      .getRexBuilder
+    relBuilder.getRexBuilder
       .makeCall(SqlStdOperatorTable.ELEMENT, array.toRexNode)
   }
 
@@ -146,14 +149,14 @@ case class ArrayElement(array: PlannerExpression) extends PlannerExpression {
 
   override private[flink] def resultType = array.resultType match {
     case oati: ObjectArrayTypeInfo[_, _] => oati.getComponentInfo
-    case bati: BasicArrayTypeInfo[_, _] => bati.getComponentInfo
+    case bati: BasicArrayTypeInfo[_, _]  => bati.getComponentInfo
     case pati: PrimitiveArrayTypeInfo[_] => pati.getComponentType
   }
 
   override private[flink] def validateInput(): ValidationResult = {
     array.resultType match {
       case ati: TypeInformation[_] if isArray(ati) => ValidationSuccess
-      case other@_ => ValidationFailure(s"Array expected but was '$other'.")
+      case other @ _                               => ValidationFailure(s"Array expected but was '$other'.")
     }
   }
 }
@@ -163,8 +166,7 @@ case class Cardinality(container: PlannerExpression) extends PlannerExpression {
   override private[flink] def children: Seq[PlannerExpression] = Seq(container)
 
   override private[flink] def toRexNode(implicit relBuilder: RelBuilder): RexNode = {
-    relBuilder
-      .getRexBuilder
+    relBuilder.getRexBuilder
       .makeCall(SqlStdOperatorTable.CARDINALITY, container.toRexNode)
   }
 
@@ -174,9 +176,9 @@ case class Cardinality(container: PlannerExpression) extends PlannerExpression {
 
   override private[flink] def validateInput(): ValidationResult = {
     container.resultType match {
-      case mti: TypeInformation[_] if isMap(mti) => ValidationSuccess
+      case mti: TypeInformation[_] if isMap(mti)   => ValidationSuccess
       case ati: TypeInformation[_] if isArray(ati) => ValidationSuccess
-      case other@_ => ValidationFailure(s"Array or map expected but was '$other'.")
+      case other @ _                               => ValidationFailure(s"Array or map expected but was '$other'.")
     }
   }
 }
@@ -186,24 +188,23 @@ case class ItemAt(container: PlannerExpression, key: PlannerExpression) extends 
   override private[flink] def children: Seq[PlannerExpression] = Seq(container, key)
 
   override private[flink] def toRexNode(implicit relBuilder: RelBuilder): RexNode = {
-    relBuilder
-      .getRexBuilder
+    relBuilder.getRexBuilder
       .makeCall(SqlStdOperatorTable.ITEM, container.toRexNode, key.toRexNode)
   }
 
   override def toString = s"($container).at($key)"
 
   override private[flink] def resultType = container.resultType match {
-    case mti: MapTypeInfo[_, _] => mti.getValueTypeInfo
+    case mti: MapTypeInfo[_, _]          => mti.getValueTypeInfo
     case oati: ObjectArrayTypeInfo[_, _] => oati.getComponentInfo
-    case bati: BasicArrayTypeInfo[_, _] => bati.getComponentInfo
+    case bati: BasicArrayTypeInfo[_, _]  => bati.getComponentInfo
     case pati: PrimitiveArrayTypeInfo[_] => pati.getComponentType
   }
 
   override private[flink] def validateInput(): ValidationResult = {
     container.resultType match {
 
-      case ati: TypeInformation[_] if isArray(ati)  =>
+      case ati: TypeInformation[_] if isArray(ati) =>
         if (key.resultType == INT_TYPE_INFO) {
           // check for common user mistake
           key match {
@@ -217,7 +218,7 @@ case class ItemAt(container: PlannerExpression, key: PlannerExpression) extends 
             s"Array element access needs an integer index but was '${key.resultType}'.")
         }
 
-      case mti: MapTypeInfo[_, _]  =>
+      case mti: MapTypeInfo[_, _] =>
         if (key.resultType == mti.getKeyTypeInfo) {
           ValidationSuccess
         } else {
@@ -226,7 +227,7 @@ case class ItemAt(container: PlannerExpression, key: PlannerExpression) extends 
               s"'${mti.getKeyTypeInfo}', found '${key.resultType}'.")
         }
 
-      case other@_ => ValidationFailure(s"Array or map expected but was '$other'.")
+      case other @ _ => ValidationFailure(s"Array or map expected but was '$other'.")
     }
   }
 }

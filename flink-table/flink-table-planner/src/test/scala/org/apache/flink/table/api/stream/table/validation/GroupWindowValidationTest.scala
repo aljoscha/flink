@@ -104,9 +104,10 @@ class GroupWindowValidationTest extends TableTestBase {
   @Test
   def testTumbleUdAggWithInvalidArgs(): Unit = {
     expectedException.expect(classOf[ValidationException])
-    expectedException.expectMessage("Given parameters do not match any signature. \n" +
-      "Actual: (java.lang.String, java.lang.Integer) \nExpected: (int, int), (long, int), " +
-      "(long, int, int, java.lang.String)")
+    expectedException.expectMessage(
+      "Given parameters do not match any signature. \n" +
+        "Actual: (java.lang.String, java.lang.Integer) \nExpected: (int, int), (long, int), " +
+        "(long, int, int, java.lang.String)")
 
     val util = streamTestUtil()
     val weightedAvg = new WeightedAvgWithMerge
@@ -159,7 +160,7 @@ class GroupWindowValidationTest extends TableTestBase {
 
     table
       // row interval is not valid for session windows
-      .window(Slide over 10 every 10.milli  on 'long as 'w)
+      .window(Slide over 10 every 10.milli on 'long as 'w)
       .groupBy('w, 'string)
       .select('string, 'int.count)
   }
@@ -167,9 +168,10 @@ class GroupWindowValidationTest extends TableTestBase {
   @Test
   def testSlideUdAggWithInvalidArgs(): Unit = {
     expectedException.expect(classOf[ValidationException])
-    expectedException.expectMessage("Given parameters do not match any signature. \n" +
-      "Actual: (java.lang.String, java.lang.Integer) \nExpected: (int, int), (long, int), " +
-      "(long, int, int, java.lang.String)")
+    expectedException.expectMessage(
+      "Given parameters do not match any signature. \n" +
+        "Actual: (java.lang.String, java.lang.Integer) \nExpected: (int, int), (long, int), " +
+        "(long, int, int, java.lang.String)")
 
     val util = streamTestUtil()
     val weightedAvg = new WeightedAvgWithMerge
@@ -216,8 +218,9 @@ class GroupWindowValidationTest extends TableTestBase {
   @Test
   def testInvalidWindowAlias1(): Unit = {
     expectedException.expect(classOf[ValidationException])
-    expectedException.expectMessage("Only unresolved reference supported for alias of a " +
-      "group window.")
+    expectedException.expectMessage(
+      "Only unresolved reference supported for alias of a " +
+        "group window.")
 
     val util = streamTestUtil()
     val table = util.addTable[(Long, Int, String)]('long.rowtime, 'int, 'string)
@@ -247,9 +250,10 @@ class GroupWindowValidationTest extends TableTestBase {
   @Test
   def testSessionUdAggWithInvalidArgs(): Unit = {
     expectedException.expect(classOf[ValidationException])
-    expectedException.expectMessage("Given parameters do not match any signature. \n" +
-      "Actual: (java.lang.String, java.lang.Integer) \nExpected: (int, int), (long, int), " +
-      "(long, int, int, java.lang.String)")
+    expectedException.expectMessage(
+      "Given parameters do not match any signature. \n" +
+        "Actual: (java.lang.String, java.lang.Integer) \nExpected: (int, int), (long, int), " +
+        "(long, int, int, java.lang.String)")
 
     val util = streamTestUtil()
     val weightedAvg = new WeightedAvgWithMerge
@@ -264,38 +268,41 @@ class GroupWindowValidationTest extends TableTestBase {
   @Test
   def testInvalidWindowPropertyOnRowCountsTumblingWindow(): Unit = {
     expectedException.expect(classOf[ValidationException])
-    expectedException.expectMessage("Window start and Window end cannot be selected " +
-      "for a row-count tumble window.")
+    expectedException.expectMessage(
+      "Window start and Window end cannot be selected " +
+        "for a row-count tumble window.")
 
     val util = streamTestUtil()
     val table = util.addTable[(Long, Int, String)]('long, 'int, 'string, 'proctime.proctime)
 
     table
-    .window(Tumble over 2.rows on 'proctime as 'w)
-    .groupBy('w, 'string)
-    .select('string, 'w.start, 'w.end) // invalid start/end on rows-count window
+      .window(Tumble over 2.rows on 'proctime as 'w)
+      .groupBy('w, 'string)
+      .select('string, 'w.start, 'w.end) // invalid start/end on rows-count window
   }
 
   @Test
   def testInvalidWindowPropertyOnRowCountsSlidingWindow(): Unit = {
     expectedException.expect(classOf[ValidationException])
-    expectedException.expectMessage("Window start and Window end cannot be selected for a " +
-      "row-count slide window.")
+    expectedException.expectMessage(
+      "Window start and Window end cannot be selected for a " +
+        "row-count slide window.")
 
     val util = streamTestUtil()
     val table = util.addTable[(Long, Int, String)]('long, 'int, 'string, 'proctime.proctime)
 
     table
-    .window(Slide over 10.rows every 5.rows on 'proctime as 'w)
-    .groupBy('w, 'string)
-    .select('string, 'w.start, 'w.end) // invalid start/end on rows-count window
+      .window(Slide over 10.rows every 5.rows on 'proctime as 'w)
+      .groupBy('w, 'string)
+      .select('string, 'w.start, 'w.end) // invalid start/end on rows-count window
   }
 
   @Test
   def testInvalidAggregateInSelection(): Unit = {
     expectedException.expect(classOf[ValidationException])
-    expectedException.expectMessage("Aggregate functions cannot be used in the select " +
-      "right after the aggregate.")
+    expectedException.expectMessage(
+      "Aggregate functions cannot be used in the select " +
+        "right after the aggregate.")
 
     val util = streamTestUtil()
     val table = util.addTable[(Long, Int, String)]('long, 'int, 'string, 'proctime.proctime)

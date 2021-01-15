@@ -22,7 +22,12 @@ import org.apache.flink.api.common.typeinfo.TypeInformation
 import org.apache.flink.api.java.typeutils.{RowTypeInfo, TupleTypeInfo, TypeExtractor}
 import org.apache.flink.api.scala.createTypeInformation
 import org.apache.flink.table.api.Types
-import org.apache.flink.table.expressions.utils.CompositeTypeTestBase.{MyCaseClass, MyCaseClass2, MyCaseClass3, MyPojo}
+import org.apache.flink.table.expressions.utils.CompositeTypeTestBase.{
+  MyCaseClass,
+  MyCaseClass2,
+  MyCaseClass3,
+  MyPojo
+}
 import org.apache.flink.types.Row
 
 class CompositeTypeTestBase extends ExpressionTestBase {
@@ -61,8 +66,7 @@ class CompositeTypeTestBase extends ExpressionTestBase {
       createTypeInformation[Array[MyCaseClass]],
       createTypeInformation[Array[MyPojo]],
       createTypeInformation[Array[MyCaseClass3]],
-      createTypeInformation[Array[MyCaseClass2]]
-      ).asInstanceOf[TypeInformation[Any]]
+      createTypeInformation[Array[MyCaseClass2]]).asInstanceOf[TypeInformation[Any]]
   }
 }
 
@@ -90,4 +94,3 @@ object CompositeTypeTestBase {
     }
   }
 }
-

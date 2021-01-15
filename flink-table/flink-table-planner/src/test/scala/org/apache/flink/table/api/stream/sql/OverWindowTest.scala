@@ -27,10 +27,8 @@ import org.junit.Test
 
 class OverWindowTest extends TableTestBase {
   private val streamUtil: StreamTableTestUtil = streamTestUtil()
-  private val table = streamUtil.addTable[(Int, String, Long)](
-    "MyTable",
-    'a, 'b, 'c,
-    'proctime.proctime, 'rowtime.rowtime)
+  private val table = streamUtil
+    .addTable[(Int, String, Long)]("MyTable", 'a, 'b, 'c, 'proctime.proctime, 'rowtime.rowtime)
 
   @Test
   def testProctimeBoundedDistinctWithNonDistinctPartitionedRowOver() = {
@@ -55,7 +53,7 @@ class OverWindowTest extends TableTestBase {
       "from MyTable " +
       "WINDOW w AS (PARTITION BY b ORDER BY proctime ROWS BETWEEN 2 preceding AND CURRENT ROW)"
     streamUtil.verifySqlPlansIdentical(sql, sql2)
-    
+
     val expected =
       unaryNode(
         "DataStreamCalc",
@@ -64,18 +62,24 @@ class OverWindowTest extends TableTestBase {
           unaryNode(
             "DataStreamCalc",
             streamTableNode(table),
-            term("select", "a", "b", "c", "proctime")
-          ),
+            term("select", "a", "b", "c", "proctime")),
           term("partitionBy", "b"),
           term("orderBy", "proctime"),
           term("rows", "BETWEEN 2 PRECEDING AND CURRENT ROW"),
-          term("select", "a", "b", "c", "proctime", "COUNT(a) AS w0$o0, $SUM0(a) AS w0$o1, " +
-            "COUNT(DISTINCT a) AS w0$o2, COUNT(DISTINCT c) AS w0$o3, $SUM0(DISTINCT c) AS w0$o4")
-        ),
-        term("select", "b", "w0$o0 AS cnt1, CASE(>(w0$o0, 0:BIGINT), w0$o1, " +
-          "null:INTEGER) AS sum1, w0$o2 AS cnt2, CASE(>(w0$o3, 0:BIGINT), w0$o4, " +
-          "null:BIGINT) AS sum2")
-      )
+          term(
+            "select",
+            "a",
+            "b",
+            "c",
+            "proctime",
+            "COUNT(a) AS w0$o0, $SUM0(a) AS w0$o1, " +
+              "COUNT(DISTINCT a) AS w0$o2, COUNT(DISTINCT c) AS w0$o3, $SUM0(DISTINCT c) AS w0$o4")),
+        term(
+          "select",
+          "b",
+          "w0$o0 AS cnt1, CASE(>(w0$o0, 0:BIGINT), w0$o1, " +
+            "null:INTEGER) AS sum1, w0$o2 AS cnt2, CASE(>(w0$o3, 0:BIGINT), w0$o4, " +
+            "null:BIGINT) AS sum2"))
     streamUtil.verifySql(sql, expected)
   }
 
@@ -103,19 +107,17 @@ class OverWindowTest extends TableTestBase {
         "DataStreamCalc",
         unaryNode(
           "DataStreamOverAggregate",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(table),
-            term("select", "a", "c", "proctime")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "c", "proctime")),
           term("partitionBy", "c"),
           term("orderBy", "proctime"),
           term("rows", "BETWEEN 2 PRECEDING AND CURRENT ROW"),
-          term("select", "a", "c", "proctime",
-            "COUNT(DISTINCT a) AS w0$o0, $SUM0(DISTINCT a) AS w0$o1")
-        ),
-        term("select", "c", "w0$o0 AS cnt1, CASE(>(w0$o0, 0:BIGINT), w0$o1, null:INTEGER) AS sum1")
-      )
+          term(
+            "select",
+            "a",
+            "c",
+            "proctime",
+            "COUNT(DISTINCT a) AS w0$o0, $SUM0(DISTINCT a) AS w0$o1")),
+        term("select", "c", "w0$o0 AS cnt1, CASE(>(w0$o0, 0:BIGINT), w0$o1, null:INTEGER) AS sum1"))
     streamUtil.verifySql(sql, expected)
   }
 
@@ -137,24 +139,18 @@ class OverWindowTest extends TableTestBase {
       "from MyTable " +
       "WINDOW w AS (PARTITION BY c ORDER BY proctime ROWS BETWEEN 2 preceding AND CURRENT ROW)"
     streamUtil.verifySqlPlansIdentical(sql, sql2)
-    
+
     val expected =
       unaryNode(
         "DataStreamCalc",
         unaryNode(
           "DataStreamOverAggregate",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(table),
-            term("select", "a", "c", "proctime")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "c", "proctime")),
           term("partitionBy", "c"),
           term("orderBy", "proctime"),
           term("rows", "BETWEEN 2 PRECEDING AND CURRENT ROW"),
-          term("select", "a", "c", "proctime", "COUNT(a) AS w0$o0, $SUM0(a) AS w0$o1")
-        ),
-        term("select", "c", "w0$o0 AS cnt1, CASE(>(w0$o0, 0:BIGINT), w0$o1, null:INTEGER) AS sum1")
-      )
+          term("select", "a", "c", "proctime", "COUNT(a) AS w0$o0, $SUM0(a) AS w0$o1")),
+        term("select", "c", "w0$o0 AS cnt1, CASE(>(w0$o0, 0:BIGINT), w0$o1, null:INTEGER) AS sum1"))
     streamUtil.verifySql(sql, expected)
   }
 
@@ -180,25 +176,12 @@ class OverWindowTest extends TableTestBase {
         "DataStreamCalc",
         unaryNode(
           "DataStreamOverAggregate",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(table),
-            term("select", "a", "c", "proctime")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "c", "proctime")),
           term("partitionBy", "a"),
           term("orderBy", "proctime"),
           term("range", "BETWEEN 7200000 PRECEDING AND CURRENT ROW"),
-          term(
-            "select",
-            "a",
-            "c",
-            "proctime",
-            "COUNT(c) AS w0$o0",
-            "$SUM0(c) AS w0$o1"
-          )
-        ),
-        term("select", "a", "/(CASE(>(w0$o0, 0:BIGINT)", "w0$o1, null:BIGINT), w0$o0) AS avgA")
-      )
+          term("select", "a", "c", "proctime", "COUNT(c) AS w0$o0", "$SUM0(c) AS w0$o1")),
+        term("select", "a", "/(CASE(>(w0$o0, 0:BIGINT)", "w0$o1, null:BIGINT), w0$o0) AS avgA"))
 
     streamUtil.verifySql(sqlQuery, expected)
   }
@@ -225,17 +208,11 @@ class OverWindowTest extends TableTestBase {
         "DataStreamCalc",
         unaryNode(
           "DataStreamOverAggregate",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(table),
-            term("select", "a", "c", "proctime")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "c", "proctime")),
           term("orderBy", "proctime"),
           term("range", "BETWEEN 10000 PRECEDING AND CURRENT ROW"),
-          term("select", "a", "c", "proctime", "COUNT(c) AS w0$o0")
-        ),
-        term("select", "a", "w0$o0 AS $1")
-      )
+          term("select", "a", "c", "proctime", "COUNT(c) AS w0$o0")),
+        term("select", "a", "w0$o0 AS $1"))
 
     streamUtil.verifySql(sqlQuery, expected)
   }
@@ -260,20 +237,13 @@ class OverWindowTest extends TableTestBase {
         "DataStreamCalc",
         unaryNode(
           "DataStreamOverAggregate",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(table),
-            term("select", "a", "c", "proctime")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "c", "proctime")),
           term("orderBy", "proctime"),
           term("rows", "BETWEEN 2 PRECEDING AND CURRENT ROW"),
-          term("select", "a", "c", "proctime", "COUNT(a) AS w0$o0")
-        ),
-        term("select", "c", "w0$o0 AS $1")
-      )
+          term("select", "a", "c", "proctime", "COUNT(a) AS w0$o0")),
+        term("select", "c", "w0$o0 AS $1"))
     streamUtil.verifySql(sql, expected)
   }
-
 
   @Test
   def testProcTimeUnboundedPartitionedRangeOver() = {
@@ -304,19 +274,17 @@ class OverWindowTest extends TableTestBase {
         "DataStreamCalc",
         unaryNode(
           "DataStreamOverAggregate",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(table),
-            term("select", "a", "c", "proctime")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "c", "proctime")),
           term("partitionBy", "c"),
           term("orderBy", "proctime"),
           term("range", "BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW"),
-          term("select", "a", "c", "proctime", "COUNT(a) AS w0$o0", "$SUM0(a) AS w0$o1")
-        ),
-        term("select", "c", "w0$o0 AS cnt1", "CASE(>(w0$o0, 0:BIGINT)",
-          "w0$o1, null:INTEGER) AS cnt2")
-      )
+          term("select", "a", "c", "proctime", "COUNT(a) AS w0$o0", "$SUM0(a) AS w0$o1")),
+        term(
+          "select",
+          "c",
+          "w0$o0 AS cnt1",
+          "CASE(>(w0$o0, 0:BIGINT)",
+          "w0$o1, null:INTEGER) AS cnt2"))
     streamUtil.verifySql(sql, expected)
   }
 
@@ -344,10 +312,8 @@ class OverWindowTest extends TableTestBase {
           term("partitionBy", "c"),
           term("orderBy", "proctime"),
           term("rows", "BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW"),
-          term("select", "a", "b", "c", "proctime", "rowtime", "COUNT(a) AS w0$o0")
-        ),
-        term("select", "c", "w0$o0 AS $1")
-      )
+          term("select", "a", "b", "c", "proctime", "rowtime", "COUNT(a) AS w0$o0")),
+        term("select", "c", "w0$o0 AS $1"))
     streamUtil.verifySql(sql, expected)
   }
 
@@ -372,18 +338,16 @@ class OverWindowTest extends TableTestBase {
         "DataStreamCalc",
         unaryNode(
           "DataStreamOverAggregate",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(table),
-            term("select", "a", "c", "proctime")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "c", "proctime")),
           term("orderBy", "proctime"),
           term("range", "BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW"),
-          term("select", "a", "c", "proctime", "COUNT(a) AS w0$o0", "$SUM0(a) AS w0$o1")
-        ),
-        term("select", "c", "w0$o0 AS cnt1", "CASE(>(w0$o0, 0:BIGINT)",
-          "w0$o1, null:INTEGER) AS cnt2")
-      )
+          term("select", "a", "c", "proctime", "COUNT(a) AS w0$o0", "$SUM0(a) AS w0$o1")),
+        term(
+          "select",
+          "c",
+          "w0$o0 AS cnt1",
+          "CASE(>(w0$o0, 0:BIGINT)",
+          "w0$o1, null:INTEGER) AS cnt2"))
     streamUtil.verifySql(sql, expected)
   }
 
@@ -410,10 +374,8 @@ class OverWindowTest extends TableTestBase {
           streamTableNode(table),
           term("orderBy", "proctime"),
           term("rows", "BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW"),
-          term("select", "a", "b", "c", "proctime", "rowtime", "COUNT(a) AS w0$o0")
-        ),
-        term("select", "c", "w0$o0 AS $1")
-      )
+          term("select", "a", "b", "c", "proctime", "rowtime", "COUNT(a) AS w0$o0")),
+        term("select", "c", "w0$o0 AS $1"))
     streamUtil.verifySql(sql, expected)
   }
 
@@ -430,18 +392,12 @@ class OverWindowTest extends TableTestBase {
         "DataStreamCalc",
         unaryNode(
           "DataStreamOverAggregate",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(table),
-            term("select", "a", "c", "rowtime")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "c", "rowtime")),
           term("partitionBy", "c"),
           term("orderBy", "rowtime"),
           term("rows", "BETWEEN 5 PRECEDING AND CURRENT ROW"),
-          term("select", "a", "c", "rowtime", "COUNT(a) AS w0$o0")
-        ),
-        term("select", "c", "w0$o0 AS $1")
-      )
+          term("select", "a", "c", "rowtime", "COUNT(a) AS w0$o0")),
+        term("select", "c", "w0$o0 AS $1"))
     streamUtil.verifySql(sql, expected)
   }
 
@@ -458,18 +414,12 @@ class OverWindowTest extends TableTestBase {
         "DataStreamCalc",
         unaryNode(
           "DataStreamOverAggregate",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(table),
-            term("select", "a", "c", "rowtime")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "c", "rowtime")),
           term("partitionBy", "c"),
           term("orderBy", "rowtime"),
           term("range", "BETWEEN 1000 PRECEDING AND CURRENT ROW"),
-          term("select", "a", "c", "rowtime", "COUNT(a) AS w0$o0")
-        ),
-        term("select", "c", "w0$o0 AS $1")
-      )
+          term("select", "a", "c", "rowtime", "COUNT(a) AS w0$o0")),
+        term("select", "c", "w0$o0 AS $1"))
     streamUtil.verifySql(sql, expected)
   }
 
@@ -486,17 +436,11 @@ class OverWindowTest extends TableTestBase {
         "DataStreamCalc",
         unaryNode(
           "DataStreamOverAggregate",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(table),
-            term("select", "a", "c", "rowtime")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "c", "rowtime")),
           term("orderBy", "rowtime"),
           term("rows", "BETWEEN 5 PRECEDING AND CURRENT ROW"),
-          term("select", "a", "c", "rowtime", "COUNT(a) AS w0$o0")
-        ),
-        term("select", "c", "w0$o0 AS $1")
-      )
+          term("select", "a", "c", "rowtime", "COUNT(a) AS w0$o0")),
+        term("select", "c", "w0$o0 AS $1"))
     streamUtil.verifySql(sql, expected)
   }
 
@@ -513,17 +457,11 @@ class OverWindowTest extends TableTestBase {
         "DataStreamCalc",
         unaryNode(
           "DataStreamOverAggregate",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(table),
-            term("select", "a", "c", "rowtime")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "c", "rowtime")),
           term("orderBy", "rowtime"),
           term("range", "BETWEEN 1000 PRECEDING AND CURRENT ROW"),
-          term("select", "a", "c", "rowtime", "COUNT(a) AS w0$o0")
-        ),
-        term("select", "c", "w0$o0 AS $1")
-      )
+          term("select", "a", "c", "rowtime", "COUNT(a) AS w0$o0")),
+        term("select", "c", "w0$o0 AS $1"))
     streamUtil.verifySql(sql, expected)
   }
 
@@ -547,19 +485,17 @@ class OverWindowTest extends TableTestBase {
         "DataStreamCalc",
         unaryNode(
           "DataStreamOverAggregate",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(table),
-            term("select", "a", "c", "rowtime")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "c", "rowtime")),
           term("partitionBy", "c"),
           term("orderBy", "rowtime"),
           term("range", "BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW"),
-          term("select", "a", "c", "rowtime", "COUNT(a) AS w0$o0", "$SUM0(a) AS w0$o1")
-        ),
-        term("select", "c", "w0$o0 AS cnt1", "CASE(>(w0$o0, 0:BIGINT)",
-          "w0$o1, null:INTEGER) AS cnt2")
-      )
+          term("select", "a", "c", "rowtime", "COUNT(a) AS w0$o0", "$SUM0(a) AS w0$o1")),
+        term(
+          "select",
+          "c",
+          "w0$o0 AS cnt1",
+          "CASE(>(w0$o0, 0:BIGINT)",
+          "w0$o1, null:INTEGER) AS cnt2"))
     streamUtil.verifySql(sql, expected)
   }
 
@@ -576,31 +512,17 @@ class OverWindowTest extends TableTestBase {
         "DataStreamCalc",
         unaryNode(
           "DataStreamOverAggregate",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(table),
-            term("select", "a", "c", "rowtime")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "c", "rowtime")),
           term("partitionBy", "c"),
           term("orderBy", "rowtime"),
           term("rows", "BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW"),
-          term(
-            "select",
-            "a",
-            "c",
-            "rowtime",
-            "COUNT(a) AS w0$o0",
-            "$SUM0(a) AS w0$o1"
-          )
-        ),
+          term("select", "a", "c", "rowtime", "COUNT(a) AS w0$o0", "$SUM0(a) AS w0$o1")),
         term(
           "select",
           "c",
           "w0$o0 AS cnt1",
           "CASE(>(w0$o0, 0:BIGINT)",
-          "w0$o1, null:INTEGER) AS cnt2"
-        )
-      )
+          "w0$o1, null:INTEGER) AS cnt2"))
     streamUtil.verifySql(sql, expected)
   }
 
@@ -617,18 +539,16 @@ class OverWindowTest extends TableTestBase {
         "DataStreamCalc",
         unaryNode(
           "DataStreamOverAggregate",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(table),
-            term("select", "a", "c", "rowtime")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "c", "rowtime")),
           term("orderBy", "rowtime"),
           term("range", "BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW"),
-          term("select", "a", "c", "rowtime", "COUNT(a) AS w0$o0", "$SUM0(a) AS w0$o1")
-        ),
-        term("select", "c", "w0$o0 AS cnt1", "CASE(>(w0$o0, 0:BIGINT)",
-          "w0$o1, null:INTEGER) AS cnt2")
-      )
+          term("select", "a", "c", "rowtime", "COUNT(a) AS w0$o0", "$SUM0(a) AS w0$o1")),
+        term(
+          "select",
+          "c",
+          "w0$o0 AS cnt1",
+          "CASE(>(w0$o0, 0:BIGINT)",
+          "w0$o1, null:INTEGER) AS cnt2"))
     streamUtil.verifySql(sql, expected)
   }
 
@@ -645,30 +565,16 @@ class OverWindowTest extends TableTestBase {
         "DataStreamCalc",
         unaryNode(
           "DataStreamOverAggregate",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(table),
-            term("select", "a", "c", "rowtime")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "c", "rowtime")),
           term("orderBy", "rowtime"),
           term("rows", "BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW"),
-          term(
-            "select",
-            "a",
-            "c",
-            "rowtime",
-            "COUNT(a) AS w0$o0",
-            "$SUM0(a) AS w0$o1"
-          )
-        ),
+          term("select", "a", "c", "rowtime", "COUNT(a) AS w0$o0", "$SUM0(a) AS w0$o1")),
         term(
           "select",
           "c",
           "w0$o0 AS cnt1",
           "CASE(>(w0$o0, 0:BIGINT)",
-          "w0$o1, null:INTEGER) AS cnt2"
-        )
-      )
+          "w0$o1, null:INTEGER) AS cnt2"))
     streamUtil.verifySql(sql, expected)
   }
 
@@ -694,20 +600,17 @@ class OverWindowTest extends TableTestBase {
         "DataStreamCalc",
         unaryNode(
           "DataStreamOverAggregate",
-          unaryNode(
-            "DataStreamCalc",
-            streamTableNode(table),
-            term("select", "a", "c", "proctime")
-          ),
+          unaryNode("DataStreamCalc", streamTableNode(table), term("select", "a", "c", "proctime")),
           term("partitionBy", "a"),
           term("orderBy", "proctime"),
           term("rows", "BETWEEN 3 PRECEDING AND CURRENT ROW"),
-          term("select", "a", "c", "proctime", "COUNT(c) AS w0$o0",
-            "$SUM0(c) AS w0$o1")
-        ),
-        term("select", "a", "CASE(>(w0$o0, 0:BIGINT)", "w0$o1, null:BIGINT) AS EXPR$1",
-          "w1$o0 AS EXPR$2")
-      )
+          term("select", "a", "c", "proctime", "COUNT(c) AS w0$o0", "$SUM0(c) AS w0$o1")),
+        term(
+          "select",
+          "a",
+          "CASE(>(w0$o0, 0:BIGINT)",
+          "w0$o1, null:BIGINT) AS EXPR$1",
+          "w1$o0 AS EXPR$2"))
 
     streamUtil.verifySql(sql, expected)
   }

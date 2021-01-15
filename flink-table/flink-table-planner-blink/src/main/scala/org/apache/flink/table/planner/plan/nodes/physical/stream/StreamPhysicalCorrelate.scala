@@ -40,27 +40,17 @@ class StreamPhysicalCorrelate(
     condition: Option[RexNode],
     outputRowType: RelDataType,
     joinType: JoinRelType)
-  extends StreamPhysicalCorrelateBase(
-    cluster,
-    traitSet,
-    inputRel,
-    scan,
-    condition,
-    outputRowType,
-    joinType) {
-
-  def copy(
-      traitSet: RelTraitSet,
-      newChild: RelNode,
-      outputType: RelDataType): RelNode = {
-    new StreamPhysicalCorrelate(
+    extends StreamPhysicalCorrelateBase(
       cluster,
       traitSet,
-      newChild,
+      inputRel,
       scan,
       condition,
-      outputType,
-      joinType)
+      outputRowType,
+      joinType) {
+
+  def copy(traitSet: RelTraitSet, newChild: RelNode, outputType: RelDataType): RelNode = {
+    new StreamPhysicalCorrelate(cluster, traitSet, newChild, scan, condition, outputType, joinType)
   }
 
   override def translateToExecNode(): ExecNode[_] = {

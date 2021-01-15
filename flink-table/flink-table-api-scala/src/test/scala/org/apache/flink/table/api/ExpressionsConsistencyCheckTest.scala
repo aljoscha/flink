@@ -58,8 +58,7 @@ class ExpressionsConsistencyCheckTest {
     "ImperativeAggregateFunctionCall" -> "call",
     "ScalarFunctionCall" -> "call",
     "TableFunctionCall" -> "call",
-    "concat_ws" -> "concatWs"
-  )
+    "concat_ws" -> "concatWs")
 
   // methods from WithOperations
   val explicitScalaToJavaMapping = Map(
@@ -80,11 +79,9 @@ class ExpressionsConsistencyCheckTest {
     // in scala trim has default values
     "trim$default$1" -> "trimLeading",
     "trim$default$2" -> "trimTrailing",
-    "trim$default$3" -> "trim"
-  )
+    "trim$default$3" -> "trim")
 
   val excludedStaticScalaMethods = Set(
-
     //-----------------------------------------------------------------------------------
     //  Scala implicit conversions to ImplicitExpressionOperations
     //-----------------------------------------------------------------------------------
@@ -103,7 +100,6 @@ class ExpressionsConsistencyCheckTest {
     "LiteralDoubleExpression",
     "LiteralIntExpression",
     "LiteralSqlTimeExpression",
-
     //-----------------------------------------------------------------------------------
     //  Scala implicit conversions to Expressions
     //-----------------------------------------------------------------------------------
@@ -132,7 +128,6 @@ class ExpressionsConsistencyCheckTest {
     "javaMap2MapConstructor",
     "row2RowConstructor",
     "tableSymbolToExpression",
-
     //-----------------------------------------------------------------------------------
     //  Internal methods
     //-----------------------------------------------------------------------------------
@@ -140,8 +135,7 @@ class ExpressionsConsistencyCheckTest {
     "org$apache$flink$table$api$ImplicitExpressionConversions$_setter_$CURRENT_ROW_$eq",
     "org$apache$flink$table$api$ImplicitExpressionConversions$_setter_$UNBOUNDED_ROW_$eq",
     "org$apache$flink$table$api$ImplicitExpressionConversions$_setter_$UNBOUNDED_RANGE_$eq",
-    "org$apache$flink$table$api$ExpressionsConsistencyCheckTest$Conversions$$$outer"
-  )
+    "org$apache$flink$table$api$ExpressionsConsistencyCheckTest$Conversions$$$outer")
 
   val excludedScalaMethods = Set(
     // in java we can use only static ifThenElse
@@ -152,10 +146,8 @@ class ExpressionsConsistencyCheckTest {
 
     // in java we can use only static range
     "to",
-
     // in java we can use only static rowInterval
     "rows",
-
     // users in java should use static negative()
     "unary_$minus", // unary_-
 
@@ -167,19 +159,15 @@ class ExpressionsConsistencyCheckTest {
     //-----------------------------------------------------------------------------------
     "expr",
     "org$apache$flink$table$api$ImplicitExpressionConversions$WithOperations$$$outer",
-    "toApiSpecificExpression"
-  )
+    "toApiSpecificExpression")
 
   val excludedStaticJavaMethods = Set(
     // in scala users should use "A" to "B"
     "range",
-
     // users should use 1.rows, 123.millis, 3.years
     "rowInterval",
-
     // users should use unary_-
-    "negative"
-  )
+    "negative")
 
   val excludedJavaMethods = Set(
     //-----------------------------------------------------------------------------------
@@ -187,13 +175,11 @@ class ExpressionsConsistencyCheckTest {
     //-----------------------------------------------------------------------------------
     "accept",
     "asSummaryString",
-    "getChildren"
-  )
+    "getChildren")
 
   @Test
   def testScalaStaticMethodsAvailableInJava(): Unit = {
-    val scalaMethodNames = classOf[Conversions]
-      .getMethods
+    val scalaMethodNames = classOf[Conversions].getMethods
       .map(_.getName)
       .toSet
     val javaMethodNames = classOf[Expressions].getMethods.map(_.getName).toSet ++
@@ -208,8 +194,7 @@ class ExpressionsConsistencyCheckTest {
 
   @Test
   def testScalaExpressionMethodsAvailableInJava(): Unit = {
-    val scalaMethodNames = classOf[ImplicitExpressionConversions#WithOperations]
-      .getMethods
+    val scalaMethodNames = classOf[ImplicitExpressionConversions#WithOperations].getMethods
       .map(_.getName)
       .toSet
     val javaMethodNames = classOf[ApiExpression].getMethods.map(_.getName).toSet
@@ -235,8 +220,7 @@ class ExpressionsConsistencyCheckTest {
 
   @Test
   def testJavaExpressionMethodsAvailableInScala(): Unit = {
-    val scalaMethodNames = classOf[ImplicitExpressionConversions#WithOperations]
-      .getMethods
+    val scalaMethodNames = classOf[ImplicitExpressionConversions#WithOperations].getMethods
       .map(_.getName)
       .toSet
     val javaMethodNames = classOf[ApiExpression].getMethods.map(_.getName).toSet
@@ -267,32 +251,21 @@ class ExpressionsConsistencyCheckTest {
             valueLiteral(" "),
             unresolvedCall(
               PLUS,
-              unresolvedCall(
-              PLUS,
-                unresolvedRef("f0"),
-                unresolvedRef("f1")
-              ),
-              unresolvedRef("f2")
-            )
-          )
-        )
-      )
-    )
+              unresolvedCall(PLUS, unresolvedRef("f0"), unresolvedRef("f1")),
+              unresolvedRef("f2"))))))
   }
 
   private def checkMethodsMatch(
       checkedMethods: Set[String],
       methodsBeingCheckedAgainst: Set[String],
       methodsMapping: Map[String, String],
-      excludedMethods: Set[String])
-    : Unit = {
+      excludedMethods: Set[String]): Unit = {
     val missingMethods = (checkedMethods -- methodsBeingCheckedAgainst)
-      .filterNot(
-        scalaName => {
-          val mappedName = methodsMapping.getOrElse(scalaName, scalaName)
-          methodsBeingCheckedAgainst.contains(mappedName)
-        }
-      ).diff(excludedMethods)
+      .filterNot(scalaName => {
+        val mappedName = methodsMapping.getOrElse(scalaName, scalaName)
+        methodsBeingCheckedAgainst.contains(mappedName)
+      })
+      .diff(excludedMethods)
 
     assertThat(missingMethods.asJava, IsEmptyIterable.emptyIterableOf(classOf[String]))
   }

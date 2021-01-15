@@ -29,20 +29,15 @@ import org.apache.calcite.rel.core.Calc
 import org.apache.calcite.rex.RexProgram
 
 /**
-  * Stream physical RelNode for Python ScalarFunctions.
-  */
+ * Stream physical RelNode for Python ScalarFunctions.
+ */
 class StreamPhysicalPythonCalc(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
     inputRel: RelNode,
     calcProgram: RexProgram,
     outputRowType: RelDataType)
-  extends StreamPhysicalCalcBase(
-    cluster,
-    traitSet,
-    inputRel,
-    calcProgram,
-    outputRowType) {
+    extends StreamPhysicalCalcBase(cluster, traitSet, inputRel, calcProgram, outputRowType) {
 
   override def copy(traitSet: RelTraitSet, child: RelNode, program: RexProgram): Calc = {
     new StreamPhysicalPythonCalc(cluster, traitSet, child, program, outputRowType)

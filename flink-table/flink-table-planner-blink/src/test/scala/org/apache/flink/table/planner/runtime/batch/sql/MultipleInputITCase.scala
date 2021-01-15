@@ -18,7 +18,11 @@
 
 package org.apache.flink.table.planner.runtime.batch.sql
 
-import org.apache.flink.api.common.typeinfo.BasicTypeInfo.{INT_TYPE_INFO, LONG_TYPE_INFO, STRING_TYPE_INFO}
+import org.apache.flink.api.common.typeinfo.BasicTypeInfo.{
+  INT_TYPE_INFO,
+  LONG_TYPE_INFO,
+  STRING_TYPE_INFO
+}
 import org.apache.flink.api.java.typeutils.RowTypeInfo
 import org.apache.flink.table.api.config.{ExecutionConfigOptions, OptimizerConfigOptions}
 import org.apache.flink.table.planner.runtime.utils.BatchTestBase
@@ -71,14 +75,13 @@ class MultipleInputITCase(shuffleMode: String) extends BatchTestBase {
       "a, b, c, nt",
       MultipleInputITCase.nullables)
 
-    tEnv.getConfig.getConfiguration.setString(
-      ExecutionConfigOptions.TABLE_EXEC_SHUFFLE_MODE, shuffleMode)
+    tEnv.getConfig.getConfiguration
+      .setString(ExecutionConfigOptions.TABLE_EXEC_SHUFFLE_MODE, shuffleMode)
   }
 
   @Test
   def testBasicMultipleInput(): Unit = {
-    checkMultipleInputResult(
-      """
+    checkMultipleInputResult("""
         |SELECT * FROM
         |  (SELECT a FROM x INNER JOIN y ON x.a = y.d) T1
         |  INNER JOIN
@@ -89,8 +92,7 @@ class MultipleInputITCase(shuffleMode: String) extends BatchTestBase {
 
   @Test
   def testManyMultipleInputs(): Unit = {
-    checkMultipleInputResult(
-      """
+    checkMultipleInputResult("""
         |WITH
         |  T1 AS (
         |    SELECT a, ny, nz FROM x
@@ -115,33 +117,28 @@ class MultipleInputITCase(shuffleMode: String) extends BatchTestBase {
 
   @Test
   def testJoinWithAggAsProbe(): Unit = {
-    checkMultipleInputResult(
-      """
+    checkMultipleInputResult("""
         |WITH T AS (SELECT a, d FROM x INNER JOIN y ON x.a = y.d)
         |SELECT * FROM
         |  (SELECT a, COUNT(*) AS cnt FROM T GROUP BY a) T1
         |  LEFT JOIN
         |  (SELECT d, SUM(a) AS sm FROM T GROUP BY d) T2
         |  ON T1.a = T2.d
-        |""".stripMargin
-    )
+        |""".stripMargin)
   }
 
   @Test
   def testNoPriorityConstraint(): Unit = {
-    checkMultipleInputResult(
-      """
+    checkMultipleInputResult("""
         |SELECT * FROM x
         |  INNER JOIN y ON x.a = y.d
         |  INNER JOIN t ON x.a = t.a
-        |""".stripMargin
-    )
+        |""".stripMargin)
   }
 
   @Test
   def testRelatedInputs(): Unit = {
-    checkMultipleInputResult(
-      """
+    checkMultipleInputResult("""
         |WITH
         |  T1 AS (SELECT x.a AS a, y.d AS b FROM y LEFT JOIN x ON y.d = x.a),
         |  T2 AS (
@@ -150,14 +147,12 @@ class MultipleInputITCase(shuffleMode: String) extends BatchTestBase {
         |      UNION ALL
         |      (SELECT x.a AS a, x.b AS b FROM x))
         |SELECT * FROM T2 LEFT JOIN t ON T2.a = t.a
-        |""".stripMargin
-    )
+        |""".stripMargin)
   }
 
   @Test
   def testRelatedInputsWithAgg(): Unit = {
-    checkMultipleInputResult(
-      """
+    checkMultipleInputResult("""
         |WITH
         |  T1 AS (SELECT x.a AS a, y.d AS b FROM y LEFT JOIN x ON y.d = x.a),
         |  T2 AS (
@@ -166,28 +161,25 @@ class MultipleInputITCase(shuffleMode: String) extends BatchTestBase {
         |      UNION ALL
         |      (SELECT COUNT(x.a) AS a, x.b AS b FROM x GROUP BY x.b))
         |SELECT * FROM T2 LEFT JOIN t ON T2.a = t.a
-        |""".stripMargin
-    )
+        |""".stripMargin)
   }
 
   @Test
   def testDeadlockCausedByExchangeInAncestor(): Unit = {
-    checkMultipleInputResult(
-      """
+    checkMultipleInputResult("""
         |WITH T1 AS (
         |  SELECT x1.*, x2.a AS k, (x1.b + x2.b) AS v
         |  FROM x x1 LEFT JOIN x x2 ON x1.a = x2.a WHERE x2.a > 0)
         |SELECT x.a, x.b, T1.* FROM x LEFT JOIN T1 ON x.a = T1.k WHERE x.a > 0 AND T1.v = 0
-        |""".stripMargin
-    )
+        |""".stripMargin)
   }
 
   def checkMultipleInputResult(sql: String): Unit = {
-    tEnv.getConfig.getConfiguration.setBoolean(
-      OptimizerConfigOptions.TABLE_OPTIMIZER_MULTIPLE_INPUT_ENABLED, false)
+    tEnv.getConfig.getConfiguration
+      .setBoolean(OptimizerConfigOptions.TABLE_OPTIMIZER_MULTIPLE_INPUT_ENABLED, false)
     val expected = executeQuery(sql)
-    tEnv.getConfig.getConfiguration.setBoolean(
-      OptimizerConfigOptions.TABLE_OPTIMIZER_MULTIPLE_INPUT_ENABLED, true)
+    tEnv.getConfig.getConfiguration
+      .setBoolean(OptimizerConfigOptions.TABLE_OPTIMIZER_MULTIPLE_INPUT_ENABLED, true)
     checkResult(sql, expected)
   }
 }
@@ -202,11 +194,12 @@ object MultipleInputITCase {
     val numRows = Random.nextInt(30)
     lazy val strs = Seq("multiple", "input", "itcase")
     for (_ <- 0 until numRows) {
-      data.add(BatchTestBase.row(
-        Random.nextInt(3),
-        Random.nextInt(3).longValue(),
-        strs(Random.nextInt(3)),
-        Random.nextInt(3)))
+      data.add(
+        BatchTestBase.row(
+          Random.nextInt(3),
+          Random.nextInt(3).longValue(),
+          strs(Random.nextInt(3)),
+          Random.nextInt(3)))
     }
     data
   }

@@ -24,8 +24,8 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 /**
-  * Tests keyword as suffix.
-  */
+ * Tests keyword as suffix.
+ */
 class KeywordParseTest {
 
   @Test

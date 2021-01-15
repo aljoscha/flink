@@ -29,21 +29,21 @@ import org.apache.calcite.plan.{RelOptCluster, RelTraitSet}
 import org.apache.calcite.rel.RelNode
 
 /**
-  * A special [[DataSetRel]] which make explain result more pretty.
-  *
-  * <p>NOTES: We can't move the [[BatchTableSink#consumeDataSet]]/[[DataSet#output]] logic
-  * from [[BatchTableEnvImpl]] to this node, because the return types of
-  * [[DataSetRel#translateToPlan]] (which returns [[DataSet]]) and
-  * [[BatchTableSink#consumeDataSet]]/[[DataSet#output]] (which returns [[DataSink]]) are
-  * different. [[DataSetSink#translateToPlan]] just returns the input's translated result.
-  */
+ * A special [[DataSetRel]] which make explain result more pretty.
+ *
+ * <p>NOTES: We can't move the [[BatchTableSink#consumeDataSet]]/[[DataSet#output]] logic
+ * from [[BatchTableEnvImpl]] to this node, because the return types of
+ * [[DataSetRel#translateToPlan]] (which returns [[DataSet]]) and
+ * [[BatchTableSink#consumeDataSet]]/[[DataSet#output]] (which returns [[DataSink]]) are
+ * different. [[DataSetSink#translateToPlan]] just returns the input's translated result.
+ */
 class DataSetSink(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
     inputRel: RelNode,
     sink: TableSink[_],
     sinkName: String)
-  extends Sink(cluster, traitSet, inputRel, sink, sinkName)
+    extends Sink(cluster, traitSet, inputRel, sink, sinkName)
     with DataSetRel {
 
   override def copy(traitSet: RelTraitSet, inputs: java.util.List[RelNode]): RelNode = {

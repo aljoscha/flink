@@ -67,21 +67,20 @@ class CoGroupDataSet[L, R](
     rightInput: DataSet[R],
     leftKeys: Keys[L],
     rightKeys: Keys[R])
-  extends DataSet(defaultCoGroup) {
+    extends DataSet(defaultCoGroup) {
 
   private val groupSortKeyPositionsFirst = mutable.MutableList[Either[Int, String]]()
   private val groupSortKeyPositionsSecond = mutable.MutableList[Either[Int, String]]()
   private val groupSortOrdersFirst = mutable.MutableList[Order]()
   private val groupSortOrdersSecond = mutable.MutableList[Order]()
-  
-  private var customPartitioner : Partitioner[_] = _
-  
+
+  private var customPartitioner: Partitioner[_] = _
+
   /**
    * Creates a new [[DataSet]] where the result for each pair of co-grouped element lists is the
    * result of the given function.
    */
-  def apply[O: TypeInformation: ClassTag](
-      fun: (Iterator[L], Iterator[R]) => O): DataSet[O] = {
+  def apply[O: TypeInformation: ClassTag](fun: (Iterator[L], Iterator[R]) => O): DataSet[O] = {
     require(fun != null, "CoGroup function must not be null.")
     val coGrouper = new CoGroupFunction[L, R, O] {
       val cleanFun = clean(fun)
@@ -101,7 +100,6 @@ class CoGroupDataSet[L, R](
       customPartitioner,
       getCallLocationName())
 
-    
     wrap(coGroupOperator)
   }
 
@@ -158,21 +156,21 @@ class CoGroupDataSet[L, R](
 
     wrap(coGroupOperator)
   }
-  
+
   // ----------------------------------------------------------------------------------------------
   //  Properties
   // ----------------------------------------------------------------------------------------------
-  
-  def withPartitioner[K : TypeInformation](partitioner : Partitioner[K]) : CoGroupDataSet[L, R] = {
+
+  def withPartitioner[K: TypeInformation](partitioner: Partitioner[K]): CoGroupDataSet[L, R] = {
     if (partitioner != null) {
-      val typeInfo : TypeInformation[K] = implicitly[TypeInformation[K]]
-      
+      val typeInfo: TypeInformation[K] = implicitly[TypeInformation[K]]
+
       leftKeys.validateCustomPartitioner(partitioner, typeInfo)
       rightKeys.validateCustomPartitioner(partitioner, typeInfo)
     }
     this.customPartitioner = partitioner
     defaultCoGroup.withPartitioner(partitioner)
-    
+
     this
   }
 
@@ -180,10 +178,10 @@ class CoGroupDataSet[L, R](
    * Gets the custom partitioner used by this join, or null, if none is set.
    */
   @Internal
-  def getPartitioner[K]() : Partitioner[K] = {
+  def getPartitioner[K](): Partitioner[K] = {
     customPartitioner.asInstanceOf[Partitioner[K]]
   }
-  
+
   /**
    * Adds a secondary sort key to the first input of this [[CoGroupDataSet]].
    *
@@ -191,8 +189,9 @@ class CoGroupDataSet[L, R](
    */
   def sortFirstGroup(field: Int, order: Order): CoGroupDataSet[L, R] = {
     if (!defaultCoGroup.getInput1Type().isTupleType) {
-      throw new InvalidProgramException("Specifying order keys via field positions is only valid " +
-        "for tuple data types.")
+      throw new InvalidProgramException(
+        "Specifying order keys via field positions is only valid " +
+          "for tuple data types.")
     }
     if (field >= defaultCoGroup.getInput1Type().getArity) {
       throw new IllegalArgumentException("Order key out of tuple bounds.")
@@ -210,7 +209,7 @@ class CoGroupDataSet[L, R](
     groupSortOrdersFirst += order
     this
   }
-  
+
   /**
    * Adds a secondary sort key to the second input of this [[CoGroupDataSet]].
    *
@@ -218,8 +217,9 @@ class CoGroupDataSet[L, R](
    */
   def sortSecondGroup(field: Int, order: Order): CoGroupDataSet[L, R] = {
     if (!defaultCoGroup.getInput2Type().isTupleType) {
-      throw new InvalidProgramException("Specifying order keys via field positions is only valid " +
-        "for tuple data types.")
+      throw new InvalidProgramException(
+        "Specifying order keys via field positions is only valid " +
+          "for tuple data types.")
     }
     if (field >= defaultCoGroup.getInput2Type().getArity) {
       throw new IllegalArgumentException("Order key out of tuple bounds.")
@@ -237,32 +237,29 @@ class CoGroupDataSet[L, R](
     groupSortOrdersSecond += order
     this
   }
-  
-  private def buildGroupSortList[T](typeInfo: TypeInformation[T],
-                                    keys: mutable.MutableList[Either[Int, String]],
-                                    orders: mutable.MutableList[Order])
-          : java.util.List[Pair[java.lang.Integer, Order]] =
-  {
+
+  private def buildGroupSortList[T](
+      typeInfo: TypeInformation[T],
+      keys: mutable.MutableList[Either[Int, String]],
+      orders: mutable.MutableList[Order]): java.util.List[Pair[java.lang.Integer, Order]] = {
     if (keys.isEmpty) {
       null
-    }
-    else {
+    } else {
       val result = new java.util.ArrayList[Pair[java.lang.Integer, Order]]
-      
-      keys.zip(orders).foreach {
-        case ( Left(position), order )  => result.add(
-                                      new ImmutablePair[java.lang.Integer, Order](position, order))
-        
-        case ( Right(expression), order ) =>
 
+      keys.zip(orders).foreach {
+        case (Left(position), order) =>
+          result.add(new ImmutablePair[java.lang.Integer, Order](position, order))
+
+        case (Right(expression), order) =>
           val ek = new ExpressionKeys[T](Array[String](expression), typeInfo)
-          val groupOrderKeys : Array[Int] = ek.computeLogicalKeyPositions()
+          val groupOrderKeys: Array[Int] = ek.computeLogicalKeyPositions()
 
           for (k <- groupOrderKeys) {
             result.add(new ImmutablePair[java.lang.Integer, Order](k, order))
           }
       }
-      
+
       result
     }
   }

@@ -25,21 +25,21 @@ import org.apache.flink.table.codegen.GeneratedAggregationsFunction
 import org.apache.flink.types.Row
 
 /**
-  * Wraps the aggregate logic inside of
-  * [[org.apache.flink.api.java.operators.GroupReduceOperator]] and
-  * [[org.apache.flink.api.java.operators.GroupCombineOperator]].
-  *
-  * It is used for sliding on batch for both time and count-windows.
-  *
-  * @param genPreAggregations Code-generated [[GeneratedAggregations]] for partial aggregation.
-  * @param genFinalAggregations Code-generated [[GeneratedAggregations]] for final aggregation.
-  * @param keysAndAggregatesArity The total arity of keys and aggregates
-  * @param finalRowWindowStartPos relative window-start position to last field of output row
-  * @param finalRowWindowEndPos relative window-end position to last field of output row
-  * @param finalRowWindowRowtimePos relative window-rowtime position to the last field of the
-  *                                 output row
-  * @param windowSize size of the window, used to determine window-end for output row
-  */
+ * Wraps the aggregate logic inside of
+ * [[org.apache.flink.api.java.operators.GroupReduceOperator]] and
+ * [[org.apache.flink.api.java.operators.GroupCombineOperator]].
+ *
+ * It is used for sliding on batch for both time and count-windows.
+ *
+ * @param genPreAggregations Code-generated [[GeneratedAggregations]] for partial aggregation.
+ * @param genFinalAggregations Code-generated [[GeneratedAggregations]] for final aggregation.
+ * @param keysAndAggregatesArity The total arity of keys and aggregates
+ * @param finalRowWindowStartPos relative window-start position to last field of output row
+ * @param finalRowWindowEndPos relative window-end position to last field of output row
+ * @param finalRowWindowRowtimePos relative window-rowtime position to the last field of the
+ *                                 output row
+ * @param windowSize size of the window, used to determine window-end for output row
+ */
 class DataSetSlideWindowAggReduceCombineFunction(
     genPreAggregations: GeneratedAggregationsFunction,
     genFinalAggregations: GeneratedAggregationsFunction,
@@ -48,14 +48,14 @@ class DataSetSlideWindowAggReduceCombineFunction(
     finalRowWindowEndPos: Option[Int],
     finalRowWindowRowtimePos: Option[Int],
     windowSize: Long)
-  extends DataSetSlideWindowAggReduceGroupFunction(
-    genFinalAggregations,
-    keysAndAggregatesArity,
-    finalRowWindowStartPos,
-    finalRowWindowEndPos,
-    finalRowWindowRowtimePos,
-    windowSize)
-  with CombineFunction[Row, Row] {
+    extends DataSetSlideWindowAggReduceGroupFunction(
+      genFinalAggregations,
+      keysAndAggregatesArity,
+      finalRowWindowStartPos,
+      finalRowWindowEndPos,
+      finalRowWindowRowtimePos,
+      windowSize)
+    with CombineFunction[Row, Row] {
 
   private val intermediateRow: Row = new Row(keysAndAggregatesArity + 1)
 
@@ -64,8 +64,9 @@ class DataSetSlideWindowAggReduceCombineFunction(
   override def open(config: Configuration): Unit = {
     super.open(config)
 
-    LOG.debug(s"Compiling AggregateHelper: $genPreAggregations.name \n\n " +
-      s"Code:\n$genPreAggregations.code")
+    LOG.debug(
+      s"Compiling AggregateHelper: $genPreAggregations.name \n\n " +
+        s"Code:\n$genPreAggregations.code")
     val clazz = compile(
       getRuntimeContext.getUserCodeClassLoader,
       genPreAggregations.name,

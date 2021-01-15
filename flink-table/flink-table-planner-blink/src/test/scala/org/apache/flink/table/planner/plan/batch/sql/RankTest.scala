@@ -87,7 +87,7 @@ class RankTest extends TableTestBase {
       """.stripMargin
     util.verifyExecPlan(sqlQuery)
   }
-  
+
   @Test
   def testRankValueFilterWithUpperValue(): Unit = {
     val sqlQuery =
@@ -170,8 +170,7 @@ class RankTest extends TableTestBase {
 
   @Test
   def testCreateViewWithRowNumber(): Unit = {
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE test_source (
         |  name STRING,
         |  eat STRING,
@@ -181,13 +180,14 @@ class RankTest extends TableTestBase {
         |  'bounded' = 'true'
         |)
       """.stripMargin)
-    util.tableEnv.executeSql("create view view1 as select name, eat ,sum(age) as cnt\n"
-      + "from test_source group by name, eat")
-    util.tableEnv.executeSql("create view view2 as\n"
-      + "select *, ROW_NUMBER() OVER (PARTITION BY name ORDER BY cnt DESC) as row_num\n"
-      + "from view1")
-    util.addTable(
-      s"""
+    util.tableEnv.executeSql(
+      "create view view1 as select name, eat ,sum(age) as cnt\n"
+        + "from test_source group by name, eat")
+    util.tableEnv.executeSql(
+      "create view view2 as\n"
+        + "select *, ROW_NUMBER() OVER (PARTITION BY name ORDER BY cnt DESC) as row_num\n"
+        + "from view1")
+    util.addTable(s"""
          |create table sink (
          |  name varchar,
          |  eat varchar,
@@ -196,9 +196,9 @@ class RankTest extends TableTestBase {
          |with(
          |  'connector' = 'print'
          |)
-         |""".stripMargin
-    )
-    util.verifyExecPlanInsert("insert into sink select name, eat, cnt\n"
-      + "from view2 where row_num <= 3")
+         |""".stripMargin)
+    util.verifyExecPlanInsert(
+      "insert into sink select name, eat, cnt\n"
+        + "from view2 where row_num <= 3")
   }
 }

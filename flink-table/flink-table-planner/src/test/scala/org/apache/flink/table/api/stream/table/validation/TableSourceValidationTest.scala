@@ -22,7 +22,11 @@ import org.apache.flink.api.common.typeinfo.TypeInformation
 import org.apache.flink.api.java.typeutils.RowTypeInfo
 import org.apache.flink.table.api._
 import org.apache.flink.table.api.internal.TableEnvironmentInternal
-import org.apache.flink.table.utils.{TableTestBase, TestFilterableTableSourceWithoutExplainSourceOverride, TestProjectableTableSourceWithoutExplainSourceOverride}
+import org.apache.flink.table.utils.{
+  TableTestBase,
+  TestFilterableTableSourceWithoutExplainSourceOverride,
+  TestProjectableTableSourceWithoutExplainSourceOverride
+}
 
 import org.hamcrest.Matchers
 import org.junit.Test
@@ -42,10 +46,16 @@ class TableSourceValidationTest extends TableTestBase {
       Array("id", "name", "val", "rtime"))
 
     val util = streamTestUtil()
-    util.tableEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(
-      "T",
-      new TestProjectableTableSourceWithoutExplainSourceOverride(
-        tableSchema, returnType, Seq(), "rtime", "ptime"))
+    util.tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSourceInternal(
+        "T",
+        new TestProjectableTableSourceWithoutExplainSourceOverride(
+          tableSchema,
+          returnType,
+          Seq(),
+          "rtime",
+          "ptime"))
 
     val t = util.tableEnv.scan("T").select('name, 'val, 'id)
 
@@ -60,7 +70,8 @@ class TableSourceValidationTest extends TableTestBase {
     val tableSource = TestFilterableTableSourceWithoutExplainSourceOverride()
     val util = batchTestUtil()
 
-    util.tableEnv.asInstanceOf[TableEnvironmentInternal]
+    util.tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
       .registerTableSourceInternal("T", tableSource)
 
     val t = util.tableEnv

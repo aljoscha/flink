@@ -47,8 +47,7 @@ class TableAggregateValidationTest extends TableTestBase {
   @Test
   def testInvalidParameterType(): Unit = {
     expectedException.expect(classOf[ValidationException])
-    expectedException.expectMessage(
-      "Invalid function call:\nEmptyTableAggFunc(BIGINT, STRING)")
+    expectedException.expectMessage("Invalid function call:\nEmptyTableAggFunc(BIGINT, STRING)")
 
     val util = streamTestUtil()
     val table = util.addTableSource[(Long, Int, String)]('a, 'b, 'c)
@@ -79,8 +78,9 @@ class TableAggregateValidationTest extends TableTestBase {
   @Test
   def testInvalidWithAggregation(): Unit = {
     expectedException.expect(classOf[ValidationException])
-    expectedException.expectMessage("Aggregate functions are not supported in the " +
-      "select right after the aggregate or flatAggregate operation.")
+    expectedException.expectMessage(
+      "Aggregate functions are not supported in the " +
+        "select right after the aggregate or flatAggregate operation.")
 
     val util = streamTestUtil()
     val table = util.addTableSource[(Long, Int, Timestamp)]('a, 'b, 'c)
@@ -112,9 +112,10 @@ class TableAggregateValidationTest extends TableTestBase {
   @Test
   def testInvalidAliasWithWrongNumber(): Unit = {
     expectedException.expect(classOf[ValidationException])
-    expectedException.expectMessage("List of column aliases must have same degree as " +
-      "table; the returned table of function 'EmptyTableAggFunc' has 2 columns, " +
-      "whereas alias list has 3 columns")
+    expectedException.expectMessage(
+      "List of column aliases must have same degree as " +
+        "table; the returned table of function 'EmptyTableAggFunc' has 2 columns, " +
+        "whereas alias list has 3 columns")
 
     val util = streamTestUtil()
     val table = util.addTableSource[(Long, Int, Timestamp)]('a, 'b, 'c)

@@ -32,21 +32,24 @@ import org.junit.{Before, Test}
 class LegacyTableSourceTest extends TableTestBase {
 
   private val util = batchTestUtil()
-  private val tableSchema = TableSchema.builder().fields(
-    Array("a", "b", "c"),
-    Array(DataTypes.INT(), DataTypes.BIGINT(), DataTypes.STRING())).build()
+  private val tableSchema = TableSchema
+    .builder()
+    .fields(Array("a", "b", "c"), Array(DataTypes.INT(), DataTypes.BIGINT(), DataTypes.STRING()))
+    .build()
 
   @Before
   def setup(): Unit = {
-    util.tableEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(
-      "ProjectableTable", new TestLegacyProjectableTableSource(
-      true,
-      tableSchema,
-      new RowTypeInfo(
-        tableSchema.getFieldDataTypes.map(TypeInfoDataTypeConverter.fromDataTypeToTypeInfo),
-        tableSchema.getFieldNames),
-      Seq.empty[Row])
-    )
+    util.tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSourceInternal(
+        "ProjectableTable",
+        new TestLegacyProjectableTableSource(
+          true,
+          tableSchema,
+          new RowTypeInfo(
+            tableSchema.getFieldDataTypes.map(TypeInfoDataTypeConverter.fromDataTypeToTypeInfo),
+            tableSchema.getFieldNames),
+          Seq.empty[Row]))
 
     TestLegacyFilterableTableSource.createTemporaryTable(
       util.tableEnv,
@@ -84,18 +87,15 @@ class LegacyTableSourceTest extends TableTestBase {
   def testNestedProject(): Unit = {
     val nested1 = new RowTypeInfo(
       Array(Types.STRING, Types.INT).asInstanceOf[Array[TypeInformation[_]]],
-      Array("name", "value")
-    )
+      Array("name", "value"))
 
     val nested2 = new RowTypeInfo(
       Array(Types.INT, Types.BOOLEAN).asInstanceOf[Array[TypeInformation[_]]],
-      Array("num", "flag")
-    )
+      Array("num", "flag"))
 
     val deepNested = new RowTypeInfo(
       Array(nested1, nested2).asInstanceOf[Array[TypeInformation[_]]],
-      Array("nested1", "nested2")
-    )
+      Array("nested1", "nested2"))
 
     val tableSchema = new TableSchema(
       Array("id", "deepNested", "nested", "name"),
@@ -105,9 +105,11 @@ class LegacyTableSourceTest extends TableTestBase {
       Array(Types.INT, deepNested, nested1, Types.STRING).asInstanceOf[Array[TypeInformation[_]]],
       Array("id", "deepNested", "nested", "name"))
 
-    util.tableEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(
-      "T",
-      new TestNestedProjectableTableSource(true, tableSchema, returnType, Seq()))
+    util.tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSourceInternal(
+        "T",
+        new TestNestedProjectableTableSource(true, tableSchema, returnType, Seq()))
 
     val sqlQuery =
       """
@@ -182,7 +184,8 @@ class LegacyTableSourceTest extends TableTestBase {
 
   @Test
   def testTimeLiteralExpressionPushDown(): Unit = {
-    val schema = TableSchema.builder()
+    val schema = TableSchema
+      .builder()
       .field("id", DataTypes.INT)
       .field("dv", DataTypes.DATE)
       .field("tv", DataTypes.TIME)

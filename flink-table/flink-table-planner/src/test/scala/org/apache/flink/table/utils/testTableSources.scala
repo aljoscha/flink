@@ -46,7 +46,7 @@ class TestTableSourceWithTime[T](
     rowtime: String = null,
     proctime: String = null,
     mapping: Map[String, String] = null)
-  extends StreamTableSource[T]
+    extends StreamTableSource[T]
     with BatchTableSource[T]
     with DefinedRowtimeAttributes
     with DefinedProctimeAttribute
@@ -63,10 +63,11 @@ class TestTableSourceWithTime[T](
   override def getRowtimeAttributeDescriptors: util.List[RowtimeAttributeDescriptor] = {
     // return a RowtimeAttributeDescriptor if rowtime attribute is defined
     if (rowtime != null) {
-      Collections.singletonList(new RowtimeAttributeDescriptor(
-        rowtime,
-        new ExistingField(rowtime),
-        new AscendingTimestamps))
+      Collections.singletonList(
+        new RowtimeAttributeDescriptor(
+          rowtime,
+          new ExistingField(rowtime),
+          new AscendingTimestamps))
     } else {
       Collections.EMPTY_LIST.asInstanceOf[util.List[RowtimeAttributeDescriptor]]
     }
@@ -94,13 +95,13 @@ class TestProjectableTableSource(
     rowtime: String = null,
     proctime: String = null,
     fieldMapping: Map[String, String] = null)
-  extends TestProjectableTableSourceWithoutExplainSourceOverride(
-    tableSchema,
-    returnType,
-    values,
-    rowtime,
-    proctime,
-    fieldMapping) {
+    extends TestProjectableTableSourceWithoutExplainSourceOverride(
+      tableSchema,
+      returnType,
+      values,
+      rowtime,
+      proctime,
+      fieldMapping) {
   override def projectFields(fields: Array[Int]): TableSource[Row] = {
 
     val rowType = returnType.asInstanceOf[RowTypeInfo]
@@ -112,7 +113,7 @@ class TestProjectableTableSource(
       val invertedMapping = fieldMapping.map(_.swap)
       val projectedNames = fields.map(rowType.getFieldNames.apply(_))
 
-      val projectedMapping: Map[String, String] = projectedNames.map{ f =>
+      val projectedMapping: Map[String, String] = projectedNames.map { f =>
         val logField = invertedMapping(f)
         logField -> s"remapped-$f"
       }.toMap
@@ -121,13 +122,12 @@ class TestProjectableTableSource(
     }
 
     val projectedTypes = fields.map(rowType.getFieldTypes.apply(_))
-    val projectedReturnType = new RowTypeInfo(
-      projectedTypes.asInstanceOf[Array[TypeInformation[_]]],
-      projectedNames)
+    val projectedReturnType =
+      new RowTypeInfo(projectedTypes.asInstanceOf[Array[TypeInformation[_]]], projectedNames)
 
     val projectedValues = values.map { fromRow =>
       val pRow = new Row(fields.length)
-      fields.zipWithIndex.foreach{ case (from, to) => pRow.setField(to, fromRow.getField(from)) }
+      fields.zipWithIndex.foreach { case (from, to) => pRow.setField(to, fromRow.getField(from)) }
       pRow
     }
 
@@ -153,14 +153,14 @@ class TestProjectableTableSourceWithoutExplainSourceOverride(
     rowtime: String = null,
     proctime: String = null,
     fieldMapping: Map[String, String] = null)
-  extends TestTableSourceWithTime[Row](
-    tableSchema,
-    returnType,
-    values,
-    rowtime,
-    proctime,
-    fieldMapping)
-  with ProjectableTableSource[Row] {
+    extends TestTableSourceWithTime[Row](
+      tableSchema,
+      returnType,
+      values,
+      rowtime,
+      proctime,
+      fieldMapping)
+    with ProjectableTableSource[Row] {
 
   override def projectFields(fields: Array[Int]): TableSource[Row] = {
 
@@ -173,7 +173,7 @@ class TestProjectableTableSourceWithoutExplainSourceOverride(
       val invertedMapping = fieldMapping.map(_.swap)
       val projectedNames = fields.map(rowType.getFieldNames.apply(_))
 
-      val projectedMapping: Map[String, String] = projectedNames.map{ f =>
+      val projectedMapping: Map[String, String] = projectedNames.map { f =>
         val logField = invertedMapping(f)
         logField -> s"remapped-$f"
       }.toMap
@@ -182,13 +182,12 @@ class TestProjectableTableSourceWithoutExplainSourceOverride(
     }
 
     val projectedTypes = fields.map(rowType.getFieldTypes.apply(_))
-    val projectedReturnType = new RowTypeInfo(
-      projectedTypes.asInstanceOf[Array[TypeInformation[_]]],
-      projectedNames)
+    val projectedReturnType =
+      new RowTypeInfo(projectedTypes.asInstanceOf[Array[TypeInformation[_]]], projectedNames)
 
     val projectedValues = values.map { fromRow =>
       val pRow = new Row(fields.length)
-      fields.zipWithIndex.foreach{ case (from, to) => pRow.setField(to, fromRow.getField(from)) }
+      fields.zipWithIndex.foreach { case (from, to) => pRow.setField(to, fromRow.getField(from)) }
       pRow
     }
 
@@ -208,14 +207,8 @@ class TestNestedProjectableTableSource(
     values: Seq[Row],
     rowtime: String = null,
     proctime: String = null)
-  extends TestTableSourceWithTime[Row](
-    tableSchema,
-    returnType,
-    values,
-    rowtime,
-    proctime,
-    null)
-  with NestedFieldsProjectableTableSource[Row] {
+    extends TestTableSourceWithTime[Row](tableSchema, returnType, values, rowtime, proctime, null)
+    with NestedFieldsProjectableTableSource[Row] {
 
   var readNestedFields: Seq[String] = tableSchema.getFieldNames.map(f => s"$f.*")
 
@@ -228,17 +221,17 @@ class TestNestedProjectableTableSource(
     val projectedNames = fields.map(rowType.getFieldNames.apply(_))
     val projectedTypes = fields.map(rowType.getFieldTypes.apply(_))
 
-    val projectedReturnType = new RowTypeInfo(
-      projectedTypes.asInstanceOf[Array[TypeInformation[_]]],
-      projectedNames)
+    val projectedReturnType =
+      new RowTypeInfo(projectedTypes.asInstanceOf[Array[TypeInformation[_]]], projectedNames)
 
     // update read nested fields
-    val newReadNestedFields = projectedNames.zip(nestedFields)
+    val newReadNestedFields = projectedNames
+      .zip(nestedFields)
       .flatMap(f => f._2.map(n => s"${f._1}.$n"))
 
     val projectedValues = values.map { fromRow =>
       val pRow = new Row(fields.length)
-      fields.zipWithIndex.foreach{ case (from, to) => pRow.setField(to, fromRow.getField(from)) }
+      fields.zipWithIndex.foreach { case (from, to) => pRow.setField(to, fromRow.getField(from)) }
       pRow
     }
 
@@ -264,14 +257,15 @@ class TestPreserveWMTableSource[T](
     returnType: TypeInformation[T],
     values: Seq[Either[(Long, T), Long]],
     rowtime: String)
-  extends StreamTableSource[T]
+    extends StreamTableSource[T]
     with DefinedRowtimeAttributes {
 
   override def getRowtimeAttributeDescriptors: util.List[RowtimeAttributeDescriptor] = {
-    Collections.singletonList(new RowtimeAttributeDescriptor(
-      rowtime,
-      new ExistingField(rowtime),
-      PreserveWatermarks.INSTANCE))
+    Collections.singletonList(
+      new RowtimeAttributeDescriptor(
+        rowtime,
+        new ExistingField(rowtime),
+        PreserveWatermarks.INSTANCE))
   }
 
   override def getDataStream(execEnv: StreamExecutionEnvironment): DataStream[T] = {
@@ -287,7 +281,8 @@ class TestPreserveWMTableSource[T](
 class TestInputFormatTableSource[T](
     tableSchema: TableSchema,
     returnType: TypeInformation[T],
-    values: Seq[T]) extends InputFormatTableSource[T] {
+    values: Seq[T])
+    extends InputFormatTableSource[T] {
 
   override def getInputFormat: InputFormat[T, _ <: InputSplit] = {
     new CollectionInputFormat[T](values.asJava, returnType.createSerializer(new ExecutionConfig))

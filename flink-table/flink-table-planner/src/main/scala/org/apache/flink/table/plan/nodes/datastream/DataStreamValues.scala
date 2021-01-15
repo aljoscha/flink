@@ -33,27 +33,21 @@ import org.apache.flink.table.runtime.types.{CRow, CRowTypeInfo}
 import scala.collection.JavaConverters._
 
 /**
-  * DataStream RelNode for LogicalValues.
-  */
+ * DataStream RelNode for LogicalValues.
+ */
 class DataStreamValues(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
     schema: RowSchema,
     tuples: ImmutableList[ImmutableList[RexLiteral]],
     ruleDescription: String)
-  extends Values(cluster, schema.relDataType, tuples, traitSet)
-  with DataStreamRel {
+    extends Values(cluster, schema.relDataType, tuples, traitSet)
+    with DataStreamRel {
 
   override def deriveRowType() = schema.relDataType
 
   override def copy(traitSet: RelTraitSet, inputs: java.util.List[RelNode]): RelNode = {
-    new DataStreamValues(
-      cluster,
-      traitSet,
-      schema,
-      getTuples,
-      ruleDescription
-    )
+    new DataStreamValues(cluster, traitSet, schema, getTuples, ruleDescription)
   }
 
   override def translateToPlan(planner: StreamPlanner): DataStream[CRow] = {
@@ -65,10 +59,7 @@ class DataStreamValues(
 
     // generate code for every record
     val generatedRecords = getTuples.asScala.map { r =>
-      generator.generateResultExpression(
-        schema.typeInfo,
-        schema.fieldNames,
-        r.asScala)
+      generator.generateResultExpression(schema.typeInfo, schema.fieldNames, r.asScala)
     }
 
     // generate input format
@@ -77,10 +68,8 @@ class DataStreamValues(
       generatedRecords.map(_.code),
       schema.typeInfo)
 
-    val inputFormat = new CRowValuesInputFormat(
-      generatedFunction.name,
-      generatedFunction.code,
-      returnType)
+    val inputFormat =
+      new CRowValuesInputFormat(generatedFunction.name, generatedFunction.code, returnType)
 
     planner.getExecutionEnvironment.createInput(inputFormat, returnType)
   }

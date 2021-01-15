@@ -28,21 +28,21 @@ import org.apache.calcite.rel.RelNode
 import org.apache.calcite.rel.convert.ConverterRule
 
 /**
-  * Rule that matches [[FlinkLogicalSort]] with empty sort fields,
-  * and converts it to [[StreamPhysicalLimit]].
-  */
+ * Rule that matches [[FlinkLogicalSort]] with empty sort fields,
+ * and converts it to [[StreamPhysicalLimit]].
+ */
 class StreamPhysicalLimitRule
-  extends ConverterRule(
-    classOf[FlinkLogicalSort],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.STREAM_PHYSICAL,
-    "StreamPhysicalLimitRule") {
+    extends ConverterRule(
+      classOf[FlinkLogicalSort],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.STREAM_PHYSICAL,
+      "StreamPhysicalLimitRule") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val sort: FlinkLogicalSort = call.rel(0)
     // only matches Sort with empty sort fields
     sort.getCollation.getFieldCollations.isEmpty
-}
+  }
 
   override def convert(rel: RelNode): RelNode = {
     val sort = rel.asInstanceOf[FlinkLogicalSort]

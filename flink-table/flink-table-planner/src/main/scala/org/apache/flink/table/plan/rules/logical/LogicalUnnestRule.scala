@@ -36,10 +36,8 @@ import org.apache.flink.table.functions.utils.UserDefinedFunctionUtils
 import org.apache.flink.table.plan.schema.{ArrayRelDataType, MapRelDataType, MultisetRelDataType}
 import org.apache.flink.table.plan.util.ExplodeFunctionUtil
 
-class LogicalUnnestRule(
-    operand: RelOptRuleOperand,
-    description: String)
-  extends RelOptRule(operand, description) {
+class LogicalUnnestRule(operand: RelOptRuleOperand, description: String)
+    extends RelOptRule(operand, description) {
 
   override def matches(call: RelOptRuleCall): Boolean = {
 
@@ -51,18 +49,20 @@ class LogicalUnnestRule(
       case filter: LogicalFilter =>
         filter.getInput.asInstanceOf[RelSubset].getOriginal match {
           case u: Uncollect => !u.withOrdinality
-          case p: LogicalProject => p.getInput.asInstanceOf[RelSubset].getOriginal match {
-            case u: Uncollect => !u.withOrdinality
-            case _ => false
-          }
+          case p: LogicalProject =>
+            p.getInput.asInstanceOf[RelSubset].getOriginal match {
+              case u: Uncollect => !u.withOrdinality
+              case _            => false
+            }
           case _ => false
         }
-      case p: LogicalProject => p.getInput.asInstanceOf[RelSubset].getOriginal match {
-        case u: Uncollect => !u.withOrdinality
-        case _ => false
-      }
+      case p: LogicalProject =>
+        p.getInput.asInstanceOf[RelSubset].getOriginal match {
+          case u: Uncollect => !u.withOrdinality
+          case _            => false
+        }
       case u: Uncollect => !u.withOrdinality
-      case _ => false
+      case _            => false
     }
   }
 
@@ -93,14 +93,16 @@ class LogicalUnnestRule(
           val dataType = uc.getInput.getRowType.getFieldList.get(0).getValue
           val (componentType, explodeTableFunc) = dataType match {
             case arrayType: ArrayRelDataType =>
-              (arrayType.getComponentType,
+              (
+                arrayType.getComponentType,
                 ExplodeFunctionUtil.explodeTableFuncFromType(arrayType.typeInfo))
 
             case map: MapRelDataType =>
               val keyTypeInfo = FlinkTypeFactory.toTypeInfo(map.keyType)
               val valueTypeInfo = FlinkTypeFactory.toTypeInfo(map.valueType)
               val componentTypeInfo = Types.ROW(keyTypeInfo, valueTypeInfo)
-              val componentType = cluster.getTypeFactory.asInstanceOf[FlinkTypeFactory]
+              val componentType = cluster.getTypeFactory
+                .asInstanceOf[FlinkTypeFactory]
                 .createTypeFromTypeInfo(componentTypeInfo, isNullable = true)
 
               val explodeFunction = ExplodeFunctionUtil.explodeTableFuncFromType(map.typeInfo)
@@ -122,9 +124,11 @@ class LogicalUnnestRule(
           // create table function call
           val rexCall = cluster.getRexBuilder.makeCall(
             explodeSqlFunc,
-            uc.getInput.asInstanceOf[RelSubset]
-              .getOriginal.asInstanceOf[LogicalProject].getProjects
-          )
+            uc.getInput
+              .asInstanceOf[RelSubset]
+              .getOriginal
+              .asInstanceOf[LogicalProject]
+              .getProjects)
 
           // determine rel data type of unnest
           val rowType = componentType match {
@@ -133,8 +137,9 @@ class LogicalUnnestRule(
                 StructKind.FULLY_QUALIFIED,
                 ImmutableList.of(new RelDataTypeFieldImpl("f0", 0, componentType)))
             case _: RelRecordType => componentType
-            case _ => throw new TableException(
-              s"Unsupported component type in UNNEST: ${componentType.toString}")
+            case _ =>
+              throw new TableException(
+                s"Unsupported component type in UNNEST: ${componentType.toString}")
           }
 
           // create table function scan
@@ -159,7 +164,5 @@ class LogicalUnnestRule(
 }
 
 object LogicalUnnestRule {
-  val INSTANCE = new LogicalUnnestRule(
-    operand(classOf[LogicalCorrelate], any),
-    "LogicalUnnestRule")
+  val INSTANCE = new LogicalUnnestRule(operand(classOf[LogicalCorrelate], any), "LogicalUnnestRule")
 }

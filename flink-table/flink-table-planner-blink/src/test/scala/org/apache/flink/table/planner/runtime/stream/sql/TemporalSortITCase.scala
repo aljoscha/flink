@@ -201,7 +201,7 @@ class TemporalSortITCase(mode: StateBackendMode) extends StreamingWithStateTestB
       "20,6,Comment#14",
       "21,6,Comment#15")
 
-     assertEquals(expected, sink.getRetractResults)
+    assertEquals(expected, sink.getRetractResults)
   }
 
 }

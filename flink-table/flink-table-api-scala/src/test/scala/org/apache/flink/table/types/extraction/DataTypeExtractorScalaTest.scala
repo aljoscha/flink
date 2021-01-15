@@ -58,59 +58,50 @@ object DataTypeExtractorScalaTest {
     TestSpec
       .forType(classOf[ScalaSimplePojo])
       .expectDataType(getSimplePojoDataType(classOf[ScalaSimplePojo])),
-
     // complex nested structured type annotation on top of type
     TestSpec
       .forType(classOf[ScalaComplexPojo])
       .lookupExpects(classOf[Any])
       .expectDataType(getComplexPojoDataType(classOf[ScalaComplexPojo], classOf[ScalaSimplePojo])),
-
     // assigning constructor defines field order
     TestSpec
-        .forType(classOf[ScalaPojoWithCustomFieldOrder])
-        .expectDataType(getPojoWithCustomOrderDataType(classOf[ScalaPojoWithCustomFieldOrder])),
-
+      .forType(classOf[ScalaPojoWithCustomFieldOrder])
+      .expectDataType(getPojoWithCustomOrderDataType(classOf[ScalaPojoWithCustomFieldOrder])),
     // many annotations that partially override each other
     TestSpec
-        .forType(classOf[ScalaSimplePojoWithManyAnnotations])
-        .expectDataType(getSimplePojoDataType(classOf[ScalaSimplePojoWithManyAnnotations])),
-
+      .forType(classOf[ScalaSimplePojoWithManyAnnotations])
+      .expectDataType(getSimplePojoDataType(classOf[ScalaSimplePojoWithManyAnnotations])),
     // invalid Scala tuple
     TestSpec
-        .forType(classOf[ScalaPojoWithInvalidTuple])
-        .expectErrorMessage("Scala tuples are not supported. " +
-          "Use case classes or 'org.apache.flink.types.Row' instead."),
-
+      .forType(classOf[ScalaPojoWithInvalidTuple])
+      .expectErrorMessage("Scala tuples are not supported. " +
+        "Use case classes or 'org.apache.flink.types.Row' instead."),
     // invalid Scala map
     TestSpec
-        .forType(classOf[ScalaPojoWithInvalidMap])
-        .expectErrorMessage("Scala collections are not supported. " +
-          "See the documentation for supported classes or treat them as RAW types.")
-  )
+      .forType(classOf[ScalaPojoWithInvalidMap])
+      .expectErrorMessage("Scala collections are not supported. " +
+        "See the documentation for supported classes or treat them as RAW types."))
 
   // ----------------------------------------------------------------------------------------------
   // Test classes for extraction
   // ----------------------------------------------------------------------------------------------
 
   case class ScalaSimplePojo(
-    intField: Integer,
-    primitiveBooleanField: Boolean,
-    primitiveIntField: Int,
-    stringField: String
-  )
+      intField: Integer,
+      primitiveBooleanField: Boolean,
+      primitiveIntField: Int,
+      stringField: String)
 
   @DataTypeHint(allowRawGlobally = HintFlag.TRUE)
   case class ScalaComplexPojo(
-    var mapField: util.Map[String, Integer],
-    var simplePojoField: ScalaSimplePojo,
-    var someObject: Any
-  )
+      var mapField: util.Map[String, Integer],
+      var simplePojoField: ScalaSimplePojo,
+      var someObject: Any)
 
   case class ScalaPojoWithCustomFieldOrder(
-    z: java.lang.Long,
-    y: java.lang.Boolean,
-    x: java.lang.Integer
-  )
+      z: java.lang.Long,
+      y: java.lang.Boolean,
+      x: java.lang.Integer)
 
   @DataTypeHint(forceRawPattern = Array("java.lang."))
   class ScalaSimplePojoWithManyAnnotations {

@@ -35,27 +35,27 @@ import org.apache.calcite.schema.impl.AbstractTable
 import java.util.function.{Function => JFunction}
 
 /**
-  * Abstract class which define the interfaces required to convert a [[TableSource]] to
-  * a Calcite Table.
-  *
-  * @param tableSource The [[TableSource]] for which is converted to a Calcite Table.
-  * @param isStreamingMode A flag that tells if the current table is in stream mode.
-  * @param statistic The table statistics.
-  */
+ * Abstract class which define the interfaces required to convert a [[TableSource]] to
+ * a Calcite Table.
+ *
+ * @param tableSource The [[TableSource]] for which is converted to a Calcite Table.
+ * @param isStreamingMode A flag that tells if the current table is in stream mode.
+ * @param statistic The table statistics.
+ */
 class TableSourceTable[T](
     val tableSchema: TableSchema,
     val tableSource: TableSource[T],
     val isStreamingMode: Boolean,
     val statistic: FlinkStatistic)
-  extends AbstractTable {
+    extends AbstractTable {
 
   TableSourceValidation.validateTableSource(tableSource, tableSchema)
 
   /**
-    * Returns statistics of current table
-    *
-    * @return statistics of current table
-    */
+   * Returns statistics of current table
+   *
+   * @return statistics of current table
+   */
   override def getStatistic: Statistic = statistic
 
   // We must enrich logical schema from catalog table with physical type coming from table source.
@@ -80,15 +80,15 @@ class TableSourceTable[T](
       tableSource,
       tableSchema.getTableColumns,
       isStreamingMode,
-      nameMapping
-    )
+      nameMapping)
 
     val typeInfos = if (LogicalTypeChecks.isCompositeType(producedDataType.getLogicalType)) {
       val physicalSchema = DataTypeUtils.expandCompositeTypeToSchema(producedDataType)
-      fieldIndexes.map(mapIndex(_,
-        idx =>
-          TypeConversions.fromDataTypeToLegacyInfo(physicalSchema.getFieldDataType(idx).get()))
-      )
+      fieldIndexes.map(
+        mapIndex(
+          _,
+          idx =>
+            TypeConversions.fromDataTypeToLegacyInfo(physicalSchema.getFieldDataType(idx).get())))
     } else {
       fieldIndexes.map(mapIndex(_, _ => TypeConversions.fromDataTypeToLegacyInfo(producedDataType)))
     }
@@ -98,13 +98,13 @@ class TableSourceTable[T](
 
   def mapIndex(idx: Int, mapNonMarker: Int => TypeInformation[_]): TypeInformation[_] = {
     idx match {
-      case TimeIndicatorTypeInfo.ROWTIME_BATCH_MARKER => Types.SQL_TIMESTAMP()
+      case TimeIndicatorTypeInfo.ROWTIME_BATCH_MARKER  => Types.SQL_TIMESTAMP()
       case TimeIndicatorTypeInfo.PROCTIME_BATCH_MARKER => Types.SQL_TIMESTAMP()
       case TimeIndicatorTypeInfo.PROCTIME_STREAM_MARKER =>
         TimeIndicatorTypeInfo.PROCTIME_INDICATOR
       case TimeIndicatorTypeInfo.ROWTIME_STREAM_MARKER => TimeIndicatorTypeInfo.ROWTIME_INDICATOR
       case _ =>
-       mapNonMarker(idx)
+        mapNonMarker(idx)
     }
   }
 }

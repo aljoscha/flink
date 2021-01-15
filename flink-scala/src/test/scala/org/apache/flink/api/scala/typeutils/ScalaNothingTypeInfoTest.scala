@@ -21,11 +21,9 @@ package org.apache.flink.api.scala.typeutils
 import org.apache.flink.api.common.typeutils.TypeInformationTestBase
 
 /**
-  * Test for [[ScalaNothingTypeInfo]].
-  */
+ * Test for [[ScalaNothingTypeInfo]].
+ */
 class ScalaNothingTypeInfoTest extends TypeInformationTestBase[ScalaNothingTypeInfo] {
 
-  override protected def getTestData: Array[ScalaNothingTypeInfo] = Array(
-    new ScalaNothingTypeInfo
-  )
+  override protected def getTestData: Array[ScalaNothingTypeInfo] = Array(new ScalaNothingTypeInfo)
 }

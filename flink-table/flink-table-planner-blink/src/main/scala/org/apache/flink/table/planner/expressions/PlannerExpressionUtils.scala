@@ -27,12 +27,12 @@ object PlannerExpressionUtils {
 
   private[flink] def isTimeIntervalLiteral(expr: PlannerExpression): Boolean = expr match {
     case Literal(_, TimeIntervalTypeInfo.INTERVAL_MILLIS) => true
-    case _ => false
+    case _                                                => false
   }
 
   private[flink] def isRowCountLiteral(expr: PlannerExpression): Boolean = expr match {
     case Literal(_, BasicTypeInfo.LONG_TYPE_INFO) => true
-    case _ => false
+    case _                                        => false
   }
 
   private[flink] def isTimeAttribute(expr: PlannerExpression): Boolean = expr match {
@@ -43,14 +43,14 @@ object PlannerExpressionUtils {
 
   private[flink] def isRowtimeAttribute(expr: PlannerExpression): Boolean = expr match {
     case r: PlannerResolvedFieldReference
-      if FlinkTypeFactory.isRowtimeIndicatorType(r.resultType) =>
+        if FlinkTypeFactory.isRowtimeIndicatorType(r.resultType) =>
       true
     case _ => false
   }
 
   private[flink] def isProctimeAttribute(expr: PlannerExpression): Boolean = expr match {
     case r: PlannerResolvedFieldReference
-      if FlinkTypeFactory.isProctimeIndicatorType(r.resultType) =>
+        if FlinkTypeFactory.isProctimeIndicatorType(r.resultType) =>
       true
     case _ => false
   }
@@ -63,6 +63,6 @@ object PlannerExpressionUtils {
 
   private[flink] def toLong(expr: PlannerExpression): Long = expr match {
     case Literal(value: Long, BasicTypeInfo.LONG_TYPE_INFO) => value
-    case _ => throw new IllegalArgumentException()
+    case _                                                  => throw new IllegalArgumentException()
   }
 }

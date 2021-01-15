@@ -22,7 +22,12 @@ import java.util
 
 import org.apache.flink.api.common.ExecutionConfig
 import org.apache.flink.api.common.typeutils.TypeSerializerUpgradeTestBase.TestSpecification
-import org.apache.flink.api.common.typeutils.{TypeSerializer, TypeSerializerMatchers, TypeSerializerSchemaCompatibility, TypeSerializerUpgradeTestBase}
+import org.apache.flink.api.common.typeutils.{
+  TypeSerializer,
+  TypeSerializerMatchers,
+  TypeSerializerSchemaCompatibility,
+  TypeSerializerUpgradeTestBase
+}
 import org.apache.flink.api.scala.createTypeInformation
 import org.apache.flink.api.scala.types.CustomCaseClass
 import org.apache.flink.testutils.migration.MigrationVersion
@@ -35,10 +40,8 @@ import org.junit.runners.Parameterized
  * A [[TypeSerializerUpgradeTestBase]] for [[ScalaCaseClassSerializer]].
  */
 @RunWith(classOf[Parameterized])
-class ScalaCaseClassSerializerUpgradeTest(
-  spec: TestSpecification[CustomCaseClass, CustomCaseClass]
-) extends TypeSerializerUpgradeTestBase[CustomCaseClass, CustomCaseClass](spec) {
-}
+class ScalaCaseClassSerializerUpgradeTest(spec: TestSpecification[CustomCaseClass, CustomCaseClass])
+    extends TypeSerializerUpgradeTestBase[CustomCaseClass, CustomCaseClass](spec) {}
 
 object ScalaCaseClassSerializerUpgradeTest {
 
@@ -56,8 +59,8 @@ object ScalaCaseClassSerializerUpgradeTest {
       new util.ArrayList[TypeSerializerUpgradeTestBase.TestSpecification[_, _]]
     for (migrationVersion <- TypeSerializerUpgradeTestBase.MIGRATION_VERSIONS) {
       testSpecifications.add(
-        new TypeSerializerUpgradeTestBase.TestSpecification[CustomCaseClass, CustomCaseClass]
-        ("scala-case-class-serializer",
+        new TypeSerializerUpgradeTestBase.TestSpecification[CustomCaseClass, CustomCaseClass](
+          "scala-case-class-serializer",
           migrationVersion,
           classOf[ScalaCaseClassSerializerSetup],
           classOf[ScalaCaseClassSerializerVerifier]))
@@ -82,8 +85,8 @@ object ScalaCaseClassSerializerUpgradeTest {
 
     override def testDataMatcher: Matcher[CustomCaseClass] = is(CustomCaseClass("flink", 11))
 
-    override def schemaCompatibilityMatcher(version: MigrationVersion):
-        Matcher[TypeSerializerSchemaCompatibility[CustomCaseClass]] =
+    override def schemaCompatibilityMatcher(
+        version: MigrationVersion): Matcher[TypeSerializerSchemaCompatibility[CustomCaseClass]] =
       TypeSerializerMatchers.isCompatibleAsIs[CustomCaseClass]()
   }
 }

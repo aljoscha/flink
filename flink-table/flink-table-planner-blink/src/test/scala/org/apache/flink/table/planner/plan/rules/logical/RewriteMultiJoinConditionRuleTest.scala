@@ -28,8 +28,8 @@ import org.apache.calcite.tools.RuleSets
 import org.junit.{Before, Test}
 
 /**
-  * Test for [[RewriteMultiJoinConditionRule]].
-  */
+ * Test for [[RewriteMultiJoinConditionRule]].
+ */
 class RewriteMultiJoinConditionRuleTest extends TableTestBase {
   private val util = batchTestUtil()
 
@@ -38,27 +38,33 @@ class RewriteMultiJoinConditionRuleTest extends TableTestBase {
     val program = new FlinkChainedProgram[BatchOptimizeContext]()
     program.addLast(
       "rules",
-      FlinkGroupProgramBuilder.newBuilder[BatchOptimizeContext]
-        .addProgram(FlinkHepRuleSetProgramBuilder.newBuilder
-          .setHepRulesExecutionType(HEP_RULES_EXECUTION_TYPE.RULE_COLLECTION)
-          .setHepMatchOrder(HepMatchOrder.BOTTOM_UP)
-          .add(RuleSets.ofList(
-            CoreRules.FILTER_INTO_JOIN,
-            CoreRules.JOIN_CONDITION_PUSH))
-          .build(), "push filter into join")
-        .addProgram(FlinkHepRuleSetProgramBuilder.newBuilder
-          .setHepRulesExecutionType(HEP_RULES_EXECUTION_TYPE.RULE_COLLECTION)
-          .setHepMatchOrder(HepMatchOrder.BOTTOM_UP)
-          .add(RuleSets.ofList(
-            CoreRules.PROJECT_MULTI_JOIN_MERGE,
-            CoreRules.FILTER_MULTI_JOIN_MERGE,
-            CoreRules.JOIN_TO_MULTI_JOIN))
-          .build(), "merge join to MultiJoin")
-        .addProgram(FlinkHepRuleSetProgramBuilder.newBuilder
-          .setHepRulesExecutionType(HEP_RULES_EXECUTION_TYPE.RULE_SEQUENCE)
-          .setHepMatchOrder(HepMatchOrder.BOTTOM_UP)
-          .add(RuleSets.ofList(RewriteMultiJoinConditionRule.INSTANCE))
-          .build(), "RewriteMultiJoinConditionRule")
+      FlinkGroupProgramBuilder
+        .newBuilder[BatchOptimizeContext]
+        .addProgram(
+          FlinkHepRuleSetProgramBuilder.newBuilder
+            .setHepRulesExecutionType(HEP_RULES_EXECUTION_TYPE.RULE_COLLECTION)
+            .setHepMatchOrder(HepMatchOrder.BOTTOM_UP)
+            .add(RuleSets.ofList(CoreRules.FILTER_INTO_JOIN, CoreRules.JOIN_CONDITION_PUSH))
+            .build(),
+          "push filter into join")
+        .addProgram(
+          FlinkHepRuleSetProgramBuilder.newBuilder
+            .setHepRulesExecutionType(HEP_RULES_EXECUTION_TYPE.RULE_COLLECTION)
+            .setHepMatchOrder(HepMatchOrder.BOTTOM_UP)
+            .add(
+              RuleSets.ofList(
+                CoreRules.PROJECT_MULTI_JOIN_MERGE,
+                CoreRules.FILTER_MULTI_JOIN_MERGE,
+                CoreRules.JOIN_TO_MULTI_JOIN))
+            .build(),
+          "merge join to MultiJoin")
+        .addProgram(
+          FlinkHepRuleSetProgramBuilder.newBuilder
+            .setHepRulesExecutionType(HEP_RULES_EXECUTION_TYPE.RULE_SEQUENCE)
+            .setHepMatchOrder(HepMatchOrder.BOTTOM_UP)
+            .add(RuleSets.ofList(RewriteMultiJoinConditionRule.INSTANCE))
+            .build(),
+          "RewriteMultiJoinConditionRule")
         .build())
 
     util.replaceBatchProgram(program)

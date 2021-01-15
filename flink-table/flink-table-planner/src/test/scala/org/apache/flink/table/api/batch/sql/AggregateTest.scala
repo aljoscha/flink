@@ -26,8 +26,8 @@ import org.apache.flink.table.utils.TableTestUtil._
 import org.junit.Test
 
 /**
-  * Test for testing aggregate plans.
-  */
+ * Test for testing aggregate plans.
+ */
 class AggregateTest extends TableTestBase {
 
   @Test
@@ -40,11 +40,7 @@ class AggregateTest extends TableTestBase {
     val aggregate = unaryNode(
       "DataSetAggregate",
       batchTableNode(table),
-      term("select",
-        "AVG(a) AS EXPR$0",
-        "SUM(b) AS EXPR$1",
-        "COUNT(c) AS EXPR$2")
-    )
+      term("select", "AVG(a) AS EXPR$0", "SUM(b) AS EXPR$1", "COUNT(c) AS EXPR$2"))
     util.verifySql(sqlQuery, aggregate)
   }
 
@@ -59,17 +55,12 @@ class AggregateTest extends TableTestBase {
       "DataSetCalc",
       batchTableNode(table),
       term("select", "CAST(1) AS a", "b", "c"),
-      term("where", "=(a, 1)")
-    )
+      term("where", "=(a, 1)"))
 
     val aggregate = unaryNode(
       "DataSetAggregate",
       calcNode,
-      term("select",
-        "AVG(a) AS EXPR$0",
-        "SUM(b) AS EXPR$1",
-        "COUNT(c) AS EXPR$2")
-    )
+      term("select", "AVG(a) AS EXPR$0", "SUM(b) AS EXPR$1", "COUNT(c) AS EXPR$2"))
     util.verifySql(sqlQuery, aggregate)
   }
 
@@ -84,18 +75,17 @@ class AggregateTest extends TableTestBase {
       "DataSetCalc",
       batchTableNode(table),
       term("select", "CAST(1) AS a", "b", "c", "c._1 AS $f3"),
-      term("where", "=(a, 1)")
-    )
+      term("where", "=(a, 1)"))
 
     val aggregate = unaryNode(
       "DataSetAggregate",
       calcNode,
-      term("select",
+      term(
+        "select",
         "AVG(a) AS EXPR$0",
         "SUM(b) AS EXPR$1",
         "COUNT(c) AS EXPR$2",
-        "SUM($f3) AS EXPR$3")
-    )
+        "SUM($f3) AS EXPR$3"))
 
     util.verifySql(sqlQuery, aggregate)
   }
@@ -108,23 +98,11 @@ class AggregateTest extends TableTestBase {
     val sqlQuery = "SELECT avg(a), sum(b), count(c) FROM MyTable GROUP BY a"
 
     val aggregate = unaryNode(
-        "DataSetAggregate",
-        batchTableNode(table),
-        term("groupBy", "a"),
-        term("select",
-          "a",
-          "AVG(a) AS EXPR$0",
-          "SUM(b) AS EXPR$1",
-          "COUNT(c) AS EXPR$2")
-    )
-    val expected = unaryNode(
-        "DataSetCalc",
-        aggregate,
-        term("select",
-          "EXPR$0",
-          "EXPR$1",
-          "EXPR$2")
-    )
+      "DataSetAggregate",
+      batchTableNode(table),
+      term("groupBy", "a"),
+      term("select", "a", "AVG(a) AS EXPR$0", "SUM(b) AS EXPR$1", "COUNT(c) AS EXPR$2"))
+    val expected = unaryNode("DataSetCalc", aggregate, term("select", "EXPR$0", "EXPR$1", "EXPR$2"))
     util.verifySql(sqlQuery, expected)
   }
 
@@ -138,28 +116,15 @@ class AggregateTest extends TableTestBase {
     val calcNode = unaryNode(
       "DataSetCalc",
       batchTableNode(table),
-      term("select","CAST(1) AS a", "b", "c") ,
-      term("where","=(a, 1)")
-    )
+      term("select", "CAST(1) AS a", "b", "c"),
+      term("where", "=(a, 1)"))
 
     val aggregate = unaryNode(
-        "DataSetAggregate",
-        calcNode,
-        term("groupBy", "a"),
-        term("select",
-          "a",
-          "AVG(a) AS EXPR$0",
-          "SUM(b) AS EXPR$1",
-          "COUNT(c) AS EXPR$2")
-    )
-    val expected = unaryNode(
-        "DataSetCalc",
-        aggregate,
-        term("select",
-          "EXPR$0",
-          "EXPR$1",
-          "EXPR$2")
-    )
+      "DataSetAggregate",
+      calcNode,
+      term("groupBy", "a"),
+      term("select", "a", "AVG(a) AS EXPR$0", "SUM(b) AS EXPR$1", "COUNT(c) AS EXPR$2"))
+    val expected = unaryNode("DataSetCalc", aggregate, term("select", "EXPR$0", "EXPR$1", "EXPR$2"))
     util.verifySql(sqlQuery, expected)
   }
 }

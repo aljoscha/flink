@@ -18,7 +18,12 @@
 
 package org.apache.flink.table.planner.expressions.utils
 
-import org.apache.flink.api.common.typeinfo.{BasicTypeInfo, LocalTimeTypeInfo, SqlTimeTypeInfo, TypeInformation}
+import org.apache.flink.api.common.typeinfo.{
+  BasicTypeInfo,
+  LocalTimeTypeInfo,
+  SqlTimeTypeInfo,
+  TypeInformation
+}
 import org.apache.flink.api.java.typeutils.RowTypeInfo
 import org.apache.flink.table.api.Types
 import org.apache.flink.table.data.TimestampData
@@ -341,13 +346,12 @@ object Func20 extends ScalarFunction {
   }
 
   override def getParameterTypes(signature: Array[Class[_]]): Array[TypeInformation[_]] = {
-    Array(new RowTypeInfo(Types.INT, Types.BOOLEAN,
-      new RowTypeInfo(Types.INT, Types.INT, Types.INT)))
+    Array(
+      new RowTypeInfo(Types.INT, Types.BOOLEAN, new RowTypeInfo(Types.INT, Types.INT, Types.INT)))
   }
 
   override def getResultType(signature: Array[Class[_]]): TypeInformation[_] = {
-    new RowTypeInfo(Types.INT, Types.BOOLEAN,
-      new RowTypeInfo(Types.INT, Types.INT, Types.INT))
+    new RowTypeInfo(Types.INT, Types.BOOLEAN, new RowTypeInfo(Types.INT, Types.INT, Types.INT))
   }
 }
 
@@ -472,10 +476,9 @@ object Func30 extends ScalarFunction {
     Array(BasicTypeInfo.INSTANT_TYPE_INFO)
 }
 
-
 /**
-  * A scalar function that always returns TRUE if opened correctly.
-  */
+ * A scalar function that always returns TRUE if opened correctly.
+ */
 @SerialVersionUID(1L)
 class FuncWithOpen extends ScalarFunction {
 

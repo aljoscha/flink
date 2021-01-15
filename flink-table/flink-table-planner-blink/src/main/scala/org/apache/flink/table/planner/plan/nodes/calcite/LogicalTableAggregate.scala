@@ -26,9 +26,9 @@ import org.apache.calcite.rel.core.{Aggregate, AggregateCall}
 import org.apache.calcite.util.ImmutableBitSet
 
 /**
-  * Sub-class of [[TableAggregate]] that is a relational expression which performs aggregations but
-  * outputs 0 or more records for a group. This class corresponds to Calcite logical rel.
-  */
+ * Sub-class of [[TableAggregate]] that is a relational expression which performs aggregations but
+ * outputs 0 or more records for a group. This class corresponds to Calcite logical rel.
+ */
 class LogicalTableAggregate(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -36,17 +36,10 @@ class LogicalTableAggregate(
     groupSet: ImmutableBitSet,
     groupSets: util.List[ImmutableBitSet],
     aggCalls: util.List[AggregateCall])
-  extends TableAggregate(cluster, traitSet, input, groupSet, groupSets, aggCalls) {
+    extends TableAggregate(cluster, traitSet, input, groupSet, groupSets, aggCalls) {
 
   override def copy(traitSet: RelTraitSet, inputs: util.List[RelNode]): TableAggregate = {
-    new LogicalTableAggregate(
-      cluster,
-      traitSet,
-      inputs.get(0),
-      groupSet,
-      groupSets,
-      aggCalls
-    )
+    new LogicalTableAggregate(cluster, traitSet, inputs.get(0), groupSet, groupSets, aggCalls)
   }
 }
 

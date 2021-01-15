@@ -28,20 +28,20 @@ import org.apache.flink.table.plan.nodes.dataset.DataSetSingleRowJoin
 import org.apache.flink.table.plan.nodes.logical.FlinkLogicalJoin
 
 class DataSetSingleRowJoinRule
-  extends ConverterRule(
-    classOf[FlinkLogicalJoin],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.DATASET,
-    "DataSetSingleRowJoinRule") {
+    extends ConverterRule(
+      classOf[FlinkLogicalJoin],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.DATASET,
+      "DataSetSingleRowJoinRule") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val join = call.rel(0).asInstanceOf[FlinkLogicalJoin]
 
     join.getJoinType match {
       case JoinRelType.INNER if isSingleRow(join.getLeft) || isSingleRow(join.getRight) => true
-      case JoinRelType.LEFT if isSingleRow(join.getRight) => true
-      case JoinRelType.RIGHT if isSingleRow(join.getLeft) => true
-      case _ => false
+      case JoinRelType.LEFT if isSingleRow(join.getRight)                               => true
+      case JoinRelType.RIGHT if isSingleRow(join.getLeft)                               => true
+      case _                                                                            => false
     }
   }
 
@@ -50,17 +50,17 @@ class DataSetSingleRowJoinRule
   }
 
   /**
-    * Recursively checks if a [[RelNode]] returns at most a single row.
-    * Input must be a global aggregation possibly followed by projections or filters.
-    */
+   * Recursively checks if a [[RelNode]] returns at most a single row.
+   * Input must be a global aggregation possibly followed by projections or filters.
+   */
   private def isSingleRow(node: RelNode): Boolean = {
     node match {
       case ss: RelSubset => isSingleRow(ss.getOriginal)
-      case lp: Project => isSingleRow(lp.getInput)
-      case lf: Filter => isSingleRow(lf.getInput)
-      case lc: Calc => isSingleRow(lc.getInput)
+      case lp: Project   => isSingleRow(lp.getInput)
+      case lf: Filter    => isSingleRow(lf.getInput)
+      case lc: Calc      => isSingleRow(lc.getInput)
       case la: Aggregate => la.getGroupSet.isEmpty
-      case _ => false
+      case _             => false
     }
   }
 

@@ -29,28 +29,29 @@ import org.apache.mesos.{SchedulerDriver, Protos}
 import scala.collection.mutable.{Map => MutableMap}
 
 /**
-  * Aggregate of monitored tasks.
-  *
-  * Routes messages between the scheduler and individual task monitor actors.
-  */
+ * Aggregate of monitored tasks.
+ *
+ * Routes messages between the scheduler and individual task monitor actors.
+ */
 class Tasks(
-     manager: ActorRef,
-     flinkConfig: Configuration,
-     schedulerDriver: SchedulerDriver,
-     taskMonitorCreator: (ActorRefFactory,TaskGoalState) => ActorRef) extends Actor {
+    manager: ActorRef,
+    flinkConfig: Configuration,
+    schedulerDriver: SchedulerDriver,
+    taskMonitorCreator: (ActorRefFactory, TaskGoalState) => ActorRef)
+    extends Actor {
 
   /**
-    * A map of task monitors by task ID.
-    */
-  private[scheduler] val taskMap: MutableMap[Protos.TaskID,ActorRef] = MutableMap()
+   * A map of task monitors by task ID.
+   */
+  private[scheduler] val taskMap: MutableMap[Protos.TaskID, ActorRef] = MutableMap()
 
   /**
-    * Cache of current connection state.
-    */
+   * Cache of current connection state.
+   */
   private[scheduler] var registered: Option[Any] = None
 
-  override def supervisorStrategy: SupervisorStrategy = AllForOneStrategy() {
-    case _ => Escalate
+  override def supervisorStrategy: SupervisorStrategy = AllForOneStrategy() { case _ =>
+    Escalate
   }
 
   override def receive: Receive = {
@@ -59,7 +60,7 @@ class Tasks(
       registered = None
       context.actorSelection("*").tell(msg, self)
 
-    case msg : Connected =>
+    case msg: Connected =>
       registered = Some(msg)
       context.actorSelection("*").tell(msg, self)
 
@@ -110,8 +111,8 @@ class Tasks(
 object Tasks {
 
   /**
-    * Create a tasks actor.
-    */
+   * Create a tasks actor.
+   */
   def createActorProps[T <: Tasks, M <: TaskMonitor](
       actorClass: Class[T],
       manager: ActorRef,

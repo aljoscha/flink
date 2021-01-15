@@ -26,7 +26,6 @@ import org.apache.flink.testutils.DeeplyEqualsChecker.CustomEqualityChecker
 import org.junit.Assert._
 import org.junit.Test
 
-
 object TupleSerializerTestInstance {
   val isProduct: BiFunction[AnyRef, AnyRef, JBoolean] =
     new BiFunction[AnyRef, AnyRef, JBoolean] {
@@ -36,10 +35,7 @@ object TupleSerializerTestInstance {
 
   val compareProduct: CustomEqualityChecker =
     new CustomEqualityChecker {
-      override def check(
-          o1: AnyRef,
-          o2: AnyRef,
-          checker: DeeplyEqualsChecker): Boolean = {
+      override def check(o1: AnyRef, o2: AnyRef, checker: DeeplyEqualsChecker): Boolean = {
         val p1 = o1.asInstanceOf[Product].productIterator
         val p2 = o2.asInstanceOf[Product].productIterator
 
@@ -55,19 +51,20 @@ object TupleSerializerTestInstance {
     }
 }
 
-class TupleSerializerTestInstance[T <: Product] (
+class TupleSerializerTestInstance[T <: Product](
     serializer: TypeSerializer[T],
     typeClass: Class[T],
     length: Int,
     testData: Array[T])
-  extends SerializerTestInstance[T](
-    new DeeplyEqualsChecker()
-      .withCustomCheck(TupleSerializerTestInstance.isProduct,
-        TupleSerializerTestInstance.compareProduct),
-    serializer,
-    typeClass,
-    length,
-    testData: _*) {
+    extends SerializerTestInstance[T](
+      new DeeplyEqualsChecker()
+        .withCustomCheck(
+          TupleSerializerTestInstance.isProduct,
+          TupleSerializerTestInstance.compareProduct),
+      serializer,
+      typeClass,
+      length,
+      testData: _*) {
 
   @Test
   override def testInstantiate(): Unit = {
@@ -80,8 +77,7 @@ class TupleSerializerTestInstance[T <: Product] (
       // We cannot check this because Tuple1 instances are not actually of type Tuple1
       // but something like Tuple1$mcI$sp
 //      assertEquals("Type of the instantiated object is wrong.", tpe, instance.getClass)
-    }
-    catch {
+    } catch {
       case e: Exception => {
         System.err.println(e.getMessage)
         e.printStackTrace()
@@ -90,4 +86,3 @@ class TupleSerializerTestInstance[T <: Product] (
     }
   }
 }
-

@@ -37,8 +37,8 @@ import org.apache.flink.table.typeutils.TimeIntervalTypeInfo
 import scala.collection.mutable
 
 /**
-  * Global hub for user-defined and built-in advanced SQL functions.
-  */
+ * Global hub for user-defined and built-in advanced SQL functions.
+ */
 object FunctionGenerator {
 
   private val sqlFunctions: mutable.Map[(SqlOperator, Seq[TypeInformation[_]]), CallGenerator] =
@@ -77,17 +77,9 @@ object FunctionGenerator {
     INT_TYPE_INFO,
     BuiltInMethod.CHAR_LENGTH.method)
 
-  addSqlFunctionMethod(
-    UPPER,
-    Seq(STRING_TYPE_INFO),
-    STRING_TYPE_INFO,
-    BuiltInMethod.UPPER.method)
+  addSqlFunctionMethod(UPPER, Seq(STRING_TYPE_INFO), STRING_TYPE_INFO, BuiltInMethod.UPPER.method)
 
-  addSqlFunctionMethod(
-    LOWER,
-    Seq(STRING_TYPE_INFO),
-    STRING_TYPE_INFO,
-    BuiltInMethod.LOWER.method)
+  addSqlFunctionMethod(LOWER, Seq(STRING_TYPE_INFO), STRING_TYPE_INFO, BuiltInMethod.LOWER.method)
 
   addSqlFunctionMethod(
     INITCAP,
@@ -177,29 +169,13 @@ object FunctionGenerator {
     STRING_TYPE_INFO,
     BuiltInMethods.FROMBASE64)
 
-  addSqlFunctionMethod(
-    TO_BASE64,
-    Seq(STRING_TYPE_INFO),
-    STRING_TYPE_INFO,
-    BuiltInMethods.TOBASE64)
+  addSqlFunctionMethod(TO_BASE64, Seq(STRING_TYPE_INFO), STRING_TYPE_INFO, BuiltInMethods.TOBASE64)
 
-  addSqlFunctionMethod(
-    UUID,
-    Seq(),
-    STRING_TYPE_INFO,
-    BuiltInMethods.UUID)
+  addSqlFunctionMethod(UUID, Seq(), STRING_TYPE_INFO, BuiltInMethods.UUID)
 
-  addSqlFunctionMethod(
-    LTRIM,
-    Seq(STRING_TYPE_INFO),
-    STRING_TYPE_INFO,
-    BuiltInMethod.LTRIM.method)
+  addSqlFunctionMethod(LTRIM, Seq(STRING_TYPE_INFO), STRING_TYPE_INFO, BuiltInMethod.LTRIM.method)
 
-  addSqlFunctionMethod(
-    RTRIM,
-    Seq(STRING_TYPE_INFO),
-    STRING_TYPE_INFO,
-    BuiltInMethod.RTRIM.method)
+  addSqlFunctionMethod(RTRIM, Seq(STRING_TYPE_INFO), STRING_TYPE_INFO, BuiltInMethod.RTRIM.method)
 
   addSqlFunctionMethod(
     REPEAT,
@@ -211,53 +187,21 @@ object FunctionGenerator {
   // Arithmetic functions
   // ----------------------------------------------------------------------------------------------
 
-  addSqlFunctionMethod(
-    LOG10,
-    Seq(DOUBLE_TYPE_INFO),
-    DOUBLE_TYPE_INFO,
-    BuiltInMethods.LOG10)
+  addSqlFunctionMethod(LOG10, Seq(DOUBLE_TYPE_INFO), DOUBLE_TYPE_INFO, BuiltInMethods.LOG10)
 
-  addSqlFunctionMethod(
-    LOG2,
-    Seq(DOUBLE_TYPE_INFO),
-    DOUBLE_TYPE_INFO,
-    BuiltInMethods.LOG2)
+  addSqlFunctionMethod(LOG2, Seq(DOUBLE_TYPE_INFO), DOUBLE_TYPE_INFO, BuiltInMethods.LOG2)
 
-  addSqlFunctionMethod(
-    COSH,
-    Seq(DOUBLE_TYPE_INFO),
-    DOUBLE_TYPE_INFO,
-    BuiltInMethods.COSH)
+  addSqlFunctionMethod(COSH, Seq(DOUBLE_TYPE_INFO), DOUBLE_TYPE_INFO, BuiltInMethods.COSH)
 
-  addSqlFunctionMethod(
-    COSH,
-    Seq(BIG_DEC_TYPE_INFO),
-    DOUBLE_TYPE_INFO,
-    BuiltInMethods.COSH_DEC)
+  addSqlFunctionMethod(COSH, Seq(BIG_DEC_TYPE_INFO), DOUBLE_TYPE_INFO, BuiltInMethods.COSH_DEC)
 
-  addSqlFunctionMethod(
-    LN,
-    Seq(DOUBLE_TYPE_INFO),
-    DOUBLE_TYPE_INFO,
-    BuiltInMethods.LN)
+  addSqlFunctionMethod(LN, Seq(DOUBLE_TYPE_INFO), DOUBLE_TYPE_INFO, BuiltInMethods.LN)
 
-  addSqlFunctionMethod(
-    SINH,
-    Seq(DOUBLE_TYPE_INFO),
-    DOUBLE_TYPE_INFO,
-    BuiltInMethods.SINH)
+  addSqlFunctionMethod(SINH, Seq(DOUBLE_TYPE_INFO), DOUBLE_TYPE_INFO, BuiltInMethods.SINH)
 
-  addSqlFunctionMethod(
-    SINH,
-    Seq(BIG_DEC_TYPE_INFO),
-    DOUBLE_TYPE_INFO,
-    BuiltInMethods.SINH_DEC)
+  addSqlFunctionMethod(SINH, Seq(BIG_DEC_TYPE_INFO), DOUBLE_TYPE_INFO, BuiltInMethods.SINH_DEC)
 
-  addSqlFunctionMethod(
-    EXP,
-    Seq(DOUBLE_TYPE_INFO),
-    DOUBLE_TYPE_INFO,
-    BuiltInMethods.EXP)
+  addSqlFunctionMethod(EXP, Seq(DOUBLE_TYPE_INFO), DOUBLE_TYPE_INFO, BuiltInMethods.EXP)
 
   addSqlFunctionMethod(
     POWER,
@@ -277,131 +221,49 @@ object FunctionGenerator {
     DOUBLE_TYPE_INFO,
     BuiltInMethods.POWER_DEC_DEC)
 
-  addSqlFunction(
-    ABS,
-    Seq(DOUBLE_TYPE_INFO),
-    new MultiTypeMethodCallGen(BuiltInMethods.ABS))
+  addSqlFunction(ABS, Seq(DOUBLE_TYPE_INFO), new MultiTypeMethodCallGen(BuiltInMethods.ABS))
 
-  addSqlFunction(
-    ABS,
-    Seq(BIG_DEC_TYPE_INFO),
-    new MultiTypeMethodCallGen(BuiltInMethods.ABS_DEC))
+  addSqlFunction(ABS, Seq(BIG_DEC_TYPE_INFO), new MultiTypeMethodCallGen(BuiltInMethods.ABS_DEC))
 
-  addSqlFunction(
-    FLOOR,
-    Seq(DOUBLE_TYPE_INFO),
-    new FloorCeilCallGen(BuiltInMethod.FLOOR.method))
+  addSqlFunction(FLOOR, Seq(DOUBLE_TYPE_INFO), new FloorCeilCallGen(BuiltInMethod.FLOOR.method))
 
-  addSqlFunction(
-    FLOOR,
-    Seq(BIG_DEC_TYPE_INFO),
-    new FloorCeilCallGen(BuiltInMethod.FLOOR.method))
+  addSqlFunction(FLOOR, Seq(BIG_DEC_TYPE_INFO), new FloorCeilCallGen(BuiltInMethod.FLOOR.method))
 
-  addSqlFunction(
-    CEIL,
-    Seq(DOUBLE_TYPE_INFO),
-    new FloorCeilCallGen(BuiltInMethod.CEIL.method))
+  addSqlFunction(CEIL, Seq(DOUBLE_TYPE_INFO), new FloorCeilCallGen(BuiltInMethod.CEIL.method))
 
-  addSqlFunction(
-    CEIL,
-    Seq(BIG_DEC_TYPE_INFO),
-    new FloorCeilCallGen(BuiltInMethod.CEIL.method))
+  addSqlFunction(CEIL, Seq(BIG_DEC_TYPE_INFO), new FloorCeilCallGen(BuiltInMethod.CEIL.method))
 
-  addSqlFunctionMethod(
-    SIN,
-    Seq(DOUBLE_TYPE_INFO),
-    DOUBLE_TYPE_INFO,
-    BuiltInMethods.SIN)
+  addSqlFunctionMethod(SIN, Seq(DOUBLE_TYPE_INFO), DOUBLE_TYPE_INFO, BuiltInMethods.SIN)
 
-  addSqlFunctionMethod(
-    SIN,
-    Seq(BIG_DEC_TYPE_INFO),
-    DOUBLE_TYPE_INFO,
-    BuiltInMethods.SIN_DEC)
+  addSqlFunctionMethod(SIN, Seq(BIG_DEC_TYPE_INFO), DOUBLE_TYPE_INFO, BuiltInMethods.SIN_DEC)
 
-  addSqlFunctionMethod(
-    COS,
-    Seq(DOUBLE_TYPE_INFO),
-    DOUBLE_TYPE_INFO,
-    BuiltInMethods.COS)
+  addSqlFunctionMethod(COS, Seq(DOUBLE_TYPE_INFO), DOUBLE_TYPE_INFO, BuiltInMethods.COS)
 
-  addSqlFunctionMethod(
-    COS,
-    Seq(BIG_DEC_TYPE_INFO),
-    DOUBLE_TYPE_INFO,
-    BuiltInMethods.COS_DEC)
+  addSqlFunctionMethod(COS, Seq(BIG_DEC_TYPE_INFO), DOUBLE_TYPE_INFO, BuiltInMethods.COS_DEC)
 
-  addSqlFunctionMethod(
-    TAN,
-    Seq(DOUBLE_TYPE_INFO),
-    DOUBLE_TYPE_INFO,
-    BuiltInMethods.TAN)
+  addSqlFunctionMethod(TAN, Seq(DOUBLE_TYPE_INFO), DOUBLE_TYPE_INFO, BuiltInMethods.TAN)
 
-  addSqlFunctionMethod(
-    TAN,
-    Seq(BIG_DEC_TYPE_INFO),
-    DOUBLE_TYPE_INFO,
-    BuiltInMethods.TAN_DEC)
+  addSqlFunctionMethod(TAN, Seq(BIG_DEC_TYPE_INFO), DOUBLE_TYPE_INFO, BuiltInMethods.TAN_DEC)
 
-  addSqlFunctionMethod(
-    TANH,
-    Seq(DOUBLE_TYPE_INFO),
-    DOUBLE_TYPE_INFO,
-    BuiltInMethods.TANH)
+  addSqlFunctionMethod(TANH, Seq(DOUBLE_TYPE_INFO), DOUBLE_TYPE_INFO, BuiltInMethods.TANH)
 
-  addSqlFunctionMethod(
-    TANH,
-    Seq(BIG_DEC_TYPE_INFO),
-    DOUBLE_TYPE_INFO,
-    BuiltInMethods.TANH_DEC)
+  addSqlFunctionMethod(TANH, Seq(BIG_DEC_TYPE_INFO), DOUBLE_TYPE_INFO, BuiltInMethods.TANH_DEC)
 
-  addSqlFunctionMethod(
-    COT,
-    Seq(DOUBLE_TYPE_INFO),
-    DOUBLE_TYPE_INFO,
-    BuiltInMethods.COT)
+  addSqlFunctionMethod(COT, Seq(DOUBLE_TYPE_INFO), DOUBLE_TYPE_INFO, BuiltInMethods.COT)
 
-  addSqlFunctionMethod(
-    COT,
-    Seq(BIG_DEC_TYPE_INFO),
-    DOUBLE_TYPE_INFO,
-    BuiltInMethods.COT_DEC)
+  addSqlFunctionMethod(COT, Seq(BIG_DEC_TYPE_INFO), DOUBLE_TYPE_INFO, BuiltInMethods.COT_DEC)
 
-  addSqlFunctionMethod(
-    ASIN,
-    Seq(DOUBLE_TYPE_INFO),
-    DOUBLE_TYPE_INFO,
-    BuiltInMethods.ASIN)
+  addSqlFunctionMethod(ASIN, Seq(DOUBLE_TYPE_INFO), DOUBLE_TYPE_INFO, BuiltInMethods.ASIN)
 
-  addSqlFunctionMethod(
-    ASIN,
-    Seq(BIG_DEC_TYPE_INFO),
-    DOUBLE_TYPE_INFO,
-    BuiltInMethods.ASIN_DEC)
+  addSqlFunctionMethod(ASIN, Seq(BIG_DEC_TYPE_INFO), DOUBLE_TYPE_INFO, BuiltInMethods.ASIN_DEC)
 
-  addSqlFunctionMethod(
-    ACOS,
-    Seq(DOUBLE_TYPE_INFO),
-    DOUBLE_TYPE_INFO,
-    BuiltInMethods.ACOS)
+  addSqlFunctionMethod(ACOS, Seq(DOUBLE_TYPE_INFO), DOUBLE_TYPE_INFO, BuiltInMethods.ACOS)
 
-  addSqlFunctionMethod(
-    ACOS,
-    Seq(BIG_DEC_TYPE_INFO),
-    DOUBLE_TYPE_INFO,
-    BuiltInMethods.ACOS_DEC)
+  addSqlFunctionMethod(ACOS, Seq(BIG_DEC_TYPE_INFO), DOUBLE_TYPE_INFO, BuiltInMethods.ACOS_DEC)
 
-  addSqlFunctionMethod(
-    ATAN,
-    Seq(DOUBLE_TYPE_INFO),
-    DOUBLE_TYPE_INFO,
-    BuiltInMethods.ATAN)
+  addSqlFunctionMethod(ATAN, Seq(DOUBLE_TYPE_INFO), DOUBLE_TYPE_INFO, BuiltInMethods.ATAN)
 
-  addSqlFunctionMethod(
-    ATAN,
-    Seq(BIG_DEC_TYPE_INFO),
-    DOUBLE_TYPE_INFO,
-    BuiltInMethods.ATAN_DEC)
+  addSqlFunctionMethod(ATAN, Seq(BIG_DEC_TYPE_INFO), DOUBLE_TYPE_INFO, BuiltInMethods.ATAN_DEC)
 
   addSqlFunctionMethod(
     ATAN2,
@@ -415,11 +277,7 @@ object FunctionGenerator {
     DOUBLE_TYPE_INFO,
     BuiltInMethods.ATAN2_DEC_DEC)
 
-  addSqlFunctionMethod(
-    DEGREES,
-    Seq(DOUBLE_TYPE_INFO),
-    DOUBLE_TYPE_INFO,
-    BuiltInMethods.DEGREES)
+  addSqlFunctionMethod(DEGREES, Seq(DOUBLE_TYPE_INFO), DOUBLE_TYPE_INFO, BuiltInMethods.DEGREES)
 
   addSqlFunctionMethod(
     DEGREES,
@@ -427,11 +285,7 @@ object FunctionGenerator {
     DOUBLE_TYPE_INFO,
     BuiltInMethods.DEGREES_DEC)
 
-  addSqlFunctionMethod(
-    RADIANS,
-    Seq(DOUBLE_TYPE_INFO),
-    DOUBLE_TYPE_INFO,
-    BuiltInMethods.RADIANS)
+  addSqlFunctionMethod(RADIANS, Seq(DOUBLE_TYPE_INFO), DOUBLE_TYPE_INFO, BuiltInMethods.RADIANS)
 
   addSqlFunctionMethod(
     RADIANS,
@@ -439,29 +293,13 @@ object FunctionGenerator {
     DOUBLE_TYPE_INFO,
     BuiltInMethods.RADIANS_DEC)
 
-  addSqlFunctionMethod(
-    SIGN,
-    Seq(DOUBLE_TYPE_INFO),
-    DOUBLE_TYPE_INFO,
-    BuiltInMethods.SIGN_DOUBLE)
+  addSqlFunctionMethod(SIGN, Seq(DOUBLE_TYPE_INFO), DOUBLE_TYPE_INFO, BuiltInMethods.SIGN_DOUBLE)
 
-  addSqlFunctionMethod(
-    SIGN,
-    Seq(INT_TYPE_INFO),
-    INT_TYPE_INFO,
-    BuiltInMethods.SIGN_INT)
+  addSqlFunctionMethod(SIGN, Seq(INT_TYPE_INFO), INT_TYPE_INFO, BuiltInMethods.SIGN_INT)
 
-  addSqlFunctionMethod(
-    SIGN,
-    Seq(LONG_TYPE_INFO),
-    LONG_TYPE_INFO,
-    BuiltInMethods.SIGN_LONG)
+  addSqlFunctionMethod(SIGN, Seq(LONG_TYPE_INFO), LONG_TYPE_INFO, BuiltInMethods.SIGN_LONG)
 
-  addSqlFunctionMethod(
-    SIGN,
-    Seq(BIG_DEC_TYPE_INFO),
-    BIG_DEC_TYPE_INFO,
-    BuiltInMethods.SIGN_DEC)
+  addSqlFunctionMethod(SIGN, Seq(BIG_DEC_TYPE_INFO), BIG_DEC_TYPE_INFO, BuiltInMethods.SIGN_DEC)
 
   addSqlFunctionMethod(
     ROUND,
@@ -487,25 +325,13 @@ object FunctionGenerator {
     DOUBLE_TYPE_INFO,
     BuiltInMethods.ROUND_DOUBLE)
 
-  addSqlFunction(
-    PI,
-    Seq(),
-    new ConstantCallGen(DOUBLE_TYPE_INFO, Math.PI.toString))
+  addSqlFunction(PI, Seq(), new ConstantCallGen(DOUBLE_TYPE_INFO, Math.PI.toString))
 
-  addSqlFunction(
-    E,
-    Seq(),
-    new ConstantCallGen(DOUBLE_TYPE_INFO, Math.E.toString))
+  addSqlFunction(E, Seq(), new ConstantCallGen(DOUBLE_TYPE_INFO, Math.E.toString))
 
-  addSqlFunction(
-    RAND,
-    Seq(),
-    new RandCallGen(isRandInteger = false, hasSeed = false))
+  addSqlFunction(RAND, Seq(), new RandCallGen(isRandInteger = false, hasSeed = false))
 
-  addSqlFunction(
-    RAND,
-    Seq(INT_TYPE_INFO),
-    new RandCallGen(isRandInteger = false, hasSeed = true))
+  addSqlFunction(RAND, Seq(INT_TYPE_INFO), new RandCallGen(isRandInteger = false, hasSeed = true))
 
   addSqlFunction(
     RAND_INTEGER,
@@ -558,11 +384,7 @@ object FunctionGenerator {
     LONG_TYPE_INFO,
     BuiltInMethods.TRUNCATE_LONG_ONE)
 
-  addSqlFunctionMethod(
-    TRUNCATE,
-    Seq(INT_TYPE_INFO),
-    INT_TYPE_INFO,
-    BuiltInMethods.TRUNCATE_INT_ONE)
+  addSqlFunctionMethod(TRUNCATE, Seq(INT_TYPE_INFO), INT_TYPE_INFO, BuiltInMethods.TRUNCATE_INT_ONE)
 
   addSqlFunctionMethod(
     TRUNCATE,
@@ -660,16 +482,12 @@ object FunctionGenerator {
   addSqlFunction(
     FLOOR,
     Seq(SqlTimeTypeInfo.DATE, new GenericTypeInfo(classOf[TimeUnitRange])),
-    new FloorCeilCallGen(
-      BuiltInMethod.FLOOR.method,
-      Some(BuiltInMethod.UNIX_DATE_FLOOR.method)))
+    new FloorCeilCallGen(BuiltInMethod.FLOOR.method, Some(BuiltInMethod.UNIX_DATE_FLOOR.method)))
 
   addSqlFunction(
     FLOOR,
     Seq(SqlTimeTypeInfo.TIME, new GenericTypeInfo(classOf[TimeUnitRange])),
-    new FloorCeilCallGen(
-      BuiltInMethod.FLOOR.method,
-      Some(BuiltInMethod.UNIX_DATE_FLOOR.method)))
+    new FloorCeilCallGen(BuiltInMethod.FLOOR.method, Some(BuiltInMethod.UNIX_DATE_FLOOR.method)))
 
   addSqlFunction(
     FLOOR,
@@ -683,23 +501,17 @@ object FunctionGenerator {
   addSqlFunction(
     CEIL,
     Seq(SqlTimeTypeInfo.DATE, new GenericTypeInfo(classOf[TimeUnitRange])),
-    new FloorCeilCallGen(
-      BuiltInMethod.CEIL.method,
-      Some(BuiltInMethods.UNIX_DATE_CEIL)))
+    new FloorCeilCallGen(BuiltInMethod.CEIL.method, Some(BuiltInMethods.UNIX_DATE_CEIL)))
 
   addSqlFunction(
     CEIL,
     Seq(SqlTimeTypeInfo.TIME, new GenericTypeInfo(classOf[TimeUnitRange])),
-    new FloorCeilCallGen(
-      BuiltInMethod.CEIL.method,
-      Some(BuiltInMethod.UNIX_DATE_CEIL.method)))
+    new FloorCeilCallGen(BuiltInMethod.CEIL.method, Some(BuiltInMethod.UNIX_DATE_CEIL.method)))
 
   addSqlFunction(
     CEIL,
     Seq(SqlTimeTypeInfo.TIMESTAMP, new GenericTypeInfo(classOf[TimeUnitRange])),
-    new FloorCeilCallGen(
-      BuiltInMethod.CEIL.method,
-      Some(BuiltInMethod.UNIX_TIMESTAMP_CEIL.method)))
+    new FloorCeilCallGen(BuiltInMethod.CEIL.method, Some(BuiltInMethod.UNIX_TIMESTAMP_CEIL.method)))
 
   addSqlFunction(
     CURRENT_DATE,
@@ -716,10 +528,7 @@ object FunctionGenerator {
     Seq(),
     new CurrentTimePointCallGen(SqlTimeTypeInfo.TIMESTAMP, local = false))
 
-  addSqlFunction(
-    LOCALTIME,
-    Seq(),
-    new CurrentTimePointCallGen(SqlTimeTypeInfo.TIME, local = true))
+  addSqlFunction(LOCALTIME, Seq(), new CurrentTimePointCallGen(SqlTimeTypeInfo.TIME, local = true))
 
   addSqlFunction(
     LOCALTIMESTAMP,
@@ -729,8 +538,7 @@ object FunctionGenerator {
   addSqlFunction(
     ScalarSqlFunctions.DATE_FORMAT,
     Seq(SqlTimeTypeInfo.TIMESTAMP, STRING_TYPE_INFO),
-    new DateFormatCallGen
-  )
+    new DateFormatCallGen)
   addSqlFunctionMethod(
     ScalarSqlFunctions.LPAD,
     Seq(STRING_TYPE_INFO, INT_TYPE_INFO, STRING_TYPE_INFO),
@@ -747,94 +555,61 @@ object FunctionGenerator {
   // Cryptographic Hash functions
   // ----------------------------------------------------------------------------------------------
 
-  addSqlFunction(
-    ScalarSqlFunctions.MD5,
-    Seq(STRING_TYPE_INFO),
-    new HashCalcCallGen("MD5")
-  )
+  addSqlFunction(ScalarSqlFunctions.MD5, Seq(STRING_TYPE_INFO), new HashCalcCallGen("MD5"))
 
-  addSqlFunction(
-    ScalarSqlFunctions.SHA1,
-    Seq(STRING_TYPE_INFO),
-    new HashCalcCallGen("SHA-1")
-  )
+  addSqlFunction(ScalarSqlFunctions.SHA1, Seq(STRING_TYPE_INFO), new HashCalcCallGen("SHA-1"))
 
-  addSqlFunction(
-    ScalarSqlFunctions.SHA224,
-    Seq(STRING_TYPE_INFO),
-    new HashCalcCallGen("SHA-224")
-  )
+  addSqlFunction(ScalarSqlFunctions.SHA224, Seq(STRING_TYPE_INFO), new HashCalcCallGen("SHA-224"))
 
-  addSqlFunction(
-    ScalarSqlFunctions.SHA256,
-    Seq(STRING_TYPE_INFO),
-    new HashCalcCallGen("SHA-256")
-  )
+  addSqlFunction(ScalarSqlFunctions.SHA256, Seq(STRING_TYPE_INFO), new HashCalcCallGen("SHA-256"))
 
-  addSqlFunction(
-    ScalarSqlFunctions.SHA384,
-    Seq(STRING_TYPE_INFO),
-    new HashCalcCallGen("SHA-384")
-  )
+  addSqlFunction(ScalarSqlFunctions.SHA384, Seq(STRING_TYPE_INFO), new HashCalcCallGen("SHA-384"))
 
-  addSqlFunction(
-    ScalarSqlFunctions.SHA512,
-    Seq(STRING_TYPE_INFO),
-    new HashCalcCallGen("SHA-512")
-  )
+  addSqlFunction(ScalarSqlFunctions.SHA512, Seq(STRING_TYPE_INFO), new HashCalcCallGen("SHA-512"))
 
   addSqlFunction(
     ScalarSqlFunctions.SHA2,
     Seq(STRING_TYPE_INFO, INT_TYPE_INFO),
-    new HashCalcCallGen("SHA-2")
-  )
+    new HashCalcCallGen("SHA-2"))
 
   // ----------------------------------------------------------------------------------------------
 
   /**
-    * Returns a [[CallGenerator]] that generates all required code for calling the given
-    * [[SqlOperator]].
-    *
-    * @param sqlOperator SQL operator (might be overloaded)
-    * @param operandTypes actual operand types
-    * @param resultType expected return type
-    * @return [[CallGenerator]]
-    */
+   * Returns a [[CallGenerator]] that generates all required code for calling the given
+   * [[SqlOperator]].
+   *
+   * @param sqlOperator SQL operator (might be overloaded)
+   * @param operandTypes actual operand types
+   * @param resultType expected return type
+   * @return [[CallGenerator]]
+   */
   def getCallGenerator(
       sqlOperator: SqlOperator,
       operandTypes: Seq[TypeInformation[_]],
-      resultType: TypeInformation[_])
-    : Option[CallGenerator] = sqlOperator match {
+      resultType: TypeInformation[_]): Option[CallGenerator] = sqlOperator match {
 
     // user-defined scalar function
     case ssf: ScalarSqlFunction =>
-      Some(
-        new ScalarFunctionCallGen(
-          ssf.getScalarFunction,
-          operandTypes,
-          resultType
-        )
-      )
+      Some(new ScalarFunctionCallGen(ssf.getScalarFunction, operandTypes, resultType))
 
     // user-defined table function
     case tsf: TableSqlFunction =>
-      Some(
-        new TableFunctionCallGen(
-          tsf.getTableFunction,
-          operandTypes,
-          resultType
-        )
-      )
+      Some(new TableFunctionCallGen(tsf.getTableFunction, operandTypes, resultType))
 
     // built-in scalar function
     case _ =>
-      sqlFunctions.get((sqlOperator, operandTypes))
-        .orElse(sqlFunctions.find(entry => entry._1._1 == sqlOperator
-          && entry._1._2.length == operandTypes.length
-          && entry._1._2.zip(operandTypes).forall {
-          case (x: BasicTypeInfo[_], y: BasicTypeInfo[_]) => y.shouldAutocastTo(x) || x == y
-          case _ => false
-        }).map(_._2))
+      sqlFunctions
+        .get((sqlOperator, operandTypes))
+        .orElse(
+          sqlFunctions
+            .find(entry =>
+              entry._1._1 == sqlOperator
+                && entry._1._2.length == operandTypes.length
+                && entry._1._2.zip(operandTypes).forall {
+                  case (x: BasicTypeInfo[_], y: BasicTypeInfo[_]) => y.shouldAutocastTo(x) || x == y
+                  case _                                          => false
+                })
+            .map(_._2))
 
   }
 
@@ -844,25 +619,22 @@ object FunctionGenerator {
       sqlOperator: SqlOperator,
       operandTypes: Seq[TypeInformation[_]],
       returnType: TypeInformation[_],
-      method: Method)
-    : Unit = {
+      method: Method): Unit = {
     sqlFunctions((sqlOperator, operandTypes)) = new MethodCallGen(returnType, method)
   }
 
   private def addSqlFunctionNotMethod(
       sqlOperator: SqlOperator,
       operandTypes: Seq[TypeInformation[_]],
-      method: Method)
-    : Unit = {
-    sqlFunctions((sqlOperator, operandTypes)) =
-      new NotCallGenerator(new MethodCallGen(BOOLEAN_TYPE_INFO, method))
+      method: Method): Unit = {
+    sqlFunctions((sqlOperator, operandTypes)) = new NotCallGenerator(
+      new MethodCallGen(BOOLEAN_TYPE_INFO, method))
   }
 
   private def addSqlFunction(
       sqlOperator: SqlOperator,
       operandTypes: Seq[TypeInformation[_]],
-      callGenerator: CallGenerator)
-    : Unit = {
+      callGenerator: CallGenerator): Unit = {
     sqlFunctions((sqlOperator, operandTypes)) = callGenerator
   }
 

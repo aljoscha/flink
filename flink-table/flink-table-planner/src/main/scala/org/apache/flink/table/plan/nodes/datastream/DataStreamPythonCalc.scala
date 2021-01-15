@@ -36,8 +36,8 @@ import org.apache.flink.table.types.utils.TypeConversions
 import scala.collection.JavaConversions._
 
 /**
-  * RelNode for Python ScalarFunctions.
-  */
+ * RelNode for Python ScalarFunctions.
+ */
 class DataStreamPythonCalc(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -46,15 +46,15 @@ class DataStreamPythonCalc(
     schema: RowSchema,
     calcProgram: RexProgram,
     ruleDescription: String)
-  extends DataStreamCalcBase(
-    cluster,
-    traitSet,
-    input,
-    inputSchema,
-    schema,
-    calcProgram,
-    ruleDescription)
-  with CommonPythonCalc {
+    extends DataStreamCalcBase(
+      cluster,
+      traitSet,
+      input,
+      inputSchema,
+      schema,
+      calcProgram,
+      ruleDescription)
+    with CommonPythonCalc {
 
   override def copy(traitSet: RelTraitSet, child: RelNode, program: RexProgram): Calc = {
     new DataStreamPythonCalc(
@@ -77,10 +77,14 @@ class DataStreamPythonCalc(
         getPythonRexCalls(calcProgram).map(node => FlinkTypeFactory.toTypeInfo(node.getType)): _*)
 
     // construct the Python operator
-    val pythonOperatorInputRowType = TypeConversions.fromLegacyInfoToDataType(
-      inputSchema.typeInfo).getLogicalType.asInstanceOf[RowType]
-    val pythonOperatorOutputRowType = TypeConversions.fromLegacyInfoToDataType(
-      pythonOperatorResultTypeInfo).getLogicalType.asInstanceOf[RowType]
+    val pythonOperatorInputRowType = TypeConversions
+      .fromLegacyInfoToDataType(inputSchema.typeInfo)
+      .getLogicalType
+      .asInstanceOf[RowType]
+    val pythonOperatorOutputRowType = TypeConversions
+      .fromLegacyInfoToDataType(pythonOperatorResultTypeInfo)
+      .getLogicalType
+      .asInstanceOf[RowType]
     val pythonOperator = getPythonScalarFunctionOperator(
       getConfig(planner.getExecutionEnvironment, planner.getConfig),
       pythonOperatorInputRowType,

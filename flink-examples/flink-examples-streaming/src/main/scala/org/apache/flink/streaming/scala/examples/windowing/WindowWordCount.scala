@@ -45,7 +45,6 @@ import org.apache.flink.streaming.examples.wordcount.util.WordCountData
  *  - write a simple Flink Streaming program,
  *  - use tuple data types,
  *  - use basic windowing abstractions.
- *
  */
 object WindowWordCount {
 
@@ -58,15 +57,15 @@ object WindowWordCount {
 
     // get input data
     val text =
-    if (params.has("input")) {
-      // read the text file from given input path
-      env.readTextFile(params.get("input"))
-    } else {
-      println("Executing WindowWordCount example with default input data set.")
-      println("Use --input to specify file input.")
-      // get default test text data
-      env.fromElements(WordCountData.WORDS: _*)
-    }
+      if (params.has("input")) {
+        // read the text file from given input path
+        env.readTextFile(params.get("input"))
+      } else {
+        println("Executing WindowWordCount example with default input data set.")
+        println("Use --input to specify file input.")
+        // get default test text data
+        env.fromElements(WordCountData.WORDS: _*)
+      }
 
     // make parameters available in the web interface
     env.getConfig.setGlobalJobParameters(params)

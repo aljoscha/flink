@@ -33,8 +33,8 @@ class OverWindowValidationTest extends TableTestBase {
   streamUtil.addTable[(Int, String, Long)]("T1", 'a, 'b, 'c, 'proctime.proctime)
 
   /**
-    * All aggregates must be computed on the same window.
-    */
+   * All aggregates must be computed on the same window.
+   */
   @Test(expected = classOf[TableException])
   def testMultiWindow(): Unit = {
 
@@ -48,8 +48,8 @@ class OverWindowValidationTest extends TableTestBase {
   }
 
   /**
-    * OVER clause is necessary for [[OverAgg0]] window function.
-    */
+   * OVER clause is necessary for [[OverAgg0]] window function.
+   */
   @Test(expected = classOf[ValidationException])
   def testInvalidOverAggregation(): Unit = {
     streamUtil.addFunction("overAgg", new OverAgg0)
@@ -60,8 +60,8 @@ class OverWindowValidationTest extends TableTestBase {
   }
 
   /**
-    * OVER clause is necessary for [[OverAgg0]] window function.
-    */
+   * OVER clause is necessary for [[OverAgg0]] window function.
+   */
   @Test(expected = classOf[ValidationException])
   def testInvalidOverAggregation2(): Unit = {
     streamUtil.addFunction("overAgg", new OverAgg0)

@@ -29,12 +29,11 @@ import org.apache.flink.table.plan.schema.TableSourceTable
 import org.apache.flink.table.sources.StreamTableSource
 
 class StreamTableSourceScanRule
-  extends ConverterRule(
-    classOf[FlinkLogicalTableSourceScan],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.DATASTREAM,
-    "StreamTableSourceScanRule")
-{
+    extends ConverterRule(
+      classOf[FlinkLogicalTableSourceScan],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.DATASTREAM,
+      "StreamTableSourceScanRule") {
 
   /** Rule must only match if TableScan targets a [[StreamTableSource]] */
   override def matches(call: RelOptRuleCall): Boolean = {
@@ -54,8 +53,7 @@ class StreamTableSourceScanRule
       scan.getTable,
       scan.tableSchema,
       scan.tableSource.asInstanceOf[StreamTableSource[_]],
-      scan.selectedFields
-    )
+      scan.selectedFields)
   }
 }
 

@@ -54,10 +54,10 @@ class StreamExecPythonGroupTableAggregate(
     inputEdge: ExecEdge,
     outputType: RowType,
     description: String)
-  extends ExecNodeBase[RowData](Collections.singletonList(inputEdge), outputType, description)
-  with StreamExecNode[RowData]
-  with CommonPythonAggregate
-  with Logging {
+    extends ExecNodeBase[RowData](Collections.singletonList(inputEdge), outputType, description)
+    with StreamExecNode[RowData]
+    with CommonPythonAggregate
+    with Logging {
 
   override protected def translateToPlanInternal(planner: PlannerBase): Transformation[RowData] = {
     val tableConfig = planner.getTableConfig
@@ -150,17 +150,18 @@ class StreamExecPythonGroupTableAggregate(
       classOf[Boolean],
       classOf[Long],
       classOf[Long])
-    ctor.newInstance(
-      config.asInstanceOf[AnyRef],
-      inputType.asInstanceOf[AnyRef],
-      outputType.asInstanceOf[AnyRef],
-      aggregateFunctions.asInstanceOf[AnyRef],
-      dataViewSpecs.asInstanceOf[AnyRef],
-      grouping.asInstanceOf[AnyRef],
-      indexOfCountStar.asInstanceOf[AnyRef],
-      generateUpdateBefore.asInstanceOf[AnyRef],
-      minIdleStateRetentionTime.asInstanceOf[AnyRef],
-      maxIdleStateRetentionTime.asInstanceOf[AnyRef])
+    ctor
+      .newInstance(
+        config.asInstanceOf[AnyRef],
+        inputType.asInstanceOf[AnyRef],
+        outputType.asInstanceOf[AnyRef],
+        aggregateFunctions.asInstanceOf[AnyRef],
+        dataViewSpecs.asInstanceOf[AnyRef],
+        grouping.asInstanceOf[AnyRef],
+        indexOfCountStar.asInstanceOf[AnyRef],
+        generateUpdateBefore.asInstanceOf[AnyRef],
+        minIdleStateRetentionTime.asInstanceOf[AnyRef],
+        maxIdleStateRetentionTime.asInstanceOf[AnyRef])
       .asInstanceOf[OneInputStreamOperator[RowData, RowData]]
   }
 }

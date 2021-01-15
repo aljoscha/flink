@@ -36,31 +36,32 @@ import org.apache.calcite.sql.parser.SqlParserPos
 import scala.collection.JavaConverters._
 
 /**
-  * Calcite wrapper for user-defined scalar functions.
-  *
-  * @param identifier     function identifier to uniquely identify this function
-  * @param displayName    name to be displayed in operator name
-  * @param scalarFunction scalar function to be called
-  * @param typeFactory    type factory for converting Flink's between Calcite's types
-  */
+ * Calcite wrapper for user-defined scalar functions.
+ *
+ * @param identifier     function identifier to uniquely identify this function
+ * @param displayName    name to be displayed in operator name
+ * @param scalarFunction scalar function to be called
+ * @param typeFactory    type factory for converting Flink's between Calcite's types
+ */
 class ScalarSqlFunction(
     identifier: FunctionIdentifier,
     displayName: String,
     val scalarFunction: ScalarFunction,
     typeFactory: FlinkTypeFactory,
     returnTypeInfer: Option[SqlReturnTypeInference] = None)
-  extends SqlFunction(
-    new SqlIdentifier(identifier.toList, SqlParserPos.ZERO),
-    returnTypeInfer.getOrElse(createReturnTypeInference(displayName, scalarFunction, typeFactory)),
-    createOperandTypeInference(displayName, scalarFunction, typeFactory),
-    createOperandTypeChecker(displayName, scalarFunction),
-    null,
-    SqlFunctionCategory.USER_DEFINED_FUNCTION) {
+    extends SqlFunction(
+      new SqlIdentifier(identifier.toList, SqlParserPos.ZERO),
+      returnTypeInfer.getOrElse(
+        createReturnTypeInference(displayName, scalarFunction, typeFactory)),
+      createOperandTypeInference(displayName, scalarFunction, typeFactory),
+      createOperandTypeChecker(displayName, scalarFunction),
+      null,
+      SqlFunctionCategory.USER_DEFINED_FUNCTION) {
 
   /**
-    * This is temporary solution for hive udf and should be removed once FLIP-65 is finished,
-    * please pass the non-null input arguments.
-    */
+   * This is temporary solution for hive udf and should be removed once FLIP-65 is finished,
+   * please pass the non-null input arguments.
+   */
   def makeFunction(constants: Array[AnyRef], argTypes: Array[LogicalType]): ScalarFunction =
     scalarFunction
 
@@ -75,15 +76,15 @@ object ScalarSqlFunction {
       name: String,
       scalarFunction: ScalarFunction,
       typeFactory: FlinkTypeFactory): SqlReturnTypeInference = {
+
     /**
-      * Return type inference based on [[ScalarFunction]] given information.
-      */
+     * Return type inference based on [[ScalarFunction]] given information.
+     */
     new SqlReturnTypeInference {
       override def inferReturnType(opBinding: SqlOperatorBinding): RelDataType = {
         val parameters = getOperandType(opBinding).toArray
         val resultType = getResultTypeOfScalarFunction(scalarFunction, parameters)
-        typeFactory.createFieldTypeFromLogicalType(
-          fromDataTypeToLogicalType(resultType))
+        typeFactory.createFieldTypeFromLogicalType(fromDataTypeToLogicalType(resultType))
       }
     }
   }
@@ -92,16 +93,22 @@ object ScalarSqlFunction {
       name: String,
       scalarFunction: ScalarFunction,
       typeFactory: FlinkTypeFactory): SqlOperandTypeInference = {
+
     /**
-      * Operand type inference based on [[ScalarFunction]] given information.
-      */
+     * Operand type inference based on [[ScalarFunction]] given information.
+     */
     new SqlOperandTypeInference {
       override def inferOperandTypes(
           callBinding: SqlCallBinding,
           returnType: RelDataType,
           operandTypes: Array[RelDataType]): Unit = {
         ScalarSqlFunction.inferOperandTypes(
-          name, scalarFunction, typeFactory, callBinding, returnType, operandTypes)
+          name,
+          scalarFunction,
+          typeFactory,
+          callBinding,
+          returnType,
+          operandTypes)
       }
     }
   }
@@ -117,13 +124,14 @@ object ScalarSqlFunction {
     if (getEvalUserDefinedMethod(func, parameters).isEmpty) {
       throwValidationException(name, func, parameters)
     }
-    func.getParameterTypes(getEvalMethodSignature(func, parameters))
-        .map(fromTypeInfoToLogicalType)
-        .map(typeFactory.createFieldTypeFromLogicalType)
-        .zipWithIndex
-        .foreach {
-          case (t, i) => operandTypes(i) = t
-        }
+    func
+      .getParameterTypes(getEvalMethodSignature(func, parameters))
+      .map(fromTypeInfoToLogicalType)
+      .map(typeFactory.createFieldTypeFromLogicalType)
+      .zipWithIndex
+      .foreach { case (t, i) =>
+        operandTypes(i) = t
+      }
   }
 
   private[flink] def createOperandTypeChecker(
@@ -133,8 +141,8 @@ object ScalarSqlFunction {
     val methods = checkAndExtractMethods(scalarFunction, "eval")
 
     /**
-      * Operand type checker based on [[ScalarFunction]] given information.
-      */
+     * Operand type checker based on [[ScalarFunction]] given information.
+     */
     new SqlOperandTypeChecker {
       override def getAllowedSignatures(op: SqlOperator, opName: String): String = {
         s"$opName[${signaturesToString(scalarFunction, "eval")}]"
@@ -144,17 +152,15 @@ object ScalarSqlFunction {
         var min = 254 // according to JVM spec 4.3.3
         var max = -1
         var isVarargs = false
-        methods.foreach(
-          m => {
-            var len = m.getParameterTypes.length
-            if (len > 0 && m.isVarArgs && m.getParameterTypes()(len - 1).isArray) {
-              isVarargs = true
-              len = len - 1
-            }
-            max = Math.max(len, max)
-            min = Math.min(len, min)
+        methods.foreach(m => {
+          var len = m.getParameterTypes.length
+          if (len > 0 && m.isVarArgs && m.getParameterTypes()(len - 1).isArray) {
+            isVarargs = true
+            len = len - 1
           }
-        )
+          max = Math.max(len, max)
+          min = Math.min(len, min)
+        })
         if (isVarargs) {
           // if eval method is varargs, set max to -1 to skip length check in Calcite
           max = -1
@@ -164,8 +170,7 @@ object ScalarSqlFunction {
 
       override def checkOperandTypes(
           callBinding: SqlCallBinding,
-          throwOnFailure: Boolean)
-      : Boolean = {
+          throwOnFailure: Boolean): Boolean = {
         val operandTypeInfo = getOperandType(callBinding)
 
         val foundMethod = getEvalUserDefinedMethod(scalarFunction, operandTypeInfo)
@@ -174,8 +179,8 @@ object ScalarSqlFunction {
           if (throwOnFailure) {
             throw new ValidationException(
               s"Given parameters of function '$name' do not match any signature. \n" +
-                  s"Actual: ${signatureInternalToString(operandTypeInfo)} \n" +
-                  s"Expected: ${signaturesToString(scalarFunction, "eval")}")
+                s"Actual: ${signatureInternalToString(operandTypeInfo)} \n" +
+                s"Expected: ${signaturesToString(scalarFunction, "eval")}")
           } else {
             false
           }

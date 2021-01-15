@@ -45,8 +45,7 @@ class UnnestITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mo
     val data = List(
       (1, Array(12, 45), Array(Array(12, 45))),
       (2, Array(41, 5), Array(Array(18), Array(87))),
-      (3, Array(18, 42), Array(Array(1), Array(45)))
-    )
+      (3, Array(18, 42), Array(Array(1), Array(45))))
     val t = env.fromCollection(data).toTable(tEnv, 'a, 'b, 'c)
     tEnv.registerTable("T", t)
 
@@ -71,8 +70,7 @@ class UnnestITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mo
     val data = List(
       (1, Array(12, 45), Array(Array(12, 45))),
       (2, Array(41, 5), Array(Array(18), Array(87))),
-      (3, Array(18, 42), Array(Array(1), Array(45)))
-    )
+      (3, Array(18, 42), Array(Array(1), Array(45))))
     val t = env.fromCollection(data).toTable(tEnv, 'a, 'b, 'c)
     tEnv.registerTable("T", t)
 
@@ -82,12 +80,7 @@ class UnnestITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mo
     result.addSink(sink)
     env.execute()
 
-    val expected = List(
-      "1,[12, 45]",
-      "2,[18]",
-      "2,[87]",
-      "3,[1]",
-      "3,[45]")
+    val expected = List("1,[12, 45]", "2,[18]", "2,[87]", "3,[1]", "3,[45]")
     assertEquals(expected.sorted, sink.getAppendResults.sorted)
   }
 
@@ -96,8 +89,7 @@ class UnnestITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mo
     val data = List(
       (1, Array((12, "45.6"), (12, "45.612"))),
       (2, Array((13, "41.6"), (14, "45.2136"))),
-      (3, Array((18, "42.6")))
-    )
+      (3, Array((18, "42.6"))))
     val t = env.fromCollection(data).toTable(tEnv, 'a, 'b)
     tEnv.registerTable("T", t)
 
@@ -107,9 +99,7 @@ class UnnestITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mo
     result.addSink(sink)
     env.execute()
 
-    val expected = List(
-      "2,[13,41.6, 14,45.2136],14,45.2136",
-      "3,[18,42.6],18,42.6")
+    val expected = List("2,[13,41.6, 14,45.2136],14,45.2136", "3,[18,42.6],18,42.6")
     assertEquals(expected.sorted, sink.getAppendResults.sorted)
   }
 
@@ -134,10 +124,7 @@ class UnnestITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mo
     result.addSink(sink)
     env.execute()
 
-    val expected = List(
-      "1,12,45.6",
-      "2,12,45.612",
-      "2,13,41.6")
+    val expected = List("1,12,45.6", "2,12,45.612", "2,13,41.6")
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
 
@@ -153,8 +140,7 @@ class UnnestITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mo
       (5, null.asInstanceOf[String], "Hello"),
       (6, "6", "Hello"),
       (7, "7", "Hello World"),
-      (7, "8", "Hello World")
-    )
+      (7, "8", "Hello World"))
 
     val t = env.fromCollection(data).toTable(tEnv, 'a, 'b, 'c)
     tEnv.registerTable("T", t)
@@ -169,23 +155,17 @@ class UnnestITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mo
     result.addSink(sink).setParallelism(1)
     env.execute()
 
-    val expected = List(
-      "1,1",
-      "1,2",
-      "2,2",
-      "3,null",
-      "4,4"
-    )
+    val expected = List("1,1", "1,2", "2,2", "3,null", "4,4")
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
 
   @Test
   def testTumbleWindowAggregateWithCollectUnnest(): Unit = {
-    val data = TestData.tupleData3.map {
-      case (i, l, s) => (l, i, s)
+    val data = TestData.tupleData3.map { case (i, l, s) =>
+      (l, i, s)
     }
     val stream = failingDataSource(data)
-        .assignTimestampsAndWatermarks(new TimestampAndWatermarkWithOffset[(Long, Int, String)](0L))
+      .assignTimestampsAndWatermarks(new TimestampAndWatermarkWithOffset[(Long, Int, String)](0L))
     val t = stream.toTable(tEnv, 'b, 'a, 'c, 'rowtime.rowtime)
     tEnv.registerTable("T", t)
 
@@ -202,11 +182,7 @@ class UnnestITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mo
     result.addSink(sink).setParallelism(1)
     env.execute()
 
-    val expected = List(
-      "1,1",
-      "2,2",
-      "2,2"
-    )
+    val expected = List("1,1", "2,2", "2,2")
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
 
@@ -215,8 +191,7 @@ class UnnestITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mo
     val data = List(
       (1, 1L, Array("Hi", "w")),
       (2, 2L, Array("Hello", "k")),
-      (3, 2L, Array("Hello world", "x"))
-    )
+      (3, 2L, Array("Hello world", "x")))
 
     val t = env.fromCollection(data).toTable(tEnv, 'a, 'b, 'c)
     tEnv.registerTable("T", t)
@@ -234,41 +209,41 @@ class UnnestITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mo
   @Test
   def testCrossWithUnnestForMap(): Unit = {
     val data = List(
-      Row.of(Int.box(1),
+      Row.of(
+        Int.box(1),
         Long.box(11L), {
           val map = new java.util.HashMap[String, String]()
           map.put("a", "10")
           map.put("b", "11")
           map
         }),
-      Row.of(Int.box(2),
+      Row.of(
+        Int.box(2),
         Long.box(22L), {
           val map = new java.util.HashMap[String, String]()
           map.put("c", "20")
           map
         }),
-      Row.of(Int.box(3),
+      Row.of(
+        Int.box(3),
         Long.box(33L), {
           val map = new java.util.HashMap[String, String]()
           map.put("d", "30")
           map.put("e", "31")
           map
-        })
-    )
+        }))
 
     implicit val typeInfo = Types.ROW(
       Array("a", "b", "c"),
-      Array[TypeInformation[_]](Types.INT, Types.LONG, Types.MAP(Types.STRING, Types.STRING))
-    )
+      Array[TypeInformation[_]](Types.INT, Types.LONG, Types.MAP(Types.STRING, Types.STRING)))
     val t = env.fromCollection(data).toTable(tEnv, 'a, 'b, 'c)
     tEnv.registerTable("T", t)
 
     val sqlQuery = "SELECT a, b, v FROM T CROSS JOIN UNNEST(c) as f (k, v)"
     val result = tEnv.sqlQuery(sqlQuery)
 
-    val sink = new TestingRetractTableSink().configure(
-      Array("a", "b", "v"),
-      Array(Types.INT, Types.LONG, Types.STRING))
+    val sink = new TestingRetractTableSink()
+      .configure(Array("a", "b", "v"), Array(Types.INT, Types.LONG, Types.STRING))
     tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSinkInternal("MySink", sink)
     result.executeInsert("MySink").await()
 
@@ -281,17 +256,16 @@ class UnnestITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mo
     val data = List(
       (1, Array((12, "45.6"), (2, "45.612"))),
       (2, Array((13, "41.6"), (1, "45.2136"))),
-      (3, Array((18, "42.6")))
-    )
+      (3, Array((18, "42.6"))))
 
     val t = env.fromCollection(data).toTable(tEnv, 'a, 'b)
     tEnv.registerTable("T", t)
 
     val sqlQuery = "SELECT a, b, x, y " +
-        "FROM " +
-        "  (SELECT a, b FROM T WHERE a < 3) as tf, " +
-        "  UNNEST(tf.b) as A (x, y) " +
-        "WHERE x > a"
+      "FROM " +
+      "  (SELECT a, b FROM T WHERE a < 3) as tf, " +
+      "  UNNEST(tf.b) as A (x, y) " +
+      "WHERE x > a"
     val result = tEnv.sqlQuery(sqlQuery).toAppendStream[Row]
     val sink = new TestingAppendSink
     result.addSink(sink)
@@ -309,8 +283,7 @@ class UnnestITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mo
     val data = List(
       (1, Array((12, "45.6"), (12, "45.612"))),
       (2, Array((13, "41.6"), (14, "45.2136"))),
-      (3, Array((18, "42.6")))
-    )
+      (3, Array((18, "42.6"))))
     val t = env.fromCollection(data).toTable(tEnv, 'a, 'b)
     tEnv.registerTable("T", t)
 
@@ -320,9 +293,7 @@ class UnnestITCase(mode: StateBackendMode) extends StreamingWithStateTestBase(mo
     result.addSink(sink)
     env.execute()
 
-    val expected = List(
-      "2,[13,41.6, 14,45.2136],14,45.2136",
-      "3,[18,42.6],18,42.6")
+    val expected = List("2,[13,41.6, 14,45.2136],14,45.2136", "3,[18,42.6],18,42.6")
     assertEquals(expected.sorted, sink.getAppendResults.sorted)
   }
 

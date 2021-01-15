@@ -31,14 +31,30 @@ import org.apache.flink.streaming.api.scala.DataStream
 import org.apache.flink.streaming.api.transformations._
 import org.apache.flink.streaming.api.watermark.Watermark
 import org.apache.flink.streaming.runtime.streamrecord.StreamRecord
-import org.apache.flink.streaming.util.{KeyedOneInputStreamOperatorTestHarness, OneInputStreamOperatorTestHarness, TestHarnessUtil}
+import org.apache.flink.streaming.util.{
+  KeyedOneInputStreamOperatorTestHarness,
+  OneInputStreamOperatorTestHarness,
+  TestHarnessUtil
+}
 import org.apache.flink.table.api.TableConfig
 import org.apache.flink.table.api.dataview.DataView
 import org.apache.flink.table.codegen.GeneratedAggregationsFunction
-import org.apache.flink.table.functions.aggfunctions.{CountAggFunction, IntSumWithRetractAggFunction, LongMaxWithRetractAggFunction, LongMinWithRetractAggFunction}
-import org.apache.flink.table.functions.{AggregateFunction, UserDefinedFunction, UserDefinedFunctionHelper}
+import org.apache.flink.table.functions.aggfunctions.{
+  CountAggFunction,
+  IntSumWithRetractAggFunction,
+  LongMaxWithRetractAggFunction,
+  LongMinWithRetractAggFunction
+}
+import org.apache.flink.table.functions.{
+  AggregateFunction,
+  UserDefinedFunction,
+  UserDefinedFunctionHelper
+}
 import org.apache.flink.table.runtime.aggregate.GeneratedAggregations
-import org.apache.flink.table.runtime.harness.HarnessTestBase.{RowResultSortComparator, RowResultSortComparatorWithWatermarks}
+import org.apache.flink.table.runtime.harness.HarnessTestBase.{
+  RowResultSortComparator,
+  RowResultSortComparatorWithWatermarks
+}
 import org.apache.flink.table.runtime.types.{CRow, CRowTypeInfo}
 import org.apache.flink.table.runtime.utils.StreamingWithStateTestBase
 import org.apache.flink.table.utils.EncodingUtils
@@ -59,17 +75,15 @@ class HarnessTestBase extends StreamingWithStateTestBase {
   val distinctCountAggFunction: String =
     EncodingUtils.encodeObjectToString(new CountAggFunction())
 
-  protected val MinMaxRowType = new RowTypeInfo(Array[TypeInformation[_]](
-    LONG_TYPE_INFO,
-    STRING_TYPE_INFO,
-    LONG_TYPE_INFO),
+  protected val MinMaxRowType = new RowTypeInfo(
+    Array[TypeInformation[_]](LONG_TYPE_INFO, STRING_TYPE_INFO, LONG_TYPE_INFO),
     Array("rowtime", "a", "b"))
 
   protected val minMaxCRowType = new CRowTypeInfo(MinMaxRowType)
 
   protected val minMaxAggregates: Array[AggregateFunction[_, _]] =
-    Array(new LongMinWithRetractAggFunction,
-          new LongMaxWithRetractAggFunction).asInstanceOf[Array[AggregateFunction[_, _]]]
+    Array(new LongMinWithRetractAggFunction, new LongMaxWithRetractAggFunction)
+      .asInstanceOf[Array[AggregateFunction[_, _]]]
 
   protected val sumAggregates: Array[AggregateFunction[_, _]] =
     Array(new IntSumWithRetractAggFunction).asInstanceOf[Array[AggregateFunction[_, _]]]
@@ -78,12 +92,14 @@ class HarnessTestBase extends StreamingWithStateTestBase {
     Array(new CountAggFunction).asInstanceOf[Array[AggregateFunction[_, _]]]
 
   protected val minMaxAggregationStateType: RowTypeInfo =
-    new RowTypeInfo(minMaxAggregates
-      .map(UserDefinedFunctionHelper.getAccumulatorTypeOfAggregateFunction(_)): _*)
+    new RowTypeInfo(
+      minMaxAggregates
+        .map(UserDefinedFunctionHelper.getAccumulatorTypeOfAggregateFunction(_)): _*)
 
   protected val sumAggregationStateType: RowTypeInfo =
-    new RowTypeInfo(sumAggregates
-      .map(UserDefinedFunctionHelper.getAccumulatorTypeOfAggregateFunction(_)): _*)
+    new RowTypeInfo(
+      sumAggregates
+        .map(UserDefinedFunctionHelper.getAccumulatorTypeOfAggregateFunction(_)): _*)
 
   protected val minMaxFuncName = "MinMaxAggregateHelper"
   protected val sumFuncName = "SumAggregationHelper"
@@ -326,12 +342,11 @@ class HarnessTestBase extends StreamingWithStateTestBase {
 
   def createHarnessTester[KEY, IN, OUT](
       dataStream: DataStream[_],
-      prefixOperatorName: String)
-  : KeyedOneInputStreamOperatorTestHarness[KEY, IN, OUT] = {
+      prefixOperatorName: String): KeyedOneInputStreamOperatorTestHarness[KEY, IN, OUT] = {
 
-    val transformation = extractExpectedTransformation(
-      dataStream.javaStream.getTransformation,
-      prefixOperatorName).asInstanceOf[OneInputTransformation[_, _]]
+    val transformation =
+      extractExpectedTransformation(dataStream.javaStream.getTransformation, prefixOperatorName)
+        .asInstanceOf[OneInputTransformation[_, _]]
     if (transformation == null) {
       throw new Exception("Can not find the expected transformation")
     }
@@ -364,10 +379,10 @@ class HarnessTestBase extends StreamingWithStateTestBase {
         } else {
           extractExpectedTransformation(one.getInputs.get(0), prefixOperatorName)
         }
-      case union: UnionTransformation[_] => extractFromInputs(union.getInputs.toSeq: _*)
-      case p: PartitionTransformation[_] => extractFromInputs(p.getInputs.get(0))
+      case union: UnionTransformation[_]    => extractFromInputs(union.getInputs.toSeq: _*)
+      case p: PartitionTransformation[_]    => extractFromInputs(p.getInputs.get(0))
       case _: LegacySourceTransformation[_] => null
-      case _ => throw new UnsupportedOperationException("This should not happen.")
+      case _                                => throw new UnsupportedOperationException("This should not happen.")
     }
   }
 
@@ -401,14 +416,14 @@ class HarnessTestBase extends StreamingWithStateTestBase {
   }
 
   def createHarnessTester[IN, OUT, KEY](
-    operator: OneInputStreamOperator[IN, OUT],
-    keySelector: KeySelector[IN, KEY],
-    keyType: TypeInformation[KEY]): KeyedOneInputStreamOperatorTestHarness[KEY, IN, OUT] = {
+      operator: OneInputStreamOperator[IN, OUT],
+      keySelector: KeySelector[IN, KEY],
+      keyType: TypeInformation[KEY]): KeyedOneInputStreamOperatorTestHarness[KEY, IN, OUT] = {
     new KeyedOneInputStreamOperatorTestHarness[KEY, IN, OUT](operator, keySelector, keyType)
   }
 
-  def getOperator(testHarness: OneInputStreamOperatorTestHarness[_, _])
-  : AbstractUdfStreamOperator[_, _] =
+  def getOperator(
+      testHarness: OneInputStreamOperatorTestHarness[_, _]): AbstractUdfStreamOperator[_, _] =
     testHarness.getOneInputOperator.asInstanceOf[AbstractUdfStreamOperator[_, _]]
 
   def verify(expected: JQueue[Object], actual: JQueue[Object]): Unit = {
@@ -420,10 +435,10 @@ class HarnessTestBase extends StreamingWithStateTestBase {
   }
 
   def verify(
-    expected: JQueue[Object],
-    actual: JQueue[Object],
-    comparator: Comparator[Object],
-    checkWaterMark: Boolean = false): Unit = {
+      expected: JQueue[Object],
+      actual: JQueue[Object],
+      comparator: Comparator[Object],
+      checkWaterMark: Boolean = false): Unit = {
     if (!checkWaterMark) {
       val it = actual.iterator()
       while (it.hasNext) {
@@ -440,8 +455,8 @@ class HarnessTestBase extends StreamingWithStateTestBase {
 object HarnessTestBase {
 
   /**
-    * Return 0 for equal Rows and non zero for different rows
-    */
+   * Return 0 for equal Rows and non zero for different rows
+   */
   class RowResultSortComparator() extends Comparator[Object] with Serializable {
 
     override def compare(o1: Object, o2: Object): Int = {
@@ -458,10 +473,9 @@ object HarnessTestBase {
   }
 
   /**
-    * Return 0 for equal Rows and non zero for different rows
-    */
-  class RowResultSortComparatorWithWatermarks()
-    extends Comparator[Object] with Serializable {
+   * Return 0 for equal Rows and non zero for different rows
+   */
+  class RowResultSortComparatorWithWatermarks() extends Comparator[Object] with Serializable {
 
     override def compare(o1: Object, o2: Object): Int = {
 
@@ -472,16 +486,15 @@ object HarnessTestBase {
           r1.getValue.toString.compareTo(r2.getValue.toString)
         case (_: Watermark, _: StreamRecord[CRow]) => -1
         case (_: StreamRecord[CRow], _: Watermark) => 1
-        case _ => -1
+        case _                                     => -1
       }
     }
   }
 
   /**
-    * Tuple row key selector that returns a specified field as the selector function
-    */
-  class TupleRowKeySelector[T](
-    private val selectorField: Int) extends KeySelector[CRow, T] {
+   * Tuple row key selector that returns a specified field as the selector function
+   */
+  class TupleRowKeySelector[T](private val selectorField: Int) extends KeySelector[CRow, T] {
 
     override def getKey(value: CRow): T = {
       value.row.getField(selectorField).asInstanceOf[T]

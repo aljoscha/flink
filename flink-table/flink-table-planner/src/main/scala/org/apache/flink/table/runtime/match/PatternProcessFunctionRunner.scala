@@ -32,16 +32,14 @@ import org.apache.flink.types.Row
 import org.apache.flink.util.Collector
 
 /**
-  * PatternSelectFunctionRunner with [[Row]] input and [[CRow]] output.
-  */
-class PatternProcessFunctionRunner(
-    name: String,
-    code: String)
-  extends PatternProcessFunction[Row, CRow]
-  with Compiler[PatternProcessFunction[Row, Row]]
-  with Logging {
+ * PatternSelectFunctionRunner with [[Row]] input and [[CRow]] output.
+ */
+class PatternProcessFunctionRunner(name: String, code: String)
+    extends PatternProcessFunction[Row, CRow]
+    with Compiler[PatternProcessFunction[Row, Row]]
+    with Logging {
 
-  @transient private var cRowWrappingCollector : CRowWrappingCollector = _
+  @transient private var cRowWrappingCollector: CRowWrappingCollector = _
 
   @transient private var function: PatternProcessFunction[Row, Row] = _
 
@@ -70,4 +68,3 @@ class PatternProcessFunctionRunner(
     FunctionUtils.closeFunction(function)
   }
 }
-

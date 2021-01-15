@@ -42,8 +42,17 @@ import org.apache.flink.table.planner.plan.optimize.Optimizer
 import org.apache.flink.table.planner.plan.reuse.SubplanReuser
 import org.apache.flink.table.planner.plan.utils.SameRelObjectShuttle
 import org.apache.flink.table.planner.sinks.DynamicSinkUtils.validateSchemaAndApplyImplicitCast
-import org.apache.flink.table.planner.sinks.TableSinkUtils.{inferSinkPhysicalSchema, validateLogicalPhysicalTypesCompatible, validateTableSink}
-import org.apache.flink.table.planner.sinks.{DataStreamTableSink, DynamicSinkUtils, SelectTableSinkBase, SelectTableSinkSchemaConverter}
+import org.apache.flink.table.planner.sinks.TableSinkUtils.{
+  inferSinkPhysicalSchema,
+  validateLogicalPhysicalTypesCompatible,
+  validateTableSink
+}
+import org.apache.flink.table.planner.sinks.{
+  DataStreamTableSink,
+  DynamicSinkUtils,
+  SelectTableSinkBase,
+  SelectTableSinkSchemaConverter
+}
 import org.apache.flink.table.planner.utils.JavaScalaConversionUtil
 import org.apache.flink.table.sinks.TableSink
 import org.apache.flink.table.types.utils.LegacyTypeInfoDataTypeConverter
@@ -61,26 +70,26 @@ import java.util.function.{Function => JFunction, Supplier => JSupplier}
 import _root_.scala.collection.JavaConversions._
 
 /**
-  * Implementation of [[Planner]] for blink planner. It supports only streaming use cases.
-  * (The new [[org.apache.flink.table.sources.InputFormatTableSource]] should work, but will be
-  * handled as streaming sources, and no batch specific optimizations will be applied).
-  *
-  * @param executor        instance of [[Executor]], needed to extract
-  *                        [[StreamExecutionEnvironment]] for
-  *                        [[org.apache.flink.table.sources.StreamTableSource.getDataStream]]
-  * @param config          mutable configuration passed from corresponding [[TableEnvironment]]
-  * @param functionCatalog catalog of functions
-  * @param catalogManager  manager of catalog meta objects such as tables, views, databases etc.
-  * @param isStreamingMode Determines if the planner should work in a batch (false}) or
-  *                        streaming (true) mode.
-  */
+ * Implementation of [[Planner]] for blink planner. It supports only streaming use cases.
+ * (The new [[org.apache.flink.table.sources.InputFormatTableSource]] should work, but will be
+ * handled as streaming sources, and no batch specific optimizations will be applied).
+ *
+ * @param executor        instance of [[Executor]], needed to extract
+ *                        [[StreamExecutionEnvironment]] for
+ *                        [[org.apache.flink.table.sources.StreamTableSource.getDataStream]]
+ * @param config          mutable configuration passed from corresponding [[TableEnvironment]]
+ * @param functionCatalog catalog of functions
+ * @param catalogManager  manager of catalog meta objects such as tables, views, databases etc.
+ * @param isStreamingMode Determines if the planner should work in a batch (false}) or
+ *                        streaming (true) mode.
+ */
 abstract class PlannerBase(
     executor: Executor,
     config: TableConfig,
     val functionCatalog: FunctionCatalog,
     val catalogManager: CatalogManager,
     isStreamingMode: Boolean)
-  extends Planner {
+    extends Planner {
 
   // temporary utility until we don't use planner expressions anymore
   functionCatalog.setPlannerTypeInferenceUtil(PlannerTypeInferenceUtilImpl.INSTANCE)
@@ -105,8 +114,7 @@ abstract class PlannerBase(
       override def apply(t: TableSchema): SqlExprToRexConverter = {
         sqlExprToRexConverterFactory.create(plannerContext.getTypeFactory.buildRelNodeRowType(t))
       }
-    }
-  )
+    })
 
   @VisibleForTesting
   private[flink] val plannerContext: PlannerContext =
@@ -115,8 +123,7 @@ abstract class PlannerBase(
       functionCatalog,
       catalogManager,
       asRootSchema(new CatalogManagerCalciteSchema(catalogManager, isStreamingMode)),
-      getTraitDefs.toList
-    )
+      getTraitDefs.toList)
 
   /** Returns the [[FlinkRelBuilder]] of this TableEnvironment. */
   private[flink] def getRelBuilder: FlinkRelBuilder = {
@@ -182,8 +189,8 @@ abstract class PlannerBase(
   }
 
   /**
-    * Converts a relational tree of [[ModifyOperation]] into a Calcite relational expression.
-    */
+   * Converts a relational tree of [[ModifyOperation]] into a Calcite relational expression.
+   */
   @VisibleForTesting
   private[flink] def translateToRel(modifyOperation: ModifyOperation): RelNode = {
     modifyOperation match {
@@ -250,21 +257,16 @@ abstract class PlannerBase(
         val input = getRelBuilder.queryOperation(outputConversion.getChild).build()
         val (needUpdateBefore, withChangeFlag) = outputConversion.getUpdateMode match {
           case UpdateMode.RETRACT => (true, true)
-          case UpdateMode.APPEND => (false, false)
-          case UpdateMode.UPSERT => (false, true)
+          case UpdateMode.APPEND  => (false, false)
+          case UpdateMode.UPSERT  => (false, true)
         }
         val typeInfo = LegacyTypeInfoDataTypeConverter.toLegacyTypeInfo(outputConversion.getType)
         val inputLogicalType = FlinkTypeFactory.toLogicalRowType(input.getRowType)
-        val sinkPhysicalSchema = inferSinkPhysicalSchema(
-          outputConversion.getType,
-          inputLogicalType,
-          withChangeFlag)
+        val sinkPhysicalSchema =
+          inferSinkPhysicalSchema(outputConversion.getType, inputLogicalType, withChangeFlag)
         // validate query schema and sink schema, and apply cast if possible
-        val query = validateSchemaAndApplyImplicitCast(
-          input,
-          sinkPhysicalSchema,
-          null,
-          getTypeFactory)
+        val query =
+          validateSchemaAndApplyImplicitCast(input, sinkPhysicalSchema, null, getTypeFactory)
         val tableSink = new DataStreamTableSink(
           FlinkTypeFactory.toTableSchema(query.getRowType),
           typeInfo,
@@ -296,15 +298,16 @@ abstract class PlannerBase(
   }
 
   /**
-    * Converts [[FlinkPhysicalRel]] DAG to [[ExecNode]] DAG, and tries to reuse duplicate sub-plans.
-    */
+   * Converts [[FlinkPhysicalRel]] DAG to [[ExecNode]] DAG, and tries to reuse duplicate sub-plans.
+   */
   @VisibleForTesting
   private[flink] def translateToExecNodePlan(
       optimizedRelNodes: Seq[RelNode]): util.List[ExecNode[_]] = {
     val nonPhysicalRel = optimizedRelNodes.filterNot(_.isInstanceOf[FlinkPhysicalRel])
     if (nonPhysicalRel.nonEmpty) {
-      throw new TableException("The expected optimized plan is FlinkPhysicalRel plan, " +
-        s"actual plan is ${nonPhysicalRel.head.getClass.getSimpleName} plan.")
+      throw new TableException(
+        "The expected optimized plan is FlinkPhysicalRel plan, " +
+          s"actual plan is ${nonPhysicalRel.head.getClass.getSimpleName} plan.")
     }
 
     require(optimizedRelNodes.forall(_.isInstanceOf[FlinkPhysicalRel]))
@@ -320,11 +323,11 @@ abstract class PlannerBase(
   }
 
   /**
-    * Translates a [[ExecNode]] DAG into a [[Transformation]] DAG.
-    *
-    * @param execNodes The node DAG to translate.
-    * @return The [[Transformation]] DAG that corresponds to the node DAG.
-    */
+   * Translates a [[ExecNode]] DAG into a [[Transformation]] DAG.
+   *
+   * @param execNodes The node DAG to translate.
+   * @return The [[Transformation]] DAG that corresponds to the node DAG.
+   */
   protected def translateToPlan(execNodes: util.List[ExecNode[_]]): util.List[Transformation[_]]
 
   /**
@@ -337,15 +340,14 @@ abstract class PlannerBase(
 
   private def getTableSink(
       objectIdentifier: ObjectIdentifier,
-      dynamicOptions: JMap[String, String])
-    : Option[(CatalogTable, Any)] = {
+      dynamicOptions: JMap[String, String]): Option[(CatalogTable, Any)] = {
     val lookupResult = JavaScalaConversionUtil.toScala(catalogManager.getTable(objectIdentifier))
     lookupResult
       .map(_.getTable) match {
       case Some(table: ConnectorCatalogTable[_, _]) =>
         JavaScalaConversionUtil.toScala(table.getTableSink) match {
           case Some(sink) => Some(table, sink)
-          case None => None
+          case None       => None
         }
 
       case Some(table: CatalogTable) =>

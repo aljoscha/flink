@@ -25,8 +25,8 @@ import org.apache.flink.table.runtime.types.CRow
 import org.apache.flink.types.Row
 
 /**
-  * The function to execute row(event) time bounded stream inner-join.
-  */
+ * The function to execute row(event) time bounded stream inner-join.
+ */
 final class RowTimeBoundedStreamJoin(
     joinType: JoinType,
     leftLowerBound: Long,
@@ -38,22 +38,22 @@ final class RowTimeBoundedStreamJoin(
     genJoinFuncCode: String,
     leftTimeIdx: Int,
     rightTimeIdx: Int)
-  extends TimeBoundedStreamJoin(
-    joinType,
-    leftLowerBound,
-    leftUpperBound,
-    allowedLateness,
-    leftType,
-    rightType,
-    genJoinFuncName,
-    genJoinFuncCode) {
+    extends TimeBoundedStreamJoin(
+      joinType,
+      leftLowerBound,
+      leftUpperBound,
+      allowedLateness,
+      leftType,
+      rightType,
+      genJoinFuncName,
+      genJoinFuncCode) {
 
   /**
-    * Get the maximum interval between receiving a row and emitting it (as part of a joined result).
-    * This is the time interval by which watermarks need to be held back.
-    *
-    * @return the maximum delay for the outputs
-    */
+   * Get the maximum interval between receiving a row and emitting it (as part of a joined result).
+   * This is the time interval by which watermarks need to be held back.
+   *
+   * @return the maximum delay for the outputs
+   */
   def getMaxOutputDelay: Long = Math.max(leftRelativeSize, rightRelativeSize) + allowedLateness
 
   override def updateOperatorTime(ctx: CoProcessFunction[CRow, CRow, CRow]#Context): Unit = {

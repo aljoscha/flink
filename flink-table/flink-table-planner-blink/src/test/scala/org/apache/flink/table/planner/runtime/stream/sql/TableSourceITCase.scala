@@ -21,7 +21,12 @@ package org.apache.flink.table.planner.runtime.stream.sql
 import org.apache.flink.api.scala._
 import org.apache.flink.table.api.bridge.scala._
 import org.apache.flink.table.planner.factories.TestValuesTableFactory
-import org.apache.flink.table.planner.runtime.utils.{StreamingTestBase, TestData, TestingAppendSink, TestingRetractSink}
+import org.apache.flink.table.planner.runtime.utils.{
+  StreamingTestBase,
+  TestData,
+  TestingAppendSink,
+  TestingRetractSink
+}
 import org.apache.flink.table.planner.utils._
 import org.apache.flink.table.utils.LegacyRowResource
 import org.apache.flink.types.Row
@@ -38,8 +43,7 @@ class TableSourceITCase extends StreamingTestBase {
   override def before(): Unit = {
     super.before()
     val myTableDataId = TestValuesTableFactory.registerData(TestData.smallData3)
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE TABLE MyTable (
          |  `a` INT,
          |  `b` BIGINT,
@@ -51,10 +55,9 @@ class TableSourceITCase extends StreamingTestBase {
          |)
          |""".stripMargin)
 
-    val filterableTableDataId = TestValuesTableFactory.registerData(
-      TestLegacyFilterableTableSource.defaultRows)
-    tEnv.executeSql(
-      s"""
+    val filterableTableDataId =
+      TestValuesTableFactory.registerData(TestLegacyFilterableTableSource.defaultRows)
+    tEnv.executeSql(s"""
          |CREATE TABLE FilterableTable (
          |  name STRING,
          |  id BIGINT,
@@ -69,8 +72,7 @@ class TableSourceITCase extends StreamingTestBase {
          |""".stripMargin)
 
     val metadataTableDataId = TestValuesTableFactory.registerData(TestData.smallData5)
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE TABLE MetadataTable (
          |  `a` INT,
          |  `other_metadata` INT METADATA FROM 'metadata_3',
@@ -86,8 +88,7 @@ class TableSourceITCase extends StreamingTestBase {
          |)
          |""".stripMargin)
     val nestedTableDataId = TestValuesTableFactory.registerData(TestData.deepNestedRow)
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE TABLE NestedTable (
          |  id BIGINT,
          |  deepNested ROW<
@@ -102,8 +103,7 @@ class TableSourceITCase extends StreamingTestBase {
          |  'nested-projection-supported' = 'true',
          |  'data-id' = '$nestedTableDataId'
          |)
-         |""".stripMargin
-    )
+         |""".stripMargin)
   }
 
   @Test
@@ -113,10 +113,7 @@ class TableSourceITCase extends StreamingTestBase {
     result.addSink(sink)
     env.execute()
 
-    val expected = Seq(
-      "1,Hi",
-      "2,Hello",
-      "3,Hello world")
+    val expected = Seq("1,Hi", "2,Hello", "3,Hello world")
     assertEquals(expected.sorted, sink.getAppendResults.sorted)
   }
 
@@ -184,8 +181,7 @@ class TableSourceITCase extends StreamingTestBase {
   @Test
   def testInputFormatSource(): Unit = {
     val dataId = TestValuesTableFactory.registerData(TestData.smallData3)
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE TABLE MyInputFormatTable (
          |  `a` INT,
          |  `b` BIGINT,
@@ -195,8 +191,7 @@ class TableSourceITCase extends StreamingTestBase {
          |  'data-id' = '$dataId',
          |  'runtime-source' = 'InputFormat'
          |)
-         |""".stripMargin
-    )
+         |""".stripMargin)
 
     val result = tEnv.sqlQuery("SELECT a, c FROM MyInputFormatTable").toAppendStream[Row]
     val sink = new TestingAppendSink
@@ -210,8 +205,7 @@ class TableSourceITCase extends StreamingTestBase {
   @Test
   def testAllDataTypes(): Unit = {
     val dataId = TestValuesTableFactory.registerData(TestData.fullDataTypesData)
-    tEnv.executeSql(
-      s"""
+    tEnv.executeSql(s"""
          |CREATE TABLE T (
          |  `a` BOOLEAN,
          |  `b` TINYINT,
@@ -234,8 +228,7 @@ class TableSourceITCase extends StreamingTestBase {
          |  'connector' = 'values',
          |  'data-id' = '$dataId'
          |)
-         |""".stripMargin
-    )
+         |""".stripMargin)
 
     val result = tEnv.sqlQuery("SELECT * FROM T").toAppendStream[Row]
     val sink = new TestingAppendSink
@@ -255,30 +248,27 @@ class TableSourceITCase extends StreamingTestBase {
       "false,5,4,123,1234,1.2345,1.2345,8.12,1234,1234,2020-05-01," +
         "23:23:23,2020-05-01T23:23:23,2020-05-01T23:23:23Z," +
         "[8],4,c,null,{null=3}",
-      "null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null"
-    )
+      "null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null")
     assertEquals(expected.sorted.mkString("\n"), sink.getAppendResults.sorted.mkString("\n"))
   }
 
   @Test
   def testSimpleMetadataAccess(): Unit = {
-    val result = tEnv.sqlQuery("SELECT `a`, `b`, `metadata_2` FROM MetadataTable")
+    val result = tEnv
+      .sqlQuery("SELECT `a`, `b`, `metadata_2` FROM MetadataTable")
       .toAppendStream[Row]
     val sink = new TestingAppendSink
     result.addSink(sink)
     env.execute()
 
-    val expected = Seq(
-      "1,1,Hallo",
-      "2,2,Hallo Welt",
-      "2,3,Hallo Welt wie")
+    val expected = Seq("1,1,Hallo", "2,2,Hallo Welt", "2,3,Hallo Welt wie")
     assertEquals(expected.sorted, sink.getAppendResults.sorted)
   }
 
   @Test
   def testComplexMetadataAccess(): Unit = {
-    val result = tEnv.sqlQuery(
-        "SELECT `a`, `other_metadata`, `b`, `metadata_2`, `computed` FROM MetadataTable")
+    val result = tEnv
+      .sqlQuery("SELECT `a`, `other_metadata`, `b`, `metadata_2`, `computed` FROM MetadataTable")
       .toAppendStream[Row]
     val sink = new TestingAppendSink
     result.addSink(sink)
@@ -287,10 +277,7 @@ class TableSourceITCase extends StreamingTestBase {
     // (1, 1L, 0, 0, "Hallo", 1L)
     // (2, 2L, 1, 2, "Hallo Welt", 2L)
     // (2, 3L, 2, 4, "Hallo Welt wie", 1L)
-    val expected = Seq(
-      "1,1,1,Hallo,0",
-      "2,2,2,Hallo Welt,2",
-      "2,1,3,Hallo Welt wie,4")
+    val expected = Seq("1,1,1,Hallo,0", "2,2,2,Hallo Welt,2", "2,1,3,Hallo Welt wie,4")
     assertEquals(expected.sorted, sink.getAppendResults.sorted)
   }
 

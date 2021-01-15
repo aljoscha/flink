@@ -28,19 +28,19 @@ import org.apache.flink.types.Row
 import org.apache.flink.util.Collector
 
 /**
-  * Computes the final (table)aggregate value from incrementally computed aggregates.
-  *
-  * @param numGroupingKey The number of grouping keys.
-  * @param numAggregates The number of aggregates.
-  * @param finalRowArity The arity of the final output row.
-  * @param isTableAggregate Whether it is table aggregate.
-  */
+ * Computes the final (table)aggregate value from incrementally computed aggregates.
+ *
+ * @param numGroupingKey The number of grouping keys.
+ * @param numAggregates The number of aggregates.
+ * @param finalRowArity The arity of the final output row.
+ * @param isTableAggregate Whether it is table aggregate.
+ */
 class IncrementalAggregateWindowFunction[W <: Window](
     private val numGroupingKey: Int,
     private val numAggregates: Int,
     private val finalRowArity: Int,
     private val isTableAggregate: Boolean)
-  extends RichWindowFunction[Row, CRow, Row, W] {
+    extends RichWindowFunction[Row, CRow, Row, W] {
 
   private var output: CRow = _
   private var concatCollector: TableAggregateCollector = _
@@ -54,14 +54,10 @@ class IncrementalAggregateWindowFunction[W <: Window](
   }
 
   /**
-    * Calculate aggregated values output by aggregate buffer, and set them into output
-    * Row based on the mapping relation between intermediate aggregate data and output data.
-    */
-  override def apply(
-      key: Row,
-      window: W,
-      records: Iterable[Row],
-      out: Collector[CRow]): Unit = {
+   * Calculate aggregated values output by aggregate buffer, and set them into output
+   * Row based on the mapping relation between intermediate aggregate data and output data.
+   */
+  override def apply(key: Row, window: W, records: Iterable[Row], out: Collector[CRow]): Unit = {
 
     val iterator = records.iterator
 

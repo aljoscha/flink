@@ -40,8 +40,8 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 /**
-  * Utilities to ingest and retrieve results into and from a table program.
-  */
+ * Utilities to ingest and retrieve results into and from a table program.
+ */
 object MemoryTableSourceSinkUtil {
 
   val tableData: mutable.ListBuffer[Row] = mutable.ListBuffer[Row]()
@@ -58,10 +58,10 @@ object MemoryTableSourceSinkUtil {
       rowtimeAttributeDescriptor: util.List[RowtimeAttributeDescriptor],
       proctime: String,
       val terminationCount: Int)
-    extends BatchTableSource[Row]
-    with StreamTableSource[Row]
-    with DefinedProctimeAttribute
-    with DefinedRowtimeAttributes {
+      extends BatchTableSource[Row]
+      with StreamTableSource[Row]
+      with DefinedProctimeAttribute
+      with DefinedRowtimeAttributes {
 
     override def getReturnType: TypeInformation[Row] = returnType
 
@@ -72,7 +72,7 @@ object MemoryTableSourceSinkUtil {
     }
 
     final class InMemorySourceFunction(var count: Int = terminationCount)
-      extends SourceFunction[Row] {
+        extends SourceFunction[Row] {
 
       override def cancel(): Unit = throw new UnsupportedOperationException()
 
@@ -101,8 +101,9 @@ object MemoryTableSourceSinkUtil {
   }
 
   final class UnsafeMemoryAppendTableSink
-    extends TableSinkBase[Row] with BatchTableSink[Row]
-    with AppendStreamTableSink[Row] {
+      extends TableSinkBase[Row]
+      with BatchTableSink[Row]
+      with AppendStreamTableSink[Row] {
 
     override def getOutputType: TypeInformation[Row] = {
       new RowTypeInfo(getTableSchema.getFieldTypes, getTableSchema.getFieldNames)

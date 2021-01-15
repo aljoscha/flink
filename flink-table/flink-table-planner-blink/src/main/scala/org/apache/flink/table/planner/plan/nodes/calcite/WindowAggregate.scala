@@ -32,10 +32,10 @@ import org.apache.calcite.util.ImmutableBitSet
 import java.util
 
 /**
-  * Relational operator that eliminates duplicates and computes totals with time window group.
-  *
-  * NOTES: complex group (GROUPING SETS, CUBE, ROLLUP) is not supported now
-  */
+ * Relational operator that eliminates duplicates and computes totals with time window group.
+ *
+ * NOTES: complex group (GROUPING SETS, CUBE, ROLLUP) is not supported now
+ */
 abstract class WindowAggregate(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -44,13 +44,7 @@ abstract class WindowAggregate(
     aggCalls: util.List[AggregateCall],
     window: LogicalWindow,
     namedProperties: Seq[PlannerNamedWindowProperty])
-  extends Aggregate(
-    cluster,
-    traitSet,
-    child,
-    groupSet,
-    ImmutableList.of(groupSet),
-    aggCalls) {
+    extends Aggregate(cluster, traitSet, child, groupSet, ImmutableList.of(groupSet), aggCalls) {
 
   def getWindow: LogicalWindow = window
 
@@ -66,21 +60,21 @@ abstract class WindowAggregate(
     namedProperties.foreach { namedProp =>
       builder.add(
         namedProp.name,
-        typeFactory.createFieldTypeFromLogicalType(namedProp.property.resultType)
-      )
+        typeFactory.createFieldTypeFromLogicalType(namedProp.property.resultType))
     }
     builder.build()
   }
 
   /**
-    * The [[getDigest]] should be uniquely identifies the node; another node
-    * is equivalent if and only if it has the same value. The [[getDigest]] is
-    * computed by [[explainTerms(pw)]], so it should contains window information
-    * to identify different WindowAggregate nodes, otherwise WindowAggregate node
-    * can be replaced by any other WindowAggregate node.
-    */
+   * The [[getDigest]] should be uniquely identifies the node; another node
+   * is equivalent if and only if it has the same value. The [[getDigest]] is
+   * computed by [[explainTerms(pw)]], so it should contains window information
+   * to identify different WindowAggregate nodes, otherwise WindowAggregate node
+   * can be replaced by any other WindowAggregate node.
+   */
   override def explainTerms(pw: RelWriter): RelWriter = {
-    super.explainTerms(pw)
+    super
+      .explainTerms(pw)
       .item("window", window)
       .item("properties", namedProperties.map(_.name).mkString(", "))
   }

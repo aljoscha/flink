@@ -25,7 +25,7 @@ import org.apache.flink.api.common.typeutils.TypeSerializer
 import org.apache.flink.configuration.Configuration
 
 /**
- * Trait implementing the functionality necessary to apply stateful functions in 
+ * Trait implementing the functionality necessary to apply stateful functions in
  * RichFunctions without exposing the OperatorStates to the user. The user should
  * call the applyWithState method in his own RichFunction implementation.
  */
@@ -33,15 +33,14 @@ import org.apache.flink.configuration.Configuration
 trait StatefulFunction[I, O, S] extends RichFunction {
 
   protected val stateSerializer: TypeSerializer[S]
-  
+
   private[this] var state: ValueState[S] = _
-  
 
   def applyWithState(in: I, fun: (I, Option[S]) => (O, Option[S])): O = {
     val (o, s: Option[S]) = fun(in, Option(state.value()))
     s match {
       case Some(v) => state.update(v)
-      case None => state.update(null.asInstanceOf[S])
+      case None    => state.update(null.asInstanceOf[S])
     }
     o
   }

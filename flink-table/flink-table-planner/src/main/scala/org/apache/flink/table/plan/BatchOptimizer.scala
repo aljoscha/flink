@@ -30,24 +30,24 @@ import org.apache.flink.table.plan.rules.FlinkRuleSets
 import org.apache.flink.table.planner.PlanningConfigurationBuilder
 
 /**
-  * An [[Optimizer]] that can be used for optimizing a batch plan. Should be used to create an
-  * optimized tree from a logical input tree.
-  *
-  * @param calciteConfig                provider for [[CalciteConfig]]. It is a provider because the
-  *                                     [[TableConfig]] in a [[TableEnvImpl]] is mutable.
-  * @param planningConfigurationBuilder provider for [[RelOptPlanner]] and [[Context]]
-  */
+ * An [[Optimizer]] that can be used for optimizing a batch plan. Should be used to create an
+ * optimized tree from a logical input tree.
+ *
+ * @param calciteConfig                provider for [[CalciteConfig]]. It is a provider because the
+ *                                     [[TableConfig]] in a [[TableEnvImpl]] is mutable.
+ * @param planningConfigurationBuilder provider for [[RelOptPlanner]] and [[Context]]
+ */
 class BatchOptimizer(
     calciteConfig: () => CalciteConfig,
     planningConfigurationBuilder: PlanningConfigurationBuilder)
-  extends Optimizer(calciteConfig, planningConfigurationBuilder) {
+    extends Optimizer(calciteConfig, planningConfigurationBuilder) {
 
   /**
-    * Generates the optimized [[RelNode]] tree from the original relational node tree.
-    *
-    * @param relNode The original [[RelNode]] tree
-    * @return The optimized [[RelNode]] tree
-    */
+   * Generates the optimized [[RelNode]] tree from the original relational node tree.
+   *
+   * @param relNode The original [[RelNode]] tree
+   * @return The optimized [[RelNode]] tree
+   */
   def optimize(relNode: RelNode): RelNode = {
     val convSubQueryPlan = optimizeConvertSubQueries(relNode)
     val expandedPlan = optimizeExpandPlan(convSubQueryPlan)
@@ -59,13 +59,13 @@ class BatchOptimizer(
   }
 
   /**
-    * Returns the built-in normalization rules that are defined by the optimizer.
-    */
+   * Returns the built-in normalization rules that are defined by the optimizer.
+   */
   protected def getBuiltInNormRuleSet: RuleSet = FlinkRuleSets.DATASET_NORM_RULES
 
   /**
-    * Returns the built-in optimization rules that are defined by the optimizer.
-    */
+   * Returns the built-in optimization rules that are defined by the optimizer.
+   */
   protected def getBuiltInPhysicalOptRuleSet: RuleSet = FlinkRuleSets.DATASET_OPT_RULES
 
 }

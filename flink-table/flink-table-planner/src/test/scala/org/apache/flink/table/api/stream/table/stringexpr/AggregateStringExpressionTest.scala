@@ -21,13 +21,15 @@ package org.apache.flink.table.api.stream.table.stringexpr
 import org.apache.flink.api.scala._
 import org.apache.flink.table.api._
 import org.apache.flink.table.functions.aggfunctions.CountAggFunction
-import org.apache.flink.table.runtime.utils.JavaUserDefinedAggFunctions.{WeightedAvg, WeightedAvgWithMergeAndReset}
+import org.apache.flink.table.runtime.utils.JavaUserDefinedAggFunctions.{
+  WeightedAvg,
+  WeightedAvgWithMergeAndReset
+}
 import org.apache.flink.table.utils.{CountMinMax, TableTestBase}
 
 import org.junit.Test
 
 class AggregateStringExpressionTest extends TableTestBase {
-
 
   @Test
   def testDistinctNonGroupedAggregate(): Unit = {
@@ -76,21 +78,24 @@ class AggregateStringExpressionTest extends TableTestBase {
     val util = streamTestUtil()
     val t = util.addTable[(Int, Long, String)]("Table3", 'a, 'b, 'c)
 
-
     val myCnt = new CountAggFunction
     util.tableEnv.registerFunction("myCnt", myCnt)
     val myWeightedAvg = new WeightedAvgWithMergeAndReset
     util.tableEnv.registerFunction("myWeightedAvg", myWeightedAvg)
 
-    val t1 = t.groupBy('b)
-      .select('b,
+    val t1 = t
+      .groupBy('b)
+      .select(
+        'b,
         myCnt.distinct('a) + 9 as 'aCnt,
         myWeightedAvg.distinct('b, 'a) * 2 as 'wAvg,
         myWeightedAvg.distinct('a, 'a) as 'distAgg,
         myWeightedAvg('a, 'a) as 'agg)
-    val t2 = t.groupBy("b")
-      .select("b, myCnt.distinct(a) + 9 as aCnt, myWeightedAvg.distinct(b, a) * 2 as wAvg, " +
-        "myWeightedAvg.distinct(a, a) as distAgg, myWeightedAvg(a, a) as agg")
+    val t2 = t
+      .groupBy("b")
+      .select(
+        "b, myCnt.distinct(a) + 9 as aCnt, myWeightedAvg.distinct(b, a) * 2 as wAvg, " +
+          "myWeightedAvg.distinct(a, a) as distAgg, myWeightedAvg(a, a) as agg")
 
     verifyTableEquals(t1, t2)
   }

@@ -38,8 +38,8 @@ import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 
 /**
-  * Flink RelNode that executes a Join where one of inputs is a single row.
-  */
+ * Flink RelNode that executes a Join where one of inputs is a single row.
+ */
 class DataSetSingleRowJoin(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -51,8 +51,8 @@ class DataSetSingleRowJoin(
     joinRowType: RelDataType,
     joinType: JoinRelType,
     ruleDescription: String)
-  extends BiRel(cluster, traitSet, leftNode, rightNode)
-  with DataSetRel {
+    extends BiRel(cluster, traitSet, leftNode, rightNode)
+    with DataSetRel {
 
   override def deriveRowType() = rowRelDataType
 
@@ -75,13 +75,14 @@ class DataSetSingleRowJoin(
   }
 
   override def explainTerms(pw: RelWriter): RelWriter = {
-    super.explainTerms(pw)
+    super
+      .explainTerms(pw)
       .item("where", joinConditionToString)
       .item("join", joinSelectionToString)
       .item("joinType", joinTypeToString)
   }
 
-  override def computeSelfCost (planner: RelOptPlanner, metadata: RelMetadataQuery): RelOptCost = {
+  override def computeSelfCost(planner: RelOptPlanner, metadata: RelMetadataQuery): RelOptCost = {
     val child = if (leftIsSingle) {
       this.getRight
     } else {
@@ -122,25 +123,19 @@ class DataSetSingleRowJoin(
       inputType1: TypeInformation[Row],
       inputType2: TypeInformation[Row],
       joinCondition: RexNode,
-      broadcastInputSetName: String)
-    : FlatMapFunction[Row, Row] = {
+      broadcastInputSetName: String): FlatMapFunction[Row, Row] = {
 
     val isOuterJoin = joinType match {
       case JoinRelType.LEFT | JoinRelType.RIGHT => true
-      case _ => false
+      case _                                    => false
     }
 
-    val codeGenerator = new FunctionCodeGenerator(
-      config,
-      isOuterJoin,
-      inputType1,
-      Some(inputType2))
+    val codeGenerator = new FunctionCodeGenerator(config, isOuterJoin, inputType1, Some(inputType2))
 
     val returnType = FlinkTypeFactory.toInternalRowTypeInfo(getRowType)
 
-    val conversion = codeGenerator.generateConverterResultExpression(
-      returnType,
-      joinRowType.getFieldNames)
+    val conversion =
+      codeGenerator.generateConverterResultExpression(returnType, joinRowType.getFieldNames)
 
     val condition = codeGenerator.generateExpression(joinCondition)
 
@@ -153,20 +148,17 @@ class DataSetSingleRowJoin(
          |  ${codeGenerator.collectorTerm}.collect(${conversion.resultTerm});
          |}
          |""".stripMargin
-    } else {
-      val singleNode =
-        if (!leftIsSingle) {
-          rightNode
-        }
-        else {
-          leftNode
-        }
+      } else {
+        val singleNode =
+          if (!leftIsSingle) {
+            rightNode
+          } else {
+            leftNode
+          }
 
-      val notSuitedToCondition = singleNode
-        .getRowType
-        .getFieldList
-        .map(field => getRowType.getFieldNames.indexOf(field.getName))
-        .map(i => s"${conversion.resultTerm}.setField($i,null);")
+        val notSuitedToCondition = singleNode.getRowType.getFieldList
+          .map(field => getRowType.getFieldNames.indexOf(field.getName))
+          .map(i => s"${conversion.resultTerm}.setField($i,null);")
 
         s"""
            |${condition.code}
@@ -176,7 +168,7 @@ class DataSetSingleRowJoin(
            |}
            |${codeGenerator.collectorTerm}.collect(${conversion.resultTerm});
            |""".stripMargin
-    }
+      }
 
     val genFunction = codeGenerator.generateFunction(
       ruleDescription,

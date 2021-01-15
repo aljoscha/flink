@@ -40,7 +40,7 @@ object TestingUtils {
   private var sharedExecutorInstance: ScheduledExecutorService = _
 
   val testConfig = ConfigFactory.parseString(getDefaultTestingActorSystemConfigString)
-  
+
   val TESTING_DURATION = Duration.ofMinutes(2L);
 
   val TESTING_TIMEOUT = Duration.ofMinutes(1L);
@@ -69,9 +69,9 @@ object TestingUtils {
     Time.milliseconds(Integer.MAX_VALUE);
   }
 
-  /** 
-    * Gets the shared global testing execution context 
-    */
+  /**
+   * Gets the shared global testing execution context
+   */
   def defaultExecutionContext: ExecutionContextExecutor = {
     ExecutionContext.fromExecutor(defaultExecutor)
   }
@@ -95,10 +95,11 @@ object TestingUtils {
     new ScheduledExecutorServiceAdapter(scheduledExecutorService)
   }
 
-  /** Returns an [[ExecutionContext]] which uses the current thread to execute the runnable.
-    *
-    * @return Direct [[ExecutionContext]] which executes runnables directly
-    */
+  /**
+   * Returns an [[ExecutionContext]] which uses the current thread to execute the runnable.
+   *
+   * @return Direct [[ExecutionContext]] which executes runnables directly
+   */
   def directExecutionContext = ExecutionContext
     .fromExecutor(org.apache.flink.runtime.concurrent.Executors.directExecutor())
 
@@ -107,12 +108,15 @@ object TestingUtils {
     new QueuedActionExecutionContext(new ActionQueue())
   }
 
-  /** [[ExecutionContext]] which queues [[Runnable]] up in an [[ActionQueue]] instead of
-    * execution them. If the automatic execution mode is activated, then the [[Runnable]] are
-    * executed.
-    */
+  /**
+   * [[ExecutionContext]] which queues [[Runnable]] up in an [[ActionQueue]] instead of
+   * execution them. If the automatic execution mode is activated, then the [[Runnable]] are
+   * executed.
+   */
   class QueuedActionExecutionContext private[testingUtils] (val actionQueue: ActionQueue)
-    extends AbstractExecutorService with ExecutionContext with ScheduledExecutorService {
+      extends AbstractExecutorService
+      with ExecutionContext
+      with ScheduledExecutorService {
 
     var automaticExecution = false
 
@@ -121,9 +125,9 @@ object TestingUtils {
     }
 
     override def execute(runnable: Runnable): Unit = {
-      if(automaticExecution){
+      if (automaticExecution) {
         runnable.run()
-      }else {
+      } else {
         actionQueue.queueAction(runnable)
       }
     }
@@ -144,8 +148,10 @@ object TestingUtils {
       throw new UnsupportedOperationException()
     }
 
-    override def schedule[V](callable: Callable[V], delay: Long, unit: TimeUnit)
-        : ScheduledFuture[V] = {
+    override def schedule[V](
+        callable: Callable[V],
+        delay: Long,
+        unit: TimeUnit): ScheduledFuture[V] = {
       throw new UnsupportedOperationException()
     }
 
@@ -190,10 +196,11 @@ object TestingUtils {
     }
   }
 
-  /** Stops the given actor by sending it a Kill message
-    *
-    * @param actor
-    */
+  /**
+   * Stops the given actor by sending it a Kill message
+   *
+   * @param actor
+   */
   def stopActor(actor: ActorRef): Unit = {
     if (actor != null) {
       actor ! Kill

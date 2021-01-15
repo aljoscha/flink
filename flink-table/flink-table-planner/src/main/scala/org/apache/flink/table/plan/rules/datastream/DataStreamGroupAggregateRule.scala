@@ -31,14 +31,14 @@ import org.apache.flink.table.plan.schema.RowSchema
 import scala.collection.JavaConversions._
 
 /**
-  * Rule to convert a [[LogicalAggregate]] into a [[DataStreamGroupAggregate]].
-  */
+ * Rule to convert a [[LogicalAggregate]] into a [[DataStreamGroupAggregate]].
+ */
 class DataStreamGroupAggregateRule
-  extends ConverterRule(
-    classOf[FlinkLogicalAggregate],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.DATASTREAM,
-    "DataStreamGroupAggregateRule") {
+    extends ConverterRule(
+      classOf[FlinkLogicalAggregate],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.DATASTREAM,
+      "DataStreamGroupAggregateRule") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val agg: FlinkLogicalAggregate = call.rel(0).asInstanceOf[FlinkLogicalAggregate]
@@ -71,4 +71,3 @@ class DataStreamGroupAggregateRule
 object DataStreamGroupAggregateRule {
   val INSTANCE: RelOptRule = new DataStreamGroupAggregateRule
 }
-

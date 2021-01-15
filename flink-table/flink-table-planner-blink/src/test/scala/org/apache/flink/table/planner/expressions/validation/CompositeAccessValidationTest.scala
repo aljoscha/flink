@@ -55,5 +55,3 @@ class CompositeAccessValidationTest extends CompositeTypeTestBase {
     testTableApi("fail", "f0.get('fghj')", "fail")
   }
 }
-
-

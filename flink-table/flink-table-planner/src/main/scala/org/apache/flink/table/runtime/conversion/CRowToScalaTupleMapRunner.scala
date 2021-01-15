@@ -28,16 +28,16 @@ import org.apache.flink.table.util.Logging
 import org.apache.flink.types.Row
 
 /**
-  * Convert [[CRow]] to a [[Tuple2]].
-  */
+ * Convert [[CRow]] to a [[Tuple2]].
+ */
 class CRowToScalaTupleMapRunner(
-  name: String,
-  code: String,
-  @transient var returnType: TypeInformation[(Boolean, Any)])
-  extends RichMapFunction[CRow, (Boolean, Any)]
-  with ResultTypeQueryable[(Boolean, Any)]
-  with Compiler[MapFunction[Row, Any]]
-  with Logging {
+    name: String,
+    code: String,
+    @transient var returnType: TypeInformation[(Boolean, Any)])
+    extends RichMapFunction[CRow, (Boolean, Any)]
+    with ResultTypeQueryable[(Boolean, Any)]
+    with Compiler[MapFunction[Row, Any]]
+    with Logging {
 
   private var function: MapFunction[Row, Any] = _
 

@@ -20,7 +20,11 @@ package org.apache.flink.table.planner.plan.rules.logical
 
 import org.apache.flink.api.scala._
 import org.apache.flink.table.api._
-import org.apache.flink.table.planner.plan.optimize.program.{FlinkBatchProgram, FlinkHepRuleSetProgramBuilder, HEP_RULES_EXECUTION_TYPE}
+import org.apache.flink.table.planner.plan.optimize.program.{
+  FlinkBatchProgram,
+  FlinkHepRuleSetProgramBuilder,
+  HEP_RULES_EXECUTION_TYPE
+}
 import org.apache.flink.table.planner.utils.{TableConfigUtils, TableTestBase}
 
 import org.apache.calcite.plan.hep.HepMatchOrder
@@ -28,8 +32,8 @@ import org.apache.calcite.tools.RuleSets
 import org.junit.{Before, Test}
 
 /**
-  * Test for [[FlinkSemiAntiJoinFilterTransposeRule]].
-  */
+ * Test for [[FlinkSemiAntiJoinFilterTransposeRule]].
+ */
 class FlinkSemiAntiJoinFilterTransposeRuleTest extends TableTestBase {
 
   private val util = batchTestUtil()
@@ -43,11 +47,11 @@ class FlinkSemiAntiJoinFilterTransposeRuleTest extends TableTestBase {
       FlinkHepRuleSetProgramBuilder.newBuilder
         .setHepRulesExecutionType(HEP_RULES_EXECUTION_TYPE.RULE_SEQUENCE)
         .setHepMatchOrder(HepMatchOrder.BOTTOM_UP)
-        .add(RuleSets.ofList(
-          FlinkSemiAntiJoinProjectTransposeRule.INSTANCE,
-          FlinkSemiAntiJoinFilterTransposeRule.INSTANCE))
-        .build()
-    )
+        .add(
+          RuleSets.ofList(
+            FlinkSemiAntiJoinProjectTransposeRule.INSTANCE,
+            FlinkSemiAntiJoinFilterTransposeRule.INSTANCE))
+        .build())
 
     util.addTableSource[(Int, Long, String)]("MyTable1", 'a, 'b, 'c)
     util.addTableSource[(Int, Long, String)]("MyTable2", 'd, 'e, 'f)

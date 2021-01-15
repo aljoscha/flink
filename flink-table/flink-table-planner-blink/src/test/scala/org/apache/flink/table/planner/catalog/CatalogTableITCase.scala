@@ -21,7 +21,12 @@ package org.apache.flink.table.planner.catalog
 import org.apache.flink.table.api.config.{ExecutionConfigOptions, TableConfigOptions}
 import org.apache.flink.table.api.internal.TableEnvironmentImpl
 import org.apache.flink.table.api.{EnvironmentSettings, TableEnvironment, ValidationException}
-import org.apache.flink.table.catalog.{CatalogDatabaseImpl, CatalogFunctionImpl, GenericInMemoryCatalog, ObjectPath}
+import org.apache.flink.table.catalog.{
+  CatalogDatabaseImpl,
+  CatalogFunctionImpl,
+  GenericInMemoryCatalog,
+  ObjectPath
+}
 import org.apache.flink.table.planner.expressions.utils.Func0
 import org.apache.flink.table.planner.factories.utils.TestCollectionTableFactory
 import org.apache.flink.table.planner.runtime.utils.JavaUserDefinedScalarFunctions.JavaFunc0
@@ -63,35 +68,32 @@ class CatalogTableITCase(isStreamingMode: Boolean) extends AbstractTestBase {
 
   @Before
   def before(): Unit = {
-    tableEnv.getConfig.getConfiguration.setBoolean(
-      TableConfigOptions.TABLE_DYNAMIC_TABLE_OPTIONS_ENABLED,
-      true)
+    tableEnv.getConfig.getConfiguration
+      .setBoolean(TableConfigOptions.TABLE_DYNAMIC_TABLE_OPTIONS_ENABLED, true)
 
-    tableEnv.getConfig
-      .getConfiguration
+    tableEnv.getConfig.getConfiguration
       .setInteger(ExecutionConfigOptions.TABLE_EXEC_RESOURCE_DEFAULT_PARALLELISM, 1)
     TestCollectionTableFactory.reset()
 
-    val func = new CatalogFunctionImpl(
-      classOf[JavaFunc0].getName)
-    tableEnv.getCatalog(tableEnv.getCurrentCatalog).get().createFunction(
-      new ObjectPath(tableEnv.getCurrentDatabase, "myfunc"),
-      func,
-      true)
+    val func = new CatalogFunctionImpl(classOf[JavaFunc0].getName)
+    tableEnv
+      .getCatalog(tableEnv.getCurrentCatalog)
+      .get()
+      .createFunction(new ObjectPath(tableEnv.getCurrentDatabase, "myfunc"), func, true)
   }
 
   //~ Tools ------------------------------------------------------------------
 
-  implicit def rowOrdering: Ordering[Row] = Ordering.by((r : Row) => {
+  implicit def rowOrdering: Ordering[Row] = Ordering.by((r: Row) => {
     val builder = new StringBuilder
-    0 until r.getArity foreach(idx => builder.append(r.getField(idx)))
+    0 until r.getArity foreach (idx => builder.append(r.getField(idx)))
     builder.toString()
   })
 
-  def toRow(args: Any*):Row = {
+  def toRow(args: Any*): Row = {
     val row = new Row(args.length)
-    0 until args.length foreach {
-      i => row.setField(i, args(i))
+    0 until args.length foreach { i =>
+      row.setField(i, args(i))
     }
     row
   }
@@ -145,8 +147,7 @@ class CatalogTableITCase(isStreamingMode: Boolean) extends AbstractTestBase {
       toRow(2, "1", 3, new JBigDecimal("10.001")),
       toRow(3, "2000", 4, new JBigDecimal("10.001")),
       toRow(1, "2", 2, new JBigDecimal("10.001")),
-      toRow(2, "3000", 3, new JBigDecimal("10.001"))
-    )
+      toRow(2, "3000", 3, new JBigDecimal("10.001")))
     TestCollectionTableFactory.initData(sourceData)
     val sourceDDL =
       """
@@ -188,11 +189,8 @@ class CatalogTableITCase(isStreamingMode: Boolean) extends AbstractTestBase {
       "1.11,US Dollar,2019-12-12 00:00:02.002001",
       "50,Yen,2019-12-12 00:00:04.004001",
       "3.1,Euro,2019-12-12 00:00:05.005001",
-      "5.33,US Dollar,2019-12-12 00:00:06.006001"
-    )
-    val tempFilePath = createTempFile(
-      "csv-order-test",
-      csvRecords.mkString("#"))
+      "5.33,US Dollar,2019-12-12 00:00:06.006001")
+    val tempFilePath = createTempFile("csv-order-test", csvRecords.mkString("#"))
     val sourceDDL =
       s"""
        |CREATE TABLE T1 (
@@ -243,7 +241,7 @@ class CatalogTableITCase(isStreamingMode: Boolean) extends AbstractTestBase {
 
     val expected =
       "2019-12-12 00:00:05.0,2019-12-12 00:00:04.004001,3,50.00\n" +
-      "2019-12-12 00:00:10.0,2019-12-12 00:00:06.006001,2,5.33\n"
+        "2019-12-12 00:00:10.0,2019-12-12 00:00:06.006001,2,5.33\n"
     assertEquals(expected, FileUtils.readFileUtf8(new File(new URI(sinkFilePath))))
   }
 
@@ -254,11 +252,8 @@ class CatalogTableITCase(isStreamingMode: Boolean) extends AbstractTestBase {
       "1.11,US Dollar,2019-12-12 00:00:02.002001",
       "50,Yen,2019-12-12 00:00:04.004001",
       "3.1,Euro,2019-12-12 00:00:05.005001",
-      "5.33,US Dollar,2019-12-12 00:00:06.006001"
-    )
-    val tempFilePath = createTempFile(
-      "csv-order-test",
-      csvRecords.mkString("#"))
+      "5.33,US Dollar,2019-12-12 00:00:06.006001")
+    val tempFilePath = createTempFile("csv-order-test", csvRecords.mkString("#"))
     val sourceDDL =
       s"""
          |CREATE TABLE T1 (
@@ -313,20 +308,14 @@ class CatalogTableITCase(isStreamingMode: Boolean) extends AbstractTestBase {
 
   @Test
   def testInsertSourceTableExpressionFields(): Unit = {
-    val sourceData = List(
-      toRow(1, "1000"),
-      toRow(2, "1"),
-      toRow(3, "2000"),
-      toRow(1, "2"),
-      toRow(2, "3000")
-    )
+    val sourceData =
+      List(toRow(1, "1000"), toRow(2, "1"), toRow(3, "2000"), toRow(1, "2"), toRow(2, "3000"))
     val expected = List(
       toRow(1, "1000", 2),
       toRow(2, "1", 3),
       toRow(3, "2000", 4),
       toRow(1, "2", 2),
-      toRow(2, "3000", 3)
-    )
+      toRow(2, "3000", 3))
     TestCollectionTableFactory.initData(sourceData)
     val sourceDDL =
       """
@@ -362,20 +351,14 @@ class CatalogTableITCase(isStreamingMode: Boolean) extends AbstractTestBase {
   // Test the computation expression in front of referenced columns.
   @Test
   def testInsertSourceTableExpressionFieldsBeforeReferences(): Unit = {
-    val sourceData = List(
-      toRow(1, "1000"),
-      toRow(2, "1"),
-      toRow(3, "2000"),
-      toRow(2, "2"),
-      toRow(2, "3000")
-    )
+    val sourceData =
+      List(toRow(1, "1000"), toRow(2, "1"), toRow(3, "2000"), toRow(2, "2"), toRow(2, "3000"))
     val expected = List(
       toRow(101, 1, "1000"),
       toRow(102, 2, "1"),
       toRow(103, 3, "2000"),
       toRow(102, 2, "2"),
-      toRow(102, 2, "3000")
-    )
+      toRow(102, 2, "3000"))
     TestCollectionTableFactory.initData(sourceData)
     val sourceDDL =
       """
@@ -415,15 +398,13 @@ class CatalogTableITCase(isStreamingMode: Boolean) extends AbstractTestBase {
       toRow(2, "2019-09-10 09:23:41"),
       toRow(3, "2019-09-10 09:23:42"),
       toRow(1, "2019-09-10 09:23:43"),
-      toRow(2, "2019-09-10 09:23:44")
-    )
+      toRow(2, "2019-09-10 09:23:44"))
     val expected = List(
       toRow(1, "1990-02-10 12:34:56", localDateTime("1990-02-10 12:34:56")),
       toRow(2, "2019-09-10 09:23:41", localDateTime("2019-09-10 09:23:41")),
       toRow(3, "2019-09-10 09:23:42", localDateTime("2019-09-10 09:23:42")),
       toRow(1, "2019-09-10 09:23:43", localDateTime("2019-09-10 09:23:43")),
-      toRow(2, "2019-09-10 09:23:44", localDateTime("2019-09-10 09:23:44"))
-    )
+      toRow(2, "2019-09-10 09:23:44", localDateTime("2019-09-10 09:23:44")))
     TestCollectionTableFactory.initData(sourceData)
     val sourceDDL =
       """
@@ -463,15 +444,13 @@ class CatalogTableITCase(isStreamingMode: Boolean) extends AbstractTestBase {
       toRow(2, "2019-09-10 9:23:41"),
       toRow(3, "2019-09-10 9:23:42"),
       toRow(1, "2019-09-10 9:23:43"),
-      toRow(2, "2019-09-10 9:23:44")
-    )
+      toRow(2, "2019-09-10 9:23:44"))
     val expected = List(
       toRow(1, "1990-02-10 12:34:56", 1, "1990-02-10 12:34:56"),
       toRow(2, "2019-09-10 9:23:41", 2, "2019-09-10 9:23:41"),
       toRow(3, "2019-09-10 9:23:42", 3, "2019-09-10 9:23:42"),
       toRow(1, "2019-09-10 9:23:43", 1, "2019-09-10 9:23:43"),
-      toRow(2, "2019-09-10 9:23:44", 2, "2019-09-10 9:23:44")
-    )
+      toRow(2, "2019-09-10 9:23:44", 2, "2019-09-10 9:23:44"))
     TestCollectionTableFactory.initData(sourceData)
     tableEnv.registerFunction("my_udf", Func0)
     val sourceDDL =
@@ -509,20 +488,9 @@ class CatalogTableITCase(isStreamingMode: Boolean) extends AbstractTestBase {
 
   @Test
   def testInsertSinkTableExpressionFields(): Unit = {
-    val sourceData = List(
-      toRow(1, "1000"),
-      toRow(2, "1"),
-      toRow(3, "2000"),
-      toRow(1, "2"),
-      toRow(2, "3000")
-    )
-    val expected = List(
-      toRow(1, 2),
-      toRow(1, 2),
-      toRow(2, 3),
-      toRow(2, 3),
-      toRow(3, 4)
-    )
+    val sourceData =
+      List(toRow(1, "1000"), toRow(2, "1"), toRow(3, "2000"), toRow(1, "2"), toRow(2, "3000"))
+    val expected = List(toRow(1, 2), toRow(1, 2), toRow(2, 3), toRow(2, 3), toRow(3, 4))
     TestCollectionTableFactory.initData(sourceData)
     val sourceDDL =
       """
@@ -557,13 +525,8 @@ class CatalogTableITCase(isStreamingMode: Boolean) extends AbstractTestBase {
 
   @Test
   def testInsertSinkTableWithUnmatchedFields(): Unit = {
-    val sourceData = List(
-      toRow(1, "1000"),
-      toRow(2, "1"),
-      toRow(3, "2000"),
-      toRow(1, "2"),
-      toRow(2, "3000")
-    )
+    val sourceData =
+      List(toRow(1, "1000"), toRow(2, "1"), toRow(3, "2000"), toRow(1, "2"), toRow(2, "3000"))
     TestCollectionTableFactory.initData(sourceData)
     val sourceDDL =
       """
@@ -599,20 +562,11 @@ class CatalogTableITCase(isStreamingMode: Boolean) extends AbstractTestBase {
 
   @Test
   def testInsertWithJoinedSource(): Unit = {
-    val sourceData = List(
-      toRow(1, 1000, 2),
-      toRow(2, 1, 3),
-      toRow(3, 2000, 4),
-      toRow(1, 2, 2),
-      toRow(2, 3000, 3)
-    )
+    val sourceData =
+      List(toRow(1, 1000, 2), toRow(2, 1, 3), toRow(3, 2000, 4), toRow(1, 2, 2), toRow(2, 3000, 3))
 
-    val expected = List(
-      toRow(1, 1000, 2, 1),
-      toRow(1, 2, 2, 1),
-      toRow(2, 1, 1, 2),
-      toRow(2, 3000, 1, 2)
-    )
+    val expected =
+      List(toRow(1, 1000, 2, 1), toRow(1, 2, 2, 1), toRow(2, 1, 1, 2), toRow(2, 3000, 1, 2))
     TestCollectionTableFactory.initData(sourceData)
     val sourceDDL =
       """
@@ -659,14 +613,9 @@ class CatalogTableITCase(isStreamingMode: Boolean) extends AbstractTestBase {
       toRow(2, 1000, 3),
       toRow(3, 2000, 4),
       toRow(4, 2000, 5),
-      toRow(5, 3000, 6)
-    )
+      toRow(5, 3000, 6))
 
-    val expected = List(
-      toRow(3, 1000),
-      toRow(5, 3000),
-      toRow(7, 2000)
-    )
+    val expected = List(toRow(3, 1000), toRow(5, 3000), toRow(7, 2000))
     TestCollectionTableFactory.initData(sourceData)
     val sourceDDL =
       """
@@ -740,7 +689,6 @@ class CatalogTableITCase(isStreamingMode: Boolean) extends AbstractTestBase {
         |  'connector' = 'COLLECTION'
         |)
       """.stripMargin
-
 
     val permanentData = List(
       toRow(1, "1000", 2),
@@ -902,9 +850,10 @@ class CatalogTableITCase(isStreamingMode: Boolean) extends AbstractTestBase {
     tableEnv.executeSql(createTable2)
 
     expectedEx.expect(classOf[ValidationException])
-    expectedEx.expectMessage("Temporary table with identifier "
-      + "'`default_catalog`.`default_database`.`t1`' exists. "
-      + "Drop it first before removing the permanent table.")
+    expectedEx.expectMessage(
+      "Temporary table with identifier "
+        + "'`default_catalog`.`default_database`.`t1`' exists. "
+        + "Drop it first before removing the permanent table.")
     tableEnv.executeSql("drop table t1")
   }
 
@@ -923,8 +872,9 @@ class CatalogTableITCase(isStreamingMode: Boolean) extends AbstractTestBase {
     tableEnv.executeSql(createTable1)
 
     expectedEx.expect(classOf[ValidationException])
-    expectedEx.expectMessage("View with identifier "
-      + "'default_catalog.default_database.t1' does not exist.")
+    expectedEx.expectMessage(
+      "View with identifier "
+        + "'default_catalog.default_database.t1' does not exist.")
     tableEnv.executeSql("drop view t1")
   }
 
@@ -966,21 +916,28 @@ class CatalogTableITCase(isStreamingMode: Boolean) extends AbstractTestBase {
     expectedProperties.put("connector", "COLLECTION")
     expectedProperties.put("k1", "a")
     expectedProperties.put("k2", "b")
-    val properties = tableEnv.getCatalog(tableEnv.getCurrentCatalog).get()
+    val properties = tableEnv
+      .getCatalog(tableEnv.getCurrentCatalog)
+      .get()
       .getTable(new ObjectPath(tableEnv.getCurrentDatabase, "t2"))
       .getProperties
     assertEquals(expectedProperties, properties)
     val currentCatalog = tableEnv.getCurrentCatalog
     val currentDB = tableEnv.getCurrentDatabase
     tableEnv.executeSql("alter table t2 add constraint ct1 primary key(a) not enforced")
-    val tableSchema1 = tableEnv.getCatalog(currentCatalog).get()
+    val tableSchema1 = tableEnv
+      .getCatalog(currentCatalog)
+      .get()
       .getTable(ObjectPath.fromString(s"${currentDB}.t2"))
       .getSchema
     assert(tableSchema1.getPrimaryKey.isPresent)
-    assertEquals("CONSTRAINT ct1 PRIMARY KEY (a)",
+    assertEquals(
+      "CONSTRAINT ct1 PRIMARY KEY (a)",
       tableSchema1.getPrimaryKey.get().asSummaryString())
     tableEnv.executeSql("alter table t2 drop constraint ct1")
-    val tableSchema2 = tableEnv.getCatalog(currentCatalog).get()
+    val tableSchema2 = tableEnv
+      .getCatalog(currentCatalog)
+      .get()
       .getTable(ObjectPath.fromString(s"${currentDB}.t2"))
       .getSchema
     assertEquals(false, tableSchema2.getPrimaryKey.isPresent)
@@ -1028,8 +985,9 @@ class CatalogTableITCase(isStreamingMode: Boolean) extends AbstractTestBase {
     } catch {
       case _: ValidationException => //ignore
     }
-    tableEnv.executeSql("create database cat2.db1 comment 'test_comment'" +
-                         " with ('k1' = 'v1', 'k2' = 'v2')")
+    tableEnv.executeSql(
+      "create database cat2.db1 comment 'test_comment'" +
+        " with ('k1' = 'v1', 'k2' = 'v2')")
     val database = tableEnv.getCatalog("cat2").get().getDatabase("db1")
     assertEquals("test_comment", database.getComment)
     assertEquals(2, database.getProperties.size())

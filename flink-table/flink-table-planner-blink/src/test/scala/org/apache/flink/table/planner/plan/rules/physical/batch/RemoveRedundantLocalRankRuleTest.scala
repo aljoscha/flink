@@ -24,8 +24,8 @@ import org.apache.flink.table.planner.utils.TableTestBase
 import org.junit.{Before, Test}
 
 /**
-  * Tests for [[RemoveRedundantLocalRankRule]].
-  */
+ * Tests for [[RemoveRedundantLocalRankRule]].
+ */
 class RemoveRedundantLocalRankRuleTest extends TableTestBase {
 
   private val util = batchTestUtil()

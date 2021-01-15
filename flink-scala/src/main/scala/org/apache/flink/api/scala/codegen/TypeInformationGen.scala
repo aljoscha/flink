@@ -34,10 +34,7 @@ import scala.reflect.macros.Context
 
 @Internal
 private[flink] trait TypeInformationGen[C <: Context] {
-  this: MacroContextHolder[C]
-  with TypeDescriptors[C]
-  with TypeAnalyzer[C]
-  with TreeGen[C] =>
+  this: MacroContextHolder[C] with TypeDescriptors[C] with TypeAnalyzer[C] with TreeGen[C] =>
 
   import c.universe._
 
@@ -54,14 +51,14 @@ private[flink] trait TypeInformationGen[C <: Context] {
 
     case f: FactoryTypeDescriptor => mkTypeInfoFromFactory(f)
 
-    case cc@CaseClassDescriptor(_, tpe, _, _, _) =>
+    case cc @ CaseClassDescriptor(_, tpe, _, _, _) =>
       mkCaseClassTypeInfo(cc)(c.WeakTypeTag(tpe).asInstanceOf[c.WeakTypeTag[Product]])
         .asInstanceOf[c.Expr[TypeInformation[T]]]
 
     case tp: TypeParameterDescriptor => mkTypeParameter(tp)
 
-    case p : PrimitiveDescriptor => mkPrimitiveTypeInfo(p.tpe)
-    case p : BoxedPrimitiveDescriptor => mkPrimitiveTypeInfo(p.tpe)
+    case p: PrimitiveDescriptor      => mkPrimitiveTypeInfo(p.tpe)
+    case p: BoxedPrimitiveDescriptor => mkPrimitiveTypeInfo(p.tpe)
 
     case n: NothingDescriptor =>
       reify { new ScalaNothingTypeInfo().asInstanceOf[TypeInformation[T]] }
@@ -76,11 +73,11 @@ private[flink] trait TypeInformationGen[C <: Context] {
 
     case o: OptionDescriptor => mkOptionTypeInfo(o)
 
-    case a : ArrayDescriptor => mkArrayTypeInfo(a)
+    case a: ArrayDescriptor => mkArrayTypeInfo(a)
 
-    case l : TraversableDescriptor => mkTraversableTypeInfo(l)
+    case l: TraversableDescriptor => mkTraversableTypeInfo(l)
 
-    case v : ValueDescriptor =>
+    case v: ValueDescriptor =>
       mkValueTypeInfo(v)(c.WeakTypeTag(v.tpe).asInstanceOf[c.WeakTypeTag[Value]])
         .asInstanceOf[c.Expr[TypeInformation[T]]]
 
@@ -91,8 +88,8 @@ private[flink] trait TypeInformationGen[C <: Context] {
     case d => mkGenericTypeInfo(d)
   }
 
-  def mkTypeInfoFromFactory[T: c.WeakTypeTag](desc: FactoryTypeDescriptor)
-    : c.Expr[TypeInformation[T]] = {
+  def mkTypeInfoFromFactory[T: c.WeakTypeTag](
+      desc: FactoryTypeDescriptor): c.Expr[TypeInformation[T]] = {
 
     val tpeClazz = c.Expr[Class[T]](Literal(Constant(desc.tpe)))
     val baseClazz = c.Expr[Class[T]](Literal(Constant(desc.baseType)))
@@ -103,14 +100,16 @@ private[flink] trait TypeInformationGen[C <: Context] {
     reify {
       val factory = TypeExtractor.getTypeInfoFactory[T](baseClazz.splice)
       val genericParameters = typeInfosList.splice
-        .zip(baseClazz.splice.getTypeParameters).map { case (typeInfo, typeParam) =>
+        .zip(baseClazz.splice.getTypeParameters)
+        .map { case (typeInfo, typeParam) =>
           typeParam.getName -> typeInfo
-        }.toMap[String, TypeInformation[_]]
+        }
+        .toMap[String, TypeInformation[_]]
       factory.createTypeInfo(tpeClazz.splice, genericParameters.asJava)
     }
   }
 
-  def mkCaseClassTypeInfo[T <: Product : c.WeakTypeTag](
+  def mkCaseClassTypeInfo[T <: Product: c.WeakTypeTag](
       desc: CaseClassDescriptor): c.Expr[TypeInformation[T]] = {
     val tpeClazz = c.Expr[Class[T]](Literal(Constant(desc.tpe)))
 
@@ -350,7 +349,7 @@ private[flink] trait TypeInformationGen[C <: Context] {
     }
   }
 
-  def mkValueTypeInfo[T <: Value : c.WeakTypeTag](
+  def mkValueTypeInfo[T <: Value: c.WeakTypeTag](
       desc: UDTDescriptor): c.Expr[TypeInformation[T]] = {
     val tpeClazz = c.Expr[Class[T]](Literal(Constant(desc.tpe)))
     reify {
@@ -367,27 +366,25 @@ private[flink] trait TypeInformationGen[C <: Context] {
     val tpeClazz = c.Expr[Class[T]](Literal(Constant(desc.tpe)))
 
     reify {
-      val fields =  fieldsList.splice
+      val fields = fieldsList.splice
       val clazz = tpeClazz.splice.asInstanceOf[Class[org.apache.flink.api.java.tuple.Tuple]]
       new TupleTypeInfo[org.apache.flink.api.java.tuple.Tuple](clazz, fields: _*)
         .asInstanceOf[TypeInformation[T]]
     }
   }
 
-
   def mkPojo[T: c.WeakTypeTag](desc: PojoDescriptor): c.Expr[TypeInformation[T]] = {
     val tpeClazz = c.Expr[Class[T]](Literal(Constant(desc.tpe)))
-    val fieldsTrees = desc.getters map {
-      f =>
-        val name = c.Expr(Literal(Constant(f.name)))
-        val fieldType = mkTypeInfo(f.desc)(c.WeakTypeTag(f.tpe))
-        reify { (name.splice, fieldType.splice) }.tree
+    val fieldsTrees = desc.getters map { f =>
+      val name = c.Expr(Literal(Constant(f.name)))
+      val fieldType = mkTypeInfo(f.desc)(c.WeakTypeTag(f.tpe))
+      reify { (name.splice, fieldType.splice) }.tree
     }
 
     val fieldsList = c.Expr[List[(String, TypeInformation[_])]](mkList(fieldsTrees.toList))
 
     reify {
-      val fields =  fieldsList.splice
+      val fields = fieldsList.splice
       val clazz: Class[T] = tpeClazz.splice
 
       var traversalClazz: Class[_] = clazz
@@ -397,9 +394,10 @@ private[flink] trait TypeInformationGen[C <: Context] {
       while (traversalClazz != null) {
         for (field <- traversalClazz.getDeclaredFields) {
           if (clazzFields.contains(field.getName) && !Modifier.isStatic(field.getModifiers)) {
-            println(s"The field $field is already contained in the " +
-              s"hierarchy of the class $clazz. Please use unique field names throughout " +
-              "your class hierarchy")
+            println(
+              s"The field $field is already contained in the " +
+                s"hierarchy of the class $clazz. Please use unique field names throughout " +
+                "your class hierarchy")
             error = true
           }
           clazzFields += (field.getName -> field)
@@ -410,16 +408,15 @@ private[flink] trait TypeInformationGen[C <: Context] {
       if (error) {
         new GenericTypeInfo(clazz)
       } else {
-        val pojoFields = fields flatMap {
-          case (fName, fTpe) =>
-            val field = clazzFields(fName)
-            if (Modifier.isTransient(field.getModifiers) || Modifier.isStatic(field.getModifiers)) {
-              // ignore transient and static fields
-              // the TypeAnalyzer for some reason does not always detect transient fields
-              None
-            } else {
-              Some(new PojoField(clazzFields(fName), fTpe))
-            }
+        val pojoFields = fields flatMap { case (fName, fTpe) =>
+          val field = clazzFields(fName)
+          if (Modifier.isTransient(field.getModifiers) || Modifier.isStatic(field.getModifiers)) {
+            // ignore transient and static fields
+            // the TypeAnalyzer for some reason does not always detect transient fields
+            None
+          } else {
+            Some(new PojoField(clazzFields(fName), fTpe))
+          }
         }
 
         new PojoTypeInfo(clazz, pojoFields.asJava)

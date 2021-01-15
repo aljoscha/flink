@@ -19,7 +19,11 @@
 package org.apache.flink.table.planner.plan.utils
 
 import org.apache.flink.table.api.{TableConfig, TableException}
-import org.apache.flink.table.planner.codegen.{CodeGeneratorContext, ExprCodeGenerator, FunctionCodeGenerator}
+import org.apache.flink.table.planner.codegen.{
+  CodeGeneratorContext,
+  ExprCodeGenerator,
+  FunctionCodeGenerator
+}
 import org.apache.flink.table.planner.plan.nodes.exec.utils.JoinSpec
 import org.apache.flink.table.runtime.generated.GeneratedJoinCondition
 import org.apache.flink.table.runtime.types.PlannerTypeUtils
@@ -37,8 +41,8 @@ import java.util.Optional
 import scala.collection.JavaConversions._
 
 /**
-  * Util for [[Join]]s.
-  */
+ * Util for [[Join]]s.
+ */
 object JoinUtil {
 
   /**
@@ -48,13 +52,13 @@ object JoinUtil {
     val filterNulls = new util.ArrayList[java.lang.Boolean]
     val joinInfo = createJoinInfo(join.getLeft, join.getRight, join.getCondition, filterNulls)
     val nonEquiCondition =
-        RexUtil.composeConjunction(join.getCluster.getRexBuilder, joinInfo.nonEquiConditions)
+      RexUtil.composeConjunction(join.getCluster.getRexBuilder, joinInfo.nonEquiConditions)
     new JoinSpec(
-        JoinTypeUtil.getFlinkJoinType(join.getJoinType),
-        joinInfo.leftKeys.toIntArray,
-        joinInfo.rightKeys.toIntArray,
-        filterNulls.map(_.booleanValue()).toArray,
-        nonEquiCondition)
+      JoinTypeUtil.getFlinkJoinType(join.getJoinType),
+      joinInfo.leftKeys.toIntArray,
+      joinInfo.rightKeys.toIntArray,
+      filterNulls.map(_.booleanValue()).toArray,
+      nonEquiCondition)
   }
 
   /**
@@ -66,35 +70,35 @@ object JoinUtil {
       rightType: RowType,
       allowEmptyKey: Boolean = false): Unit = {
     if (joinSpec.getLeftKeys.isEmpty && !allowEmptyKey) {
-        throw new TableException(
-          s"Joins should have at least one equality condition.\n" +
-            s"\tLeft type: $leftType\n\tright type: $rightType\n" +
-            s"please re-check the join statement and make sure there's " +
-            "equality condition for join.")
+      throw new TableException(
+        s"Joins should have at least one equality condition.\n" +
+          s"\tLeft type: $leftType\n\tright type: $rightType\n" +
+          s"please re-check the join statement and make sure there's " +
+          "equality condition for join.")
     }
 
     val leftKeys = joinSpec.getLeftKeys
     val rightKeys = joinSpec.getRightKeys
     (0 until joinSpec.getJoinKeySize).foreach { idx =>
-        val leftKeyType = leftType.getTypeAt(leftKeys(idx))
-        val rightKeyType = rightType.getTypeAt(rightKeys(idx))
+      val leftKeyType = leftType.getTypeAt(leftKeys(idx))
+      val rightKeyType = rightType.getTypeAt(rightKeys(idx))
 
-        // check if keys are compatible
-        if (!PlannerTypeUtils.isInteroperable(leftKeyType, rightKeyType)) {
-          throw new TableException(
-            s"Join: Equality join predicate on incompatible types. " +
-              s"\tLeft type: $leftType\n\tright type: $rightType\n" +
-              "please re-check the join statement.")
-        }
+      // check if keys are compatible
+      if (!PlannerTypeUtils.isInteroperable(leftKeyType, rightKeyType)) {
+        throw new TableException(
+          s"Join: Equality join predicate on incompatible types. " +
+            s"\tLeft type: $leftType\n\tright type: $rightType\n" +
+            "please re-check the join statement.")
+      }
     }
   }
 
   /**
-    * Creates a [[JoinInfo]] by analyzing a condition.
-    *
-    * <p>NOTES: the functionality of the method is same with [[JoinInfo#of]],
-    * the only difference is that the methods could return `filterNulls`.
-    */
+   * Creates a [[JoinInfo]] by analyzing a condition.
+   *
+   * <p>NOTES: the functionality of the method is same with [[JoinInfo#of]],
+   * the only difference is that the methods could return `filterNulls`.
+   */
   def createJoinInfo(
       left: RelNode,
       right: RelNode,
@@ -102,8 +106,8 @@ object JoinUtil {
       filterNulls: util.List[java.lang.Boolean]): JoinInfo = {
     val leftKeys = new util.ArrayList[Integer]
     val rightKeys = new util.ArrayList[Integer]
-    val remaining = RelOptUtil.splitJoinCondition(
-      left, right, condition, leftKeys, rightKeys, filterNulls)
+    val remaining =
+      RelOptUtil.splitJoinCondition(left, right, condition, leftKeys, rightKeys, filterNulls)
 
     if (remaining.isAlwaysTrue) {
       JoinInfo.of(ImmutableIntList.copyOf(leftKeys), ImmutableIntList.copyOf(rightKeys))
@@ -119,22 +123,22 @@ object JoinUtil {
       leftType: LogicalType,
       rightType: LogicalType): GeneratedJoinCondition = {
     generateConditionFunction(
-        config,
-        joinSpec.getNonEquiCondition().orElse(null),
-        leftType,
-        rightType)
+      config,
+      joinSpec.getNonEquiCondition().orElse(null),
+      leftType,
+      rightType)
   }
 
   def generateConditionFunction(
-        config: TableConfig,
-        nonEquiCondition: RexNode,
-        leftType: LogicalType,
-        rightType: LogicalType): GeneratedJoinCondition = {
+      config: TableConfig,
+      nonEquiCondition: RexNode,
+      leftType: LogicalType,
+      rightType: LogicalType): GeneratedJoinCondition = {
     val ctx = CodeGeneratorContext(config)
     // should consider null fields
     val exprGenerator = new ExprCodeGenerator(ctx, false)
-        .bindInput(leftType)
-        .bindSecondInput(rightType)
+      .bindInput(leftType)
+      .bindSecondInput(rightType)
 
     val body = if (nonEquiCondition == null) {
       // only equality condition
@@ -147,9 +151,6 @@ object JoinUtil {
          |""".stripMargin
     }
 
-    FunctionCodeGenerator.generateJoinCondition(
-      ctx,
-      "ConditionFunction",
-      body)
+    FunctionCodeGenerator.generateJoinCondition(ctx, "ConditionFunction", body)
   }
 }

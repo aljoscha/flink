@@ -23,17 +23,17 @@ import org.apache.calcite.rel.RelNode
 import org.apache.calcite.rex.RexNode
 
 /**
-  * Sub-class of [[WatermarkAssigner]] that is a relational operator
-  * which generates [[org.apache.flink.streaming.api.watermark.Watermark]].
-  * This class corresponds to Calcite logical rel.
-  */
+ * Sub-class of [[WatermarkAssigner]] that is a relational operator
+ * which generates [[org.apache.flink.streaming.api.watermark.Watermark]].
+ * This class corresponds to Calcite logical rel.
+ */
 final class LogicalWatermarkAssigner(
     cluster: RelOptCluster,
     traits: RelTraitSet,
     input: RelNode,
     rowtimeFieldIndex: Int,
     watermarkExpr: RexNode)
-  extends WatermarkAssigner(cluster, traits, input, rowtimeFieldIndex, watermarkExpr) {
+    extends WatermarkAssigner(cluster, traits, input, rowtimeFieldIndex, watermarkExpr) {
 
   override def copy(
       traitSet: RelTraitSet,
@@ -55,4 +55,3 @@ object LogicalWatermarkAssigner {
     new LogicalWatermarkAssigner(cluster, traits, input, rowtimeFieldIndex, watermarkExpr)
   }
 }
-

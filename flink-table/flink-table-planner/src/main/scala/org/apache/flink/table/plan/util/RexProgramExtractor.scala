@@ -46,17 +46,16 @@ object RexProgramExtractor {
   lazy val LOG: Logger = LoggerFactory.getLogger(getClass)
 
   /**
-    * Extracts the indices of input fields which accessed by the RexProgram.
-    *
-    * @param rexProgram The RexProgram to analyze
-    * @return The indices of accessed input fields
-    */
+   * Extracts the indices of input fields which accessed by the RexProgram.
+   *
+   * @param rexProgram The RexProgram to analyze
+   * @return The indices of accessed input fields
+   */
   def extractRefInputFields(rexProgram: RexProgram): Array[Int] = {
     val visitor = new InputRefVisitor
 
     // extract referenced input fields from projections
-    rexProgram.getProjectList.foreach(
-      exp => rexProgram.expandLocalRef(exp).accept(visitor))
+    rexProgram.getProjectList.foreach(exp => rexProgram.expandLocalRef(exp).accept(visitor))
 
     // extract referenced input fields from condition
     val condition = rexProgram.getCondition
@@ -68,11 +67,11 @@ object RexProgramExtractor {
   }
 
   /**
-    * Extract condition from RexProgram and convert it into independent CNF expressions.
-    *
-    * @param rexProgram The RexProgram to analyze
-    * @return converted expressions as well as RexNodes which cannot be translated
-    */
+   * Extract condition from RexProgram and convert it into independent CNF expressions.
+   *
+   * @param rexProgram The RexProgram to analyze
+   * @return converted expressions as well as RexNodes which cannot be translated
+   */
   def extractConjunctiveConditions(
       rexProgram: RexProgram,
       rexBuilder: RexBuilder,
@@ -101,7 +100,7 @@ object RexProgramExtractor {
         conjunctions.asScala.foreach(rex => {
           rex.accept(converter) match {
             case Some(expression) => convertedExpressions += expression
-            case None => unconvertedRexNodes += rex
+            case None             => unconvertedRexNodes += rex
           }
         })
         (convertedExpressions.toArray, unconvertedRexNodes.toArray)
@@ -111,14 +110,15 @@ object RexProgramExtractor {
   }
 
   /**
-    * Extracts the name of nested input fields accessed by the RexProgram and returns the
-    * prefix of the accesses.
-    *
-    * @param rexProgram The RexProgram to analyze
-    * @return The full names of accessed input fields. e.g. field.subfield
-    */
+   * Extracts the name of nested input fields accessed by the RexProgram and returns the
+   * prefix of the accesses.
+   *
+   * @param rexProgram The RexProgram to analyze
+   * @return The full names of accessed input fields. e.g. field.subfield
+   */
   def extractRefNestedInputFields(
-      rexProgram: RexProgram, usedFields: Array[Int]): Array[Array[String]] = {
+      rexProgram: RexProgram,
+      usedFields: Array[Int]): Array[Array[String]] = {
 
     val visitor = new RefFieldAccessorVisitor(usedFields)
     rexProgram.getProjectList.foreach(exp => rexProgram.expandLocalRef(exp).accept(visitor))
@@ -132,8 +132,8 @@ object RexProgramExtractor {
 }
 
 /**
-  * An RexVisitor to extract all referenced input fields
-  */
+ * An RexVisitor to extract all referenced input fields
+ */
 class InputRefVisitor extends RexVisitorImpl[Unit](true) {
 
   private val fields = mutable.LinkedHashSet[Int]()
@@ -148,11 +148,11 @@ class InputRefVisitor extends RexVisitorImpl[Unit](true) {
 }
 
 /**
-  * An RexVisitor to convert RexNode to Expression.
-  *
-  * @param inputNames      The input names of the relation node
-  * @param functionCatalog The function catalog
-  */
+ * An RexVisitor to convert RexNode to Expression.
+ *
+ * @param inputNames      The input names of the relation node
+ * @param functionCatalog The function catalog
+ */
 class RexNodeToExpressionConverter(
     rexBuilder: RexBuilder,
     inputNames: Array[String],
@@ -161,10 +161,10 @@ class RexNodeToExpressionConverter(
 
   override def visitInputRef(inputRef: RexInputRef): Option[Expression] = {
     Preconditions.checkArgument(inputRef.getIndex < inputNames.length)
-    Some(PlannerResolvedFieldReference(
-      inputNames(inputRef.getIndex),
-      FlinkTypeFactory.toTypeInfo(inputRef.getType)
-    ))
+    Some(
+      PlannerResolvedFieldReference(
+        inputNames(inputRef.getIndex),
+        FlinkTypeFactory.toTypeInfo(inputRef.getType)))
   }
 
   override def visitTableInputRef(rexTableInputRef: RexTableInputRef): Option[Expression] =
@@ -179,51 +179,51 @@ class RexNodeToExpressionConverter(
 
     val literalValue = literalType match {
 
-      case _@SqlTimeTypeInfo.DATE =>
+      case _ @SqlTimeTypeInfo.DATE =>
         val rexValue = literal.getValueAs(classOf[DateString])
         Date.valueOf(rexValue.toString)
 
-      case _@SqlTimeTypeInfo.TIME =>
+      case _ @SqlTimeTypeInfo.TIME =>
         val rexValue = literal.getValueAs(classOf[TimeString])
         Time.valueOf(rexValue.toString(0))
 
-      case _@SqlTimeTypeInfo.TIMESTAMP =>
+      case _ @SqlTimeTypeInfo.TIMESTAMP =>
         val rexValue = literal.getValueAs(classOf[TimestampString])
         Timestamp.valueOf(rexValue.toString(3))
 
-      case _@BasicTypeInfo.BYTE_TYPE_INFO =>
+      case _ @BasicTypeInfo.BYTE_TYPE_INFO =>
         // convert from BigDecimal to Byte
         literal.getValueAs(classOf[java.lang.Byte])
 
-      case _@BasicTypeInfo.SHORT_TYPE_INFO =>
+      case _ @BasicTypeInfo.SHORT_TYPE_INFO =>
         // convert from BigDecimal to Short
         literal.getValueAs(classOf[java.lang.Short])
 
-      case _@BasicTypeInfo.INT_TYPE_INFO =>
+      case _ @BasicTypeInfo.INT_TYPE_INFO =>
         // convert from BigDecimal to Integer
         literal.getValueAs(classOf[java.lang.Integer])
 
-      case _@BasicTypeInfo.LONG_TYPE_INFO =>
+      case _ @BasicTypeInfo.LONG_TYPE_INFO =>
         // convert from BigDecimal to Long
         literal.getValueAs(classOf[java.lang.Long])
 
-      case _@BasicTypeInfo.FLOAT_TYPE_INFO =>
+      case _ @BasicTypeInfo.FLOAT_TYPE_INFO =>
         // convert from BigDecimal to Float
         literal.getValueAs(classOf[java.lang.Float])
 
-      case _@BasicTypeInfo.DOUBLE_TYPE_INFO =>
+      case _ @BasicTypeInfo.DOUBLE_TYPE_INFO =>
         // convert from BigDecimal to Double
         literal.getValueAs(classOf[java.lang.Double])
 
-      case _@BasicTypeInfo.STRING_TYPE_INFO =>
+      case _ @BasicTypeInfo.STRING_TYPE_INFO =>
         // convert from NlsString to String
         literal.getValueAs(classOf[java.lang.String])
 
-      case _@BasicTypeInfo.BOOLEAN_TYPE_INFO =>
+      case _ @BasicTypeInfo.BOOLEAN_TYPE_INFO =>
         // convert to Boolean
         literal.getValueAs(classOf[java.lang.Boolean])
 
-      case _@BasicTypeInfo.BIG_DEC_TYPE_INFO =>
+      case _ @BasicTypeInfo.BIG_DEC_TYPE_INFO =>
         // convert to BigDecimal
         literal.getValueAs(classOf[java.math.BigDecimal])
 
@@ -254,33 +254,29 @@ class RexNodeToExpressionConverter(
   }
 
   override def visitCall(oriRexCall: RexCall): Option[Expression] = {
-    val call = expandSearch(
-      rexBuilder,
-      oriRexCall).asInstanceOf[RexCall]
-    val operands = call.getOperands.map(
-      operand => operand.accept(this).orNull
-    )
+    val call = expandSearch(rexBuilder, oriRexCall).asInstanceOf[RexCall]
+    val operands = call.getOperands.map(operand => operand.accept(this).orNull)
 
     // return null if we cannot translate all the operands of the call
     if (operands.contains(null)) {
       None
     } else {
-        // TODO we cast to planner expression as a temporary solution to keep the old interfaces
-        call.getOperator match {
-          case SqlStdOperatorTable.OR =>
-            Option(operands.reduceLeft { (l, r) =>
-              Or(l.asInstanceOf[PlannerExpression], r.asInstanceOf[PlannerExpression])
-            })
-          case SqlStdOperatorTable.AND =>
-            Option(operands.reduceLeft { (l, r) =>
-              And(l.asInstanceOf[PlannerExpression], r.asInstanceOf[PlannerExpression])
-            })
-          case function: SqlFunction =>
-            lookupFunction(replace(function.getName), operands)
-          case postfix: SqlPostfixOperator =>
-            lookupFunction(replace(postfix.getName), operands)
-          case operator@_ =>
-            lookupFunction(replace(s"${operator.getKind}"), operands)
+      // TODO we cast to planner expression as a temporary solution to keep the old interfaces
+      call.getOperator match {
+        case SqlStdOperatorTable.OR =>
+          Option(operands.reduceLeft { (l, r) =>
+            Or(l.asInstanceOf[PlannerExpression], r.asInstanceOf[PlannerExpression])
+          })
+        case SqlStdOperatorTable.AND =>
+          Option(operands.reduceLeft { (l, r) =>
+            And(l.asInstanceOf[PlannerExpression], r.asInstanceOf[PlannerExpression])
+          })
+        case function: SqlFunction =>
+          lookupFunction(replace(function.getName), operands)
+        case postfix: SqlPostfixOperator =>
+          lookupFunction(replace(postfix.getName), operands)
+        case operator @ _ =>
+          lookupFunction(replace(s"${operator.getKind}"), operands)
       }
     }
   }
@@ -301,13 +297,14 @@ class RexNodeToExpressionConverter(
 
   private def lookupFunction(name: String, operands: Seq[Expression]): Option[Expression] = {
     // TODO we assume only planner expression as a temporary solution to keep the old interfaces
-    val expressionBridge = new ExpressionBridge[PlannerExpression](
-      PlannerExpressionConverter.INSTANCE)
-    JavaScalaConversionUtil.toScala(functionCatalog.lookupFunction(UnresolvedIdentifier.of(name)))
+    val expressionBridge =
+      new ExpressionBridge[PlannerExpression](PlannerExpressionConverter.INSTANCE)
+    JavaScalaConversionUtil
+      .toScala(functionCatalog.lookupFunction(UnresolvedIdentifier.of(name)))
       .flatMap(result =>
-        Try(expressionBridge.bridge(
-          unresolvedCall(result.getFunctionDefinition, operands: _*))).toOption
-      )
+        Try(
+          expressionBridge.bridge(
+            unresolvedCall(result.getFunctionDefinition, operands: _*))).toOption)
   }
 
   private def replace(str: String): String = {
@@ -316,8 +313,8 @@ class RexNodeToExpressionConverter(
 }
 
 /**
-  * A RexVisitor to extract used nested input fields
-  */
+ * A RexVisitor to extract used nested input fields
+ */
 class RefFieldAccessorVisitor(usedFields: Array[Int]) extends RexVisitorImpl[Unit](true) {
 
   private val projectedFields: Array[Array[String]] = Array.fill(usedFields.length)(Array.empty)
@@ -331,20 +328,20 @@ class RefFieldAccessorVisitor(usedFields: Array[Int]) extends RexVisitorImpl[Uni
       // sort nested field accesses
       val sorted = nestedFields.sorted
       // get prefix field accesses
-      val prefixAccesses = sorted.foldLeft(Nil: List[String]) {
-        (prefixAccesses, nestedAccess) => prefixAccesses match {
-              // first access => add access
-            case Nil => List[String](nestedAccess)
-              // top-level access already found => return top-level access
-            case head :: Nil if head.equals("*") => prefixAccesses
-              // access is top-level access => return top-level access
-            case _ :: _ if nestedAccess.equals("*") => List("*")
-            // previous access is not prefix of this access => add access
-            case head :: _ if !nestedAccess.startsWith(head) =>
-              nestedAccess :: prefixAccesses
-              // previous access is a prefix of this access => do not add access
-            case _ => prefixAccesses
-          }
+      val prefixAccesses = sorted.foldLeft(Nil: List[String]) { (prefixAccesses, nestedAccess) =>
+        prefixAccesses match {
+          // first access => add access
+          case Nil => List[String](nestedAccess)
+          // top-level access already found => return top-level access
+          case head :: Nil if head.equals("*") => prefixAccesses
+          // access is top-level access => return top-level access
+          case _ :: _ if nestedAccess.equals("*") => List("*")
+          // previous access is not prefix of this access => add access
+          case head :: _ if !nestedAccess.startsWith(head) =>
+            nestedAccess :: prefixAccesses
+          // previous access is a prefix of this access => do not add access
+          case _ => prefixAccesses
+        }
       }
       prefixAccesses.toArray
     }

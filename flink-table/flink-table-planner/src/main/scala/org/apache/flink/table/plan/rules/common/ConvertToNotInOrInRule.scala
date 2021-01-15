@@ -30,62 +30,53 @@ import scala.collection.JavaConversions._
 import scala.collection.mutable
 
 /**
-  * Rule for converting a cascade of predicates to [[IN]] or [[NOT_IN]].
-  *
-  * For example, convert predicate: (x = 1 OR x = 2 OR x = 3) AND y = 4 to
-  * predicate: x IN (1, 2, 3) AND y = 4.
-  *
-  * @param toOperator       The toOperator, for example, when convert to [[IN]], toOperator is
-  *                         [[IN]]. We convert a cascade of [[EQUALS]] to [[IN]].
-  * @param description      The description of the rule.
-  */
-class ConvertToNotInOrInRule(
-    toOperator: SqlBinaryOperator,
-    description: String)
-  extends RelOptRule(
-    operand(classOf[Filter], any),
-    description) {
+ * Rule for converting a cascade of predicates to [[IN]] or [[NOT_IN]].
+ *
+ * For example, convert predicate: (x = 1 OR x = 2 OR x = 3) AND y = 4 to
+ * predicate: x IN (1, 2, 3) AND y = 4.
+ *
+ * @param toOperator       The toOperator, for example, when convert to [[IN]], toOperator is
+ *                         [[IN]]. We convert a cascade of [[EQUALS]] to [[IN]].
+ * @param description      The description of the rule.
+ */
+class ConvertToNotInOrInRule(toOperator: SqlBinaryOperator, description: String)
+    extends RelOptRule(operand(classOf[Filter], any), description) {
 
   override def onMatch(call: RelOptRuleCall): Unit = {
     val filter: Filter = call.rel(0)
     convertToNotInOrIn(call.builder(), filter.getCondition) match {
       case Some(newRex) =>
-        call.transformTo(filter.copy(
-          filter.getTraitSet,
-          filter.getInput,
-          newRex))
+        call.transformTo(filter.copy(filter.getTraitSet, filter.getInput, newRex))
 
       case None => // do nothing
     }
   }
 
   /**
-    * Returns a condition decomposed by [[AND]] or [[OR]].
-    */
+   * Returns a condition decomposed by [[AND]] or [[OR]].
+   */
   private def decomposedBy(rex: RexNode, operator: SqlBinaryOperator): Seq[RexNode] = {
     operator match {
       case AND => RelOptUtil.conjunctions(rex)
-      case OR => RelOptUtil.disjunctions(rex)
+      case OR  => RelOptUtil.disjunctions(rex)
     }
   }
 
   /**
-    * Convert a cascade predicates to [[IN]] or [[NOT_IN]].
-    *
-    * @param builder The [[RelBuilder]] to build the [[RexNode]].
-    * @param rex     The predicates to be converted.
-    * @return The converted predicates.
-    */
-  private def convertToNotInOrIn(
-    builder: RelBuilder,
-    rex: RexNode): Option[RexNode] = {
+   * Convert a cascade predicates to [[IN]] or [[NOT_IN]].
+   *
+   * @param builder The [[RelBuilder]] to build the [[RexNode]].
+   * @param rex     The predicates to be converted.
+   * @return The converted predicates.
+   */
+  private def convertToNotInOrIn(builder: RelBuilder, rex: RexNode): Option[RexNode] = {
 
     // For example, when convert to [[IN]], fromOperator is [[EQUALS]].
     // We convert a cascade of [[EQUALS]] to [[IN]].
     // A connect operator is used to connect the fromOperator.
     // A composed operator may contains sub [[IN]] or [[NOT_IN]].
     val (fromOperator, connectOperator, composedOperator) = toOperator match {
-      case IN => (EQUALS, OR, AND)
+      case IN     => (EQUALS, OR, AND)
       case NOT_IN => (NOT_EQUALS, AND, OR)
     }
 
@@ -121,7 +112,7 @@ class ConvertToNotInOrInRule(
             })
             composedOperator match {
               case AND => rexBuffer += builder.and(newRex)
-              case OR => rexBuffer += builder.or(newRex)
+              case OR  => rexBuffer += builder.or(newRex)
             }
 
           case _ => rexBuffer += call
@@ -140,7 +131,7 @@ class ConvertToNotInOrInRule(
       } else {
         connectOperator match {
           case AND => rexBuffer += builder.and(list)
-          case OR => rexBuffer += builder.or(list)
+          case OR  => rexBuffer += builder.or(list)
         }
       }
     }
@@ -149,7 +140,7 @@ class ConvertToNotInOrInRule(
       // return result if has been converted
       connectOperator match {
         case AND => Some(builder.and(rexBuffer))
-        case OR => Some(builder.or(rexBuffer))
+        case OR  => Some(builder.or(rexBuffer))
       }
     } else {
       None
@@ -160,20 +151,18 @@ class ConvertToNotInOrInRule(
 object ConvertToNotInOrInRule {
 
   /**
-    * Rule to convert multi [[EQUALS]] to [[IN]].
-    *
-    * For example, convert predicate: (x = 1 OR x = 2 OR x = 3) AND y = 4 to
-    * predicate: x IN (1, 2, 3) AND y = 4.
-    *
-    */
+   * Rule to convert multi [[EQUALS]] to [[IN]].
+   *
+   * For example, convert predicate: (x = 1 OR x = 2 OR x = 3) AND y = 4 to
+   * predicate: x IN (1, 2, 3) AND y = 4.
+   */
   val IN_INSTANCE = new ConvertToNotInOrInRule(IN, "MergeMultiEqualsToInRule")
 
   /**
-    * Rule to convert multi [[NOT_EQUALS]] to [[NOT_IN]].
-    *
-    * For example, convert predicate: (x <> 1 AND x <> 2 AND x <> 3) OR y <> 4 to
-    * predicate: x NOT_IN (1, 2, 3) OR y <> 4.
-    *
-    */
+   * Rule to convert multi [[NOT_EQUALS]] to [[NOT_IN]].
+   *
+   * For example, convert predicate: (x <> 1 AND x <> 2 AND x <> 3) OR y <> 4 to
+   * predicate: x NOT_IN (1, 2, 3) OR y <> 4.
+   */
   val NOT_IN_INSTANCE = new ConvertToNotInOrInRule(NOT_IN, "MergeMultiNotEqualsToNotInRule")
 }

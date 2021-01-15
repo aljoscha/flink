@@ -29,11 +29,11 @@ import org.apache.flink.table.plan.schema.TableSourceTable
 import org.apache.flink.table.sources.BatchTableSource
 
 class BatchTableSourceScanRule
-  extends ConverterRule(
-    classOf[FlinkLogicalTableSourceScan],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.DATASET,
-    "BatchTableSourceScanRule") {
+    extends ConverterRule(
+      classOf[FlinkLogicalTableSourceScan],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.DATASET,
+      "BatchTableSourceScanRule") {
 
   /** Rule must only match if TableScan targets a [[BatchTableSource]] */
   override def matches(call: RelOptRuleCall): Boolean = {
@@ -52,8 +52,7 @@ class BatchTableSourceScanRule
       scan.getTable,
       scan.tableSchema,
       scan.tableSource,
-      scan.selectedFields
-    )
+      scan.selectedFields)
   }
 }
 

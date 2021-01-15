@@ -25,8 +25,8 @@ import org.apache.flink.table.runtime.types.CRow
 import org.apache.flink.types.Row
 
 /**
-  * The function to execute processing time bounded stream inner-join.
-  */
+ * The function to execute processing time bounded stream inner-join.
+ */
 final class ProcTimeBoundedStreamJoin(
     joinType: JoinType,
     leftLowerBound: Long,
@@ -35,15 +35,15 @@ final class ProcTimeBoundedStreamJoin(
     rightType: TypeInformation[Row],
     genJoinFuncName: String,
     genJoinFuncCode: String)
-  extends TimeBoundedStreamJoin(
-    joinType,
-    leftLowerBound,
-    leftUpperBound,
-    allowedLateness = 0L,
-    leftType,
-    rightType,
-    genJoinFuncName,
-    genJoinFuncCode) {
+    extends TimeBoundedStreamJoin(
+      joinType,
+      leftLowerBound,
+      leftUpperBound,
+      allowedLateness = 0L,
+      leftType,
+      rightType,
+      genJoinFuncName,
+      genJoinFuncCode) {
 
   override def updateOperatorTime(ctx: CoProcessFunction[CRow, CRow, CRow]#Context): Unit = {
     leftOperatorTime = ctx.timerService().currentProcessingTime()

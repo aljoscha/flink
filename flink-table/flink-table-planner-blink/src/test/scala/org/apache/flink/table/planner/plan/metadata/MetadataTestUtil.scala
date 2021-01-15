@@ -25,7 +25,14 @@ import org.apache.flink.table.planner.calcite.{FlinkTypeFactory, FlinkTypeSystem
 import org.apache.flink.table.planner.plan.schema.FlinkPreparingTableBase
 import org.apache.flink.table.planner.plan.stats.FlinkStatistic
 import org.apache.flink.table.runtime.types.TypeInfoLogicalTypeConverter.fromTypeInfoToLogicalType
-import org.apache.flink.table.types.logical.{BigIntType, IntType, LogicalType, TimestampKind, TimestampType, VarCharType}
+import org.apache.flink.table.types.logical.{
+  BigIntType,
+  IntType,
+  LogicalType,
+  TimestampKind,
+  TimestampType,
+  VarCharType
+}
 
 import org.apache.calcite.config.CalciteConnectionConfig
 import org.apache.calcite.jdbc.CalciteSchema
@@ -68,12 +75,12 @@ object MetadataTestUtil {
         BasicTypeInfo.INT_TYPE_INFO))
 
     val colStatsMap = Map[String, ColumnStats](
-      "id" -> new ColumnStats(50L, 0L, 8D, 8, null, 0),
+      "id" -> new ColumnStats(50L, 0L, 8d, 8, null, 0),
       "name" -> new ColumnStats(48L, 0L, 7.2, 12, null, null),
-      "score" -> new ColumnStats(20L, 6L, 8D, 8, 4.8D, 2.7D),
-      "age" -> new ColumnStats(7L, 0L, 4D, 4, 18, 12),
-      "height" -> new ColumnStats(35L, null, 8D, 8, 172.1D, 161.0D),
-      "sex" -> new ColumnStats(2L, 0L, 1D, 1, null, null))
+      "score" -> new ColumnStats(20L, 6L, 8d, 8, 4.8d, 2.7d),
+      "age" -> new ColumnStats(7L, 0L, 4d, 4, 18, 12),
+      "height" -> new ColumnStats(35L, null, 8d, 8, 172.1d, 161.0d),
+      "sex" -> new ColumnStats(2L, 0L, 1d, 1, null, null))
 
     val tableStats = new TableStats(50L, colStatsMap)
     val uniqueKeys = Set(Set("id").asJava).asJava
@@ -107,12 +114,11 @@ object MetadataTestUtil {
         BasicTypeInfo.INT_TYPE_INFO))
 
     val colStatsMap = Map[String, ColumnStats](
-      "a" -> new ColumnStats(20000000L, 0L, 4D, 4, null, 0),
-      "b" -> new ColumnStats(800000000L, 0L, 8D, 8, 800000000L, 1L),
-      "c" -> new ColumnStats(1581L, 0L, 12D, 12, null, null),
-      "d" -> new ColumnStats(245623352L, 136231L, 88.8D, 140, null, null),
-      "e" -> new ColumnStats(null, 0L, 4d, 4, 100, 1)
-    )
+      "a" -> new ColumnStats(20000000L, 0L, 4d, 4, null, 0),
+      "b" -> new ColumnStats(800000000L, 0L, 8d, 8, 800000000L, 1L),
+      "c" -> new ColumnStats(1581L, 0L, 12d, 12, null, null),
+      "d" -> new ColumnStats(245623352L, 136231L, 88.8d, 140, null, null),
+      "e" -> new ColumnStats(null, 0L, 4d, 4, 100, 1))
 
     val tableStats = new TableStats(800000000L, colStatsMap)
     val uniqueKeys = Set(Set("b").asJava).asJava
@@ -130,12 +136,11 @@ object MetadataTestUtil {
         BasicTypeInfo.INT_TYPE_INFO))
 
     val colStatsMap = Map[String, ColumnStats](
-      "a" -> new ColumnStats(20000000L, 0L, 4D, 4, null, null),
-      "b" -> new ColumnStats(2556L, 62L, 8D, 8, 5247L, 8L),
-      "c" -> new ColumnStats(682L, 0L, 12D, 12, null, null),
+      "a" -> new ColumnStats(20000000L, 0L, 4d, 4, null, null),
+      "b" -> new ColumnStats(2556L, 62L, 8d, 8, 5247L, 8L),
+      "c" -> new ColumnStats(682L, 0L, 12d, 12, null, null),
       "d" -> new ColumnStats(125234L, 0L, 10.52, 16, null, null),
-      "e" -> new ColumnStats(null, 0L, 4d, 4, 300, 200)
-    )
+      "e" -> new ColumnStats(null, 0L, 4d, 4, 300, 200))
 
     val tableStats = new TableStats(20000000L, colStatsMap)
     getMetadataTable(schema, new FlinkStatistic(tableStats))
@@ -147,9 +152,8 @@ object MetadataTestUtil {
       Array(BasicTypeInfo.INT_TYPE_INFO, BasicTypeInfo.DOUBLE_TYPE_INFO))
 
     val colStatsMap = Map[String, ColumnStats](
-      "a" -> new ColumnStats(10L, 1L, 4D, 4, 5, -5),
-      "b" -> new ColumnStats(5L, 0L, 8D, 8, 6.1D, 0D)
-    )
+      "a" -> new ColumnStats(10L, 1L, 4d, 4, 5, -5),
+      "b" -> new ColumnStats(5L, 0L, 8d, 8, 6.1d, 0d))
 
     val tableStats = new TableStats(100L, colStatsMap)
     getMetadataTable(schema, new FlinkStatistic(tableStats))
@@ -158,17 +162,17 @@ object MetadataTestUtil {
   private def createMyTable4(): Table = {
     val schema = new TableSchema(
       Array("a", "b", "c", "d"),
-      Array(BasicTypeInfo.LONG_TYPE_INFO,
+      Array(
+        BasicTypeInfo.LONG_TYPE_INFO,
         BasicTypeInfo.DOUBLE_TYPE_INFO,
         BasicTypeInfo.INT_TYPE_INFO,
         BasicTypeInfo.DOUBLE_TYPE_INFO))
 
     val colStatsMap = Map[String, ColumnStats](
-      "a" -> new ColumnStats(50L, 0L, 8D, 8, 50, 1),
-      "b" -> new ColumnStats(7L, 0L, 8D, 8, 5.1D, 0D),
-      "c" -> new ColumnStats(25L, 0L, 4D, 4, 46, 0),
-      "d" -> new ColumnStats(46L, 0L, 8D, 8, 172.1D, 161.0D)
-    )
+      "a" -> new ColumnStats(50L, 0L, 8d, 8, 50, 1),
+      "b" -> new ColumnStats(7L, 0L, 8d, 8, 5.1d, 0d),
+      "c" -> new ColumnStats(25L, 0L, 4d, 4, 46, 0),
+      "d" -> new ColumnStats(46L, 0L, 8d, 8, 172.1d, 161.0d))
 
     val tableStats = new TableStats(50L, colStatsMap)
     val uniqueKeys = Set(Set("a").asJava, Set("a", "b").asJava).asJava
@@ -185,10 +189,9 @@ object MetadataTestUtil {
       new TimestampType(true, TimestampKind.ROWTIME, 3))
 
     val colStatsMap = Map[String, ColumnStats](
-      "a" -> new ColumnStats(30L, 0L, 4D, 4, 45, 5),
-      "b" -> new ColumnStats(5L, 0L, 32D, 32, null, null),
-      "c" -> new ColumnStats(48L, 0L, 8D, 8, 50, 0)
-    )
+      "a" -> new ColumnStats(30L, 0L, 4d, 4, 45, 5),
+      "b" -> new ColumnStats(5L, 0L, 32d, 32, null, null),
+      "c" -> new ColumnStats(48L, 0L, 8d, 8, 50, 0))
 
     val tableStats = new TableStats(50L, colStatsMap)
     getMetadataTable(fieldNames, fieldTypes, new FlinkStatistic(tableStats))
@@ -204,10 +207,9 @@ object MetadataTestUtil {
       new TimestampType(true, TimestampKind.ROWTIME, 3))
 
     val colStatsMap = Map[String, ColumnStats](
-      "a" -> new ColumnStats(50L, 0L, 8D, 8, 55, 5),
-      "b" -> new ColumnStats(5L, 0L, 16D, 32, null, null),
-      "c" -> new ColumnStats(48L, 0L, 4D, 4, 50, 0)
-    )
+      "a" -> new ColumnStats(50L, 0L, 8d, 8, 55, 5),
+      "b" -> new ColumnStats(5L, 0L, 16d, 32, null, null),
+      "c" -> new ColumnStats(48L, 0L, 4d, 4, 50, 0))
 
     val tableStats = new TableStats(50L, colStatsMap)
     val uniqueKeys = Set(Set("a").asJava).asJava
@@ -224,10 +226,9 @@ object MetadataTestUtil {
       new TimestampType(true, TimestampKind.ROWTIME, 3))
 
     val colStatsMap = Map[String, ColumnStats](
-      "a" -> new ColumnStats(3740000000L, 0L, 4D, 4, null, null),
-      "b" -> new ColumnStats(53252726L, 1474L, 8D, 8, 100000000L, -100000000L),
-      "c" -> new ColumnStats(null, 0L, 18.6, 64, null, null)
-    )
+      "a" -> new ColumnStats(3740000000L, 0L, 4d, 4, null, null),
+      "b" -> new ColumnStats(53252726L, 1474L, 8d, 8, 100000000L, -100000000L),
+      "c" -> new ColumnStats(null, 0L, 18.6, 64, null, null))
 
     val tableStats = new TableStats(4000000000L, colStatsMap)
     getMetadataTable(fieldNames, fieldTypes, new FlinkStatistic(tableStats))
@@ -253,18 +254,26 @@ object MetadataTestUtil {
   }
 }
 
-/** A mock table used for metadata test, it implements both [[Table]]
-  * and [[FlinkPreparingTableBase]]. */
+/**
+ * A mock table used for metadata test, it implements both [[Table]]
+ * and [[FlinkPreparingTableBase]].
+ */
 class MockMetaTable(rowType: RelDataType, statistic: FlinkStatistic)
-  extends FlinkPreparingTableBase(null, rowType,
-    Collections.singletonList("MockMetaTable"), statistic)
-  with Table {
+    extends FlinkPreparingTableBase(
+      null,
+      rowType,
+      Collections.singletonList("MockMetaTable"),
+      statistic)
+    with Table {
   override def getRowType(typeFactory: RelDataTypeFactory): RelDataType = rowType
 
   override def getJdbcTableType: Schema.TableType = TableType.TABLE
 
   override def isRolledUp(column: String): Boolean = false
 
-  override def rolledUpColumnValidInsideAgg(column: String,
-    call: SqlCall, parent: SqlNode, config: CalciteConnectionConfig): Boolean = false
+  override def rolledUpColumnValidInsideAgg(
+      column: String,
+      call: SqlCall,
+      parent: SqlNode,
+      config: CalciteConnectionConfig): Boolean = false
 }

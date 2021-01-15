@@ -34,8 +34,8 @@ class FlinkLogicalCorrelate(
     correlationId: CorrelationId,
     requiredColumns: ImmutableBitSet,
     joinType: JoinRelType)
-  extends Correlate(cluster, traitSet, left, right, correlationId, requiredColumns, joinType)
-  with FlinkLogicalRel {
+    extends Correlate(cluster, traitSet, left, right, correlationId, requiredColumns, joinType)
+    with FlinkLogicalRel {
 
   override def copy(
       traitSet: RelTraitSet,
@@ -57,11 +57,11 @@ class FlinkLogicalCorrelate(
 }
 
 class FlinkLogicalCorrelateConverter
-  extends ConverterRule(
-    classOf[LogicalCorrelate],
-    Convention.NONE,
-    FlinkConventions.LOGICAL,
-    "FlinkLogicalCorrelateConverter") {
+    extends ConverterRule(
+      classOf[LogicalCorrelate],
+      Convention.NONE,
+      FlinkConventions.LOGICAL,
+      "FlinkLogicalCorrelateConverter") {
 
   override def convert(rel: RelNode): RelNode = {
     val correlate = rel.asInstanceOf[LogicalCorrelate]

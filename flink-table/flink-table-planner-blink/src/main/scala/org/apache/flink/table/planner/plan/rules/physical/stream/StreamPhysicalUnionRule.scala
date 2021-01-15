@@ -29,14 +29,14 @@ import org.apache.calcite.rel.convert.ConverterRule
 import scala.collection.JavaConversions._
 
 /**
-  * Rule that converts [[FlinkLogicalUnion]] to [[StreamPhysicalUnion]].
-  */
+ * Rule that converts [[FlinkLogicalUnion]] to [[StreamPhysicalUnion]].
+ */
 class StreamPhysicalUnionRule
-  extends ConverterRule(
-    classOf[FlinkLogicalUnion],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.STREAM_PHYSICAL,
-    "StreamPhysicalUnionRule") {
+    extends ConverterRule(
+      classOf[FlinkLogicalUnion],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.STREAM_PHYSICAL,
+      "StreamPhysicalUnionRule") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     call.rel(0).asInstanceOf[FlinkLogicalUnion].all
@@ -47,12 +47,7 @@ class StreamPhysicalUnionRule
     val traitSet: RelTraitSet = rel.getTraitSet.replace(FlinkConventions.STREAM_PHYSICAL)
     val newInputs = union.getInputs.map(RelOptRule.convert(_, FlinkConventions.STREAM_PHYSICAL))
 
-    new StreamPhysicalUnion(
-      rel.getCluster,
-      traitSet,
-      newInputs,
-      union.all,
-      rel.getRowType)
+    new StreamPhysicalUnion(rel.getCluster, traitSet, newInputs, union.all, rel.getRowType)
   }
 }
 

@@ -18,13 +18,33 @@
 
 package org.apache.flink.runtime.types
 
-import scala.collection.immutable.{BitSet, HashMap, HashSet, ListMap, ListSet, NumericRange, Queue, Range, SortedMap, SortedSet}
-import scala.collection.mutable.{Buffer, ListBuffer, WrappedArray, BitSet => MBitSet, HashMap => MHashMap, HashSet => MHashSet, Map => MMap, Queue => MQueue, Set => MSet}
+import scala.collection.immutable.{
+  BitSet,
+  HashMap,
+  HashSet,
+  ListMap,
+  ListSet,
+  NumericRange,
+  Queue,
+  Range,
+  SortedMap,
+  SortedSet
+}
+import scala.collection.mutable.{
+  Buffer,
+  ListBuffer,
+  WrappedArray,
+  BitSet => MBitSet,
+  HashMap => MHashMap,
+  HashSet => MHashSet,
+  Map => MMap,
+  Queue => MQueue,
+  Set => MSet
+}
 import scala.util.matching.Regex
 import _root_.java.io.Serializable
 
 import com.twitter.chill._
-
 
 import scala.collection.JavaConverters._
 
@@ -140,9 +160,10 @@ class ScalaCollectionsRegistrar extends IKryoRegistrar {
       .forConcreteTraversableClass(
         HashMap[Any, Any]('a -> 'a, 'b -> 'b, 'c -> 'c, 'd -> 'd, 'e -> 'e))
       // The normal fields serializer works for ranges
-      .registerClasses(Seq(classOf[Range.Inclusive],
-      classOf[NumericRange.Inclusive[_]],
-      classOf[NumericRange.Exclusive[_]]))
+      .registerClasses(Seq(
+        classOf[Range.Inclusive],
+        classOf[NumericRange.Inclusive[_]],
+        classOf[NumericRange.Exclusive[_]]))
       // Add some maps
       .forSubclass[SortedMap[Any, Any]](new SortedMapSerializer)
       .forTraversableSubclass(ListMap.empty[Any, Any])
@@ -180,8 +201,7 @@ class AllScalaRegistrar extends IKryoRegistrar {
       override def isImmutable = true
       def write(k: Kryo, out: Output, obj: Symbol) { out.writeString(obj.name) }
       def read(k: Kryo, in: Input, cls: Class[Symbol]) = Symbol(in.readString)
-    })
-      .forSubclass[Regex](new RegexSerializer)
+    }).forSubclass[Regex](new RegexSerializer)
       .forClass[ClassManifest[Any]](new ClassManifestSerializer[Any])
       .forSubclass[Manifest[Any]](new ManifestSerializer[Any])
       .forSubclass[scala.Enumeration#Value](new EnumerationSerializer)

@@ -34,8 +34,8 @@ import java.time.LocalDateTime
 import java.util.TimeZone
 
 /**
-  * Integration tests for time attributes defined in DDL.
-  */
+ * Integration tests for time attributes defined in DDL.
+ */
 class TimeAttributeITCase extends StreamingTestBase {
 
   val data = List(

@@ -50,19 +50,19 @@ class BatchPhysicalHashWindowAggregate(
     namedWindowProperties: Seq[PlannerNamedWindowProperty],
     enableAssignPane: Boolean = false,
     isMerge: Boolean)
-  extends BatchPhysicalHashWindowAggregateBase(
-    cluster,
-    traitSet,
-    inputRel,
-    outputRowType,
-    grouping,
-    auxGrouping,
-    aggCallToAggFunction,
-    window,
-    namedWindowProperties,
-    enableAssignPane,
-    isMerge,
-    isFinal = true) {
+    extends BatchPhysicalHashWindowAggregateBase(
+      cluster,
+      traitSet,
+      inputRel,
+      outputRowType,
+      grouping,
+      auxGrouping,
+      aggCallToAggFunction,
+      window,
+      namedWindowProperties,
+      enableAssignPane,
+      isMerge,
+      isFinal = true) {
 
   override def copy(traitSet: RelTraitSet, inputs: util.List[RelNode]): RelNode = {
     new BatchPhysicalHashWindowAggregate(
@@ -97,7 +97,6 @@ class BatchPhysicalHashWindowAggregate(
       true, // isFinal is always true
       ExecEdge.builder().damBehavior(ExecEdge.DamBehavior.END_INPUT).build(),
       FlinkTypeFactory.toLogicalRowType(getRowType),
-      getRelDetailedDescription
-    )
+      getRelDetailedDescription)
   }
 }

@@ -26,11 +26,11 @@ import org.apache.flink.table.plan.nodes.dataset.DataSetMinus
 import org.apache.flink.table.plan.nodes.logical.FlinkLogicalMinus
 
 class DataSetMinusRule
-  extends ConverterRule(
-    classOf[FlinkLogicalMinus],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.DATASET,
-    "DataSetMinusRule") {
+    extends ConverterRule(
+      classOf[FlinkLogicalMinus],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.DATASET,
+      "DataSetMinusRule") {
 
   def convert(rel: RelNode): RelNode = {
 
@@ -39,17 +39,10 @@ class DataSetMinusRule
     val convLeft: RelNode = RelOptRule.convert(minus.getInput(0), FlinkConventions.DATASET)
     val convRight: RelNode = RelOptRule.convert(minus.getInput(1), FlinkConventions.DATASET)
 
-    new DataSetMinus(
-      rel.getCluster,
-      traitSet,
-      convLeft,
-      convRight,
-      rel.getRowType,
-      minus.all)
+    new DataSetMinus(rel.getCluster, traitSet, convLeft, convRight, rel.getRowType, minus.all)
   }
 }
 
 object DataSetMinusRule {
   val INSTANCE: RelOptRule = new DataSetMinusRule
 }
-

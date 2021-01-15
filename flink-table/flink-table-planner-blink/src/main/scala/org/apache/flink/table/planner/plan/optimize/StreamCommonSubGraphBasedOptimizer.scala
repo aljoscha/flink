@@ -23,11 +23,27 @@ import org.apache.flink.table.api.config.ExecutionConfigOptions
 import org.apache.flink.table.catalog.{CatalogManager, FunctionCatalog}
 import org.apache.flink.table.planner.calcite.{FlinkContext, SqlExprToRexConverterFactory}
 import org.apache.flink.table.planner.delegation.StreamPlanner
-import org.apache.flink.table.planner.plan.`trait`.{MiniBatchInterval, MiniBatchIntervalTrait, MiniBatchIntervalTraitDef, MiniBatchMode, ModifyKindSet, ModifyKindSetTraitDef, UpdateKind, UpdateKindTraitDef}
+import org.apache.flink.table.planner.plan.`trait`.{
+  MiniBatchInterval,
+  MiniBatchIntervalTrait,
+  MiniBatchIntervalTraitDef,
+  MiniBatchMode,
+  ModifyKindSet,
+  ModifyKindSetTraitDef,
+  UpdateKind,
+  UpdateKindTraitDef
+}
 import org.apache.flink.table.planner.plan.metadata.FlinkRelMetadataQuery
 import org.apache.flink.table.planner.plan.nodes.calcite.{LegacySink, Sink}
-import org.apache.flink.table.planner.plan.nodes.physical.stream.{StreamExecIntermediateTableScan, StreamPhysicalDataStreamScan, StreamPhysicalRel}
-import org.apache.flink.table.planner.plan.optimize.program.{FlinkStreamProgram, StreamOptimizeContext}
+import org.apache.flink.table.planner.plan.nodes.physical.stream.{
+  StreamExecIntermediateTableScan,
+  StreamPhysicalDataStreamScan,
+  StreamPhysicalRel
+}
+import org.apache.flink.table.planner.plan.optimize.program.{
+  FlinkStreamProgram,
+  StreamOptimizeContext
+}
 import org.apache.flink.table.planner.plan.schema.IntermediateRelTable
 import org.apache.flink.table.planner.plan.stats.FlinkStatistic
 import org.apache.flink.table.planner.plan.utils.FlinkRelOptUtil
@@ -44,10 +60,10 @@ import java.util.Collections
 import scala.collection.JavaConversions._
 
 /**
-  * A [[CommonSubGraphBasedOptimizer]] for Stream.
-  */
+ * A [[CommonSubGraphBasedOptimizer]] for Stream.
+ */
 class StreamCommonSubGraphBasedOptimizer(planner: StreamPlanner)
-  extends CommonSubGraphBasedOptimizer {
+    extends CommonSubGraphBasedOptimizer {
 
   override protected def doOptimize(roots: Seq[RelNode]): Seq[RelNodeBlock] = {
     val config = planner.getTableConfig
@@ -58,16 +74,20 @@ class StreamCommonSubGraphBasedOptimizer(planner: StreamPlanner)
       // don't require update before by default
       sinkBlock.setUpdateBeforeRequired(false)
 
-      val miniBatchInterval: MiniBatchInterval = if (config.getConfiguration.getBoolean(
-        ExecutionConfigOptions.TABLE_EXEC_MINIBATCH_ENABLED)) {
-        val miniBatchLatency = config.getConfiguration.get(
-          ExecutionConfigOptions.TABLE_EXEC_MINIBATCH_ALLOW_LATENCY).toMillis
-        Preconditions.checkArgument(miniBatchLatency > 0,
-          "MiniBatch Latency must be greater than 0 ms.", null)
-        MiniBatchInterval(miniBatchLatency, MiniBatchMode.ProcTime)
-      }  else {
-        MiniBatchIntervalTrait.NONE.getMiniBatchInterval
-      }
+      val miniBatchInterval: MiniBatchInterval =
+        if (config.getConfiguration.getBoolean(
+            ExecutionConfigOptions.TABLE_EXEC_MINIBATCH_ENABLED)) {
+          val miniBatchLatency = config.getConfiguration
+            .get(ExecutionConfigOptions.TABLE_EXEC_MINIBATCH_ALLOW_LATENCY)
+            .toMillis
+          Preconditions.checkArgument(
+            miniBatchLatency > 0,
+            "MiniBatch Latency must be greater than 0 ms.",
+            null)
+          MiniBatchInterval(miniBatchLatency, MiniBatchMode.ProcTime)
+        } else {
+          MiniBatchIntervalTrait.NONE.getMiniBatchInterval
+        }
       sinkBlock.setMiniBatchInterval(miniBatchInterval)
     }
 
@@ -99,11 +119,10 @@ class StreamCommonSubGraphBasedOptimizer(planner: StreamPlanner)
   }
 
   private def optimizeBlock(block: RelNodeBlock, isSinkBlock: Boolean): Unit = {
-    block.children.foreach {
-      child =>
-        if (child.getNewOutputNode.isEmpty) {
-          optimizeBlock(child, isSinkBlock = false)
-        }
+    block.children.foreach { child =>
+      if (child.getNewOutputNode.isEmpty) {
+        optimizeBlock(child, isSinkBlock = false)
+      }
     }
 
     val blockLogicalPlan = block.getPlan
@@ -138,14 +157,14 @@ class StreamCommonSubGraphBasedOptimizer(planner: StreamPlanner)
   }
 
   /**
-    * Generates the optimized [[RelNode]] tree from the original relational node tree.
-    *
-    * @param relNode The root node of the relational expression tree.
-    * @param updateBeforeRequired True if UPDATE_BEFORE message is required for updates
-    * @param miniBatchInterval mini-batch interval of the block.
-    * @param isSinkBlock True if the given block is sink block.
-    * @return The optimized [[RelNode]] tree
-    */
+   * Generates the optimized [[RelNode]] tree from the original relational node tree.
+   *
+   * @param relNode The root node of the relational expression tree.
+   * @param updateBeforeRequired True if UPDATE_BEFORE message is required for updates
+   * @param miniBatchInterval mini-batch interval of the block.
+   * @param isSinkBlock True if the given block is sink block.
+   * @return The optimized [[RelNode]] tree
+   */
   private def optimizeTree(
       relNode: RelNode,
       updateBeforeRequired: Boolean,
@@ -160,51 +179,52 @@ class StreamCommonSubGraphBasedOptimizer(planner: StreamPlanner)
 
     val context = relNode.getCluster.getPlanner.getContext.unwrap(classOf[FlinkContext])
 
-    programs.optimize(relNode, new StreamOptimizeContext() {
+    programs.optimize(
+      relNode,
+      new StreamOptimizeContext() {
 
-      override def getTableConfig: TableConfig = config
+        override def getTableConfig: TableConfig = config
 
-      override def getFunctionCatalog: FunctionCatalog = planner.functionCatalog
+        override def getFunctionCatalog: FunctionCatalog = planner.functionCatalog
 
-      override def getCatalogManager: CatalogManager = planner.catalogManager
+        override def getCatalogManager: CatalogManager = planner.catalogManager
 
-      override def getSqlExprToRexConverterFactory: SqlExprToRexConverterFactory =
-        context.getSqlExprToRexConverterFactory
+        override def getSqlExprToRexConverterFactory: SqlExprToRexConverterFactory =
+          context.getSqlExprToRexConverterFactory
 
-      override def getRexBuilder: RexBuilder = planner.getRelBuilder.getRexBuilder
+        override def getRexBuilder: RexBuilder = planner.getRelBuilder.getRexBuilder
 
-      override def isUpdateBeforeRequired: Boolean = updateBeforeRequired
+        override def isUpdateBeforeRequired: Boolean = updateBeforeRequired
 
-      def getMiniBatchInterval: MiniBatchInterval = miniBatchInterval
+        def getMiniBatchInterval: MiniBatchInterval = miniBatchInterval
 
-      override def needFinalTimeIndicatorConversion: Boolean = isSinkBlock
-    })
+        override def needFinalTimeIndicatorConversion: Boolean = isSinkBlock
+      })
   }
 
   /**
-    * Infer UpdateAsRetraction property and MiniBatchInterval property for each block.
-    * NOTES: this method should not change the original RelNode tree.
-    *
-    * @param block              The [[RelNodeBlock]] instance.
-    * @param updateBeforeRequired True if UPDATE_BEFORE message is required for updates
-    * @param miniBatchInterval  mini-batch interval of the block.
-    * @param isSinkBlock        True if the given block is sink block.
-    */
+   * Infer UpdateAsRetraction property and MiniBatchInterval property for each block.
+   * NOTES: this method should not change the original RelNode tree.
+   *
+   * @param block              The [[RelNodeBlock]] instance.
+   * @param updateBeforeRequired True if UPDATE_BEFORE message is required for updates
+   * @param miniBatchInterval  mini-batch interval of the block.
+   * @param isSinkBlock        True if the given block is sink block.
+   */
   private def inferTraits(
       block: RelNodeBlock,
       updateBeforeRequired: Boolean,
       miniBatchInterval: MiniBatchInterval,
       isSinkBlock: Boolean): Unit = {
 
-    block.children.foreach {
-      child =>
-        if (child.getNewOutputNode.isEmpty) {
-          inferTraits(
-            child,
-            updateBeforeRequired = false,
-            miniBatchInterval = MiniBatchInterval.NONE,
-            isSinkBlock = false)
-        }
+    block.children.foreach { child =>
+      if (child.getNewOutputNode.isEmpty) {
+        inferTraits(
+          child,
+          updateBeforeRequired = false,
+          miniBatchInterval = MiniBatchInterval.NONE,
+          isSinkBlock = false)
+      }
     }
 
     val blockLogicalPlan = block.getPlan
@@ -212,12 +232,15 @@ class StreamCommonSubGraphBasedOptimizer(planner: StreamPlanner)
       case _: LegacySink | _: Sink =>
         require(isSinkBlock)
         val optimizedPlan = optimizeTree(
-          blockLogicalPlan, updateBeforeRequired, miniBatchInterval, isSinkBlock = true)
+          blockLogicalPlan,
+          updateBeforeRequired,
+          miniBatchInterval,
+          isSinkBlock = true)
         block.setOptimizedPlan(optimizedPlan)
 
       case o =>
-        val optimizedPlan = optimizeTree(
-          o, updateBeforeRequired, miniBatchInterval, isSinkBlock = isSinkBlock)
+        val optimizedPlan =
+          optimizeTree(o, updateBeforeRequired, miniBatchInterval, isSinkBlock = isSinkBlock)
         val name = createUniqueIntermediateRelTableName
         val modifyKindSetTrait = optimizedPlan.getTraitSet.getTrait(ModifyKindSetTraitDef.INSTANCE)
         val intermediateRelTable = createIntermediateRelTable(
@@ -234,17 +257,15 @@ class StreamCommonSubGraphBasedOptimizer(planner: StreamPlanner)
   }
 
   /**
-    * Propagate updateBeforeRequired property and miniBatchInterval property to all input blocks.
-    *
-    * @param block The [[RelNodeBlock]] instance.
-    * @param isSinkBlock True if the given block is sink block.
-    */
+   * Propagate updateBeforeRequired property and miniBatchInterval property to all input blocks.
+   *
+   * @param block The [[RelNodeBlock]] instance.
+   * @param isSinkBlock True if the given block is sink block.
+   */
   private def propagateTraits(block: RelNodeBlock, isSinkBlock: Boolean): Unit = {
 
     // process current block
-    def shipTraits(
-        rel: RelNode,
-        miniBatchInterval: MiniBatchInterval): Unit = {
+    def shipTraits(rel: RelNode, miniBatchInterval: MiniBatchInterval): Unit = {
       rel match {
         case _: StreamPhysicalDataStreamScan | _: StreamExecIntermediateTableScan =>
           val scan = rel.asInstanceOf[TableScan]
@@ -260,19 +281,22 @@ class StreamCommonSubGraphBasedOptimizer(planner: StreamPlanner)
               miniBatchIntervalTrait.getMiniBatchInterval
             } else {
               FlinkRelOptUtil.mergeMiniBatchInterval(
-                miniBatchIntervalTrait.getMiniBatchInterval, miniBatchInterval)
+                miniBatchIntervalTrait.getMiniBatchInterval,
+                miniBatchInterval)
             }
             val newInterval = FlinkRelOptUtil.mergeMiniBatchInterval(
-              inputBlocks.head.getMiniBatchInterval,mergedInterval)
+              inputBlocks.head.getMiniBatchInterval,
+              mergedInterval)
             inputBlocks.head.setMiniBatchInterval(newInterval)
 
             if (updateKindTrait.updateKind == UpdateKind.BEFORE_AND_AFTER) {
               inputBlocks.head.setUpdateBeforeRequired(true)
             }
           }
-        case ser: StreamPhysicalRel => ser.getInputs.foreach { e =>
-          shipTraits(e, miniBatchInterval)
-        }
+        case ser: StreamPhysicalRel =>
+          ser.getInputs.foreach { e =>
+            shipTraits(e, miniBatchInterval)
+          }
       }
     }
 
@@ -281,19 +305,18 @@ class StreamCommonSubGraphBasedOptimizer(planner: StreamPlanner)
   }
 
   /**
-    * Reset the intermediate result including newOutputNode and outputTableName
-    *
-    * @param block the [[RelNodeBlock]] instance.
-    */
+   * Reset the intermediate result including newOutputNode and outputTableName
+   *
+   * @param block the [[RelNodeBlock]] instance.
+   */
   private def resetIntermediateResult(block: RelNodeBlock): Unit = {
     block.setNewOutputNode(null)
     block.setOutputTableName(null)
 
-    block.children.foreach {
-      child =>
-        if (child.getNewOutputNode.nonEmpty) {
-          resetIntermediateResult(child)
-        }
+    block.children.foreach { child =>
+      if (child.getNewOutputNode.nonEmpty) {
+        resetIntermediateResult(child)
+      }
     }
   }
 
@@ -306,7 +329,8 @@ class StreamCommonSubGraphBasedOptimizer(planner: StreamPlanner)
     val monotonicity = FlinkRelMetadataQuery
       .reuseOrCreate(planner.getRelBuilder.getCluster.getMetadataQuery)
       .getRelModifiedMonotonicity(relNode)
-    val statistic = FlinkStatistic.builder()
+    val statistic = FlinkStatistic
+      .builder()
       .uniqueKeys(uniqueKeys)
       .relModifiedMonotonicity(monotonicity)
       .build()

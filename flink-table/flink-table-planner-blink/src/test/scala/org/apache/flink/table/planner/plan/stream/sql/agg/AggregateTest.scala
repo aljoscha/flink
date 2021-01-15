@@ -33,17 +33,45 @@ class AggregateTest extends TableTestBase {
 
   private val util: StreamTableTestUtil = streamTestUtil()
   util.addTableSource[(Int, String, Long)](
-    "MyTable", 'a, 'b, 'c, 'proctime.proctime, 'rowtime.rowtime)
+    "MyTable",
+    'a,
+    'b,
+    'c,
+    'proctime.proctime,
+    'rowtime.rowtime)
   util.addTableSource[(Int, Long, String, Boolean)]("T", 'a, 'b, 'c, 'd)
   util.addTableSource[(Long, Int, String)]("T1", 'a, 'b, 'c)
   util.addTableSource[(Long, Int, String)]("T2", 'a, 'b, 'c)
-  util.addTableSource("MyTable1",
+  util.addTableSource(
+    "MyTable1",
     Array[TypeInformation[_]](
-      Types.BYTE, Types.SHORT, Types.INT, Types.LONG, Types.FLOAT, Types.DOUBLE, Types.BOOLEAN,
-      Types.STRING, Types.LOCAL_DATE, Types.LOCAL_TIME, Types.LOCAL_DATE_TIME,
-      DecimalDataTypeInfo.of(30, 20), DecimalDataTypeInfo.of(10, 5)),
-    Array("byte", "short", "int", "long", "float", "double", "boolean",
-      "string", "date", "time", "timestamp", "decimal3020", "decimal105"))
+      Types.BYTE,
+      Types.SHORT,
+      Types.INT,
+      Types.LONG,
+      Types.FLOAT,
+      Types.DOUBLE,
+      Types.BOOLEAN,
+      Types.STRING,
+      Types.LOCAL_DATE,
+      Types.LOCAL_TIME,
+      Types.LOCAL_DATE_TIME,
+      DecimalDataTypeInfo.of(30, 20),
+      DecimalDataTypeInfo.of(10, 5)),
+    Array(
+      "byte",
+      "short",
+      "int",
+      "long",
+      "float",
+      "double",
+      "boolean",
+      "string",
+      "date",
+      "time",
+      "timestamp",
+      "decimal3020",
+      "decimal105"))
 
   @Test(expected = classOf[ValidationException])
   def testGroupingOnNonExistentField(): Unit = {
@@ -64,19 +92,19 @@ class AggregateTest extends TableTestBase {
 
   @Test
   def testAggWithMiniBatch(): Unit = {
-    util.tableEnv.getConfig.getConfiguration.setBoolean(
-      ExecutionConfigOptions.TABLE_EXEC_MINIBATCH_ENABLED, true)
-    util.tableEnv.getConfig.getConfiguration.set(
-      ExecutionConfigOptions.TABLE_EXEC_MINIBATCH_ALLOW_LATENCY, Duration.ofSeconds(1))
+    util.tableEnv.getConfig.getConfiguration
+      .setBoolean(ExecutionConfigOptions.TABLE_EXEC_MINIBATCH_ENABLED, true)
+    util.tableEnv.getConfig.getConfiguration
+      .set(ExecutionConfigOptions.TABLE_EXEC_MINIBATCH_ALLOW_LATENCY, Duration.ofSeconds(1))
     util.verifyExecPlan("SELECT b, COUNT(DISTINCT a), MAX(b), SUM(c)  FROM MyTable GROUP BY b")
   }
 
   @Test
   def testAggAfterUnionWithMiniBatch(): Unit = {
-    util.tableEnv.getConfig.getConfiguration.setBoolean(
-      ExecutionConfigOptions.TABLE_EXEC_MINIBATCH_ENABLED, true)
-    util.tableEnv.getConfig.getConfiguration.set(
-      ExecutionConfigOptions.TABLE_EXEC_MINIBATCH_ALLOW_LATENCY, Duration.ofSeconds(1))
+    util.tableEnv.getConfig.getConfiguration
+      .setBoolean(ExecutionConfigOptions.TABLE_EXEC_MINIBATCH_ENABLED, true)
+    util.tableEnv.getConfig.getConfiguration
+      .set(ExecutionConfigOptions.TABLE_EXEC_MINIBATCH_ALLOW_LATENCY, Duration.ofSeconds(1))
     val query =
       """
         |SELECT a, sum(b), count(distinct c)
@@ -97,10 +125,10 @@ class AggregateTest extends TableTestBase {
   @Test
   def testLocalGlobalAggAfterUnion(): Unit = {
     // enable local global optimize
-    util.tableEnv.getConfig.getConfiguration.setBoolean(
-      ExecutionConfigOptions.TABLE_EXEC_MINIBATCH_ENABLED, true)
-    util.tableEnv.getConfig.getConfiguration.set(
-      ExecutionConfigOptions.TABLE_EXEC_MINIBATCH_ALLOW_LATENCY, Duration.ofSeconds(1))
+    util.tableEnv.getConfig.getConfiguration
+      .setBoolean(ExecutionConfigOptions.TABLE_EXEC_MINIBATCH_ENABLED, true)
+    util.tableEnv.getConfig.getConfiguration
+      .set(ExecutionConfigOptions.TABLE_EXEC_MINIBATCH_ALLOW_LATENCY, Duration.ofSeconds(1))
 
     val sql =
       """
@@ -130,10 +158,10 @@ class AggregateTest extends TableTestBase {
 
   @Test
   def testAggWithFilterClauseWithLocalGlobal(): Unit = {
-    util.tableEnv.getConfig.getConfiguration.setBoolean(
-      ExecutionConfigOptions.TABLE_EXEC_MINIBATCH_ENABLED, true)
-    util.tableEnv.getConfig.getConfiguration.set(
-      ExecutionConfigOptions.TABLE_EXEC_MINIBATCH_ALLOW_LATENCY, Duration.ofSeconds(1))
+    util.tableEnv.getConfig.getConfiguration
+      .setBoolean(ExecutionConfigOptions.TABLE_EXEC_MINIBATCH_ENABLED, true)
+    util.tableEnv.getConfig.getConfiguration
+      .set(ExecutionConfigOptions.TABLE_EXEC_MINIBATCH_ALLOW_LATENCY, Duration.ofSeconds(1))
 
     val sql =
       """
@@ -153,7 +181,7 @@ class AggregateTest extends TableTestBase {
     // FlinkRelMdModifiedMonotonicity will analyse sum argument's column interval
     // this test covers all column interval types
     val sql =
-    """
+      """
       |SELECT
       |  a,
       |  SUM(CAST(1 as INT)),
@@ -170,8 +198,7 @@ class AggregateTest extends TableTestBase {
 
   @Test
   def testAvgOnDifferentTypes(): Unit = {
-    util.verifyRelPlanWithType(
-      """
+    util.verifyRelPlanWithType("""
         |SELECT AVG(`byte`),
         |       AVG(`short`),
         |       AVG(`int`),
@@ -187,13 +214,13 @@ class AggregateTest extends TableTestBase {
   @Test
   def testAvgWithRetract(): Unit = {
     util.verifyRelPlan(
-      "SELECT AVG(a) FROM (SELECT AVG(a) AS a FROM T GROUP BY b)", ExplainDetail.CHANGELOG_MODE)
+      "SELECT AVG(a) FROM (SELECT AVG(a) AS a FROM T GROUP BY b)",
+      ExplainDetail.CHANGELOG_MODE)
   }
 
   @Test
   def testSum(): Unit = {
-    util.verifyRelPlanWithType(
-      """
+    util.verifyRelPlanWithType("""
         |SELECT SUM(`byte`),
         |       SUM(`short`),
         |       SUM(`int`),
@@ -209,13 +236,13 @@ class AggregateTest extends TableTestBase {
   @Test
   def testSumWithRetract(): Unit = {
     util.verifyRelPlan(
-      "SELECT SUM(a) FROM (SELECT SUM(a) AS a FROM T GROUP BY b)", ExplainDetail.CHANGELOG_MODE)
+      "SELECT SUM(a) FROM (SELECT SUM(a) AS a FROM T GROUP BY b)",
+      ExplainDetail.CHANGELOG_MODE)
   }
 
   @Test
   def testMinOnDifferentTypes(): Unit = {
-    util.verifyRelPlanWithType(
-      """
+    util.verifyRelPlanWithType("""
         |SELECT MIN(`byte`),
         |       MIN(`short`),
         |       MIN(`int`),
@@ -236,13 +263,13 @@ class AggregateTest extends TableTestBase {
   @Test
   def testMinWithRetract(): Unit = {
     util.verifyRelPlan(
-      "SELECT MIN(a) FROM (SELECT MIN(a) AS a FROM T GROUP BY b)", ExplainDetail.CHANGELOG_MODE)
+      "SELECT MIN(a) FROM (SELECT MIN(a) AS a FROM T GROUP BY b)",
+      ExplainDetail.CHANGELOG_MODE)
   }
 
   @Test
   def testMaxOnDifferentTypes(): Unit = {
-    util.verifyRelPlanWithType(
-      """
+    util.verifyRelPlanWithType("""
         |SELECT MAX(`byte`),
         |       MAX(`short`),
         |       MAX(`int`),
@@ -263,7 +290,8 @@ class AggregateTest extends TableTestBase {
   @Test
   def testMaxWithRetract(): Unit = {
     util.verifyRelPlan(
-      "SELECT MAX(a) FROM (SELECT MAX(a) AS a FROM T GROUP BY b)", ExplainDetail.CHANGELOG_MODE)
+      "SELECT MAX(a) FROM (SELECT MAX(a) AS a FROM T GROUP BY b)",
+      ExplainDetail.CHANGELOG_MODE)
   }
 
   @Test

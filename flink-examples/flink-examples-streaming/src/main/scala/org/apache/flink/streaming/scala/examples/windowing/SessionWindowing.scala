@@ -55,11 +55,10 @@ object SessionWindowing {
       // functionality can only detect here when the next starts)
       ("a", 10L, 1),
       // We expect to detect session "b" and "c" at this point as well
-      ("c", 11L, 1)
-    )
+      ("c", 11L, 1))
 
-    val source: DataStream[(String, Long, Int)] = env.addSource(
-      new SourceFunction[(String, Long, Int)]() {
+    val source: DataStream[(String, Long, Int)] =
+      env.addSource(new SourceFunction[(String, Long, Int)]() {
 
         override def run(ctx: SourceContext[(String, Long, Int)]): Unit = {
           input.foreach(value => {

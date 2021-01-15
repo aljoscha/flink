@@ -18,7 +18,11 @@
 
 package org.apache.flink.table.planner.runtime.batch.sql
 
-import org.apache.flink.api.common.typeinfo.BasicTypeInfo.{INT_TYPE_INFO, LONG_TYPE_INFO, STRING_TYPE_INFO}
+import org.apache.flink.api.common.typeinfo.BasicTypeInfo.{
+  INT_TYPE_INFO,
+  LONG_TYPE_INFO,
+  STRING_TYPE_INFO
+}
 import org.apache.flink.api.java.typeutils.RowTypeInfo
 import org.apache.flink.api.scala._
 import org.apache.flink.table.planner.runtime.batch.sql.join.JoinITCaseHelper
@@ -50,12 +54,8 @@ class SetOperatorsITCase(joinType: JoinType) extends BatchTestBase {
 
   @Test
   def testIntersect(): Unit = {
-    val data = List(
-      row(1, 1L, "Hi"),
-      row(2, 2L, "Hello"),
-      row(2, 2L, "Hello"),
-      row(3, 2L, "Hello world!")
-    )
+    val data =
+      List(row(1, 1L, "Hi"), row(2, 2L, "Hello"), row(2, 2L, "Hello"), row(3, 2L, "Hello world!"))
     val shuffleData = Random.shuffle(data)
     BatchTableEnvUtil.registerCollection(
       tEnv,
@@ -64,9 +64,7 @@ class SetOperatorsITCase(joinType: JoinType) extends BatchTestBase {
       new RowTypeInfo(INT_TYPE_INFO, LONG_TYPE_INFO, STRING_TYPE_INFO),
       "a, b, c")
 
-    checkResult(
-      "SELECT c FROM SmallTable3 INTERSECT SELECT c FROM T",
-      Seq(row("Hi"), row("Hello")))
+    checkResult("SELECT c FROM SmallTable3 INTERSECT SELECT c FROM T", Seq(row("Hi"), row("Hello")))
   }
 
   @Test
@@ -81,7 +79,8 @@ class SetOperatorsITCase(joinType: JoinType) extends BatchTestBase {
     val data = List(row(1, 1L, "Hi"))
     BatchTableEnvUtil.registerCollection(
       tEnv,
-      "T", data,
+      "T",
+      data,
       new RowTypeInfo(INT_TYPE_INFO, LONG_TYPE_INFO, STRING_TYPE_INFO),
       "a, b, c")
 
@@ -94,32 +93,26 @@ class SetOperatorsITCase(joinType: JoinType) extends BatchTestBase {
   def testExceptWithFilter(): Unit = {
     checkResult(
       "SELECT c FROM (" +
-          "SELECT * FROM SmallTable3 EXCEPT (SELECT a, b, d FROM Table5))" +
-          "WHERE b < 2",
+        "SELECT * FROM SmallTable3 EXCEPT (SELECT a, b, d FROM Table5))" +
+        "WHERE b < 2",
       Seq(row("Hi")))
   }
 
   @Test
   def testIntersectWithNulls(): Unit = {
-    checkResult(
-      "SELECT c FROM AllNullTable3 INTERSECT SELECT c FROM AllNullTable3",
-      Seq(row(null)))
+    checkResult("SELECT c FROM AllNullTable3 INTERSECT SELECT c FROM AllNullTable3", Seq(row(null)))
   }
 
   @Test
   def testExceptWithNulls(): Unit = {
-    checkResult(
-      "SELECT c FROM AllNullTable3 EXCEPT SELECT c FROM AllNullTable3",
-      Seq())
+    checkResult("SELECT c FROM AllNullTable3 EXCEPT SELECT c FROM AllNullTable3", Seq())
   }
 
   @Test
   def testIntersectAll(): Unit = {
     BatchTableEnvUtil.registerCollection(tEnv, "T1", Seq(1, 1, 1, 2, 2), "c")
     BatchTableEnvUtil.registerCollection(tEnv, "T2", Seq(1, 2, 2, 2, 3), "c")
-    checkResult(
-      "SELECT c FROM T1 INTERSECT ALL SELECT c FROM T2",
-      Seq(row(1), row(2), row(2)))
+    checkResult("SELECT c FROM T1 INTERSECT ALL SELECT c FROM T2", Seq(row(1), row(2), row(2)))
   }
 
   @Test

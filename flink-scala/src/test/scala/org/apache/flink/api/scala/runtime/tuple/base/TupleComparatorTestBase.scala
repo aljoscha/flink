@@ -28,4 +28,3 @@ abstract class TupleComparatorTestBase[T <: Product] extends ComparatorTestBase[
     }
   }
 }
-

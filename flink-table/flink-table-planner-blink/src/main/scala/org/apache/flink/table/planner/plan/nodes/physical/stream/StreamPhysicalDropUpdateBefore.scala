@@ -34,35 +34,29 @@ import java.util
  * This is usually used as an optimization for the downstream operators that doesn't need
  * the UPDATE_BEFORE messages, but the upstream operator can't drop it by itself (e.g. the source).
  */
-class StreamPhysicalDropUpdateBefore(
-    cluster: RelOptCluster,
-    traitSet: RelTraitSet,
-    input: RelNode)
-  extends SingleRel(cluster, traitSet, input)
-  with StreamPhysicalRel {
+class StreamPhysicalDropUpdateBefore(cluster: RelOptCluster, traitSet: RelTraitSet, input: RelNode)
+    extends SingleRel(cluster, traitSet, input)
+    with StreamPhysicalRel {
 
   override def requireWatermark: Boolean = false
 
   override def deriveRowType(): RelDataType = getInput.getRowType
 
   override def copy(traitSet: RelTraitSet, inputs: util.List[RelNode]): RelNode = {
-    new StreamPhysicalDropUpdateBefore(
-      cluster,
-      traitSet,
-      inputs.get(0))
+    new StreamPhysicalDropUpdateBefore(cluster, traitSet, inputs.get(0))
   }
 
   override def translateToExecNode(): ExecNode[_] = {
     // sanity check
     if (ChangelogPlanUtils.generateUpdateBefore(this)) {
-      throw new IllegalStateException(s"${this.getClass.getSimpleName} is required to emit " +
-        s"UPDATE_BEFORE messages. This should never happen.")
+      throw new IllegalStateException(
+        s"${this.getClass.getSimpleName} is required to emit " +
+          s"UPDATE_BEFORE messages. This should never happen.")
     }
 
     new StreamExecDropUpdateBefore(
       ExecEdge.DEFAULT,
       FlinkTypeFactory.toLogicalRowType(getRowType),
-      getRelDetailedDescription
-    )
+      getRelDetailedDescription)
   }
 }

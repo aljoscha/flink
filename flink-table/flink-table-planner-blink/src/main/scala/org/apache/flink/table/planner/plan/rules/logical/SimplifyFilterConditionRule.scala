@@ -28,17 +28,13 @@ import org.apache.calcite.rel.{RelNode, RelShuttleImpl}
 import org.apache.calcite.rex._
 
 /**
-  * Planner rule that apply various simplifying transformations on filter condition.
-  *
-  * if `simplifySubQuery` is true, this rule will also simplify the filter condition
-  * in [[RexSubQuery]].
-  */
-class SimplifyFilterConditionRule(
-    simplifySubQuery: Boolean,
-    description: String)
-  extends RelOptRule(
-    operand(classOf[Filter], any()),
-    description) {
+ * Planner rule that apply various simplifying transformations on filter condition.
+ *
+ * if `simplifySubQuery` is true, this rule will also simplify the filter condition
+ * in [[RexSubQuery]].
+ */
+class SimplifyFilterConditionRule(simplifySubQuery: Boolean, description: String)
+    extends RelOptRule(operand(classOf[Filter], any()), description) {
 
   override def onMatch(call: RelOptRuleCall): Unit = {
     val filter: Filter = call.rel(0)
@@ -95,9 +91,8 @@ class SimplifyFilterConditionRule(
 }
 
 object SimplifyFilterConditionRule {
-  val INSTANCE = new SimplifyFilterConditionRule(
-    false, "SimplifyFilterConditionRule")
+  val INSTANCE = new SimplifyFilterConditionRule(false, "SimplifyFilterConditionRule")
 
-  val EXTENDED = new SimplifyFilterConditionRule(
-    true, "SimplifyFilterConditionRule:simplifySubQuery")
+  val EXTENDED =
+    new SimplifyFilterConditionRule(true, "SimplifyFilterConditionRule:simplifySubQuery")
 }

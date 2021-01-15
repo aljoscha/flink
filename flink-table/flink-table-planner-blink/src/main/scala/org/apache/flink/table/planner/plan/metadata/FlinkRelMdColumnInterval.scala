@@ -20,12 +20,22 @@ package org.apache.flink.table.planner.plan.metadata
 
 import org.apache.flink.table.api.TableException
 import org.apache.flink.table.planner.plan.metadata.FlinkMetadata.ColumnInterval
-import org.apache.flink.table.planner.plan.nodes.calcite.{Expand, Rank, TableAggregate, WindowAggregate}
+import org.apache.flink.table.planner.plan.nodes.calcite.{
+  Expand,
+  Rank,
+  TableAggregate,
+  WindowAggregate
+}
 import org.apache.flink.table.planner.plan.nodes.physical.batch._
 import org.apache.flink.table.planner.plan.nodes.physical.stream._
 import org.apache.flink.table.planner.plan.schema.FlinkPreparingTableBase
 import org.apache.flink.table.planner.plan.stats._
-import org.apache.flink.table.planner.plan.utils.{AggregateUtil, ColumnIntervalUtil, FlinkRelOptUtil, RankUtil}
+import org.apache.flink.table.planner.plan.utils.{
+  AggregateUtil,
+  ColumnIntervalUtil,
+  FlinkRelOptUtil,
+  RankUtil
+}
 import org.apache.flink.table.runtime.operators.rank.{ConstantRankRange, VariableRankRange}
 import org.apache.flink.util.Preconditions
 
@@ -117,9 +127,11 @@ class FlinkRelMdColumnInterval private extends MetadataHandler[ColumnInterval] {
     if (tuples.isEmpty) {
       EmptyValueInterval
     } else {
-      val values = tuples.map {
-        t => FlinkRelOptUtil.getLiteralValueByBroadType(t.get(index))
-      }.filter(_ != null)
+      val values = tuples
+        .map { t =>
+          FlinkRelOptUtil.getLiteralValueByBroadType(t.get(index))
+        }
+        .filter(_ != null)
       if (values.isEmpty) {
         EmptyValueInterval
       } else {
@@ -180,10 +192,7 @@ class FlinkRelMdColumnInterval private extends MetadataHandler[ColumnInterval] {
     val inputValueInterval = fmq.getColumnInterval(filter.getInput, index)
     ColumnIntervalUtil.getColumnIntervalWithFilter(
       Option(inputValueInterval),
-      RexUtil.expandSearch(
-        filter.getCluster.getRexBuilder,
-        null,
-        filter.getCondition),
+      RexUtil.expandSearch(filter.getCluster.getRexBuilder, null, filter.getCondition),
       index,
       filter.getCluster.getRexBuilder)
   }
@@ -278,8 +287,7 @@ class FlinkRelMdColumnInterval private extends MetadataHandler[ColumnInterval] {
         possibleValueIntervals.reduceLeft(ValueInterval.union)
 
       case searchCall: RexCall if searchCall.getKind == SqlKind.SEARCH =>
-        val expanded = RexUtil.expandSearch(
-          baseNode.getCluster.getRexBuilder, null, searchCall)
+        val expanded = RexUtil.expandSearch(baseNode.getCluster.getRexBuilder, null, searchCall)
         getRexNodeInterval(expanded, baseNode, mq)
 
       // TODO supports ScalarSqlFunctions.IF
@@ -328,10 +336,7 @@ class FlinkRelMdColumnInterval private extends MetadataHandler[ColumnInterval] {
    * @param index  the index of the given column
    * @return interval of the given column in batch sort
    */
-  def getColumnInterval(
-      expand: Expand,
-      mq: RelMetadataQuery,
-      index: Int): ValueInterval = {
+  def getColumnInterval(expand: Expand, mq: RelMetadataQuery, index: Int): ValueInterval = {
     val fmq = FlinkRelMetadataQuery.reuseOrCreate(mq)
     val intervals = expand.projects.flatMap { project =>
       project(index) match {
@@ -342,7 +347,7 @@ class FlinkRelMdColumnInterval private extends MetadataHandler[ColumnInterval] {
           Some(ValueInterval(v, v))
         case l: RexLiteral if l.getValue == null =>
           None
-        case p@_ =>
+        case p @ _ =>
           throw new TableException(s"Column interval can't handle $p type in expand.")
       }
     }
@@ -362,10 +367,7 @@ class FlinkRelMdColumnInterval private extends MetadataHandler[ColumnInterval] {
    * @param index       the index of the given column
    * @return interval of the given column on Rank
    */
-  def getColumnInterval(
-      rank: Rank,
-      mq: RelMetadataQuery,
-      index: Int): ValueInterval = {
+  def getColumnInterval(rank: Rank, mq: RelMetadataQuery, index: Int): ValueInterval = {
     val fmq = FlinkRelMetadataQuery.reuseOrCreate(mq)
     val rankFunColumnIndex = RankUtil.getRankNumberColumnIndex(rank).getOrElse(-1)
     if (index == rankFunColumnIndex) {
@@ -407,8 +409,8 @@ class FlinkRelMdColumnInterval private extends MetadataHandler[ColumnInterval] {
    */
   def getColumnInterval(
       aggregate: TableAggregate,
-      mq: RelMetadataQuery, index: Int): ValueInterval =
-
+      mq: RelMetadataQuery,
+      index: Int): ValueInterval =
     estimateColumnIntervalOfAggregate(aggregate, mq, index)
 
   /**
@@ -484,10 +486,8 @@ class FlinkRelMdColumnInterval private extends MetadataHandler[ColumnInterval] {
    * @param index the index of the given column
    * @return interval of the given column on window Aggregate
    */
-  def getColumnInterval(
-      agg: WindowAggregate,
-      mq: RelMetadataQuery,
-      index: Int): ValueInterval = estimateColumnIntervalOfAggregate(agg, mq, index)
+  def getColumnInterval(agg: WindowAggregate, mq: RelMetadataQuery, index: Int): ValueInterval =
+    estimateColumnIntervalOfAggregate(agg, mq, index)
 
   /**
    * Gets interval of the given column on batch window aggregate.
@@ -535,22 +535,22 @@ class FlinkRelMdColumnInterval private extends MetadataHandler[ColumnInterval] {
     val input = aggregate.getInput
     val fmq = FlinkRelMetadataQuery.reuseOrCreate(mq)
     val groupSet = aggregate match {
-      case agg: StreamPhysicalGroupAggregate => agg.grouping
-      case agg: StreamPhysicalLocalGroupAggregate => agg.grouping
-      case agg: StreamPhysicalGlobalGroupAggregate => agg.grouping
+      case agg: StreamPhysicalGroupAggregate            => agg.grouping
+      case agg: StreamPhysicalLocalGroupAggregate       => agg.grouping
+      case agg: StreamPhysicalGlobalGroupAggregate      => agg.grouping
       case agg: StreamPhysicalIncrementalGroupAggregate => agg.partialAggGrouping
-      case agg: StreamPhysicalGroupWindowAggregate => agg.grouping
-      case agg: BatchPhysicalGroupAggregateBase => agg.grouping ++ agg.auxGrouping
-      case agg: Aggregate => AggregateUtil.checkAndGetFullGroupSet(agg)
-      case agg: BatchPhysicalLocalSortWindowAggregate =>
+      case agg: StreamPhysicalGroupWindowAggregate      => agg.grouping
+      case agg: BatchPhysicalGroupAggregateBase         => agg.grouping ++ agg.auxGrouping
+      case agg: Aggregate                               => AggregateUtil.checkAndGetFullGroupSet(agg)
+      case agg: BatchPhysicalLocalSortWindowAggregate   =>
         // grouping + assignTs + auxGrouping
         agg.grouping ++ Array(agg.inputTimeFieldIndex) ++ agg.auxGrouping
       case agg: BatchPhysicalLocalHashWindowAggregate =>
         // grouping + assignTs + auxGrouping
         agg.grouping ++ Array(agg.inputTimeFieldIndex) ++ agg.auxGrouping
-      case agg: BatchPhysicalWindowAggregateBase => agg.grouping ++ agg.auxGrouping
-      case agg: TableAggregate => agg.getGroupSet.toArray
-      case agg: StreamPhysicalGroupTableAggregate => agg.grouping
+      case agg: BatchPhysicalWindowAggregateBase        => agg.grouping ++ agg.auxGrouping
+      case agg: TableAggregate                          => agg.getGroupSet.toArray
+      case agg: StreamPhysicalGroupTableAggregate       => agg.grouping
       case agg: StreamPhysicalGroupWindowTableAggregate => agg.grouping
     }
 
@@ -563,8 +563,8 @@ class FlinkRelMdColumnInterval private extends MetadataHandler[ColumnInterval] {
           index: Int,
           aggCalls: Seq[AggregateCall],
           inputType: RelDataType): AggregateCall = {
-        val outputIndexToAggCallIndexMap = AggregateUtil.getOutputIndexToAggCallIndexMap(
-          aggCalls, inputType)
+        val outputIndexToAggCallIndexMap =
+          AggregateUtil.getOutputIndexToAggCallIndexMap(aggCalls, inputType)
         if (outputIndexToAggCallIndexMap.containsKey(index)) {
           val realIndex = outputIndexToAggCallIndexMap.get(index)
           aggCalls(realIndex)
@@ -577,11 +577,11 @@ class FlinkRelMdColumnInterval private extends MetadataHandler[ColumnInterval] {
           index: Int,
           globalAggCalls: Seq[AggregateCall],
           inputRowType: RelDataType): Integer = {
-        val outputIndexToAggCallIndexMap = AggregateUtil.getOutputIndexToAggCallIndexMap(
-          globalAggCalls, inputRowType)
+        val outputIndexToAggCallIndexMap =
+          AggregateUtil.getOutputIndexToAggCallIndexMap(globalAggCalls, inputRowType)
 
-        outputIndexToAggCallIndexMap.foreach {
-          case (k, v) => if (v == index) {
+        outputIndexToAggCallIndexMap.foreach { case (k, v) =>
+          if (v == index) {
             return k
           }
         }
@@ -597,10 +597,9 @@ class FlinkRelMdColumnInterval private extends MetadataHandler[ColumnInterval] {
         val aggCall = aggregate match {
           case agg: StreamPhysicalGroupAggregate if agg.aggCalls.length > aggCallIndex =>
             agg.aggCalls(aggCallIndex)
-          case agg: StreamPhysicalGlobalGroupAggregate
-            if agg.aggCalls.length > aggCallIndex =>
-            val aggCallIndexInLocalAgg = getAggCallIndexInLocalAgg(
-              aggCallIndex, agg.aggCalls, agg.localAggInputRowType)
+          case agg: StreamPhysicalGlobalGroupAggregate if agg.aggCalls.length > aggCallIndex =>
+            val aggCallIndexInLocalAgg =
+              getAggCallIndexInLocalAgg(aggCallIndex, agg.aggCalls, agg.localAggInputRowType)
             if (aggCallIndexInLocalAgg != null) {
               return fmq.getColumnInterval(agg.getInput, groupSet.length + aggCallIndexInLocalAgg)
             } else {
@@ -609,15 +608,15 @@ class FlinkRelMdColumnInterval private extends MetadataHandler[ColumnInterval] {
           case agg: StreamPhysicalLocalGroupAggregate =>
             getAggCallFromLocalAgg(aggCallIndex, agg.aggCalls, agg.getInput.getRowType)
           case agg: StreamPhysicalIncrementalGroupAggregate
-            if agg.partialAggCalls.length > aggCallIndex =>
+              if agg.partialAggCalls.length > aggCallIndex =>
             agg.partialAggCalls(aggCallIndex)
           case agg: StreamPhysicalGroupWindowAggregate if agg.aggCalls.length > aggCallIndex =>
             agg.aggCalls(aggCallIndex)
           case agg: BatchPhysicalLocalHashAggregate =>
             getAggCallFromLocalAgg(aggCallIndex, agg.getAggCallList, agg.getInput.getRowType)
           case agg: BatchPhysicalHashAggregate if agg.isMerge =>
-            val aggCallIndexInLocalAgg = getAggCallIndexInLocalAgg(
-              aggCallIndex, agg.getAggCallList, agg.aggInputRowType)
+            val aggCallIndexInLocalAgg =
+              getAggCallIndexInLocalAgg(aggCallIndex, agg.getAggCallList, agg.aggInputRowType)
             if (aggCallIndexInLocalAgg != null) {
               return fmq.getColumnInterval(agg.getInput, groupSet.length + aggCallIndexInLocalAgg)
             } else {
@@ -626,8 +625,8 @@ class FlinkRelMdColumnInterval private extends MetadataHandler[ColumnInterval] {
           case agg: BatchPhysicalLocalSortAggregate =>
             getAggCallFromLocalAgg(aggCallIndex, agg.getAggCallList, agg.getInput.getRowType)
           case agg: BatchPhysicalSortAggregate if agg.isMerge =>
-            val aggCallIndexInLocalAgg = getAggCallIndexInLocalAgg(
-              aggCallIndex, agg.getAggCallList, agg.aggInputRowType)
+            val aggCallIndexInLocalAgg =
+              getAggCallIndexInLocalAgg(aggCallIndex, agg.getAggCallList, agg.aggInputRowType)
             if (aggCallIndexInLocalAgg != null) {
               return fmq.getColumnInterval(agg.getInput, groupSet.length + aggCallIndexInLocalAgg)
             } else {
@@ -690,10 +689,7 @@ class FlinkRelMdColumnInterval private extends MetadataHandler[ColumnInterval] {
    * @param index  the index of the given column
    * @return interval of the given column on window
    */
-  def getColumnInterval(
-      window: Window,
-      mq: RelMetadataQuery,
-      index: Int): ValueInterval = {
+  def getColumnInterval(window: Window, mq: RelMetadataQuery, index: Int): ValueInterval = {
     getColumnIntervalOfOverAgg(window, mq, index)
   }
 
@@ -780,8 +776,7 @@ class FlinkRelMdColumnInterval private extends MetadataHandler[ColumnInterval] {
    */
   def getColumnInterval(union: Union, mq: RelMetadataQuery, index: Int): ValueInterval = {
     val fmq = FlinkRelMetadataQuery.reuseOrCreate(mq)
-    val subIntervals = union
-      .getInputs
+    val subIntervals = union.getInputs
       .map(fmq.getColumnInterval(_, index))
     subIntervals.reduceLeft(ValueInterval.union)
   }
@@ -816,7 +811,7 @@ object FlinkRelMdColumnInterval {
 
   private val INSTANCE = new FlinkRelMdColumnInterval
 
-  val SOURCE: RelMetadataProvider = ReflectiveRelMetadataProvider.reflectiveSource(
-    FlinkMetadata.ColumnInterval.METHOD, INSTANCE)
+  val SOURCE: RelMetadataProvider =
+    ReflectiveRelMetadataProvider.reflectiveSource(FlinkMetadata.ColumnInterval.METHOD, INSTANCE)
 
 }

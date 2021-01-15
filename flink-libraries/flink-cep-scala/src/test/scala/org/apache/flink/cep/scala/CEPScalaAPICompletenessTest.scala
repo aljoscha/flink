@@ -39,7 +39,9 @@ class CEPScalaAPICompletenessTest extends ScalaAPICompletenessTestBase {
 
   @Test
   override def testCompleteness(): Unit = {
-    checkMethods("PatternStream", "PatternStream",
+    checkMethods(
+      "PatternStream",
+      "PatternStream",
       classOf[JPatternStream[_]],
       classOf[PatternStream[_]])
   }

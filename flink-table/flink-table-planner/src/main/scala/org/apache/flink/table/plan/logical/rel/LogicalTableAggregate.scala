@@ -26,17 +26,17 @@ import org.apache.calcite.rel.RelNode
 import org.apache.calcite.util.ImmutableBitSet
 
 /**
-  * Logical Node for TableAggregate.
-  */
+ * Logical Node for TableAggregate.
+ */
 class LogicalTableAggregate(
-  cluster: RelOptCluster,
-  traitSet: RelTraitSet,
-  input: RelNode,
-  indicator: Boolean,
-  groupSet: ImmutableBitSet,
-  groupSets: util.List[ImmutableBitSet],
-  aggCalls: util.List[AggregateCall])
-  extends TableAggregate(cluster, traitSet, input, indicator, groupSet, groupSets, aggCalls) {
+    cluster: RelOptCluster,
+    traitSet: RelTraitSet,
+    input: RelNode,
+    indicator: Boolean,
+    groupSet: ImmutableBitSet,
+    groupSets: util.List[ImmutableBitSet],
+    aggCalls: util.List[AggregateCall])
+    extends TableAggregate(cluster, traitSet, input, indicator, groupSet, groupSets, aggCalls) {
 
   override def copy(traitSet: RelTraitSet, inputs: util.List[RelNode]): TableAggregate = {
     new LogicalTableAggregate(
@@ -46,8 +46,7 @@ class LogicalTableAggregate(
       indicator,
       groupSet,
       groupSets,
-      aggCalls
-    )
+      aggCalls)
   }
 }
 

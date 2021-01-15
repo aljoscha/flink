@@ -32,8 +32,8 @@ import org.apache.calcite.rex.RexNode
 import java.util
 
 /**
-  * Batch physical RelNode for [[Expand]].
-  */
+ * Batch physical RelNode for [[Expand]].
+ */
 class BatchPhysicalExpand(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -41,8 +41,8 @@ class BatchPhysicalExpand(
     outputRowType: RelDataType,
     projects: util.List[util.List[RexNode]],
     expandIdIndex: Int)
-  extends Expand(cluster, traitSet, input, outputRowType, projects, expandIdIndex)
-  with BatchPhysicalRel {
+    extends Expand(cluster, traitSet, input, outputRowType, projects, expandIdIndex)
+    with BatchPhysicalRel {
 
   override def copy(traitSet: RelTraitSet, inputs: util.List[RelNode]): RelNode = {
     new BatchPhysicalExpand(
@@ -51,12 +51,12 @@ class BatchPhysicalExpand(
       inputs.get(0),
       outputRowType,
       projects,
-      expandIdIndex
-    )
+      expandIdIndex)
   }
 
   override def explainTerms(pw: RelWriter): RelWriter = {
-    super.explainTerms(pw)
+    super
+      .explainTerms(pw)
       .item("projects", RelExplainUtil.projectsToString(projects, input.getRowType, getRowType))
   }
 
@@ -65,7 +65,6 @@ class BatchPhysicalExpand(
       projects,
       ExecEdge.DEFAULT,
       FlinkTypeFactory.toLogicalRowType(getRowType),
-      getRelDetailedDescription
-    )
+      getRelDetailedDescription)
   }
 }

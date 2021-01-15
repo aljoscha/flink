@@ -32,9 +32,8 @@ import org.junit.runners.Parameterized
 import scala.collection.JavaConverters._
 
 @RunWith(classOf[Parameterized])
-class TableSourceITCase(
-    configMode: TableConfigMode)
-  extends TableProgramsCollectionTestBase(configMode) {
+class TableSourceITCase(configMode: TableConfigMode)
+    extends TableProgramsCollectionTestBase(configMode) {
 
   @Test
   def testCsvTableSource(): Unit = {
@@ -45,8 +44,7 @@ class TableSourceITCase(
     val tEnv = BatchTableEnvironment.create(env, config)
 
     tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal("csvTable", csvTable)
-    val results = tEnv.sqlQuery(
-      "SELECT id, `first`, `last`, score FROM csvTable").collect()
+    val results = tEnv.sqlQuery("SELECT id, `first`, `last`, score FROM csvTable").collect()
 
     val expected = Seq(
       "1,Mike,Smith,12.3",
@@ -69,13 +67,10 @@ class TableSourceITCase(
     val tEnv = BatchTableEnvironment.create(env, config)
 
     tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal("csvTable", csvTable)
-    val results = tEnv.sqlQuery(
-      "SELECT id, `first`, `last`, score FROM csvTable").collect()
+    val results = tEnv.sqlQuery("SELECT id, `first`, `last`, score FROM csvTable").collect()
 
-    val expected = Seq(
-      "1,Mike,Smith,12.3",
-      "2,Bob,Taylor,null",
-      "null,Leonard,null,null").mkString("\n")
+    val expected =
+      Seq("1,Mike,Smith,12.3", "2,Bob,Taylor,null", "null,Leonard,null,null").mkString("\n")
     TestBaseUtils.compareResultAsText(results.asJava, expected)
   }
 
@@ -85,13 +80,17 @@ class TableSourceITCase(
     val tableEnv = BatchTableEnvironment.create(env, config)
     val nestedTable = CommonTestData.getNestedTableSource
 
-    tableEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(
-      "NestedPersons", nestedTable)
+    tableEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSourceInternal("NestedPersons", nestedTable)
 
-    val result = tableEnv.sqlQuery("SELECT NestedPersons.firstName, NestedPersons.lastName," +
-        "NestedPersons.address.street, NestedPersons.address.city AS city " +
-        "FROM NestedPersons " +
-        "WHERE NestedPersons.address.city LIKE 'Dublin'").collect()
+    val result = tableEnv
+      .sqlQuery(
+        "SELECT NestedPersons.firstName, NestedPersons.lastName," +
+          "NestedPersons.address.street, NestedPersons.address.city AS city " +
+          "FROM NestedPersons " +
+          "WHERE NestedPersons.address.city LIKE 'Dublin'")
+      .collect()
 
     val expected = "Bob,Taylor,Pearse Street,Dublin"
 

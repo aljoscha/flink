@@ -31,8 +31,8 @@ trait WindowProperty {
 }
 
 abstract class AbstractWindowProperty(child: PlannerExpression)
-  extends UnaryExpression
-  with WindowProperty {
+    extends UnaryExpression
+    with WindowProperty {
 
   override def toString = s"WindowProperty($child)"
 

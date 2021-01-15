@@ -49,7 +49,5 @@ class TupleComparatorILDXC2Test extends TupleComparatorTestBase[(Int, Long, Doub
     (4, 17L, 24.0),
     (4, 18L, 24.0),
     (4, 24L, 25.0),
-    (4, 25L, 25.0)
-  )
+    (4, 25L, 25.0))
 }
-

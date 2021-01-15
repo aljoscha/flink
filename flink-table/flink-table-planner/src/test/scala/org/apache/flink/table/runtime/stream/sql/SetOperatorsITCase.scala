@@ -44,35 +44,20 @@ class SetOperatorsITCase extends StreamingWithStateTestBase {
          |WHERE a IN (SELECT SUM(x) FROM tableB GROUP BY y HAVING y LIKE '%Hanoi%')
        """.stripMargin
 
-    val dataA = Seq(
-      (1, 1L, "Hello"),
-      (2, 2L, "Hello"),
-      (3, 3L, "Hello World"),
-      (4, 4L, "Hello")
-    )
+    val dataA = Seq((1, 1L, "Hello"), (2, 2L, "Hello"), (3, 3L, "Hello World"), (4, 4L, "Hello"))
 
-    val dataB = Seq(
-      (1, "hello"),
-      (1, "Hanoi"),
-      (1, "Hanoi"),
-      (2, "Hanoi-1"),
-      (2, "Hanoi-1"),
-      (-1, "Hanoi-1")
-    )
+    val dataB =
+      Seq((1, "hello"), (1, "Hanoi"), (1, "Hanoi"), (2, "Hanoi-1"), (2, "Hanoi-1"), (-1, "Hanoi-1"))
 
-    tEnv.registerTable("tableA",
-      env.fromCollection(dataA).toTable(tEnv).as("a", "b", "c"))
+    tEnv.registerTable("tableA", env.fromCollection(dataA).toTable(tEnv).as("a", "b", "c"))
 
-    tEnv.registerTable("tableB",
-      env.fromCollection(dataB).toTable(tEnv).as("x", "y"))
+    tEnv.registerTable("tableB", env.fromCollection(dataB).toTable(tEnv).as("x", "y"))
 
     val results = tEnv.sqlQuery(sqlQuery).toRetractStream[Row]
     results.addSink(new StreamITCase.RetractingSink)
     env.execute()
 
-    val expected = Seq(
-      "2,2,Hello", "3,3,Hello World"
-    )
+    val expected = Seq("2,2,Hello", "3,3,Hello World")
 
     assertEquals(expected.sorted, StreamITCase.retractedResults.sorted)
   }
@@ -88,41 +73,23 @@ class SetOperatorsITCase extends StreamingWithStateTestBase {
          |AND b IN (SELECT w FROM tableC)
        """.stripMargin
 
-    val dataA = Seq(
-      (1, 1L, "Hello"),
-      (2, 2L, "Hello"),
-      (3, 3L, "Hello World"),
-      (4, 4L, "Hello")
-    )
+    val dataA = Seq((1, 1L, "Hello"), (2, 2L, "Hello"), (3, 3L, "Hello World"), (4, 4L, "Hello"))
 
-    val dataB = Seq(
-      (1, "hello"),
-      (2, "co-hello"),
-      (4, "hello")
-    )
+    val dataB = Seq((1, "hello"), (2, "co-hello"), (4, "hello"))
 
-    val dataC = Seq(
-      (1L, "Joker"),
-      (1L, "Sanity"),
-      (2L, "Cool")
-    )
+    val dataC = Seq((1L, "Joker"), (1L, "Sanity"), (2L, "Cool"))
 
-    tEnv.registerTable("tableA",
-      env.fromCollection(dataA).toTable(tEnv).as("a", "b", "c"))
+    tEnv.registerTable("tableA", env.fromCollection(dataA).toTable(tEnv).as("a", "b", "c"))
 
-    tEnv.registerTable("tableB",
-      env.fromCollection(dataB).toTable(tEnv).as("x", "y"))
+    tEnv.registerTable("tableB", env.fromCollection(dataB).toTable(tEnv).as("x", "y"))
 
-    tEnv.registerTable("tableC",
-      env.fromCollection(dataC).toTable(tEnv).as("w", "z"))
+    tEnv.registerTable("tableC", env.fromCollection(dataC).toTable(tEnv).as("w", "z"))
 
     val results = tEnv.sqlQuery(sqlQuery).toRetractStream[Row]
     results.addSink(new StreamITCase.RetractingSink)
     env.execute()
 
-    val expected = Seq(
-      "1,1,Hello", "2,2,Hello"
-    )
+    val expected = Seq("1,1,Hello", "2,2,Hello")
 
     assertEquals(expected.sorted, StreamITCase.retractedResults.sorted)
   }
@@ -137,32 +104,19 @@ class SetOperatorsITCase extends StreamingWithStateTestBase {
          |WHERE a NOT IN (SELECT x FROM tableB)
        """.stripMargin
 
-    val dataA = Seq(
-      (1, 1L, "Hello"),
-      (2, 2L, "Hello"),
-      (3, 3L, "Hello World"),
-      (4, 4L, "Hello")
-    )
+    val dataA = Seq((1, 1L, "Hello"), (2, 2L, "Hello"), (3, 3L, "Hello World"), (4, 4L, "Hello"))
 
-    val dataB = Seq(
-      (1, "hello"),
-      (2, "co-hello"),
-      (4, "hello")
-    )
+    val dataB = Seq((1, "hello"), (2, "co-hello"), (4, "hello"))
 
-    tEnv.registerTable("tableA",
-      env.fromCollection(dataA).toTable(tEnv).as("a", "b", "c"))
+    tEnv.registerTable("tableA", env.fromCollection(dataA).toTable(tEnv).as("a", "b", "c"))
 
-    tEnv.registerTable("tableB",
-      env.fromCollection(dataB).toTable(tEnv).as("x", "y"))
+    tEnv.registerTable("tableB", env.fromCollection(dataB).toTable(tEnv).as("x", "y"))
 
     val results = tEnv.sqlQuery(sqlQuery).toRetractStream[Row]
     results.addSink(new StreamITCase.RetractingSink)
     env.execute()
 
-    val expected = Seq(
-      "3,3,Hello World"
-    )
+    val expected = Seq("3,3,Hello World")
 
     assertEquals(expected.sorted, StreamITCase.retractedResults.sorted)
   }

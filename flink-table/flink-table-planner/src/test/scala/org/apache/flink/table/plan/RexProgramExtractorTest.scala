@@ -48,8 +48,7 @@ class RexProgramExtractorTest extends RexProgramTestBase {
   private val functionCatalog: FunctionCatalog = new FunctionCatalog(
     TableConfig.getDefault,
     CatalogManagerMocks.createEmptyCatalogManager(),
-    new ModuleManager
-  )
+    new ModuleManager)
   private val expressionBridge: ExpressionBridge[PlannerExpression] =
     new ExpressionBridge[PlannerExpression](PlannerExpressionConverter.INSTANCE)
 
@@ -69,10 +68,7 @@ class RexProgramExtractorTest extends RexProgramTestBase {
     val expected: Array[Expression] = Array(firstExp, secondExp)
 
     val (convertedExpressions, unconvertedRexNodes) =
-      RexProgramExtractor.extractConjunctiveConditions(
-        program,
-        builder,
-        functionCatalog)
+      RexProgramExtractor.extractConjunctiveConditions(program, builder, functionCatalog)
 
     assertExpressionArrayEquals(expected, convertedExpressions)
     assertEquals(0, unconvertedRexNodes.length)
@@ -95,10 +91,7 @@ class RexProgramExtractorTest extends RexProgramTestBase {
     val program = builder.getProgram
     val relBuilder: RexBuilder = new RexBuilder(typeFactory)
     val (convertedExpressions, unconvertedRexNodes) =
-      RexProgramExtractor.extractConjunctiveConditions(
-        program,
-        relBuilder,
-        functionCatalog)
+      RexProgramExtractor.extractConjunctiveConditions(program, relBuilder, functionCatalog)
 
     val expected: Array[Expression] = Array(ExpressionParser.parseExpression("amount >= id"))
     assertExpressionArrayEquals(expected, convertedExpressions)
@@ -141,16 +134,13 @@ class RexProgramExtractorTest extends RexProgramTestBase {
     val not = builder.addExpr(rexBuilder.makeCall(SqlStdOperatorTable.NOT, List(d).asJava))
 
     // (a AND b) OR c OR e) AND (NOT d)
-    builder.addCondition(builder.addExpr(
-      rexBuilder.makeCall(SqlStdOperatorTable.AND, List(or, not).asJava)))
+    builder.addCondition(
+      builder.addExpr(rexBuilder.makeCall(SqlStdOperatorTable.AND, List(or, not).asJava)))
 
     val program = builder.getProgram
     val relBuilder: RexBuilder = new RexBuilder(typeFactory)
     val (convertedExpressions, unconvertedRexNodes) =
-      RexProgramExtractor.extractConjunctiveConditions(
-        program,
-        relBuilder,
-        functionCatalog)
+      RexProgramExtractor.extractConjunctiveConditions(program, relBuilder, functionCatalog)
 
     val expected: Array[Expression] = Array(
       ExpressionParser.parseExpression("amount < 100 || price == 100 || price === 200"),
@@ -239,26 +229,17 @@ class RexProgramExtractorTest extends RexProgramTestBase {
       new RexBuilder(typeFactory),
       functionCatalog)
 
-
     val expected = Array[Expression](
       EqualTo(
         UnresolvedFieldReference("timestamp_col"),
-        Literal(Timestamp.valueOf("2017-09-10 14:23:01.245"))
-      ),
-      EqualTo(
-        UnresolvedFieldReference("date_col"),
-        Literal(Date.valueOf("2017-09-12"))
-      ),
-      EqualTo(
-        UnresolvedFieldReference("time_col"),
-        Literal(Time.valueOf("14:23:01"))
-      )
-    )
+        Literal(Timestamp.valueOf("2017-09-10 14:23:01.245"))),
+      EqualTo(UnresolvedFieldReference("date_col"), Literal(Date.valueOf("2017-09-12"))),
+      EqualTo(UnresolvedFieldReference("time_col"), Literal(Time.valueOf("14:23:01"))))
 
     assertExpressionArrayEquals(expected, converted)
   }
 
-    @Test
+  @Test
   def testExtractArithmeticConditions(): Unit = {
     val inputRowType = typeFactory.createStructType(allFieldTypes, allFieldNames)
     val builder = new RexProgramBuilder(inputRowType, rexBuilder)
@@ -284,30 +265,41 @@ class RexProgramExtractorTest extends RexProgramTestBase {
       // amount > id
       builder.addExpr(rexBuilder.makeCall(SqlStdOperatorTable.GREATER_THAN, t0, t1)),
       // amount + id == 100
-      builder.addExpr(rexBuilder.makeCall(SqlStdOperatorTable.EQUALS,
-        rexBuilder.makeCall(SqlStdOperatorTable.PLUS, t0, t1), t2)),
+      builder.addExpr(
+        rexBuilder.makeCall(
+          SqlStdOperatorTable.EQUALS,
+          rexBuilder.makeCall(SqlStdOperatorTable.PLUS, t0, t1),
+          t2)),
       // amount - id == 100
-      builder.addExpr(rexBuilder.makeCall(SqlStdOperatorTable.EQUALS,
-        rexBuilder.makeCall(SqlStdOperatorTable.MINUS, t0, t1), t2)),
+      builder.addExpr(
+        rexBuilder.makeCall(
+          SqlStdOperatorTable.EQUALS,
+          rexBuilder.makeCall(SqlStdOperatorTable.MINUS, t0, t1),
+          t2)),
       // amount * id == 100
-      builder.addExpr(rexBuilder.makeCall(SqlStdOperatorTable.EQUALS,
-        rexBuilder.makeCall(SqlStdOperatorTable.MULTIPLY, t0, t1), t2)),
+      builder.addExpr(
+        rexBuilder.makeCall(
+          SqlStdOperatorTable.EQUALS,
+          rexBuilder.makeCall(SqlStdOperatorTable.MULTIPLY, t0, t1),
+          t2)),
       // amount / id == 100
-      builder.addExpr(rexBuilder.makeCall(SqlStdOperatorTable.EQUALS,
-        rexBuilder.makeCall(SqlStdOperatorTable.DIVIDE, t0, t1), t2)),
+      builder.addExpr(
+        rexBuilder.makeCall(
+          SqlStdOperatorTable.EQUALS,
+          rexBuilder.makeCall(SqlStdOperatorTable.DIVIDE, t0, t1),
+          t2)),
       // -amount == 100
-      builder.addExpr(rexBuilder.makeCall(SqlStdOperatorTable.EQUALS,
-        rexBuilder.makeCall(SqlStdOperatorTable.UNARY_MINUS, t0), t2))
-    ).asJava
+      builder.addExpr(
+        rexBuilder.makeCall(
+          SqlStdOperatorTable.EQUALS,
+          rexBuilder.makeCall(SqlStdOperatorTable.UNARY_MINUS, t0),
+          t2))).asJava
 
     builder.addCondition(builder.addExpr(rexBuilder.makeCall(SqlStdOperatorTable.AND, condition)))
     val program = builder.getProgram
     val relBuilder: RexBuilder = new RexBuilder(typeFactory)
     val (convertedExpressions, unconvertedRexNodes) =
-      RexProgramExtractor.extractConjunctiveConditions(
-        program,
-        relBuilder,
-        functionCatalog)
+      RexProgramExtractor.extractConjunctiveConditions(program, relBuilder, functionCatalog)
 
     val expected: Array[Expression] = Array(
       ExpressionParser.parseExpression("amount < id"),
@@ -320,8 +312,7 @@ class RexProgramExtractorTest extends RexProgramTestBase {
       ExpressionParser.parseExpression("amount - id == 100"),
       ExpressionParser.parseExpression("amount * id == 100"),
       ExpressionParser.parseExpression("amount / id == 100"),
-      ExpressionParser.parseExpression("-amount == 100")
-    )
+      ExpressionParser.parseExpression("-amount == 100"))
     assertExpressionArrayEquals(expected, convertedExpressions)
     assertEquals(0, unconvertedRexNodes.length)
   }
@@ -351,29 +342,27 @@ class RexProgramExtractorTest extends RexProgramTestBase {
 
     // sum(amount) > 100
     val condition1 = builder.addExpr(
-      rexBuilder.makeCall(SqlStdOperatorTable.GREATER_THAN,
-        rexBuilder.makeCall(SqlStdOperatorTable.SUM, t0), t2))
+      rexBuilder.makeCall(
+        SqlStdOperatorTable.GREATER_THAN,
+        rexBuilder.makeCall(SqlStdOperatorTable.SUM, t0),
+        t2))
 
     // min(id) == 100
     val condition2 = builder.addExpr(
-      rexBuilder.makeCall(SqlStdOperatorTable.EQUALS,
-        rexBuilder.makeCall(SqlStdOperatorTable.MIN, t1), t2))
+      rexBuilder
+        .makeCall(SqlStdOperatorTable.EQUALS, rexBuilder.makeCall(SqlStdOperatorTable.MIN, t1), t2))
 
-    builder.addCondition(builder.addExpr(
-      rexBuilder.makeCall(SqlStdOperatorTable.AND, condition1, condition2)))
+    builder.addCondition(
+      builder.addExpr(rexBuilder.makeCall(SqlStdOperatorTable.AND, condition1, condition2)))
 
     val program = builder.getProgram
     val relBuilder: RexBuilder = new RexBuilder(typeFactory)
     val (convertedExpressions, unconvertedRexNodes) =
-      RexProgramExtractor.extractConjunctiveConditions(
-        program,
-        relBuilder,
-        functionCatalog)
+      RexProgramExtractor.extractConjunctiveConditions(program, relBuilder, functionCatalog)
 
     val expected: Array[Expression] = Array(
       GreaterThan(Sum(UnresolvedFieldReference("amount")), Literal(100)),
-      EqualTo(Min(UnresolvedFieldReference("id")), Literal(100))
-    )
+      EqualTo(Min(UnresolvedFieldReference("id")), Literal(100)))
     assertExpressionArrayEquals(expected, convertedExpressions)
     assertEquals(0, unconvertedRexNodes.length)
   }
@@ -394,16 +383,16 @@ class RexProgramExtractorTest extends RexProgramTestBase {
     val cast = builder.addExpr(rexBuilder.makeCast(allFieldTypes.get(1), t0))
 
     // unsupported now: amount.cast(BigInteger) > 100
-    val condition1 = builder.addExpr(
-      rexBuilder.makeCall(SqlStdOperatorTable.GREATER_THAN, cast, t2))
+    val condition1 =
+      builder.addExpr(rexBuilder.makeCall(SqlStdOperatorTable.GREATER_THAN, cast, t2))
 
     // amount <= id
-    val condition2 = builder.addExpr(
-      rexBuilder.makeCall(SqlStdOperatorTable.LESS_THAN_OR_EQUAL, t0, t1))
+    val condition2 =
+      builder.addExpr(rexBuilder.makeCall(SqlStdOperatorTable.LESS_THAN_OR_EQUAL, t0, t1))
 
     // contains unsupported condition: (amount.cast(BigInteger) > 100 OR amount <= id)
-    val condition3 = builder.addExpr(
-      rexBuilder.makeCall(SqlStdOperatorTable.OR, condition1, condition2))
+    val condition3 =
+      builder.addExpr(rexBuilder.makeCall(SqlStdOperatorTable.OR, condition1, condition2))
 
     // only condition2 can be translated
     builder.addCondition(
@@ -412,18 +401,14 @@ class RexProgramExtractorTest extends RexProgramTestBase {
     val program = builder.getProgram
     val relBuilder: RexBuilder = new RexBuilder(typeFactory)
     val (convertedExpressions, unconvertedRexNodes) =
-      RexProgramExtractor.extractConjunctiveConditions(
-        program,
-        relBuilder,
-        functionCatalog)
+      RexProgramExtractor.extractConjunctiveConditions(program, relBuilder, functionCatalog)
 
-    val expected: Array[Expression] = Array(
-      ExpressionParser.parseExpression("amount <= id")
-    )
+    val expected: Array[Expression] = Array(ExpressionParser.parseExpression("amount <= id"))
     assertExpressionArrayEquals(expected, convertedExpressions)
     assertEquals(2, unconvertedRexNodes.length)
     assertEquals(">(CAST($2):BIGINT NOT NULL, 100)", unconvertedRexNodes(0).toString)
-    assertEquals("OR(>(CAST($2):BIGINT NOT NULL, 100), <=($2, $1))",
+    assertEquals(
+      "OR(>(CAST($2):BIGINT NOT NULL, 100), <=($2, $1))",
       unconvertedRexNodes(1).toString)
   }
 
@@ -456,10 +441,7 @@ class RexProgramExtractorTest extends RexProgramTestBase {
     val usedFields = RexProgramExtractor.extractRefInputFields(rexProgram)
     val usedNestedFields = RexProgramExtractor.extractRefNestedInputFields(rexProgram, usedFields)
 
-    val expected = Array(
-      Array("amount"),
-      Array("*"),
-      Array("with.deeper.entry", "with.deep.entry"))
+    val expected = Array(Array("amount"), Array("*"), Array("with.deeper.entry", "with.deep.entry"))
 
     assertThat(usedFields, is(Array(1, 0, 2)))
     assertThat(usedNestedFields, is(expected))
@@ -536,8 +518,8 @@ class RexProgramExtractorTest extends RexProgramTestBase {
 
     // payment
     val pay$amount = rexBuilder.makeFieldAccess(t1, "amount", false)
-    val multiplyAmount = builder.addExpr(
-      rexBuilder.makeCall(SqlStdOperatorTable.MULTIPLY, pay$amount, t3))
+    val multiplyAmount =
+      builder.addExpr(rexBuilder.makeCall(SqlStdOperatorTable.MULTIPLY, pay$amount, t3))
 
     // field
     val field$with = rexBuilder.makeFieldAccess(t2, "with", false)
@@ -604,7 +586,7 @@ class RexProgramExtractorTest extends RexProgramTestBase {
   private def testExtractSinglePostfixCondition(
       fieldIndex: Integer,
       op: SqlPostfixOperator,
-      expr: String) : Unit = {
+      expr: String): Unit = {
 
     val inputRowType = typeFactory.createStructType(allFieldTypes, allFieldNames)
     val builder = new RexProgramBuilder(inputRowType, rexBuilder)
@@ -617,10 +599,7 @@ class RexProgramExtractorTest extends RexProgramTestBase {
     val program = builder.getProgram(false)
     val relBuilder: RexBuilder = new RexBuilder(typeFactory)
     val (convertedExpressions, unconvertedRexNodes) =
-      RexProgramExtractor.extractConjunctiveConditions(
-        program,
-        relBuilder,
-        functionCatalog)
+      RexProgramExtractor.extractConjunctiveConditions(program, relBuilder, functionCatalog)
 
     assertEquals(1, convertedExpressions.length)
     assertEquals(expr, convertedExpressions.head.toString)
@@ -635,8 +614,8 @@ class RexProgramExtractorTest extends RexProgramTestBase {
     val sortedActual = actual.sortBy(e => e.toString)
 
     assertEquals(sortedExpected.length, sortedActual.length)
-    sortedExpected.zip(sortedActual).foreach {
-      case (l, r) => assertEquals(l.toString, r.toString)
+    sortedExpected.zip(sortedActual).foreach { case (l, r) =>
+      assertEquals(l.toString, r.toString)
     }
   }
 }

@@ -24,15 +24,14 @@ import org.apache.flink.table.codegen.calls.CallGenerator._
 import org.apache.flink.table.codegen.{CodeGenerator, GeneratedExpression}
 
 /**
-  * Generates a function call that calls a method which returns the same type that it
-  * takes as first argument.
-  */
+ * Generates a function call that calls a method which returns the same type that it
+ * takes as first argument.
+ */
 class MultiTypeMethodCallGen(method: Method) extends CallGenerator {
 
   override def generate(
       codeGenerator: CodeGenerator,
-      operands: Seq[GeneratedExpression])
-    : GeneratedExpression = {
+      operands: Seq[GeneratedExpression]): GeneratedExpression = {
     generateCallIfArgsNotNull(codeGenerator.nullCheck, operands.head.resultType, operands) {
       (operandResultTerms) =>
         s"""

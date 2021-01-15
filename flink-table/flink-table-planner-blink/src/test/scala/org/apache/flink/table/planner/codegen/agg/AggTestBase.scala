@@ -27,7 +27,10 @@ import org.apache.flink.table.api.{DataTypes, EnvironmentSettings}
 import org.apache.flink.table.planner.calcite.{FlinkTypeFactory, FlinkTypeSystem}
 import org.apache.flink.table.planner.codegen.CodeGeneratorContext
 import org.apache.flink.table.planner.delegation.PlannerBase
-import org.apache.flink.table.planner.functions.aggfunctions.AvgAggFunction.{DoubleAvgAggFunction, LongAvgAggFunction}
+import org.apache.flink.table.planner.functions.aggfunctions.AvgAggFunction.{
+  DoubleAvgAggFunction,
+  LongAvgAggFunction
+}
 import org.apache.flink.table.planner.plan.utils.{AggregateInfo, AggregateInfoList}
 import org.apache.flink.table.planner.typeutils.DataViewUtils.DataViewSpec
 import org.apache.flink.table.runtime.context.ExecutionContext
@@ -39,8 +42,8 @@ import org.apache.calcite.tools.RelBuilder
 import org.powermock.api.mockito.PowerMockito.{mock, when}
 
 /**
-  * Agg test base to mock agg information and etc.
-  */
+ * Agg test base to mock agg information and etc.
+ */
 abstract class AggTestBase(isBatchMode: Boolean) {
 
   val typeFactory: FlinkTypeFactory = new FlinkTypeFactory(new FlinkTypeSystem())
@@ -57,12 +60,15 @@ abstract class AggTestBase(isBatchMode: Boolean) {
   private val planner = tEnv.asInstanceOf[TableEnvironmentImpl].getPlanner.asInstanceOf[PlannerBase]
   val inputNames = Array("f0", "f1", "f2", "f3", "f4")
   val inputTypes: Array[LogicalType] = Array(
-    new VarCharType(VarCharType.MAX_LENGTH), new BigIntType(), new DoubleType(), new BigIntType(),
+    new VarCharType(VarCharType.MAX_LENGTH),
+    new BigIntType(),
+    new DoubleType(),
+    new BigIntType(),
     new VarCharType(VarCharType.MAX_LENGTH))
   val inputType: RowType = RowType.of(inputTypes, inputNames)
 
-  val relBuilder: RelBuilder = planner.getRelBuilder.values(
-    typeFactory.buildRelNodeRowType(inputNames, inputTypes))
+  val relBuilder: RelBuilder =
+    planner.getRelBuilder.values(typeFactory.buildRelNodeRowType(inputNames, inputTypes))
   val aggInfo1: AggregateInfo = {
     val aggInfo = mock(classOf[AggregateInfo])
     val call = mock(classOf[AggregateCall])
@@ -108,8 +114,8 @@ abstract class AggTestBase(isBatchMode: Boolean) {
     aggInfo
   }
 
-  val aggInfoList = AggregateInfoList(
-    Array(aggInfo1, aggInfo2, aggInfo3), None, countStarInserted = false, Array())
+  val aggInfoList =
+    AggregateInfoList(Array(aggInfo1, aggInfo2, aggInfo3), None, countStarInserted = false, Array())
   val ctx = new CodeGeneratorContext(tEnv.getConfig)
   val classLoader: ClassLoader = Thread.currentThread().getContextClassLoader
   val context: ExecutionContext = mock(classOf[ExecutionContext])

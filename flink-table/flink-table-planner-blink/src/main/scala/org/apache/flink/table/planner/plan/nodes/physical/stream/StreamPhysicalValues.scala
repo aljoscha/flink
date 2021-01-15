@@ -39,8 +39,8 @@ class StreamPhysicalValues(
     traitSet: RelTraitSet,
     tuples: ImmutableList[ImmutableList[RexLiteral]],
     outputRowType: RelDataType)
-  extends Values(cluster, outputRowType, tuples, traitSet)
-  with StreamPhysicalRel {
+    extends Values(cluster, outputRowType, tuples, traitSet)
+    with StreamPhysicalRel {
 
   override def requireWatermark: Boolean = false
 
@@ -54,7 +54,6 @@ class StreamPhysicalValues(
     new StreamExecValues(
       tuples.asList().map(_.asList()),
       FlinkTypeFactory.toLogicalRowType(getRowType),
-      getRelDetailedDescription
-    )
+      getRelDetailedDescription)
   }
 }

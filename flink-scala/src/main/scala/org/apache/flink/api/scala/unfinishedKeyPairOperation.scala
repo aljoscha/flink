@@ -69,9 +69,8 @@ private[flink] abstract class UnfinishedKeyPairOperation[L, R, O](
    * operation.
    */
   def where(firstLeftField: String, otherLeftFields: String*) = {
-    val leftKey = new ExpressionKeys[L](
-      firstLeftField +: otherLeftFields.toArray,
-      leftInput.getType)
+    val leftKey =
+      new ExpressionKeys[L](firstLeftField +: otherLeftFields.toArray, leftInput.getType)
     new HalfUnfinishedKeyPairOperation[L, R, O](this, leftKey)
   }
 
@@ -107,7 +106,8 @@ private[flink] abstract class UnfinishedKeyPairOperation[L, R, O](
 
 @Internal
 private[flink] class HalfUnfinishedKeyPairOperation[L, R, O](
-    unfinished: UnfinishedKeyPairOperation[L, R, O], leftKey: Keys[L]) {
+    unfinished: UnfinishedKeyPairOperation[L, R, O],
+    leftKey: Keys[L]) {
 
   /**
    * Specify the key fields for the right side of the key based operation. This returns
@@ -118,8 +118,9 @@ private[flink] class HalfUnfinishedKeyPairOperation[L, R, O](
   def equalTo(rightKeys: Int*): O = {
     val rightKey = new ExpressionKeys[R](rightKeys.toArray, unfinished.rightInput.getType)
     if (!leftKey.areCompatible(rightKey)) {
-      throw new InvalidProgramException("The types of the key fields do not match. Left: " +
-        leftKey + " Right: " + rightKey)
+      throw new InvalidProgramException(
+        "The types of the key fields do not match. Left: " +
+          leftKey + " Right: " + rightKey)
     }
     unfinished.finish(leftKey, rightKey)
   }
@@ -133,8 +134,9 @@ private[flink] class HalfUnfinishedKeyPairOperation[L, R, O](
       firstRightField +: otherRightFields.toArray,
       unfinished.rightInput.getType)
     if (!leftKey.areCompatible(rightKey)) {
-      throw new InvalidProgramException("The types of the key fields do not match. Left: " +
-        leftKey + " Right: " + rightKey)
+      throw new InvalidProgramException(
+        "The types of the key fields do not match. Left: " +
+          leftKey + " Right: " + rightKey)
     }
     unfinished.finish(leftKey, rightKey)
   }
@@ -149,14 +151,13 @@ private[flink] class HalfUnfinishedKeyPairOperation[L, R, O](
       val cleanFun = unfinished.leftInput.clean(fun)
       def getKey(in: R) = cleanFun(in)
     }
-    val rightKey = new Keys.SelectorFunctionKeys[R, K](
-      keyExtractor,
-      unfinished.rightInput.getType,
-      keyType)
+    val rightKey =
+      new Keys.SelectorFunctionKeys[R, K](keyExtractor, unfinished.rightInput.getType, keyType)
 
     if (!leftKey.areCompatible(rightKey)) {
-      throw new InvalidProgramException("The types of the key fields do not match. Left: " +
-        leftKey + " Right: " + rightKey)
+      throw new InvalidProgramException(
+        "The types of the key fields do not match. Left: " +
+          leftKey + " Right: " + rightKey)
     }
     unfinished.finish(leftKey, rightKey)
   }
@@ -172,10 +173,11 @@ private[flink] class HalfUnfinishedKeyPairOperation[L, R, O](
       unfinished.leftInput.clean(fun),
       unfinished.rightInput.getType,
       keyType)
-    
+
     if (!leftKey.areCompatible(rightKey)) {
-      throw new InvalidProgramException("The types of the key fields do not match. Left: " +
-        leftKey + " Right: " + rightKey)
+      throw new InvalidProgramException(
+        "The types of the key fields do not match. Left: " +
+          leftKey + " Right: " + rightKey)
     }
     unfinished.finish(leftKey, rightKey)
   }

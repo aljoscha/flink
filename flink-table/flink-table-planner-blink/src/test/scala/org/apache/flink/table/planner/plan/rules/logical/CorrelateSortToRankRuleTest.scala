@@ -18,7 +18,12 @@
 
 package org.apache.flink.table.planner.plan.rules.logical
 
-import org.apache.flink.table.planner.plan.optimize.program.{FlinkChainedProgram, FlinkHepRuleSetProgramBuilder, HEP_RULES_EXECUTION_TYPE, StreamOptimizeContext}
+import org.apache.flink.table.planner.plan.optimize.program.{
+  FlinkChainedProgram,
+  FlinkHepRuleSetProgramBuilder,
+  HEP_RULES_EXECUTION_TYPE,
+  StreamOptimizeContext
+}
 import org.apache.flink.table.planner.utils.TableTestBase
 
 import org.apache.calcite.plan.hep.HepMatchOrder
@@ -26,8 +31,8 @@ import org.apache.calcite.tools.RuleSets
 import org.junit.{Before, Test}
 
 /**
-  * Test for [[CalcRankTransposeRule]].
-  */
+ * Test for [[CalcRankTransposeRule]].
+ */
 class CorrelateSortToRankRuleTest extends TableTestBase {
   private val util = streamTestUtil()
 
@@ -37,10 +42,10 @@ class CorrelateSortToRankRuleTest extends TableTestBase {
     programs.addLast(
       "rules",
       FlinkHepRuleSetProgramBuilder.newBuilder
-          .setHepRulesExecutionType(HEP_RULES_EXECUTION_TYPE.RULE_SEQUENCE)
-          .setHepMatchOrder(HepMatchOrder.BOTTOM_UP)
-          .add(RuleSets.ofList(CorrelateSortToRankRule.INSTANCE))
-          .build())
+        .setHepRulesExecutionType(HEP_RULES_EXECUTION_TYPE.RULE_SEQUENCE)
+        .setHepMatchOrder(HepMatchOrder.BOTTOM_UP)
+        .add(RuleSets.ofList(CorrelateSortToRankRule.INSTANCE))
+        .build())
     util.replaceStreamProgram(programs)
 
     val createTable =

@@ -23,7 +23,10 @@ import org.apache.flink.api.common.functions.RichFlatMapFunction
 import org.apache.flink.configuration.Configuration
 import org.apache.flink.streaming.api.operators.OneInputStreamOperator
 import org.apache.flink.table.functions.python.PythonFunctionInfo
-import org.apache.flink.table.plan.nodes.CommonPythonCorrelate.{PYTHON_TABLE_FUNCTION_OPERATOR_NAME, PYTHON_TABLE_FUNCTION_FLAT_MAP_NAME}
+import org.apache.flink.table.plan.nodes.CommonPythonCorrelate.{
+  PYTHON_TABLE_FUNCTION_OPERATOR_NAME,
+  PYTHON_TABLE_FUNCTION_FLAT_MAP_NAME
+}
 import org.apache.flink.table.runtime.types.CRow
 import org.apache.flink.table.types.logical.RowType
 import org.apache.flink.types.Row
@@ -46,13 +49,14 @@ trait CommonPythonCorrelate extends CommonPythonBase {
       classOf[RowType],
       classOf[Array[Int]],
       classOf[JoinRelType])
-    ctor.newInstance(
-      config,
-      pythonFunctionInfo,
-      inputRowType,
-      outputRowType,
-      udtfInputOffsets,
-      joinType)
+    ctor
+      .newInstance(
+        config,
+        pythonFunctionInfo,
+        inputRowType,
+        outputRowType,
+        udtfInputOffsets,
+        joinType)
       .asInstanceOf[OneInputStreamOperator[CRow, CRow]]
   }
 
@@ -71,13 +75,14 @@ trait CommonPythonCorrelate extends CommonPythonBase {
       classOf[RowType],
       classOf[Array[Int]],
       classOf[JoinRelType])
-    ctor.newInstance(
-      config,
-      pythonFunctionInfo,
-      inputRowType,
-      outputRowType,
-      udtfInputOffsets,
-      joinType)
+    ctor
+      .newInstance(
+        config,
+        pythonFunctionInfo,
+        inputRowType,
+        outputRowType,
+        udtfInputOffsets,
+        joinType)
       .asInstanceOf[RichFlatMapFunction[Row, Row]]
   }
 

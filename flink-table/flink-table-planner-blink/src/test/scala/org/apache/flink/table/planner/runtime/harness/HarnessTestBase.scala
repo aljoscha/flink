@@ -34,7 +34,11 @@ import org.apache.flink.streaming.util.KeyedOneInputStreamOperatorTestHarness
 import org.apache.flink.table.data.RowData
 import org.apache.flink.table.planner.JLong
 import org.apache.flink.table.planner.runtime.utils.StreamingTestBase
-import org.apache.flink.table.planner.runtime.utils.StreamingWithStateTestBase.{HEAP_BACKEND, ROCKSDB_BACKEND, StateBackendMode}
+import org.apache.flink.table.planner.runtime.utils.StreamingWithStateTestBase.{
+  HEAP_BACKEND,
+  ROCKSDB_BACKEND,
+  StateBackendMode
+}
 
 import org.junit.runners.Parameterized
 
@@ -62,22 +66,17 @@ class HarnessTestBase(mode: StateBackendMode) extends StreamingTestBase {
       operator: OneInputStreamOperator[IN, OUT],
       keySelector: KeySelector[IN, KEY],
       keyType: TypeInformation[KEY]): KeyedOneInputStreamOperatorTestHarness[KEY, IN, OUT] = {
-    val harness = new KeyedOneInputStreamOperatorTestHarness[KEY, IN, OUT](
-      operator,
-      keySelector,
-      keyType)
+    val harness =
+      new KeyedOneInputStreamOperatorTestHarness[KEY, IN, OUT](operator, keySelector, keyType)
     harness.setStateBackend(getStateBackend)
     harness
   }
 
-  def createHarnessTester(
-      ds: DataStream[_],
-      prefixOperatorName: String)
-  : KeyedOneInputStreamOperatorTestHarness[RowData, RowData, RowData] = {
+  def createHarnessTester(ds: DataStream[_], prefixOperatorName: String)
+      : KeyedOneInputStreamOperatorTestHarness[RowData, RowData, RowData] = {
 
-    val transformation = extractExpectedTransformation(
-      ds.javaStream.getTransformation,
-      prefixOperatorName)
+    val transformation =
+      extractExpectedTransformation(ds.javaStream.getTransformation, prefixOperatorName)
     val processOperator = transformation.getOperator
       .asInstanceOf[OneInputStreamOperator[Any, Any]]
     val keySelector = transformation.getStateKeySelector.asInstanceOf[KeySelector[Any, Any]]
@@ -97,8 +96,7 @@ class HarnessTestBase(mode: StateBackendMode) extends StreamingTestBase {
         } else {
           extractExpectedTransformation(one.getInputs.get(0), prefixOperatorName)
         }
-      case _ => throw new Exception(
-        s"Can not find the expected $prefixOperatorName transformation")
+      case _ => throw new Exception(s"Can not find the expected $prefixOperatorName transformation")
     }
   }
 
@@ -130,8 +128,8 @@ object HarnessTestBase {
     Seq[Array[AnyRef]](Array(HEAP_BACKEND), Array(ROCKSDB_BACKEND))
   }
 
-  class TestingRowDataKeySelector(
-    private val selectorField: Int) extends KeySelector[RowData, JLong] {
+  class TestingRowDataKeySelector(private val selectorField: Int)
+      extends KeySelector[RowData, JLong] {
 
     override def getKey(value: RowData): JLong = {
       value.getLong(selectorField)

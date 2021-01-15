@@ -17,7 +17,12 @@
  */
 package org.apache.flink.table.codegen
 
-import org.apache.flink.api.common.state.{ListStateDescriptor, MapStateDescriptor, State, StateDescriptor}
+import org.apache.flink.api.common.state.{
+  ListStateDescriptor,
+  MapStateDescriptor,
+  State,
+  StateDescriptor
+}
 import org.apache.flink.api.common.typeinfo.TypeInformation
 import org.apache.flink.api.java.typeutils.RowTypeInfo
 import org.apache.flink.api.java.typeutils.TypeExtractionUtils.{extractTypeArgument, getRawClass}
@@ -28,12 +33,24 @@ import org.apache.flink.table.codegen.CodeGenUtils.{newName, reflectiveFieldWrit
 import org.apache.flink.table.codegen.Indenter.toISC
 import org.apache.flink.table.dataview.{StateListView, StateMapView}
 import org.apache.flink.table.functions.aggfunctions.DistinctAccumulator
-import org.apache.flink.table.functions.utils.UserDefinedFunctionUtils.{getUserDefinedMethod, signatureToString}
+import org.apache.flink.table.functions.utils.UserDefinedFunctionUtils.{
+  getUserDefinedMethod,
+  signatureToString
+}
 import org.apache.flink.table.functions.utils.{AggSqlFunction, UserDefinedFunctionUtils}
-import org.apache.flink.table.functions.{ImperativeAggregateFunction, TableAggregateFunction, UserDefinedFunction}
+import org.apache.flink.table.functions.{
+  ImperativeAggregateFunction,
+  TableAggregateFunction,
+  UserDefinedFunction
+}
 import org.apache.flink.table.runtime.CRowWrappingCollector
 import org.apache.flink.table.runtime.aggregate.AggregateUtil.CalcitePair
-import org.apache.flink.table.runtime.aggregate.{AggregateUtil, GeneratedAggregations, GeneratedTableAggregations, SingleElementIterable}
+import org.apache.flink.table.runtime.aggregate.{
+  AggregateUtil,
+  GeneratedAggregations,
+  GeneratedTableAggregations,
+  SingleElementIterable
+}
 import org.apache.flink.table.utils.EncodingUtils
 import org.apache.flink.types.Row
 import org.apache.flink.util.Collector
@@ -50,38 +67,38 @@ import scala.collection.JavaConversions._
 import scala.collection.mutable
 
 /**
-  * A code generator for generating [[GeneratedAggregations]] or
-  * [[GeneratedTableAggregations]].
-  *
-  * @param config                 configuration that determines runtime behavior
-  * @param nullableInput          input(s) can be null.
-  * @param inputTypeInfo          type information about the input of the Function
-  * @param constants              constant expressions that act like a second input in the
-  *                               parameter indices.
-  * @param classNamePrefix        Class name of the function.
-  *                               Does not need to be unique but has to be a valid Java class
-  *                               identifier.
-  * @param physicalInputTypes     Physical input row types
-  * @param aggregates             All aggregate functions
-  * @param aggFields              Indexes of the input fields for all aggregate functions
-  * @param aggMapping             The mapping of aggregates to output fields
-  * @param distinctAccMapping     The mapping of the distinct accumulator index to the
-  *                               corresponding aggregates.
-  * @param isStateBackedDataViews a flag to indicate if distinct filter uses state backend.
-  * @param partialResults         A flag defining whether final or partial results (accumulators)
-  *                               are set
-  *                               to the output row.
-  * @param fwdMapping             The mapping of input fields to output fields
-  * @param mergeMapping           An optional mapping to specify the accumulators to merge. If not
-  *                               set, we
-  *                               assume that both rows have the accumulators at the same position.
-  * @param outputArity            The number of fields in the output row.
-  * @param needRetract            a flag to indicate if the aggregate needs the retract method
-  * @param needMerge              a flag to indicate if the aggregate needs the merge method
-  * @param needReset              a flag to indicate if the aggregate needs the resetAccumulator
-  *                               method
-  * @param accConfig              Data view specification for accumulators
-  */
+ * A code generator for generating [[GeneratedAggregations]] or
+ * [[GeneratedTableAggregations]].
+ *
+ * @param config                 configuration that determines runtime behavior
+ * @param nullableInput          input(s) can be null.
+ * @param inputTypeInfo          type information about the input of the Function
+ * @param constants              constant expressions that act like a second input in the
+ *                               parameter indices.
+ * @param classNamePrefix        Class name of the function.
+ *                               Does not need to be unique but has to be a valid Java class
+ *                               identifier.
+ * @param physicalInputTypes     Physical input row types
+ * @param aggregates             All aggregate functions
+ * @param aggFields              Indexes of the input fields for all aggregate functions
+ * @param aggMapping             The mapping of aggregates to output fields
+ * @param distinctAccMapping     The mapping of the distinct accumulator index to the
+ *                               corresponding aggregates.
+ * @param isStateBackedDataViews a flag to indicate if distinct filter uses state backend.
+ * @param partialResults         A flag defining whether final or partial results (accumulators)
+ *                               are set
+ *                               to the output row.
+ * @param fwdMapping             The mapping of input fields to output fields
+ * @param mergeMapping           An optional mapping to specify the accumulators to merge. If not
+ *                               set, we
+ *                               assume that both rows have the accumulators at the same position.
+ * @param outputArity            The number of fields in the output row.
+ * @param needRetract            a flag to indicate if the aggregate needs the retract method
+ * @param needMerge              a flag to indicate if the aggregate needs the merge method
+ * @param needReset              a flag to indicate if the aggregate needs the resetAccumulator
+ *                               method
+ * @param accConfig              Data view specification for accumulators
+ */
 class AggregationCodeGenerator(
     config: TableConfig,
     nullableInput: Boolean,
@@ -102,7 +119,7 @@ class AggregationCodeGenerator(
     needMerge: Boolean,
     needReset: Boolean,
     accConfig: Option[Array[Seq[DataViewSpec[_]]]])
-  extends CodeGenerator(config, nullableInput, inputTypeInfo) {
+    extends CodeGenerator(config, nullableInput, inputTypeInfo) {
 
   // set of statements for cleanup dataview that will be added only once
   // we use a LinkedHashSet to keep the insertion order
@@ -136,9 +153,9 @@ class AggregationCodeGenerator(
   val isTableAggregate = AggregateUtil.containsTableAggregateFunction(aggregates)
 
   /**
-    * @return code block of statements that need to be placed in the cleanup() method of
-    *         [[GeneratedAggregations]]
-    */
+   * @return code block of statements that need to be placed in the cleanup() method of
+   *         [[GeneratedAggregations]]
+   */
   def reuseCleanupCode(): String = {
     reusableCleanupStatements.mkString("", "\n", "\n")
   }
@@ -174,7 +191,12 @@ class AggregationCodeGenerator(
     parametersCodeForDistinctMerge = aggFields.map { inFields =>
       // transform inFields to pairs of (inField, index in acc) firstly,
       // e.g. (4, 2, 3, 2) will be transformed to ((4,2), (2,0), (3,1), (2,0))
-      val fields = inFields.filter(_ > -1).groupBy(identity).toSeq.sortBy(_._1).zipWithIndex
+      val fields = inFields
+        .filter(_ > -1)
+        .groupBy(identity)
+        .toSeq
+        .sortBy(_._1)
+        .zipWithIndex
         .flatMap { case (a, i) => a._2.map((_, i)) }
         .map { case (f, i) =>
           // index to constant
@@ -211,71 +233,63 @@ class AggregationCodeGenerator(
       // should not happen, but add an error message just in case.
       throw new CodeGenException(
         s"Cannot emit partial results if DISTINCT values are tracked in state-backed maps. " +
-          s"Please report this bug."
-      )
+          s"Please report this bug.")
     }
 
     // initialize and create data views for accumulators & distinct filters
     addAccumulatorDataViews()
 
     // check and validate the needed methods
-    aggregates.zipWithIndex.map {
-      case (a, i) =>
-        getUserDefinedMethod(a, "accumulate", Array(accTypeClasses(i)) ++ methodSignaturesList(i))
+    aggregates.zipWithIndex.map { case (a, i) =>
+      getUserDefinedMethod(a, "accumulate", Array(accTypeClasses(i)) ++ methodSignaturesList(i))
+        .getOrElse(
+          throw new CodeGenException(
+            s"No matching accumulate method found for AggregateFunction " +
+              s"'${a.getClass.getCanonicalName}'" +
+              s"with parameters '${signatureToString(methodSignaturesList(i))}'."))
+
+      if (needRetract) {
+        getUserDefinedMethod(a, "retract", Array(accTypeClasses(i)) ++ methodSignaturesList(i))
           .getOrElse(
             throw new CodeGenException(
-              s"No matching accumulate method found for AggregateFunction " +
+              s"No matching retract method found for AggregateFunction " +
                 s"'${a.getClass.getCanonicalName}'" +
-                s"with parameters '${signatureToString(methodSignaturesList(i))}'.")
-          )
+                s"with parameters '${signatureToString(methodSignaturesList(i))}'."))
+      }
 
-        if (needRetract) {
-          getUserDefinedMethod(a, "retract", Array(accTypeClasses(i)) ++ methodSignaturesList(i))
+      if (needMerge) {
+        val method =
+          getUserDefinedMethod(a, "merge", Array(accTypeClasses(i), classOf[JIterable[Any]]))
             .getOrElse(
-              throw new CodeGenException(
-                s"No matching retract method found for AggregateFunction " +
-                  s"'${a.getClass.getCanonicalName}'" +
-                  s"with parameters '${signatureToString(methodSignaturesList(i))}'.")
-            )
+              throw new CodeGenException(s"No matching merge method found for AggregateFunction " +
+                s"${a.getClass.getCanonicalName}'."))
+
+        // use the TypeExtractionUtils here to support nested GenericArrayTypes and
+        // other complex types
+        val iterableGenericType = extractTypeArgument(method.getGenericParameterTypes()(1), 0)
+        val iterableTypeClass = getRawClass(iterableGenericType)
+
+        if (iterableTypeClass != accTypeClasses(i)) {
+          throw new CodeGenException(
+            s"Merge method in AggregateFunction ${a.getClass.getCanonicalName} does not have " +
+              s"the correct Iterable type. Actually: ${iterableTypeClass.toString}. " +
+              s"Expected: ${accTypeClasses(i).toString}")
         }
+      }
 
-        if (needMerge) {
-          val method =
-            getUserDefinedMethod(a, "merge", Array(accTypeClasses(i), classOf[JIterable[Any]]))
-              .getOrElse(
-                throw new CodeGenException(
-                  s"No matching merge method found for AggregateFunction " +
-                    s"${a.getClass.getCanonicalName}'.")
-              )
-
-          // use the TypeExtractionUtils here to support nested GenericArrayTypes and
-          // other complex types
-          val iterableGenericType = extractTypeArgument(method.getGenericParameterTypes()(1), 0)
-          val iterableTypeClass = getRawClass(iterableGenericType)
-
-          if (iterableTypeClass != accTypeClasses(i)) {
-            throw new CodeGenException(
-              s"Merge method in AggregateFunction ${a.getClass.getCanonicalName} does not have " +
-                s"the correct Iterable type. Actually: ${iterableTypeClass.toString}. " +
-                s"Expected: ${accTypeClasses(i).toString}")
-          }
-        }
-
-        if (needReset) {
-          getUserDefinedMethod(a, "resetAccumulator", Array(accTypeClasses(i)))
-            .getOrElse(
-              throw new CodeGenException(
-                s"No matching resetAccumulator method found for " +
-                  s"aggregate ${a.getClass.getCanonicalName}'.")
-            )
-        }
+      if (needReset) {
+        getUserDefinedMethod(a, "resetAccumulator", Array(accTypeClasses(i)))
+          .getOrElse(
+            throw new CodeGenException(s"No matching resetAccumulator method found for " +
+              s"aggregate ${a.getClass.getCanonicalName}'."))
+      }
     }
   }
 
   /**
-    * Add all data views for all field accumulators and distinct filters defined by
-    * aggregation functions.
-    */
+   * Add all data views for all field accumulators and distinct filters defined by
+   * aggregation functions.
+   */
   def addAccumulatorDataViews(): Unit = {
     if (accConfig.isDefined) {
       // create state handles for DataView backed accumulator fields.
@@ -286,7 +300,8 @@ class AggregationCodeGenerator(
       for (i <- 0 until aggs.length + distinctAccCount) yield {
         for (spec <- accConfig.get(i)) yield {
           // Check if stat descriptor exists.
-          val desc: StateDescriptor[_, _] = descMapping.getOrElse(spec.stateId,
+          val desc: StateDescriptor[_, _] = descMapping.getOrElse(
+            spec.stateId,
             throw new CodeGenException(
               s"Can not find DataView in accumulator by id: ${spec.stateId}"))
 
@@ -297,27 +312,27 @@ class AggregationCodeGenerator(
   }
 
   /**
-    * Create DataView Term, for example, acc1_map_dataview.
-    *
-    * @param aggIndex index of aggregate function
-    * @param fieldName field name of DataView
-    * @return term to access [[MapView]] or [[ListView]]
-    */
+   * Create DataView Term, for example, acc1_map_dataview.
+   *
+   * @param aggIndex index of aggregate function
+   * @param fieldName field name of DataView
+   * @return term to access [[MapView]] or [[ListView]]
+   */
   def createDataViewTerm(aggIndex: Int, fieldName: String): String = {
     s"acc${aggIndex}_${fieldName}_dataview"
   }
 
   /**
-    * Adds a reusable [[org.apache.flink.table.api.dataview.DataView]] to the open, cleanup,
-    * close and member area of the generated function.
-    * @param spec the [[DataViewSpec]] of the desired data view term.
-    * @param desc the [[StateDescriptor]] of the desired data view term.
-    * @param aggIndex the aggregation function index associate with the data view.
-    */
+   * Adds a reusable [[org.apache.flink.table.api.dataview.DataView]] to the open, cleanup,
+   * close and member area of the generated function.
+   * @param spec the [[DataViewSpec]] of the desired data view term.
+   * @param desc the [[StateDescriptor]] of the desired data view term.
+   * @param aggIndex the aggregation function index associate with the data view.
+   */
   def addReusableDataView(
-    spec: DataViewSpec[_],
-    desc: StateDescriptor[_, _],
-    aggIndex: Int): Unit = {
+      spec: DataViewSpec[_],
+      desc: StateDescriptor[_, _],
+      aggIndex: Int): Unit = {
     val dataViewField = spec.field
     val dataViewTypeTerm = dataViewField.getType.getCanonicalName
 
@@ -377,17 +392,17 @@ class AggregationCodeGenerator(
   }
 
   /**
-    * Generate statements to set data view field when use state backend.
-    *
-    * @param specs aggregation [[DataViewSpec]]s for this aggregation term.
-    * @param accTerm aggregation term
-    * @param aggIndex index of aggregation
-    * @return data view field set statements
-    */
+   * Generate statements to set data view field when use state backend.
+   *
+   * @param specs aggregation [[DataViewSpec]]s for this aggregation term.
+   * @param accTerm aggregation term
+   * @param aggIndex index of aggregation
+   * @return data view field set statements
+   */
   def genDataViewFieldSetter(
-    specs: Seq[DataViewSpec[_]],
-    accTerm: String,
-    aggIndex: Int): String = {
+      specs: Seq[DataViewSpec[_]],
+      accTerm: String,
+      aggIndex: Int): String = {
     val setters = for (spec <- specs) yield {
       val field = spec.field
       val dataViewTerm = createDataViewTerm(aggIndex, field.getName)
@@ -573,8 +588,7 @@ class AggregationCodeGenerator(
     val init: String =
       j"""
          |      org.apache.flink.types.Row accs =
-         |          new org.apache.flink.types.Row(${aggs.length + distinctAccCount});"""
-        .stripMargin
+         |          new org.apache.flink.types.Row(${aggs.length + distinctAccCount});""".stripMargin
     val create: String = {
       def createAcc(aggIndexes: JList[Integer]) = {
         for (i <- aggIndexes) yield {
@@ -606,8 +620,7 @@ class AggregationCodeGenerator(
     }.mkString("\n")
     val ret: String =
       j"""
-         |      return accs;"""
-        .stripMargin
+         |      return accs;""".stripMargin
 
     j"""$sig {
        |$init
@@ -626,14 +639,12 @@ class AggregationCodeGenerator(
          |    """.stripMargin
 
     val forward: String = {
-      for (i <- fwdMapping.indices if fwdMapping(i) >= 0) yield
-        {
-          j"""
+      for (i <- fwdMapping.indices if fwdMapping(i) >= 0) yield {
+        j"""
              |    output.setField(
              |      $i,
-             |      input.getField(${fwdMapping(i)}));"""
-            .stripMargin
-        }
+             |      input.getField(${fwdMapping(i)}));""".stripMargin
+      }
     }.mkString("\n")
 
     j"""$sig {
@@ -713,8 +724,9 @@ class AggregationCodeGenerator(
 
     if (needMerge) {
       if (accConfig.isDefined) {
-        throw new CodeGenException("DataView doesn't support merge when the backend uses " +
-          s"state when generate aggregation for $funcName.")
+        throw new CodeGenException(
+          "DataView doesn't support merge when the backend uses " +
+            s"state when generate aggregation for $funcName.")
       }
       j"""
          |$sig {
@@ -732,8 +744,8 @@ class AggregationCodeGenerator(
   def genMergeList: String = {
     {
       val singleIterableClass = classOf[SingleElementIterable[_]].getCanonicalName
-      for (i <- accTypes.indices) yield
-        j"""
+      for (i <- accTypes.indices)
+        yield j"""
            |    private final $singleIterableClass<${accTypes(i)}> accIt$i =
            |      new $singleIterableClass<${accTypes(i)}>();
              """.stripMargin
@@ -785,10 +797,10 @@ class AggregationCodeGenerator(
   }
 
   /**
-    * Generates a [[GeneratedAggregations]] that can be passed to a Java compiler.
-    *
-    * @return A GeneratedAggregationsFunction
-    */
+   * Generates a [[GeneratedAggregations]] that can be passed to a Java compiler.
+   *
+   * @return A GeneratedAggregationsFunction
+   */
   def generateAggregations: GeneratedAggregationsFunction = {
 
     init()
@@ -835,15 +847,15 @@ class AggregationCodeGenerator(
   }
 
   /**
-    * Generates a [[org.apache.flink.table.runtime.aggregate.GeneratedAggregations]] that can be
-    * passed to a Java compiler.
-    *
-    * @return A GeneratedAggregationsFunction
-    */
+   * Generates a [[org.apache.flink.table.runtime.aggregate.GeneratedAggregations]] that can be
+   * passed to a Java compiler.
+   *
+   * @return A GeneratedAggregationsFunction
+   */
   def generateTableAggregations(
-    tableAggOutputRowType: RowTypeInfo,
-    tableAggOutputType: TypeInformation[_],
-    supportEmitIncrementally: Boolean): GeneratedAggregationsFunction = {
+      tableAggOutputRowType: RowTypeInfo,
+      tableAggOutputType: TypeInformation[_],
+      supportEmitIncrementally: Boolean): GeneratedAggregationsFunction = {
 
     // constants
     val CONVERT_COLLECTOR_CLASS_TERM = "ConvertCollector"
@@ -903,62 +915,55 @@ class AggregationCodeGenerator(
     def genRecordToRow: String = {
       // gen access expr
 
-      val functionGenerator = new FunctionCodeGenerator(
-        config,
-        false,
-        tableAggOutputType,
-        None,
-        None,
-        None)
+      val functionGenerator =
+        new FunctionCodeGenerator(config, false, tableAggOutputType, None, None, None)
 
       functionGenerator.outRecordTerm = s"$CONVERTER_ROW_RESULT_TERM"
       val resultExprs = functionGenerator.generateConverterResultExpression(
-        tableAggOutputRowType, tableAggOutputRowType.getFieldNames)
+        tableAggOutputRowType,
+        tableAggOutputRowType.getFieldNames)
 
       functionGenerator.reuseInputUnboxingCode() + resultExprs.code
     }
 
     def checkAndGetEmitValueMethod(function: UserDefinedFunction, index: Int): Unit = {
       finalEmitMethodName = emitValue
-      getUserDefinedMethod(
-        function, emitValue, Array(accTypeClasses(index), classOf[Collector[_]]))
-        .getOrElse(throw new CodeGenException(
-          s"No matching $emitValue method found for " +
-            s"tableAggregate ${function.getClass.getCanonicalName}'."))
+      getUserDefinedMethod(function, emitValue, Array(accTypeClasses(index), classOf[Collector[_]]))
+        .getOrElse(throw new CodeGenException(s"No matching $emitValue method found for " +
+          s"tableAggregate ${function.getClass.getCanonicalName}'."))
     }
 
     /**
-      * Call super init and check emit methods.
-      */
+     * Call super init and check emit methods.
+     */
     def innerInit(): Unit = {
       init()
       // check and validate the emit methods. Find incremental emit method first if the operator
       // supports emit incrementally.
-      aggregates.zipWithIndex.map {
-        case (a, i) =>
-          if (supportEmitIncrementally) {
-            try {
-              finalEmitMethodName = emitUpdateWithRetract
-              getUserDefinedMethod(
-                a,
-                emitUpdateWithRetract,
-                Array(accTypeClasses(i), classOf[TableAggregateFunction.RetractableCollector[_]]))
-                .getOrElse(checkAndGetEmitValueMethod(a, i))
-            } catch {
-              case _: ValidationException =>
-                // Use try catch here as exception will be thrown if there is no
-                // emitUpdateWithRetract method
-                checkAndGetEmitValueMethod(a, i)
-            }
-          } else {
-            checkAndGetEmitValueMethod(a, i)
+      aggregates.zipWithIndex.map { case (a, i) =>
+        if (supportEmitIncrementally) {
+          try {
+            finalEmitMethodName = emitUpdateWithRetract
+            getUserDefinedMethod(
+              a,
+              emitUpdateWithRetract,
+              Array(accTypeClasses(i), classOf[TableAggregateFunction.RetractableCollector[_]]))
+              .getOrElse(checkAndGetEmitValueMethod(a, i))
+          } catch {
+            case _: ValidationException =>
+              // Use try catch here as exception will be thrown if there is no
+              // emitUpdateWithRetract method
+              checkAndGetEmitValueMethod(a, i)
           }
+        } else {
+          checkAndGetEmitValueMethod(a, i)
+        }
       }
     }
 
     /**
-      * Generates the retract method if it is a [[TableAggregateFunction.RetractableCollector]].
-      */
+     * Generates the retract method if it is a [[TableAggregateFunction.RetractableCollector]].
+     */
     def getRetractMethodForConvertCollector(emitMethodName: String): String = {
       if (emitMethodName == emitValue) {
         // Users can't retract messages with emitValue method.
@@ -1053,22 +1058,21 @@ class AggregationCodeGenerator(
   }
 
   /**
-    * Generates a [[GeneratedAggregations]] or a [[GeneratedTableAggregations]] that can be passed
-    * to a Java compiler.
-    *
-    * @param outputType      Output type of the (table)aggregate node.
-    * @param groupSize       The size of the groupings.
-    * @param namedAggregates The correspond named aggregates in the aggregate operator.
-    * @param supportEmitIncrementally Whether support emit values incrementally. Window operators
-    *                                 don't support it yet.
-    * @return A GeneratedAggregationsFunction
-    */
+   * Generates a [[GeneratedAggregations]] or a [[GeneratedTableAggregations]] that can be passed
+   * to a Java compiler.
+   *
+   * @param outputType      Output type of the (table)aggregate node.
+   * @param groupSize       The size of the groupings.
+   * @param namedAggregates The correspond named aggregates in the aggregate operator.
+   * @param supportEmitIncrementally Whether support emit values incrementally. Window operators
+   *                                 don't support it yet.
+   * @return A GeneratedAggregationsFunction
+   */
   def genAggregationsOrTableAggregations(
-    outputType: RelDataType,
-    groupSize: Int,
-    namedAggregates: Seq[CalcitePair[AggregateCall, String]],
-    supportEmitIncrementally: Boolean)
-  : GeneratedAggregationsFunction = {
+      outputType: RelDataType,
+      groupSize: Int,
+      namedAggregates: Seq[CalcitePair[AggregateCall, String]],
+      supportEmitIncrementally: Boolean): GeneratedAggregationsFunction = {
 
     if (isTableAggregate) {
       // get the output row type of the table aggregate

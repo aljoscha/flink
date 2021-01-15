@@ -30,11 +30,11 @@ import org.apache.flink.table.plan.schema.RowSchema
 import scala.collection.JavaConversions._
 
 class DataStreamGroupWindowTableAggregateRule
-  extends ConverterRule(
-    classOf[FlinkLogicalWindowTableAggregate],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.DATASTREAM,
-    "DataStreamGroupWindowTableAggregateRule") {
+    extends ConverterRule(
+      classOf[FlinkLogicalWindowTableAggregate],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.DATASTREAM,
+      "DataStreamGroupWindowTableAggregateRule") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val agg: FlinkLogicalWindowTableAggregate =

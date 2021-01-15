@@ -29,16 +29,44 @@ import org.apache.flink.table.functions.python.PythonFunctionInfo
 import org.apache.flink.table.planner.calcite.FlinkRelBuilder.PlannerNamedWindowProperty
 import org.apache.flink.table.planner.calcite.FlinkTypeFactory
 import org.apache.flink.table.planner.delegation.PlannerBase
-import org.apache.flink.table.planner.expressions.{PlannerProctimeAttribute, PlannerRowtimeAttribute, PlannerWindowEnd, PlannerWindowStart}
-import org.apache.flink.table.planner.plan.logical.{LogicalWindow, SlidingGroupWindow, TumblingGroupWindow}
+import org.apache.flink.table.planner.expressions.{
+  PlannerProctimeAttribute,
+  PlannerRowtimeAttribute,
+  PlannerWindowEnd,
+  PlannerWindowStart
+}
+import org.apache.flink.table.planner.plan.logical.{
+  LogicalWindow,
+  SlidingGroupWindow,
+  TumblingGroupWindow
+}
 import org.apache.flink.table.planner.plan.nodes.exec.common.CommonPythonAggregate
 import org.apache.flink.table.planner.plan.nodes.exec.stream.StreamExecPythonGroupWindowAggregate.ARROW_STREAM_PYTHON_GROUP_WINDOW_AGGREGATE_FUNCTION_OPERATOR_NAME
 import org.apache.flink.table.planner.plan.nodes.exec.{ExecEdge, ExecNode, ExecNodeBase}
-import org.apache.flink.table.planner.plan.utils.AggregateUtil.{hasRowIntervalType, hasTimeIntervalType, isProctimeAttribute, isRowtimeAttribute, timeFieldIndex, toDuration, toLong}
+import org.apache.flink.table.planner.plan.utils.AggregateUtil.{
+  hasRowIntervalType,
+  hasTimeIntervalType,
+  isProctimeAttribute,
+  isRowtimeAttribute,
+  timeFieldIndex,
+  toDuration,
+  toLong
+}
 import org.apache.flink.table.planner.plan.utils.{KeySelectorUtil, WindowEmitStrategy}
 import org.apache.flink.table.planner.utils.Logging
-import org.apache.flink.table.runtime.operators.window.assigners.{CountSlidingWindowAssigner, CountTumblingWindowAssigner, SlidingWindowAssigner, TumblingWindowAssigner, WindowAssigner}
-import org.apache.flink.table.runtime.operators.window.triggers.{ElementTriggers, EventTimeTriggers, ProcessingTimeTriggers, Trigger}
+import org.apache.flink.table.runtime.operators.window.assigners.{
+  CountSlidingWindowAssigner,
+  CountTumblingWindowAssigner,
+  SlidingWindowAssigner,
+  TumblingWindowAssigner,
+  WindowAssigner
+}
+import org.apache.flink.table.runtime.operators.window.triggers.{
+  ElementTriggers,
+  EventTimeTriggers,
+  ProcessingTimeTriggers,
+  Trigger
+}
 import org.apache.flink.table.runtime.typeutils.InternalTypeInfo
 import org.apache.flink.table.types.logical.RowType
 
@@ -62,16 +90,16 @@ class StreamExecPythonGroupWindowAggregate(
     inputEdge: ExecEdge,
     outputType: RowType,
     description: String)
-  extends ExecNodeBase[RowData](Collections.singletonList(inputEdge), outputType, description)
-  with StreamExecNode[RowData]
-  with CommonPythonAggregate
-  with Logging {
+    extends ExecNodeBase[RowData](Collections.singletonList(inputEdge), outputType, description)
+    with StreamExecNode[RowData]
+    with CommonPythonAggregate
+    with Logging {
 
   override def translateToPlanInternal(planner: PlannerBase): Transformation[RowData] = {
     val isCountWindow = window match {
-      case TumblingGroupWindow(_, _, size) if hasRowIntervalType(size) => true
+      case TumblingGroupWindow(_, _, size) if hasRowIntervalType(size)   => true
       case SlidingGroupWindow(_, _, size, _) if hasRowIntervalType(size) => true
-      case _ => false
+      case _                                                             => false
     }
 
     val config = planner.getTableConfig
@@ -133,19 +161,20 @@ class StreamExecPythonGroupWindowAggregate(
   private[this] def generateWindowAssignerAndTrigger(): (WindowAssigner[_], Trigger[_]) = {
     window match {
       case TumblingGroupWindow(_, timeField, size)
-        if isProctimeAttribute(timeField) && hasTimeIntervalType(size) =>
-        (TumblingWindowAssigner.of(toDuration(size)).withProcessingTime(),
+          if isProctimeAttribute(timeField) && hasTimeIntervalType(size) =>
+        (
+          TumblingWindowAssigner.of(toDuration(size)).withProcessingTime(),
           ProcessingTimeTriggers.afterEndOfWindow())
 
       case TumblingGroupWindow(_, timeField, size)
-        if isRowtimeAttribute(timeField) && hasTimeIntervalType(size) =>
-        (TumblingWindowAssigner.of(toDuration(size)).withEventTime(),
+          if isRowtimeAttribute(timeField) && hasTimeIntervalType(size) =>
+        (
+          TumblingWindowAssigner.of(toDuration(size)).withEventTime(),
           EventTimeTriggers.afterEndOfWindow())
 
       case TumblingGroupWindow(_, timeField, size)
-        if isProctimeAttribute(timeField) && hasRowIntervalType(size) =>
-        (CountTumblingWindowAssigner.of(toLong(size)),
-          ElementTriggers.count(toLong(size)))
+          if isProctimeAttribute(timeField) && hasRowIntervalType(size) =>
+        (CountTumblingWindowAssigner.of(toLong(size)), ElementTriggers.count(toLong(size)))
 
       case TumblingGroupWindow(_, _, _) =>
         // TODO: EventTimeTumblingGroupWindow should sort the stream on event time
@@ -155,18 +184,21 @@ class StreamExecPythonGroupWindowAggregate(
           "Event-time grouping windows on row intervals are currently not supported.")
 
       case SlidingGroupWindow(_, timeField, size, slide)
-        if isProctimeAttribute(timeField) && hasTimeIntervalType(size) =>
-        (SlidingWindowAssigner.of(toDuration(size), toDuration(slide)),
+          if isProctimeAttribute(timeField) && hasTimeIntervalType(size) =>
+        (
+          SlidingWindowAssigner.of(toDuration(size), toDuration(slide)),
           ProcessingTimeTriggers.afterEndOfWindow())
 
       case SlidingGroupWindow(_, timeField, size, slide)
-        if isRowtimeAttribute(timeField) && hasTimeIntervalType(size) =>
-        (SlidingWindowAssigner.of(toDuration(size), toDuration(slide)),
+          if isRowtimeAttribute(timeField) && hasTimeIntervalType(size) =>
+        (
+          SlidingWindowAssigner.of(toDuration(size), toDuration(slide)),
           EventTimeTriggers.afterEndOfWindow())
 
       case SlidingGroupWindow(_, timeField, size, slide)
-        if isProctimeAttribute(timeField) && hasRowIntervalType(size) =>
-        (CountSlidingWindowAssigner.of(toLong(size), toLong(slide)),
+          if isProctimeAttribute(timeField) && hasRowIntervalType(size) =>
+        (
+          CountSlidingWindowAssigner.of(toLong(size), toLong(slide)),
           ElementTriggers.count(toLong(size)))
 
       case SlidingGroupWindow(_, _, _, _) =>
@@ -188,15 +220,14 @@ class StreamExecPythonGroupWindowAggregate(
       allowance: Long,
       config: Configuration): OneInputTransformation[RowData, RowData] = {
 
-    val namePropertyTypeArray = namedWindowProperties
-      .map {
-        case PlannerNamedWindowProperty(_, p) => p match {
-          case PlannerWindowStart(_) => 0
-          case PlannerWindowEnd(_) => 1
-          case PlannerRowtimeAttribute(_) => 2
-          case PlannerProctimeAttribute(_) => 3
-        }
-      }.toArray
+    val namePropertyTypeArray = namedWindowProperties.map { case PlannerNamedWindowProperty(_, p) =>
+      p match {
+        case PlannerWindowStart(_)       => 0
+        case PlannerWindowEnd(_)         => 1
+        case PlannerRowtimeAttribute(_)  => 2
+        case PlannerProctimeAttribute(_) => 3
+      }
+    }.toArray
 
     val (pythonUdafInputOffsets, pythonFunctionInfos) =
       extractPythonAggregateFunctionInfosFromAggregateCall(aggCalls)
@@ -246,18 +277,19 @@ class StreamExecPythonGroupWindowAggregate(
       classOf[Array[Int]],
       classOf[Array[Int]])
 
-    ctor.newInstance(
-      config,
-      pythonFunctionInfos,
-      inputRowType,
-      outputRowType,
-      Integer.valueOf(inputTimeFieldIndex),
-      windowAssigner,
-      trigger,
-      java.lang.Long.valueOf(allowance),
-      namedProperties,
-      grouping,
-      udafInputOffsets)
+    ctor
+      .newInstance(
+        config,
+        pythonFunctionInfos,
+        inputRowType,
+        outputRowType,
+        Integer.valueOf(inputTimeFieldIndex),
+        windowAssigner,
+        trigger,
+        java.lang.Long.valueOf(allowance),
+        namedProperties,
+        grouping,
+        udafInputOffsets)
       .asInstanceOf[OneInputStreamOperator[RowData, RowData]]
   }
 }

@@ -30,14 +30,14 @@ import org.apache.calcite.rel.convert.ConverterRule
 import scala.collection.JavaConverters._
 
 /**
-  * Rule that converts [[FlinkLogicalCalc]] to [[StreamPhysicalCalc]].
-  */
+ * Rule that converts [[FlinkLogicalCalc]] to [[StreamPhysicalCalc]].
+ */
 class StreamPhysicalCalcRule
-  extends ConverterRule(
-    classOf[FlinkLogicalCalc],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.STREAM_PHYSICAL,
-    "StreamPhysicalCalcRule") {
+    extends ConverterRule(
+      classOf[FlinkLogicalCalc],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.STREAM_PHYSICAL,
+      "StreamPhysicalCalcRule") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val calc: FlinkLogicalCalc = call.rel(0)
@@ -50,12 +50,7 @@ class StreamPhysicalCalcRule
     val traitSet: RelTraitSet = rel.getTraitSet.replace(FlinkConventions.STREAM_PHYSICAL)
     val newInput = RelOptRule.convert(calc.getInput, FlinkConventions.STREAM_PHYSICAL)
 
-    new StreamPhysicalCalc(
-      rel.getCluster,
-      traitSet,
-      newInput,
-      calc.getProgram,
-      rel.getRowType)
+    new StreamPhysicalCalc(rel.getCluster, traitSet, newInput, calc.getProgram, rel.getRowType)
   }
 }
 

@@ -28,23 +28,17 @@ import org.apache.flink.table.plan.nodes.FlinkConventions
 import org.apache.flink.util.Preconditions.checkArgument
 
 /**
-  * Represents a join between a table and
-  * [[org.apache.flink.table.functions.TemporalTableFunction]]. For more details please check
-  * [[LogicalTemporalTableJoin]].
-  */
+ * Represents a join between a table and
+ * [[org.apache.flink.table.functions.TemporalTableFunction]]. For more details please check
+ * [[LogicalTemporalTableJoin]].
+ */
 class FlinkLogicalTemporalTableJoin(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
     left: RelNode,
     right: RelNode,
     condition: RexNode)
-  extends FlinkLogicalJoinBase(
-    cluster,
-    traitSet,
-    left,
-    right,
-    condition,
-    JoinRelType.INNER) {
+    extends FlinkLogicalJoinBase(cluster, traitSet, left, right, condition, JoinRelType.INNER) {
 
   def copy(
       traitSet: RelTraitSet,
@@ -53,25 +47,20 @@ class FlinkLogicalTemporalTableJoin(
       right: RelNode,
       joinType: JoinRelType,
       semiJoinDone: Boolean): FlinkLogicalTemporalTableJoin = {
-    checkArgument(joinType == this.getJoinType,
-      "Can not change join type".asInstanceOf[Object])
-    checkArgument(semiJoinDone == this.isSemiJoinDone,
+    checkArgument(joinType == this.getJoinType, "Can not change join type".asInstanceOf[Object])
+    checkArgument(
+      semiJoinDone == this.isSemiJoinDone,
       "Can not change semiJoinDone".asInstanceOf[Object])
-    new FlinkLogicalTemporalTableJoin(
-      cluster,
-      traitSet,
-      left,
-      right,
-      condition)
+    new FlinkLogicalTemporalTableJoin(cluster, traitSet, left, right, condition)
   }
 }
 
 class FlinkLogicalTemporalTableJoinConverter
-  extends ConverterRule(
-    classOf[LogicalTemporalTableJoin],
-    Convention.NONE,
-    FlinkConventions.LOGICAL,
-    "FlinkLogicalTemporalTableJoinConverter") {
+    extends ConverterRule(
+      classOf[LogicalTemporalTableJoin],
+      Convention.NONE,
+      FlinkConventions.LOGICAL,
+      "FlinkLogicalTemporalTableJoinConverter") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     true

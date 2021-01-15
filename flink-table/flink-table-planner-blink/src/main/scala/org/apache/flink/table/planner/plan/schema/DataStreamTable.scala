@@ -34,8 +34,8 @@ import org.apache.calcite.rel.`type`.RelDataType
 import java.util.{List => JList}
 
 /**
-  * The class that wraps [[DataStream]] as a Calcite Table.
-  */
+ * The class that wraps [[DataStream]] as a Calcite Table.
+ */
 class DataStreamTable[T](
     relOptSchema: RelOptSchema,
     names: JList[String],
@@ -45,7 +45,7 @@ class DataStreamTable[T](
     val fieldNames: Array[String],
     statistic: FlinkStatistic = FlinkStatistic.UNKNOWN,
     fieldNullables: Option[Array[Boolean]] = None)
-  extends FlinkPreparingTableBase(relOptSchema, rowType, names, statistic) {
+    extends FlinkPreparingTableBase(relOptSchema, rowType, names, statistic) {
 
   if (fieldIndexes.length != fieldNames.length) {
     throw new TableException(
@@ -59,9 +59,11 @@ class DataStreamTable[T](
   if (fieldNames.length != fieldNames.toSet.size) {
     val duplicateFields = fieldNames
       // count occurrences of field names
-      .groupBy(identity).mapValues(_.length)
+      .groupBy(identity)
+      .mapValues(_.length)
       // filter for occurrences > 1 and map to field name
-      .filter(g => g._2 > 1).keys
+      .filter(g => g._2 > 1)
+      .keys
 
     throw new TableException(
       s"Field names must be unique.\n" +
@@ -71,13 +73,14 @@ class DataStreamTable[T](
 
   val dataType: DataType = fromLegacyInfoToDataType(dataStream.getType)
 
-  val fieldTypes: Array[LogicalType] = DataStreamTable.getFieldLogicalTypes(dataType,
-    fieldIndexes, fieldNames)
+  val fieldTypes: Array[LogicalType] =
+    DataStreamTable.getFieldLogicalTypes(dataType, fieldIndexes, fieldNames)
 }
 
 object DataStreamTable {
 
-  def getFieldLogicalTypes(rowType: DataType,
+  def getFieldLogicalTypes(
+      rowType: DataType,
       fieldIndexes: Array[Int],
       fieldNames: Array[String]): Array[LogicalType] = {
     LogicalTypeDataTypeConverter.fromDataTypeToLogicalType(rowType) match {
@@ -125,7 +128,8 @@ object DataStreamTable {
     }
   }
 
-  def getRowType(typeFactory: FlinkTypeFactory,
+  def getRowType(
+      typeFactory: FlinkTypeFactory,
       dataStream: DataStream[_],
       fieldNames: Array[String],
       fieldIndexes: Array[Int],
@@ -134,12 +138,18 @@ object DataStreamTable {
     val fieldTypes = getFieldLogicalTypes(dataType, fieldIndexes, fieldNames)
 
     fieldNullables match {
-      case Some(nulls) => typeFactory.asInstanceOf[FlinkTypeFactory]
-        .buildRelNodeRowType(fieldNames, fieldTypes.zip(nulls).map {
-          case (t, nullable) => t.copy(nullable)
-        })
-      case _ => typeFactory.asInstanceOf[FlinkTypeFactory]
-        .buildRelNodeRowType(fieldNames, fieldTypes)
+      case Some(nulls) =>
+        typeFactory
+          .asInstanceOf[FlinkTypeFactory]
+          .buildRelNodeRowType(
+            fieldNames,
+            fieldTypes.zip(nulls).map { case (t, nullable) =>
+              t.copy(nullable)
+            })
+      case _ =>
+        typeFactory
+          .asInstanceOf[FlinkTypeFactory]
+          .buildRelNodeRowType(fieldNames, fieldTypes)
     }
   }
 }

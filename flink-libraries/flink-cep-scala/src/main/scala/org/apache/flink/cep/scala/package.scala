@@ -28,14 +28,14 @@ package object scala {
   import collection.Map
 
   /**
-    * Utility method to wrap [[org.apache.flink.cep.PatternStream]] for usage with the Scala API.
-    *
-    * @param javaPatternStream The underlying pattern stream from the Java API
-    * @tparam T Type of the events
-    * @return A pattern stream from the Scala API which wraps a pattern stream from the Java API
-    */
-  private[flink] def wrapPatternStream[T](javaPatternStream: JPatternStream[T])
-  : scala.PatternStream[T] = {
+   * Utility method to wrap [[org.apache.flink.cep.PatternStream]] for usage with the Scala API.
+   *
+   * @param javaPatternStream The underlying pattern stream from the Java API
+   * @tparam T Type of the events
+   * @return A pattern stream from the Scala API which wraps a pattern stream from the Java API
+   */
+  private[flink] def wrapPatternStream[T](
+      javaPatternStream: JPatternStream[T]): scala.PatternStream[T] = {
     Option(javaPatternStream) match {
       case Some(p) => PatternStream[T](p)
       case None =>
@@ -52,4 +52,3 @@ package object scala {
     map.asScala.mapValues(_.asScala.toIterable)
   }
 }
-

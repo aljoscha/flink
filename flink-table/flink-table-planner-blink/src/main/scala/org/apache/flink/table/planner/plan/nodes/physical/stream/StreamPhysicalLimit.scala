@@ -28,24 +28,18 @@ import org.apache.calcite.rel.core.Sort
 import org.apache.calcite.rex.RexNode
 
 /**
-  * Stream physical RelNode for [[Sort]].
-  *
-  * This node will output `limit` records beginning with the first `offset` records without sort.
-  */
+ * Stream physical RelNode for [[Sort]].
+ *
+ * This node will output `limit` records beginning with the first `offset` records without sort.
+ */
 class StreamPhysicalLimit(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
     inputRel: RelNode,
     offset: RexNode,
     fetch: RexNode)
-  extends Sort(
-    cluster,
-    traitSet,
-    inputRel,
-    RelCollations.EMPTY,
-    offset,
-    fetch)
-  with StreamPhysicalRel {
+    extends Sort(cluster, traitSet, inputRel, RelCollations.EMPTY, offset, fetch)
+    with StreamPhysicalRel {
 
   private lazy val limitStart: Long = SortUtil.getLimitStart(offset)
   private lazy val limitEnd: Long = SortUtil.getLimitEnd(offset, fetch)
@@ -71,13 +65,12 @@ class StreamPhysicalLimit(
     val generateUpdateBefore = ChangelogPlanUtils.generateUpdateBefore(this)
     val needRetraction = !ChangelogPlanUtils.inputInsertOnly(this)
     new StreamExecLimit(
-        limitStart,
-        limitEnd,
-        generateUpdateBefore,
-        needRetraction,
-        ExecEdge.DEFAULT,
-        FlinkTypeFactory.toLogicalRowType(getRowType),
-        getRelDetailedDescription
-    )
+      limitStart,
+      limitEnd,
+      generateUpdateBefore,
+      needRetraction,
+      ExecEdge.DEFAULT,
+      FlinkTypeFactory.toLogicalRowType(getRowType),
+      getRelDetailedDescription)
   }
 }

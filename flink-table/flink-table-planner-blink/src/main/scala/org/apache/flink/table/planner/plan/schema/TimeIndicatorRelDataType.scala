@@ -24,18 +24,15 @@ import org.apache.calcite.sql.`type`.BasicSqlType
 import java.lang
 
 /**
-  * Creates a time indicator type for event-time or processing-time, but with similar properties
-  * as a basic SQL type.
-  */
+ * Creates a time indicator type for event-time or processing-time, but with similar properties
+ * as a basic SQL type.
+ */
 class TimeIndicatorRelDataType(
     val typeSystem: RelDataTypeSystem,
     val originalType: BasicSqlType,
     val nullable: Boolean,
     val isEventTime: Boolean)
-  extends BasicSqlType(
-    typeSystem,
-    originalType.getSqlTypeName,
-    originalType.getPrecision) {
+    extends BasicSqlType(typeSystem, originalType.getSqlTypeName, originalType.getPrecision) {
 
   this.isNullable = nullable
   computeDigest()

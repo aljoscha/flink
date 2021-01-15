@@ -25,22 +25,22 @@ import org.apache.flink.table.codegen.GeneratedAggregationsFunction
 import org.apache.flink.types.Row
 
 /**
-  * It wraps the aggregate logic inside of
-  * [[org.apache.flink.api.java.operators.GroupReduceOperator]] and
-  * [[org.apache.flink.api.java.operators.GroupCombineOperator]].
-  * It is used for tumbling time-window on batch.
-  *
-  * @param genPreAggregations        Code-generated [[GeneratedAggregations]] for partial aggs.
-  * @param genFinalAggregations        Code-generated [[GeneratedAggregations]] for final aggs.
-  * @param windowSize             Tumbling time window size
-  * @param windowStartPos         The relative window-start field position to the last field of
-  *                               output row
-  * @param windowEndPos           The relative window-end field position to the last field of
-  *                               output row
-  * @param windowRowtimePos       The relative window-rowtime field position to the last field of
-  *                               output row
-  * @param keysAndAggregatesArity The total arity of keys and aggregates
-  */
+ * It wraps the aggregate logic inside of
+ * [[org.apache.flink.api.java.operators.GroupReduceOperator]] and
+ * [[org.apache.flink.api.java.operators.GroupCombineOperator]].
+ * It is used for tumbling time-window on batch.
+ *
+ * @param genPreAggregations        Code-generated [[GeneratedAggregations]] for partial aggs.
+ * @param genFinalAggregations        Code-generated [[GeneratedAggregations]] for final aggs.
+ * @param windowSize             Tumbling time window size
+ * @param windowStartPos         The relative window-start field position to the last field of
+ *                               output row
+ * @param windowEndPos           The relative window-end field position to the last field of
+ *                               output row
+ * @param windowRowtimePos       The relative window-rowtime field position to the last field of
+ *                               output row
+ * @param keysAndAggregatesArity The total arity of keys and aggregates
+ */
 class DataSetTumbleTimeWindowAggReduceCombineFunction(
     genPreAggregations: GeneratedAggregationsFunction,
     genFinalAggregations: GeneratedAggregationsFunction,
@@ -49,13 +49,13 @@ class DataSetTumbleTimeWindowAggReduceCombineFunction(
     windowEndPos: Option[Int],
     windowRowtimePos: Option[Int],
     keysAndAggregatesArity: Int)
-  extends DataSetTumbleTimeWindowAggReduceGroupFunction(
-    genFinalAggregations,
-    windowSize,
-    windowStartPos,
-    windowEndPos,
-    windowRowtimePos,
-    keysAndAggregatesArity)
+    extends DataSetTumbleTimeWindowAggReduceGroupFunction(
+      genFinalAggregations,
+      windowSize,
+      windowStartPos,
+      windowEndPos,
+      windowRowtimePos,
+      keysAndAggregatesArity)
     with CombineFunction[Row, Row] {
 
   protected var preAggfunction: GeneratedAggregations = _
@@ -63,8 +63,9 @@ class DataSetTumbleTimeWindowAggReduceCombineFunction(
   override def open(config: Configuration): Unit = {
     super.open(config)
 
-    LOG.debug(s"Compiling AggregateHelper: $genPreAggregations.name \n\n " +
-      s"Code:\n$genPreAggregations.code")
+    LOG.debug(
+      s"Compiling AggregateHelper: $genPreAggregations.name \n\n " +
+        s"Code:\n$genPreAggregations.code")
     val clazz = compile(
       getRuntimeContext.getUserCodeClassLoader,
       genPreAggregations.name,
@@ -74,12 +75,11 @@ class DataSetTumbleTimeWindowAggReduceCombineFunction(
   }
 
   /**
-    * For sub-grouped intermediate aggregate Rows, merge all of them into aggregate buffer,
-    *
-    * @param records Sub-grouped intermediate aggregate Rows iterator.
-    * @return Combined intermediate aggregate Row.
-    *
-    */
+   * For sub-grouped intermediate aggregate Rows, merge all of them into aggregate buffer,
+   *
+   * @param records Sub-grouped intermediate aggregate Rows iterator.
+   * @return Combined intermediate aggregate Row.
+   */
   override def combine(records: Iterable[Row]): Row = {
 
     var last: Row = null

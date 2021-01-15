@@ -28,18 +28,18 @@ import org.apache.calcite.rel.RelNode
 import org.apache.calcite.rel.convert.ConverterRule
 
 /**
-  * Rule that converts [[FlinkLogicalDataStreamTableScan]] to [[BatchPhysicalBoundedStreamScan]].
-  */
+ * Rule that converts [[FlinkLogicalDataStreamTableScan]] to [[BatchPhysicalBoundedStreamScan]].
+ */
 class BatchPhysicalBoundedStreamScanRule
-  extends ConverterRule(
-    classOf[FlinkLogicalDataStreamTableScan],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.BATCH_PHYSICAL,
-    "BatchPhysicalBoundedStreamScanRule") {
+    extends ConverterRule(
+      classOf[FlinkLogicalDataStreamTableScan],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.BATCH_PHYSICAL,
+      "BatchPhysicalBoundedStreamScanRule") {
 
   /**
-    * If the input is not a DataStreamTable, we want the TableScanRule to match instead
-    */
+   * If the input is not a DataStreamTable, we want the TableScanRule to match instead
+   */
   override def matches(call: RelOptRuleCall): Boolean = {
     val scan: FlinkLogicalDataStreamTableScan = call.rel(0)
     val dataStreamTable = scan.getTable.unwrap(classOf[DataStreamTable[Any]])

@@ -47,19 +47,19 @@ abstract class BatchPhysicalHashWindowAggregateBase(
     enableAssignPane: Boolean = false,
     isMerge: Boolean,
     isFinal: Boolean)
-  extends BatchPhysicalWindowAggregateBase(
-    cluster,
-    traitSet,
-    inputRel,
-    outputRowType,
-    grouping,
-    auxGrouping,
-    aggCallToAggFunction,
-    window,
-    namedWindowProperties,
-    enableAssignPane,
-    isMerge,
-    isFinal) {
+    extends BatchPhysicalWindowAggregateBase(
+      cluster,
+      traitSet,
+      inputRel,
+      outputRowType,
+      grouping,
+      auxGrouping,
+      aggCallToAggFunction,
+      window,
+      namedWindowProperties,
+      enableAssignPane,
+      isMerge,
+      isFinal) {
 
   override def computeSelfCost(planner: RelOptPlanner, mq: RelMetadataQuery): RelOptCost = {
     val numOfGroupKey = grouping.length

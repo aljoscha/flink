@@ -28,7 +28,12 @@ import org.apache.calcite.rel.metadata.RelMetadataQuery
 import org.apache.calcite.rel.{BiRel, RelNode, RelWriter}
 import org.apache.calcite.rex.RexNode
 import org.apache.calcite.util.mapping.IntPair
-import org.apache.flink.api.common.functions.{FilterFunction, FlatJoinFunction, GroupReduceFunction, JoinFunction}
+import org.apache.flink.api.common.functions.{
+  FilterFunction,
+  FlatJoinFunction,
+  GroupReduceFunction,
+  JoinFunction
+}
 import org.apache.flink.api.common.operators.Order
 import org.apache.flink.api.common.operators.base.JoinOperatorBase.JoinHint
 import org.apache.flink.api.common.typeinfo.TypeInformation
@@ -47,8 +52,8 @@ import scala.collection.JavaConversions._
 import scala.collection.mutable.ArrayBuffer
 
 /**
-  * Flink RelNode which matches along with JoinOperator and its related operations.
-  */
+ * Flink RelNode which matches along with JoinOperator and its related operations.
+ */
 class DataSetJoin(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -62,9 +67,9 @@ class DataSetJoin(
     joinType: JoinRelType,
     joinHint: JoinHint,
     ruleDescription: String)
-  extends BiRel(cluster, traitSet, leftNode, rightNode)
-  with CommonJoin
-  with DataSetRel {
+    extends BiRel(cluster, traitSet, leftNode, rightNode)
+    with CommonJoin
+    with DataSetRel {
 
   override def deriveRowType(): RelDataType = rowRelDataType
 
@@ -85,11 +90,7 @@ class DataSetJoin(
   }
 
   override def toString: String = {
-    joinToString(
-      joinRowType,
-      joinCondition,
-      joinType,
-      getExpressionString)
+    joinToString(joinRowType, joinCondition, joinType, getExpressionString)
   }
 
   override def explainTerms(pw: RelWriter): RelWriter = {
@@ -101,7 +102,7 @@ class DataSetJoin(
       getExpressionString)
   }
 
-  override def computeSelfCost (planner: RelOptPlanner, metadata: RelMetadataQuery): RelOptCost = {
+  override def computeSelfCost(planner: RelOptPlanner, metadata: RelMetadataQuery): RelOptCost = {
 
     val leftRowCnt = metadata.getRowCount(getLeft)
     val leftRowSize = estimateRowSize(getLeft.getRowType)
@@ -127,15 +128,11 @@ class DataSetJoin(
     val rightKeys = ArrayBuffer.empty[Int]
     if (keyPairs.isEmpty) {
       // if no equality keys => not supported
-      throw new TableException(
-        "Joins should have at least one equality condition.\n" +
-          s"\tLeft: ${left.toString},\n" +
-          s"\tRight: ${right.toString},\n" +
-          s"\tCondition: (${joinConditionToString(joinRowType,
-            joinCondition, getExpressionString)})"
-      )
-    }
-    else {
+      throw new TableException("Joins should have at least one equality condition.\n" +
+        s"\tLeft: ${left.toString},\n" +
+        s"\tRight: ${right.toString},\n" +
+        s"\tCondition: (${joinConditionToString(joinRowType, joinCondition, getExpressionString)})")
+    } else {
       // at least one equality expression
       val leftFields = left.getRowType.getFieldList
       val rightFields = right.getRowType.getFieldList
@@ -150,13 +147,10 @@ class DataSetJoin(
           leftKeys.add(pair.source)
           rightKeys.add(pair.target)
         } else {
-          throw new TableException(
-            "Equality join predicate on incompatible types.\n" +
-              s"\tLeft: ${left.toString},\n" +
-              s"\tRight: ${right.toString},\n" +
-              s"\tCondition: (${joinConditionToString(joinRowType,
-                joinCondition, getExpressionString)})"
-          )
+          throw new TableException("Equality join predicate on incompatible types.\n" +
+            s"\tLeft: ${left.toString},\n" +
+            s"\tRight: ${right.toString},\n" +
+            s"\tCondition: (${joinConditionToString(joinRowType, joinCondition, getExpressionString)})")
         }
       })
     }
@@ -209,14 +203,9 @@ class DataSetJoin(
       resultType: TypeInformation[Row],
       config: TableConfig): DataSet[Row] = {
 
-    val generator = new FunctionCodeGenerator(
-      config,
-      false,
-      left.getType,
-      Some(right.getType))
-    val conversion = generator.generateConverterResultExpression(
-      resultType,
-      joinRowType.getFieldNames)
+    val generator = new FunctionCodeGenerator(config, false, left.getType, Some(right.getType))
+    val conversion =
+      generator.generateConverterResultExpression(resultType, joinRowType.getFieldNames)
 
     val condition = generator.generateExpression(joinCondition)
     val body =
@@ -234,12 +223,11 @@ class DataSetJoin(
       body,
       resultType)
 
-    val joinFun = new FlatJoinRunner[Row, Row, Row](
-      genFunction.name,
-      genFunction.code,
-      genFunction.returnType)
+    val joinFun =
+      new FlatJoinRunner[Row, Row, Row](genFunction.name, genFunction.code, genFunction.returnType)
 
-    left.join(right)
+    left
+      .join(right)
       .where(leftKeys: _*)
       .equalTo(rightKeys: _*)
       .`with`(joinFun)
@@ -279,7 +267,8 @@ class DataSetJoin(
 
     // join left and right inputs, evaluate join predicate, and emit join pairs
     val nestedLeftKeys = leftKeys.map(i => s"f0.f$i")
-    val joinPairs = foldedRowsLeft.leftOuterJoin(right, JoinHint.REPARTITION_SORT_MERGE)
+    val joinPairs = foldedRowsLeft
+      .leftOuterJoin(right, JoinHint.REPARTITION_SORT_MERGE)
       .where(nestedLeftKeys: _*)
       .equalTo(rightKeys: _*)
       .`with`(joinFun)
@@ -288,10 +277,8 @@ class DataSetJoin(
 
     // create GroupReduceFunction to generate the join result
     val convFun = generateConversionFunction(leftType, rightType, resultType, config)
-    val reduceFun = new LeftOuterJoinGroupReduceRunner(
-      convFun.name,
-      convFun.code,
-      convFun.returnType)
+    val reduceFun =
+      new LeftOuterJoinGroupReduceRunner(convFun.name, convFun.code, convFun.returnType)
 
     // convert join pairs to result.
     // This step ensures we preserve the rows of the left input.
@@ -335,7 +322,8 @@ class DataSetJoin(
 
     // join left and right inputs, evaluate join predicate, and emit join pairs
     val nestedRightKeys = rightKeys.map(i => s"f0.f$i")
-    val joinPairs = left.rightOuterJoin(foldedRowsRight, JoinHint.REPARTITION_SORT_MERGE)
+    val joinPairs = left
+      .rightOuterJoin(foldedRowsRight, JoinHint.REPARTITION_SORT_MERGE)
       .where(leftKeys: _*)
       .equalTo(nestedRightKeys: _*)
       .`with`(joinFun)
@@ -344,10 +332,8 @@ class DataSetJoin(
 
     // create GroupReduceFunction to generate the join result
     val convFun = generateConversionFunction(leftType, rightType, resultType, config)
-    val reduceFun = new RightOuterJoinGroupReduceRunner(
-      convFun.name,
-      convFun.code,
-      convFun.returnType)
+    val reduceFun =
+      new RightOuterJoinGroupReduceRunner(convFun.name, convFun.code, convFun.returnType)
 
     // convert join pairs to result
     // This step ensures we preserve the rows of the right input.
@@ -405,20 +391,17 @@ class DataSetJoin(
 
     // create GroupReduceFunctions to generate the join result
     val convFun = generateConversionFunction(leftType, rightType, resultType, config)
-    val leftReduceFun = new LeftFullOuterJoinGroupReduceRunner(
-      convFun.name,
-      convFun.code,
-      convFun.returnType)
-    val rightReduceFun = new RightFullOuterJoinGroupReduceRunner(
-      convFun.name,
-      convFun.code,
-      convFun.returnType)
+    val leftReduceFun =
+      new LeftFullOuterJoinGroupReduceRunner(convFun.name, convFun.code, convFun.returnType)
+    val rightReduceFun =
+      new RightFullOuterJoinGroupReduceRunner(convFun.name, convFun.code, convFun.returnType)
 
     // compute joined (left + right) and left preserved (left + null)
     val joinedAndLeftPreserved = joinPairs
       // filter for pairs with left row
-      .filter(new FilterFunction[Row](){
-        override def filter(row: Row): Boolean = row.getField(0) != null})
+      .filter(new FilterFunction[Row]() {
+        override def filter(row: Row): Boolean = row.getField(0) != null
+      })
       .groupBy("f0")
       .reduceGroup(leftReduceFun)
       .name(joinOpName)
@@ -427,8 +410,9 @@ class DataSetJoin(
     // compute right preserved (null + right)
     val rightPreserved = joinPairs
       // filter for pairs with right row
-      .filter(new FilterFunction[Row](){
-        override def filter(row: Row): Boolean = row.getField(1) != null})
+      .filter(new FilterFunction[Row]() {
+        override def filter(row: Row): Boolean = row.getField(1) != null
+      })
       .groupBy("f1")
       .reduceGroup(rightReduceFun)
       .name(joinOpName)
@@ -452,12 +436,10 @@ class DataSetJoin(
   }
 
   /**
-    * Partitions the data set on the join keys and sort it on all field with the join keys being a
-    * prefix.
-    */
-  private def partitionAndSort(
-      dataSet: DataSet[Row],
-      partitionKeys: Array[Int]): DataSet[Row] = {
+   * Partitions the data set on the join keys and sort it on all field with the join keys being a
+   * prefix.
+   */
+  private def partitionAndSort(dataSet: DataSet[Row], partitionKeys: Array[Int]): DataSet[Row] = {
 
     // construct full sort keys with partitionKeys being a prefix
     val sortKeys = getFullIndiciesWithPrefix(partitionKeys, dataSet.getType.getArity)
@@ -470,8 +452,8 @@ class DataSetJoin(
   }
 
   /**
-    * Folds identical rows of a data set into a single row with a duplicate count.
-    */
+   * Folds identical rows of a data set into a single row with a duplicate count.
+   */
   private def foldIdenticalRows(
       dataSet: DataSet[Row],
       dataSetType: TypeInformation[Row]): DataSet[Row] = {
@@ -506,9 +488,9 @@ class DataSetJoin(
   }
 
   /**
-    * Generates a [[GeneratedFunction]] of a [[JoinFunction]] to evaluate the join predicate.
-    * The function returns the result of the predicate as [[JBool]].
-    */
+   * Generates a [[GeneratedFunction]] of a [[JoinFunction]] to evaluate the join predicate.
+   * The function returns the result of the predicate as [[JBool]].
+   */
   private def generatePredicateFunction(
       leftType: TypeInformation[Row],
       rightType: TypeInformation[Row],
@@ -529,8 +511,8 @@ class DataSetJoin(
   }
 
   /**
-    * Generates a [[GeneratedFunction]] of a [[JoinFunction]] to produce the join result.
-    */
+   * Generates a [[GeneratedFunction]] of a [[JoinFunction]] to produce the join result.
+   */
   private def generateConversionFunction(
       leftType: TypeInformation[Row],
       rightType: TypeInformation[Row],
@@ -538,9 +520,8 @@ class DataSetJoin(
       config: TableConfig): GeneratedFunction[JoinFunction[Row, Row, Row], Row] = {
 
     val conversionGenerator = new FunctionCodeGenerator(config, true, leftType, Some(rightType))
-    val conversion = conversionGenerator.generateConverterResultExpression(
-      resultType,
-      joinRowType.getFieldNames)
+    val conversion =
+      conversionGenerator.generateConverterResultExpression(resultType, joinRowType.getFieldNames)
     val convCode =
       s"""
          |${conversion.code}

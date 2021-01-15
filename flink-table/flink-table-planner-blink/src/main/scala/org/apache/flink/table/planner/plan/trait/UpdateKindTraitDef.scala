@@ -39,8 +39,7 @@ class UpdateKindTraitDef extends RelTraitDef[UpdateKindTrait] {
       planner: RelOptPlanner,
       fromTrait: UpdateKindTrait,
       toTrait: UpdateKindTrait): Boolean = {
-    throw new UnsupportedOperationException(
-      "UpdateKindTrait conversion is not supported for now.")
+    throw new UnsupportedOperationException("UpdateKindTrait conversion is not supported for now.")
   }
 
   override def getDefault: UpdateKindTrait = UpdateKindTrait.NONE
@@ -49,4 +48,3 @@ class UpdateKindTraitDef extends RelTraitDef[UpdateKindTrait] {
 object UpdateKindTraitDef {
   val INSTANCE = new UpdateKindTraitDef()
 }
-

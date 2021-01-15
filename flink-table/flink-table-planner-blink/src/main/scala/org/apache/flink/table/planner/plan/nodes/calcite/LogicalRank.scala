@@ -30,10 +30,10 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
-  * Sub-class of [[Rank]] that is a relational expression which returns
-  * the rows in which the rank function value of each row is in the given range.
-  * This class corresponds to Calcite logical rel.
-  */
+ * Sub-class of [[Rank]] that is a relational expression which returns
+ * the rows in which the rank function value of each row is in the given range.
+ * This class corresponds to Calcite logical rel.
+ */
 final class LogicalRank(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -44,16 +44,16 @@ final class LogicalRank(
     rankRange: RankRange,
     rankNumberType: RelDataTypeField,
     outputRankNumber: Boolean)
-  extends Rank(
-    cluster,
-    traitSet,
-    input,
-    partitionKey,
-    orderKey,
-    rankType,
-    rankRange,
-    rankNumberType,
-    outputRankNumber) {
+    extends Rank(
+      cluster,
+      traitSet,
+      input,
+      partitionKey,
+      orderKey,
+      rankType,
+      rankRange,
+      rankNumberType,
+      outputRankNumber) {
 
   override def copy(traitSet: RelTraitSet, inputs: util.List[RelNode]): RelNode = {
     new LogicalRank(
@@ -65,8 +65,7 @@ final class LogicalRank(
       rankType,
       rankRange,
       rankNumberType,
-      outputRankNumber
-    )
+      outputRankNumber)
   }
 }
 
@@ -90,7 +89,6 @@ object LogicalRank {
       rankType,
       rankRange,
       rankNumberType,
-      outputRankNumber
-    )
+      outputRankNumber)
   }
 }

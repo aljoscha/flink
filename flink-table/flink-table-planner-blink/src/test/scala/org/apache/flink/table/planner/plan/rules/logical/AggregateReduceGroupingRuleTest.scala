@@ -24,8 +24,8 @@ import org.apache.calcite.tools.RuleSets
 import org.junit.Before
 
 /**
-  * Test for [[AggregateReduceGroupingRule]].
-  */
+ * Test for [[AggregateReduceGroupingRule]].
+ */
 class AggregateReduceGroupingRuleTest extends AggregateReduceGroupingTestBase(false) {
 
   @Before
@@ -34,11 +34,12 @@ class AggregateReduceGroupingRuleTest extends AggregateReduceGroupingTestBase(fa
 
     // remove FlinkAggregateRemoveRule to prevent the agg from removing
     val programs = util.getBatchProgram()
-    programs.getFlinkRuleSetProgram(FlinkBatchProgram.LOGICAL).get
+    programs
+      .getFlinkRuleSetProgram(FlinkBatchProgram.LOGICAL)
+      .get
       .remove(RuleSets.ofList(FlinkAggregateRemoveRule.INSTANCE))
     util.replaceBatchProgram(programs)
 
     super.setup()
   }
 }
-

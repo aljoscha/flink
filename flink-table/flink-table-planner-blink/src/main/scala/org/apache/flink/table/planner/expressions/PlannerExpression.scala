@@ -26,25 +26,26 @@ import java.util
 import _root_.scala.collection.JavaConversions._
 
 abstract class PlannerExpression extends TreeNode[PlannerExpression] with Expression {
+
   /**
-    * Returns the [[TypeInformation]] for evaluating this expression.
-    * It is sometimes not available until the expression is valid.
-    */
+   * Returns the [[TypeInformation]] for evaluating this expression.
+   * It is sometimes not available until the expression is valid.
+   */
   private[flink] def resultType: TypeInformation[_]
 
   /**
-    * One pass validation of the expression tree in post order.
-    */
+   * One pass validation of the expression tree in post order.
+   */
   private[flink] lazy val valid: Boolean = childrenValid && validateInput().isSuccess
 
   private[flink] def childrenValid: Boolean = children.forall(_.valid)
 
   /**
-    * Check input data types, inputs number or other properties specified by this expression.
-    * Return `ValidationSuccess` if it pass the check,
-    * or `ValidationFailure` with supplement message explaining the error.
-    * Note: we should only call this method until `childrenValid == true`
-    */
+   * Check input data types, inputs number or other properties specified by this expression.
+   * Return `ValidationSuccess` if it pass the check,
+   * or `ValidationFailure` with supplement message explaining the error.
+   * Note: we should only call this method until `childrenValid == true`
+   */
   private[flink] def validateInput(): ValidationResult = ValidationSuccess
 
   private[flink] def checkEquals(other: PlannerExpression): Boolean = {
@@ -54,8 +55,8 @@ abstract class PlannerExpression extends TreeNode[PlannerExpression] with Expres
       def checkEquality(elements1: Seq[Any], elements2: Seq[Any]): Boolean = {
         elements1.length == elements2.length && elements1.zip(elements2).forall {
           case (e1: PlannerExpression, e2: PlannerExpression) => e1.checkEquals(e2)
-          case (t1: Seq[_], t2: Seq[_]) => checkEquality(t1, t2)
-          case (i1, i2) => i1 == i2
+          case (t1: Seq[_], t2: Seq[_])                       => checkEquality(t1, t2)
+          case (i1, i2)                                       => i1 == i2
         }
       }
       val elements1 = this.productIterator.toSeq

@@ -35,15 +35,15 @@ import java.util.Collections
 import java.util.function.Supplier
 
 /**
-  * Sub-class of [[TableScan]] that is a relational operator
-  * which returns the contents of a [[DataStreamTable]] in Flink.
-  */
+ * Sub-class of [[TableScan]] that is a relational operator
+ * which returns the contents of a [[DataStreamTable]] in Flink.
+ */
 class FlinkLogicalDataStreamTableScan(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
     table: RelOptTable)
-  extends TableScan(cluster, traitSet, Collections.emptyList[RelHint](), table)
-  with FlinkLogicalRel {
+    extends TableScan(cluster, traitSet, Collections.emptyList[RelHint](), table)
+    with FlinkLogicalRel {
 
   override def copy(traitSet: RelTraitSet, inputs: util.List[RelNode]): RelNode = {
     new FlinkLogicalDataStreamTableScan(cluster, traitSet, table)
@@ -58,11 +58,11 @@ class FlinkLogicalDataStreamTableScan(
 }
 
 class FlinkLogicalDataStreamTableScanConverter
-  extends ConverterRule(
-    classOf[LogicalTableScan],
-    Convention.NONE,
-    FlinkConventions.LOGICAL,
-    "FlinkLogicalDataStreamTableScanConverter") {
+    extends ConverterRule(
+      classOf[LogicalTableScan],
+      Convention.NONE,
+      FlinkConventions.LOGICAL,
+      "FlinkLogicalDataStreamTableScanConverter") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val scan: TableScan = call.rel(0)
@@ -86,16 +86,20 @@ object FlinkLogicalDataStreamTableScan {
 
   def create(cluster: RelOptCluster, relOptTable: RelOptTable): FlinkLogicalDataStreamTableScan = {
     val dataStreamTable = relOptTable.unwrap(classOf[DataStreamTable[_]])
-    val traitSet = cluster.traitSetOf(FlinkConventions.LOGICAL).replaceIfs(
-      RelCollationTraitDef.INSTANCE, new Supplier[util.List[RelCollation]]() {
-        def get: util.List[RelCollation] = {
-          if (dataStreamTable != null) {
-            dataStreamTable.getStatistic.getCollations
-          } else {
-            ImmutableList.of[RelCollation]
+    val traitSet = cluster
+      .traitSetOf(FlinkConventions.LOGICAL)
+      .replaceIfs(
+        RelCollationTraitDef.INSTANCE,
+        new Supplier[util.List[RelCollation]]() {
+          def get: util.List[RelCollation] = {
+            if (dataStreamTable != null) {
+              dataStreamTable.getStatistic.getCollations
+            } else {
+              ImmutableList.of[RelCollation]
+            }
           }
-        }
-      }).simplify()
+        })
+      .simplify()
     new FlinkLogicalDataStreamTableScan(cluster, traitSet, dataStreamTable)
   }
 }

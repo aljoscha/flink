@@ -28,7 +28,6 @@ import org.junit.rules.TemporaryFolder
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
-
 // TODO case class Tuple2[T1, T2](_1: T1, _2: T2)
 // TODO case class Foo(a: Int, b: String
 
@@ -83,9 +82,9 @@ class ExamplesITCase(mode: TestExecutionMode) extends MultipleProgramsTestBase(m
      * Test nested tuples with int offset
      */
     val env = ExecutionEnvironment.getExecutionEnvironment
-    val ds = env.fromElements( (("this","is"), 1), (("this", "is"),2), (("this","hello"),3) )
+    val ds = env.fromElements((("this", "is"), 1), (("this", "is"), 2), (("this", "hello"), 3))
 
-    val grouped = ds.groupBy(0).reduce( { (e1, e2) => ((e1._1._1, e1._1._2), e1._2 + e2._2)})
+    val grouped = ds.groupBy(0).reduce({ (e1, e2) => ((e1._1._1, e1._1._2), e1._2 + e2._2) })
     grouped.writeAsText(resultPath, writeMode = WriteMode.OVERWRITE)
     env.execute()
     expected = "((this,hello),3)\n((this,is),3)\n"
@@ -97,10 +96,10 @@ class ExamplesITCase(mode: TestExecutionMode) extends MultipleProgramsTestBase(m
      * Test nested tuples with expression keys
      */
     val env = ExecutionEnvironment.getExecutionEnvironment
-    val ds = env.fromElements( (("this","is"), 1), (("this", "is"),2), (("this","hello"),3) )
+    val ds = env.fromElements((("this", "is"), 1), (("this", "is"), 2), (("this", "hello"), 3))
 
-    val grouped = ds.groupBy("_1._1").reduce{
-      (e1, e2) => ((e1._1._1, e1._1._2), e1._2 + e2._2)
+    val grouped = ds.groupBy("_1._1").reduce { (e1, e2) =>
+      ((e1._1._1, e1._1._2), e1._2 + e2._2)
     }
     grouped.writeAsText(resultPath, WriteMode.OVERWRITE)
     env.execute()
@@ -116,12 +115,11 @@ class ExamplesITCase(mode: TestExecutionMode) extends MultipleProgramsTestBase(m
     val ds = env.fromElements(
       new PojoWithPojo("one", 1, 1L),
       new PojoWithPojo("one", 1, 1L),
-      new PojoWithPojo("two", 666, 2L) )
+      new PojoWithPojo("two", 666, 2L))
 
-    val grouped = ds.groupBy("nested.myLong").reduce {
-      (p1, p2) =>
-        p1.myInt += p2.myInt
-        p1
+    val grouped = ds.groupBy("nested.myLong").reduce { (p1, p2) =>
+      p1.myInt += p2.myInt
+      p1
     }
     grouped.writeAsText(resultPath, WriteMode.OVERWRITE)
     env.execute()
@@ -134,15 +132,12 @@ class ExamplesITCase(mode: TestExecutionMode) extends MultipleProgramsTestBase(m
      * Test pojo with nested case class
      */
     val env = ExecutionEnvironment.getExecutionEnvironment
-    val ds = env.fromElements(
-      new Pojo("one", 1, 1L),
-      new Pojo("one", 1, 1L),
-      new Pojo("two", 666, 2L) )
+    val ds =
+      env.fromElements(new Pojo("one", 1, 1L), new Pojo("one", 1, 1L), new Pojo("two", 666, 2L))
 
-    val grouped = ds.groupBy("nested.myLong").reduce {
-      (p1, p2) =>
-        p1.myInt += p2.myInt
-        p1
+    val grouped = ds.groupBy("nested.myLong").reduce { (p1, p2) =>
+      p1.myInt += p2.myInt
+      p1
     }
     grouped.writeAsText(resultPath, writeMode = WriteMode.OVERWRITE)
     env.execute()

@@ -27,16 +27,16 @@ import org.apache.calcite.rel.core.Calc
 import org.apache.calcite.rex.RexProgram
 
 /**
-  * Base stream physical RelNode for [[Calc]].
-  */
+ * Base stream physical RelNode for [[Calc]].
+ */
 abstract class StreamPhysicalCalcBase(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
     inputRel: RelNode,
     calcProgram: RexProgram,
     outputRowType: RelDataType)
-  extends CommonCalc(cluster, traitSet, inputRel, calcProgram)
-  with StreamPhysicalRel {
+    extends CommonCalc(cluster, traitSet, inputRel, calcProgram)
+    with StreamPhysicalRel {
 
   override def requireWatermark: Boolean = false
 

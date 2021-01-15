@@ -35,10 +35,10 @@ import java.util.function.{Function => JFunction}
 
 import scala.collection.JavaConverters._
 
-class PushProjectIntoTableSourceScanRule extends RelOptRule(
-  operand(classOf[FlinkLogicalCalc],
-    operand(classOf[FlinkLogicalTableSourceScan], none)),
-  "PushProjectIntoTableSourceScanRule") {
+class PushProjectIntoTableSourceScanRule
+    extends RelOptRule(
+      operand(classOf[FlinkLogicalCalc], operand(classOf[FlinkLogicalTableSourceScan], none)),
+      "PushProjectIntoTableSourceScanRule") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val scan: FlinkLogicalTableSourceScan = call.rel(1).asInstanceOf[FlinkLogicalTableSourceScan]
@@ -66,8 +66,7 @@ class PushProjectIntoTableSourceScanRule extends RelOptRule(
       source,
       accessedLogicalFields.map(scan.tableSchema.getTableColumn(_).get()).toList.asJava,
       source.isInstanceOf[StreamTableSource[_]],
-      nameMapping
-    )
+      nameMapping)
     val physicalFields = expandTimeAttributes(
       source,
       if (LogicalTypeChecks.isCompositeType(source.getProducedDataType.getLogicalType)) {
@@ -96,24 +95,23 @@ class PushProjectIntoTableSourceScanRule extends RelOptRule(
 
       if (isProjectSuccess
         && newTableSource.explainSource().equals(scan.tableSource.explainSource())) {
-        throw new TableException("Failed to push project into table source! "
-          + "table source with pushdown capability must override and change "
-          + "explainSource() API to explain the pushdown applied!")
+        throw new TableException(
+          "Failed to push project into table source! "
+            + "table source with pushdown capability must override and change "
+            + "explainSource() API to explain the pushdown applied!")
       }
 
       // check that table schema of the new table source is identical to original
       if (source.getTableSchema != newTableSource.getTableSchema) {
-        throw new TableException("TableSchema of ProjectableTableSource must not be modified " +
-          "by projectFields() call. This is a bug in the implementation of the TableSource " +
-          s"${source.getClass.getCanonicalName}.")
+        throw new TableException(
+          "TableSchema of ProjectableTableSource must not be modified " +
+            "by projectFields() call. This is a bug in the implementation of the TableSource " +
+            s"${source.getClass.getCanonicalName}.")
       }
 
       // Apply the projection during the input conversion of the scan.
-      val newScan = scan.copy(
-        scan.getTraitSet,
-        scan.tableSchema,
-        newTableSource,
-        Some(accessedLogicalFields))
+      val newScan =
+        scan.copy(scan.getTraitSet, scan.tableSchema, newTableSource, Some(accessedLogicalFields))
       val newCalcProgram = RexProgramRewriter.rewriteWithFieldProjection(
         calc.getProgram,
         newScan.getRowType,
@@ -135,7 +133,7 @@ class PushProjectIntoTableSourceScanRule extends RelOptRule(
       physicalSchema: TableSchema,
       physicalIndices: Array[Int]): Array[Int] = {
 
-      physicalIndices
+    physicalIndices
       // resolve time indicator markers to physical indexes
       .flatMap {
         case TimeIndicatorTypeInfo.PROCTIME_STREAM_MARKER =>
@@ -148,9 +146,10 @@ class PushProjectIntoTableSourceScanRule extends RelOptRule(
           val accessedFields = if (rowtimeAttributeDescriptor.isDefined) {
             rowtimeAttributeDescriptor.get.getTimestampExtractor.getArgumentFields
           } else {
-            throw new TableException("Computed field mapping includes a rowtime marker but the " +
-              "TableSource does not provide a RowtimeAttributeDescriptor. " +
-              "This is a bug and should be reported.")
+            throw new TableException(
+              "Computed field mapping includes a rowtime marker but the " +
+                "TableSource does not provide a RowtimeAttributeDescriptor. " +
+                "This is a bug and should be reported.")
           }
           // resolve field names to physical fields
           accessedFields.map(name => {
@@ -168,8 +167,7 @@ class PushProjectIntoTableSourceScanRule extends RelOptRule(
   private def mapToCompositeType(
       tableSource: TableSource[_],
       physicalSchema: TableSchema,
-      name: String)
-    : Int = {
+      name: String): Int = {
     val fieldName = tableSource match {
       case mapping: DefinedFieldMapping if mapping.getFieldMapping != null =>
         mapping.getFieldMapping.get(name)

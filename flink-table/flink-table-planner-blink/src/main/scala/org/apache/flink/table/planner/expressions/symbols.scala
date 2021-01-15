@@ -26,8 +26,8 @@ import org.apache.calcite.sql.fun.SqlTrimFunction
 import scala.language.{existentials, implicitConversions}
 
 /**
-  * General expression class to represent a symbol.
-  */
+ * General expression class to represent a symbol.
+ */
 case class SymbolPlannerExpression(symbol: PlannerSymbol) extends LeafExpression {
 
   override private[flink] def resultType: TypeInformation[_] =
@@ -40,8 +40,8 @@ case class SymbolPlannerExpression(symbol: PlannerSymbol) extends LeafExpression
 }
 
 /**
-  * Symbol that wraps a Calcite symbol in form of a Java enum.
-  */
+ * Symbol that wraps a Calcite symbol in form of a Java enum.
+ */
 trait PlannerSymbol {
   def symbols: PlannerSymbols
   def name: String
@@ -49,8 +49,8 @@ trait PlannerSymbol {
 }
 
 /**
-  * Enumeration of symbols.
-  */
+ * Enumeration of symbols.
+ */
 abstract class PlannerSymbols extends Enumeration {
 
   class PlannerSymbolValue(e: Enum[_]) extends Val(e.name()) with PlannerSymbol {
@@ -69,8 +69,8 @@ abstract class PlannerSymbols extends Enumeration {
 }
 
 /**
-  * Units for working with time intervals.
-  */
+ * Units for working with time intervals.
+ */
 object PlannerTimeIntervalUnit extends PlannerSymbols {
 
   type PlannerTimeIntervalUnit = PlannerSymbolValue
@@ -94,8 +94,8 @@ object PlannerTimeIntervalUnit extends PlannerSymbols {
 }
 
 /**
-  * Units for working with time points.
-  */
+ * Units for working with time points.
+ */
 object PlannerTimePointUnit extends PlannerSymbols {
 
   type PlannerTimePointUnit = PlannerSymbolValue
@@ -114,8 +114,8 @@ object PlannerTimePointUnit extends PlannerSymbols {
 }
 
 /**
-  * Modes for trimming strings.
-  */
+ * Modes for trimming strings.
+ */
 object PlannerTrimMode extends PlannerSymbols {
 
   type PlannerTrimMode = PlannerSymbolValue

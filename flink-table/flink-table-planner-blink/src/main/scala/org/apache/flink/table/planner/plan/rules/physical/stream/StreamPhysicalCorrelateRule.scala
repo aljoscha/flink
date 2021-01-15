@@ -19,9 +19,16 @@ package org.apache.flink.table.planner.plan.rules.physical.stream
 
 import org.apache.flink.table.api.TableException
 import org.apache.flink.table.planner.plan.nodes.FlinkConventions
-import org.apache.flink.table.planner.plan.nodes.logical.{FlinkLogicalCalc, FlinkLogicalCorrelate, FlinkLogicalTableFunctionScan}
+import org.apache.flink.table.planner.plan.nodes.logical.{
+  FlinkLogicalCalc,
+  FlinkLogicalCorrelate,
+  FlinkLogicalTableFunctionScan
+}
 import org.apache.flink.table.planner.plan.nodes.physical.stream.StreamPhysicalCorrelate
-import org.apache.flink.table.planner.plan.rules.physical.stream.StreamPhysicalCorrelateRule.{getMergedCalc, getTableScan}
+import org.apache.flink.table.planner.plan.rules.physical.stream.StreamPhysicalCorrelateRule.{
+  getMergedCalc,
+  getTableScan
+}
 import org.apache.flink.table.planner.plan.utils.PythonUtil
 
 import org.apache.calcite.plan.hep.HepRelVertex
@@ -35,11 +42,11 @@ import org.apache.calcite.rex.{RexNode, RexProgram, RexProgramBuilder}
  * Rule that converts [[FlinkLogicalCorrelate]] to [[StreamPhysicalCorrelate]].
  */
 class StreamPhysicalCorrelateRule
-  extends ConverterRule(
-    classOf[FlinkLogicalCorrelate],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.STREAM_PHYSICAL,
-    "StreamPhysicalCorrelateRule") {
+    extends ConverterRule(
+      classOf[FlinkLogicalCorrelate],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.STREAM_PHYSICAL,
+      "StreamPhysicalCorrelateRule") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val correlate: FlinkLogicalCorrelate = call.rel(0)
@@ -51,8 +58,8 @@ class StreamPhysicalCorrelateRule
       val child = calc.getInput.asInstanceOf[RelSubset].getOriginal
       child match {
         case scan: FlinkLogicalTableFunctionScan => PythonUtil.isNonPythonCall(scan.getCall)
-        case calc: FlinkLogicalCalc => findTableFunction(calc)
-        case _ => false
+        case calc: FlinkLogicalCalc              => findTableFunction(calc)
+        case _                                   => false
       }
     }
 
@@ -61,15 +68,15 @@ class StreamPhysicalCorrelateRule
       case scan: FlinkLogicalTableFunctionScan => PythonUtil.isNonPythonCall(scan.getCall)
       // a filter is pushed above the table function
       case calc: FlinkLogicalCalc => findTableFunction(calc)
-      case _ => false
+      case _                      => false
     }
   }
 
   override def convert(rel: RelNode): RelNode = {
     val correlate = rel.asInstanceOf[FlinkLogicalCorrelate]
     val traitSet: RelTraitSet = rel.getTraitSet.replace(FlinkConventions.STREAM_PHYSICAL)
-    val convInput: RelNode = RelOptRule.convert(
-      correlate.getInput(0), FlinkConventions.STREAM_PHYSICAL)
+    val convInput: RelNode =
+      RelOptRule.convert(correlate.getInput(0), FlinkConventions.STREAM_PHYSICAL)
     val right: RelNode = correlate.getInput(1)
 
     @scala.annotation.tailrec
@@ -108,7 +115,7 @@ object StreamPhysicalCorrelateRule {
 
   def getMergedCalc(calc: FlinkLogicalCalc): FlinkLogicalCalc = {
     val child = calc.getInput match {
-      case relSubset: RelSubset => relSubset.getOriginal
+      case relSubset: RelSubset       => relSubset.getOriginal
       case hepRelVertex: HepRelVertex => hepRelVertex.getCurrentRel
     }
     child match {
@@ -122,7 +129,8 @@ object StreamPhysicalCorrelateRule {
             bottomCalc.getProgram,
             topCalc.getCluster.getRexBuilder)
         assert(mergedProgram.getOutputRowType eq topProgram.getOutputRowType)
-        topCalc.copy(topCalc.getTraitSet, bottomCalc.getInput, mergedProgram)
+        topCalc
+          .copy(topCalc.getTraitSet, bottomCalc.getInput, mergedProgram)
           .asInstanceOf[FlinkLogicalCalc]
       case _ =>
         calc
@@ -132,13 +140,13 @@ object StreamPhysicalCorrelateRule {
   @scala.annotation.tailrec
   def getTableScan(calc: FlinkLogicalCalc): FlinkLogicalTableFunctionScan = {
     val child = calc.getInput match {
-      case relSubset: RelSubset => relSubset.getOriginal
+      case relSubset: RelSubset       => relSubset.getOriginal
       case hepRelVertex: HepRelVertex => hepRelVertex.getCurrentRel
     }
     child match {
       case scan: FlinkLogicalTableFunctionScan => scan
-      case calc: FlinkLogicalCalc => getTableScan(calc)
-      case _ => throw new TableException("This must be a bug, could not find table scan")
+      case calc: FlinkLogicalCalc              => getTableScan(calc)
+      case _                                   => throw new TableException("This must be a bug, could not find table scan")
     }
   }
 }

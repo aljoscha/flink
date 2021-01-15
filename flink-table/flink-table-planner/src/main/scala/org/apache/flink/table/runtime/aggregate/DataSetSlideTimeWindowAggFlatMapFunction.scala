@@ -24,23 +24,22 @@ import org.apache.flink.streaming.api.windowing.windows.TimeWindow
 import org.apache.flink.types.Row
 import org.apache.flink.util.Collector
 
-
 /**
-  * It is used for sliding windows on batch for time-windows. It takes a prepared input row,
-  * aligns the window start, and replicates or omits records for different panes of a sliding
-  * window. It is used for non-partial aggregations.
-  *
-  * @param windowSize window size of the sliding window
-  * @param windowSlide window slide of the sliding window
-  * @param returnType return type of this function
-  */
+ * It is used for sliding windows on batch for time-windows. It takes a prepared input row,
+ * aligns the window start, and replicates or omits records for different panes of a sliding
+ * window. It is used for non-partial aggregations.
+ *
+ * @param windowSize window size of the sliding window
+ * @param windowSlide window slide of the sliding window
+ * @param returnType return type of this function
+ */
 class DataSetSlideTimeWindowAggFlatMapFunction(
     private val timeFieldPos: Int,
     private val windowSize: Long,
     private val windowSlide: Long,
     @transient private val returnType: TypeInformation[Row])
-  extends RichFlatMapFunction[Row, Row]
-  with ResultTypeQueryable[Row] {
+    extends RichFlatMapFunction[Row, Row]
+    with ResultTypeQueryable[Row] {
 
   override def flatMap(record: Row, out: Collector[Row]): Unit = {
     val windowStart = record.getField(timeFieldPos).asInstanceOf[Long]

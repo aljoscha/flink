@@ -20,8 +20,16 @@ package org.apache.flink.table.planner.plan.utils
 
 import org.apache.flink.annotation.VisibleForTesting
 import org.apache.flink.table.api.TableException
-import org.apache.flink.table.catalog.{CatalogManager, FunctionCatalog, FunctionLookup, UnresolvedIdentifier}
-import org.apache.flink.table.data.util.DataFormatConverters.{LocalDateConverter, LocalTimeConverter}
+import org.apache.flink.table.catalog.{
+  CatalogManager,
+  FunctionCatalog,
+  FunctionLookup,
+  UnresolvedIdentifier
+}
+import org.apache.flink.table.data.util.DataFormatConverters.{
+  LocalDateConverter,
+  LocalTimeConverter
+}
 import org.apache.flink.table.expressions._
 import ApiExpressionUtils._
 import org.apache.flink.table.functions.BuiltInFunctionDefinitions.{AND, CAST, OR}
@@ -50,11 +58,11 @@ import scala.util.{Failure, Success, Try}
 object RexNodeExtractor extends Logging {
 
   /**
-    * Extracts the indices of input fields which accessed by the expressions.
-    *
-    * @param exprs The RexNode list to analyze
-    * @return The indices of accessed input fields
-    */
+   * Extracts the indices of input fields which accessed by the expressions.
+   *
+   * @param exprs The RexNode list to analyze
+   * @return The indices of accessed input fields
+   */
   def extractRefInputFields(exprs: JList[RexNode]): Array[Int] = {
     val visitor = new InputRefVisitor
     // extract referenced input fields from expressions
@@ -63,13 +71,13 @@ object RexNodeExtractor extends Logging {
   }
 
   /**
-    * Extracts the name of nested input fields accessed by the expressions and returns the
-    * prefix of the accesses.
-    *
-    * @param exprs The expressions to analyze
-    * @param usedFields indices of used input fields
-    * @return The full names of accessed input fields. e.g. field.subfield
-    */
+   * Extracts the name of nested input fields accessed by the expressions and returns the
+   * prefix of the accesses.
+   *
+   * @param exprs The expressions to analyze
+   * @param usedFields indices of used input fields
+   * @return The full names of accessed input fields. e.g. field.subfield
+   */
   def extractRefNestedInputFields(
       exprs: JList[RexNode],
       usedFields: Array[Int]): Array[Array[JList[String]]] = {
@@ -79,14 +87,14 @@ object RexNodeExtractor extends Logging {
   }
 
   /**
-    * Convert rexNode into independent CNF expressions.
-    *
-    * @param expr            The RexNode to analyze
-    * @param inputFieldNames The input names of the RexNode
-    * @param rexBuilder      The factory to build CNF expressions
-    * @param functionCatalog The function catalog
-    * @return converted expressions and unconverted rex nodes
-    */
+   * Convert rexNode into independent CNF expressions.
+   *
+   * @param expr            The RexNode to analyze
+   * @param inputFieldNames The input names of the RexNode
+   * @param rexBuilder      The factory to build CNF expressions
+   * @param functionCatalog The function catalog
+   * @return converted expressions and unconverted rex nodes
+   */
   def extractConjunctiveConditions(
       expr: RexNode,
       maxCnfNodeCount: Int,
@@ -112,11 +120,15 @@ object RexNodeExtractor extends Logging {
     val unconvertedRexNodes = new mutable.ArrayBuffer[RexNode]
     val inputNames = inputFieldNames.asScala.toArray
     val converter = new RexNodeToExpressionConverter(
-      rexBuilder, inputNames, functionCatalog, catalogManager, timeZone)
+      rexBuilder,
+      inputNames,
+      functionCatalog,
+      catalogManager,
+      timeZone)
     conjunctions.asScala.foreach(rex => {
       rex.accept(converter) match {
         case Some(expression) => convertedExpressions += expression
-        case None => unconvertedRexNodes += rex
+        case None             => unconvertedRexNodes += rex
       }
     })
     (convertedExpressions.toArray, unconvertedRexNodes.toArray)
@@ -141,14 +153,14 @@ object RexNodeExtractor extends Logging {
   }
 
   /**
-    * Extract partition predicate from filter condition.
-    *
-    * @param expr            The RexNode to analyze
-    * @param inputFieldNames The input names of the RexNode
-    * @param rexBuilder      The factory to build CNF expressions
-    * @param partitionFieldNames Partition field names.
-    * @return Partition predicates and non-partition predicates.
-    */
+   * Extract partition predicate from filter condition.
+   *
+   * @param expr            The RexNode to analyze
+   * @param inputFieldNames The input names of the RexNode
+   * @param rexBuilder      The factory to build CNF expressions
+   * @param partitionFieldNames Partition field names.
+   * @return Partition predicates and non-partition predicates.
+   */
   def extractPartitionPredicateList(
       expr: RexNode,
       maxCnfNodeCount: Int,
@@ -167,9 +179,9 @@ object RexNodeExtractor extends Logging {
   }
 
   /**
-    * returns true if the given predicate only contains [[RexInputRef]], [[RexLiteral]] and
-    * [[RexCall]], and all [[RexInputRef]]s reference partition fields. otherwise false.
-    */
+   * returns true if the given predicate only contains [[RexInputRef]], [[RexLiteral]] and
+   * [[RexCall]], and all [[RexInputRef]]s reference partition fields. otherwise false.
+   */
   private def isSupportedPartitionPredicate(
       predicate: RexNode,
       partitionFieldNames: Array[String],
@@ -233,8 +245,8 @@ object RexNodeExtractor extends Logging {
 }
 
 /**
-  * An RexVisitor to extract all referenced input fields
-  */
+ * An RexVisitor to extract all referenced input fields
+ */
 class InputRefVisitor extends RexVisitorImpl[Unit](true) {
 
   private val fields = mutable.LinkedHashSet[Int]()
@@ -249,8 +261,8 @@ class InputRefVisitor extends RexVisitorImpl[Unit](true) {
 }
 
 /**
-  * A RexVisitor to extract used nested input fields
-  */
+ * A RexVisitor to extract used nested input fields
+ */
 class RefFieldAccessorVisitor(usedFields: Array[Int]) extends RexVisitorImpl[Unit](true) {
 
   private val projectedFields: Array[List[List[String]]] =
@@ -290,11 +302,11 @@ class RefFieldAccessorVisitor(usedFields: Array[Int]) extends RexVisitorImpl[Uni
             case head :: Nil if head.get(0).equals("*") => prefixAccesses
             // access is top-level access => return top-level access
             case _ :: _ if nestedAccess.get(0).equals("*") => List(util.Arrays.asList("*"))
-            case _  =>
+            case _ =>
               if (isPrefix(prefixAccesses.head, nestedAccess)) {
                 // previous access is a prefix of this access => do not add access
                 prefixAccesses
-              }else {
+              } else {
                 // previous access is not prefix of this access => add access
                 nestedAccess :: prefixAccesses
               }
@@ -332,27 +344,27 @@ class RefFieldAccessorVisitor(usedFields: Array[Int]) extends RexVisitorImpl[Uni
 }
 
 /**
-  * An RexVisitor to convert RexNode to Expression.
-  *
-  * @param inputNames      The input names of the relation node
-  * @param functionCatalog The function catalog
-  */
+ * An RexVisitor to convert RexNode to Expression.
+ *
+ * @param inputNames      The input names of the relation node
+ * @param functionCatalog The function catalog
+ */
 class RexNodeToExpressionConverter(
     rexBuilder: RexBuilder,
     inputNames: Array[String],
     functionCatalog: FunctionCatalog,
     catalogManager: CatalogManager,
     timeZone: TimeZone)
-  extends RexVisitor[Option[ResolvedExpression]] {
+    extends RexVisitor[Option[ResolvedExpression]] {
 
   override def visitInputRef(inputRef: RexInputRef): Option[ResolvedExpression] = {
     Preconditions.checkArgument(inputRef.getIndex < inputNames.length)
-    Some(new FieldReferenceExpression(
-      inputNames(inputRef.getIndex),
-      fromLogicalTypeToDataType(FlinkTypeFactory.toLogicalType(inputRef.getType)),
-      0,
-      inputRef.getIndex
-    ))
+    Some(
+      new FieldReferenceExpression(
+        inputNames(inputRef.getIndex),
+        fromLogicalTypeToDataType(FlinkTypeFactory.toLogicalType(inputRef.getType)),
+        0,
+        inputRef.getIndex))
   }
 
   override def visitTableInputRef(rexTableInputRef: RexTableInputRef): Option[ResolvedExpression] =
@@ -366,7 +378,7 @@ class RexNodeToExpressionConverter(
     // TODO support SqlTrimFunction.Flag
     literal.getValue match {
       case _: SqlTrimFunction.Flag => return None
-      case _ => // do nothing
+      case _                       => // do nothing
     }
 
     val literalType = FlinkTypeFactory.toLogicalType(literal.getType)
@@ -433,12 +445,8 @@ class RexNodeToExpressionConverter(
   }
 
   override def visitCall(oriRexCall: RexCall): Option[ResolvedExpression] = {
-    val rexCall = FlinkRexUtil.expandSearch(
-      rexBuilder,
-      oriRexCall).asInstanceOf[RexCall]
-    val operands = rexCall.getOperands.map(
-      operand => operand.accept(this).orNull
-    )
+    val rexCall = FlinkRexUtil.expandSearch(rexBuilder, oriRexCall).asInstanceOf[RexCall]
+    val operands = rexCall.getOperands.map(operand => operand.accept(this).orNull)
 
     val outputType = fromLogicalTypeToDataType(FlinkTypeFactory.toLogicalType(rexCall.getType))
 
@@ -458,7 +466,7 @@ class RexNodeToExpressionConverter(
           names.set(names.size() - 1, replace(names.get(names.size() - 1)))
           val id = UnresolvedIdentifier.of(names.asScala.toArray: _*)
           lookupFunction(id, operands, outputType)
-        case operator@_ =>
+        case operator @ _ =>
           lookupFunction(
             UnresolvedIdentifier.of(replace(s"${operator.getKind}")),
             operands,
@@ -469,8 +477,8 @@ class RexNodeToExpressionConverter(
 
   override def visitFieldAccess(fieldAccess: RexFieldAccess): Option[ResolvedExpression] = None
 
-  override def visitCorrelVariable(
-      correlVariable: RexCorrelVariable): Option[ResolvedExpression] = None
+  override def visitCorrelVariable(correlVariable: RexCorrelVariable): Option[ResolvedExpression] =
+    None
 
   override def visitRangeRef(rangeRef: RexRangeRef): Option[ResolvedExpression] = None
 
@@ -480,8 +488,7 @@ class RexNodeToExpressionConverter(
 
   override def visitOver(over: RexOver): Option[ResolvedExpression] = None
 
-  override def visitPatternFieldRef(
-      fieldRef: RexPatternFieldRef): Option[ResolvedExpression] = None
+  override def visitPatternFieldRef(fieldRef: RexPatternFieldRef): Option[ResolvedExpression] = None
 
   private def lookupFunction(
       identifier: UnresolvedIdentifier,

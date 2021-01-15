@@ -28,20 +28,22 @@ class OnUnfinishedKeyPairOperationTest extends AcceptPFTestBase {
   @Test
   def testInnerJoinWhereClauseOnTuple(): Unit = {
     val test =
-      tuples.join(tuples).whereClause {
-        case (id, _) => id
+      tuples.join(tuples).whereClause { case (id, _) =>
+        id
       }
-    assert(test.isInstanceOf[HalfUnfinishedKeyPairOperation[_, _, _]],
+    assert(
+      test.isInstanceOf[HalfUnfinishedKeyPairOperation[_, _, _]],
       "whereClause for inner join on tuples should produce a HalfUnfinishedKeyPairOperation")
   }
 
   @Test
   def testInnerJoinWhereClauseOnCaseClass(): Unit = {
     val test =
-      caseObjects.join(caseObjects).whereClause {
-        case KeyValuePair(id, _) => id
+      caseObjects.join(caseObjects).whereClause { case KeyValuePair(id, _) =>
+        id
       }
-    assert(test.isInstanceOf[HalfUnfinishedKeyPairOperation[_, _, _]],
+    assert(
+      test.isInstanceOf[HalfUnfinishedKeyPairOperation[_, _, _]],
       "whereClause for inner join on case objects " +
         "should produce a HalfUnfinishedKeyPairOperation")
   }
@@ -49,10 +51,11 @@ class OnUnfinishedKeyPairOperationTest extends AcceptPFTestBase {
   @Test
   def testRightOuterJoinWhereClauseOnTuple(): Unit = {
     val test =
-      tuples.join(tuples).whereClause {
-        case (id, _) => id
+      tuples.join(tuples).whereClause { case (id, _) =>
+        id
       }
-    assert(test.isInstanceOf[HalfUnfinishedKeyPairOperation[_, _, _]],
+    assert(
+      test.isInstanceOf[HalfUnfinishedKeyPairOperation[_, _, _]],
       "whereClause for right outer join on tuples " +
         "should produce a HalfUnfinishedKeyPairOperation")
   }
@@ -60,10 +63,11 @@ class OnUnfinishedKeyPairOperationTest extends AcceptPFTestBase {
   @Test
   def testRightOuterJoinWhereClauseOnCaseClass(): Unit = {
     val test =
-      caseObjects.join(caseObjects).whereClause {
-        case KeyValuePair(id, _) => id
+      caseObjects.join(caseObjects).whereClause { case KeyValuePair(id, _) =>
+        id
       }
-    assert(test.isInstanceOf[HalfUnfinishedKeyPairOperation[_, _, _]],
+    assert(
+      test.isInstanceOf[HalfUnfinishedKeyPairOperation[_, _, _]],
       "whereClause for right outer join on case objects " +
         "should produce a HalfUnfinishedKeyPairOperation")
   }
@@ -71,10 +75,11 @@ class OnUnfinishedKeyPairOperationTest extends AcceptPFTestBase {
   @Test
   def testLeftOuterJoinWhereClauseOnTuple(): Unit = {
     val test =
-      tuples.join(tuples).whereClause {
-        case (id, _) => id
+      tuples.join(tuples).whereClause { case (id, _) =>
+        id
       }
-    assert(test.isInstanceOf[HalfUnfinishedKeyPairOperation[_, _, _]],
+    assert(
+      test.isInstanceOf[HalfUnfinishedKeyPairOperation[_, _, _]],
       "whereClause for left outer join on tuples " +
         "should produce a HalfUnfinishedKeyPairOperation")
   }
@@ -82,10 +87,11 @@ class OnUnfinishedKeyPairOperationTest extends AcceptPFTestBase {
   @Test
   def testLeftOuterJoinWhereClauseOnCaseClass(): Unit = {
     val test =
-      caseObjects.join(caseObjects).whereClause {
-        case KeyValuePair(id, _) => id
+      caseObjects.join(caseObjects).whereClause { case KeyValuePair(id, _) =>
+        id
       }
-    assert(test.isInstanceOf[HalfUnfinishedKeyPairOperation[_, _, _]],
+    assert(
+      test.isInstanceOf[HalfUnfinishedKeyPairOperation[_, _, _]],
       "whereClause for left outer join on case objects " +
         "should produce a HalfUnfinishedKeyPairOperation")
   }
@@ -93,10 +99,11 @@ class OnUnfinishedKeyPairOperationTest extends AcceptPFTestBase {
   @Test
   def testFullOuterJoinWhereClauseOnTuple(): Unit = {
     val test =
-      tuples.fullOuterJoin(tuples).whereClause {
-        case (id, _) => id
+      tuples.fullOuterJoin(tuples).whereClause { case (id, _) =>
+        id
       }
-    assert(test.isInstanceOf[HalfUnfinishedKeyPairOperation[_, _, _]],
+    assert(
+      test.isInstanceOf[HalfUnfinishedKeyPairOperation[_, _, _]],
       "whereClause for full outer join on tuples " +
         "should produce a HalfUnfinishedKeyPairOperation")
   }
@@ -104,10 +111,11 @@ class OnUnfinishedKeyPairOperationTest extends AcceptPFTestBase {
   @Test
   def testFullOuterJoinWhereClauseOnCaseClass(): Unit = {
     val test =
-      caseObjects.fullOuterJoin(caseObjects).whereClause {
-        case KeyValuePair(id, _) => id
+      caseObjects.fullOuterJoin(caseObjects).whereClause { case KeyValuePair(id, _) =>
+        id
       }
-    assert(test.isInstanceOf[HalfUnfinishedKeyPairOperation[_, _, _]],
+    assert(
+      test.isInstanceOf[HalfUnfinishedKeyPairOperation[_, _, _]],
       "whereClause for full outer join on case objects " +
         "should produce a HalfUnfinishedKeyPairOperation")
   }
@@ -115,10 +123,11 @@ class OnUnfinishedKeyPairOperationTest extends AcceptPFTestBase {
   @Test
   def testCoGroupWhereClauseOnTuple(): Unit = {
     val test =
-      tuples.coGroup(tuples).whereClause {
-        case (id, _) => id
+      tuples.coGroup(tuples).whereClause { case (id, _) =>
+        id
       }
-    assert(test.isInstanceOf[HalfUnfinishedKeyPairOperation[_, _, _]],
+    assert(
+      test.isInstanceOf[HalfUnfinishedKeyPairOperation[_, _, _]],
       "whereClause for co-group on tuples " +
         "should produce a HalfUnfinishedKeyPairOperation")
   }
@@ -126,10 +135,11 @@ class OnUnfinishedKeyPairOperationTest extends AcceptPFTestBase {
   @Test
   def testCoGroupWhereClauseOnCaseClass(): Unit = {
     val test =
-      caseObjects.coGroup(caseObjects).whereClause {
-        case KeyValuePair(id, _) => id
+      caseObjects.coGroup(caseObjects).whereClause { case KeyValuePair(id, _) =>
+        id
       }
-    assert(test.isInstanceOf[HalfUnfinishedKeyPairOperation[_, _, _]],
+    assert(
+      test.isInstanceOf[HalfUnfinishedKeyPairOperation[_, _, _]],
       "whereClause for co-group on case objects " +
         "should produce a HalfUnfinishedKeyPairOperation")
   }

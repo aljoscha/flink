@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-
 package org.apache.flink.table.functions.utils
 
 import org.apache.flink.api.common.functions.InvalidTypesException
@@ -51,32 +50,30 @@ object UserDefinedFunctionUtils {
   // ----------------------------------------------------------------------------------------------
 
   /**
-    * Returns the signature of the eval method matching the given signature of [[TypeInformation]].
-    * Elements of the signature can be null (act as a wildcard).
-    */
+   * Returns the signature of the eval method matching the given signature of [[TypeInformation]].
+   * Elements of the signature can be null (act as a wildcard).
+   */
   def getEvalMethodSignature(
       function: UserDefinedFunction,
-      signature: Seq[TypeInformation[_]])
-    : Option[Array[Class[_]]] = {
+      signature: Seq[TypeInformation[_]]): Option[Array[Class[_]]] = {
 
     getUserDefinedMethod(function, "eval", typeInfoToClass(signature)).map(_.getParameterTypes)
   }
 
   /**
-    * Returns the signature of the accumulate method matching the given signature
-    * of [[TypeInformation]]. Elements of the signature can be null (act as a wildcard).
-    */
+   * Returns the signature of the accumulate method matching the given signature
+   * of [[TypeInformation]]. Elements of the signature can be null (act as a wildcard).
+   */
   def getAccumulateMethodSignature(
-    function: ImperativeAggregateFunction[_, _],
-    signature: Seq[TypeInformation[_]])
-  : Option[Array[Class[_]]] = {
+      function: ImperativeAggregateFunction[_, _],
+      signature: Seq[TypeInformation[_]]): Option[Array[Class[_]]] = {
     val accType = TypeExtractor.createTypeInfo(
-      function, classOf[ImperativeAggregateFunction[_, _]], function.getClass, 1)
-    val input = (Array(accType) ++ signature).toSeq
-    getUserDefinedMethod(
       function,
-      "accumulate",
-      typeInfoToClass(input)).map(_.getParameterTypes)
+      classOf[ImperativeAggregateFunction[_, _]],
+      function.getClass,
+      1)
+    val input = (Array(accType) ++ signature).toSeq
+    getUserDefinedMethod(function, "accumulate", typeInfoToClass(input)).map(_.getParameterTypes)
   }
 
   def getParameterTypes(
@@ -95,19 +92,18 @@ object UserDefinedFunctionUtils {
   }
 
   /**
-    * Returns user defined method matching the given name and signature.
-    *
-    * @param function        function instance
-    * @param methodName      method name
-    * @param methodSignature an array of raw Java classes. We compare the raw Java classes not the
-    *                        TypeInformation. TypeInformation does not matter during runtime (e.g.
-    *                        within a MapFunction)
-    */
+   * Returns user defined method matching the given name and signature.
+   *
+   * @param function        function instance
+   * @param methodName      method name
+   * @param methodSignature an array of raw Java classes. We compare the raw Java classes not the
+   *                        TypeInformation. TypeInformation does not matter during runtime (e.g.
+   *                        within a MapFunction)
+   */
   def getUserDefinedMethod(
       function: UserDefinedFunction,
       methodName: String,
-      methodSignature: Array[Class[_]])
-    : Option[Method] = {
+      methodSignature: Array[Class[_]]): Option[Method] = {
 
     val methods = checkAndExtractMethods(function, methodName)
 
@@ -118,20 +114,20 @@ object UserDefinedFunctionUtils {
           val signatures = cur.getParameterTypes
           // match parameters of signature to actual parameters
           methodSignature.length == signatures.length &&
-            signatures.zipWithIndex.forall { case (clazz, i) =>
-              parameterTypeApplicable(methodSignature(i), clazz)
+          signatures.zipWithIndex.forall { case (clazz, i) =>
+            parameterTypeApplicable(methodSignature(i), clazz)
           }
         case cur if cur.isVarArgs =>
           val signatures = cur.getParameterTypes
           methodSignature.zipWithIndex.forall {
             // non-varargs
-            case (clazz, i) if i < signatures.length - 1  =>
+            case (clazz, i) if i < signatures.length - 1 =>
               parameterTypeApplicable(clazz, signatures(i))
             // varargs
             case (clazz, i) if i >= signatures.length - 1 =>
               parameterTypeApplicable(clazz, signatures.last.getComponentType)
           } || (methodSignature.isEmpty && signatures.length == 1) // empty varargs
-    }
+      }
 
     // if there is a fixed method, compiler will call this method preferentially
     val fixedMethodsCount = filtered.count(!_.isVarArgs)
@@ -193,34 +189,28 @@ object UserDefinedFunctionUtils {
   }
 
   /**
-    * Checks if a given method exists in the given function
-    */
+   * Checks if a given method exists in the given function
+   */
   def ifMethodExistInFunction(method: String, function: UserDefinedFunction): Boolean = {
-    val methods = function
-      .getClass
-      .getMethods
-      .filter {
-        m => m.getName == method
+    val methods = function.getClass.getMethods
+      .filter { m =>
+        m.getName == method
       }
     !methods.isEmpty
   }
 
   /**
-    * Extracts methods and throws a [[ValidationException]] if no implementation
-    * can be found, or implementation does not match the requirements.
-    */
-  def checkAndExtractMethods(
-      function: UserDefinedFunction,
-      methodName: String): Array[Method] = {
-    val methods = function
-      .getClass
-      .getMethods
+   * Extracts methods and throws a [[ValidationException]] if no implementation
+   * can be found, or implementation does not match the requirements.
+   */
+  def checkAndExtractMethods(function: UserDefinedFunction, methodName: String): Array[Method] = {
+    val methods = function.getClass.getMethods
       .filter { m =>
         val modifiers = m.getModifiers
         m.getName == methodName &&
-          Modifier.isPublic(modifiers) &&
-          !Modifier.isAbstract(modifiers) &&
-          !(function.isInstanceOf[TableFunction[_]] && Modifier.isStatic(modifiers))
+        Modifier.isPublic(modifiers) &&
+        !Modifier.isAbstract(modifiers) &&
+        !(function.isInstanceOf[TableFunction[_]] && Modifier.isStatic(modifiers))
       }
 
     if (methods.isEmpty) {
@@ -244,79 +234,67 @@ object UserDefinedFunctionUtils {
   // ----------------------------------------------------------------------------------------------
 
   /**
-    * Creates [[SqlFunction]] for a [[ScalarFunction]]
-    *
-    * @param name function name
-    * @param function scalar function
-    * @param typeFactory type factory
-    * @return the ScalarSqlFunction
-    */
+   * Creates [[SqlFunction]] for a [[ScalarFunction]]
+   *
+   * @param name function name
+   * @param function scalar function
+   * @param typeFactory type factory
+   * @return the ScalarSqlFunction
+   */
   def createScalarSqlFunction(
       name: String,
       displayName: String,
       function: ScalarFunction,
-      typeFactory: FlinkTypeFactory)
-    : SqlFunction = {
+      typeFactory: FlinkTypeFactory): SqlFunction = {
     new ScalarSqlFunction(name, displayName, function, typeFactory)
   }
 
   /**
-    * Creates [[SqlFunction]] for a [[TableFunction]]
-    *
-    * @param name function name
-    * @param tableFunction table function
-    * @param resultType the type information of returned table
-    * @param typeFactory type factory
-    * @return the TableSqlFunction
-    */
+   * Creates [[SqlFunction]] for a [[TableFunction]]
+   *
+   * @param name function name
+   * @param tableFunction table function
+   * @param resultType the type information of returned table
+   * @param typeFactory type factory
+   * @return the TableSqlFunction
+   */
   def createTableSqlFunction(
       name: String,
       displayName: String,
       tableFunction: TableFunction[_],
       resultType: TypeInformation[_],
-      typeFactory: FlinkTypeFactory)
-    : SqlFunction = {
+      typeFactory: FlinkTypeFactory): SqlFunction = {
     val (fieldNames, fieldIndexes, _) = UserDefinedFunctionUtils.getFieldInfo(resultType)
     val function = new FlinkTableFunctionImpl(resultType, fieldIndexes, fieldNames)
     new TableSqlFunction(name, displayName, tableFunction, resultType, typeFactory, function)
   }
 
   /**
-    * Creates [[SqlFunction]] for an [[AggregateFunction]]
-    *
-    * @param name function name
-    * @param aggFunction aggregate function
-    * @param typeFactory type factory
-    * @return the TableSqlFunction
-    */
+   * Creates [[SqlFunction]] for an [[AggregateFunction]]
+   *
+   * @param name function name
+   * @param aggFunction aggregate function
+   * @param typeFactory type factory
+   * @return the TableSqlFunction
+   */
   def createAggregateSqlFunction(
       name: String,
       displayName: String,
       aggFunction: ImperativeAggregateFunction[_, _],
       resultType: TypeInformation[_],
       accTypeInfo: TypeInformation[_],
-      typeFactory: FlinkTypeFactory)
-    : SqlFunction = {
+      typeFactory: FlinkTypeFactory): SqlFunction = {
     //check if a qualified accumulate method exists before create Sql function
     checkAndExtractMethods(aggFunction, "accumulate")
 
-    AggSqlFunction(
-      name,
-      displayName,
-      aggFunction,
-      resultType,
-      accTypeInfo,
-      typeFactory)
+    AggSqlFunction(name, displayName, aggFunction, resultType, accTypeInfo, typeFactory)
   }
 
   /**
-    * Creates a [[SqlOperandTypeChecker]] for SQL validation of
-    * eval functions (scalar and table functions).
-    */
-  def createEvalOperandMetadata(
-      name: String,
-      function: UserDefinedFunction)
-    : SqlOperandMetadata = {
+   * Creates a [[SqlOperandTypeChecker]] for SQL validation of
+   * eval functions (scalar and table functions).
+   */
+  def createEvalOperandMetadata(name: String, function: UserDefinedFunction): SqlOperandMetadata = {
 
     val methods = checkAndExtractMethods(function, "eval")
 
@@ -329,7 +307,7 @@ object UserDefinedFunctionUtils {
         var min = 254
         var max = -1
         var isVarargs = false
-        methods.foreach( m => {
+        methods.foreach(m => {
           var len = m.getParameterTypes.length
           if (len > 0 && m.isVarArgs && m.getParameterTypes()(len - 1).isArray) {
             isVarargs = true
@@ -348,8 +326,7 @@ object UserDefinedFunctionUtils {
 
       override def checkOperandTypes(
           callBinding: SqlCallBinding,
-          throwOnFailure: Boolean)
-        : Boolean = {
+          throwOnFailure: Boolean): Boolean = {
         val operandTypeInfo = getOperandTypeInfo(callBinding)
 
         val foundSignature = getEvalMethodSignature(function, operandTypeInfo)
@@ -373,24 +350,25 @@ object UserDefinedFunctionUtils {
       override def getConsistency: Consistency = Consistency.NONE
 
       override def paramTypes(typeFactory: RelDataTypeFactory): util.List[RelDataType] =
-        throw new UnsupportedOperationException("SqlOperandMetadata.paramTypes " +
+        throw new UnsupportedOperationException(
+          "SqlOperandMetadata.paramTypes " +
             "should never be invoked")
 
       override def paramNames(): util.List[String] =
-        throw new UnsupportedOperationException("SqlOperandMetadata.paramNames " +
+        throw new UnsupportedOperationException(
+          "SqlOperandMetadata.paramNames " +
             "should never be invoked")
     }
   }
 
   /**
-    * Creates a [[SqlOperandTypeInference]] for the SQL validation of eval functions
-    * (scalar and table functions).
-    */
+   * Creates a [[SqlOperandTypeInference]] for the SQL validation of eval functions
+   * (scalar and table functions).
+   */
   def createEvalOperandTypeInference(
-    name: String,
-    function: UserDefinedFunction,
-    typeFactory: FlinkTypeFactory)
-  : SqlOperandTypeInference = {
+      name: String,
+      function: UserDefinedFunction,
+      typeFactory: FlinkTypeFactory): SqlOperandTypeInference = {
 
     new SqlOperandTypeInference {
       override def inferOperandTypes(
@@ -401,10 +379,11 @@ object UserDefinedFunctionUtils {
         val operandTypeInfo = getOperandTypeInfo(callBinding)
 
         val foundSignature = getEvalMethodSignature(function, operandTypeInfo)
-          .getOrElse(throw new ValidationException(
-            s"Given parameters of function '$name' do not match any signature. \n" +
-              s"Actual: ${signatureToString(operandTypeInfo)} \n" +
-              s"Expected: ${signaturesToString(function, "eval")}"))
+          .getOrElse(
+            throw new ValidationException(
+              s"Given parameters of function '$name' do not match any signature. \n" +
+                s"Actual: ${signatureToString(operandTypeInfo)} \n" +
+                s"Expected: ${signaturesToString(function, "eval")}"))
 
         val inferredTypes = function match {
           case sf: ScalarFunction =>
@@ -435,32 +414,30 @@ object UserDefinedFunctionUtils {
   // ----------------------------------------------------------------------------------------------
 
   /**
-    * Remove StateView fields from accumulator type information.
-    *
-    * @param index index of aggregate function
-    * @param acc accumulator
-    * @param accType accumulator type information, only support pojo type
-    * @param isStateBackedDataViews is data views use state backend
-    * @return mapping of accumulator type information and data view config which contains id,
-    *         field name and state descriptor
-    */
+   * Remove StateView fields from accumulator type information.
+   *
+   * @param index index of aggregate function
+   * @param acc accumulator
+   * @param accType accumulator type information, only support pojo type
+   * @param isStateBackedDataViews is data views use state backend
+   * @return mapping of accumulator type information and data view config which contains id,
+   *         field name and state descriptor
+   */
   def removeStateViewFieldsFromAccTypeInfo[ACC](
       index: Int,
       acc: ACC,
       accType: TypeInformation[_],
-      isStateBackedDataViews: Boolean)
-    : (TypeInformation[_], Option[Seq[DataViewSpec[_]]]) = {
+      isStateBackedDataViews: Boolean): (TypeInformation[_], Option[Seq[DataViewSpec[_]]]) = {
 
     /** Recursively checks if composite type includes a data view type. */
     def includesDataView(ct: CompositeType[_]): Boolean = {
       (0 until ct.getArity).exists(i =>
         ct.getTypeAt(i) match {
-          case nestedCT: CompositeType[_] => includesDataView(nestedCT)
-          case t: TypeInformation[_] if t.getTypeClass == classOf[ListView[_]] => true
+          case nestedCT: CompositeType[_]                                        => includesDataView(nestedCT)
+          case t: TypeInformation[_] if t.getTypeClass == classOf[ListView[_]]   => true
           case t: TypeInformation[_] if t.getTypeClass == classOf[MapView[_, _]] => true
-          case _ => false
-        }
-      )
+          case _                                                                 => false
+        })
     }
 
     accType match {
@@ -490,10 +467,7 @@ object UserDefinedFunctionUtils {
                 }
 
                 // create map view specs with unique id (used as state name)
-                var spec = MapViewSpec(
-                  "agg" + index + "$" + fieldName,
-                  field,
-                  newTypeInfo)
+                var spec = MapViewSpec("agg" + index + "$" + fieldName, field, newTypeInfo)
 
                 accumulatorSpecs += spec
                 if (!isStateBackedDataViews) {
@@ -514,10 +488,7 @@ object UserDefinedFunctionUtils {
                 }
 
                 // create list view specs with unique is (used as state name)
-                var spec = ListViewSpec(
-                  "agg" + index + "$" + fieldName,
-                  field,
-                  newTypeInfo)
+                var spec = ListViewSpec("agg" + index + "$" + fieldName, field, newTypeInfo)
 
                 accumulatorSpecs += spec
                 if (!isStateBackedDataViews) {
@@ -539,13 +510,12 @@ object UserDefinedFunctionUtils {
   }
 
   /**
-    * Internal method of [[ScalarFunction#getResultType()]] that does some pre-checking and uses
-    * [[TypeExtractor]] as default return type inference.
-    */
+   * Internal method of [[ScalarFunction#getResultType()]] that does some pre-checking and uses
+   * [[TypeExtractor]] as default return type inference.
+   */
   def getResultTypeOfScalarFunction(
       function: ScalarFunction,
-      signature: Array[Class[_]])
-    : TypeInformation[_] = {
+      signature: Array[Class[_]]): TypeInformation[_] = {
 
     val userDefinedTypeInfo = function.getResultType(signature)
     if (userDefinedTypeInfo != null) {
@@ -563,12 +533,11 @@ object UserDefinedFunctionUtils {
   }
 
   /**
-    * Returns the return type of the evaluation method matching the given signature.
-    */
+   * Returns the return type of the evaluation method matching the given signature.
+   */
   def getResultTypeClassOfScalarFunction(
       function: ScalarFunction,
-      signature: Array[Class[_]])
-    : Class[_] = {
+      signature: Array[Class[_]]): Class[_] = {
     // find method for signature
     val evalMethod = checkAndExtractMethods(function, "eval")
       .find(m => signature.sameElements(m.getParameterTypes))
@@ -581,84 +550,89 @@ object UserDefinedFunctionUtils {
   // ----------------------------------------------------------------------------------------------
 
   /**
-    * Returns field names and field positions for a given [[TypeInformation]].
-    *
-    * Field names are automatically extracted for
-    * [[org.apache.flink.api.common.typeutils.CompositeType]].
-    *
-    * @param inputType The TypeInformation to extract the field names and positions from.
-    * @return A tuple of two arrays holding the field names and corresponding field positions.
-    */
-  def getFieldInfo(inputType: TypeInformation[_])
-    : (Array[String], Array[Int], Array[TypeInformation[_]]) = {
+   * Returns field names and field positions for a given [[TypeInformation]].
+   *
+   * Field names are automatically extracted for
+   * [[org.apache.flink.api.common.typeutils.CompositeType]].
+   *
+   * @param inputType The TypeInformation to extract the field names and positions from.
+   * @return A tuple of two arrays holding the field names and corresponding field positions.
+   */
+  def getFieldInfo(
+      inputType: TypeInformation[_]): (Array[String], Array[Int], Array[TypeInformation[_]]) = {
 
-    (FieldInfoUtils.getFieldNames(inputType),
+    (
+      FieldInfoUtils.getFieldNames(inputType),
       FieldInfoUtils.getFieldIndices(inputType),
       FieldInfoUtils.getFieldTypes(inputType))
   }
 
   /**
-    * Prints one signature consisting of classes.
-    */
+   * Prints one signature consisting of classes.
+   */
   def signatureToString(signature: Array[Class[_]]): String =
-  signature.map { clazz =>
-    if (clazz == null) {
-      "null"
-    } else {
-      clazz.getCanonicalName
-    }
-  }.mkString("(", ", ", ")")
+    signature
+      .map { clazz =>
+        if (clazz == null) {
+          "null"
+        } else {
+          clazz.getCanonicalName
+        }
+      }
+      .mkString("(", ", ", ")")
 
   /**
-    * Prints one signature consisting of TypeInformation.
-    */
+   * Prints one signature consisting of TypeInformation.
+   */
   def signatureToString(signature: Seq[TypeInformation[_]]): String = {
     signatureToString(typeInfoToClass(signature))
   }
 
   /**
-    * Prints all signatures of methods with given name in a class.
-    */
+   * Prints all signatures of methods with given name in a class.
+   */
   def signaturesToString(function: UserDefinedFunction, name: String): String = {
     getMethodSignatures(function, name).map(signatureToString).mkString(", ")
   }
 
   /**
-    * Extracts type classes of [[TypeInformation]] in a null-aware way.
-    */
+   * Extracts type classes of [[TypeInformation]] in a null-aware way.
+   */
   def typeInfoToClass(typeInfos: Seq[TypeInformation[_]]): Array[Class[_]] =
-  typeInfos.map { typeInfo =>
-    if (typeInfo == null) {
-      null
-    } else {
-      typeInfo.getTypeClass
-    }
-  }.toArray
+    typeInfos.map { typeInfo =>
+      if (typeInfo == null) {
+        null
+      } else {
+        typeInfo.getTypeClass
+      }
+    }.toArray
 
   /**
-    * Compares parameter candidate classes with expected classes. If true, the parameters match.
-    * Candidate can be null (acts as a wildcard).
-    */
+   * Compares parameter candidate classes with expected classes. If true, the parameters match.
+   * Candidate can be null (acts as a wildcard).
+   */
   private def parameterTypeApplicable(candidate: Class[_], expected: Class[_]): Boolean =
     parameterTypeEquals(candidate, expected) ||
       ((expected != null && expected.isAssignableFrom(candidate)) ||
         expected.isPrimitive && Primitives.wrap(expected).isAssignableFrom(candidate))
 
   private def parameterTypeEquals(candidate: Class[_], expected: Class[_]): Boolean =
-  candidate == null ||
-    candidate == expected ||
-    expected.isPrimitive && Primitives.wrap(expected) == candidate ||
-    // time types
-    candidate == classOf[Date] && (expected == classOf[Int] || expected == classOf[JInt])  ||
-    candidate == classOf[Time] && (expected == classOf[Int] || expected == classOf[JInt]) ||
-    candidate == classOf[Timestamp] && (expected == classOf[Long] || expected == classOf[JLong]) ||
-    // arrays
-    (candidate.isArray && expected.isArray &&
-      (candidate.getComponentType == expected.getComponentType))
+    candidate == null ||
+      candidate == expected ||
+      expected.isPrimitive && Primitives.wrap(expected) == candidate ||
+      // time types
+      candidate == classOf[Date] && (expected == classOf[Int] || expected == classOf[JInt]) ||
+      candidate == classOf[Time] && (expected == classOf[Int] || expected == classOf[JInt]) ||
+      candidate == classOf[Timestamp] && (expected == classOf[Long] || expected == classOf[
+        JLong]) ||
+      // arrays
+      (candidate.isArray && expected.isArray &&
+        (candidate.getComponentType == expected.getComponentType))
 
   def getOperandTypeInfo(callBinding: SqlCallBinding): Seq[TypeInformation[_]] = {
-    val operandTypes = for (i <- 0 until callBinding.getOperandCount)
-      yield callBinding.getOperandType(i)
+    val operandTypes =
+      for (i <- 0 until callBinding.getOperandCount)
+        yield callBinding.getOperandType(i)
     operandTypes.map { operandType =>
       if (operandType.getSqlTypeName == SqlTypeName.NULL) {
         null

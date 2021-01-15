@@ -76,7 +76,6 @@ class PatternStreamScalaJavaAPIInteroperabilityTest extends TestLogger {
     val outParam = new ListCollector[List[Int]](outList)
 
     val result: DataStream[List[Int]] = pStream
-
       .flatSelect((pattern: Map[String, Iterable[List[Int]]], out: Collector[List[Int]]) => {
         //verifies input parameter forwarding
         assertEquals(inParam, pattern)
@@ -102,23 +101,25 @@ class PatternStreamScalaJavaAPIInteroperabilityTest extends TestLogger {
 
     val outputTag = OutputTag[Either[String, String]]("timeouted")
     val result: DataStream[Either[String, String]] = pStream.flatSelect(outputTag) {
-        (pattern: Map[String, Iterable[String]], timestamp: Long,
-         out: Collector[Either[String, String]]) =>
-          out.collect(Left("timeout"))
-          out.collect(Left(pattern("begin").head))
-      } {
-        (pattern: Map[String, Iterable[String]], out: Collector[Either[String, String]]) =>
-          //verifies input parameter forwarding
-          assertEquals(inParam, pattern)
-          out.collect(Right("match"))
-          out.collect(Right(pattern("begin").head))
-      }
+      (
+          pattern: Map[String, Iterable[String]],
+          timestamp: Long,
+          out: Collector[Either[String, String]]) =>
+        out.collect(Left("timeout"))
+        out.collect(Left(pattern("begin").head))
+    } { (pattern: Map[String, Iterable[String]], out: Collector[Either[String, String]]) =>
+      //verifies input parameter forwarding
+      assertEquals(inParam, pattern)
+      out.collect(Right("match"))
+      out.collect(Right(pattern("begin").head))
+    }
 
     val fun = extractFun[String, Either[String, String]](result)
 
     val ctx = new ListTestContext
     fun.processMatch(inParam.mapValues(_.asJava).asJava, ctx, output)
-    fun.asInstanceOf[TimedOutPartialMatchHandler[String]]
+    fun
+      .asInstanceOf[TimedOutPartialMatchHandler[String]]
       .processTimedOutMatch(inParam.mapValues(_.asJava).asJava, ctx)
 
     assertEquals(List(Right("match"), Right("barfoo")).asJava, outList)
@@ -126,8 +127,7 @@ class PatternStreamScalaJavaAPIInteroperabilityTest extends TestLogger {
   }
 
   def extractFun[IN, OUT](dataStream: DataStream[OUT]): PatternProcessFunction[IN, OUT] = {
-    val oper = dataStream.javaStream
-      .getTransformation
+    val oper = dataStream.javaStream.getTransformation
       .asInstanceOf[OneInputTransformation[_, _]]
       .getOperator
       .asInstanceOf[CepOperator[IN, Byte, OUT]]

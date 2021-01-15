@@ -25,8 +25,8 @@ object DateTimeFunctions {
   private val PIVOT_YEAR = 2020
 
   private val DATETIME_FORMATTER_CACHE = new ThreadLocalCache[String, DateTimeFormatter](64) {
-    protected override def getNewInstance(format: String): DateTimeFormatter
-    = createDateTimeFormatter(format)
+    protected override def getNewInstance(format: String): DateTimeFormatter =
+      createDateTimeFormatter(format)
   }
 
   def dateFormat(ts: Long, formatString: String): String = {
@@ -74,14 +74,25 @@ object DateTimeFunctions {
           // %p AM or PM
           case 'p' => builder.appendHalfdayOfDayText
           // %r Time, 12-hour (hh:mm:ss followed by AM or PM)
-          case 'r' => builder.appendClockhourOfHalfday(2).appendLiteral(':').
-            appendMinuteOfHour(2).appendLiteral(':').appendSecondOfMinute(2).
-            appendLiteral(' ').appendHalfdayOfDayText
+          case 'r' =>
+            builder
+              .appendClockhourOfHalfday(2)
+              .appendLiteral(':')
+              .appendMinuteOfHour(2)
+              .appendLiteral(':')
+              .appendSecondOfMinute(2)
+              .appendLiteral(' ')
+              .appendHalfdayOfDayText
           // %S Seconds (00..59)
           case 'S' | 's' => builder.appendSecondOfMinute(2)
           // %T Time, 24-hour (hh:mm:ss)
-          case 'T' => builder.appendHourOfDay(2).appendLiteral(':').
-            appendMinuteOfHour(2).appendLiteral(':').appendSecondOfMinute(2)
+          case 'T' =>
+            builder
+              .appendHourOfDay(2)
+              .appendLiteral(':')
+              .appendMinuteOfHour(2)
+              .appendLiteral(':')
+              .appendSecondOfMinute(2)
           // %v Week (01..53), where Monday is the first day of the week; used with %x
           case 'v' => builder.appendWeekOfWeekyear(2)
           // %x Year for the week, where Monday is the first day of the week, numeric,
@@ -110,8 +121,7 @@ object DateTimeFunctions {
           case _ => builder.appendLiteral(character)
         }
         escaped = false
-      }
-      else if (character == '%') { escaped = true }
+      } else if (character == '%') { escaped = true }
       else { builder.appendLiteral(character) }
     }
     builder.toFormatter

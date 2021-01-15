@@ -29,18 +29,17 @@ import scala.collection.JavaConversions._
 import scala.collection.mutable
 
 /**
-  * Planner rule to apply transitive closure on [[MultiJoin]] for equi-join predicates.
-  *
-  * <p>e.g.
-  * MJ(A, B, C) ON A.a1=B.b1 AND B.b1=C.c1 &rarr;
-  * MJ(A, B, C) ON A.a1=B.b1 AND B.b1=C.c1 AND A.a1=C.c1
-  *
-  * The advantage of applying this rule is that it increases the choice of join reorder;
-  * at the same time, the disadvantage is that it will use more CPU for additional join predicates.
-  */
-class RewriteMultiJoinConditionRule extends RelOptRule(
-  operand(classOf[MultiJoin], any),
-  "RewriteMultiJoinConditionRule") {
+ * Planner rule to apply transitive closure on [[MultiJoin]] for equi-join predicates.
+ *
+ * <p>e.g.
+ * MJ(A, B, C) ON A.a1=B.b1 AND B.b1=C.c1 &rarr;
+ * MJ(A, B, C) ON A.a1=B.b1 AND B.b1=C.c1 AND A.a1=C.c1
+ *
+ * The advantage of applying this rule is that it increases the choice of join reorder;
+ * at the same time, the disadvantage is that it will use more CPU for additional join predicates.
+ */
+class RewriteMultiJoinConditionRule
+    extends RelOptRule(operand(classOf[MultiJoin], any), "RewriteMultiJoinConditionRule") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val multiJoin: MultiJoin = call.rel(0)
@@ -55,13 +54,12 @@ class RewriteMultiJoinConditionRule extends RelOptRule(
     val (equiJoinFilters, nonEquiJoinFilters) = partitionJoinFilters(multiJoin)
     // there is no `equals` method in RexCall, so the key of this map should be String
     val equiJoinFilterMap = mutable.HashMap[String, mutable.ListBuffer[RexNode]]()
-    equiJoinFilters.foreach {
-      case c: RexCall =>
-        require(c.isA(SqlKind.EQUALS))
-        val left = c.operands.head
-        val right = c.operands(1)
-        equiJoinFilterMap.getOrElseUpdate(left.toString, mutable.ListBuffer[RexNode]()) += right
-        equiJoinFilterMap.getOrElseUpdate(right.toString, mutable.ListBuffer[RexNode]()) += left
+    equiJoinFilters.foreach { case c: RexCall =>
+      require(c.isA(SqlKind.EQUALS))
+      val left = c.operands.head
+      val right = c.operands(1)
+      equiJoinFilterMap.getOrElseUpdate(left.toString, mutable.ListBuffer[RexNode]()) += right
+      equiJoinFilterMap.getOrElseUpdate(right.toString, mutable.ListBuffer[RexNode]()) += left
     }
 
     val candidateJoinFilters = equiJoinFilterMap.values.filter(_.size > 1)
@@ -76,19 +74,17 @@ class RewriteMultiJoinConditionRule extends RelOptRule(
     }
 
     val rexBuilder = multiJoin.getCluster.getRexBuilder
-    candidateJoinFilters.foreach {
-      candidate => candidate.indices.foreach {
-        startIndex =>
-          val op1 = candidate(startIndex)
-          candidate.subList(startIndex + 1, candidate.size).foreach {
-            op2 =>
-              // `a = b` and `b = a` are the same
-              val newFilter1 = rexBuilder.makeCall(EQUALS, op1, op2)
-              val newFilter2 = rexBuilder.makeCall(EQUALS, op2, op1)
-              if (!containEquiJoinFilter(newFilter1) && !containEquiJoinFilter(newFilter2)) {
-                newEquiJoinFilters += newFilter1
-              }
+    candidateJoinFilters.foreach { candidate =>
+      candidate.indices.foreach { startIndex =>
+        val op1 = candidate(startIndex)
+        candidate.subList(startIndex + 1, candidate.size).foreach { op2 =>
+          // `a = b` and `b = a` are the same
+          val newFilter1 = rexBuilder.makeCall(EQUALS, op1, op2)
+          val newFilter2 = rexBuilder.makeCall(EQUALS, op2, op1)
+          if (!containEquiJoinFilter(newFilter1) && !containEquiJoinFilter(newFilter2)) {
+            newEquiJoinFilters += newFilter1
           }
+        }
       }
     }
 
@@ -115,8 +111,8 @@ class RewriteMultiJoinConditionRule extends RelOptRule(
   }
 
   /**
-    * Partitions MultiJoin condition in equi join filters and non-equi join filters.
-    */
+   * Partitions MultiJoin condition in equi join filters and non-equi join filters.
+   */
   private def partitionJoinFilters(multiJoin: MultiJoin): (Seq[RexNode], Seq[RexNode]) = {
     val joinFilters = RelOptUtil.conjunctions(multiJoin.getJoinFilter)
     joinFilters.partition(f => f.isA(SqlKind.EQUALS))

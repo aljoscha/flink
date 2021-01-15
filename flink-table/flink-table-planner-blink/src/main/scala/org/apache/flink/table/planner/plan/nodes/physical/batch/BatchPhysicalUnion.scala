@@ -19,12 +19,23 @@
 package org.apache.flink.table.planner.plan.nodes.physical.batch
 
 import org.apache.flink.table.planner.calcite.FlinkTypeFactory
-import org.apache.flink.table.planner.plan.`trait`.{FlinkRelDistribution, FlinkRelDistributionTraitDef}
+import org.apache.flink.table.planner.plan.`trait`.{
+  FlinkRelDistribution,
+  FlinkRelDistributionTraitDef
+}
 import org.apache.flink.table.planner.plan.nodes.exec.batch.BatchExecUnion
 import org.apache.flink.table.planner.plan.nodes.exec.{ExecEdge, ExecNode}
 
 import org.apache.calcite.plan.{RelOptCluster, RelOptRule, RelTraitSet}
-import org.apache.calcite.rel.RelDistribution.Type.{ANY, BROADCAST_DISTRIBUTED, HASH_DISTRIBUTED, RANDOM_DISTRIBUTED, RANGE_DISTRIBUTED, ROUND_ROBIN_DISTRIBUTED, SINGLETON}
+import org.apache.calcite.rel.RelDistribution.Type.{
+  ANY,
+  BROADCAST_DISTRIBUTED,
+  HASH_DISTRIBUTED,
+  RANDOM_DISTRIBUTED,
+  RANGE_DISTRIBUTED,
+  ROUND_ROBIN_DISTRIBUTED,
+  SINGLETON
+}
 import org.apache.calcite.rel.`type`.RelDataType
 import org.apache.calcite.rel.core.{SetOp, Union}
 import org.apache.calcite.rel.{RelNode, RelWriter}
@@ -34,16 +45,16 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
-  * Batch physical RelNode for [[Union]].
-  */
+ * Batch physical RelNode for [[Union]].
+ */
 class BatchPhysicalUnion(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
     inputRels: util.List[RelNode],
     all: Boolean,
     outputRowType: RelDataType)
-  extends Union(cluster, traitSet, inputRels, all)
-  with BatchPhysicalRel {
+    extends Union(cluster, traitSet, inputRels, all)
+    with BatchPhysicalRel {
 
   require(all, "Only support union all now")
 
@@ -54,7 +65,8 @@ class BatchPhysicalUnion(
   }
 
   override def explainTerms(pw: RelWriter): RelWriter = {
-    super.explainTerms(pw)
+    super
+      .explainTerms(pw)
       .item("union", getRowType.getFieldNames.mkString(", "))
   }
 
@@ -62,10 +74,9 @@ class BatchPhysicalUnion(
     // union will destroy collation trait. So does not handle collation requirement.
     val requiredDistribution = requiredTraitSet.getTrait(FlinkRelDistributionTraitDef.INSTANCE)
     val canSatisfy = requiredDistribution.getType match {
-      case RANDOM_DISTRIBUTED |
-           ROUND_ROBIN_DISTRIBUTED |
-           BROADCAST_DISTRIBUTED |
-           HASH_DISTRIBUTED => true
+      case RANDOM_DISTRIBUTED | ROUND_ROBIN_DISTRIBUTED | BROADCAST_DISTRIBUTED |
+          HASH_DISTRIBUTED =>
+        true
       // range distribution cannot be satisfied because partition's [lower, upper] of each union
       // child may be different.
       case RANGE_DISTRIBUTED => false
@@ -97,7 +108,6 @@ class BatchPhysicalUnion(
     new BatchExecUnion(
       getInputs.map(_ => ExecEdge.DEFAULT),
       FlinkTypeFactory.toLogicalRowType(getRowType),
-      getRelDetailedDescription
-    )
+      getRelDetailedDescription)
   }
 }

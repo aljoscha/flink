@@ -41,34 +41,40 @@ abstract class StreamPhysicalGroupWindowAggregateBase(
     val window: LogicalWindow,
     val namedWindowProperties: Seq[PlannerNamedWindowProperty],
     val emitStrategy: WindowEmitStrategy)
-  extends SingleRel(cluster, traitSet, inputRel)
-  with StreamPhysicalRel {
+    extends SingleRel(cluster, traitSet, inputRel)
+    with StreamPhysicalRel {
 
   override def requireWatermark: Boolean = window match {
     case TumblingGroupWindow(_, timeField, size)
-      if isRowtimeAttribute(timeField) && hasTimeIntervalType(size) => true
+        if isRowtimeAttribute(timeField) && hasTimeIntervalType(size) =>
+      true
     case SlidingGroupWindow(_, timeField, size, _)
-      if isRowtimeAttribute(timeField) && hasTimeIntervalType(size) => true
-    case SessionGroupWindow(_, timeField, _)
-      if isRowtimeAttribute(timeField) => true
-    case _ => false
+        if isRowtimeAttribute(timeField) && hasTimeIntervalType(size) =>
+      true
+    case SessionGroupWindow(_, timeField, _) if isRowtimeAttribute(timeField) => true
+    case _                                                                    => false
   }
 
   override def deriveRowType(): RelDataType = outputRowType
 
   override def explainTerms(pw: RelWriter): RelWriter = {
     val inputRowType = getInput.getRowType
-    super.explainTerms(pw)
+    super
+      .explainTerms(pw)
       .itemIf("groupBy", RelExplainUtil.fieldToString(grouping, inputRowType), grouping.nonEmpty)
       .item("window", window)
-      .itemIf("properties", namedWindowProperties.map(_.name).mkString(", "),
+      .itemIf(
+        "properties",
+        namedWindowProperties.map(_.name).mkString(", "),
         namedWindowProperties.nonEmpty)
-      .item("select", RelExplainUtil.streamWindowAggregationToString(
-        inputRowType,
-        grouping,
-        outputRowType,
-        aggCalls,
-        namedWindowProperties))
+      .item(
+        "select",
+        RelExplainUtil.streamWindowAggregationToString(
+          inputRowType,
+          grouping,
+          outputRowType,
+          aggCalls,
+          namedWindowProperties))
       .itemIf("emit", emitStrategy, !emitStrategy.toString.isEmpty)
   }
 }

@@ -35,9 +35,9 @@ import org.apache.calcite.util.{BuiltInMethod, ImmutableBitSet, Util}
 import scala.collection.JavaConversions._
 
 /**
-  * FlinkRelMdSelectivity supplies a implementation of
-  * [[RelMetadataQuery#getSelectivity]] for the standard logical algebra.
-  */
+ * FlinkRelMdSelectivity supplies a implementation of
+ * [[RelMetadataQuery#getSelectivity]] for the standard logical algebra.
+ */
 class FlinkRelMdSelectivity private extends MetadataHandler[BuiltInMetadata.Selectivity] {
 
   def getDef: MetadataDef[BuiltInMetadata.Selectivity] = BuiltInMetadata.Selectivity.DEF
@@ -73,17 +73,17 @@ class FlinkRelMdSelectivity private extends MetadataHandler[BuiltInMetadata.Sele
 
   def getSelectivity(rel: Rank, mq: RelMetadataQuery, predicate: RexNode): JDouble = {
     if (predicate == null || predicate.isAlwaysTrue) {
-      return 1D
+      return 1d
     }
     val (nonRankPred, rankPred) = FlinkRelMdUtil.splitPredicateOnRank(rel, predicate)
     val childSelectivity: JDouble = nonRankPred match {
       case Some(p) => mq.getSelectivity(rel.getInput, p)
-      case _ => 1D
+      case _       => 1d
     }
 
     val rankSelectivity: JDouble = rankPred match {
       case Some(p) => estimateSelectivity(rel, mq, p)
-      case _ => 1D
+      case _       => 1d
     }
     childSelectivity * rankSelectivity
   }
@@ -91,20 +91,15 @@ class FlinkRelMdSelectivity private extends MetadataHandler[BuiltInMetadata.Sele
   def getSelectivity(rel: Sort, mq: RelMetadataQuery, predicate: RexNode): JDouble =
     mq.getSelectivity(rel.getInput, predicate)
 
-  def getSelectivity(
-      rel: Aggregate,
-      mq: RelMetadataQuery,
-      predicate: RexNode): JDouble = getSelectivityOfAgg(rel, mq, predicate)
+  def getSelectivity(rel: Aggregate, mq: RelMetadataQuery, predicate: RexNode): JDouble =
+    getSelectivityOfAgg(rel, mq, predicate)
 
   def getSelectivity(
       rel: BatchPhysicalGroupAggregateBase,
       mq: RelMetadataQuery,
       predicate: RexNode): JDouble = getSelectivityOfAgg(rel, mq, predicate)
 
-  def getSelectivity(
-      rel: WindowAggregate,
-      mq: RelMetadataQuery,
-      predicate: RexNode): JDouble = {
+  def getSelectivity(rel: WindowAggregate, mq: RelMetadataQuery, predicate: RexNode): JDouble = {
     val newPredicate = FlinkRelMdUtil.makeNamePropertiesSelectivityRexNode(rel, predicate)
     getSelectivityOfAgg(rel, mq, newPredicate)
   }
@@ -129,10 +124,10 @@ class FlinkRelMdSelectivity private extends MetadataHandler[BuiltInMetadata.Sele
       1.0
     } else {
       val hasLocalAgg = agg match {
-        case _: Aggregate => false
-        case rel: BatchPhysicalGroupAggregateBase => rel.isFinal && rel.isMerge
+        case _: Aggregate                          => false
+        case rel: BatchPhysicalGroupAggregateBase  => rel.isFinal && rel.isMerge
         case rel: BatchPhysicalWindowAggregateBase => rel.isFinal && rel.isMerge
-        case _ => throw new IllegalArgumentException(s"Cannot handle ${agg.getRelTypeName}!")
+        case _                                     => throw new IllegalArgumentException(s"Cannot handle ${agg.getRelTypeName}!")
       }
       if (hasLocalAgg) {
         val childPredicate = agg match {
@@ -161,17 +156,15 @@ class FlinkRelMdSelectivity private extends MetadataHandler[BuiltInMetadata.Sele
         val aggCallEstimator = new AggCallSelectivityEstimator(agg, fmq)
         val restSelectivity = aggCallEstimator.evaluate(restPred.orNull) match {
           case Some(s) => s
-          case _ => RelMdUtil.guessSelectivity(restPred.orNull)
+          case _       => RelMdUtil.guessSelectivity(restPred.orNull)
         }
         childSelectivity * restSelectivity
       }
     }
   }
 
-  def getSelectivity(
-      overWindow: Window,
-      mq: RelMetadataQuery,
-      predicate: RexNode): JDouble = getSelectivityOfOverAgg(overWindow, mq, predicate)
+  def getSelectivity(overWindow: Window, mq: RelMetadataQuery, predicate: RexNode): JDouble =
+    getSelectivityOfOverAgg(overWindow, mq, predicate)
 
   def getSelectivity(
       rel: BatchPhysicalOverAggregate,
@@ -193,11 +186,7 @@ class FlinkRelMdSelectivity private extends MetadataHandler[BuiltInMetadata.Sele
       }
       val notPushable = new JArrayList[RexNode]
       val pushable = new JArrayList[RexNode]
-      RelOptUtil.splitFilters(
-        childBitmap,
-        predicate,
-        pushable,
-        notPushable)
+      RelOptUtil.splitFilters(childBitmap, predicate, pushable, notPushable)
       val rexBuilder = over.getCluster.getRexBuilder
       val childPreds = RexUtil.composeConjunction(rexBuilder, pushable, true)
       val partSelectivity = mq.getSelectivity(input, childPreds)
@@ -248,7 +237,10 @@ class FlinkRelMdSelectivity private extends MetadataHandler[BuiltInMetadata.Sele
         } else {
           val modifiedPred = predicate.accept(
             new RelOptUtil.RexInputConverter(
-              rexBuilder, null, input.getRowType.getFieldList, adjustments))
+              rexBuilder,
+              null,
+              input.getRowType.getFieldList,
+              adjustments))
           val selectivity = mq.getSelectivity(input, modifiedPred)
           if (selectivity == null) null else selectivity * inputRowCount
         }
@@ -273,7 +265,7 @@ class FlinkRelMdSelectivity private extends MetadataHandler[BuiltInMetadata.Sele
   def getSelectivity(rel: RelNode, mq: RelMetadataQuery, predicate: RexNode): JDouble = {
     rel match {
       case _: BatchPhysicalRel => estimateSelectivity(rel, mq, predicate)
-      case _ => RelMdUtil.guessSelectivity(predicate)
+      case _                   => RelMdUtil.guessSelectivity(predicate)
     }
   }
 
@@ -285,7 +277,7 @@ class FlinkRelMdSelectivity private extends MetadataHandler[BuiltInMetadata.Sele
     val estimator = new SelectivityEstimator(rel, fmq)
     estimator.evaluate(predicate) match {
       case Some(s) => s
-      case _ => RelMdUtil.guessSelectivity(predicate)
+      case _       => RelMdUtil.guessSelectivity(predicate)
     }
   }
 
@@ -295,7 +287,7 @@ object FlinkRelMdSelectivity {
 
   private val INSTANCE = new FlinkRelMdSelectivity
 
-  val SOURCE: RelMetadataProvider = ReflectiveRelMetadataProvider.reflectiveSource(
-    BuiltInMethod.SELECTIVITY.method, INSTANCE)
+  val SOURCE: RelMetadataProvider =
+    ReflectiveRelMetadataProvider.reflectiveSource(BuiltInMethod.SELECTIVITY.method, INSTANCE)
 
 }

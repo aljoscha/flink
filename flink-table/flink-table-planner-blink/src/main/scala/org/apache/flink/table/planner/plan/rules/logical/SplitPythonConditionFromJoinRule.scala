@@ -28,16 +28,17 @@ import org.apache.flink.table.planner.plan.utils.PythonUtil.containsPythonCall
 import scala.collection.JavaConversions._
 
 /**
-  * Rule will splits the [[FlinkLogicalJoin]] which contains Python Functions in join condition
-  * into a [[FlinkLogicalJoin]] and a [[FlinkLogicalCalc]] with python Functions. Currently, only
-  * inner join is supported.
-  *
-  * After this rule is applied, there will be no Python Functions in the condition of the
-  * [[FlinkLogicalJoin]].
-  */
-class SplitPythonConditionFromJoinRule extends RelOptRule(
-  operand(classOf[FlinkLogicalJoin], none),
-  "SplitPythonConditionFromJoinRule") {
+ * Rule will splits the [[FlinkLogicalJoin]] which contains Python Functions in join condition
+ * into a [[FlinkLogicalJoin]] and a [[FlinkLogicalCalc]] with python Functions. Currently, only
+ * inner join is supported.
+ *
+ * After this rule is applied, there will be no Python Functions in the condition of the
+ * [[FlinkLogicalJoin]].
+ */
+class SplitPythonConditionFromJoinRule
+    extends RelOptRule(
+      operand(classOf[FlinkLogicalJoin], none),
+      "SplitPythonConditionFromJoinRule") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val join: FlinkLogicalJoin = call.rel(0).asInstanceOf[FlinkLogicalJoin]

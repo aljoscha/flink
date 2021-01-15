@@ -58,10 +58,10 @@ object SortUtil {
    * @return A function to sort stream values based on event-time and secondary sort fields.
    */
   private[flink] def createRowTimeSortFunction(
-    collationSort: RelCollation,
-    inputType: RelDataType,
-    inputTypeInfo: TypeInformation[Row],
-    execCfg: ExecutionConfig): KeyedProcessFunction[JByte, CRow, CRow] = {
+      collationSort: RelCollation,
+      inputType: RelDataType,
+      inputTypeInfo: TypeInformation[Row],
+      execCfg: ExecutionConfig): KeyedProcessFunction[JByte, CRow, CRow] = {
 
     Preconditions.checkArgument(collationSort.getFieldCollations.size() > 0)
     val rowtimeIdx = collationSort.getFieldCollations.get(0).getFieldIndex
@@ -79,14 +79,11 @@ object SortUtil {
     }
 
     val inputCRowType = CRowTypeInfo(inputTypeInfo)
- 
-    new RowTimeSortProcessFunction[JByte](
-      inputCRowType,
-      rowtimeIdx,
-      collectionRowComparator)
+
+    new RowTimeSortProcessFunction[JByte](inputCRowType, rowtimeIdx, collectionRowComparator)
 
   }
-  
+
   /**
    * Creates a ProcessFunction to sort rows based on processing time and additional fields.
    *
@@ -96,10 +93,10 @@ object SortUtil {
    * @return A function to sort stream values based on proctime and other secondary sort fields.
    */
   private[flink] def createProcTimeSortFunction(
-    collationSort: RelCollation,
-    inputType: RelDataType,
-    inputTypeInfo: TypeInformation[Row],
-    execCfg: ExecutionConfig): KeyedProcessFunction[JByte, CRow, CRow] = {
+      collationSort: RelCollation,
+      inputType: RelDataType,
+      inputTypeInfo: TypeInformation[Row],
+      execCfg: ExecutionConfig): KeyedProcessFunction[JByte, CRow, CRow] = {
 
     val rowComp = createRowComparator(
       inputType,
@@ -107,22 +104,20 @@ object SortUtil {
       execCfg)
 
     val collectionRowComparator = new CollectionRowComparator(rowComp)
-    
+
     val inputCRowType = CRowTypeInfo(inputTypeInfo)
-    
-    new ProcTimeSortProcessFunction(
-      inputCRowType,
-      collectionRowComparator)
+
+    new ProcTimeSortProcessFunction(inputCRowType, collectionRowComparator)
 
   }
-  
+
   /**
    * Creates a RowComparator for the provided field collations and input type.
    *
    * @param inputType the row type of the input.
    * @param fieldCollations the field collations
    * @param execConfig the execution configuration.
-    *
+   *
    * @return A RowComparator for the provided sort collations and input type.
    */
   def createRowComparator(
@@ -132,16 +127,16 @@ object SortUtil {
 
     val sortFields = fieldCollations.map(_.getFieldIndex)
     val sortDirections = fieldCollations.map(_.direction).map {
-      case Direction.ASCENDING => true
+      case Direction.ASCENDING  => true
       case Direction.DESCENDING => false
-      case _ =>  throw new TableException("SQL/Table does not support such sorting")
+      case _                    => throw new TableException("SQL/Table does not support such sorting")
     }
 
     val fieldComps = for ((k, o) <- sortFields.zip(sortDirections)) yield {
       FlinkTypeFactory.toTypeInfo(inputType.getFieldList.get(k).getType) match {
         case a: AtomicType[_] =>
           a.createComparator(o, execConfig).asInstanceOf[TypeComparator[AnyRef]]
-        case x: TypeInformation[_] =>  
+        case x: TypeInformation[_] =>
           throw new TableException(s"Unsupported field type $x to sort on.")
       }
     }
@@ -152,9 +147,9 @@ object SortUtil {
       fieldComps.toArray,
       new Array[TypeSerializer[AnyRef]](0), // not required because we only compare objects.
       sortDirections.toArray)
-    
+
   }
- 
+
   /**
    * Returns the direction of the first sort field.
    *
@@ -165,7 +160,7 @@ object SortUtil {
     Preconditions.checkArgument(collationSort.getFieldCollations.size() > 0)
     collationSort.getFieldCollations.get(0).direction
   }
-  
+
   /**
    * Returns the first sort field.
    *
@@ -180,16 +175,16 @@ object SortUtil {
   }
 
   /**
-    * Translates direction into Order
-    *
-    * @param direction order direction
-    * @return corresponding order
-    */
+   * Translates direction into Order
+   *
+   * @param direction order direction
+   * @return corresponding order
+   */
   def directionToOrder(direction: Direction): Order = {
     direction match {
-      case Direction.ASCENDING | Direction.STRICTLY_ASCENDING => Order.ASCENDING
+      case Direction.ASCENDING | Direction.STRICTLY_ASCENDING   => Order.ASCENDING
       case Direction.DESCENDING | Direction.STRICTLY_DESCENDING => Order.DESCENDING
-      case _ => throw new IllegalArgumentException("Unsupported direction.")
+      case _                                                    => throw new IllegalArgumentException("Unsupported direction.")
     }
   }
 }
@@ -197,20 +192,20 @@ object SortUtil {
 /**
  * Wrapper for Row TypeComparator to a Java Comparator object
  */
-class CollectionRowComparator(
-    private val rowComp: TypeComparator[Row]) extends Comparator[Row] with Serializable {
-  
-  override def compare(arg0:Row, arg1:Row):Int = {
+class CollectionRowComparator(private val rowComp: TypeComparator[Row])
+    extends Comparator[Row]
+    with Serializable {
+
+  override def compare(arg0: Row, arg1: Row): Int = {
     rowComp.compare(arg0, arg1)
   }
 }
 
-
 /**
  * Identity map for forwarding the fields based on their arriving times
  */
-private[flink] class IdentityCRowMap extends MapFunction[CRow,CRow] {
-   override def map(value:CRow):CRow ={
-     value
-   }
- }
+private[flink] class IdentityCRowMap extends MapFunction[CRow, CRow] {
+  override def map(value: CRow): CRow = {
+    value
+  }
+}

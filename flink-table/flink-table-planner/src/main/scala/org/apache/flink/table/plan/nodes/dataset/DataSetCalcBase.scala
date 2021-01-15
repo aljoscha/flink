@@ -27,8 +27,8 @@ import org.apache.calcite.rex.RexProgram
 import org.apache.flink.table.plan.nodes.CommonCalc
 
 /**
-  * Base RelNode for data set calc.
-  */
+ * Base RelNode for data set calc.
+ */
 abstract class DataSetCalcBase(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -36,9 +36,9 @@ abstract class DataSetCalcBase(
     rowRelDataType: RelDataType,
     calcProgram: RexProgram,
     ruleDescription: String)
-  extends Calc(cluster, traitSet, input, calcProgram)
-  with CommonCalc
-  with DataSetRel {
+    extends Calc(cluster, traitSet, input, calcProgram)
+    with CommonCalc
+    with DataSetRel {
 
   override def deriveRowType(): RelDataType = rowRelDataType
 
@@ -47,7 +47,8 @@ abstract class DataSetCalcBase(
   override def explainTerms(pw: RelWriter): RelWriter = {
     pw.input("input", getInput)
       .item("select", selectionToString(calcProgram, getExpressionString))
-      .itemIf("where",
+      .itemIf(
+        "where",
         conditionToString(calcProgram, getExpressionString),
         calcProgram.getCondition != null)
   }

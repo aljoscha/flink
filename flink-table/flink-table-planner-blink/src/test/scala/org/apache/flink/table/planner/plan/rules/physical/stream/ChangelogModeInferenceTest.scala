@@ -35,8 +35,7 @@ class ChangelogModeInferenceTest extends TableTestBase {
 
   @Before
   def before(): Unit = {
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE MyTable (
         | word STRING,
         | number INT
@@ -46,8 +45,7 @@ class ChangelogModeInferenceTest extends TableTestBase {
         |)
       """.stripMargin)
 
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE Orders (
         | amount INT,
         | currency STRING,
@@ -59,8 +57,7 @@ class ChangelogModeInferenceTest extends TableTestBase {
         | 'is-bounded' = 'false'
         |)
       """.stripMargin)
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE ratesHistory (
         | currency STRING,
         | rate INT,
@@ -80,8 +77,7 @@ class ChangelogModeInferenceTest extends TableTestBase {
         "  ) T " +
         "  WHERE rowNum = 1")
 
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE ratesChangelogStream (
         | currency STRING,
         | rate INT,
@@ -104,7 +100,8 @@ class ChangelogModeInferenceTest extends TableTestBase {
   def testOneLevelGroupBy(): Unit = {
     // one level unbounded groupBy
     util.verifyRelPlan(
-      "SELECT COUNT(number) FROM MyTable GROUP BY word", ExplainDetail.CHANGELOG_MODE)
+      "SELECT COUNT(number) FROM MyTable GROUP BY word",
+      ExplainDetail.CHANGELOG_MODE)
   }
 
   @Test
@@ -121,11 +118,11 @@ class ChangelogModeInferenceTest extends TableTestBase {
 
   @Test
   def testTwoLevelGroupByLocalGlobalOn(): Unit = {
-      util.enableMiniBatch()
-      util.tableEnv.getConfig.setIdleStateRetentionTime(Time.hours(1), Time.hours(2))
-      util.tableEnv.getConfig.getConfiguration.setString(
-        OptimizerConfigOptions.TABLE_OPTIMIZER_AGG_PHASE_STRATEGY,
-        AggregatePhaseStrategy.TWO_PHASE.toString)
+    util.enableMiniBatch()
+    util.tableEnv.getConfig.setIdleStateRetentionTime(Time.hours(1), Time.hours(2))
+    util.tableEnv.getConfig.getConfiguration.setString(
+      OptimizerConfigOptions.TABLE_OPTIMIZER_AGG_PHASE_STRATEGY,
+      AggregatePhaseStrategy.TWO_PHASE.toString)
     // two level unbounded groupBy
     val sql =
       """
@@ -160,8 +157,7 @@ class ChangelogModeInferenceTest extends TableTestBase {
 
   @Test
   def testGroupByWithUnion(): Unit = {
-    util.addTable(
-      """
+    util.addTable("""
         |CREATE TABLE MyTable2 (
         | word STRING,
         | cnt INT

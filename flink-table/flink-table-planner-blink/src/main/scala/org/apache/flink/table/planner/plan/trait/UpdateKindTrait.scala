@@ -44,7 +44,7 @@ class UpdateKindTrait(val updateKind: UpdateKind) extends RelTrait {
 
   override def equals(obj: Any): Boolean = obj match {
     case t: UpdateKindTrait => this.updateKind.equals(t.updateKind)
-    case _ => false
+    case _                  => false
   }
 
   override def toString: String = s"[${updateKind.toString}]"
@@ -107,11 +107,12 @@ object UpdateKindTrait {
     val hasUpdateBefore = changelogMode.contains(RowKind.UPDATE_BEFORE)
     val hasUpdateAfter = changelogMode.contains(RowKind.UPDATE_AFTER)
     (hasUpdateBefore, hasUpdateAfter) match {
-      case (true, true) => BEFORE_AND_AFTER
+      case (true, true)  => BEFORE_AND_AFTER
       case (false, true) => ONLY_UPDATE_AFTER
       case (true, false) =>
-        throw new IllegalArgumentException("Unsupported changelog mode: " +
-          ChangelogPlanUtils.stringifyChangelogMode(Some(changelogMode)))
+        throw new IllegalArgumentException(
+          "Unsupported changelog mode: " +
+            ChangelogPlanUtils.stringifyChangelogMode(Some(changelogMode)))
       case (false, false) => NONE
     }
   }

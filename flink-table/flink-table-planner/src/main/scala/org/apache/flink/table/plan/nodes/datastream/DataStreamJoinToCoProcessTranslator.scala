@@ -43,8 +43,7 @@ class DataStreamJoinToCoProcessTranslator(
 
   val nonEquiJoinPredicates: Option[RexNode] = if (joinInfo.isEqui) {
     None
-  }
-  else {
+  } else {
     Some(joinInfo.getRemaining(rexBuilder))
   }
 
@@ -71,9 +70,7 @@ class DataStreamJoinToCoProcessTranslator(
       nullableInput = false,
       leftSchema.typeInfo,
       Some(rightSchema.typeInfo))
-    val conversion = generator.generateConverterResultExpression(
-      returnType,
-      returnFieldNames)
+    val conversion = generator.generateConverterResultExpression(returnType, returnFieldNames)
 
     val body = if (nonEquiJoinPredicates.isEmpty) {
       // only equality condition
@@ -102,9 +99,9 @@ class DataStreamJoinToCoProcessTranslator(
   }
 
   protected def createJoinOperator(
-    joinType: JoinRelType,
-    genFunction: GeneratedFunction[FlatJoinFunction[Row, Row, Row], Row])
-    : TwoInputStreamOperator[CRow, CRow, CRow] = {
+      joinType: JoinRelType,
+      genFunction: GeneratedFunction[FlatJoinFunction[Row, Row, Row], Row])
+      : TwoInputStreamOperator[CRow, CRow, CRow] = {
 
     val joinFunction = joinType match {
       case JoinRelType.INNER =>

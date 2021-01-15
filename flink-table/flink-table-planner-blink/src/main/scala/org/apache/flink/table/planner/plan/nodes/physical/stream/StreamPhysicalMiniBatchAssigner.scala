@@ -41,21 +41,19 @@ class StreamPhysicalMiniBatchAssigner(
     cluster: RelOptCluster,
     traits: RelTraitSet,
     inputRel: RelNode)
-  extends SingleRel(cluster, traits, inputRel)
-  with StreamPhysicalRel {
+    extends SingleRel(cluster, traits, inputRel)
+    with StreamPhysicalRel {
 
   override def requireWatermark: Boolean = false
 
   override def copy(traitSet: RelTraitSet, inputs: util.List[RelNode]): RelNode = {
-    new StreamPhysicalMiniBatchAssigner(
-      cluster,
-      traitSet,
-      inputs.get(0))
+    new StreamPhysicalMiniBatchAssigner(cluster, traitSet, inputs.get(0))
   }
 
   override def explainTerms(pw: RelWriter): RelWriter = {
     val miniBatchInterval = traits.getTrait(MiniBatchIntervalTraitDef.INSTANCE).getMiniBatchInterval
-    super.explainTerms(pw)
+    super
+      .explainTerms(pw)
       .item("interval", miniBatchInterval.interval + "ms")
       .item("mode", miniBatchInterval.mode.toString)
   }
@@ -66,7 +64,6 @@ class StreamPhysicalMiniBatchAssigner(
       miniBatchInterval,
       ExecEdge.DEFAULT,
       FlinkTypeFactory.toLogicalRowType(getRowType),
-      getRelDetailedDescription
-    )
+      getRelDetailedDescription)
   }
 }

@@ -30,16 +30,16 @@ object UserDefinedFunctionTestUtils {
 
   def setJobParameters(env: ExecutionEnvironment, parameters: Map[String, String]): Unit = {
     val conf = new Configuration()
-    parameters.foreach {
-      case (k, v) => conf.setString(k, v)
+    parameters.foreach { case (k, v) =>
+      conf.setString(k, v)
     }
     env.getConfig.setGlobalJobParameters(conf)
   }
 
   def setJobParameters(env: StreamExecutionEnvironment, parameters: Map[String, String]): Unit = {
     val conf = new Configuration()
-    parameters.foreach {
-      case (k, v) => conf.setString(k, v)
+    parameters.foreach { case (k, v) =>
+      conf.setString(k, v)
     }
     env.getConfig.setGlobalJobParameters(conf)
   }

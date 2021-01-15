@@ -29,18 +29,20 @@ class RexProgramRewriterTest extends RexProgramTestBase {
   @Test
   def testRewriteRexProgram(): Unit = {
     val rexProgram = buildSimpleRexProgram()
-    assertTrue(extractExprStrList(rexProgram) == wrapRefArray(Array(
-      "$0",
-      "$1",
-      "$2",
-      "$3",
-      "$4",
-      "*($t2, $t3)",
-      "100",
-      "<($t5, $t6)",
-      "6",
-      ">($t1, $t8)",
-      "AND($t7, $t9)")))
+    assertTrue(
+      extractExprStrList(rexProgram) == wrapRefArray(
+        Array(
+          "$0",
+          "$1",
+          "$2",
+          "$3",
+          "$4",
+          "*($t2, $t3)",
+          "100",
+          "<($t5, $t6)",
+          "6",
+          ">($t1, $t8)",
+          "AND($t7, $t9)")))
 
     // use amount, id, price fields to create a new RexProgram
     val usedFields = Array(2, 3, 1)
@@ -48,16 +50,21 @@ class RexProgramRewriterTest extends RexProgramTestBase {
     val names = usedFields.map(allFieldNames.get).toList.asJava
     val inputRowType = typeFactory.createStructType(types, names)
     val newRexProgram = RexProgramRewriter.rewriteWithFieldProjection(
-      rexProgram, inputRowType, rexBuilder, usedFields)
-    assertTrue(extractExprStrList(newRexProgram) == wrapRefArray(Array(
-      "$0",
-      "$1",
-      "$2",
-      "*($t0, $t1)",
-      "100",
-      "<($t3, $t4)",
-      "6",
-      ">($t2, $t6)",
-      "AND($t5, $t7)")))
+      rexProgram,
+      inputRowType,
+      rexBuilder,
+      usedFields)
+    assertTrue(
+      extractExprStrList(newRexProgram) == wrapRefArray(
+        Array(
+          "$0",
+          "$1",
+          "$2",
+          "*($t0, $t1)",
+          "100",
+          "<($t3, $t4)",
+          "6",
+          ">($t2, $t6)",
+          "AND($t5, $t7)")))
   }
 }

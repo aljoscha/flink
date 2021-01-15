@@ -36,12 +36,13 @@ class TableSinkValidationTest extends TableTestBase {
     val tEnv = StreamTableEnvironment.create(env)
 
     val t = StreamTestData.get3TupleDataStream(env).toTable(tEnv, 'id, 'num, 'text)
-    tEnv.asInstanceOf[TableEnvironmentInternal]
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
       .registerTableSinkInternal("testSink", new TestAppendSink)
 
     t.groupBy('text)
-    .select('text, 'id.count, 'num.sum)
-    .insertInto("testSink")
+      .select('text, 'id.count, 'num.sum)
+      .insertInto("testSink")
 
     // must fail because table is not append-only
     env.execute()
@@ -52,16 +53,18 @@ class TableSinkValidationTest extends TableTestBase {
     val env = StreamExecutionEnvironment.getExecutionEnvironment
     val tEnv = StreamTableEnvironment.create(env)
 
-    val t = StreamTestData.get3TupleDataStream(env)
+    val t = StreamTestData
+      .get3TupleDataStream(env)
       .assignAscendingTimestamps(_._1.toLong)
       .toTable(tEnv, 'id, 'num, 'text)
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSinkInternal(
-      "testSink", new TestUpsertSink(Array("len", "cTrue"), false))
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSinkInternal("testSink", new TestUpsertSink(Array("len", "cTrue"), false))
 
     t.select('id, 'num, 'text.charLength() as 'len, ('id > 0) as 'cTrue)
-    .groupBy('len, 'cTrue)
-    .select('len, 'id.count, 'num.sum)
-    .insertInto("testSink")
+      .groupBy('len, 'cTrue)
+      .select('len, 'id.count, 'num.sum)
+      .insertInto("testSink")
 
     // must fail because table is updating table without full key
     env.execute()
@@ -74,10 +77,12 @@ class TableSinkValidationTest extends TableTestBase {
 
     val ds1 = StreamTestData.get3TupleDataStream(env).toTable(tEnv, 'a, 'b, 'c)
     val ds2 = StreamTestData.get5TupleDataStream(env).toTable(tEnv, 'd, 'e, 'f, 'g, 'h)
-    tEnv.asInstanceOf[TableEnvironmentInternal]
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
       .registerTableSinkInternal("testSink", new TestAppendSink)
 
-    ds1.leftOuterJoin(ds2, 'a === 'd && 'b === 'h)
+    ds1
+      .leftOuterJoin(ds2, 'a === 'd && 'b === 'h)
       .select('c, 'g)
       .insertInto("testSink")
 

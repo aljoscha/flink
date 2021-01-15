@@ -18,7 +18,17 @@
 package org.apache.flink.table.planner.codegen
 
 import org.apache.flink.streaming.api.graph.StreamConfig
-import org.apache.flink.streaming.api.operators.{AbstractStreamOperator, BoundedMultiInput, BoundedOneInput, InputSelectable, InputSelection, OneInputStreamOperator, Output, StreamOperator, TwoInputStreamOperator}
+import org.apache.flink.streaming.api.operators.{
+  AbstractStreamOperator,
+  BoundedMultiInput,
+  BoundedOneInput,
+  InputSelectable,
+  InputSelection,
+  OneInputStreamOperator,
+  Output,
+  StreamOperator,
+  TwoInputStreamOperator
+}
 import org.apache.flink.streaming.runtime.streamrecord.StreamRecord
 import org.apache.flink.streaming.runtime.tasks.{ProcessingTimeService, StreamTask}
 import org.apache.flink.table.planner.codegen.CodeGenUtils._
@@ -28,8 +38,8 @@ import org.apache.flink.table.runtime.generated.GeneratedOperator
 import org.apache.flink.table.types.logical.LogicalType
 
 /**
-  * A code generator for generating Flink [[StreamOperator]]s.
-  */
+ * A code generator for generating Flink [[StreamOperator]]s.
+ */
 object OperatorCodeGenerator extends Logging {
 
   val ELEMENT = "element"
@@ -60,13 +70,15 @@ object OperatorCodeGenerator extends Logging {
     val (endInput, endInputImpl) = endInputCode match {
       case None => ("", "")
       case Some(code) =>
-        (s"""
+        (
+          s"""
            |@Override
            |public void endInput() throws Exception {
            |  ${ctx.reuseLocalVariableCode()}
            |  $code
            |}
-         """.stripMargin, s", ${className[BoundedOneInput]}")
+         """.stripMargin,
+          s", ${className[BoundedOneInput]}")
     }
 
     val operatorCode =
@@ -135,8 +147,7 @@ object OperatorCodeGenerator extends Logging {
       nextSelectionCode: Option[String] = None,
       endInputCode1: Option[String] = None,
       endInputCode2: Option[String] = None,
-      useTimeCollect: Boolean = false)
-    : GeneratedOperator[TwoInputStreamOperator[IN1, IN2, OUT]] = {
+      useTimeCollect: Boolean = false): GeneratedOperator[TwoInputStreamOperator[IN1, IN2, OUT]] = {
     addReuseOutElement(ctx)
     val operatorName = newName(name)
     val abstractBaseClass = ctx.getOperatorBaseClass
@@ -149,12 +160,14 @@ object OperatorCodeGenerator extends Logging {
       case Some(code) =>
         val end1 = endInputCode1.getOrElse("")
         val end2 = endInputCode2.getOrElse("")
-        (s"""
+        (
+          s"""
             |@Override
             |public $INPUT_SELECTION nextSelection() {
             |  $code
             |}
-         """.stripMargin, s", ${className[InputSelectable]}")
+         """.stripMargin,
+          s", ${className[InputSelectable]}")
     }
 
     val (endInput, endInputImpl) = (endInputCode1, endInputCode2) match {
@@ -162,7 +175,8 @@ object OperatorCodeGenerator extends Logging {
       case (_, _) =>
         val end1 = endInputCode1.getOrElse("")
         val end2 = endInputCode2.getOrElse("")
-        (s"""
+        (
+          s"""
            |private void endInput1() throws Exception {
            |  $end1
            |}
@@ -182,7 +196,8 @@ object OperatorCodeGenerator extends Logging {
            |      break;
            |  }
            |}
-         """.stripMargin, s", ${className[BoundedMultiInput]}")
+         """.stripMargin,
+          s", ${className[BoundedMultiInput]}")
     }
 
     val operatorCode =

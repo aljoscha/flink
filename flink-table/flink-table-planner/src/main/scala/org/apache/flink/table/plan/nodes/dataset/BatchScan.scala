@@ -44,7 +44,7 @@ trait BatchScan extends CommonScan[Row] with DataSetRel {
 
     val hasTimeIndicator = fieldIdxs.exists(f =>
       f == TimeIndicatorTypeInfo.ROWTIME_BATCH_MARKER ||
-      f == TimeIndicatorTypeInfo.PROCTIME_BATCH_MARKER)
+        f == TimeIndicatorTypeInfo.PROCTIME_BATCH_MARKER)
 
     // conversion
     if (inputType != internalType || hasTimeIndicator) {
@@ -58,10 +58,7 @@ trait BatchScan extends CommonScan[Row] with DataSetRel {
         fieldIdxs,
         rowtimeExpression)
 
-      val runner = new MapRunner[T, Row](
-        function.name,
-        function.code,
-        function.returnType)
+      val runner = new MapRunner[T, Row](function.name, function.code, function.returnType)
 
       val opName = s"from: (${schema.fieldNames.mkString(", ")})"
 
@@ -82,17 +79,11 @@ trait BatchScan extends CommonScan[Row] with DataSetRel {
       inputFieldMapping: Array[Int],
       rowtimeExpression: Option[RexNode]): GeneratedFunction[MapFunction[_, Row], Row] = {
 
-    val generator = new FunctionCodeGenerator(
-      config,
-      false,
-      inputType,
-      None,
-      Some(inputFieldMapping))
+    val generator =
+      new FunctionCodeGenerator(config, false, inputType, None, Some(inputFieldMapping))
 
-    val conversion = generator.generateConverterResultExpression(
-      outputType,
-      fieldNames,
-      rowtimeExpression)
+    val conversion =
+      generator.generateConverterResultExpression(outputType, fieldNames, rowtimeExpression)
 
     val body =
       s"""

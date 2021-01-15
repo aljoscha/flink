@@ -27,8 +27,8 @@ import org.apache.flink.table.api.{TableConfig, Types}
 abstract class KeyedProcessFunctionWithCleanupState[K, I, O](
     minRetentionTime: Long,
     maxRetentionTime: Long)
-  extends KeyedProcessFunction[K, I, O]
-  with CleanupState {
+    extends KeyedProcessFunction[K, I, O]
+    with CleanupState {
 
   protected val stateCleaningEnabled: Boolean = minRetentionTime > 1
 
@@ -44,16 +44,15 @@ abstract class KeyedProcessFunctionWithCleanupState[K, I, O](
   }
 
   protected def processCleanupTimer(
-    ctx: KeyedProcessFunction[K, I, O]#Context,
-    currentTime: Long): Unit = {
+      ctx: KeyedProcessFunction[K, I, O]#Context,
+      currentTime: Long): Unit = {
     if (stateCleaningEnabled) {
       registerProcessingCleanupTimer(
         cleanupTimeState,
         currentTime,
         minRetentionTime,
         maxRetentionTime,
-        ctx.timerService()
-      )
+        ctx.timerService())
     }
   }
 

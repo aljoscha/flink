@@ -32,7 +32,6 @@ import java.lang.Boolean
 
 import scala.annotation.varargs
 
-
 case class SimpleUser(name: String, age: Int)
 
 @SerialVersionUID(1L)
@@ -49,7 +48,7 @@ class TableFunc0 extends TableFunction[SimpleUser] {
 @SerialVersionUID(1L)
 class TableFunc1 extends TableFunction[String] {
   def eval(str: String): Unit = {
-    if (str.contains("#")){
+    if (str.contains("#")) {
       str.split("#").foreach(collect)
     }
   }
@@ -65,12 +64,14 @@ class TableFunc1 extends TableFunction[String] {
 class TableFunc2 extends TableFunction[Row] {
   def eval(str: String): Unit = {
     if (str.contains("#")) {
-      str.split("#").foreach({ s =>
-        val row = new Row(2)
-        row.setField(0, s)
-        row.setField(1, s.length)
-        collect(row)
-      })
+      str
+        .split("#")
+        .foreach({ s =>
+          val row = new Row(2)
+          row.setField(0, s)
+          row.setField(1, s.length)
+          collect(row)
+        })
     }
   }
 
@@ -96,12 +97,13 @@ class TableFunc3(data: String, conf: Map[String, String]) extends TableFunction[
             val value = conf.get(key).get
             collect(
               SimpleUser(
-                data.concat("_key=")
-                .concat(key)
-                .concat("_value=")
-                .concat(value)
-                .concat("_")
-                .concat(splits(0)),
+                data
+                  .concat("_key=")
+                  .concat(key)
+                  .concat("_value=")
+                  .concat(value)
+                  .concat("_")
+                  .concat(splits(0)),
                 splits(1).toInt))
           }
         } else {
@@ -393,11 +395,9 @@ class TableFunc6 extends TableFunction[Row] {
 @SerialVersionUID(1L)
 class TableFunc7 extends TableFunction[Row] {
 
-  def eval(row: Row): Unit = {
-  }
+  def eval(row: Row): Unit = {}
 
-  def eval(row: java.util.List[Row]): Unit = {
-  }
+  def eval(row: java.util.List[Row]): Unit = {}
 }
 
 @SerialVersionUID(1L)
@@ -453,7 +453,6 @@ class PojoUser() {
 // ----------------------------------------------------------------------------------------------
 // Invalid Table Functions
 // ----------------------------------------------------------------------------------------------
-
 
 // this is used to check whether scala object is forbidden
 @SerialVersionUID(1L)

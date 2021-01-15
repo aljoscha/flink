@@ -22,12 +22,13 @@ import org.apache.flink.table.api.config.ExecutionConfigOptions
 import org.apache.flink.table.planner.plan.utils.OperatorType
 
 /**
-  * HashDistinctAggITCase using HashAgg Operator.
-  */
+ * HashDistinctAggITCase using HashAgg Operator.
+ */
 class HashDistinctAggregateITCase extends DistinctAggregateITCaseBase {
 
   override def prepareAggOp(): Unit = {
     tEnv.getConfig.getConfiguration.setString(
-      ExecutionConfigOptions.TABLE_EXEC_DISABLED_OPERATORS, OperatorType.SortAgg.toString)
+      ExecutionConfigOptions.TABLE_EXEC_DISABLED_OPERATORS,
+      OperatorType.SortAgg.toString)
   }
 }

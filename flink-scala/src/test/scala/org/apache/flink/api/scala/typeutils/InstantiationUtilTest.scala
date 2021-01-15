@@ -25,9 +25,9 @@ import org.hamcrest.Matchers
 import org.junit.{Assert, Test}
 
 /**
-  * Serialization/Deserialization tests of Scala types using the
-  * [[org.apache.flink.util.InstantiationUtil]].
-  */
+ * Serialization/Deserialization tests of Scala types using the
+ * [[org.apache.flink.util.InstantiationUtil]].
+ */
 class InstantiationUtilTest extends TestLogger {
 
   @Test
@@ -49,7 +49,7 @@ class InstantiationUtilTest extends TestLogger {
       override def equals(obj: scala.Any): Boolean = {
         obj match {
           case x: Foo.FooTrait => value == x.value()
-          case _ => false
+          case _               => false
         }
       }
     }
@@ -64,10 +64,7 @@ class InstantiationUtilTest extends TestLogger {
 
     InstantiationUtil.serializeObject(baos, instance)
 
-    InstantiationUtil.deserializeObject(
-      baos.toByteArray,
-      getClass.getClassLoader,
-      true)
+    InstantiationUtil.deserializeObject(baos.toByteArray, getClass.getClassLoader, true)
   }
 }
 

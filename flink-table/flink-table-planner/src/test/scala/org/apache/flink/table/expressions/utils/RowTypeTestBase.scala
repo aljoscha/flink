@@ -58,7 +58,6 @@ class RowTypeTestBase extends ExpressionTestBase {
       Types.ROW(Types.INT, Types.ROW(Types.INT, Types.STRING, Types.BOOLEAN)),
       Types.ROW(Types.SQL_DATE, Types.DECIMAL, ObjectArrayTypeInfo.getInfoFor(Types.INT)),
       Types.ROW(Types.STRING, Types.BOOLEAN),
-      Types.ROW(Types.STRING, Types.STRING)
-    ).asInstanceOf[TypeInformation[Any]]
+      Types.ROW(Types.STRING, Types.STRING)).asInstanceOf[TypeInformation[Any]]
   }
 }

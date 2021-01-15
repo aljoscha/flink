@@ -30,10 +30,10 @@ import org.apache.calcite.rel.metadata.RelMetadataQuery
 import org.apache.calcite.util.Util
 
 /**
-  * Batch physical RelNode for hash-based aggregate operator.
-  *
-  * @see [[BatchPhysicalGroupAggregateBase]] for more info.
-  */
+ * Batch physical RelNode for hash-based aggregate operator.
+ *
+ * @see [[BatchPhysicalGroupAggregateBase]] for more info.
+ */
 abstract class BatchPhysicalHashAggregateBase(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -44,16 +44,16 @@ abstract class BatchPhysicalHashAggregateBase(
     aggCallToAggFunction: Seq[(AggregateCall, UserDefinedFunction)],
     isMerge: Boolean,
     isFinal: Boolean)
-  extends BatchPhysicalGroupAggregateBase(
-    cluster,
-    traitSet,
-    inputRel,
-    outputRowType,
-    grouping,
-    auxGrouping,
-    aggCallToAggFunction,
-    isMerge,
-    isFinal) {
+    extends BatchPhysicalGroupAggregateBase(
+      cluster,
+      traitSet,
+      inputRel,
+      outputRowType,
+      grouping,
+      auxGrouping,
+      aggCallToAggFunction,
+      isMerge,
+      isFinal) {
 
   override def computeSelfCost(planner: RelOptPlanner, mq: RelMetadataQuery): RelOptCost = {
     val numOfGroupKey = grouping.length

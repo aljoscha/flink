@@ -19,7 +19,12 @@
 package org.apache.flink.table.planner.plan.utils
 
 import org.apache.flink.table.connector.ChangelogMode
-import org.apache.flink.table.planner.plan.`trait`.{ModifyKind, ModifyKindSetTraitDef, UpdateKind, UpdateKindTraitDef}
+import org.apache.flink.table.planner.plan.`trait`.{
+  ModifyKind,
+  ModifyKindSetTraitDef,
+  UpdateKind,
+  UpdateKindTraitDef
+}
 import org.apache.flink.table.planner.plan.nodes.physical.stream.StreamPhysicalRel
 import org.apache.flink.table.planner.plan.optimize.program.FlinkChangelogModeInferenceProgram
 import org.apache.flink.types.RowKind
@@ -36,7 +41,8 @@ object ChangelogPlanUtils {
   /**
    * A [[ChangelogMode]] contains all kinds of [[RowKind]].
    */
-  val FULL_CHANGELOG_MODE: ChangelogMode = ChangelogMode.newBuilder()
+  val FULL_CHANGELOG_MODE: ChangelogMode = ChangelogMode
+    .newBuilder()
     .addContainedKind(RowKind.INSERT)
     .addContainedKind(RowKind.UPDATE_BEFORE)
     .addContainedKind(RowKind.UPDATE_AFTER)
@@ -49,8 +55,8 @@ object ChangelogPlanUtils {
    *  <p>Note: this method must be called after [[FlinkChangelogModeInferenceProgram]] is applied.
    */
   def inputInsertOnly(node: StreamPhysicalRel): Boolean = {
-    node.getInputs.forall {
-      case input: StreamPhysicalRel => isInsertOnly(input)
+    node.getInputs.forall { case input: StreamPhysicalRel =>
+      isInsertOnly(input)
     }
   }
 

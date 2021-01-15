@@ -39,8 +39,8 @@ class MatchHarnessTest extends HarnessTestBase {
   def testAccessingProctime(): Unit = {
     val env = StreamExecutionEnvironment.getExecutionEnvironment
 
-    val tEnv = StreamTableEnvironment.create(
-      env, EnvironmentSettings.newInstance().useOldPlanner().build())
+    val tEnv =
+      StreamTableEnvironment.create(env, EnvironmentSettings.newInstance().useOldPlanner().build())
 
     val data = new mutable.MutableList[(Int, String)]
     val t = env.fromCollection(data).toTable(tEnv, 'id, 'name, 'proctime.proctime)
@@ -81,18 +81,18 @@ class MatchHarnessTest extends HarnessTestBase {
   }
 
   private class RecordBuilder[T](record: T) {
-    def asRecord() : StreamRecord[T] = {
+    def asRecord(): StreamRecord[T] = {
       new StreamRecord[T](record)
     }
   }
 
   private object RecordBuilder {
-    def row(values: AnyRef*) : RecordBuilder[Row] = {
-      new RecordBuilder[Row](Row.of(values : _*))
+    def row(values: AnyRef*): RecordBuilder[Row] = {
+      new RecordBuilder[Row](Row.of(values: _*))
     }
 
-    def cRow(values: AnyRef*) : RecordBuilder[CRow] = {
-      new RecordBuilder[CRow](CRow(values : _*))
+    def cRow(values: AnyRef*): RecordBuilder[CRow] = {
+      new RecordBuilder[CRow](CRow(values: _*))
     }
   }
 }

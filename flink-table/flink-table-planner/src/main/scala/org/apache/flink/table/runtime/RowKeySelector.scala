@@ -24,11 +24,9 @@ import org.apache.flink.api.java.typeutils.ResultTypeQueryable
 import org.apache.flink.table.typeutils.TypeCheckUtils.validateEqualsHashCode
 import org.apache.flink.types.Row
 
-class RowKeySelector(
-    val keyFields: Array[Int],
-    @transient var returnType: TypeInformation[Row])
-  extends KeySelector[Row, Row]
-  with ResultTypeQueryable[Row] {
+class RowKeySelector(val keyFields: Array[Int], @transient var returnType: TypeInformation[Row])
+    extends KeySelector[Row, Row]
+    with ResultTypeQueryable[Row] {
 
   // check if type implements proper equals/hashCode
   validateEqualsHashCode("grouping", returnType)

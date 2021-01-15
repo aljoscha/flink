@@ -30,9 +30,9 @@ import org.apache.flink.table.planner.calcite.FlinkTypeFactory
 import org.apache.flink.table.planner.plan.logical.LogicalWindow
 
 /**
-  * Relational operator that represents a window table aggregate. A TableAggregate is similar to the
-  * [[org.apache.calcite.rel.core.Aggregate]] but may output 0 or more records for a group.
-  */
+ * Relational operator that represents a window table aggregate. A TableAggregate is similar to the
+ * [[org.apache.calcite.rel.core.Aggregate]] but may output 0 or more records for a group.
+ */
 abstract class WindowTableAggregate(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -42,7 +42,7 @@ abstract class WindowTableAggregate(
     aggCalls: util.List[AggregateCall],
     window: LogicalWindow,
     namedProperties: Seq[PlannerNamedWindowProperty])
-  extends TableAggregate(cluster, traitSet, input, groupSet, groupSets, aggCalls) {
+    extends TableAggregate(cluster, traitSet, input, groupSet, groupSets, aggCalls) {
 
   def getWindow: LogicalWindow = window
 
@@ -56,14 +56,14 @@ abstract class WindowTableAggregate(
     namedProperties.foreach { namedProp =>
       builder.add(
         namedProp.name,
-        typeFactory.createFieldTypeFromLogicalType(namedProp.property.resultType)
-      )
+        typeFactory.createFieldTypeFromLogicalType(namedProp.property.resultType))
     }
     builder.build()
   }
 
   override def explainTerms(pw: RelWriter): RelWriter = {
-    super.explainTerms(pw)
+    super
+      .explainTerms(pw)
       .item("window", window)
       .item("properties", namedProperties.map(_.name).mkString(", "))
   }

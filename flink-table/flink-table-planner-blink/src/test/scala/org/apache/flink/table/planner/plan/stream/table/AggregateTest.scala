@@ -132,8 +132,7 @@ class AggregateTest extends TableTestBase {
   @Test
   def testDistinctAggregateOnTumbleWindow(): Unit = {
     val util = streamTestUtil()
-    val table = util.addDataStream[(Int, Long, String)](
-      "MyTable", 'a, 'b, 'c, 'rowtime.rowtime)
+    val table = util.addDataStream[(Int, Long, String)]("MyTable", 'a, 'b, 'c, 'rowtime.rowtime)
     val result = table
       .window(Tumble over 15.minute on 'rowtime as 'w)
       .groupBy('w)
@@ -145,8 +144,7 @@ class AggregateTest extends TableTestBase {
   @Test
   def testMultiDistinctAggregateSameFieldOnHopWindow(): Unit = {
     val util = streamTestUtil()
-    val table = util.addDataStream[(Int, Long, String)](
-      "MyTable", 'a, 'b, 'c, 'rowtime.rowtime)
+    val table = util.addDataStream[(Int, Long, String)]("MyTable", 'a, 'b, 'c, 'rowtime.rowtime)
     val result = table
       .window(Slide over 1.hour every 15.minute on 'rowtime as 'w)
       .groupBy('w)
@@ -158,8 +156,7 @@ class AggregateTest extends TableTestBase {
   @Test
   def testDistinctAggregateWithGroupingOnSessionWindow(): Unit = {
     val util = streamTestUtil()
-    val table = util.addDataStream[(Int, Long, String)](
-      "MyTable", 'a, 'b, 'c, 'rowtime.rowtime)
+    val table = util.addDataStream[(Int, Long, String)]("MyTable", 'a, 'b, 'c, 'rowtime.rowtime)
     val result = table
       .window(Session withGap 15.minute on 'rowtime as 'w)
       .groupBy('a, 'w)
@@ -171,8 +168,7 @@ class AggregateTest extends TableTestBase {
   @Test
   def testSimpleAggregate(): Unit = {
     val util = streamTestUtil()
-    val table = util.addTableSource[(Int, Long, String)](
-      "MyTable", 'a, 'b, 'c)
+    val table = util.addTableSource[(Int, Long, String)]("MyTable", 'a, 'b, 'c)
 
     val testAgg = new CountMinMax
     val resultTable = table
@@ -186,8 +182,7 @@ class AggregateTest extends TableTestBase {
   @Test
   def testSelectStar(): Unit = {
     val util = streamTestUtil()
-    val table = util.addTableSource[(Int, Long, String)](
-      "MyTable", 'a, 'b, 'c)
+    val table = util.addTableSource[(Int, Long, String)]("MyTable", 'a, 'b, 'c)
 
     val testAgg = new CountMinMax
     val resultTable = table
@@ -201,8 +196,7 @@ class AggregateTest extends TableTestBase {
   @Test
   def testAggregateWithScalarResult(): Unit = {
     val util = streamTestUtil()
-    val table = util.addTableSource[(Int, Long, String)](
-      "MyTable", 'a, 'b, 'c)
+    val table = util.addTableSource[(Int, Long, String)]("MyTable", 'a, 'b, 'c)
 
     val resultTable = table
       .groupBy('b)
@@ -215,8 +209,7 @@ class AggregateTest extends TableTestBase {
   @Test
   def testAggregateWithAlias(): Unit = {
     val util = streamTestUtil()
-    val table = util.addTableSource[(Int, Long, String)](
-      "MyTable", 'a, 'b, 'c)
+    val table = util.addTableSource[(Int, Long, String)]("MyTable", 'a, 'b, 'c)
 
     val testAgg = new CountMinMax
     val resultTable = table

@@ -42,16 +42,16 @@ object CommonTestData {
       "Liz#5#34.5#Williams",
       "Sally#6#6.78#Miller",
       "Alice#7#90.1#Smith",
-      "Kelly#8#2.34#Williams"
-    )
+      "Kelly#8#2.34#Williams")
 
     val tempFilePath = writeToTempFile(csvRecords.mkString("$"), "csv-test", "tmp")
-    CsvTableSource.builder()
+    CsvTableSource
+      .builder()
       .path(tempFilePath)
-      .field("first",Types.STRING)
-      .field("id",Types.INT)
-      .field("score",Types.DOUBLE)
-      .field("last",Types.STRING)
+      .field("first", Types.STRING)
+      .field("id", Types.INT)
+      .field("score", Types.DOUBLE)
+      .field("last", Types.STRING)
       .fieldDelimiter("#")
       .lineDelimiter("$")
       .ignoreFirstLine()
@@ -65,16 +65,16 @@ object CommonTestData {
       "Mike#1#12.3#Smith",
       "Bob#2##Taylor",
       "% Just a comment",
-      "Leonard###"
-    )
+      "Leonard###")
 
     val tempFilePath = writeToTempFile(csvRecords.mkString("$"), "csv-null-test", "tmp")
-    CsvTableSource.builder()
+    CsvTableSource
+      .builder()
       .path(tempFilePath)
-      .field("first",Types.STRING)
-      .field("id",Types.INT)
-      .field("score",Types.DOUBLE)
-      .field("last",Types.STRING)
+      .field("first", Types.STRING)
+      .field("id", Types.INT)
+      .field("score", Types.DOUBLE)
+      .field("last", Types.STRING)
       .fieldDelimiter("#")
       .lineDelimiter("$")
       .ignoreFirstLine()
@@ -105,8 +105,7 @@ object CommonTestData {
             new Person("Mike", "Smith", new Address("5th Ave", "New-York")),
             new Person("Sally", "Miller", new Address("Potsdamer Platz", "Berlin")),
             new Person("Bob", "Taylor", new Address("Pearse Street", "Dublin"))),
-          getReturnType
-        )
+          getReturnType)
       }
 
       override def getReturnType: TypeInformation[Person] = {

@@ -25,26 +25,26 @@ import org.apache.flink.table.api.{TableException, TableSchema}
 import org.apache.flink.table.operations.OutputConversionModifyOperation
 
 /**
-  * A special [[TableSink]] that represents information of [[OutputConversionModifyOperation]].
-  *
-  * @param outputType The [[TypeInformation]] that specifies the type of the [[DataStream]].
-  * @param withChangeFlag Set to true to emit records with change flags.
-  * @tparam T The type of the resulting [[DataStream]].
-  */
+ * A special [[TableSink]] that represents information of [[OutputConversionModifyOperation]].
+ *
+ * @param outputType The [[TypeInformation]] that specifies the type of the [[DataStream]].
+ * @param withChangeFlag Set to true to emit records with change flags.
+ * @tparam T The type of the resulting [[DataStream]].
+ */
 @Internal
 class DataStreamTableSink[T](
     tableSchema: TableSchema,
     outputType: TypeInformation[T],
     val withChangeFlag: Boolean)
-  extends TableSink[T] {
+    extends TableSink[T] {
 
   /**
-    * Return the type expected by this [[TableSink]].
-    *
-    * This type should depend on the types returned by [[getTableSchema]].
-    *
-    * @return The type expected by this [[TableSink]].
-    */
+   * Return the type expected by this [[TableSink]].
+   *
+   * This type should depend on the types returned by [[getTableSchema]].
+   *
+   * @return The type expected by this [[TableSink]].
+   */
   override def getOutputType: TypeInformation[T] = outputType
 
   override def getTableSchema: TableSchema = tableSchema

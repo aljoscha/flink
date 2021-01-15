@@ -38,8 +38,7 @@ class DistinctOperatorTest {
     // Should work
     try {
       tupleDs.distinct(0)
-    }
-    catch {
+    } catch {
       case e: Exception => Assert.fail()
     }
   }
@@ -101,8 +100,7 @@ class DistinctOperatorTest {
     // Should work
     try {
       tupleDs.distinct("_1")
-    }
-    catch {
+    } catch {
       case e: Exception => Assert.fail()
     }
   }
@@ -161,11 +159,9 @@ class DistinctOperatorTest {
     val env: ExecutionEnvironment = ExecutionEnvironment.getExecutionEnvironment
     try {
       val customDs = env.fromCollection(customTypeData)
-      customDs.distinct {_.myLong}
-    }
-    catch {
+      customDs.distinct { _.myLong }
+    } catch {
       case e: Exception => Assert.fail()
     }
   }
 }
-

@@ -237,7 +237,9 @@ class PatternTranslatorTest extends PatternTranslatorTestBase {
         |    A as A.f0 = 1
         |) AS T
         |""".stripMargin,
-      Pattern.begin("A", skipToNext()).next("B")
+      Pattern
+        .begin("A", skipToNext())
+        .next("B")
         .within(Time.milliseconds(10 * 24 * 60 * 60 * 1000 + 4)))
 
     verifyPattern(
@@ -250,7 +252,9 @@ class PatternTranslatorTest extends PatternTranslatorTestBase {
         |    A as A.f0 = 1
         |) AS T
         |""".stripMargin,
-      Pattern.begin("A", skipToNext()).next("B")
+      Pattern
+        .begin("A", skipToNext())
+        .next("B")
         .within(Time.milliseconds(10 * 24 * 60 * 60 * 1000)))
 
     verifyPattern(
@@ -263,7 +267,9 @@ class PatternTranslatorTest extends PatternTranslatorTestBase {
         |    A as A.f0 = 1
         |) AS T
         |""".stripMargin,
-      Pattern.begin("A", skipToNext()).next("B")
+      Pattern
+        .begin("A", skipToNext())
+        .next("B")
         .within(Time.milliseconds(10 * 60 * 1000)))
   }
 
@@ -279,7 +285,7 @@ class PatternTranslatorTest extends PatternTranslatorTestBase {
         |    A as A.f0 = 1
         |) AS T
         |""".stripMargin,
-      null /* don't care */)
+      null /* don't care */ )
   }
 
   @Test(expected = classOf[TableException])
@@ -293,7 +299,7 @@ class PatternTranslatorTest extends PatternTranslatorTestBase {
         |   DEFINE
         |     A as A.f0 = 1
         |)""".stripMargin,
-      null /* don't care */)
+      null /* don't care */ )
   }
 
   @Test(expected = classOf[TableException])
@@ -307,7 +313,7 @@ class PatternTranslatorTest extends PatternTranslatorTestBase {
         |   DEFINE
         |     A as A.f0 = 1
         |)""".stripMargin,
-      null /* don't care */)
+      null /* don't care */ )
   }
 
   @Test
@@ -324,7 +330,7 @@ class PatternTranslatorTest extends PatternTranslatorTestBase {
         |   DEFINE
         |     A AS A.f0 = 1
         |)""".stripMargin,
-      null /* don't care */)
+      null /* don't care */ )
   }
 
   @Test
@@ -341,7 +347,7 @@ class PatternTranslatorTest extends PatternTranslatorTestBase {
         |   DEFINE
         |     A AS A.f0 = 1
         |)""".stripMargin,
-      null /* don't care */)
+      null /* don't care */ )
   }
 
   @Test
@@ -358,7 +364,7 @@ class PatternTranslatorTest extends PatternTranslatorTestBase {
         |   DEFINE
         |     A AS A.f0 = 1
         |)""".stripMargin,
-      null /* don't care */)
+      null /* don't care */ )
   }
 
   @Test
@@ -375,7 +381,7 @@ class PatternTranslatorTest extends PatternTranslatorTestBase {
         |   DEFINE
         |     A AS PREV(A.f0) = 1
         |)""".stripMargin,
-      null /* don't care */)
+      null /* don't care */ )
   }
 
   @Test
@@ -392,6 +398,6 @@ class PatternTranslatorTest extends PatternTranslatorTestBase {
         |   DEFINE
         |     A AS A.f0 = 1
         |)""".stripMargin,
-      null /* don't care */)
+      null /* don't care */ )
   }
 }

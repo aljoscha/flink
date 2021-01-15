@@ -34,33 +34,32 @@ import org.apache.calcite.rel.RelNode
 import scala.collection.JavaConversions._
 
 /**
-  * Rule that matches [[FlinkLogicalAggregate]] which all aggregate function buffer are fix length,
-  * and converts it to
-  * {{{
-  *   BatchPhysicalHashAggregate (global)
-  *   +- BatchPhysicalExchange (hash by group keys if group keys is not empty, else singleton)
-  *      +- BatchPhysicalLocalHashAggregate (local)
-  *         +- input of agg
-  * }}}
-  * when all aggregate functions are mergeable
-  * and [[OptimizerConfigOptions.TABLE_OPTIMIZER_AGG_PHASE_STRATEGY]] is TWO_PHASE, or
-  * {{{
-  *   BatchPhysicalHashAggregate
-  *   +- BatchPhysicalExchange (hash by group keys if group keys is not empty, else singleton)
-  *      +- input of agg
-  * }}}
-  * when some aggregate functions are not mergeable
-  * or [[OptimizerConfigOptions.TABLE_OPTIMIZER_AGG_PHASE_STRATEGY]] is ONE_PHASE.
-  *
-  * Notes: if [[OptimizerConfigOptions.TABLE_OPTIMIZER_AGG_PHASE_STRATEGY]] is NONE,
-  * this rule will try to create two possibilities above, and chooses the best one based on cost.
-  */
+ * Rule that matches [[FlinkLogicalAggregate]] which all aggregate function buffer are fix length,
+ * and converts it to
+ * {{{
+ *   BatchPhysicalHashAggregate (global)
+ *   +- BatchPhysicalExchange (hash by group keys if group keys is not empty, else singleton)
+ *      +- BatchPhysicalLocalHashAggregate (local)
+ *         +- input of agg
+ * }}}
+ * when all aggregate functions are mergeable
+ * and [[OptimizerConfigOptions.TABLE_OPTIMIZER_AGG_PHASE_STRATEGY]] is TWO_PHASE, or
+ * {{{
+ *   BatchPhysicalHashAggregate
+ *   +- BatchPhysicalExchange (hash by group keys if group keys is not empty, else singleton)
+ *      +- input of agg
+ * }}}
+ * when some aggregate functions are not mergeable
+ * or [[OptimizerConfigOptions.TABLE_OPTIMIZER_AGG_PHASE_STRATEGY]] is ONE_PHASE.
+ *
+ * Notes: if [[OptimizerConfigOptions.TABLE_OPTIMIZER_AGG_PHASE_STRATEGY]] is NONE,
+ * this rule will try to create two possibilities above, and chooses the best one based on cost.
+ */
 class BatchPhysicalHashAggRule
-  extends RelOptRule(
-    operand(classOf[FlinkLogicalAggregate],
-      operand(classOf[RelNode], any)),
-    "BatchPhysicalHashAggRule")
-  with BatchPhysicalAggRuleBase {
+    extends RelOptRule(
+      operand(classOf[FlinkLogicalAggregate], operand(classOf[RelNode], any)),
+      "BatchPhysicalHashAggRule")
+    with BatchPhysicalAggRuleBase {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val tableConfig = call.getPlanner.getContext.unwrap(classOf[FlinkContext]).getTableConfig
@@ -70,7 +69,7 @@ class BatchPhysicalHashAggRule
     val agg: FlinkLogicalAggregate = call.rel(0)
     // HashAgg cannot process aggregate whose agg buffer is not fix length
     isAggBufferFixedLength(agg) &&
-      !agg.getAggCallList.exists(isPythonAggregate(_))
+    !agg.getAggCallList.exists(isPythonAggregate(_))
   }
 
   override def onMatch(call: RelOptRuleCall): Unit = {
@@ -87,7 +86,8 @@ class BatchPhysicalHashAggRule
     val (auxGroupSet, aggCallsWithoutAuxGroupCalls) = AggregateUtil.checkAndSplitAggCalls(agg)
 
     val (_, aggBufferTypes, aggFunctions) = AggregateUtil.transformToBatchAggregateFunctions(
-      FlinkTypeFactory.toLogicalRowType(inputRowType), aggCallsWithoutAuxGroupCalls)
+      FlinkTypeFactory.toLogicalRowType(inputRowType),
+      aggCallsWithoutAuxGroupCalls)
 
     val aggCallToAggFunction = aggCallsWithoutAuxGroupCalls.zip(aggFunctions)
     val aggProvidedTraitSet = agg.getTraitSet.replace(FlinkConventions.BATCH_PHYSICAL)
@@ -121,13 +121,12 @@ class BatchPhysicalHashAggRule
       }
       // Remove the global agg call filters because the
       // filter is already done by local aggregation.
-      val aggCallsWithoutFilter = aggCallsWithoutAuxGroupCalls.map {
-        aggCall =>
-          if (aggCall.filterArg > 0) {
-            aggCall.copy(aggCall.getArgList, -1, aggCall.getCollation)
-          } else {
-            aggCall
-          }
+      val aggCallsWithoutFilter = aggCallsWithoutAuxGroupCalls.map { aggCall =>
+        if (aggCall.filterArg > 0) {
+          aggCall.copy(aggCall.getArgList, -1, aggCall.getCollation)
+        } else {
+          aggCall
+        }
       }
       val globalAggCallToAggFunction = aggCallsWithoutFilter.zip(aggFunctions)
       globalDistributions.foreach { globalDistribution =>

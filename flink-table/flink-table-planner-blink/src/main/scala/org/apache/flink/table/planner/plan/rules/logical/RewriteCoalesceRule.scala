@@ -33,25 +33,21 @@ import org.apache.calcite.util.Util
 import scala.collection.JavaConversions._
 
 /**
-  * Collection of planner rules that transform `Coalesce` to `Case When` RexNode trees.
-  *
-  * <p>Currently this is only used for natural join, for explicit Coalesce
-  * Calcite already replace it with Case When.
-  *
-  * <p>There are four transformation contexts:
-  * <ul>
-  * <li>Project project list
-  * <li>Join condition
-  * <li>Filter condition
-  * <li>Calc expression list
-  * </ul>
-  */
-abstract class RewriteCoalesceRule[T <: RelNode](
-    clazz: Class[T],
-    description: String)
-  extends RelOptRule(
-    operand(clazz, any),
-    description) {
+ * Collection of planner rules that transform `Coalesce` to `Case When` RexNode trees.
+ *
+ * <p>Currently this is only used for natural join, for explicit Coalesce
+ * Calcite already replace it with Case When.
+ *
+ * <p>There are four transformation contexts:
+ * <ul>
+ * <li>Project project list
+ * <li>Join condition
+ * <li>Filter condition
+ * <li>Calc expression list
+ * </ul>
+ */
+abstract class RewriteCoalesceRule[T <: RelNode](clazz: Class[T], description: String)
+    extends RelOptRule(operand(clazz, any), description) {
 
   private class CoalesceToCaseShuttle(rexBuilder: RexBuilder) extends RexShuttle {
     override def visitCall(call: RexCall): RexNode = {
@@ -74,8 +70,7 @@ abstract class RewriteCoalesceRule[T <: RelNode](
     }
   }
 
-  protected def replace(input: RexNode,
-      rexBuilder: RexBuilder): RexNode = {
+  protected def replace(input: RexNode, rexBuilder: RexBuilder): RexNode = {
     val shuttle = new CoalesceToCaseShuttle(rexBuilder)
     input.accept(shuttle)
   }
@@ -87,7 +82,7 @@ abstract class RewriteCoalesceRule[T <: RelNode](
       override def visitCall(call: RexCall): Unit = {
         call.getKind match {
           case SqlKind.COALESCE => found = true
-          case _ => super.visitCall(call)
+          case _                => super.visitCall(call)
         }
       }
 
@@ -101,12 +96,10 @@ abstract class RewriteCoalesceRule[T <: RelNode](
 }
 
 /**
-  * Planner rule that rewrites `Coalesce` in filter condition to `Case When`.
-  */
-class FilterRewriteCoalesceRule extends
-  RewriteCoalesceRule(
-    classOf[LogicalFilter],
-    "FilterRewriteCoalesceRule") {
+ * Planner rule that rewrites `Coalesce` in filter condition to `Case When`.
+ */
+class FilterRewriteCoalesceRule
+    extends RewriteCoalesceRule(classOf[LogicalFilter], "FilterRewriteCoalesceRule") {
   override def matches(call: RelOptRuleCall): Boolean = {
     val filter: Filter = call.rel(0)
     existsCoalesce(filter.getCondition)
@@ -129,12 +122,10 @@ class FilterRewriteCoalesceRule extends
 }
 
 /**
-  * Planner rule that rewrites `Coalesce` in project list to `Case When`.
-  */
-class ProjectRewriteCoalesceRule extends
-  RewriteCoalesceRule(
-    classOf[LogicalProject],
-    "ProjectRewriteCoalesceRule") {
+ * Planner rule that rewrites `Coalesce` in project list to `Case When`.
+ */
+class ProjectRewriteCoalesceRule
+    extends RewriteCoalesceRule(classOf[LogicalProject], "ProjectRewriteCoalesceRule") {
   override def matches(call: RelOptRuleCall): Boolean = {
     val prj: Project = call.rel(0)
     prj.getProjects.exists(p => existsCoalesce(p))
@@ -157,12 +148,10 @@ class ProjectRewriteCoalesceRule extends
 }
 
 /**
-  * Planner rule that rewrites `Coalesce` in join condition to `Case When`.
-  */
-class JoinRewriteCoalesceRule extends
-  RewriteCoalesceRule(
-    classOf[LogicalJoin],
-    "JoinRewriteCoalesceRule") {
+ * Planner rule that rewrites `Coalesce` in join condition to `Case When`.
+ */
+class JoinRewriteCoalesceRule
+    extends RewriteCoalesceRule(classOf[LogicalJoin], "JoinRewriteCoalesceRule") {
   override def matches(call: RelOptRuleCall): Boolean = {
     val prj: Join = call.rel(0)
     existsCoalesce(prj.getCondition)
@@ -188,12 +177,10 @@ class JoinRewriteCoalesceRule extends
 }
 
 /**
-  * Planner rule that rewrites `Coalesce` in calc expression list to `Case When`.
-  */
-class CalcRewriteCoalesceRule extends
-  RewriteCoalesceRule(
-    classOf[LogicalCalc],
-    "CalcRewriteCoalesceRule") {
+ * Planner rule that rewrites `Coalesce` in calc expression list to `Case When`.
+ */
+class CalcRewriteCoalesceRule
+    extends RewriteCoalesceRule(classOf[LogicalCalc], "CalcRewriteCoalesceRule") {
   override def matches(call: RelOptRuleCall): Boolean = {
     val calc: Calc = call.rel(0)
     val program = calc.getProgram
@@ -210,18 +197,16 @@ class CalcRewriteCoalesceRule extends
     // by this rule after the transformation.
     val program = calc.getProgram
     val exprList = program.getExprList.map(expr => replace(expr, rexBuilder))
-    val builder: RexProgramBuilder = new RexProgramBuilder(
-      calc.getInput.getRowType, calc.getCluster.getRexBuilder)
+    val builder: RexProgramBuilder =
+      new RexProgramBuilder(calc.getInput.getRowType, calc.getCluster.getRexBuilder)
     val list = exprList.map(expr => builder.registerInput(expr))
     if (program.getCondition != null) {
       val conditionIndex = program.getCondition.getIndex
       builder.addCondition(list.get(conditionIndex))
     }
-    program.getProjectList.zipWithIndex.foreach {
-      case (projectExpr, idx) =>
-        val index = projectExpr.getIndex
-        builder.addProject(list.get(index).getIndex,
-          program.getOutputRowType.getFieldNames.get(idx))
+    program.getProjectList.zipWithIndex.foreach { case (projectExpr, idx) =>
+      val index = projectExpr.getIndex
+      builder.addProject(list.get(index).getIndex, program.getOutputRowType.getFieldNames.get(idx))
     }
 
     val newCalc = calc.copy(calc.getTraitSet, calc.getInput, builder.getProgram)

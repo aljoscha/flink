@@ -38,21 +38,20 @@ import org.apache.flink.types.Row
 import org.apache.flink.util.Collector
 
 /**
-  * A CoProcessFunction to execute time-bounded stream inner-join.
-  * Two kinds of time criteria:
-  * "L.time between R.time + X and R.time + Y" or "R.time between L.time - Y and L.time - X" where
-  * X and Y might be negative or positive and X <= Y.
-  *
-  * @param joinType        the join type (inner or left/right/full outer)
-  * @param leftLowerBound  the lower bound for the left stream (X in the criteria)
-  * @param leftUpperBound  the upper bound for the left stream (Y in the criteria)
-  * @param allowedLateness the lateness allowed for the two streams
-  * @param leftType        the input type of left stream
-  * @param rightType       the input type of right stream
-  * @param genJoinFuncName the name of the generated function
-  * @param genJoinFuncCode the code of function to evaluate the non-window join conditions
-  *
-  */
+ * A CoProcessFunction to execute time-bounded stream inner-join.
+ * Two kinds of time criteria:
+ * "L.time between R.time + X and R.time + Y" or "R.time between L.time - Y and L.time - X" where
+ * X and Y might be negative or positive and X <= Y.
+ *
+ * @param joinType        the join type (inner or left/right/full outer)
+ * @param leftLowerBound  the lower bound for the left stream (X in the criteria)
+ * @param leftUpperBound  the upper bound for the left stream (Y in the criteria)
+ * @param allowedLateness the lateness allowed for the two streams
+ * @param leftType        the input type of left stream
+ * @param rightType       the input type of right stream
+ * @param genJoinFuncName the name of the generated function
+ * @param genJoinFuncCode the code of function to evaluate the non-window join conditions
+ */
 abstract class TimeBoundedStreamJoin(
     private val joinType: JoinType,
     private val leftLowerBound: Long,
@@ -62,9 +61,9 @@ abstract class TimeBoundedStreamJoin(
     private val rightType: TypeInformation[Row],
     private val genJoinFuncName: String,
     private val genJoinFuncCode: String)
-  extends CoProcessFunction[CRow, CRow, CRow]
-  with Compiler[FlatJoinFunction[Row, Row, Row]]
-  with Logging {
+    extends CoProcessFunction[CRow, CRow, CRow]
+    with Compiler[FlatJoinFunction[Row, Row, Row]]
+    with Logging {
 
   private val paddingUtil: OuterJoinPaddingUtil =
     new OuterJoinPaddingUtil(leftType.getArity, rightType.getArity)
@@ -103,12 +102,10 @@ abstract class TimeBoundedStreamJoin(
   }
 
   override def open(config: Configuration) {
-    LOG.debug(s"Compiling JoinFunction: $genJoinFuncName \n\n " +
-      s"Code:\n$genJoinFuncCode")
-    val clazz = compile(
-      getRuntimeContext.getUserCodeClassLoader,
-      genJoinFuncName,
-      genJoinFuncCode)
+    LOG.debug(
+      s"Compiling JoinFunction: $genJoinFuncName \n\n " +
+        s"Code:\n$genJoinFuncCode")
+    val clazz = compile(getRuntimeContext.getUserCodeClassLoader, genJoinFuncName, genJoinFuncCode)
     LOG.debug("Instantiating JoinFunction.")
     joinFunction = clazz.newInstance()
     FunctionUtils.setFunctionRuntimeContext(joinFunction, getRuntimeContext)
@@ -119,7 +116,7 @@ abstract class TimeBoundedStreamJoin(
 
     // Initialize the data caches.
     val leftListTypeInfo: TypeInformation[JList[JTuple2[Row, Boolean]]] =
-      new ListTypeInfo[JTuple2[Row, Boolean]] (
+      new ListTypeInfo[JTuple2[Row, Boolean]](
         new TupleTypeInfo(leftType, BasicTypeInfo.BOOLEAN_TYPE_INFO)
           .asInstanceOf[TypeInformation[JTuple2[Row, Boolean]]])
     val leftStateDescriptor: MapStateDescriptor[Long, JList[JTuple2[Row, Boolean]]] =
@@ -130,7 +127,7 @@ abstract class TimeBoundedStreamJoin(
     leftCache = getRuntimeContext.getMapState(leftStateDescriptor)
 
     val rightListTypeInfo: TypeInformation[JList[JTuple2[Row, Boolean]]] =
-      new ListTypeInfo[JTuple2[Row, Boolean]] (
+      new ListTypeInfo[JTuple2[Row, Boolean]](
         new TupleTypeInfo(rightType, BasicTypeInfo.BOOLEAN_TYPE_INFO)
           .asInstanceOf[TypeInformation[JTuple2[Row, Boolean]]])
     val rightStateDescriptor: MapStateDescriptor[Long, JList[JTuple2[Row, Boolean]]] =
@@ -151,8 +148,8 @@ abstract class TimeBoundedStreamJoin(
   }
 
   /**
-    * Process rows from the left stream.
-    */
+   * Process rows from the left stream.
+   */
   override def processElement1(
       cRowValue: CRow,
       ctx: CoProcessFunction[CRow, CRow, CRow]#Context,
@@ -246,8 +243,8 @@ abstract class TimeBoundedStreamJoin(
   }
 
   /**
-    * Process rows from the right stream.
-    */
+   * Process rows from the right stream.
+   */
   override def processElement2(
       cRowValue: CRow,
       ctx: CoProcessFunction[CRow, CRow, CRow]#Context,
@@ -258,7 +255,7 @@ abstract class TimeBoundedStreamJoin(
     val rightRow = cRowValue.row
     val timeForRightRow: Long = getTimeForRightStream(ctx, rightRow)
     val leftQualifiedLowerBound: Long = timeForRightRow - leftRelativeSize
-    val leftQualifiedUpperBound: Long =  timeForRightRow + rightRelativeSize
+    val leftQualifiedUpperBound: Long = timeForRightRow + rightRelativeSize
     var emitted: Boolean = false
 
     // Check if we need to join the current row against cached rows of the left input.
@@ -338,14 +335,14 @@ abstract class TimeBoundedStreamJoin(
   }
 
   /**
-    * Called when a registered timer is fired.
-    * Remove rows whose timestamps are earlier than the expiration time,
-    * and register a new timer for the remaining rows.
-    *
-    * @param timestamp the timestamp of the timer
-    * @param ctx       the context to register timer or get current time
-    * @param out       the collector for returning result values
-    */
+   * Called when a registered timer is fired.
+   * Remove rows whose timestamps are earlier than the expiration time,
+   * and register a new timer for the remaining rows.
+   *
+   * @param timestamp the timestamp of the timer
+   * @param ctx       the context to register timer or get current time
+   * @param out       the collector for returning result values
+   */
   override def onTimer(
       timestamp: Long,
       ctx: CoProcessFunction[CRow, CRow, CRow]#OnTimerContext,
@@ -364,8 +361,7 @@ abstract class TimeBoundedStreamJoin(
         rightCache,
         leftTimerState,
         ctx,
-        removeLeft = false
-      )
+        removeLeft = false)
     }
 
     if (rightTimerState.value == timestamp) {
@@ -376,8 +372,7 @@ abstract class TimeBoundedStreamJoin(
         leftCache,
         rightTimerState,
         ctx,
-        removeLeft = true
-      )
+        removeLeft = true)
     }
   }
 
@@ -386,12 +381,12 @@ abstract class TimeBoundedStreamJoin(
   }
 
   /**
-    * Calculate the expiration time with the given operator time and relative window size.
-    *
-    * @param operatorTime the operator time
-    * @param relativeSize the relative window size
-    * @return the expiration time for cached rows
-    */
+   * Calculate the expiration time with the given operator time and relative window size.
+   *
+   * @param operatorTime the operator time
+   * @param relativeSize the relative window size
+   * @return the expiration time for cached rows
+   */
   private def calExpirationTime(operatorTime: Long, relativeSize: Long): Long = {
     if (operatorTime < Long.MaxValue) {
       operatorTime - relativeSize - allowedLateness - 1
@@ -402,12 +397,12 @@ abstract class TimeBoundedStreamJoin(
   }
 
   /**
-    * Register a timer for cleaning up rows in a specified time.
-    *
-    * @param ctx        the context to register timer
-    * @param rowTime    time for the input row
-    * @param leftRow    whether this row comes from the left stream
-    */
+   * Register a timer for cleaning up rows in a specified time.
+   *
+   * @param ctx        the context to register timer
+   * @param rowTime    time for the input row
+   * @param leftRow    whether this row comes from the left stream
+   */
   private def registerCleanUpTimer(
       ctx: CoProcessFunction[CRow, CRow, CRow]#Context,
       rowTime: Long,
@@ -424,16 +419,16 @@ abstract class TimeBoundedStreamJoin(
   }
 
   /**
-    * Remove the expired rows. Register a new timer if the cache still holds valid rows
-    * after the cleaning up.
-    *
-    * @param collector      the collector to emit results
-    * @param expirationTime the expiration time for this cache
-    * @param rowCache       the row cache
-    * @param timerState     timer state for the opposite stream
-    * @param ctx            the context to register the cleanup timer
-    * @param removeLeft     whether to remove the left rows
-    */
+   * Remove the expired rows. Register a new timer if the cache still holds valid rows
+   * after the cleaning up.
+   *
+   * @param collector      the collector to emit results
+   * @param expirationTime the expiration time for this cache
+   * @param rowCache       the row cache
+   * @param timerState     timer state for the opposite stream
+   * @param ctx            the context to register the cleanup timer
+   * @param removeLeft     whether to remove the left rows
+   */
   private def removeExpiredRows(
       collector: Collector[Row],
       expirationTime: Long,
@@ -488,10 +483,7 @@ abstract class TimeBoundedStreamJoin(
 
     if (earliestTimestamp > 0) {
       // There are rows left in the cache. Register a timer to expire them later.
-      registerCleanUpTimer(
-        ctx,
-        earliestTimestamp,
-        removeLeft)
+      registerCleanUpTimer(ctx, earliestTimestamp, removeLeft)
     } else {
       // No rows left in the cache. Clear the states and the timerState will be 0.
       timerState.clear()
@@ -500,42 +492,40 @@ abstract class TimeBoundedStreamJoin(
   }
 
   /**
-    * Update the operator time of the two streams.
-    * Must be the first call in all processing methods (i.e., processElement(), onTimer()).
-    *
-    * @param ctx the context to acquire watermarks
-    */
+   * Update the operator time of the two streams.
+   * Must be the first call in all processing methods (i.e., processElement(), onTimer()).
+   *
+   * @param ctx the context to acquire watermarks
+   */
   def updateOperatorTime(ctx: CoProcessFunction[CRow, CRow, CRow]#Context): Unit
 
   /**
-    * Return the time for the target row from the left stream.
-    *
-    * Requires that [[updateOperatorTime()]] has been called before.
-    *
-    * @param context the runtime context
-    * @param row     the target row
-    * @return time for the target row
-    */
+   * Return the time for the target row from the left stream.
+   *
+   * Requires that [[updateOperatorTime()]] has been called before.
+   *
+   * @param context the runtime context
+   * @param row     the target row
+   * @return time for the target row
+   */
   def getTimeForLeftStream(context: CoProcessFunction[CRow, CRow, CRow]#Context, row: Row): Long
 
   /**
-    * Return the time for the target row from the right stream.
-    *
-    * Requires that [[updateOperatorTime()]] has been called before.
-    *
-    * @param context the runtime context
-    * @param row     the target row
-    * @return time for the target row
-    */
+   * Return the time for the target row from the right stream.
+   *
+   * Requires that [[updateOperatorTime()]] has been called before.
+   *
+   * @param context the runtime context
+   * @param row     the target row
+   * @return time for the target row
+   */
   def getTimeForRightStream(context: CoProcessFunction[CRow, CRow, CRow]#Context, row: Row): Long
 
   /**
-    * Register a proctime or rowtime timer.
-    *
-    * @param ctx         the context to register the timer
-    * @param cleanupTime timestamp for the timer
-    */
-  def registerTimer(
-      ctx: CoProcessFunction[CRow, CRow, CRow]#Context,
-      cleanupTime: Long): Unit
+   * Register a proctime or rowtime timer.
+   *
+   * @param ctx         the context to register the timer
+   * @param cleanupTime timestamp for the timer
+   */
+  def registerTimer(ctx: CoProcessFunction[CRow, CRow, CRow]#Context, cleanupTime: Long): Unit
 }

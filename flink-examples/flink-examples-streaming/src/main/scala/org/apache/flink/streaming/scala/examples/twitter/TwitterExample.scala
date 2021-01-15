@@ -54,7 +54,6 @@ import scala.collection.mutable.ListBuffer
  *  - acquire external data,
  *  - use in-line defined functions,
  *  - handle flattened stream inputs.
- *
  */
 object TwitterExample {
 
@@ -62,11 +61,12 @@ object TwitterExample {
 
     // Checking input parameters
     val params = ParameterTool.fromArgs(args)
-    println("Usage: TwitterExample [--output <path>] " +
-      "[--twitter-source.consumerKey <key> " +
-      "--twitter-source.consumerSecret <secret> " +
-      "--twitter-source.token <token> " +
-      "--twitter-source.tokenSecret <tokenSecret>]")
+    println(
+      "Usage: TwitterExample [--output <path>] " +
+        "[--twitter-source.consumerKey <key> " +
+        "--twitter-source.consumerSecret <secret> " +
+        "--twitter-source.token <token> " +
+        "--twitter-source.tokenSecret <tokenSecret>]")
 
     // set up the execution environment
     val env = StreamExecutionEnvironment.getExecutionEnvironment
@@ -78,27 +78,27 @@ object TwitterExample {
 
     // get input data
     val streamSource: DataStream[String] =
-    if (params.has(TwitterSource.CONSUMER_KEY) &&
-      params.has(TwitterSource.CONSUMER_SECRET) &&
-      params.has(TwitterSource.TOKEN) &&
-      params.has(TwitterSource.TOKEN_SECRET)
-    ) {
-      env.addSource(new TwitterSource(params.getProperties))
-    } else {
-      print("Executing TwitterStream example with default props.")
-      print("Use --twitter-source.consumerKey <key> --twitter-source.consumerSecret <secret> " +
-        "--twitter-source.token <token> " +
-        "--twitter-source.tokenSecret <tokenSecret> specify the authentication info."
-      )
-      // get default test text data
-      env.fromElements(TwitterExampleData.TEXTS: _*)
-    }
+      if (params.has(TwitterSource.CONSUMER_KEY) &&
+        params.has(TwitterSource.CONSUMER_SECRET) &&
+        params.has(TwitterSource.TOKEN) &&
+        params.has(TwitterSource.TOKEN_SECRET)) {
+        env.addSource(new TwitterSource(params.getProperties))
+      } else {
+        print("Executing TwitterStream example with default props.")
+        print(
+          "Use --twitter-source.consumerKey <key> --twitter-source.consumerSecret <secret> " +
+            "--twitter-source.token <token> " +
+            "--twitter-source.tokenSecret <tokenSecret> specify the authentication info.")
+        // get default test text data
+        env.fromElements(TwitterExampleData.TEXTS: _*)
+      }
 
     val tweets: DataStream[(String, Int)] = streamSource
       // selecting English tweets and splitting to (word, 1)
       .flatMap(new SelectEnglishAndTokenizeFlatMap)
       // group by words and sum their occurrences
-      .keyBy(_._1).sum(1)
+      .keyBy(_._1)
+      .sum(1)
 
     // emit result
     if (params.has("output")) {
@@ -137,7 +137,7 @@ object TwitterExample {
 
           while (tokenizer.hasMoreTokens) {
             val token = tokenizer.nextToken().replaceAll("\\s*", "").toLowerCase()
-            if (token.nonEmpty)out.collect((token, 1))
+            if (token.nonEmpty) out.collect((token, 1))
           }
         }
         case _ =>

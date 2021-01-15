@@ -29,11 +29,11 @@ import org.apache.flink.table.plan.nodes.logical.FlinkLogicalJoin
 import scala.collection.JavaConversions._
 
 class DataSetJoinRule
-  extends ConverterRule(
-    classOf[FlinkLogicalJoin],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.DATASET,
-    "DataSetJoinRule") {
+    extends ConverterRule(
+      classOf[FlinkLogicalJoin],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.DATASET,
+      "DataSetJoinRule") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val join: FlinkLogicalJoin = call.rel(0).asInstanceOf[FlinkLogicalJoin]

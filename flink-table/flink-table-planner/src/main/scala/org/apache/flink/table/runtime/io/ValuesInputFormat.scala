@@ -26,15 +26,12 @@ import org.apache.flink.table.codegen.Compiler
 import org.apache.flink.table.util.Logging
 import org.apache.flink.types.Row
 
-class ValuesInputFormat(
-    name: String,
-    code: String,
-    @transient var returnType: TypeInformation[Row])
-  extends GenericInputFormat[Row]
-  with NonParallelInput
-  with ResultTypeQueryable[Row]
-  with Compiler[GenericInputFormat[Row]]
-  with Logging {
+class ValuesInputFormat(name: String, code: String, @transient var returnType: TypeInformation[Row])
+    extends GenericInputFormat[Row]
+    with NonParallelInput
+    with ResultTypeQueryable[Row]
+    with Compiler[GenericInputFormat[Row]]
+    with Logging {
 
   private var format: GenericInputFormat[Row] = _
 

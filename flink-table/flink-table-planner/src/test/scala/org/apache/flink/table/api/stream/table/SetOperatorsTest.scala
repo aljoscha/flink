@@ -33,37 +33,33 @@ class SetOperatorsTest extends TableTestBase {
     val left = util.addTable[(Int, Long, String)]("left", 'a, 'b, 'c)
     val right = util.addTable[(Int, Long, String)]("right", 'a, 'b, 'c)
 
-    val result = left.unionAll(right)
+    val result = left
+      .unionAll(right)
       .where('a > 0)
       .groupBy('b)
       .select('a.sum as 'a, 'b as 'b, 'c.count as 'c)
 
     val expected = unaryNode(
       "DataStreamCalc",
-        unaryNode(
-          "DataStreamGroupAggregate",
-          binaryNode(
-            "DataStreamUnion",
-            unaryNode(
-              "DataStreamCalc",
-              streamTableNode(left),
-              term("select", "a", "b", "c"),
-              term("where", ">(a, 0)")
-            ),
-            unaryNode(
-              "DataStreamCalc",
-              streamTableNode(right),
-              term("select", "a", "b", "c"),
-              term("where", ">(a, 0)")
-            ),
-            term("all", "true"),
-            term("union all", "a", "b", "c")
-          ),
-          term("groupBy", "b"),
-          term("select", "b", "SUM(a) AS EXPR$0", "COUNT(c) AS EXPR$1")
-        ),
-      term("select", "EXPR$0 AS a", "b", "EXPR$1 AS c")
-    )
+      unaryNode(
+        "DataStreamGroupAggregate",
+        binaryNode(
+          "DataStreamUnion",
+          unaryNode(
+            "DataStreamCalc",
+            streamTableNode(left),
+            term("select", "a", "b", "c"),
+            term("where", ">(a, 0)")),
+          unaryNode(
+            "DataStreamCalc",
+            streamTableNode(right),
+            term("select", "a", "b", "c"),
+            term("where", ">(a, 0)")),
+          term("all", "true"),
+          term("union all", "a", "b", "c")),
+        term("groupBy", "b"),
+        term("select", "b", "SUM(a) AS EXPR$0", "COUNT(c) AS EXPR$1")),
+      term("select", "EXPR$0 AS a", "b", "EXPR$1 AS c"))
 
     util.verifyTable(result, expected)
   }
@@ -74,7 +70,8 @@ class SetOperatorsTest extends TableTestBase {
     val left = util.addTable[(Int, Long, String)]("left", 'a, 'b, 'c)
     val right = util.addTable[(Int, Long, String)]("right", 'a, 'b, 'c)
 
-    val result = left.select('a, 'b, 'c)
+    val result = left
+      .select('a, 'b, 'c)
       .unionAll(right.select('a, 'b, 'c))
       .select('b, 'c)
 
@@ -85,10 +82,8 @@ class SetOperatorsTest extends TableTestBase {
         streamTableNode(left),
         streamTableNode(right),
         term("all", "true"),
-        term("union all", "a, b, c")
-      ),
-      term("select", "b, c")
-    )
+        term("union all", "a, b, c")),
+      term("select", "b, c"))
 
     util.verifyTable(result, expected)
   }
@@ -109,20 +104,13 @@ class SetOperatorsTest extends TableTestBase {
           streamTableNode(tableA),
           unaryNode(
             "DataStreamGroupAggregate",
-            unaryNode(
-              "DataStreamCalc",
-              streamTableNode(tableB),
-              term("select", "x")
-            ),
+            unaryNode("DataStreamCalc", streamTableNode(tableB), term("select", "x")),
             term("groupBy", "x"),
-            term("select", "x")
-          ),
+            term("select", "x")),
           term("where", "=(a, x)"),
           term("join", "a", "b", "c", "x"),
-          term("joinType", "InnerJoin")
-        ),
-        term("select", "a", "b", "c")
-      )
+          term("joinType", "InnerJoin")),
+        term("select", "a", "b", "c"))
 
     streamUtil.verifyTable(result, expected)
   }
@@ -152,22 +140,16 @@ class SetOperatorsTest extends TableTestBase {
                   "DataStreamCalc",
                   streamTableNode(tableB),
                   term("select", "x", "y"),
-                  term("where", "LIKE(y, '%Hanoi%')")
-                ),
+                  term("where", "LIKE(y, '%Hanoi%')")),
                 term("groupBy", "y"),
-                term("select", "y, SUM(x) AS EXPR$0")
-              ),
-              term("select", "EXPR$0")
-            ),
+                term("select", "y, SUM(x) AS EXPR$0")),
+              term("select", "EXPR$0")),
             term("groupBy", "EXPR$0"),
-            term("select", "EXPR$0")
-          ),
+            term("select", "EXPR$0")),
           term("where", "=(a, EXPR$0)"),
           term("join", "a", "b", "c", "EXPR$0"),
-          term("joinType", "InnerJoin")
-        ),
-        term("select", "a", "b", "c")
-      )
+          term("joinType", "InnerJoin")),
+        term("select", "a", "b", "c"))
 
     streamUtil.verifyTable(result, expected)
   }
@@ -194,36 +176,22 @@ class SetOperatorsTest extends TableTestBase {
               streamTableNode(tableA),
               unaryNode(
                 "DataStreamGroupAggregate",
-                unaryNode(
-                  "DataStreamCalc",
-                  streamTableNode(tableB),
-                  term("select", "x")
-                ),
+                unaryNode("DataStreamCalc", streamTableNode(tableB), term("select", "x")),
                 term("groupBy", "x"),
-                term("select", "x")
-              ),
+                term("select", "x")),
               term("where", "=(a, x)"),
               term("join", "a", "b", "c", "x"),
-              term("joinType", "InnerJoin")
-            ),
-            term("select", "a", "b", "c")
-          ),
+              term("joinType", "InnerJoin")),
+            term("select", "a", "b", "c")),
           unaryNode(
             "DataStreamGroupAggregate",
-            unaryNode(
-              "DataStreamCalc",
-              streamTableNode(tableC),
-              term("select", "w")
-            ),
+            unaryNode("DataStreamCalc", streamTableNode(tableC), term("select", "w")),
             term("groupBy", "w"),
-            term("select", "w")
-          ),
+            term("select", "w")),
           term("where", "=(b, w)"),
           term("join", "a", "b", "c", "w"),
-          term("joinType", "InnerJoin")
-        ),
-        term("select", "a", "b", "c")
-      )
+          term("joinType", "InnerJoin")),
+        term("select", "a", "b", "c"))
 
     streamUtil.verifyTable(result, expected)
   }

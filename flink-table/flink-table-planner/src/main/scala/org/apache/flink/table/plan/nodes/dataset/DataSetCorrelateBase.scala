@@ -29,8 +29,8 @@ import org.apache.calcite.rel.{RelNode, RelWriter, SingleRel}
 import org.apache.calcite.rex.{RexCall, RexNode}
 
 /**
-  * Base RelNode for data set correlate.
-  */
+ * Base RelNode for data set correlate.
+ */
 abstract class DataSetCorrelateBase(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -41,9 +41,9 @@ abstract class DataSetCorrelateBase(
     joinRowType: RelDataType,
     joinType: JoinRelType,
     ruleDescription: String)
-  extends SingleRel(cluster, traitSet, inputNode)
-  with CommonCorrelate
-  with DataSetRel {
+    extends SingleRel(cluster, traitSet, inputNode)
+    with CommonCorrelate
+    with DataSetRel {
 
   override def deriveRowType() = relRowType
 
@@ -61,12 +61,12 @@ abstract class DataSetCorrelateBase(
   override def explainTerms(pw: RelWriter): RelWriter = {
     val rexCall = scan.getCall.asInstanceOf[RexCall]
     val sqlFunction = rexCall.getOperator.asInstanceOf[TableSqlFunction]
-    super.explainTerms(pw)
+    super
+      .explainTerms(pw)
       .item("invocation", scan.getCall)
-      .item("correlate", correlateToString(
-        inputNode.getRowType,
-        rexCall, sqlFunction,
-        getExpressionString))
+      .item(
+        "correlate",
+        correlateToString(inputNode.getRowType, rexCall, sqlFunction, getExpressionString))
       .item("select", selectToString(relRowType))
       .item("rowType", relRowType)
       .item("joinType", joinType)

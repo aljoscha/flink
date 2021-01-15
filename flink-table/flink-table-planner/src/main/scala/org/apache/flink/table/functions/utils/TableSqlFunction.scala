@@ -30,8 +30,8 @@ import org.apache.calcite.sql.parser.SqlParserPos
 import org.apache.calcite.sql.validate.SqlUserDefinedTableFunction
 
 /**
-  * Calcite wrapper for user-defined table functions.
-  */
+ * Calcite wrapper for user-defined table functions.
+ */
 class TableSqlFunction(
     name: String,
     displayName: String,
@@ -39,28 +39,28 @@ class TableSqlFunction(
     rowTypeInfo: TypeInformation[_],
     typeFactory: FlinkTypeFactory,
     functionImpl: FlinkTableFunctionImpl[_])
-  extends SqlUserDefinedTableFunction(
-    new SqlIdentifier(name, SqlParserPos.ZERO),
-    SqlKind.OTHER_FUNCTION,
-    ReturnTypes.CURSOR,
-    createEvalOperandTypeInference(name, tableFunction, typeFactory),
-    createEvalOperandMetadata(name, tableFunction),
-    functionImpl) {
+    extends SqlUserDefinedTableFunction(
+      new SqlIdentifier(name, SqlParserPos.ZERO),
+      SqlKind.OTHER_FUNCTION,
+      ReturnTypes.CURSOR,
+      createEvalOperandTypeInference(name, tableFunction, typeFactory),
+      createEvalOperandMetadata(name, tableFunction),
+      functionImpl) {
 
   /**
-    * Get the user-defined table function.
-    */
+   * Get the user-defined table function.
+   */
   def getTableFunction: TableFunction[_] = tableFunction
 
   /**
-    * Get the type information of the table returned by the table function.
-    */
+   * Get the type information of the table returned by the table function.
+   */
   def getRowTypeInfo: TypeInformation[_] = rowTypeInfo
 
   /**
-    * Get additional mapping information if the returned table type is a POJO
-    * (POJO types have no deterministic field order).
-    */
+   * Get additional mapping information if the returned table type is a POJO
+   * (POJO types have no deterministic field order).
+   */
   def getPojoFieldMapping: Array[Int] = functionImpl.fieldIndexes
 
   override def isDeterministic: Boolean = tableFunction.isDeterministic

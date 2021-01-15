@@ -27,8 +27,8 @@ import org.apache.flink.table.api.{TableConfig, Types}
 abstract class CoProcessFunctionWithCleanupState[IN1, IN2, OUT](
     minRetentionTime: Long,
     maxRetentionTime: Long)
-  extends CoProcessFunction[IN1, IN2, OUT]
-  with CleanupState {
+    extends CoProcessFunction[IN1, IN2, OUT]
+    with CleanupState {
 
   protected val stateCleaningEnabled: Boolean = minRetentionTime > 1
 
@@ -44,16 +44,15 @@ abstract class CoProcessFunctionWithCleanupState[IN1, IN2, OUT](
   }
 
   protected def processCleanupTimer(
-    ctx: CoProcessFunction[IN1, IN2, OUT]#Context,
-    currentTime: Long): Unit = {
+      ctx: CoProcessFunction[IN1, IN2, OUT]#Context,
+      currentTime: Long): Unit = {
     if (stateCleaningEnabled) {
       registerProcessingCleanupTimer(
         cleanupTimeState,
         currentTime,
         minRetentionTime,
         maxRetentionTime,
-        ctx.timerService()
-      )
+        ctx.timerService())
     }
   }
 

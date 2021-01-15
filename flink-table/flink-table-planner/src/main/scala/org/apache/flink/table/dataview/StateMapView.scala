@@ -24,12 +24,12 @@ import org.apache.flink.api.common.state.MapState
 import org.apache.flink.table.api.dataview.MapView
 
 /**
-  * [[MapView]] use state backend.
-  *
-  * @param state map state
-  * @tparam K key type
-  * @tparam V value type
-  */
+ * [[MapView]] use state backend.
+ *
+ * @param state map state
+ * @tparam K key type
+ * @tparam V value type
+ */
 class StateMapView[K, V](state: MapState[K, V]) extends MapView[K, V] {
 
   override def get(key: K): V = state.get(key)

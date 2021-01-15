@@ -29,14 +29,15 @@ import scala.collection.generic.CanBuildFrom
 import scala.ref.WeakReference
 
 /**
-  * Serializer for Scala Collections.
-  */
+ * Serializer for Scala Collections.
+ */
 @Internal
 @SerialVersionUID(7522917416391312410L)
 class TraversableSerializer[T <: TraversableOnce[E], E](
     var elementSerializer: TypeSerializer[E],
     var cbfCode: String)
-  extends TypeSerializer[T] with Cloneable {
+    extends TypeSerializer[T]
+    with Cloneable {
 
   @transient var cbf: CanBuildFrom[T, E, T] = compileCbf(cbfCode)
 
@@ -172,7 +173,8 @@ class TraversableSerializer[T <: TraversableOnce[E], E](
 
 object TraversableSerializer {
 
-  private val CACHE: Cache[Key, CanBuildFrom[_, _, _]] = CacheBuilder.newBuilder()
+  private val CACHE: Cache[Key, CanBuildFrom[_, _, _]] = CacheBuilder
+    .newBuilder()
     .weakValues()
     .maximumSize(128)
     .build()
@@ -194,33 +196,34 @@ object TraversableSerializer {
     }
   }
 
-  case class Key(classLoaderHash: Int,
-                 classLoaderRef: WeakReference[ClassLoader],
-                 cbfCode: String) {
+  case class Key(
+      classLoaderHash: Int,
+      classLoaderRef: WeakReference[ClassLoader],
+      cbfCode: String) {
 
     override def hashCode(): Int = classLoaderHash * 37 + cbfCode.hashCode
 
     override def equals(obj: Any): Boolean = {
       obj match {
-        case Key(thatHashCode, thatClassLoaderRef, thatCbfCode) => 
-          (this.classLoaderHash == thatHashCode) && 
-          (this.classLoaderRef.get == thatClassLoaderRef.get) &&
-          (this.cbfCode == thatCbfCode)
-        
+        case Key(thatHashCode, thatClassLoaderRef, thatCbfCode) =>
+          (this.classLoaderHash == thatHashCode) &&
+            (this.classLoaderRef.get == thatClassLoaderRef.get) &&
+            (this.cbfCode == thatCbfCode)
+
         case _ =>
           false
       }
     }
   }
 
-  private case class LazyRuntimeCompiler[T, E](classLoader: ClassLoader,
-                                               code: String)
-    extends Callable[CanBuildFrom[T, E, T]] {
+  private case class LazyRuntimeCompiler[T, E](classLoader: ClassLoader, code: String)
+      extends Callable[CanBuildFrom[T, E, T]] {
 
     override def call(): CanBuildFrom[T, E, T] = compileCbfInternal(classLoader, code)
 
-    private def compileCbfInternal(classLoader: ClassLoader, code: String):
-    CanBuildFrom[T, E, T] = {
+    private def compileCbfInternal(
+        classLoader: ClassLoader,
+        code: String): CanBuildFrom[T, E, T] = {
 
       import scala.reflect.runtime.universe._
       import scala.tools.reflect.ToolBox
@@ -234,4 +237,3 @@ object TraversableSerializer {
   }
 
 }
-

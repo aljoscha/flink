@@ -27,8 +27,8 @@ import org.junit.Test
 import scala.collection.JavaConverters._
 
 /**
-  * Tests for [[LiteralValue]].
-  */
+ * Tests for [[LiteralValue]].
+ */
 class LiteralValueTest extends DescriptorTestBase {
 
   @Test(expected = classOf[ValidationException])
@@ -73,43 +73,16 @@ class LiteralValueTest extends DescriptorTestBase {
   }
 
   override def properties(): JList[JMap[String, String]] = {
-    val bigDecimalProps = Map(
-      "type" -> "DECIMAL",
-      "value" -> "1"
-    )
-    val booleanDesc = Map(
-      "type" -> "BOOLEAN",
-      "value" -> "false"
-    )
-    val byteDesc = Map(
-      "type" -> "TINYINT",
-      "value" -> "4"
-    )
+    val bigDecimalProps = Map("type" -> "DECIMAL", "value" -> "1")
+    val booleanDesc = Map("type" -> "BOOLEAN", "value" -> "false")
+    val byteDesc = Map("type" -> "TINYINT", "value" -> "4")
 
-    val doubleDesc = Map(
-      "type" -> "DOUBLE",
-      "value" -> "7.0"
-    )
-    val floatDesc = Map(
-      "type" -> "FLOAT",
-      "value" -> "8.0"
-    )
-    val intProps = Map(
-      "type" -> "INT",
-      "value" -> "9"
-    )
-    val longDesc = Map(
-      "type" -> "BIGINT",
-      "value" -> "10"
-    )
-    val shortDesc = Map(
-      "type" -> "SMALLINT",
-      "value" -> "11"
-    )
-    val stringDesc = Map(
-      "type" -> "VARCHAR",
-      "value" -> "12"
-    )
+    val doubleDesc = Map("type" -> "DOUBLE", "value" -> "7.0")
+    val floatDesc = Map("type" -> "FLOAT", "value" -> "8.0")
+    val intProps = Map("type" -> "INT", "value" -> "9")
+    val longDesc = Map("type" -> "BIGINT", "value" -> "10")
+    val shortDesc = Map("type" -> "SMALLINT", "value" -> "11")
+    val stringDesc = Map("type" -> "VARCHAR", "value" -> "12")
     JArrays.asList(
       bigDecimalProps.asJava,
       booleanDesc.asJava,
@@ -119,7 +92,6 @@ class LiteralValueTest extends DescriptorTestBase {
       intProps.asJava,
       longDesc.asJava,
       shortDesc.asJava,
-      stringDesc.asJava
-    )
+      stringDesc.asJava)
   }
 }

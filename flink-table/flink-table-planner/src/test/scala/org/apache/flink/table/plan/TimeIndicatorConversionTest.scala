@@ -31,8 +31,8 @@ import org.junit.Test
 import java.sql.Timestamp
 
 /**
-  * Tests for [[org.apache.flink.table.calcite.RelTimeIndicatorConverter]].
-  */
+ * Tests for [[org.apache.flink.table.calcite.RelTimeIndicatorConverter]].
+ */
 class TimeIndicatorConversionTest extends TableTestBase {
 
   @Test
@@ -49,8 +49,7 @@ class TimeIndicatorConversionTest extends TableTestBase {
       "DataStreamCalc",
       streamTableNode(t),
       term("select", "FLOOR(CAST(rowtime)", "FLAG(DAY)) AS rowtime"),
-      term("where", ">(long, 0)")
-    )
+      term("where", ">(long, 0)"))
 
     util.verifyTable(result, expected)
   }
@@ -65,9 +64,7 @@ class TimeIndicatorConversionTest extends TableTestBase {
     val expected = unaryNode(
       "DataStreamCalc",
       streamTableNode(t),
-      term("select", "rowtime", "long", "int",
-        "PROCTIME(proctime) AS proctime")
-    )
+      term("select", "rowtime", "long", "int", "PROCTIME(proctime) AS proctime"))
 
     util.verifyTable(result, expected)
   }
@@ -85,8 +82,7 @@ class TimeIndicatorConversionTest extends TableTestBase {
       "DataStreamCalc",
       streamTableNode(t),
       term("select", "rowtime"),
-      term("where", ">(CAST(rowtime), 1990-12-02 12:11:11:TIMESTAMP(3))")
-    )
+      term("where", ">(CAST(rowtime), 1990-12-02 12:11:11:TIMESTAMP(3))"))
 
     util.verifyTable(result, expected)
   }
@@ -107,13 +103,10 @@ class TimeIndicatorConversionTest extends TableTestBase {
         unaryNode(
           "DataStreamCalc",
           streamTableNode(t),
-          term("select", "CAST(rowtime) AS rowtime", "long")
-        ),
+          term("select", "CAST(rowtime) AS rowtime", "long")),
         term("groupBy", "rowtime"),
-        term("select", "rowtime", "COUNT(long) AS EXPR$0")
-      ),
-      term("select", "EXPR$0")
-    )
+        term("select", "rowtime", "COUNT(long) AS EXPR$0")),
+      term("select", "EXPR$0"))
 
     util.verifyTable(result, expected)
   }
@@ -134,13 +127,10 @@ class TimeIndicatorConversionTest extends TableTestBase {
         unaryNode(
           "DataStreamCalc",
           streamTableNode(t),
-          term("select", "CAST(rowtime) AS rowtime", "long")
-        ),
+          term("select", "CAST(rowtime) AS rowtime", "long")),
         term("groupBy", "long"),
-        term("select", "long", "MIN(rowtime) AS EXPR$0")
-      ),
-      term("select", "EXPR$0")
-    )
+        term("select", "long", "MIN(rowtime) AS EXPR$0")),
+      term("select", "EXPR$0"))
 
     util.verifyTable(result, expected)
   }
@@ -158,16 +148,17 @@ class TimeIndicatorConversionTest extends TableTestBase {
       unaryNode(
         "DataStreamCorrelate",
         streamTableNode(t),
-        term("invocation",
+        term(
+          "invocation",
           s"${func.functionIdentifier}(CAST($$0):TIMESTAMP(3) NOT NULL, PROCTIME($$3), '')"),
         term("correlate", s"table(TableFunc(CAST(rowtime), PROCTIME(proctime), ''))"),
         term("select", "rowtime", "long", "int", "proctime", "s"),
-        term("rowType", "RecordType(TIME ATTRIBUTE(ROWTIME) rowtime, BIGINT long, INTEGER int, " +
-          "TIME ATTRIBUTE(PROCTIME) proctime, VARCHAR(65536) s)"),
-        term("joinType", "INNER")
-      ),
-      term("select", "rowtime", "PROCTIME(proctime) AS proctime", "s")
-    )
+        term(
+          "rowType",
+          "RecordType(TIME ATTRIBUTE(ROWTIME) rowtime, BIGINT long, INTEGER int, " +
+            "TIME ATTRIBUTE(PROCTIME) proctime, VARCHAR(65536) s)"),
+        term("joinType", "INNER")),
+      term("select", "rowtime", "PROCTIME(proctime) AS proctime", "s"))
 
     util.verifyTable(result, expected)
   }
@@ -189,10 +180,8 @@ class TimeIndicatorConversionTest extends TableTestBase {
         streamTableNode(t),
         term("groupBy", "long"),
         term("window", "TumblingGroupWindow('w, 'rowtime, 100.millis)"),
-        term("select", "long", "SUM(int) AS EXPR$1", "end('w) AS EXPR$0")
-      ),
-      term("select", "EXPR$0 AS rowtime", "long", "EXPR$1")
-    )
+        term("select", "long", "SUM(int) AS EXPR$1", "end('w) AS EXPR$0")),
+      term("select", "EXPR$0 AS rowtime", "long", "EXPR$1"))
 
     util.verifyTable(result, expected)
   }
@@ -212,10 +201,8 @@ class TimeIndicatorConversionTest extends TableTestBase {
         streamTableNode(t),
         streamTableNode(t),
         term("all", "true"),
-        term("union all", "rowtime, long, int")
-      ),
-      term("select", "rowtime")
-    )
+        term("union all", "rowtime, long, int")),
+      term("select", "rowtime"))
 
     util.verifyTable(result, expected)
   }
@@ -244,16 +231,12 @@ class TimeIndicatorConversionTest extends TableTestBase {
             streamTableNode(t),
             term("groupBy", "long"),
             term("window", "TumblingGroupWindow('w, 'rowtime, 100.millis)"),
-            term("select", "long", "SUM(int) AS EXPR$1", "rowtime('w) AS EXPR$0")
-          ),
-          term("select", "EXPR$0 AS newrowtime", "long", "EXPR$1 AS int")
-        ),
+            term("select", "long", "SUM(int) AS EXPR$1", "rowtime('w) AS EXPR$0")),
+          term("select", "EXPR$0 AS newrowtime", "long", "EXPR$1 AS int")),
         term("groupBy", "long"),
         term("window", "TumblingGroupWindow('w2, 'newrowtime, 1000.millis)"),
-        term("select", "long", "SUM(int) AS EXPR$1", "end('w2) AS EXPR$0")
-      ),
-      term("select", "EXPR$0", "long", "EXPR$1")
-    )
+        term("select", "long", "SUM(int) AS EXPR$1", "end('w2) AS EXPR$0")),
+      term("select", "EXPR$0", "long", "EXPR$1"))
 
     util.verifyTable(result, expected)
   }
@@ -261,7 +244,7 @@ class TimeIndicatorConversionTest extends TableTestBase {
   @Test
   def testGroupingOnProctime(): Unit = {
     val util = streamTestUtil()
-    val t = util.addTable[(Long, Int)]("MyTable" , 'long, 'int, 'proctime.proctime)
+    val t = util.addTable[(Long, Int)]("MyTable", 'long, 'int, 'proctime.proctime)
 
     val result = util.tableEnv.sqlQuery("SELECT COUNT(long) FROM MyTable GROUP BY proctime")
 
@@ -272,13 +255,10 @@ class TimeIndicatorConversionTest extends TableTestBase {
         unaryNode(
           "DataStreamCalc",
           streamTableNode(t),
-          term("select", "PROCTIME(proctime) AS proctime", "long")
-        ),
+          term("select", "PROCTIME(proctime) AS proctime", "long")),
         term("groupBy", "proctime"),
-        term("select", "proctime", "COUNT(long) AS EXPR$0")
-      ),
-      term("select", "EXPR$0")
-    )
+        term("select", "proctime", "COUNT(long) AS EXPR$0")),
+      term("select", "EXPR$0"))
 
     util.verifyTable(result, expected)
   }
@@ -286,7 +266,7 @@ class TimeIndicatorConversionTest extends TableTestBase {
   @Test
   def testAggregationOnProctime(): Unit = {
     val util = streamTestUtil()
-    val t = util.addTable[(Long, Int)]("MyTable" , 'long, 'int, 'proctime.proctime)
+    val t = util.addTable[(Long, Int)]("MyTable", 'long, 'int, 'proctime.proctime)
 
     val result = util.tableEnv.sqlQuery("SELECT MIN(proctime) FROM MyTable GROUP BY long")
 
@@ -297,13 +277,10 @@ class TimeIndicatorConversionTest extends TableTestBase {
         unaryNode(
           "DataStreamCalc",
           streamTableNode(t),
-          term("select", "long", "PROCTIME(proctime) AS proctime")
-        ),
+          term("select", "long", "PROCTIME(proctime) AS proctime")),
         term("groupBy", "long"),
-        term("select", "long", "MIN(proctime) AS EXPR$0")
-      ),
-      term("select", "EXPR$0")
-    )
+        term("select", "long", "MIN(proctime) AS EXPR$0")),
+      term("select", "EXPR$0"))
 
     util.verifyTable(result, expected)
   }
@@ -325,16 +302,15 @@ class TimeIndicatorConversionTest extends TableTestBase {
         streamTableNode(t),
         term("groupBy", "long"),
         term("window", "TumblingGroupWindow('w$, 'rowtime, 100.millis)"),
-        term("select",
+        term(
+          "select",
           "long",
           "SUM(int) AS EXPR$2",
           "start('w$) AS w$start",
           "end('w$) AS w$end",
           "rowtime('w$) AS w$rowtime",
-          "proctime('w$) AS w$proctime")
-      ),
-      term("select", "w$end AS rowtime", "long", "EXPR$2")
-    )
+          "proctime('w$) AS w$proctime")),
+      term("select", "w$end AS rowtime", "long", "EXPR$2"))
 
     util.verifyTable(result, expected)
   }
@@ -344,8 +320,9 @@ class TimeIndicatorConversionTest extends TableTestBase {
     val util = streamTestUtil()
     val t = util.addTable[(Long, Long, Int)]("MyTable", 'rowtime.rowtime, 'long, 'int)
 
-    val result = util.tableEnv.sqlQuery("SELECT MIN(rowtime), long FROM MyTable " +
-      "GROUP BY long, TUMBLE(rowtime, INTERVAL '0.1' SECOND)")
+    val result = util.tableEnv.sqlQuery(
+      "SELECT MIN(rowtime), long FROM MyTable " +
+        "GROUP BY long, TUMBLE(rowtime, INTERVAL '0.1' SECOND)")
 
     val expected = unaryNode(
       "DataStreamCalc",
@@ -354,14 +331,11 @@ class TimeIndicatorConversionTest extends TableTestBase {
         unaryNode(
           "DataStreamCalc",
           streamTableNode(t),
-          term("select", "long", "rowtime", "CAST(rowtime) AS rowtime0")
-        ),
+          term("select", "long", "rowtime", "CAST(rowtime) AS rowtime0")),
         term("groupBy", "long"),
         term("window", "TumblingGroupWindow('w$, 'rowtime, 100.millis)"),
-        term("select", "long", "MIN(rowtime0) AS EXPR$0")
-      ),
-      term("select", "EXPR$0", "long")
-    )
+        term("select", "long", "MIN(rowtime0) AS EXPR$0")),
+      term("select", "EXPR$0", "long"))
 
     util.verifyTable(result, expected)
   }
@@ -370,17 +344,18 @@ class TimeIndicatorConversionTest extends TableTestBase {
   def testMaterializeRightSideOfTemporalTableJoin(): Unit = {
     val util = streamTestUtil()
 
-    val proctimeOrders = util.addTable[(Long, String)](
-      "ProctimeOrders", 'o_amount, 'o_currency, 'o_proctime.proctime)
+    val proctimeOrders =
+      util.addTable[(Long, String)]("ProctimeOrders", 'o_amount, 'o_currency, 'o_proctime.proctime)
 
-    val proctimeRatesHistory = util.addTable[(String, Int)](
-      "ProctimeRatesHistory", 'currency, 'rate, 'proctime.proctime)
+    val proctimeRatesHistory =
+      util.addTable[(String, Int)]("ProctimeRatesHistory", 'currency, 'rate, 'proctime.proctime)
 
     val proctimeRates = proctimeRatesHistory.createTemporalTableFunction('proctime, 'currency)
 
     val result = proctimeOrders
       .joinLateral(proctimeRates('o_proctime), 'currency === 'o_currency)
-      .select($"o_amount" * $"rate", $"currency", $"proctime").as("converted_amount")
+      .select($"o_amount" * $"rate", $"currency", $"proctime")
+      .as("converted_amount")
       .window(Tumble over 1.second on 'proctime as 'w)
       .groupBy('w, 'currency)
       .select('converted_amount.sum)
@@ -395,10 +370,7 @@ class TimeIndicatorConversionTest extends TableTestBase {
               "select",
               "*(o_amount, rate) AS converted_amount",
               "currency",
-              "PROCTIME(proctime) AS proctime")
-          )
-        )
-      )
+              "PROCTIME(proctime) AS proctime"))))
 
     util.verifyTable(result, expected)
   }
@@ -407,17 +379,18 @@ class TimeIndicatorConversionTest extends TableTestBase {
   def testDoNotMaterializeLeftSideOfTemporalTableJoin(): Unit = {
     val util = streamTestUtil()
 
-    val proctimeOrders = util.addTable[(Long, String)](
-      "ProctimeOrders", 'o_amount, 'o_currency, 'o_proctime.proctime)
+    val proctimeOrders =
+      util.addTable[(Long, String)]("ProctimeOrders", 'o_amount, 'o_currency, 'o_proctime.proctime)
 
-    val proctimeRatesHistory = util.addTable[(String, Int)](
-      "ProctimeRatesHistory", 'currency, 'rate, 'proctime.proctime)
+    val proctimeRatesHistory =
+      util.addTable[(String, Int)]("ProctimeRatesHistory", 'currency, 'rate, 'proctime.proctime)
 
     val proctimeRates = proctimeRatesHistory.createTemporalTableFunction('proctime, 'currency)
 
     val result = proctimeOrders
       .joinLateral(proctimeRates('o_proctime), 'currency === 'o_currency)
-      .select($"o_amount" * $"rate", $"currency", $"o_proctime").as("converted_amount")
+      .select($"o_amount" * $"rate", $"currency", $"o_proctime")
+      .as("converted_amount")
       .window(Tumble over 1.second on 'o_proctime as 'w)
       .groupBy('w, 'currency)
       .select('converted_amount.sum)
@@ -428,14 +401,7 @@ class TimeIndicatorConversionTest extends TableTestBase {
           unaryNode(
             "DataStreamCalc",
             anySubtree(),
-            term(
-              "select",
-              "*(o_amount, rate) AS converted_amount",
-              "currency",
-              "o_proctime")
-          )
-        )
-      )
+            term("select", "*(o_amount, rate) AS converted_amount", "currency", "o_proctime"))))
 
     util.verifyTable(result, expected)
   }
@@ -445,10 +411,14 @@ class TimeIndicatorConversionTest extends TableTestBase {
     val util = streamTestUtil()
 
     val proctimeOrders = util.addTable[(Long, String)](
-      "ProctimeOrders", 'o_amount, 'o_currency, 'o_proctime.proctime, 'o_rowtime.rowtime)
+      "ProctimeOrders",
+      'o_amount,
+      'o_currency,
+      'o_proctime.proctime,
+      'o_rowtime.rowtime)
 
-    val proctimeRatesHistory = util.addTable[(String, Int)](
-      "ProctimeRatesHistory", 'currency, 'rate, 'proctime.proctime)
+    val proctimeRatesHistory =
+      util.addTable[(String, Int)]("ProctimeRatesHistory", 'currency, 'rate, 'proctime.proctime)
 
     val proctimeRates = proctimeRatesHistory.createTemporalTableFunction('proctime, 'currency)
 
@@ -470,10 +440,7 @@ class TimeIndicatorConversionTest extends TableTestBase {
               "select",
               "*(o_amount, rate) AS converted_amount",
               "currency",
-              "CAST(o_rowtime) AS o_rowtime")
-          )
-        )
-      )
+              "CAST(o_rowtime) AS o_rowtime"))))
 
     util.verifyTable(result, expected)
   }
@@ -481,11 +448,7 @@ class TimeIndicatorConversionTest extends TableTestBase {
   @Test
   def testMatchRecognizeRowtimeMaterialization(): Unit = {
     val util = streamTestUtil()
-    val t = util.addTable[(Long, Long, Int)](
-      "RowtimeTicker",
-      'rowtime.rowtime,
-      'symbol,
-      'price)
+    val t = util.addTable[(Long, Long, Int)]("RowtimeTicker", 'rowtime.rowtime, 'symbol, 'price)
     util.addFunction("func", new ScalarFunc)
 
     val query =
@@ -512,16 +475,15 @@ class TimeIndicatorConversionTest extends TableTestBase {
       streamTableNode(t),
       term("partitionBy", "symbol"),
       term("orderBy", "rowtime ASC"),
-      term("measures",
+      term(
+        "measures",
         "FINAL(MATCH_ROWTIME()) AS matchRowtime",
         "FINAL(func(CAST(MATCH_ROWTIME()))) AS funcRowtime",
-        "FINAL(CAST(A.rowtime)) AS noLongerRowtime"
-      ),
+        "FINAL(CAST(A.rowtime)) AS noLongerRowtime"),
       term("rowsPerMatch", "ONE ROW PER MATCH"),
       term("after", "SKIP TO NEXT ROW"),
       term("pattern", "'A'"),
-      term("define", "{A=>(PREV(A.$2, 0), 0)}")
-    )
+      term("define", "{A=>(PREV(A.$2, 0), 0)}"))
 
     util.verifySql(query, expected)
   }
@@ -563,23 +525,21 @@ class TimeIndicatorConversionTest extends TableTestBase {
         streamTableNode(t),
         term("partitionBy", "symbol"),
         term("orderBy", "rowtime ASC"),
-        term("measures",
+        term(
+          "measures",
           "FINAL(MATCH_PROCTIME()) AS matchProctime",
           "FINAL(func(PROCTIME(MATCH_PROCTIME()))) AS funcProctime",
-          "FINAL(PROCTIME(A.proctime)) AS noLongerProctime"
-        ),
+          "FINAL(PROCTIME(A.proctime)) AS noLongerProctime"),
         term("rowsPerMatch", "ONE ROW PER MATCH"),
         term("after", "SKIP TO NEXT ROW"),
         term("pattern", "'A'"),
-        term("define", "{A=>(PREV(A.$2, 0), 0)}")
-      ),
-      term("select",
+        term("define", "{A=>(PREV(A.$2, 0), 0)}")),
+      term(
+        "select",
         "symbol",
         "PROCTIME(matchProctime) AS matchProctime",
         "funcProctime",
-        "noLongerProctime"
-      )
-    )
+        "noLongerProctime"))
 
     util.verifySql(query, expected)
   }

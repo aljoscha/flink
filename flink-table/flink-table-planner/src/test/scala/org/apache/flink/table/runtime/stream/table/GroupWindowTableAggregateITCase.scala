@@ -34,9 +34,9 @@ import org.junit.{Before, Rule, Test}
 import java.math.BigDecimal
 
 /**
-  * We only test some aggregations until better testing of constructed DataStream
-  * programs is possible.
-  */
+ * We only test some aggregations until better testing of constructed DataStream
+ * programs is possible.
+ */
 class GroupWindowTableAggregateITCase extends AbstractTestBase {
 
   @Rule
@@ -85,9 +85,29 @@ class GroupWindowTableAggregateITCase extends AbstractTestBase {
     results.addSink(new StreamITCase.StringSink[Row])
     env.execute()
 
-    val expected = Seq("2,2,2", "2,3,3", "3,4,4", "3,5,5", "4,7,7", "4,8,8", "4,8,8", "4,9,9",
-      "4,10,10", "5,11,11", "5,12,12", "5,12,12", "5,13,13", "5,14,14", "6,16,16", "6,17,17",
-      "6,17,17", "6,18,18", "6,19,19", "6,19,19", "6,20,20", "6,21,21")
+    val expected = Seq(
+      "2,2,2",
+      "2,3,3",
+      "3,4,4",
+      "3,5,5",
+      "4,7,7",
+      "4,8,8",
+      "4,8,8",
+      "4,9,9",
+      "4,10,10",
+      "5,11,11",
+      "5,12,12",
+      "5,12,12",
+      "5,13,13",
+      "5,14,14",
+      "6,16,16",
+      "6,17,17",
+      "6,17,17",
+      "6,18,18",
+      "6,19,19",
+      "6,19,19",
+      "6,20,20",
+      "6,21,21")
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
   }
 
@@ -111,8 +131,7 @@ class GroupWindowTableAggregateITCase extends AbstractTestBase {
 
     val stream = env
       .fromCollection(sessionWindowTestdata)
-      .assignTimestampsAndWatermarks(
-   new TimestampAndWatermarkWithOffset[(Long, Int, String)](10L))
+      .assignTimestampsAndWatermarks(new TimestampAndWatermarkWithOffset[(Long, Int, String)](10L))
     val table = stream.toTable(tEnv, 'long, 'int, 'string, 'rowtime.rowtime)
 
     val top3 = new Top3
@@ -161,7 +180,8 @@ class GroupWindowTableAggregateITCase extends AbstractTestBase {
     val settings = EnvironmentSettings.newInstance().useOldPlanner().build()
     val tEnv = StreamTableEnvironment.create(env, settings)
 
-    val stream = StreamTestData.get3TupleDataStream(env)
+    val stream = StreamTestData
+      .get3TupleDataStream(env)
       .assignTimestampsAndWatermarks(new TimestampAndWatermarkWithOffset[(Int, Long, String)](0L))
     val table = stream.toTable(tEnv, 'int, 'long, 'string, 'rowtime.rowtime)
 

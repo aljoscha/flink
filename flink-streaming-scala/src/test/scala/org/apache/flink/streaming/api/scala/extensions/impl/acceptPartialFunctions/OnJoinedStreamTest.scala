@@ -33,35 +33,45 @@ class OnJoinedStreamTest extends AcceptPFTestBase {
   @Test
   def testProjectingOnTuple(): Unit = {
     val test =
-      tuples.join(tuples).
-        where {
-          case (id, _) => id
-        }.equalTo {
-          case (id, _) => id
-        }.window {
-          TumblingProcessingTimeWindows.of(Time.of(1, TimeUnit.SECONDS))
-        }.projecting {
-          case ((_, v1), (_, v2)) => s"$v1 $v2"
+      tuples
+        .join(tuples)
+        .where { case (id, _) =>
+          id
         }
-    assert(test.javaStream.isInstanceOf[SingleOutputStreamOperator[_]],
+        .equalTo { case (id, _) =>
+          id
+        }
+        .window {
+          TumblingProcessingTimeWindows.of(Time.of(1, TimeUnit.SECONDS))
+        }
+        .projecting { case ((_, v1), (_, v2)) =>
+          s"$v1 $v2"
+        }
+    assert(
+      test.javaStream.isInstanceOf[SingleOutputStreamOperator[_]],
       "projecting should produce a SingleOutputStreamOperator")
   }
 
   @Test
   def testProjectingOnCaseClass(): Unit = {
     val test =
-      caseObjects.join(caseObjects).
-      where {
-        case KeyValuePair(id, _) => id
-      }.equalTo {
-        case KeyValuePair(id, _) => id
-      }.window {
-        TumblingProcessingTimeWindows.of(Time.of(1, TimeUnit.SECONDS))
-      }.projecting {
-        case (KeyValuePair(_, v1), KeyValuePair(_, v2)) => s"$v1 $v2"
-      }
-   assert(test.javaStream.isInstanceOf[SingleOutputStreamOperator[_]],
-     "projecting should produce a SingleOutputStreamOperator")
+      caseObjects
+        .join(caseObjects)
+        .where { case KeyValuePair(id, _) =>
+          id
+        }
+        .equalTo { case KeyValuePair(id, _) =>
+          id
+        }
+        .window {
+          TumblingProcessingTimeWindows.of(Time.of(1, TimeUnit.SECONDS))
+        }
+        .projecting { case (KeyValuePair(_, v1), KeyValuePair(_, v2)) =>
+          s"$v1 $v2"
+        }
+    assert(
+      test.javaStream.isInstanceOf[SingleOutputStreamOperator[_]],
+      "projecting should produce a SingleOutputStreamOperator")
   }
 
 }

@@ -28,8 +28,8 @@ import org.apache.flink.table.planner.utils.TableTestBase
 import org.junit.Test
 
 /**
-  * Test for [[org.apache.flink.table.planner.codegen.ExpressionReducer]].
-  */
+ * Test for [[org.apache.flink.table.planner.codegen.ExpressionReducer]].
+ */
 class ExpressionReductionRulesTest extends TableTestBase {
 
   private val util = batchTestUtil()

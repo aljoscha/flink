@@ -20,7 +20,10 @@ package org.apache.flink.table.planner.plan.nodes.common
 
 import org.apache.flink.table.planner.plan.nodes.ExpressionFormat.ExpressionFormat
 import org.apache.flink.table.planner.plan.nodes.{ExpressionFormat, FlinkRelNode}
-import org.apache.flink.table.planner.plan.utils.RelExplainUtil.{conditionToString, preferExpressionFormat}
+import org.apache.flink.table.planner.plan.utils.RelExplainUtil.{
+  conditionToString,
+  preferExpressionFormat
+}
 
 import org.apache.calcite.plan.{RelOptCluster, RelOptCost, RelOptPlanner, RelTraitSet}
 import org.apache.calcite.rel.core.Calc
@@ -34,15 +37,15 @@ import java.util.Collections
 import scala.collection.JavaConversions._
 
 /**
-  * Base class for flink [[Calc]].
-  */
+ * Base class for flink [[Calc]].
+ */
 abstract class CommonCalc(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
     input: RelNode,
     calcProgram: RexProgram)
-  extends Calc(cluster, traitSet, Collections.emptyList[RelHint](), input, calcProgram)
-  with FlinkRelNode {
+    extends Calc(cluster, traitSet, Collections.emptyList[RelHint](), input, calcProgram)
+    with FlinkRelNode {
 
   override def computeSelfCost(planner: RelOptPlanner, mq: RelMetadataQuery): RelOptCost = {
     val calcProgram = getProgram
@@ -51,10 +54,10 @@ abstract class CommonCalc(
     // CASTs in RexProgram are reduced as far as possible by ReduceExpressionsRule
     // in normalization stage. So we should ignore CASTs here in optimization stage.
     val compCnt = calcProgram.getProjectList.map(calcProgram.expandLocalRef).toList.count {
-      case _: RexInputRef => false
-      case _: RexLiteral => false
+      case _: RexInputRef                                     => false
+      case _: RexLiteral                                      => false
       case c: RexCall if c.getOperator.getName.equals("CAST") => false
-      case _ => true
+      case _                                                  => true
     }
     val newRowCnt = mq.getRowCount(this)
     // TODO use inputRowCnt to compute cpu cost
@@ -64,7 +67,8 @@ abstract class CommonCalc(
   override def explainTerms(pw: RelWriter): RelWriter = {
     pw.input("input", getInput)
       .item("select", projectionToString(preferExpressionFormat(pw)))
-      .itemIf("where",
+      .itemIf(
+        "where",
         conditionToString(calcProgram, getExpressionString, preferExpressionFormat(pw)),
         calcProgram.getCondition != null)
   }
@@ -78,13 +82,15 @@ abstract class CommonCalc(
 
     projectList
       .map(getExpressionString(_, inputFieldNames, Some(localExprs), expressionFormat))
-      .zip(outputFieldNames).map { case (e, o) =>
-      if (e != o) {
-        e + " AS " + o
-      } else {
-        e
+      .zip(outputFieldNames)
+      .map { case (e, o) =>
+        if (e != o) {
+          e + " AS " + o
+        } else {
+          e
+        }
       }
-    }.mkString(", ")
+      .mkString(", ")
   }
 
 }

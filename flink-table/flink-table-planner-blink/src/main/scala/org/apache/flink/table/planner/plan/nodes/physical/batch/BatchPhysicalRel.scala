@@ -21,9 +21,6 @@ package org.apache.flink.table.planner.plan.nodes.physical.batch
 import org.apache.flink.table.planner.plan.nodes.physical.FlinkPhysicalRel
 
 /**
-  * Base class for batch physical relational expression.
-  */
-trait BatchPhysicalRel extends FlinkPhysicalRel {
-
-}
-
+ * Base class for batch physical relational expression.
+ */
+trait BatchPhysicalRel extends FlinkPhysicalRel {}

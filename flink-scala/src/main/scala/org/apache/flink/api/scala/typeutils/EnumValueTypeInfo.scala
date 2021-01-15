@@ -29,7 +29,8 @@ import scala.collection.JavaConverters._
  */
 @Public
 class EnumValueTypeInfo[E <: Enumeration](val enum: E, val clazz: Class[E#Value])
-  extends TypeInformation[E#Value] with AtomicType[E#Value] {
+    extends TypeInformation[E#Value]
+    with AtomicType[E#Value] {
 
   type T = E#Value
 
@@ -47,7 +48,6 @@ class EnumValueTypeInfo[E <: Enumeration](val enum: E, val clazz: Class[E#Value]
   override def getTypeClass = clazz
   @PublicEvolving
   override def getGenericParameters = Map.empty[String, TypeInformation[_]].asJava
-
 
   @PublicEvolving
   def createSerializer(executionConfig: ExecutionConfig): TypeSerializer[T] = {

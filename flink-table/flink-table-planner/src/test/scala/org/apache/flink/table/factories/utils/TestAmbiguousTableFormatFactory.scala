@@ -25,11 +25,11 @@ import org.apache.flink.table.factories.{TableFormatFactory, TableFormatFactoryS
 import org.apache.flink.types.Row
 
 /**
-  * Table format factory for testing.
-  *
-  * It does not support UNIQUE_PROPERTY compared to [[TestTableFormatFactory]] nor
-  * schema derivation. Both formats have the same context and support COMMON_PATH.
-  */
+ * Table format factory for testing.
+ *
+ * It does not support UNIQUE_PROPERTY compared to [[TestTableFormatFactory]] nor
+ * schema derivation. Both formats have the same context and support COMMON_PATH.
+ */
 class TestAmbiguousTableFormatFactory extends TableFormatFactory[Row] {
 
   override def requiredContext(): util.Map[String, String] = {

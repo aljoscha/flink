@@ -27,9 +27,6 @@ class ValuesITCase extends BatchTestBase {
 
   @Test
   def testValues(): Unit = {
-    checkResult(
-      "SELECT * FROM (VALUES (1, 2, 3)) T(a, b, c)",
-      Seq(row(1, 2, 3))
-    )
+    checkResult("SELECT * FROM (VALUES (1, 2, 3)) T(a, b, c)", Seq(row(1, 2, 3)))
   }
 }

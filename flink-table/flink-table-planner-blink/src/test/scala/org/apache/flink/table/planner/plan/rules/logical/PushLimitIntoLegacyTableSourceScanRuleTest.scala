@@ -18,8 +18,15 @@
 package org.apache.flink.table.planner.plan.rules.logical
 
 import org.apache.flink.table.api.SqlParserException
-import org.apache.flink.table.planner.plan.nodes.logical.{FlinkLogicalLegacyTableSourceScan, FlinkLogicalSort}
-import org.apache.flink.table.planner.plan.optimize.program.{FlinkBatchProgram, FlinkHepRuleSetProgramBuilder, HEP_RULES_EXECUTION_TYPE}
+import org.apache.flink.table.planner.plan.nodes.logical.{
+  FlinkLogicalLegacyTableSourceScan,
+  FlinkLogicalSort
+}
+import org.apache.flink.table.planner.plan.optimize.program.{
+  FlinkBatchProgram,
+  FlinkHepRuleSetProgramBuilder,
+  HEP_RULES_EXECUTION_TYPE
+}
 import org.apache.flink.table.planner.utils.{TableConfigUtils, TableTestBase}
 
 import org.apache.calcite.plan.hep.HepMatchOrder
@@ -42,13 +49,13 @@ class PushLimitIntoLegacyTableSourceScanRuleTest extends TableTestBase {
       FlinkHepRuleSetProgramBuilder.newBuilder
         .setHepRulesExecutionType(HEP_RULES_EXECUTION_TYPE.RULE_COLLECTION)
         .setHepMatchOrder(HepMatchOrder.BOTTOM_UP)
-        .add(RuleSets.ofList(PushLimitIntoLegacyTableSourceScanRule.INSTANCE,
+        .add(RuleSets.ofList(
+          PushLimitIntoLegacyTableSourceScanRule.INSTANCE,
           CoreRules.SORT_PROJECT_TRANSPOSE,
           // converts calcite rel(RelNode) to flink rel(FlinkRelNode)
           FlinkLogicalSort.BATCH_CONVERTER,
           FlinkLogicalLegacyTableSourceScan.CONVERTER))
-        .build()
-    )
+        .build())
 
     val ddl =
       s"""

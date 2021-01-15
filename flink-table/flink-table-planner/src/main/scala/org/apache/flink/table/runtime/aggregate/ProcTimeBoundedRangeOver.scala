@@ -35,14 +35,14 @@ import org.apache.flink.table.runtime.types.{CRow, CRowTypeInfo}
 import org.apache.flink.table.util.Logging
 
 /**
-  * Process Function used for the aggregate in bounded proc-time OVER window
-  * [[org.apache.flink.streaming.api.datastream.DataStream]]
-  *
-  * @param genAggregations          Generated aggregate helper function
-  * @param precedingTimeBoundary    Is used to indicate the processing time boundaries
-  * @param aggregatesTypeInfo       row type info of aggregation
-  * @param inputType                row type info of input row
-  */
+ * Process Function used for the aggregate in bounded proc-time OVER window
+ * [[org.apache.flink.streaming.api.datastream.DataStream]]
+ *
+ * @param genAggregations          Generated aggregate helper function
+ * @param precedingTimeBoundary    Is used to indicate the processing time boundaries
+ * @param aggregatesTypeInfo       row type info of aggregation
+ * @param inputType                row type info of input row
+ */
 class ProcTimeBoundedRangeOver[K](
     genAggregations: GeneratedAggregationsFunction,
     precedingTimeBoundary: Long,
@@ -50,7 +50,7 @@ class ProcTimeBoundedRangeOver[K](
     inputType: TypeInformation[CRow],
     minRetentionTime: Long,
     maxRetentionTime: Long)
-  extends ProcessFunctionWithCleanupState[K, CRow, CRow](minRetentionTime, maxRetentionTime)
+    extends ProcessFunctionWithCleanupState[K, CRow, CRow](minRetentionTime, maxRetentionTime)
     with Compiler[GeneratedAggregations]
     with Logging {
 
@@ -61,12 +61,11 @@ class ProcTimeBoundedRangeOver[K](
   private var function: GeneratedAggregations = _
 
   override def open(config: Configuration) {
-    LOG.debug(s"Compiling AggregateHelper: ${genAggregations.name} \n\n" +
-                s"Code:\n${genAggregations.code}")
-    val clazz = compile(
-      getRuntimeContext.getUserCodeClassLoader,
-      genAggregations.name,
-      genAggregations.code)
+    LOG.debug(
+      s"Compiling AggregateHelper: ${genAggregations.name} \n\n" +
+        s"Code:\n${genAggregations.code}")
+    val clazz =
+      compile(getRuntimeContext.getUserCodeClassLoader, genAggregations.name, genAggregations.code)
     LOG.debug("Instantiating AggregateHelper.")
     function = clazz.newInstance()
     function.open(getRuntimeContext)
@@ -78,8 +77,10 @@ class ProcTimeBoundedRangeOver[K](
       new ListTypeInfo[Row](inputType.asInstanceOf[CRowTypeInfo].rowType)
         .asInstanceOf[TypeInformation[JList[Row]]]
     val mapStateDescriptor: MapStateDescriptor[Long, JList[Row]] =
-      new MapStateDescriptor[Long, JList[Row]]("rowmapstate",
-        BasicTypeInfo.LONG_TYPE_INFO.asInstanceOf[TypeInformation[Long]], rowListTypeInfo)
+      new MapStateDescriptor[Long, JList[Row]](
+        "rowmapstate",
+        BasicTypeInfo.LONG_TYPE_INFO.asInstanceOf[TypeInformation[Long]],
+        rowListTypeInfo)
     rowMapState = getRuntimeContext.getMapState(mapStateDescriptor)
 
     val stateDescriptor: ValueStateDescriptor[Row] =
@@ -90,9 +91,9 @@ class ProcTimeBoundedRangeOver[K](
   }
 
   override def processElement(
-    input: CRow,
-    ctx: KeyedProcessFunction[K, CRow, CRow]#Context,
-    out: Collector[CRow]): Unit = {
+      input: CRow,
+      ctx: KeyedProcessFunction[K, CRow, CRow]#Context,
+      out: Collector[CRow]): Unit = {
 
     val currentTime = ctx.timerService.currentProcessingTime
     // register state-cleanup timer
@@ -114,9 +115,9 @@ class ProcTimeBoundedRangeOver[K](
   }
 
   override def onTimer(
-    timestamp: Long,
-    ctx: KeyedProcessFunction[K, CRow, CRow]#OnTimerContext,
-    out: Collector[CRow]): Unit = {
+      timestamp: Long,
+      ctx: KeyedProcessFunction[K, CRow, CRow]#OnTimerContext,
+      out: Collector[CRow]): Unit = {
 
     if (stateCleaningEnabled) {
       val cleanupTime = cleanupTimeState.value()

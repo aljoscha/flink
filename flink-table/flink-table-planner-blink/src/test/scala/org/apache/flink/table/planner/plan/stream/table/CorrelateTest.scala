@@ -72,8 +72,8 @@ class CorrelateTest extends TableTestBase {
     util.addFunction("func2", function)
     val scalarFunc = new Func13("pre")
 
-    val result = table.joinLateral(
-      function(scalarFunc('c)) as ('name, 'len)).select('c, 'name, 'len)
+    val result =
+      table.joinLateral(function(scalarFunc('c)) as ('name, 'len)).select('c, 'name, 'len)
 
     util.verifyExecPlan(result)
   }
@@ -132,8 +132,9 @@ class CorrelateTest extends TableTestBase {
     val function = new TableFunc0
     util.addFunction("func1", function)
 
-    val result = sourceTable.select('a, 'b, 'c)
-      .joinLateral(function('c) as('d, 'e))
+    val result = sourceTable
+      .select('a, 'b, 'c)
+      .joinLateral(function('c) as ('d, 'e))
       .select('c, 'd, 'e)
       .where('e > 10)
       .where('e > 20)
@@ -146,20 +147,20 @@ class CorrelateTest extends TableTestBase {
   def testCorrelateWithMultiFilterAndWithoutCalcMergeRules(): Unit = {
     val util = streamTestUtil()
     val programs = util.getStreamProgram()
-    programs.getFlinkRuleSetProgram(FlinkStreamProgram.LOGICAL)
-      .get.remove(
-      RuleSets.ofList(
-        CoreRules.CALC_MERGE,
-        CoreRules.FILTER_CALC_MERGE,
-        CoreRules.PROJECT_CALC_MERGE))
+    programs
+      .getFlinkRuleSetProgram(FlinkStreamProgram.LOGICAL)
+      .get
+      .remove(RuleSets
+        .ofList(CoreRules.CALC_MERGE, CoreRules.FILTER_CALC_MERGE, CoreRules.PROJECT_CALC_MERGE))
     // removing
     util.replaceStreamProgram(programs)
 
     val sourceTable = util.addTableSource[(Int, Long, String)]("MyTable", 'a, 'b, 'c)
     val function = new TableFunc0
     util.addFunction("func1", function)
-    val result = sourceTable.select('a, 'b, 'c)
-      .joinLateral(function('c) as('d, 'e))
+    val result = sourceTable
+      .select('a, 'b, 'c)
+      .joinLateral(function('c) as ('d, 'e))
       .select('c, 'd, 'e)
       .where('e > 10)
       .where('e > 20)
@@ -184,7 +185,7 @@ class CorrelateTest extends TableTestBase {
     val util = streamTestUtil()
     val sourceTable = util.addTableSource[(Int, Int, String)]("MyTable", 'a, 'b, 'c)
     val func = new MockPythonTableFunction
-    val result = sourceTable.joinLateral(func('a, 'b) as('x, 'y))
+    val result = sourceTable.joinLateral(func('a, 'b) as ('x, 'y))
 
     util.verifyExecPlan(result)
   }

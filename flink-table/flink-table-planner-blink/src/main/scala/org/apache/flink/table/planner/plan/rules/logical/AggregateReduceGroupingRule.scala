@@ -32,14 +32,15 @@ import scala.collection.JavaConversions._
 import scala.collection.mutable
 
 /**
-  * Planner rule that reduces unless grouping columns.
-  *
-  * Find (minimum) unique group for the grouping columns, and use it as new grouping columns.
-  */
-class AggregateReduceGroupingRule(relBuilderFactory: RelBuilderFactory) extends RelOptRule(
-  operand(classOf[Aggregate], any),
-  relBuilderFactory,
-  "AggregateReduceGroupingRule") {
+ * Planner rule that reduces unless grouping columns.
+ *
+ * Find (minimum) unique group for the grouping columns, and use it as new grouping columns.
+ */
+class AggregateReduceGroupingRule(relBuilderFactory: RelBuilderFactory)
+    extends RelOptRule(
+      operand(classOf[Aggregate], any),
+      relBuilderFactory,
+      "AggregateReduceGroupingRule") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val agg: Aggregate = call.rel(0)
@@ -64,24 +65,23 @@ class AggregateReduceGroupingRule(relBuilderFactory: RelBuilderFactory) extends 
     val newGroupingList = newGrouping.toList
     var idxOfNewGrouping = 0
     var idxOfAggCallsForDroppedGrouping = newGroupingList.size()
-    originalGrouping.zipWithIndex.foreach {
-      case (column, oldIdx) =>
-        val newIdx = if (newGroupingList.contains(column)) {
-          val p = idxOfNewGrouping
-          idxOfNewGrouping += 1
-          p
-        } else {
-          val p = idxOfAggCallsForDroppedGrouping
-          idxOfAggCallsForDroppedGrouping += 1
-          p
-        }
-        indexOldToNewMap += (oldIdx -> newIdx)
+    originalGrouping.zipWithIndex.foreach { case (column, oldIdx) =>
+      val newIdx = if (newGroupingList.contains(column)) {
+        val p = idxOfNewGrouping
+        idxOfNewGrouping += 1
+        p
+      } else {
+        val p = idxOfAggCallsForDroppedGrouping
+        idxOfAggCallsForDroppedGrouping += 1
+        p
+      }
+      indexOldToNewMap += (oldIdx -> newIdx)
     }
     require(indexOldToNewMap.size == originalGrouping.cardinality())
 
     // the indices of aggCalls (or NamedProperties for WindowAggregate) do not change
-    (originalGrouping.cardinality() until aggRowType.getFieldCount).foreach {
-      index => indexOldToNewMap += (index -> index)
+    (originalGrouping.cardinality() until aggRowType.getFieldCount).foreach { index =>
+      indexOldToNewMap += (index -> index)
     }
 
     val aggCallsForDroppedGrouping = uselessGrouping.map { column =>
@@ -104,15 +104,14 @@ class AggregateReduceGroupingRule(relBuilderFactory: RelBuilderFactory) extends 
       agg.indicator, // always false here
       newGrouping,
       ImmutableList.of(newGrouping),
-      newAggCalls
-    )
+      newAggCalls)
     val builder = call.builder()
     builder.push(newAgg)
-    val projects = (0 until aggRowType.getFieldCount).map {
-      index =>
-        val refIndex = indexOldToNewMap.getOrElse(index,
-          throw new IllegalArgumentException(s"Illegal index: $index"))
-        builder.field(refIndex)
+    val projects = (0 until aggRowType.getFieldCount).map { index =>
+      val refIndex = indexOldToNewMap.getOrElse(
+        index,
+        throw new IllegalArgumentException(s"Illegal index: $index"))
+      builder.field(refIndex)
     }
     builder.project(projects, aggRowType.getFieldNames)
     call.transformTo(builder.build())

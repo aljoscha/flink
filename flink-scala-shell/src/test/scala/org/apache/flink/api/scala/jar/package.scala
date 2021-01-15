@@ -20,6 +20,4 @@ package org.apache.flink.api.scala
 /**
  * Custom objects for use in testing loading of external jars in [[ScalaShellITCase]].
  */
-package object jar {
-
-}
+package object jar {}

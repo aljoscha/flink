@@ -26,12 +26,17 @@ import org.apache.flink.table.api.TableException
 import org.apache.flink.table.calcite.FlinkTypeFactory
 import org.apache.flink.table.catalog.BasicOperatorTable
 import org.apache.flink.table.expressions._
-import org.apache.flink.table.plan.logical.{LogicalWindow, SessionGroupWindow, SlidingGroupWindow, TumblingGroupWindow}
+import org.apache.flink.table.plan.logical.{
+  LogicalWindow,
+  SessionGroupWindow,
+  SlidingGroupWindow,
+  TumblingGroupWindow
+}
 import org.apache.flink.table.plan.rules.common.LogicalWindowAggregateRule
 import org.apache.flink.table.typeutils.TimeIntervalTypeInfo
 
 class DataSetLogicalWindowAggregateRule
-  extends LogicalWindowAggregateRule("DataSetLogicalWindowAggregateRule") {
+    extends LogicalWindowAggregateRule("DataSetLogicalWindowAggregateRule") {
 
   /** Returns the operand of the group window function. */
   override private[table] def getInAggregateGroupExpression(
@@ -54,7 +59,7 @@ class DataSetLogicalWindowAggregateRule
     def getOperandAsLong(call: RexCall, idx: Int): Long =
       call.getOperands.get(idx) match {
         case v: RexLiteral => v.getValue.asInstanceOf[BigDecimal].longValue()
-        case _ => throw new TableException("Only constant window descriptors are supported")
+        case _             => throw new TableException("Only constant window descriptors are supported")
       }
 
     def getFieldReference(operand: RexNode): PlannerExpression = {
@@ -74,8 +79,7 @@ class DataSetLogicalWindowAggregateRule
         TumblingGroupWindow(
           WindowReference("w$", Some(timeField.resultType)),
           timeField,
-          Literal(interval, TimeIntervalTypeInfo.INTERVAL_MILLIS)
-        )
+          Literal(interval, TimeIntervalTypeInfo.INTERVAL_MILLIS))
 
       case BasicOperatorTable.HOP =>
         val (slide, size) = (getOperandAsLong(windowExpr, 1), getOperandAsLong(windowExpr, 2))
@@ -83,16 +87,14 @@ class DataSetLogicalWindowAggregateRule
           WindowReference("w$", Some(timeField.resultType)),
           timeField,
           Literal(size, TimeIntervalTypeInfo.INTERVAL_MILLIS),
-          Literal(slide, TimeIntervalTypeInfo.INTERVAL_MILLIS)
-        )
+          Literal(slide, TimeIntervalTypeInfo.INTERVAL_MILLIS))
 
       case BasicOperatorTable.SESSION =>
         val gap = getOperandAsLong(windowExpr, 1)
         SessionGroupWindow(
           WindowReference("w$", Some(timeField.resultType)),
           timeField,
-          Literal(gap, TimeIntervalTypeInfo.INTERVAL_MILLIS)
-        )
+          Literal(gap, TimeIntervalTypeInfo.INTERVAL_MILLIS))
     }
   }
 }

@@ -36,9 +36,8 @@ import scala.collection.mutable
 import scala.util.Random
 
 @RunWith(classOf[Parameterized])
-class SetOperatorsITCase(
-    configMode: TableConfigMode)
-  extends TableProgramsCollectionTestBase(configMode) {
+class SetOperatorsITCase(configMode: TableConfigMode)
+    extends TableProgramsCollectionTestBase(configMode) {
 
   @Test
   def testUnionAll(): Unit = {
@@ -305,8 +304,22 @@ class SetOperatorsITCase(
 
     val result = tEnv.sqlQuery("SELECT d IN (SELECT a FROM Table3) FROM Table5")
 
-    val expected = Seq("false", "false", "false", "false", "false", "false", "false",
-      "false", "false", "true", "true", "true", "true", "true", "true").mkString("\n")
+    val expected = Seq(
+      "false",
+      "false",
+      "false",
+      "false",
+      "false",
+      "false",
+      "false",
+      "false",
+      "false",
+      "true",
+      "true",
+      "true",
+      "true",
+      "true",
+      "true").mkString("\n")
     val results = result.toDataSet[Row].collect()
     TestBaseUtils.compareResultAsText(results.asJava, expected)
   }

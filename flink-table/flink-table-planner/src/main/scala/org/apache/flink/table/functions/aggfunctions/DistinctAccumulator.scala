@@ -26,10 +26,10 @@ import org.apache.flink.table.api.dataview.MapView
 import org.apache.flink.types.Row
 
 /**
-  * Wraps an accumulator and adds a map to filter distinct values.
-  *
-  * @param distinctValueMap the [[MapView]] that stores the distinct filter hash map.
-  */
+ * Wraps an accumulator and adds a map to filter distinct values.
+ *
+ * @param distinctValueMap the [[MapView]] that stores the distinct filter hash map.
+ */
 class DistinctAccumulator(var distinctValueMap: MapView[Row, JLong]) {
 
   def this() {
@@ -40,18 +40,19 @@ class DistinctAccumulator(var distinctValueMap: MapView[Row, JLong]) {
 
   override def equals(that: Any): Boolean =
     that match {
-      case that: DistinctAccumulator => that.canEqual(this) &&
-        this.distinctValueMap == that.distinctValueMap
+      case that: DistinctAccumulator =>
+        that.canEqual(this) &&
+          this.distinctValueMap == that.distinctValueMap
       case _ => false
     }
 
   /**
-    * Checks if the parameters are unique and adds the parameters to the distinct map.
-    * Returns true if the parameters are unique (haven't been in the map yet), false otherwise.
-    *
-    * @param params the parameters to check.
-    * @return true if the parameters are unique (haven't been in the map yet), false otherwise.
-    */
+   * Checks if the parameters are unique and adds the parameters to the distinct map.
+   * Returns true if the parameters are unique (haven't been in the map yet), false otherwise.
+   *
+   * @param params the parameters to check.
+   * @return true if the parameters are unique (haven't been in the map yet), false otherwise.
+   */
   def add(params: Row): Boolean = {
     val currentCnt = distinctValueMap.get(params)
     if (currentCnt != null) {
@@ -64,12 +65,12 @@ class DistinctAccumulator(var distinctValueMap: MapView[Row, JLong]) {
   }
 
   /**
-    * Checks if the parameters are unique and adds the parameters to the distinct map.
-    * Returns true if the parameters are unique (haven't been in the map yet), false otherwise.
-    *
-    * @param params the parameters to check.
-    * @return true if the parameters are unique (haven't been in the map yet), false otherwise.
-    */
+   * Checks if the parameters are unique and adds the parameters to the distinct map.
+   * Returns true if the parameters are unique (haven't been in the map yet), false otherwise.
+   *
+   * @param params the parameters to check.
+   * @return true if the parameters are unique (haven't been in the map yet), false otherwise.
+   */
   def add(params: Row, count: JLong): Boolean = {
     val currentCnt = distinctValueMap.get(params)
     if (currentCnt != null) {
@@ -82,13 +83,13 @@ class DistinctAccumulator(var distinctValueMap: MapView[Row, JLong]) {
   }
 
   /**
-    * Removes one instance of the parameters from the distinct map and checks if this was the last
-    * instance.
-    * Returns true if no instances of the parameters remain in the map, false otherwise.
-    *
-    * @param params the parameters to check.
-    * @return true if no instances of the parameters remain in the map, false otherwise.
-    */
+   * Removes one instance of the parameters from the distinct map and checks if this was the last
+   * instance.
+   * Returns true if no instances of the parameters remain in the map, false otherwise.
+   *
+   * @param params the parameters to check.
+   * @return true if no instances of the parameters remain in the map, false otherwise.
+   */
   def remove(params: Row): Boolean = {
     val currentCnt = distinctValueMap.get(params)
     if (currentCnt == 1) {

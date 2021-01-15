@@ -25,8 +25,8 @@ import org.apache.flink.api.common.typeutils.{SerializerTestBase, TypeSerializer
 import org.apache.flink.table.api.dataview.ListView
 
 /**
-  * A test for the [[ListViewSerializer]].
-  */
+ * A test for the [[ListViewSerializer]].
+ */
 class ListViewSerializerTest extends SerializerTestBase[ListView[Long]] {
 
   override protected def createSerializer(): TypeSerializer[ListView[Long]] = {

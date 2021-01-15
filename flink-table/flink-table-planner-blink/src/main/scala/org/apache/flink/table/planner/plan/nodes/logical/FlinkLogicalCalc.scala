@@ -33,16 +33,16 @@ import java.util
 import java.util.function.Supplier
 
 /**
-  * Sub-class of [[Calc]] that is a relational expression which computes project expressions
-  * and also filters in Flink.
-  */
+ * Sub-class of [[Calc]] that is a relational expression which computes project expressions
+ * and also filters in Flink.
+ */
 class FlinkLogicalCalc(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
     input: RelNode,
     calcProgram: RexProgram)
-  extends CommonCalc(cluster, traitSet, input, calcProgram)
-  with FlinkLogicalRel {
+    extends CommonCalc(cluster, traitSet, input, calcProgram)
+    with FlinkLogicalRel {
 
   override def copy(traitSet: RelTraitSet, child: RelNode, program: RexProgram): Calc = {
     new FlinkLogicalCalc(cluster, traitSet, child, program)
@@ -51,11 +51,11 @@ class FlinkLogicalCalc(
 }
 
 private class FlinkLogicalCalcConverter
-  extends ConverterRule(
-    classOf[LogicalCalc],
-    Convention.NONE,
-    FlinkConventions.LOGICAL,
-    "FlinkLogicalCalcConverter") {
+    extends ConverterRule(
+      classOf[LogicalCalc],
+      Convention.NONE,
+      FlinkConventions.LOGICAL,
+      "FlinkLogicalCalcConverter") {
 
   override def convert(rel: RelNode): RelNode = {
     val calc = rel.asInstanceOf[LogicalCalc]
@@ -70,10 +70,14 @@ object FlinkLogicalCalc {
   def create(input: RelNode, calcProgram: RexProgram): FlinkLogicalCalc = {
     val cluster = input.getCluster
     val mq = cluster.getMetadataQuery
-    val traitSet = cluster.traitSetOf(FlinkConventions.LOGICAL).replaceIfs(
-      RelCollationTraitDef.INSTANCE, new Supplier[util.List[RelCollation]]() {
-        def get: util.List[RelCollation] = RelMdCollation.calc(mq, input, calcProgram)
-      }).simplify()
+    val traitSet = cluster
+      .traitSetOf(FlinkConventions.LOGICAL)
+      .replaceIfs(
+        RelCollationTraitDef.INSTANCE,
+        new Supplier[util.List[RelCollation]]() {
+          def get: util.List[RelCollation] = RelMdCollation.calc(mq, input, calcProgram)
+        })
+      .simplify()
     new FlinkLogicalCalc(cluster, traitSet, input, calcProgram)
   }
 }

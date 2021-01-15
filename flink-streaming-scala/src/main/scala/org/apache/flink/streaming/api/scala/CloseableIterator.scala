@@ -25,18 +25,16 @@ import org.apache.flink.util.{CloseableIterator => JCloseableIterator}
  * for this interface are iterators that are based on native-resources such as files, network, or
  * database connections. Clients must call close after using the iterator.
  */
-trait CloseableIterator[T] extends Iterator[T] with AutoCloseable {
-
-}
+trait CloseableIterator[T] extends Iterator[T] with AutoCloseable {}
 
 object CloseableIterator {
 
   def fromJava[T](iterator: JCloseableIterator[T]): CloseableIterator[T] =
     new CloseableIterator[T] {
-    override def hasNext: Boolean = iterator.hasNext
+      override def hasNext: Boolean = iterator.hasNext
 
-    override def next(): T = iterator.next
+      override def next(): T = iterator.next
 
-    override def close(): Unit = iterator.close()
-  }
+      override def close(): Unit = iterator.close()
+    }
 }

@@ -36,12 +36,11 @@ class CalcTest extends TableTestBase {
   def testSelectFromWindow(): Unit = {
     val util = streamTestUtil()
     val sourceTable =
-      util.addDataStream[(Int, Long, String, Double)](
-        "MyTable", 'a, 'b, 'c, 'd, 'rowtime.rowtime)
+      util.addDataStream[(Int, Long, String, Double)]("MyTable", 'a, 'b, 'c, 'd, 'rowtime.rowtime)
     val resultTable = sourceTable
-        .window(Tumble over 5.millis on 'rowtime as 'w)
-        .groupBy('w)
-        .select('c.upperCase().count, 'a.sum)
+      .window(Tumble over 5.millis on 'rowtime as 'w)
+      .groupBy('w)
+      .select('c.upperCase().count, 'a.sum)
 
     util.verifyExecPlan(resultTable)
   }
@@ -50,12 +49,11 @@ class CalcTest extends TableTestBase {
   def testSelectFromGroupedWindow(): Unit = {
     val util = streamTestUtil()
     val sourceTable =
-      util.addDataStream[(Int, Long, String, Double)](
-        "MyTable", 'a, 'b, 'c, 'd, 'rowtime.rowtime)
+      util.addDataStream[(Int, Long, String, Double)]("MyTable", 'a, 'b, 'c, 'd, 'rowtime.rowtime)
     val resultTable = sourceTable
-        .window(Tumble over 5.millis on 'rowtime as 'w)
-        .groupBy('w, 'b)
-        .select('c.upperCase().count, 'a.sum, 'b)
+      .window(Tumble over 5.millis on 'rowtime as 'w)
+      .groupBy('w, 'b)
+      .select('c.upperCase().count, 'a.sum, 'b)
 
     util.verifyExecPlan(resultTable)
   }
@@ -64,7 +62,8 @@ class CalcTest extends TableTestBase {
   def testMultiFilter(): Unit = {
     val util = streamTestUtil()
     val sourceTable = util.addTableSource[(Int, Long, String, Double)]("MyTable", 'a, 'b, 'c, 'd)
-    val resultTable = sourceTable.select('a, 'b)
+    val resultTable = sourceTable
+      .select('a, 'b)
       .filter('a > 0)
       .filter('b < 2)
       .filter(('a % 2) === 1)
@@ -76,7 +75,8 @@ class CalcTest extends TableTestBase {
   def testIn(): Unit = {
     val util = streamTestUtil()
     val sourceTable = util.addTableSource[(Int, Long, String)]("MyTable", 'a, 'b, 'c)
-    val resultTable = sourceTable.select('a, 'b, 'c)
+    val resultTable = sourceTable
+      .select('a, 'b, 'c)
       .where((1 to 30).map($"b" === _).reduce((ex1, ex2) => ex1 || ex2) && ($"c" === "xx"))
 
     util.verifyExecPlan(resultTable)
@@ -86,7 +86,8 @@ class CalcTest extends TableTestBase {
   def testNotIn(): Unit = {
     val util = streamTestUtil()
     val sourceTable = util.addTableSource[(Int, Long, String)]("MyTable", 'a, 'b, 'c)
-    val resultTable = sourceTable.select('a, 'b, 'c)
+    val resultTable = sourceTable
+      .select('a, 'b, 'c)
       .where((1 to 30).map($"b" !== _).reduce((ex1, ex2) => ex1 && ex2) || ($"c" !== "xx"))
 
     util.verifyExecPlan(resultTable)
@@ -156,5 +157,3 @@ class CalcTest extends TableTestBase {
     util.verifyExecPlan(resultTable)
   }
 }
-
-

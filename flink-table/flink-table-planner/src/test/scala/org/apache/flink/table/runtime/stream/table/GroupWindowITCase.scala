@@ -26,7 +26,12 @@ import org.apache.flink.table.api._
 import org.apache.flink.table.api.bridge.scala._
 import org.apache.flink.table.functions.aggfunctions.CountAggFunction
 import org.apache.flink.table.runtime.stream.table.GroupWindowITCase._
-import org.apache.flink.table.runtime.utils.JavaUserDefinedAggFunctions.{CountDistinct, CountDistinctWithMerge, WeightedAvg, WeightedAvgWithMerge}
+import org.apache.flink.table.runtime.utils.JavaUserDefinedAggFunctions.{
+  CountDistinct,
+  CountDistinctWithMerge,
+  WeightedAvg,
+  WeightedAvgWithMerge
+}
 import org.apache.flink.table.runtime.utils.StreamITCase
 import org.apache.flink.table.utils.{CountMinMax, LegacyRowResource}
 import org.apache.flink.test.util.AbstractTestBase
@@ -38,9 +43,9 @@ import org.junit.{Before, Rule, Test}
 import java.math.BigDecimal
 
 /**
-  * We only test some aggregations until better testing of constructed DataStream
-  * programs is possible.
-  */
+ * We only test some aggregations until better testing of constructed DataStream
+ * programs is possible.
+ */
 class GroupWindowITCase extends AbstractTestBase {
 
   @Rule
@@ -85,16 +90,24 @@ class GroupWindowITCase extends AbstractTestBase {
     val windowedTable = table
       .window(Slide over 2.rows every 1.rows on 'proctime as 'w)
       .groupBy('w, 'string)
-      .select('string, countFun('int), 'int.avg,
-        weightAvgFun('long, 'int), weightAvgFun('int, 'int),
+      .select(
+        'string,
+        countFun('int),
+        'int.avg,
+        weightAvgFun('long, 'int),
+        weightAvgFun('int, 'int),
         countDistinct('long))
 
     val results = windowedTable.toAppendStream[Row]
     results.addSink(new StreamITCase.StringSink[Row])
     env.execute()
 
-    val expected = Seq("Hello world,1,3,8,3,1", "Hello world,2,3,12,3,2", "Hello,1,2,2,2,1",
-      "Hello,2,2,3,2,2", "Hi,1,1,1,1,1")
+    val expected = Seq(
+      "Hello world,1,3,8,3,1",
+      "Hello world,2,3,12,3,2",
+      "Hello,1,2,2,2,1",
+      "Hello,2,2,3,2,2",
+      "Hi,1,1,1,1,1")
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
   }
 
@@ -128,8 +141,12 @@ class GroupWindowITCase extends AbstractTestBase {
     val windowedTable = table
       .window(Session withGap 5.milli on 'rowtime as 'w)
       .groupBy('w, 'string)
-      .select('string, countFun('int), 'int.avg,
-        weightAvgFun('long, 'int), weightAvgFun('int, 'int),
+      .select(
+        'string,
+        countFun('int),
+        'int.avg,
+        weightAvgFun('long, 'int),
+        weightAvgFun('int, 'int),
         countDistinct('long))
 
     val results = windowedTable.toAppendStream[Row]
@@ -156,10 +173,12 @@ class GroupWindowITCase extends AbstractTestBase {
     val windowedTable = table
       .window(Tumble over 2.rows on 'proctime as 'w)
       .groupBy('w)
-      .select(countFun('string), 'int.avg,
-        weightAvgFun('long, 'int), weightAvgFun('int, 'int),
-        countDistinct('long)
-      )
+      .select(
+        countFun('string),
+        'int.avg,
+        weightAvgFun('long, 'int),
+        weightAvgFun('int, 'int),
+        countDistinct('long))
 
     val results = windowedTable.toAppendStream[Row]
     results.addSink(new StreamITCase.StringSink[Row])
@@ -186,8 +205,17 @@ class GroupWindowITCase extends AbstractTestBase {
     val windowedTable = table
       .window(Tumble over 5.milli on 'rowtime as 'w)
       .groupBy('w, 'string)
-      .select('string, countFun('string), 'int.avg, weightAvgFun('long, 'int),
-        weightAvgFun('int, 'int), 'int.min, 'int.max, 'int.sum, 'w.start, 'w.end,
+      .select(
+        'string,
+        countFun('string),
+        'int.avg,
+        weightAvgFun('long, 'int),
+        weightAvgFun('int, 'int),
+        'int.min,
+        'int.max,
+        'int.sum,
+        'w.start,
+        'w.end,
         countDistinct('long))
 
     val results = windowedTable.toAppendStream[Row]
@@ -472,18 +500,14 @@ class GroupWindowITCase extends AbstractTestBase {
 
 object GroupWindowITCase {
 
-  class TimestampAndWatermarkWithOffset[T <: Product](
-    offset: Long) extends AssignerWithPunctuatedWatermarks[T] {
+  class TimestampAndWatermarkWithOffset[T <: Product](offset: Long)
+      extends AssignerWithPunctuatedWatermarks[T] {
 
-    override def checkAndGetNextWatermark(
-        lastElement: T,
-        extractedTimestamp: Long): Watermark = {
+    override def checkAndGetNextWatermark(lastElement: T, extractedTimestamp: Long): Watermark = {
       new Watermark(extractedTimestamp - offset)
     }
 
-    override def extractTimestamp(
-        element: T,
-        previousElementTimestamp: Long): Long = {
+    override def extractTimestamp(element: T, previousElementTimestamp: Long): Long = {
       element.productElement(0).asInstanceOf[Number].longValue()
     }
   }

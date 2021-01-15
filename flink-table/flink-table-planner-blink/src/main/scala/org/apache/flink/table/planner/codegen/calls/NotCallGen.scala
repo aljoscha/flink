@@ -27,10 +27,9 @@ import org.apache.flink.table.types.logical.{BooleanType, LogicalType}
 class NotCallGen(callGenerator: CallGenerator) extends CallGenerator {
 
   override def generate(
-    ctx: CodeGeneratorContext,
-    operands: Seq[GeneratedExpression],
-    returnType: LogicalType
-  ): GeneratedExpression = {
+      ctx: CodeGeneratorContext,
+      operands: Seq[GeneratedExpression],
+      returnType: LogicalType): GeneratedExpression = {
     assert(returnType.isInstanceOf[BooleanType])
 
     ScalarOperatorGens.generateNot(ctx, callGenerator.generate(ctx, operands, returnType))

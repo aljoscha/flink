@@ -27,8 +27,8 @@ import org.junit.Test
 import scala.collection.JavaConverters._
 
 /**
-  * Tests for [[OldCsv]].
-  */
+ * Tests for [[OldCsv]].
+ */
 class OldCsvTest extends DescriptorTestBase {
 
   @Test(expected = classOf[ValidationException])
@@ -53,15 +53,16 @@ class OldCsvTest extends DescriptorTestBase {
       .field("field1", "STRING")
       .field("field2", Types.SQL_TIMESTAMP)
       .field("field3", TypeExtractor.createTypeInfo(classOf[Class[_]]))
-      .field("field4", Types.ROW(
-        Array[String]("test", "row"),
-        Array[TypeInformation[_]](Types.INT, Types.STRING)))
+      .field(
+        "field4",
+        Types.ROW(Array[String]("test", "row"), Array[TypeInformation[_]](Types.INT, Types.STRING)))
       .lineDelimiter("^")
 
     val desc2 = new OldCsv()
-      .schema(new TableSchema(
-        Array[String]("test", "row"),
-        Array[TypeInformation[_]](Types.INT, Types.STRING)))
+      .schema(
+        new TableSchema(
+          Array[String]("test", "row"),
+          Array[TypeInformation[_]](Types.INT, Types.STRING)))
       .quoteCharacter('#')
       .ignoreFirstLine()
 
@@ -95,10 +96,8 @@ class OldCsvTest extends DescriptorTestBase {
       "format.quote-character" -> "#",
       "format.ignore-first-line" -> "true")
 
-    val props3 = Map(
-      "format.type" -> "csv",
-      "format.property-version" -> "1",
-      "format.comment-prefix" -> "#")
+    val props3 =
+      Map("format.type" -> "csv", "format.property-version" -> "1", "format.comment-prefix" -> "#")
 
     util.Arrays.asList(props1.asJava, props2.asJava, props3.asJava)
   }

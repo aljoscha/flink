@@ -34,8 +34,8 @@ class SetOperatorsTest extends TableTestBase {
 
   @Before
   def before(): Unit = {
-    util.tableEnv.getConfig.getConfiguration.setString(
-      ExecutionConfigOptions.TABLE_EXEC_DISABLED_OPERATORS, "SortAgg")
+    util.tableEnv.getConfig.getConfiguration
+      .setString(ExecutionConfigOptions.TABLE_EXEC_DISABLED_OPERATORS, "SortAgg")
     util.addTableSource[(Int, Long, String)]("T1", 'a, 'b, 'c)
     util.addTableSource[(Int, Long, String)]("T2", 'd, 'e, 'f)
     util.addTableSource[(Int, Long, Int, String, Long)]("T3", 'a, 'b, 'd, 'c, 'e)
@@ -121,10 +121,11 @@ class SetOperatorsTest extends TableTestBase {
   @Test
   def testUnionAnyType(): Unit = {
     val util = batchTestUtil()
-    util.addTableSource("A",
+    util.addTableSource(
+      "A",
       Array[TypeInformation[_]](
-          new GenericTypeInfo(classOf[NonPojo]),
-          new GenericTypeInfo(classOf[NonPojo])),
+        new GenericTypeInfo(classOf[NonPojo]),
+        new GenericTypeInfo(classOf[NonPojo])),
       Array("a", "b"))
     util.verifyExecPlan("SELECT a FROM A UNION ALL SELECT b FROM A")
   }

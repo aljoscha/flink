@@ -75,7 +75,8 @@ class TableSourceITCase extends AbstractTestBase {
     }
     tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal("T", tableSource)
 
-    tEnv.scan("T")
+    tEnv
+      .scan("T")
       .select('value, 'name)
       .addSink(new StreamITCase.StringSink[Row])
     env.execute()
@@ -94,12 +95,14 @@ class TableSourceITCase extends AbstractTestBase {
     env.setParallelism(4)
 
     // test DataStreamScan
-    val table = env.fromElements[String]()
+    val table = env
+      .fromElements[String]()
       .setParallelism(1)
       .toTable(tEnv, 'a)
 
     tEnv.createTemporaryView("MyTable1", table)
-    val parallelism = tEnv.from("MyTable1")
+    val parallelism = tEnv
+      .from("MyTable1")
       .toAppendStream[String]
       .parallelism
 
@@ -119,7 +122,8 @@ class TableSourceITCase extends AbstractTestBase {
         |""".stripMargin
     tEnv.executeSql(createTableStmt)
 
-    val parallelism2 = tEnv.from("MyTable2")
+    val parallelism2 = tEnv
+      .from("MyTable2")
       .toAppendStream[String]
       .parallelism
 
@@ -133,7 +137,8 @@ class TableSourceITCase extends AbstractTestBase {
     val settings = EnvironmentSettings.newInstance().useOldPlanner().build()
     val tEnv = StreamTableEnvironment.create(env, settings)
 
-    tEnv.fromTableSource(csvTable)
+    tEnv
+      .fromTableSource(csvTable)
       .where('id > 4)
       .select('last, 'score * 2)
       .toAppendStream[Row]
@@ -141,11 +146,7 @@ class TableSourceITCase extends AbstractTestBase {
 
     env.execute()
 
-    val expected = Seq(
-      "Williams,69.0",
-      "Miller,13.56",
-      "Smith,180.2",
-      "Williams,4.68")
+    val expected = Seq("Williams,69.0", "Miller,13.56", "Smith,180.2", "Williams,4.68")
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
   }
 
@@ -157,7 +158,8 @@ class TableSourceITCase extends AbstractTestBase {
     val tEnv = StreamTableEnvironment.create(env, settings)
 
     tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal("csvTable", csvTable)
-    tEnv.scan("csvTable")
+    tEnv
+      .scan("csvTable")
       .where('id > 4)
       .select('last, 'score * 2)
       .toAppendStream[Row]
@@ -165,11 +167,7 @@ class TableSourceITCase extends AbstractTestBase {
 
     env.execute()
 
-    val expected = Seq(
-      "Williams,69.0",
-      "Miller,13.56",
-      "Smith,180.2",
-      "Williams,4.68")
+    val expected = Seq("Williams,69.0", "Miller,13.56", "Smith,180.2", "Williams,4.68")
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
   }
 
@@ -180,9 +178,11 @@ class TableSourceITCase extends AbstractTestBase {
     val settings = EnvironmentSettings.newInstance().useOldPlanner().build()
     val tEnv = StreamTableEnvironment.create(env, settings)
 
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(
-      tableName, TestFilterableTableSource())
-    tEnv.scan(tableName)
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSourceInternal(tableName, TestFilterableTableSource())
+    tEnv
+      .scan(tableName)
       .where($"amount" > 4 && $"price" < 9)
       .select($"id", $"name")
       .addSink(new StreamITCase.StringSink[Row])
@@ -215,7 +215,8 @@ class TableSourceITCase extends AbstractTestBase {
     val tableSource = new TestTableSourceWithTime(schema, rowType, data, "rtime", null)
     tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(tableName, tableSource)
 
-    tEnv.scan(tableName)
+    tEnv
+      .scan(tableName)
       .window(Tumble over 1.second on 'rtime as 'w)
       .groupBy('name, 'w)
       .select('name, 'w.start, 'amount.sum)
@@ -253,17 +254,14 @@ class TableSourceITCase extends AbstractTestBase {
     val tableSource = new TestTableSourceWithTime(schema, rowType, data, null, "ptime")
     tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(tableName, tableSource)
 
-    tEnv.scan(tableName)
+    tEnv
+      .scan(tableName)
       .where('ptime.cast(Types.LONG) > 0L)
       .select('name, 'amount)
       .addSink(new StreamITCase.StringSink[Row])
     env.execute()
 
-    val expected = Seq(
-      "Mary,10",
-      "Bob,20",
-      "Mary,30",
-      "Liz,40")
+    val expected = Seq("Mary,10", "Bob,20", "Mary,30", "Liz,40")
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
   }
 
@@ -291,7 +289,8 @@ class TableSourceITCase extends AbstractTestBase {
     val tableSource = new TestTableSourceWithTime(schema, rowType, data, "rtime", "ptime")
     tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(tableName, tableSource)
 
-    tEnv.scan(tableName)
+    tEnv
+      .scan(tableName)
       .window(Tumble over 1.second on 'rtime as 'w)
       .groupBy('name, 'w)
       .select('name, 'w.start, 'amount.sum)
@@ -327,7 +326,8 @@ class TableSourceITCase extends AbstractTestBase {
     val tableSource = new TestTableSourceWithTime(schema, rowType, data, "rtime", null)
     tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(tableName, tableSource)
 
-    tEnv.scan(tableName)
+    tEnv
+      .scan(tableName)
       .window(Tumble over 1.second on 'rtime as 'w)
       .groupBy('name, 'w)
       .select('name, 'w.start, 'amount.sum)
@@ -356,17 +356,16 @@ class TableSourceITCase extends AbstractTestBase {
     val tableSource = new TestTableSourceWithTime(schema, returnType, data, "rtime", null)
     tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(tableName, tableSource)
 
-    tEnv.scan(tableName)
+    tEnv
+      .scan(tableName)
       .window(Tumble over 1.second on 'rtime as 'w)
       .groupBy('w)
       .select('w.start, 1.count)
       .addSink(new StreamITCase.StringSink[Row])
     env.execute()
 
-    val expected = Seq(
-      "1970-01-01 00:00:00.0,3",
-      "1970-01-01 00:00:02.0,1",
-      "1970-01-01 00:00:04.0,1")
+    val expected =
+      Seq("1970-01-01 00:00:00.0,3", "1970-01-01 00:00:02.0,1", "1970-01-01 00:00:04.0,1")
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
   }
 
@@ -390,7 +389,8 @@ class TableSourceITCase extends AbstractTestBase {
     val tableSource = new TestTableSourceWithTime(schema, returnType, data, "rtime", null)
     tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(tableName, tableSource)
 
-    tEnv.scan(tableName)
+    tEnv
+      .scan(tableName)
       .window(Tumble over 1.second on 'rtime as 'w)
       .groupBy('w)
       .select('w.start, 1.count)
@@ -420,7 +420,8 @@ class TableSourceITCase extends AbstractTestBase {
     val tableSource = new TestTableSourceWithTime(schema, returnType, data, null, "ptime")
     tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(tableName, tableSource)
 
-    tEnv.scan(tableName)
+    tEnv
+      .scan(tableName)
       .where('ptime.cast(Types.LONG) > 1)
       .select('name)
       .addSink(new StreamITCase.StringSink[Row])
@@ -439,15 +440,15 @@ class TableSourceITCase extends AbstractTestBase {
 
     val data = Seq(new JLong(1L), new JLong(2L), new JLong(2L), new JLong(2001L), new JLong(4001L))
 
-    val schema = new TableSchema(
-      Array("rtime", "ptime"),
-      Array(Types.SQL_TIMESTAMP, Types.SQL_TIMESTAMP))
+    val schema =
+      new TableSchema(Array("rtime", "ptime"), Array(Types.SQL_TIMESTAMP, Types.SQL_TIMESTAMP))
     val returnType = Types.LONG
 
     val tableSource = new TestTableSourceWithTime(schema, returnType, data, "rtime", "ptime")
     tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(tableName, tableSource)
 
-    tEnv.scan(tableName)
+    tEnv
+      .scan(tableName)
       .where('ptime.cast(Types.LONG) > 1)
       .window(Tumble over 1.second on 'rtime as 'w)
       .groupBy('w)
@@ -455,10 +456,8 @@ class TableSourceITCase extends AbstractTestBase {
       .addSink(new StreamITCase.StringSink[Row])
     env.execute()
 
-    val expected = Seq(
-      "1970-01-01 00:00:00.0,3",
-      "1970-01-01 00:00:02.0,1",
-      "1970-01-01 00:00:04.0,1")
+    val expected =
+      Seq("1970-01-01 00:00:00.0,3", "1970-01-01 00:00:02.0,1", "1970-01-01 00:00:04.0,1")
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
   }
 
@@ -484,7 +483,8 @@ class TableSourceITCase extends AbstractTestBase {
     val source = new TestTableSourceWithTime(schema, returnType, data, "rtime", "ptime", mapping)
     tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(tableName, source)
 
-    tEnv.scan(tableName)
+    tEnv
+      .scan(tableName)
       .window(Tumble over 1.second on 'rtime as 'w)
       .groupBy('name, 'w)
       .select('name, 'w.start, 'amount.sum)
@@ -518,20 +518,19 @@ class TableSourceITCase extends AbstractTestBase {
         .asInstanceOf[Array[TypeInformation[_]]],
       Array("id", "name", "val", "rtime"))
 
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(
-      "T",
-      new TestProjectableTableSource(tableSchema, returnType, data, "rtime", "ptime"))
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSourceInternal(
+        "T",
+        new TestProjectableTableSource(tableSchema, returnType, data, "rtime", "ptime"))
 
-    tEnv.scan("T")
+    tEnv
+      .scan("T")
       .select('name, 'val, 'id)
       .addSink(new StreamITCase.StringSink[Row])
     env.execute()
 
-    val expected = Seq(
-      "Mary,10,1",
-      "Bob,20,2",
-      "Mike,30,3",
-      "Liz,40,4")
+    val expected = Seq("Mary,10,1", "Bob,20,2", "Mike,30,3", "Liz,40,4")
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
   }
 
@@ -555,11 +554,14 @@ class TableSourceITCase extends AbstractTestBase {
         .asInstanceOf[Array[TypeInformation[_]]],
       Array("id", "name", "val", "rtime"))
 
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(
-      "T",
-      new TestProjectableTableSource(tableSchema, returnType, data, "rtime", "ptime"))
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSourceInternal(
+        "T",
+        new TestProjectableTableSource(tableSchema, returnType, data, "rtime", "ptime"))
 
-    tEnv.scan("T")
+    tEnv
+      .scan("T")
       .select('rtime, 'name, 'id)
       .addSink(new StreamITCase.StringSink[Row])
     env.execute()
@@ -592,21 +594,20 @@ class TableSourceITCase extends AbstractTestBase {
         .asInstanceOf[Array[TypeInformation[_]]],
       Array("id", "name", "val", "rtime"))
 
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(
-      "T",
-      new TestProjectableTableSource(tableSchema, returnType, data, "rtime", "ptime"))
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSourceInternal(
+        "T",
+        new TestProjectableTableSource(tableSchema, returnType, data, "rtime", "ptime"))
 
-    tEnv.scan("T")
+    tEnv
+      .scan("T")
       .filter('ptime.cast(Types.LONG) > 0)
       .select('name, 'id)
       .addSink(new StreamITCase.StringSink[Row])
     env.execute()
 
-    val expected = Seq(
-      "Mary,1",
-      "Bob,2",
-      "Mike,3",
-      "Liz,4")
+    val expected = Seq("Mary,1", "Bob,2", "Mike,3", "Liz,4")
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
   }
 
@@ -629,11 +630,14 @@ class TableSourceITCase extends AbstractTestBase {
         .asInstanceOf[Array[TypeInformation[_]]],
       Array("id", "rtime", "val", "name"))
 
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(
-      "T",
-      new TestProjectableTableSource(tableSchema, returnType, data, "rtime", "ptime"))
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSourceInternal(
+        "T",
+        new TestProjectableTableSource(tableSchema, returnType, data, "rtime", "ptime"))
 
-    tEnv.scan("T")
+    tEnv
+      .scan("T")
       .select('ptime > 0)
       .select(1.count)
       .addSink(new StreamITCase.StringSink[Row])
@@ -662,11 +666,14 @@ class TableSourceITCase extends AbstractTestBase {
         .asInstanceOf[Array[TypeInformation[_]]],
       Array("id", "rtime", "val", "name"))
 
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(
-      "T",
-      new TestProjectableTableSource(tableSchema, returnType, data, "rtime", "ptime"))
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSourceInternal(
+        "T",
+        new TestProjectableTableSource(tableSchema, returnType, data, "rtime", "ptime"))
 
-    tEnv.scan("T")
+    tEnv
+      .scan("T")
       .select('rtime)
       .addSink(new StreamITCase.StringSink[Row])
     env.execute()
@@ -700,11 +707,14 @@ class TableSourceITCase extends AbstractTestBase {
       Array("p-rtime", "p-id", "p-name", "p-val"))
     val mapping = Map("rtime" -> "p-rtime", "id" -> "p-id", "val" -> "p-val", "name" -> "p-name")
 
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(
-      "T",
-      new TestProjectableTableSource(tableSchema, returnType, data, "rtime", "ptime", mapping))
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSourceInternal(
+        "T",
+        new TestProjectableTableSource(tableSchema, returnType, data, "rtime", "ptime", mapping))
 
-    tEnv.scan("T")
+    tEnv
+      .scan("T")
       .select('name, 'rtime, 'val)
       .addSink(new StreamITCase.StringSink[Row])
     env.execute()
@@ -724,40 +734,31 @@ class TableSourceITCase extends AbstractTestBase {
     val tEnv = StreamTableEnvironment.create(env, settings)
 
     val data = Seq(
-      Row.of(new JLong(1),
-        Row.of(
-          Row.of("Sarah", new JInt(100)),
-          Row.of(new JInt(1000), new JBool(true))
-        ),
+      Row.of(
+        new JLong(1),
+        Row.of(Row.of("Sarah", new JInt(100)), Row.of(new JInt(1000), new JBool(true))),
         Row.of("Peter", new JInt(10000)),
         "Mary"),
-      Row.of(new JLong(2),
-        Row.of(
-          Row.of("Rob", new JInt(200)),
-          Row.of(new JInt(2000), new JBool(false))
-        ),
+      Row.of(
+        new JLong(2),
+        Row.of(Row.of("Rob", new JInt(200)), Row.of(new JInt(2000), new JBool(false))),
         Row.of("Lucy", new JInt(20000)),
         "Bob"),
-      Row.of(new JLong(3),
-        Row.of(
-          Row.of("Mike", new JInt(300)),
-          Row.of(new JInt(3000), new JBool(true))
-        ),
+      Row.of(
+        new JLong(3),
+        Row.of(Row.of("Mike", new JInt(300)), Row.of(new JInt(3000), new JBool(true))),
         Row.of("Betty", new JInt(30000)),
         "Liz"))
 
     val nested1 = new RowTypeInfo(
       Array(Types.STRING, Types.INT).asInstanceOf[Array[TypeInformation[_]]],
-      Array("name", "value")
-    )
+      Array("name", "value"))
     val nested2 = new RowTypeInfo(
       Array(Types.INT, Types.BOOLEAN).asInstanceOf[Array[TypeInformation[_]]],
-      Array("num", "flag")
-    )
+      Array("num", "flag"))
     val deepNested = new RowTypeInfo(
       Array(nested1, nested2).asInstanceOf[Array[TypeInformation[_]]],
-      Array("nested1", "nested2")
-    )
+      Array("nested1", "nested2"))
     val tableSchema = new TableSchema(
       Array("id", "deepNested", "nested", "name"),
       Array(Types.LONG, deepNested, nested1, Types.STRING))
@@ -766,13 +767,16 @@ class TableSourceITCase extends AbstractTestBase {
       Array(Types.LONG, deepNested, nested1, Types.STRING).asInstanceOf[Array[TypeInformation[_]]],
       Array("id", "deepNested", "nested", "name"))
 
-    tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(
-      "T",
-      new TestNestedProjectableTableSource(tableSchema, returnType, data))
+    tEnv
+      .asInstanceOf[TableEnvironmentInternal]
+      .registerTableSourceInternal(
+        "T",
+        new TestNestedProjectableTableSource(tableSchema, returnType, data))
 
     tEnv
       .scan("T")
-      .select('id,
+      .select(
+        'id,
         'deepNested.get("nested1").get("name") as 'nestedName,
         'nested.get("value") as 'nestedValue,
         'deepNested.get("nested2").get("flag") as 'nestedFlag,
@@ -780,10 +784,8 @@ class TableSourceITCase extends AbstractTestBase {
       .addSink(new StreamITCase.StringSink[Row])
     env.execute()
 
-    val expected = Seq(
-      "1,Sarah,10000,true,1000",
-      "2,Rob,20000,false,2000",
-      "3,Mike,30000,true,3000")
+    val expected =
+      Seq("1,Sarah,10000,true,1000", "2,Rob,20000,false,2000", "3,Mike,30000,true,3000")
     assertEquals(expected.sorted, StreamITCase.testResults.sorted)
   }
 
@@ -803,8 +805,7 @@ class TableSourceITCase extends AbstractTestBase {
       Left(8L, Row.of(new JInt(6), new JLong(8), "C")),
       Right(20L),
       Left(21L, Row.of(new JInt(6), new JLong(21), "D")),
-      Right(30L)
-    )
+      Right(30L))
 
     val fieldNames = Array("id", "rtime", "name")
     val schema = new TableSchema(fieldNames, Array(Types.INT, Types.SQL_TIMESTAMP, Types.STRING))
@@ -815,7 +816,8 @@ class TableSourceITCase extends AbstractTestBase {
     val tableSource = new TestPreserveWMTableSource(schema, rowType, data, "rtime")
     tEnv.asInstanceOf[TableEnvironmentInternal].registerTableSourceInternal(tableName, tableSource)
 
-    tEnv.scan(tableName)
+    tEnv
+      .scan(tableName)
       .where('rtime.cast(Types.LONG) > 3L)
       .select('id, 'name)
       .toAppendStream[Row]

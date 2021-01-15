@@ -28,15 +28,14 @@ import org.junit.runners.Parameterized
 import scala.collection.JavaConversions._
 
 /**
-  * This test base provides full cluster-like integration tests for batch programs. Only runtime
-  * operator tests should use this test base as they are expensive.
-  * (e.g. [[GroupWindowITCase]])
-  */
+ * This test base provides full cluster-like integration tests for batch programs. Only runtime
+ * operator tests should use this test base as they are expensive.
+ * (e.g. [[GroupWindowITCase]])
+ */
 class TableProgramsClusterTestBase(
     executionMode: TestExecutionMode,
     tableConfigMode: TableConfigMode)
-    extends TableProgramsTestBase(executionMode, tableConfigMode) {
-}
+    extends TableProgramsTestBase(executionMode, tableConfigMode) {}
 
 object TableProgramsClusterTestBase {
 
@@ -44,7 +43,6 @@ object TableProgramsClusterTestBase {
   def parameters(): util.Collection[Array[java.lang.Object]] = {
     Seq[Array[AnyRef]](
       Array(TestExecutionMode.CLUSTER, TableProgramsTestBase.DEFAULT),
-      Array(TestExecutionMode.CLUSTER_OBJECT_REUSE, TableProgramsTestBase.DEFAULT)
-    )
+      Array(TestExecutionMode.CLUSTER_OBJECT_REUSE, TableProgramsTestBase.DEFAULT))
   }
 }

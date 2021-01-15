@@ -29,16 +29,16 @@ import org.apache.flink.table.util.Logging
 import org.apache.flink.types.Row
 
 /**
-  * MapRunner with [[CRow]] input.
-  */
+ * MapRunner with [[CRow]] input.
+ */
 class CRowMapRunner[OUT](
     name: String,
     code: String,
     @transient var returnType: TypeInformation[OUT])
-  extends RichMapFunction[CRow, OUT]
-  with ResultTypeQueryable[OUT]
-  with Compiler[MapFunction[Row, OUT]]
-  with Logging {
+    extends RichMapFunction[CRow, OUT]
+    with ResultTypeQueryable[OUT]
+    with Compiler[MapFunction[Row, OUT]]
+    with Logging {
 
   private var function: MapFunction[Row, OUT] = _
 

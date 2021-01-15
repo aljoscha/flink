@@ -28,9 +28,9 @@ import scala.collection.JavaConverters._
  * A wrapper function that exposes a Scala Function3 as a Java AllWindowFunction.
  */
 final class ScalaAllWindowFunction[IN, OUT, W <: Window](
-        private[this] val function: (W, Iterable[IN], Collector[OUT]) => Unit)
+    private[this] val function: (W, Iterable[IN], Collector[OUT]) => Unit)
     extends JAllWindowFunction[IN, OUT, W] {
-  
+
   @throws(classOf[Exception])
   override def apply(window: W, input: java.lang.Iterable[IN], out: Collector[OUT]) {
     function.apply(window, input.asScala, out)

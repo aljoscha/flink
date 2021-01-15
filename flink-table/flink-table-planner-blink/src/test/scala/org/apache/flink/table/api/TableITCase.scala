@@ -64,7 +64,8 @@ class TableITCase(tableEnvName: String, isStreaming: Boolean) extends TestLogger
         tEnv = TableEnvironmentImpl.create(settings)
       case "StreamTableEnvironment" =>
         tEnv = StreamTableEnvironment.create(
-          StreamExecutionEnvironment.getExecutionEnvironment, settings)
+          StreamExecutionEnvironment.getExecutionEnvironment,
+          settings)
       case _ => throw new UnsupportedOperationException("unsupported tableEnvName: " + tableEnvName)
     }
     TestTableSourceSinks.createPersonCsvTemporaryTable(tEnv, "MyTable")
@@ -82,7 +83,8 @@ class TableITCase(tableEnvName: String, isStreaming: Boolean) extends TestLogger
     assertTrue(tableResult.getJobClient.isPresent)
     assertEquals(ResultKind.SUCCESS_WITH_CONTENT, tableResult.getResultKind)
     assertEquals(
-      TableSchema.builder()
+      TableSchema
+        .builder()
         .field("id", DataTypes.INT())
         .field("full name", DataTypes.STRING())
         .build(),
@@ -120,13 +122,14 @@ class TableITCase(tableEnvName: String, isStreaming: Boolean) extends TestLogger
     assertEquals(ResultKind.SUCCESS_WITH_CONTENT, tableResult.getResultKind)
     val it = tableResult.collect()
     it.close()
-    val jobStatus = try {
-      Some(tableResult.getJobClient.get().getJobStatus.get())
-    } catch {
-      // ignore the exception,
-      // because the MiniCluster maybe already been shut down when getting job status
-      case _: Throwable => None
-    }
+    val jobStatus =
+      try {
+        Some(tableResult.getJobClient.get().getJobStatus.get())
+      } catch {
+        // ignore the exception,
+        // because the MiniCluster maybe already been shut down when getting job status
+        case _: Throwable => None
+      }
     if (jobStatus.isDefined) {
       assertNotEquals(JobStatus.RUNNING, jobStatus.get)
     }
@@ -156,8 +159,7 @@ class TableITCase(tableEnvName: String, isStreaming: Boolean) extends TestLogger
         Row.ofKind(RowKind.UPDATE_BEFORE, JLong.valueOf(6)),
         Row.ofKind(RowKind.UPDATE_AFTER, JLong.valueOf(7)),
         Row.ofKind(RowKind.UPDATE_BEFORE, JLong.valueOf(7)),
-        Row.ofKind(RowKind.UPDATE_AFTER, JLong.valueOf(8))
-      )
+        Row.ofKind(RowKind.UPDATE_AFTER, JLong.valueOf(8)))
     } else {
       util.Arrays.asList(Row.of(JLong.valueOf(8)))
     }
@@ -173,7 +175,6 @@ object TableITCase {
     util.Arrays.asList(
       Array("TableEnvironment", true),
       Array("TableEnvironment", false),
-      Array("StreamTableEnvironment", true)
-    )
+      Array("StreamTableEnvironment", true))
   }
 }

@@ -23,16 +23,14 @@ import org.apache.calcite.sql.`type`.ArraySqlType
 import org.apache.flink.api.common.typeinfo.TypeInformation
 
 /**
-  * Flink distinguishes between primitive arrays (int[], double[], ...) and
-  * object arrays (Integer[], MyPojo[], ...). This custom type supports both cases.
-  */
+ * Flink distinguishes between primitive arrays (int[], double[], ...) and
+ * object arrays (Integer[], MyPojo[], ...). This custom type supports both cases.
+ */
 class ArrayRelDataType(
     val typeInfo: TypeInformation[_],
     elementType: RelDataType,
     isNullable: Boolean)
-  extends ArraySqlType(
-    elementType,
-    isNullable) {
+    extends ArraySqlType(elementType, isNullable) {
 
   override def toString = s"ARRAY($typeInfo)"
 

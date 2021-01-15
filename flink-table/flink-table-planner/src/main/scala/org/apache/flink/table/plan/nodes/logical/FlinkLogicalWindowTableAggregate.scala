@@ -43,7 +43,7 @@ class FlinkLogicalWindowTableAggregate(
     groupSet: ImmutableBitSet,
     groupSets: util.List[ImmutableBitSet],
     aggCalls: util.List[AggregateCall])
-  extends TableAggregate(cluster, traitSet, input, indicator, groupSet, groupSets, aggCalls)
+    extends TableAggregate(cluster, traitSet, input, indicator, groupSet, groupSets, aggCalls)
     with FlinkLogicalRel {
 
   def getWindow: LogicalWindow = window
@@ -82,8 +82,7 @@ class FlinkLogicalWindowTableAggregate(
     namedProperties.foreach { namedProp =>
       builder.add(
         namedProp.name,
-        typeFactory.createTypeFromTypeInfo(namedProp.property.resultType, isNullable = false)
-      )
+        typeFactory.createTypeFromTypeInfo(namedProp.property.resultType, isNullable = false))
     }
     builder.build()
   }
@@ -98,11 +97,11 @@ class FlinkLogicalWindowTableAggregate(
 }
 
 class FlinkLogicalWindowTableAggregateConverter
-  extends ConverterRule(
-    classOf[LogicalWindowTableAggregate],
-    Convention.NONE,
-    FlinkConventions.LOGICAL,
-    "FlinkLogicalWindowTableAggregateConverter") {
+    extends ConverterRule(
+      classOf[LogicalWindowTableAggregate],
+      Convention.NONE,
+      FlinkConventions.LOGICAL,
+      "FlinkLogicalWindowTableAggregateConverter") {
 
   override def convert(rel: RelNode): RelNode = {
     val agg = rel.asInstanceOf[LogicalWindowTableAggregate]

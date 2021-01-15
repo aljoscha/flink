@@ -41,10 +41,8 @@ import java.lang.{Iterable => JIterable}
 import scala.collection.JavaConverters._
 
 @RunWith(classOf[Parameterized])
-class JoinITCase(
-    execMode: TestExecutionMode,
-    configMode: TableConfigMode)
-  extends TableProgramsClusterTestBase(execMode, configMode) {
+class JoinITCase(execMode: TestExecutionMode, configMode: TableConfigMode)
+    extends TableProgramsClusterTestBase(execMode, configMode) {
 
   @Test
   def testInnerJoin(): Unit = {
@@ -56,7 +54,8 @@ class JoinITCase(
 
     val testOpenCall = new Func20
 
-    val joinT = ds1.join(ds2)
+    val joinT = ds1
+      .join(ds2)
       .where('b === 'e)
       .where(testOpenCall('a + 'd))
       .select('c, 'g)
@@ -118,15 +117,14 @@ class JoinITCase(
     val env: ExecutionEnvironment = ExecutionEnvironment.getExecutionEnvironment
     val tEnv = BatchTableEnvironment.create(env, config)
 
-    val ds1 = addNullKey3Tuples(
-      CollectionDataSets.get3TupleDataSet(env)).toTable(tEnv, 'a, 'b, 'c)
-    val ds2 = addNullKey5Tuples(
-      CollectionDataSets.get5TupleDataSet(env)).toTable(tEnv, 'd, 'e, 'f, 'g, 'h)
+    val ds1 = addNullKey3Tuples(CollectionDataSets.get3TupleDataSet(env)).toTable(tEnv, 'a, 'b, 'c)
+    val ds2 =
+      addNullKey5Tuples(CollectionDataSets.get5TupleDataSet(env)).toTable(tEnv, 'd, 'e, 'f, 'g, 'h)
 
     val joinT = ds1.join(ds2).filter('a === 'd && 'b === 'h).select('c, 'g)
 
     val expected = "Hi,Hallo\n" + "Hello,Hallo Welt\n" + "Hello world,Hallo Welt wie gehts?\n" +
-    "Hello world,ABC\n" + "I am fine.,HIJ\n" + "I am fine.,IJK\n"
+      "Hello world,ABC\n" + "I am fine.,HIJ\n" + "I am fine.,IJK\n"
     val results = joinT.toDataSet[Row].collect()
     TestBaseUtils.compareResultAsText(results.asJava, expected)
   }
@@ -144,7 +142,7 @@ class JoinITCase(
     val joinT = ds1.join(ds2).where('a === 'd).select('g.count)
 
     val expected = "6"
-    val results = joinT.toDataSet[Row] collect()
+    val results = joinT.toDataSet[Row] collect ()
     TestBaseUtils.compareResultAsText(results.asJava, expected)
   }
 
@@ -156,13 +154,14 @@ class JoinITCase(
     val ds1 = CollectionDataSets.getSmall3TupleDataSet(env).toTable(tEnv, 'a, 'b, 'c)
     val ds2 = CollectionDataSets.get5TupleDataSet(env).toTable(tEnv, 'd, 'e, 'f, 'g, 'h)
 
-    val joinT = ds1.join(ds2)
+    val joinT = ds1
+      .join(ds2)
       .where('a === 'd)
       .groupBy('a, 'd)
       .select('b.sum, 'g.count)
 
     val expected = "6,3\n" + "4,2\n" + "1,1"
-    val results = joinT.toDataSet[Row] collect()
+    val results = joinT.toDataSet[Row] collect ()
     TestBaseUtils.compareResultAsText(results.asJava, expected)
   }
 
@@ -175,14 +174,15 @@ class JoinITCase(
     val ds2 = CollectionDataSets.get5TupleDataSet(env).toTable(tEnv, 'd, 'e, 'f, 'g, 'h)
     val ds3 = CollectionDataSets.getSmall3TupleDataSet(env).toTable(tEnv, 'j, 'k, 'l)
 
-    val joinT = ds1.join(ds2)
+    val joinT = ds1
+      .join(ds2)
       .where(true)
       .join(ds3)
       .where('a === 'd && 'e === 'k)
       .select('a, 'f, 'l)
 
     val expected = "2,1,Hello\n" + "2,1,Hello world\n" + "1,0,Hi"
-    val results = joinT.toDataSet[Row] collect()
+    val results = joinT.toDataSet[Row] collect ()
     TestBaseUtils.compareResultAsText(results.asJava, expected)
   }
 
@@ -199,7 +199,7 @@ class JoinITCase(
     val expected = "Hi,Hallo\n" +
       "Hello,Hallo Welt\n" +
       "I am fine.,IJK"
-    val results = joinT.toDataSet[Row] collect()
+    val results = joinT.toDataSet[Row] collect ()
     TestBaseUtils.compareResultAsText(results.asJava, expected)
   }
 
@@ -218,7 +218,7 @@ class JoinITCase(
       "Luke Skywalker,ABC\n" +
       "Comment#2,HIJ\n" +
       "Comment#2,IJK"
-    val results = joinT.toDataSet[Row] collect()
+    val results = joinT.toDataSet[Row] collect ()
     TestBaseUtils.compareResultAsText(results.asJava, expected)
   }
 
@@ -228,10 +228,9 @@ class JoinITCase(
     val tEnv = BatchTableEnvironment.create(env, config)
     tEnv.getConfig.setNullCheck(true)
 
-    val ds1 = addNullKey3Tuples(
-      CollectionDataSets.get3TupleDataSet(env)).toTable(tEnv, 'a, 'b, 'c)
-    val ds2 = addNullKey5Tuples(
-      CollectionDataSets.get5TupleDataSet(env)).toTable(tEnv, 'd, 'e, 'f, 'g, 'h)
+    val ds1 = addNullKey3Tuples(CollectionDataSets.get3TupleDataSet(env)).toTable(tEnv, 'a, 'b, 'c)
+    val ds2 =
+      addNullKey5Tuples(CollectionDataSets.get5TupleDataSet(env)).toTable(tEnv, 'd, 'e, 'f, 'g, 'h)
 
     val joinT = ds1.leftOuterJoin(ds2, 'a === 'd && 'b === 'h).select('c, 'g)
 
@@ -253,21 +252,39 @@ class JoinITCase(
     val tEnv = BatchTableEnvironment.create(env, config)
     tEnv.getConfig.setNullCheck(true)
 
-    val ds1 = addNullKey3Tuples(
-      CollectionDataSets.get3TupleDataSet(env)).toTable(tEnv, 'a, 'b, 'c)
-    val ds2 = addNullKey5Tuples(
-      CollectionDataSets.get5TupleDataSet(env)).toTable(tEnv, 'd, 'e, 'f, 'g, 'h)
+    val ds1 = addNullKey3Tuples(CollectionDataSets.get3TupleDataSet(env)).toTable(tEnv, 'a, 'b, 'c)
+    val ds2 =
+      addNullKey5Tuples(CollectionDataSets.get5TupleDataSet(env)).toTable(tEnv, 'd, 'e, 'f, 'g, 'h)
 
     val joinT = ds1.leftOuterJoin(ds2, 'a === 'd && 'b <= 'h).select('c, 'g)
 
     val expected = Seq(
-      "Hi,Hallo", "Hello,Hallo Welt", "Hello world,Hallo Welt wie gehts?", "Hello world,ABC",
-      "Hello world,BCD", "I am fine.,HIJ", "I am fine.,IJK",
-      "Hello world, how are you?,null", "Luke Skywalker,null", "Comment#1,null", "Comment#2,null",
-      "Comment#3,null", "Comment#4,null", "Comment#5,null", "Comment#6,null", "Comment#7,null",
-      "Comment#8,null", "Comment#9,null", "Comment#10,null", "Comment#11,null", "Comment#12,null",
-      "Comment#13,null", "Comment#14,null", "Comment#15,null",
-      "NullTuple,null", "NullTuple,null")
+      "Hi,Hallo",
+      "Hello,Hallo Welt",
+      "Hello world,Hallo Welt wie gehts?",
+      "Hello world,ABC",
+      "Hello world,BCD",
+      "I am fine.,HIJ",
+      "I am fine.,IJK",
+      "Hello world, how are you?,null",
+      "Luke Skywalker,null",
+      "Comment#1,null",
+      "Comment#2,null",
+      "Comment#3,null",
+      "Comment#4,null",
+      "Comment#5,null",
+      "Comment#6,null",
+      "Comment#7,null",
+      "Comment#8,null",
+      "Comment#9,null",
+      "Comment#10,null",
+      "Comment#11,null",
+      "Comment#12,null",
+      "Comment#13,null",
+      "Comment#14,null",
+      "Comment#15,null",
+      "NullTuple,null",
+      "NullTuple,null")
     val results = joinT.toDataSet[Row].collect()
     TestBaseUtils.compareResultAsText(results.asJava, expected.mkString("\n"))
   }
@@ -278,21 +295,39 @@ class JoinITCase(
     val tEnv = BatchTableEnvironment.create(env, config)
     tEnv.getConfig.setNullCheck(true)
 
-    val ds1 = addNullKey3Tuples(
-      CollectionDataSets.get3TupleDataSet(env)).toTable(tEnv, 'a, 'b, 'c)
-    val ds2 = addNullKey5Tuples(
-      CollectionDataSets.get5TupleDataSet(env)).toTable(tEnv, 'd, 'e, 'f, 'g, 'h)
+    val ds1 = addNullKey3Tuples(CollectionDataSets.get3TupleDataSet(env)).toTable(tEnv, 'a, 'b, 'c)
+    val ds2 =
+      addNullKey5Tuples(CollectionDataSets.get5TupleDataSet(env)).toTable(tEnv, 'd, 'e, 'f, 'g, 'h)
 
     val joinT = ds1.leftOuterJoin(ds2, 'a === 'd && 'b === 2).select('c, 'g)
 
     val expected = Seq(
-      "Hello,Hallo Welt", "Hello,Hallo Welt wie",
-      "Hello world,Hallo Welt wie gehts?", "Hello world,ABC", "Hello world,BCD",
-      "Hi,null", "Hello world, how are you?,null", "I am fine.,null", "Luke Skywalker,null",
-      "Comment#1,null", "Comment#2,null", "Comment#3,null", "Comment#4,null", "Comment#5,null",
-      "Comment#6,null", "Comment#7,null", "Comment#8,null", "Comment#9,null", "Comment#10,null",
-      "Comment#11,null", "Comment#12,null", "Comment#13,null", "Comment#14,null", "Comment#15,null",
-      "NullTuple,null", "NullTuple,null")
+      "Hello,Hallo Welt",
+      "Hello,Hallo Welt wie",
+      "Hello world,Hallo Welt wie gehts?",
+      "Hello world,ABC",
+      "Hello world,BCD",
+      "Hi,null",
+      "Hello world, how are you?,null",
+      "I am fine.,null",
+      "Luke Skywalker,null",
+      "Comment#1,null",
+      "Comment#2,null",
+      "Comment#3,null",
+      "Comment#4,null",
+      "Comment#5,null",
+      "Comment#6,null",
+      "Comment#7,null",
+      "Comment#8,null",
+      "Comment#9,null",
+      "Comment#10,null",
+      "Comment#11,null",
+      "Comment#12,null",
+      "Comment#13,null",
+      "Comment#14,null",
+      "Comment#15,null",
+      "NullTuple,null",
+      "NullTuple,null")
     val results = joinT.toDataSet[Row].collect()
     TestBaseUtils.compareResultAsText(results.asJava, expected.mkString("\n"))
   }
@@ -303,10 +338,9 @@ class JoinITCase(
     val tEnv = BatchTableEnvironment.create(env, config)
     tEnv.getConfig.setNullCheck(true)
 
-    val ds1 = addNullKey3Tuples(
-      CollectionDataSets.get3TupleDataSet(env)).toTable(tEnv, 'a, 'b, 'c)
-    val ds2 = addNullKey5Tuples(
-      CollectionDataSets.get5TupleDataSet(env)).toTable(tEnv, 'd, 'e, 'f, 'g, 'h)
+    val ds1 = addNullKey3Tuples(CollectionDataSets.get3TupleDataSet(env)).toTable(tEnv, 'a, 'b, 'c)
+    val ds2 =
+      addNullKey5Tuples(CollectionDataSets.get5TupleDataSet(env)).toTable(tEnv, 'd, 'e, 'f, 'g, 'h)
 
     val joinT = ds1.rightOuterJoin(ds2, 'a === 'd && 'b === 'h).select('c, 'g)
 
@@ -325,21 +359,39 @@ class JoinITCase(
     val tEnv = BatchTableEnvironment.create(env, config)
     tEnv.getConfig.setNullCheck(true)
 
-    val ds1 = addNullKey5Tuples(
-      CollectionDataSets.get5TupleDataSet(env)).toTable(tEnv, 'd, 'e, 'f, 'g, 'h)
-    val ds2 = addNullKey3Tuples(
-      CollectionDataSets.get3TupleDataSet(env)).toTable(tEnv, 'a, 'b, 'c)
+    val ds1 =
+      addNullKey5Tuples(CollectionDataSets.get5TupleDataSet(env)).toTable(tEnv, 'd, 'e, 'f, 'g, 'h)
+    val ds2 = addNullKey3Tuples(CollectionDataSets.get3TupleDataSet(env)).toTable(tEnv, 'a, 'b, 'c)
 
     val joinT = ds1.rightOuterJoin(ds2, 'a === 'd && 'b <= 'h).select('c, 'g)
 
     val expected = Seq(
-      "Hi,Hallo", "Hello,Hallo Welt", "Hello world,Hallo Welt wie gehts?", "Hello world,ABC",
-      "Hello world,BCD", "I am fine.,HIJ", "I am fine.,IJK",
-      "Hello world, how are you?,null", "Luke Skywalker,null", "Comment#1,null", "Comment#2,null",
-      "Comment#3,null", "Comment#4,null", "Comment#5,null", "Comment#6,null", "Comment#7,null",
-      "Comment#8,null", "Comment#9,null", "Comment#10,null", "Comment#11,null", "Comment#12,null",
-      "Comment#13,null", "Comment#14,null", "Comment#15,null",
-      "NullTuple,null", "NullTuple,null")
+      "Hi,Hallo",
+      "Hello,Hallo Welt",
+      "Hello world,Hallo Welt wie gehts?",
+      "Hello world,ABC",
+      "Hello world,BCD",
+      "I am fine.,HIJ",
+      "I am fine.,IJK",
+      "Hello world, how are you?,null",
+      "Luke Skywalker,null",
+      "Comment#1,null",
+      "Comment#2,null",
+      "Comment#3,null",
+      "Comment#4,null",
+      "Comment#5,null",
+      "Comment#6,null",
+      "Comment#7,null",
+      "Comment#8,null",
+      "Comment#9,null",
+      "Comment#10,null",
+      "Comment#11,null",
+      "Comment#12,null",
+      "Comment#13,null",
+      "Comment#14,null",
+      "Comment#15,null",
+      "NullTuple,null",
+      "NullTuple,null")
     val results = joinT.toDataSet[Row].collect()
     TestBaseUtils.compareResultAsText(results.asJava, expected.mkString("\n"))
   }
@@ -350,21 +402,39 @@ class JoinITCase(
     val tEnv = BatchTableEnvironment.create(env, config)
     tEnv.getConfig.setNullCheck(true)
 
-    val ds1 = addNullKey5Tuples(
-      CollectionDataSets.get5TupleDataSet(env)).toTable(tEnv, 'd, 'e, 'f, 'g, 'h)
-    val ds2 = addNullKey3Tuples(
-      CollectionDataSets.get3TupleDataSet(env)).toTable(tEnv, 'a, 'b, 'c)
+    val ds1 =
+      addNullKey5Tuples(CollectionDataSets.get5TupleDataSet(env)).toTable(tEnv, 'd, 'e, 'f, 'g, 'h)
+    val ds2 = addNullKey3Tuples(CollectionDataSets.get3TupleDataSet(env)).toTable(tEnv, 'a, 'b, 'c)
 
     val joinT = ds1.rightOuterJoin(ds2, 'a === 'd && 'b === 2).select('c, 'g)
 
     val expected = Seq(
-      "Hello,Hallo Welt", "Hello,Hallo Welt wie",
-      "Hello world,Hallo Welt wie gehts?", "Hello world,ABC", "Hello world,BCD",
-      "Hi,null", "Hello world, how are you?,null", "I am fine.,null", "Luke Skywalker,null",
-      "Comment#1,null", "Comment#2,null", "Comment#3,null", "Comment#4,null", "Comment#5,null",
-      "Comment#6,null", "Comment#7,null", "Comment#8,null", "Comment#9,null", "Comment#10,null",
-      "Comment#11,null", "Comment#12,null", "Comment#13,null", "Comment#14,null", "Comment#15,null",
-      "NullTuple,null", "NullTuple,null")
+      "Hello,Hallo Welt",
+      "Hello,Hallo Welt wie",
+      "Hello world,Hallo Welt wie gehts?",
+      "Hello world,ABC",
+      "Hello world,BCD",
+      "Hi,null",
+      "Hello world, how are you?,null",
+      "I am fine.,null",
+      "Luke Skywalker,null",
+      "Comment#1,null",
+      "Comment#2,null",
+      "Comment#3,null",
+      "Comment#4,null",
+      "Comment#5,null",
+      "Comment#6,null",
+      "Comment#7,null",
+      "Comment#8,null",
+      "Comment#9,null",
+      "Comment#10,null",
+      "Comment#11,null",
+      "Comment#12,null",
+      "Comment#13,null",
+      "Comment#14,null",
+      "Comment#15,null",
+      "NullTuple,null",
+      "NullTuple,null")
     val results = joinT.toDataSet[Row].collect()
     TestBaseUtils.compareResultAsText(results.asJava, expected.mkString("\n"))
   }
@@ -375,10 +445,9 @@ class JoinITCase(
     val tEnv = BatchTableEnvironment.create(env, config)
     tEnv.getConfig.setNullCheck(true)
 
-    val ds1 = addNullKey3Tuples(
-      CollectionDataSets.get3TupleDataSet(env)).toTable(tEnv, 'a, 'b, 'c)
-    val ds2 = addNullKey5Tuples(
-      CollectionDataSets.get5TupleDataSet(env)).toTable(tEnv, 'd, 'e, 'f, 'g, 'h)
+    val ds1 = addNullKey3Tuples(CollectionDataSets.get3TupleDataSet(env)).toTable(tEnv, 'a, 'b, 'c)
+    val ds2 =
+      addNullKey5Tuples(CollectionDataSets.get5TupleDataSet(env)).toTable(tEnv, 'd, 'e, 'f, 'g, 'h)
 
     val joinT = ds1.fullOuterJoin(ds2, 'a === 'd && 'b === 'h).select('c, 'g)
 
@@ -402,25 +471,52 @@ class JoinITCase(
     val tEnv = BatchTableEnvironment.create(env, config)
     tEnv.getConfig.setNullCheck(true)
 
-    val ds1 = addNullKey3Tuples(
-      CollectionDataSets.get3TupleDataSet(env)).toTable(tEnv, 'a, 'b, 'c)
-    val ds2 = addNullKey5Tuples(
-      CollectionDataSets.get5TupleDataSet(env)).toTable(tEnv, 'd, 'e, 'f, 'g, 'h)
+    val ds1 = addNullKey3Tuples(CollectionDataSets.get3TupleDataSet(env)).toTable(tEnv, 'a, 'b, 'c)
+    val ds2 =
+      addNullKey5Tuples(CollectionDataSets.get5TupleDataSet(env)).toTable(tEnv, 'd, 'e, 'f, 'g, 'h)
 
     val joinT = ds1.fullOuterJoin(ds2, 'a === 'd && 'b <= 'h).select('c, 'g)
 
     val expected = Seq(
       // join matches
-      "Hi,Hallo", "Hello,Hallo Welt", "Hello world,Hallo Welt wie gehts?", "Hello world,ABC",
-      "Hello world,BCD", "I am fine.,HIJ", "I am fine.,IJK",
+      "Hi,Hallo",
+      "Hello,Hallo Welt",
+      "Hello world,Hallo Welt wie gehts?",
+      "Hello world,ABC",
+      "Hello world,BCD",
+      "I am fine.,HIJ",
+      "I am fine.,IJK",
       // preserved left
-      "Hello world, how are you?,null", "Luke Skywalker,null", "Comment#1,null", "Comment#2,null",
-      "Comment#3,null", "Comment#4,null", "Comment#5,null", "Comment#6,null", "Comment#7,null",
-      "Comment#8,null", "Comment#9,null", "Comment#10,null", "Comment#11,null", "Comment#12,null",
-      "Comment#13,null", "Comment#14,null", "Comment#15,null", "NullTuple,null", "NullTuple,null",
+      "Hello world, how are you?,null",
+      "Luke Skywalker,null",
+      "Comment#1,null",
+      "Comment#2,null",
+      "Comment#3,null",
+      "Comment#4,null",
+      "Comment#5,null",
+      "Comment#6,null",
+      "Comment#7,null",
+      "Comment#8,null",
+      "Comment#9,null",
+      "Comment#10,null",
+      "Comment#11,null",
+      "Comment#12,null",
+      "Comment#13,null",
+      "Comment#14,null",
+      "Comment#15,null",
+      "NullTuple,null",
+      "NullTuple,null",
       // preserved right
-      "null,Hallo Welt wie", "null,CDE", "null,DEF", "null,EFG", "null,FGH", "null,GHI", "null,JKL",
-      "null,KLM", "null,NullTuple", "null,NullTuple")
+      "null,Hallo Welt wie",
+      "null,CDE",
+      "null,DEF",
+      "null,EFG",
+      "null,FGH",
+      "null,GHI",
+      "null,JKL",
+      "null,KLM",
+      "null,NullTuple",
+      "null,NullTuple")
     val results = joinT.toDataSet[Row].collect()
     TestBaseUtils.compareResultAsText(results.asJava, expected.mkString("\n"))
   }
@@ -431,27 +527,53 @@ class JoinITCase(
     val tEnv = BatchTableEnvironment.create(env, config)
     tEnv.getConfig.setNullCheck(true)
 
-    val ds1 = addNullKey3Tuples(
-      CollectionDataSets.get3TupleDataSet(env)).toTable(tEnv, 'a, 'b, 'c)
-    val ds2 = addNullKey5Tuples(
-      CollectionDataSets.get5TupleDataSet(env)).toTable(tEnv, 'd, 'e, 'f, 'g, 'h)
+    val ds1 = addNullKey3Tuples(CollectionDataSets.get3TupleDataSet(env)).toTable(tEnv, 'a, 'b, 'c)
+    val ds2 =
+      addNullKey5Tuples(CollectionDataSets.get5TupleDataSet(env)).toTable(tEnv, 'd, 'e, 'f, 'g, 'h)
 
     val joinT = ds1.fullOuterJoin(ds2, 'a === 'd && 'b >= 2 && 'h === 1).select('c, 'g)
 
     val expected = Seq(
       // join matches
-      "Hello,Hallo Welt wie", "Hello world, how are you?,DEF", "Hello world, how are you?,EFG",
+      "Hello,Hallo Welt wie",
+      "Hello world, how are you?,DEF",
+      "Hello world, how are you?,EFG",
       "I am fine.,GHI",
       // preserved left
-      "Hi,null", "Hello world,null", "Luke Skywalker,null",
-      "Comment#1,null", "Comment#2,null", "Comment#3,null", "Comment#4,null", "Comment#5,null",
-      "Comment#6,null", "Comment#7,null", "Comment#8,null", "Comment#9,null", "Comment#10,null",
-      "Comment#11,null", "Comment#12,null", "Comment#13,null", "Comment#14,null", "Comment#15,null",
-      "NullTuple,null", "NullTuple,null",
+      "Hi,null",
+      "Hello world,null",
+      "Luke Skywalker,null",
+      "Comment#1,null",
+      "Comment#2,null",
+      "Comment#3,null",
+      "Comment#4,null",
+      "Comment#5,null",
+      "Comment#6,null",
+      "Comment#7,null",
+      "Comment#8,null",
+      "Comment#9,null",
+      "Comment#10,null",
+      "Comment#11,null",
+      "Comment#12,null",
+      "Comment#13,null",
+      "Comment#14,null",
+      "Comment#15,null",
+      "NullTuple,null",
+      "NullTuple,null",
       // preserved right
-      "null,Hallo", "null,Hallo Welt", "null,Hallo Welt wie gehts?", "null,ABC", "null,BCD",
-      "null,CDE", "null,FGH", "null,HIJ", "null,IJK", "null,JKL", "null,KLM",
-      "null,NullTuple", "null,NullTuple")
+      "null,Hallo",
+      "null,Hallo Welt",
+      "null,Hallo Welt wie gehts?",
+      "null,ABC",
+      "null,BCD",
+      "null,CDE",
+      "null,FGH",
+      "null,HIJ",
+      "null,IJK",
+      "null,JKL",
+      "null,KLM",
+      "null,NullTuple",
+      "null,NullTuple")
 
     val results = joinT.toDataSet[Row].collect()
     TestBaseUtils.compareResultAsText(results.asJava, expected.mkString("\n"))
@@ -480,21 +602,20 @@ class JoinITCase(
   }
 
   private def addNullKey3Tuples(rows: DataSet[(Int, Long, String)]) = {
-    rows.mapPartition(
-      new MapPartitionFunction[(Int, Long, String), (Integer, Long, String)] {
+    rows.mapPartition(new MapPartitionFunction[(Int, Long, String), (Integer, Long, String)] {
 
-        override def mapPartition(
-            vals: JIterable[(Int, Long, String)],
-            out: Collector[(Integer, Long, String)]): Unit = {
-          val it = vals.iterator()
-          while (it.hasNext) {
-            val v = it.next()
-            out.collect((int2Integer(v._1), v._2, v._3))
-          }
-          out.collect((null.asInstanceOf[Integer], 999L, "NullTuple"))
-          out.collect((null.asInstanceOf[Integer], 999L, "NullTuple"))
+      override def mapPartition(
+          vals: JIterable[(Int, Long, String)],
+          out: Collector[(Integer, Long, String)]): Unit = {
+        val it = vals.iterator()
+        while (it.hasNext) {
+          val v = it.next()
+          out.collect((int2Integer(v._1), v._2, v._3))
         }
-      })
+        out.collect((null.asInstanceOf[Integer], 999L, "NullTuple"))
+        out.collect((null.asInstanceOf[Integer], 999L, "NullTuple"))
+      }
+    })
   }
 
   private def addNullKey5Tuples(rows: DataSet[(Int, Long, Int, String, Long)]) = {

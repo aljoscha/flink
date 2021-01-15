@@ -28,22 +28,16 @@ import org.apache.flink.table.codegen.calls.CallGenerator.generateCallIfArgsNotN
 import org.apache.flink.table.codegen.{CodeGenException, CodeGenerator, GeneratedExpression}
 
 class ExtractCallGen(returnType: TypeInformation[_], method: Method)
-  extends MethodCallGen(returnType, method) {
+    extends MethodCallGen(returnType, method) {
 
-  override def generate(codeGenerator: CodeGenerator, operands: Seq[GeneratedExpression])
-  : GeneratedExpression = {
+  override def generate(
+      codeGenerator: CodeGenerator,
+      operands: Seq[GeneratedExpression]): GeneratedExpression = {
     val unit = getEnum(operands.head).asInstanceOf[TimeUnitRange].startUnit
     val tpe = operands(1).resultType
     unit match {
-      case TimeUnit.YEAR |
-           TimeUnit.MONTH |
-           TimeUnit.DAY |
-           TimeUnit.QUARTER |
-           TimeUnit.DOY |
-           TimeUnit.DOW |
-           TimeUnit.WEEK |
-           TimeUnit.CENTURY |
-           TimeUnit.MILLENNIUM =>
+      case TimeUnit.YEAR | TimeUnit.MONTH | TimeUnit.DAY | TimeUnit.QUARTER | TimeUnit.DOY |
+          TimeUnit.DOW | TimeUnit.WEEK | TimeUnit.CENTURY | TimeUnit.MILLENNIUM =>
         tpe match {
           case SqlTimeTypeInfo.TIMESTAMP =>
             return generateCallIfArgsNotNull(codeGenerator.nullCheck, returnType, operands) {
@@ -65,8 +59,8 @@ class ExtractCallGen(returnType: TypeInformation[_], method: Method)
 
       case _ => // do nothing
     }
-    generateCallIfArgsNotNull(codeGenerator.nullCheck, returnType, operands) {
-      (terms) => {
+    generateCallIfArgsNotNull(codeGenerator.nullCheck, returnType, operands) { (terms) =>
+      {
         val factor = getFactor(unit)
         unit match {
           case TimeUnit.QUARTER =>
@@ -102,9 +96,7 @@ class ExtractCallGen(returnType: TypeInformation[_], method: Method)
         TimeUnit.YEAR.multiplier.longValue()
       case TimeUnit.QUARTER =>
         TimeUnit.YEAR.multiplier.longValue()
-      case TimeUnit.YEAR |
-           TimeUnit.CENTURY |
-           TimeUnit.MILLENNIUM => 1L
+      case TimeUnit.YEAR | TimeUnit.CENTURY | TimeUnit.MILLENNIUM => 1L
       case _ =>
         throw new CodeGenException(s"Unit '$unit' is not supported.")
     }

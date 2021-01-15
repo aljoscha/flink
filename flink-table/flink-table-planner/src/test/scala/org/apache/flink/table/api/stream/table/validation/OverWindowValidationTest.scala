@@ -21,19 +21,22 @@ package org.apache.flink.table.api.stream.table.validation
 import org.apache.flink.api.scala._
 import org.apache.flink.table.api._
 import org.apache.flink.table.planner.StreamPlanner
-import org.apache.flink.table.runtime.utils.JavaUserDefinedAggFunctions.{OverAgg0, WeightedAvgWithRetract}
+import org.apache.flink.table.runtime.utils.JavaUserDefinedAggFunctions.{
+  OverAgg0,
+  WeightedAvgWithRetract
+}
 import org.apache.flink.table.utils.{StreamTableTestUtil, TableTestBase}
 
 import org.junit.Test
 
 class OverWindowValidationTest extends TableTestBase {
   private val streamUtil: StreamTableTestUtil = streamTestUtil()
-  val table: Table = streamUtil.addTable[(Int, String, Long)]("MyTable",
-    'a, 'b, 'c, 'proctime.proctime, 'rowtime.rowtime)
+  val table: Table = streamUtil
+    .addTable[(Int, String, Long)]("MyTable", 'a, 'b, 'c, 'proctime.proctime, 'rowtime.rowtime)
 
   /**
-    * Perform optimization for the input Table.
-    */
+   * Perform optimization for the input Table.
+   */
   def optimizeTable(table: Table, updatesAsRetraction: Boolean): Unit = {
     val planner = streamUtil.tableEnv.getPlanner.asInstanceOf[StreamPlanner]
     planner.optimizer
@@ -41,8 +44,8 @@ class OverWindowValidationTest extends TableTestBase {
   }
 
   /**
-    * OVER clause is necessary for [[OverAgg0]] window function.
-    */
+   * OVER clause is necessary for [[OverAgg0]] window function.
+   */
   @Test(expected = classOf[ValidationException])
   def testInvalidOverAggregation(): Unit = {
     val util = streamTestUtil()
@@ -52,8 +55,8 @@ class OverWindowValidationTest extends TableTestBase {
   }
 
   /**
-    * OVER clause is necessary for [[OverAgg0]] window function.
-    */
+   * OVER clause is necessary for [[OverAgg0]] window function.
+   */
   @Test(expected = classOf[ValidationException])
   def testInvalidOverAggregation2(): Unit = {
     val util = streamTestUtil()
@@ -148,7 +151,7 @@ class OverWindowValidationTest extends TableTestBase {
     thrown.expectMessage("Window start and end properties are not available for Over windows.")
 
     table
-    .window(Over orderBy 'rowtime preceding 1.minutes as 'w)
-    .select('c, 'a.count over 'w, 'w.start + 1, 'w.end)
+      .window(Over orderBy 'rowtime preceding 1.minutes as 'w)
+      .select('c, 'a.count over 'w, 'w.start + 1, 'w.end)
   }
 }

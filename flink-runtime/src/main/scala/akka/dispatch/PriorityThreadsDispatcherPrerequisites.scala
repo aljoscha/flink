@@ -19,17 +19,18 @@
 package akka.dispatch
 
 /**
-  * Composition over [[DefaultDispatcherPrerequisites]] that replaces thread factory with one that
-  * allow to configure thread priority.
-  *
-  * @param newThreadPriority priority that will be set to each newly created thread
-  *                          should be between Thread.MIN_PRIORITY and Thread.MAX_PRIORITY
-  */
+ * Composition over [[DefaultDispatcherPrerequisites]] that replaces thread factory with one that
+ * allow to configure thread priority.
+ *
+ * @param newThreadPriority priority that will be set to each newly created thread
+ *                          should be between Thread.MIN_PRIORITY and Thread.MAX_PRIORITY
+ */
 class PriorityThreadsDispatcherPrerequisites(
-  prerequisites: DispatcherPrerequisites,
-  newThreadPriority: Int) extends DispatcherPrerequisites {
+    prerequisites: DispatcherPrerequisites,
+    newThreadPriority: Int)
+    extends DispatcherPrerequisites {
 
-  private val defaultDispatcherPrerequisites : DefaultDispatcherPrerequisites =
+  private val defaultDispatcherPrerequisites: DefaultDispatcherPrerequisites =
     new DefaultDispatcherPrerequisites(
       eventStream = prerequisites.eventStream,
       scheduler = prerequisites.scheduler,
@@ -37,42 +38,40 @@ class PriorityThreadsDispatcherPrerequisites(
       settings = prerequisites.settings,
       mailboxes = prerequisites.mailboxes,
       defaultExecutionContext = prerequisites.defaultExecutionContext,
-      threadFactory = new PriorityThreadFactory(prerequisites, newThreadPriority)
-  )
+      threadFactory = new PriorityThreadFactory(prerequisites, newThreadPriority))
 
-  override def threadFactory : java.util.concurrent.ThreadFactory = {
+  override def threadFactory: java.util.concurrent.ThreadFactory = {
     defaultDispatcherPrerequisites.threadFactory
   }
 
-  override def eventStream : akka.event.EventStream = {
+  override def eventStream: akka.event.EventStream = {
     defaultDispatcherPrerequisites.eventStream
   }
 
-  override def scheduler : akka.actor.Scheduler = {
+  override def scheduler: akka.actor.Scheduler = {
     defaultDispatcherPrerequisites.scheduler
   }
 
-  override def dynamicAccess : akka.actor.DynamicAccess = {
+  override def dynamicAccess: akka.actor.DynamicAccess = {
     defaultDispatcherPrerequisites.dynamicAccess
   }
 
-  override def settings : akka.actor.ActorSystem.Settings = {
+  override def settings: akka.actor.ActorSystem.Settings = {
     defaultDispatcherPrerequisites.settings
   }
 
-  override def mailboxes : akka.dispatch.Mailboxes = {
+  override def mailboxes: akka.dispatch.Mailboxes = {
     defaultDispatcherPrerequisites.mailboxes
   }
 
-  override def defaultExecutionContext : scala.Option[scala.concurrent.ExecutionContext] = {
+  override def defaultExecutionContext: scala.Option[scala.concurrent.ExecutionContext] = {
     defaultDispatcherPrerequisites.defaultExecutionContext
   }
 }
 
 object PriorityThreadsDispatcherPrerequisites {
-  def apply(prerequisites: DispatcherPrerequisites, newThreadPriority: Int):
-    PriorityThreadsDispatcherPrerequisites =
-      new PriorityThreadsDispatcherPrerequisites(prerequisites, newThreadPriority)
+  def apply(
+      prerequisites: DispatcherPrerequisites,
+      newThreadPriority: Int): PriorityThreadsDispatcherPrerequisites =
+    new PriorityThreadsDispatcherPrerequisites(prerequisites, newThreadPriority)
 }
-
-

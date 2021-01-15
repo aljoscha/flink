@@ -28,11 +28,11 @@ import org.apache.flink.table.plan.nodes.logical.FlinkLogicalOverWindow
 import org.apache.flink.table.plan.schema.RowSchema
 
 class DataStreamOverAggregateRule
-  extends ConverterRule(
-    classOf[FlinkLogicalOverWindow],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.DATASTREAM,
-    "DataStreamOverAggregateRule") {
+    extends ConverterRule(
+      classOf[FlinkLogicalOverWindow],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.DATASTREAM,
+      "DataStreamOverAggregateRule") {
 
   override def convert(rel: RelNode): RelNode = {
     val logicWindow: FlinkLogicalOverWindow = rel.asInstanceOf[FlinkLogicalOverWindow]
@@ -55,4 +55,3 @@ class DataStreamOverAggregateRule
 object DataStreamOverAggregateRule {
   val INSTANCE: RelOptRule = new DataStreamOverAggregateRule
 }
-

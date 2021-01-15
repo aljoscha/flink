@@ -22,18 +22,18 @@ import org.apache.calcite.plan.{RelOptUtil, RelOptCostFactory, RelOptCost}
 import org.apache.calcite.util.Util
 
 /**
-  * This class is based on Apache Calcite's `org.apache.calcite.plan.volcano.VolcanoCost` and has
-  * an adapted cost comparison method `isLe(other: RelOptCost)` that takes io and cpu into account.
-  */
+ * This class is based on Apache Calcite's `org.apache.calcite.plan.volcano.VolcanoCost` and has
+ * an adapted cost comparison method `isLe(other: RelOptCost)` that takes io and cpu into account.
+ */
 class DataSetCost(val rowCount: Double, val cpu: Double, val io: Double) extends RelOptCost {
 
   def getCpu: Double = cpu
 
   def isInfinite: Boolean = {
     (this eq DataSetCost.Infinity) ||
-      (this.rowCount == Double.PositiveInfinity) ||
-      (this.cpu == Double.PositiveInfinity) ||
-      (this.io == Double.PositiveInfinity)
+    (this.rowCount == Double.PositiveInfinity) ||
+    (this.cpu == Double.PositiveInfinity) ||
+    (this.io == Double.PositiveInfinity)
   }
 
   def getIo: Double = io
@@ -41,9 +41,9 @@ class DataSetCost(val rowCount: Double, val cpu: Double, val io: Double) extends
   def isLe(other: RelOptCost): Boolean = {
     val that: DataSetCost = other.asInstanceOf[DataSetCost]
     (this eq that) ||
-      (this.io < that.io) ||
-      (this.io == that.io && this.cpu < that.cpu) ||
-      (this.io == that.io && this.cpu == that.cpu && this.rowCount < that.rowCount)
+    (this.io < that.io) ||
+    (this.io == that.io && this.cpu < that.cpu) ||
+    (this.io == that.io && this.cpu == that.cpu && this.rowCount < that.rowCount)
   }
 
   def isLt(other: RelOptCost): Boolean = {
@@ -56,10 +56,10 @@ class DataSetCost(val rowCount: Double, val cpu: Double, val io: Double) extends
 
   def equals(other: RelOptCost): Boolean = {
     (this eq other) ||
-      other.isInstanceOf[DataSetCost] &&
-        (this.rowCount == other.asInstanceOf[DataSetCost].rowCount) &&
-        (this.cpu == other.asInstanceOf[DataSetCost].cpu) &&
-        (this.io == other.asInstanceOf[DataSetCost].io)
+    other.isInstanceOf[DataSetCost] &&
+    (this.rowCount == other.asInstanceOf[DataSetCost].rowCount) &&
+    (this.cpu == other.asInstanceOf[DataSetCost].cpu) &&
+    (this.io == other.asInstanceOf[DataSetCost].io)
   }
 
   def isEqWithEpsilon(other: RelOptCost): Boolean = {
@@ -68,9 +68,9 @@ class DataSetCost(val rowCount: Double, val cpu: Double, val io: Double) extends
     }
     val that: DataSetCost = other.asInstanceOf[DataSetCost]
     (this eq that) ||
-      ((Math.abs(this.rowCount - that.rowCount) < RelOptUtil.EPSILON) &&
-        (Math.abs(this.cpu - that.cpu) < RelOptUtil.EPSILON) &&
-        (Math.abs(this.io - that.io) < RelOptUtil.EPSILON))
+    ((Math.abs(this.rowCount - that.rowCount) < RelOptUtil.EPSILON) &&
+      (Math.abs(this.cpu - that.cpu) < RelOptUtil.EPSILON) &&
+      (Math.abs(this.io - that.io) < RelOptUtil.EPSILON))
   }
 
   def minus(other: RelOptCost): RelOptCost = {
@@ -93,8 +93,7 @@ class DataSetCost(val rowCount: Double, val cpu: Double, val io: Double) extends
     var d: Double = 1
     var n: Double = 0
     if ((this.rowCount != 0) && !this.rowCount.isInfinite &&
-      (that.rowCount != 0) && !that.rowCount.isInfinite)
-    {
+      (that.rowCount != 0) && !that.rowCount.isInfinite) {
       d *= this.rowCount / that.rowCount
       n += 1
     }
@@ -126,13 +125,10 @@ class DataSetCost(val rowCount: Double, val cpu: Double, val io: Double) extends
 
 object DataSetCost {
 
-  private[flink] val Infinity = new DataSetCost(
-    Double.PositiveInfinity,
-    Double.PositiveInfinity,
-    Double.PositiveInfinity)
-  {
-    override def toString: String = "{inf}"
-  }
+  private[flink] val Infinity =
+    new DataSetCost(Double.PositiveInfinity, Double.PositiveInfinity, Double.PositiveInfinity) {
+      override def toString: String = "{inf}"
+    }
 
   private[flink] val Huge = new DataSetCost(Double.MaxValue, Double.MaxValue, Double.MaxValue) {
     override def toString: String = "{huge}"

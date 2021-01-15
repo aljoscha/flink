@@ -30,15 +30,15 @@ import org.apache.calcite.rel.{RelNode, RelWriter, SingleRel}
 import scala.collection.JavaConversions._
 
 /**
-  * Relational expression that writes out data of input node into a [[DynamicTableSink]].
-  *
-  * @param cluster  cluster that this relational expression belongs to
-  * @param traitSet the traits of this rel
-  * @param input    input relational expression
+ * Relational expression that writes out data of input node into a [[DynamicTableSink]].
+ *
+ * @param cluster  cluster that this relational expression belongs to
+ * @param traitSet the traits of this rel
+ * @param input    input relational expression
  *  @param tableIdentifier the full path of the table to retrieve.
  *  @param catalogTable Catalog table where this table source table comes from
  *  @param tableSink the [[DynamicTableSink]] for which to write into
-  */
+ */
 abstract class Sink(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -46,14 +46,15 @@ abstract class Sink(
     val tableIdentifier: ObjectIdentifier,
     val catalogTable: CatalogTable,
     val tableSink: DynamicTableSink)
-  extends SingleRel(cluster, traitSet, input) {
+    extends SingleRel(cluster, traitSet, input) {
 
   override def deriveRowType(): RelDataType = {
     input.getRowType
   }
 
   override def explainTerms(pw: RelWriter): RelWriter = {
-    super.explainTerms(pw)
+    super
+      .explainTerms(pw)
       .item("table", tableIdentifier.asSummaryString())
       .item("fields", getRowType.getFieldNames.mkString(", "))
   }

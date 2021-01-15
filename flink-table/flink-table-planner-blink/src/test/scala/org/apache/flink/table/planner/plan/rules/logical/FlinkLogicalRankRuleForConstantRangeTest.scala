@@ -26,8 +26,8 @@ import org.apache.flink.table.planner.utils.TableTestBase
 import org.junit.Test
 
 /**
-  * Test for [[FlinkLogicalRankRuleForConstantRange]].
-  */
+ * Test for [[FlinkLogicalRankRuleForConstantRange]].
+ */
 class FlinkLogicalRankRuleForConstantRangeTest extends TableTestBase {
 
   private val util = batchTestUtil()

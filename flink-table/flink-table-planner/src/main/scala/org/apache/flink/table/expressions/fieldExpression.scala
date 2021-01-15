@@ -41,11 +41,9 @@ abstract class Attribute extends LeafExpression with NamedExpression {
 }
 
 /**
-  * Dummy wrapper for expressions that were converted to RexNode in a different way.
-  */
-case class RexPlannerExpression(
-    private[flink] val rexNode: RexNode)
-  extends LeafExpression {
+ * Dummy wrapper for expressions that were converted to RexNode in a different way.
+ */
+case class RexPlannerExpression(private[flink] val rexNode: RexNode) extends LeafExpression {
 
   override private[flink] def toRexNode(implicit relBuilder: RelBuilder): RexNode = {
     rexNode
@@ -69,9 +67,8 @@ case class UnresolvedFieldReference(name: String) extends Attribute {
     ValidationFailure(s"Unresolved reference $name.")
 }
 
-case class PlannerResolvedFieldReference(
-    name: String,
-    resultType: TypeInformation[_]) extends Attribute {
+case class PlannerResolvedFieldReference(name: String, resultType: TypeInformation[_])
+    extends Attribute {
 
   override def toString = s"'$name"
 
@@ -89,7 +86,8 @@ case class PlannerResolvedFieldReference(
 }
 
 case class Alias(child: PlannerExpression, name: String, extraNames: Seq[String] = Seq())
-    extends UnaryExpression with NamedExpression {
+    extends UnaryExpression
+    with NamedExpression {
 
   override def toString = s"$child as '$name"
 
@@ -155,8 +153,8 @@ case class WindowReference(name: String, tpe: Option[TypeInformation[_]] = None)
 }
 
 case class TableReference(name: String, tableOperation: QueryOperation)
-  extends LeafExpression
-  with NamedExpression {
+    extends LeafExpression
+    with NamedExpression {
 
   override private[flink] def toRexNode(implicit relBuilder: RelBuilder): RexNode =
     throw new UnsupportedOperationException(s"Table reference '$name' can not be used solely.")
@@ -171,8 +169,8 @@ case class TableReference(name: String, tableOperation: QueryOperation)
 }
 
 abstract class TimeAttribute(val expression: PlannerExpression)
-  extends UnaryExpression
-  with WindowProperty {
+    extends UnaryExpression
+    with WindowProperty {
 
   override private[flink] def child: PlannerExpression = expression
 }

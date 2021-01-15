@@ -28,7 +28,6 @@ import java.util.Collections
 
 import org.apache.flink.streaming.api.operators.TimestampedCollector
 
-
 /**
  * ProcessFunction to sort on processing time and additional attributes.
  *
@@ -38,28 +37,27 @@ import org.apache.flink.streaming.api.operators.TimestampedCollector
 class ProcTimeSortProcessFunction[K](
     private val inputRowType: CRowTypeInfo,
     private val rowComparator: CollectionRowComparator)
-  extends KeyedProcessFunction[K, CRow, CRow] {
+    extends KeyedProcessFunction[K, CRow, CRow] {
 
   Preconditions.checkNotNull(rowComparator)
 
   private var bufferedEvents: ListState[Row] = _
   private val sortBuffer: ArrayList[Row] = new ArrayList[Row]
-  
+
   private var outputC: CRow = _
-  
+
   override def open(config: Configuration) {
-    val sortDescriptor = new ListStateDescriptor[Row](
-      "sortState",
-      inputRowType.asInstanceOf[CRowTypeInfo].rowType)
+    val sortDescriptor =
+      new ListStateDescriptor[Row]("sortState", inputRowType.asInstanceOf[CRowTypeInfo].rowType)
     bufferedEvents = getRuntimeContext.getListState(sortDescriptor)
 
     outputC = new CRow()
   }
 
   override def processElement(
-    inputC: CRow,
-    ctx: KeyedProcessFunction[K, CRow, CRow]#Context,
-    out: Collector[CRow]): Unit = {
+      inputC: CRow,
+      ctx: KeyedProcessFunction[K, CRow, CRow]#Context,
+      out: Collector[CRow]): Unit = {
 
     val input = inputC.row
     val currentTime = ctx.timerService.currentProcessingTime
@@ -69,27 +67,27 @@ class ProcTimeSortProcessFunction[K](
 
     // register a timer for the next millisecond to sort and emit buffered data
     ctx.timerService.registerProcessingTimeTimer(currentTime + 1)
-    
+
   }
-  
+
   override def onTimer(
-    timestamp: Long,
-    ctx: KeyedProcessFunction[K, CRow, CRow]#OnTimerContext,
-    out: Collector[CRow]): Unit = {
+      timestamp: Long,
+      ctx: KeyedProcessFunction[K, CRow, CRow]#OnTimerContext,
+      out: Collector[CRow]): Unit = {
 
     // remove timestamp set outside of ProcessFunction.
     out.asInstanceOf[TimestampedCollector[_]].eraseTimestamp()
 
-    val iter =  bufferedEvents.get.iterator()
+    val iter = bufferedEvents.get.iterator()
 
     // insert all rows into the sort buffer
     sortBuffer.clear()
-    while(iter.hasNext) {
+    while (iter.hasNext) {
       sortBuffer.add(iter.next())
     }
     // sort the rows
     Collections.sort(sortBuffer, rowComparator)
-    
+
     // Emit the rows in order
     var i = 0
     while (i < sortBuffer.size) {
@@ -97,9 +95,9 @@ class ProcTimeSortProcessFunction[K](
       out.collect(outputC)
       i += 1
     }
-    
+
     // remove all buffered rows
     bufferedEvents.clear()
   }
-  
+
 }

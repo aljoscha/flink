@@ -32,7 +32,7 @@ import org.apache.calcite.tools.RelBuilder
 import scala.collection.JavaConversions._
 
 case class In(expression: PlannerExpression, elements: Seq[PlannerExpression])
-  extends PlannerExpression  {
+    extends PlannerExpression {
 
   override def toString = s"$expression.in(${elements.mkString(", ")})"
 
@@ -67,7 +67,7 @@ case class In(expression: PlannerExpression, elements: Seq[PlannerExpression])
             s"The sub-query table '$name' must not have more than one column.")
         }
         (expression.resultType, tableSchema.getFieldType(0).get()) match {
-          case (lType, rType) if lType == rType => ValidationSuccess
+          case (lType, rType) if lType == rType                       => ValidationSuccess
           case (lType, rType) if isNumeric(lType) && isNumeric(rType) => ValidationSuccess
           case (lType, rType) if isArray(lType) && lType.getTypeClass == rType.getTypeClass =>
             ValidationSuccess
@@ -84,7 +84,7 @@ case class In(expression: PlannerExpression, elements: Seq[PlannerExpression])
         }
         (children.head.resultType, children.last.resultType) match {
           case (lType, rType) if isNumeric(lType) && isNumeric(rType) => ValidationSuccess
-          case (lType, rType) if lType == rType => ValidationSuccess
+          case (lType, rType) if lType == rType                       => ValidationSuccess
           case (lType, rType) if isArray(lType) && lType.getTypeClass == rType.getTypeClass =>
             ValidationSuccess
           case (lType, rType) =>
@@ -95,4 +95,3 @@ case class In(expression: PlannerExpression, elements: Seq[PlannerExpression])
 
   override private[flink] def resultType: TypeInformation[_] = BOOLEAN_TYPE_INFO
 }
-

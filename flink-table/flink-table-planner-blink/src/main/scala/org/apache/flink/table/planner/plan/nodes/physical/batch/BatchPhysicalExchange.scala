@@ -38,8 +38,8 @@ class BatchPhysicalExchange(
     traitSet: RelTraitSet,
     inputRel: RelNode,
     relDistribution: RelDistribution)
-  extends CommonPhysicalExchange(cluster, traitSet, inputRel, relDistribution)
-  with BatchPhysicalRel {
+    extends CommonPhysicalExchange(cluster, traitSet, inputRel, relDistribution)
+    with BatchPhysicalRel {
 
   override def copy(
       traitSet: RelTraitSet,
@@ -66,16 +66,17 @@ class BatchPhysicalExchange(
       ExecEdge.DamBehavior.PIPELINED
     }
 
-    ExecEdge.builder.
-      requiredShuffle(getRequiredShuffle)
+    ExecEdge.builder
+      .requiredShuffle(getRequiredShuffle)
       .damBehavior(damBehavior)
       .build
   }
 
   private def getShuffleMode: ShuffleMode = {
     val tableConfig = FlinkRelOptUtil.getTableConfigFromContext(this)
-    if (tableConfig.getConfiguration.getString(ExecutionConfigOptions.TABLE_EXEC_SHUFFLE_MODE)
-      .equalsIgnoreCase(GlobalDataExchangeMode.ALL_EDGES_BLOCKING.toString)) {
+    if (tableConfig.getConfiguration
+        .getString(ExecutionConfigOptions.TABLE_EXEC_SHUFFLE_MODE)
+        .equalsIgnoreCase(GlobalDataExchangeMode.ALL_EDGES_BLOCKING.toString)) {
       ShuffleMode.BATCH
     } else {
       ShuffleMode.UNDEFINED

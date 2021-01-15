@@ -24,11 +24,11 @@ import org.apache.calcite.rel.metadata._
 import org.apache.calcite.util.BuiltInMethod
 
 /**
-  * FlinkRelMdNonCumulativeCost supplies a implementation of
-  * [[RelMetadataQuery#getNonCumulativeCost]] for the standard logical algebra.
-  */
+ * FlinkRelMdNonCumulativeCost supplies a implementation of
+ * [[RelMetadataQuery#getNonCumulativeCost]] for the standard logical algebra.
+ */
 class FlinkRelMdNonCumulativeCost private
-  extends MetadataHandler[BuiltInMetadata.NonCumulativeCost] {
+    extends MetadataHandler[BuiltInMetadata.NonCumulativeCost] {
 
   def getDef: MetadataDef[BuiltInMetadata.NonCumulativeCost] = BuiltInMetadata.NonCumulativeCost.DEF
 
@@ -48,7 +48,8 @@ object FlinkRelMdNonCumulativeCost {
   private val INSTANCE = new FlinkRelMdNonCumulativeCost
 
   val SOURCE: RelMetadataProvider = ReflectiveRelMetadataProvider.reflectiveSource(
-    BuiltInMethod.NON_CUMULATIVE_COST.method, INSTANCE)
+    BuiltInMethod.NON_CUMULATIVE_COST.method,
+    INSTANCE)
 
   val THREAD_PLANNER = new ThreadLocal[RelOptPlanner]()
 

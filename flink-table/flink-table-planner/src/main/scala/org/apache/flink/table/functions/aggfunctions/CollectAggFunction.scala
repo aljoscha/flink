@@ -31,7 +31,7 @@ import scala.collection.JavaConverters._
 /** The initial accumulator for Collect aggregate function */
 class CollectAccumulator[E](var map: MapView[E, Integer]) {
   def this() {
-      this(null)
+    this(null)
   }
 
   def canEqual(a: Any): Boolean = a.isInstanceOf[CollectAccumulator[E]]
@@ -39,12 +39,12 @@ class CollectAccumulator[E](var map: MapView[E, Integer]) {
   override def equals(that: Any): Boolean =
     that match {
       case that: CollectAccumulator[E] => that.canEqual(this) && this.map == that.map
-      case _ => false
+      case _                           => false
     }
 }
 
 class CollectAggFunction[E](valueTypeInfo: TypeInformation[_])
-  extends AggregateFunction[util.Map[E, Integer], CollectAccumulator[E]] {
+    extends AggregateFunction[util.Map[E, Integer], CollectAccumulator[E]] {
 
   override def createAccumulator(): CollectAccumulator[E] = {
     new CollectAccumulator[E](
@@ -85,9 +85,12 @@ class CollectAggFunction[E](valueTypeInfo: TypeInformation[_])
   override def getAccumulatorType: TypeInformation[CollectAccumulator[E]] = {
     val clazz = classOf[CollectAccumulator[E]]
     val pojoFields = new util.ArrayList[PojoField]
-    pojoFields.add(new PojoField(clazz.getDeclaredField("map"),
-      new MapViewTypeInfo[E, Integer](
-        valueTypeInfo.asInstanceOf[TypeInformation[E]], BasicTypeInfo.INT_TYPE_INFO)))
+    pojoFields.add(
+      new PojoField(
+        clazz.getDeclaredField("map"),
+        new MapViewTypeInfo[E, Integer](
+          valueTypeInfo.asInstanceOf[TypeInformation[E]],
+          BasicTypeInfo.INT_TYPE_INFO)))
     new PojoTypeInfo[CollectAccumulator[E]](clazz, pojoFields)
   }
 

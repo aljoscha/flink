@@ -30,8 +30,8 @@ import org.junit.Test
 class OverAggregateTest extends TableTestBase {
 
   private val util = streamTestUtil()
-  util.addDataStream[(Int, String, Long)](
-    "MyTable", 'a, 'b, 'c, 'proctime.proctime, 'rowtime.rowtime)
+  util
+    .addDataStream[(Int, String, Long)]("MyTable", 'a, 'b, 'c, 'proctime.proctime, 'rowtime.rowtime)
 
   def verifyPlanIdentical(sql1: String, sql2: String): Unit = {
     val table1 = util.tableEnv.sqlQuery(sql1)
@@ -42,8 +42,8 @@ class OverAggregateTest extends TableTestBase {
   }
 
   /**
-    * All aggregates must be computed on the same window.
-    */
+   * All aggregates must be computed on the same window.
+   */
   @Test(expected = classOf[TableException])
   def testMultiWindow(): Unit = {
     val sqlQuery =
@@ -58,8 +58,8 @@ class OverAggregateTest extends TableTestBase {
   }
 
   /**
-    * OVER clause is necessary for [[OverAgg0]] window function.
-    */
+   * OVER clause is necessary for [[OverAgg0]] window function.
+   */
   @Test(expected = classOf[ValidationException])
   def testInvalidOverAggregation(): Unit = {
     util.addFunction("overAgg", new OverAgg0)
@@ -67,8 +67,8 @@ class OverAggregateTest extends TableTestBase {
   }
 
   /**
-    * OVER clause is necessary for [[OverAgg0]] window function.
-    */
+   * OVER clause is necessary for [[OverAgg0]] window function.
+   */
   @Test(expected = classOf[ValidationException])
   def testInvalidOverAggregation2(): Unit = {
     util.addFunction("overAgg", new OverAgg0)

@@ -38,19 +38,18 @@ import org.apache.flink.table.util.Logging
 import org.apache.flink.types.Row
 
 /**
-  *
-  * Base RelNode for data stream unbounded group aggregate and unbounded group table aggregate.
-  *
-  * @param cluster         Cluster of the RelNode, represent for an environment of related
-  *                        relational expressions during the optimization of a query.
-  * @param traitSet        Trait set of the RelNode
-  * @param inputNode       The input RelNode of aggregation
-  * @param namedAggregates List of calls to aggregate functions and their output field names
-  * @param inputSchema     The type of the rows consumed by this RelNode
-  * @param schema          The type of the rows emitted by this RelNode
-  * @param groupings       The position (in the input Row) of the grouping keys
-  * @param aggTypeName     The type name of aggregate
-  */
+ * Base RelNode for data stream unbounded group aggregate and unbounded group table aggregate.
+ *
+ * @param cluster         Cluster of the RelNode, represent for an environment of related
+ *                        relational expressions during the optimization of a query.
+ * @param traitSet        Trait set of the RelNode
+ * @param inputNode       The input RelNode of aggregation
+ * @param namedAggregates List of calls to aggregate functions and their output field names
+ * @param inputSchema     The type of the rows consumed by this RelNode
+ * @param schema          The type of the rows emitted by this RelNode
+ * @param groupings       The position (in the input Row) of the grouping keys
+ * @param aggTypeName     The type name of aggregate
+ */
 abstract class DataStreamGroupAggregateBase(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -60,7 +59,7 @@ abstract class DataStreamGroupAggregateBase(
     inputSchema: RowSchema,
     groupings: Array[Int],
     aggTypeName: String)
-  extends SingleRel(cluster, traitSet, inputNode)
+    extends SingleRel(cluster, traitSet, inputNode)
     with CommonAggregate
     with DataStreamRel
     with Logging {
@@ -76,26 +75,24 @@ abstract class DataStreamGroupAggregateBase(
   def getGroupings: Array[Int] = groupings
 
   override def toString: String = {
-    s"$aggTypeName(${
-      if (!groupings.isEmpty) {
-        s"groupBy: (${groupingToString(inputSchema.relDataType, groupings)}), "
-      } else {
-        ""
-      }
-    }select:(${aggregationToString(
-      inputSchema.relDataType, groupings, getRowType, namedAggregates, Nil)}))"
+    s"$aggTypeName(${if (!groupings.isEmpty) {
+      s"groupBy: (${groupingToString(inputSchema.relDataType, groupings)}), "
+    } else {
+      ""
+    }}select:(${aggregationToString(inputSchema.relDataType, groupings, getRowType, namedAggregates, Nil)}))"
   }
 
   override def explainTerms(pw: RelWriter): RelWriter = {
-    super.explainTerms(pw)
-      .itemIf("groupBy", groupingToString(
-        inputSchema.relDataType, groupings), !groupings.isEmpty)
-      .item("select", aggregationToString(
-        inputSchema.relDataType, groupings, getRowType, namedAggregates, Nil))
+    super
+      .explainTerms(pw)
+      .itemIf("groupBy", groupingToString(inputSchema.relDataType, groupings), !groupings.isEmpty)
+      .item(
+        "select",
+        aggregationToString(inputSchema.relDataType, groupings, getRowType, namedAggregates, Nil))
   }
 
   private def createKeyedProcessFunction[K](
-    tableConfig: TableConfig): KeyedProcessFunction[K, CRow, CRow] = {
+      tableConfig: TableConfig): KeyedProcessFunction[K, CRow, CRow] = {
 
     AggregateUtil.createDataStreamGroupAggregateFunction[K](
       tableConfig,
@@ -115,8 +112,7 @@ abstract class DataStreamGroupAggregateBase(
     val config = planner.getConfig
 
     if (groupings.length > 0 && config.getMinIdleStateRetentionTime < 0) {
-      LOG.warn(
-        "No state retention interval configured for a query which accumulates state. " +
+      LOG.warn("No state retention interval configured for a query which accumulates state. " +
         "Please provide a query configuration with valid retention interval to prevent excessive " +
         "state size. You may specify a retention time of 0 to not clean up the state.")
     }
@@ -125,39 +121,34 @@ abstract class DataStreamGroupAggregateBase(
 
     val outRowType = CRowTypeInfo(schema.typeInfo)
 
-    val aggString = aggregationToString(
-      inputSchema.relDataType,
-      groupings,
-      getRowType,
-      namedAggregates,
-      Nil)
+    val aggString =
+      aggregationToString(inputSchema.relDataType, groupings, getRowType, namedAggregates, Nil)
 
     val keyedAggOpName = s"groupBy: (${groupingToString(inputSchema.relDataType, groupings)}), " +
       s"select: ($aggString)"
     val nonKeyedAggOpName = s"select: ($aggString)"
 
     val result: DataStream[CRow] =
-    // grouped / keyed aggregation
+      // grouped / keyed aggregation
       if (groupings.nonEmpty) {
         inputDS
-        .keyBy(new CRowKeySelector(groupings, inputSchema.projectedTypeInfo(groupings)))
-        .process(createKeyedProcessFunction[Row](config))
-        .returns(outRowType)
-        .name(keyedAggOpName)
-        .asInstanceOf[DataStream[CRow]]
+          .keyBy(new CRowKeySelector(groupings, inputSchema.projectedTypeInfo(groupings)))
+          .process(createKeyedProcessFunction[Row](config))
+          .returns(outRowType)
+          .name(keyedAggOpName)
+          .asInstanceOf[DataStream[CRow]]
       }
       // global / non-keyed aggregation
       else {
         inputDS
-        .keyBy(new NullByteKeySelector[CRow])
-        .process(createKeyedProcessFunction[JByte](config))
-        .setParallelism(1)
-        .setMaxParallelism(1)
-        .returns(outRowType)
-        .name(nonKeyedAggOpName)
-        .asInstanceOf[DataStream[CRow]]
+          .keyBy(new NullByteKeySelector[CRow])
+          .process(createKeyedProcessFunction[JByte](config))
+          .setParallelism(1)
+          .setMaxParallelism(1)
+          .returns(outRowType)
+          .name(nonKeyedAggOpName)
+          .asInstanceOf[DataStream[CRow]]
       }
     result
   }
 }
-

@@ -85,7 +85,6 @@ object UserDefinedFunctionTestUtils {
     f0 = 0L //count
   }
 
-
   class VarArgsAggFunction extends AggregateFunction[Long, CountAccumulator] {
 
     @varargs
@@ -115,7 +114,6 @@ object UserDefinedFunctionTestUtils {
       new CountAccumulator
     }
   }
-
 
   /** Counts how often the first argument was larger than the second argument. */
   class LargerThanCount extends AggregateFunction[Long, Tuple1[Long]] {
@@ -288,9 +286,11 @@ object UserDefinedFunctionTestUtils {
 
     override def getResultType(signature: Array[Class[_]]): PojoTypeInfo[MyPojo] = {
       val cls = classOf[MyPojo]
-      new PojoTypeInfo[MyPojo](classOf[MyPojo], util.Arrays.asList(
-        new PojoField(cls.getDeclaredField("f1"), Types.INT),
-        new PojoField(cls.getDeclaredField("f2"), Types.INT)))
+      new PojoTypeInfo[MyPojo](
+        classOf[MyPojo],
+        util.Arrays.asList(
+          new PojoField(cls.getDeclaredField("f1"), Types.INT),
+          new PojoField(cls.getDeclaredField("f2"), Types.INT)))
     }
   }
 
@@ -344,6 +344,7 @@ object UserDefinedFunctionTestUtils {
   }
 
   object TestAddWithOpen {
+
     /** A thread-safe counter to record how many alive TestAddWithOpen UDFs */
     val aliveCounter = new AtomicInteger(0)
   }
@@ -418,16 +419,16 @@ object UserDefinedFunctionTestUtils {
 
   def setJobParameters(env: ExecutionEnvironment, parameters: Map[String, String]): Unit = {
     val conf = new Configuration()
-    parameters.foreach {
-      case (k, v) => conf.setString(k, v)
+    parameters.foreach { case (k, v) =>
+      conf.setString(k, v)
     }
     env.getConfig.setGlobalJobParameters(conf)
   }
 
   def setJobParameters(env: StreamExecutionEnvironment, parameters: Map[String, String]): Unit = {
     val conf = new Configuration()
-    parameters.foreach {
-      case (k, v) => conf.setString(k, v)
+    parameters.foreach { case (k, v) =>
+      conf.setString(k, v)
     }
     env.getConfig.setGlobalJobParameters(conf)
   }
@@ -436,8 +437,8 @@ object UserDefinedFunctionTestUtils {
       env: org.apache.flink.streaming.api.environment.StreamExecutionEnvironment,
       parameters: Map[String, String]): Unit = {
     val conf = new Configuration()
-    parameters.foreach {
-      case (k, v) => conf.setString(k, v)
+    parameters.foreach { case (k, v) =>
+      conf.setString(k, v)
     }
     env.getConfig.setGlobalJobParameters(conf)
   }
@@ -460,8 +461,8 @@ class GenericAggregateFunction extends AggregateFunction[java.lang.Integer, Rand
   override def getResultType: TypeInformation[java.lang.Integer] =
     new GenericTypeInfo[Integer](classOf[Integer])
 
-  override def getAccumulatorType: TypeInformation[RandomClass] = new GenericTypeInfo[RandomClass](
-    classOf[RandomClass])
+  override def getAccumulatorType: TypeInformation[RandomClass] =
+    new GenericTypeInfo[RandomClass](classOf[RandomClass])
 
   def accumulate(acc: RandomClass, value: Int): Unit = {
     acc.i = value

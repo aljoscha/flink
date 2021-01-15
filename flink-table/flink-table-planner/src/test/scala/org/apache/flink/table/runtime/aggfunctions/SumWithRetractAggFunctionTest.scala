@@ -24,12 +24,12 @@ import org.apache.flink.table.functions.AggregateFunction
 import org.apache.flink.table.functions.aggfunctions._
 
 /**
-  * Test case for built-in sum with retract aggregate function
-  *
-  * @tparam T the type for the aggregation result
-  */
+ * Test case for built-in sum with retract aggregate function
+ *
+ * @tparam T the type for the aggregation result
+ */
 abstract class SumWithRetractAggFunctionTestBase[T: Numeric]
-  extends AggFunctionTestBase[T, SumWithRetractAccumulator[T]] {
+    extends AggFunctionTestBase[T, SumWithRetractAccumulator[T]] {
 
   private val numeric: Numeric[T] = implicitly[Numeric[T]]
 
@@ -50,22 +50,16 @@ abstract class SumWithRetractAggFunctionTestBase[T: Numeric]
       numeric.fromInt(-20),
       numeric.fromInt(17),
       null.asInstanceOf[T],
-      maxVal
-    ),
+      maxVal),
     Seq(
       null.asInstanceOf[T],
       null.asInstanceOf[T],
       null.asInstanceOf[T],
       null.asInstanceOf[T],
       null.asInstanceOf[T],
-      null.asInstanceOf[T]
-    )
-  )
+      null.asInstanceOf[T]))
 
-  override def expectedResults: Seq[T] = Seq(
-    numeric.fromInt(2),
-    null.asInstanceOf[T]
-  )
+  override def expectedResults: Seq[T] = Seq(numeric.fromInt(2), null.asInstanceOf[T])
 
   override def retractFunc = aggregator.getClass.getMethod("retract", accType, classOf[Any])
 }
@@ -118,9 +112,8 @@ class DoubleSumWithRetractAggFunctionTest extends SumWithRetractAggFunctionTestB
     new DoubleSumWithRetractAggFunction
 }
 
-
 class DecimalSumWithRetractAggFunctionTest
-  extends AggFunctionTestBase[BigDecimal, DecimalSumWithRetractAccumulator] {
+    extends AggFunctionTestBase[BigDecimal, DecimalSumWithRetractAccumulator] {
 
   override def inputValueSets: Seq[Seq[_]] = Seq(
     Seq(
@@ -137,26 +130,13 @@ class DecimalSumWithRetractAggFunctionTest
       null,
       new BigDecimal("4"),
       new BigDecimal("-999.999"),
-      null
-    ),
-    Seq(
-      null,
-      null,
-      null,
-      null,
-      null
-    )
-  )
+      null),
+    Seq(null, null, null, null, null))
 
-  override def expectedResults: Seq[BigDecimal] = Seq(
-    new BigDecimal("10.000000000001"),
-    null
-  )
+  override def expectedResults: Seq[BigDecimal] = Seq(new BigDecimal("10.000000000001"), null)
 
   override def aggregator: AggregateFunction[BigDecimal, DecimalSumWithRetractAccumulator] =
     new DecimalSumWithRetractAggFunction()
 
   override def retractFunc = aggregator.getClass.getMethod("retract", accType, classOf[Any])
 }
-
-

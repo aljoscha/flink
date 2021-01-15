@@ -18,7 +18,6 @@
 
 package org.apache.flink.streaming.scala.examples.async
 
-
 import java.util.concurrent.TimeUnit
 
 import org.apache.flink.streaming.api.functions.source.ParallelSourceFunction
@@ -41,7 +40,7 @@ object AsyncIOExample {
       (input, collector: ResultFuture[Int]) =>
         Future {
           collector.complete(Seq(input))
-        } (ExecutionContext.global)
+        }(ExecutionContext.global)
     }
 
     asyncMapped.print()

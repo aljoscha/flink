@@ -30,12 +30,13 @@ import org.junit.Assert
 import java.{lang, util}
 
 /**
-  * Test [[TableSourceFactory]] and [[TableSinkFactory]] for context.
-  */
+ * Test [[TableSourceFactory]] and [[TableSinkFactory]] for context.
+ */
 class TestContextTableFactory[T](
     sourceIdentifier: ObjectIdentifier,
     sinkIdentifier: ObjectIdentifier)
-    extends TableSourceFactory[T] with TableSinkFactory[T] {
+    extends TableSourceFactory[T]
+    with TableSinkFactory[T] {
 
   var hasInvokedSource = false
   var hasInvokedSink = false
@@ -64,7 +65,9 @@ class TestContextTableFactory[T](
   }
 }
 
-object TestContextTableFactory{
+object TestContextTableFactory {
   val REQUIRED_KEY: ConfigOption[lang.Boolean] = ConfigOptions
-      .key("testing.required.key").booleanType().defaultValue(false)
+    .key("testing.required.key")
+    .booleanType()
+    .defaultValue(false)
 }

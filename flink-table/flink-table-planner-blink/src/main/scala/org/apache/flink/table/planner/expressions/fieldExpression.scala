@@ -23,7 +23,11 @@ import org.apache.flink.table.operations.QueryOperation
 import org.apache.flink.table.planner.calcite.FlinkRelBuilder.NamedWindowProperty
 import org.apache.flink.table.planner.calcite.FlinkTypeFactory
 import org.apache.flink.table.planner.calcite.FlinkTypeFactory._
-import org.apache.flink.table.planner.validate.{ValidationFailure, ValidationResult, ValidationSuccess}
+import org.apache.flink.table.planner.validate.{
+  ValidationFailure,
+  ValidationResult,
+  ValidationSuccess
+}
 import org.apache.flink.table.runtime.types.TypeInfoLogicalTypeConverter.fromLogicalTypeToTypeInfo
 import org.apache.flink.table.typeutils.TimeIndicatorTypeInfo
 
@@ -41,11 +45,9 @@ abstract class Attribute extends LeafExpression with NamedExpression {
 }
 
 /**
-  * Dummy wrapper for expressions that were converted to RexNode in a different way.
-  */
-case class RexPlannerExpression(
-    private[flink] val rexNode: RexNode)
-  extends LeafExpression {
+ * Dummy wrapper for expressions that were converted to RexNode in a different way.
+ */
+case class RexPlannerExpression(private[flink] val rexNode: RexNode) extends LeafExpression {
 
   override private[flink] def resultType: TypeInformation[_] =
     fromLogicalTypeToTypeInfo(FlinkTypeFactory.toLogicalType(rexNode.getType))
@@ -65,9 +67,8 @@ case class UnresolvedFieldReference(name: String) extends Attribute {
     ValidationFailure(s"Unresolved reference $name.")
 }
 
-case class PlannerResolvedFieldReference(
-    name: String,
-    resultType: TypeInformation[_]) extends Attribute {
+case class PlannerResolvedFieldReference(name: String, resultType: TypeInformation[_])
+    extends Attribute {
 
   override def toString = s"'$name"
 
@@ -97,8 +98,8 @@ case class WindowReference(name: String, tpe: Option[TypeInformation[_]] = None)
 }
 
 case class TableReference(name: String, tableOperation: QueryOperation)
-  extends LeafExpression
-  with NamedExpression {
+    extends LeafExpression
+    with NamedExpression {
 
   override private[flink] def resultType: TypeInformation[_] =
     throw new UnresolvedException(s"Table reference '$name' has no result type.")
@@ -110,8 +111,8 @@ case class TableReference(name: String, tableOperation: QueryOperation)
 }
 
 abstract class TimeAttribute(val expression: PlannerExpression)
-  extends UnaryExpression
-  with WindowProperty {
+    extends UnaryExpression
+    with WindowProperty {
 
   override private[flink] def child: PlannerExpression = expression
 }
@@ -187,13 +188,11 @@ case class StreamRecordTimestamp() extends LeafExpression {
 }
 
 /**
-  * Special reference which represent a local field, such as aggregate buffers or constants.
-  * We are stored as class members, so the field can be referenced directly.
-  * We should use an unique name to locate the field.
-  */
-case class PlannerLocalReference(
-    name: String,
-    resultType: TypeInformation[_]) extends Attribute {
+ * Special reference which represent a local field, such as aggregate buffers or constants.
+ * We are stored as class members, so the field can be referenced directly.
+ * We should use an unique name to locate the field.
+ */
+case class PlannerLocalReference(name: String, resultType: TypeInformation[_]) extends Attribute {
 
   override def toString = s"'$name"
 

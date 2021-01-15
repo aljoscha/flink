@@ -39,8 +39,8 @@ class StreamPhysicalWatermarkAssigner(
     inputRel: RelNode,
     rowtimeFieldIndex: Int,
     watermarkExpr: RexNode)
-  extends WatermarkAssigner(cluster, traits, inputRel, rowtimeFieldIndex, watermarkExpr)
-  with StreamPhysicalRel {
+    extends WatermarkAssigner(cluster, traits, inputRel, rowtimeFieldIndex, watermarkExpr)
+    with StreamPhysicalRel {
 
   override def requireWatermark: Boolean = false
 
@@ -60,11 +60,9 @@ class StreamPhysicalWatermarkAssigner(
     val rowtimeFieldName = inFieldNames(rowtimeFieldIndex)
     pw.input("input", getInput())
       .item("rowtime", rowtimeFieldName)
-      .item("watermark", getExpressionString(
-        watermarkExpr,
-        inFieldNames,
-        None,
-        preferExpressionFormat(pw)))
+      .item(
+        "watermark",
+        getExpressionString(watermarkExpr, inFieldNames, None, preferExpressionFormat(pw)))
   }
 
   override def translateToExecNode(): ExecNode[_] = {

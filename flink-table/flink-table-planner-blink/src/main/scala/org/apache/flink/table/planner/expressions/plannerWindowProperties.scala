@@ -25,50 +25,51 @@ trait PlannerWindowProperty {
   def resultType: LogicalType
 }
 
-abstract class AbstractPlannerWindowProperty(
-    reference: PlannerWindowReference) extends PlannerWindowProperty {
+abstract class AbstractPlannerWindowProperty(reference: PlannerWindowReference)
+    extends PlannerWindowProperty {
   override def toString = s"WindowProperty($reference)"
 }
 
 /**
-  * Indicate timeField type.
-  */
+ * Indicate timeField type.
+ */
 case class PlannerWindowReference(name: String, tpe: Option[LogicalType] = None) {
   override def toString: String = s"'$name"
 }
 
-case class PlannerWindowStart(
-    reference: PlannerWindowReference) extends AbstractPlannerWindowProperty(reference) {
+case class PlannerWindowStart(reference: PlannerWindowReference)
+    extends AbstractPlannerWindowProperty(reference) {
 
   override def resultType: TimestampType = new TimestampType(3)
 
   override def toString: String = s"start($reference)"
 }
 
-case class PlannerWindowEnd(
-    reference: PlannerWindowReference) extends AbstractPlannerWindowProperty(reference) {
+case class PlannerWindowEnd(reference: PlannerWindowReference)
+    extends AbstractPlannerWindowProperty(reference) {
 
   override def resultType: TimestampType = new TimestampType(3)
 
   override def toString: String = s"end($reference)"
 }
 
-case class PlannerRowtimeAttribute(
-    reference: PlannerWindowReference) extends AbstractPlannerWindowProperty(reference) {
+case class PlannerRowtimeAttribute(reference: PlannerWindowReference)
+    extends AbstractPlannerWindowProperty(reference) {
 
   override def resultType: LogicalType = {
     reference match {
       case PlannerWindowReference(_, Some(tpe))
-        if tpe.isInstanceOf[TimestampType] &&
+          if tpe.isInstanceOf[TimestampType] &&
             tpe.asInstanceOf[TimestampType].getKind == TimestampKind.ROWTIME =>
         // rowtime window
         new TimestampType(true, TimestampKind.ROWTIME, 3)
       case PlannerWindowReference(_, Some(tpe))
-        if tpe.isInstanceOf[BigIntType] || tpe.isInstanceOf[TimestampType] =>
+          if tpe.isInstanceOf[BigIntType] || tpe.isInstanceOf[TimestampType] =>
         // batch time window
         new TimestampType(3)
       case _ =>
-        throw new TableException("WindowReference of RowtimeAttribute has invalid type. " +
+        throw new TableException(
+          "WindowReference of RowtimeAttribute has invalid type. " +
             "Please report this bug.")
     }
   }
@@ -77,7 +78,7 @@ case class PlannerRowtimeAttribute(
 }
 
 case class PlannerProctimeAttribute(reference: PlannerWindowReference)
-  extends AbstractPlannerWindowProperty(reference) {
+    extends AbstractPlannerWindowProperty(reference) {
 
   override def resultType: LogicalType =
     new TimestampType(true, TimestampKind.PROCTIME, 3)

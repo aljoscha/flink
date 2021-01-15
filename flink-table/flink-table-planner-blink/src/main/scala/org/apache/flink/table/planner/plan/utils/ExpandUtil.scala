@@ -38,10 +38,10 @@ import scala.collection.mutable
 object ExpandUtil {
 
   /**
-    * Build the [[Expand]] node.
-    * The input node should be pushed into the RelBuilder before calling this method
-    * and the created Expand node will be at the top of the stack of the RelBuilder.
-    */
+   * Build the [[Expand]] node.
+   * The input node should be pushed into the RelBuilder before calling this method
+   * and the created Expand node will be at the top of the stack of the RelBuilder.
+   */
   def buildExpandNode(
       cluster: RelOptCluster,
       relBuilder: FlinkRelBuilder,
@@ -60,8 +60,8 @@ object ExpandUtil {
     // only field 'b' and 'c' need be outputted as duplicate fields.
     val groupIdExprs = AggregateUtil.getGroupIdExprIndexes(aggCalls)
     val commonGroupSet = groupSets.asList().reduce((g1, g2) => g1.intersect(g2)).asList()
-    val duplicateFieldIndexes = aggCalls.zipWithIndex.flatMap {
-      case (aggCall, idx) =>
+    val duplicateFieldIndexes = aggCalls.zipWithIndex
+      .flatMap { case (aggCall, idx) =>
         // filterArg should also be considered here.
         val allArgList = new util.ArrayList[Integer](aggCall.getArgList)
         if (aggCall.filterArg > -1) {
@@ -74,7 +74,10 @@ object ExpandUtil {
         } else {
           allArgList.diff(commonGroupSet)
         }
-    }.intersect(groupSet.asList()).sorted.toArray[Integer]
+      }
+      .intersect(groupSet.asList())
+      .sorted
+      .toArray[Integer]
 
     val inputType = relBuilder.peek().getRowType
 
@@ -82,8 +85,7 @@ object ExpandUtil {
     val expandIdIdxInExpand = inputType.getFieldCount
     val duplicateFieldMap = buildDuplicateFieldMap(inputType, duplicateFieldIndexes)
 
-    val expandRowType = buildExpandRowType(
-      cluster.getTypeFactory, inputType, duplicateFieldIndexes)
+    val expandRowType = buildExpandRowType(cluster.getTypeFactory, inputType, duplicateFieldIndexes)
     val expandProjects = createExpandProjects(
       relBuilder.getRexBuilder,
       inputType,
@@ -92,45 +94,44 @@ object ExpandUtil {
       groupSets,
       duplicateFieldIndexes)
 
-    relBuilder.expand(
-      expandRowType, expandProjects, expandIdIdxInExpand)
+    relBuilder.expand(expandRowType, expandProjects, expandIdIdxInExpand)
 
     (duplicateFieldMap, expandIdIdxInExpand)
   }
 
   /**
-    * Mapping original duplicate field index to new index in [[LogicalExpand]].
-    *
-    * @param inputType Input row type.
-    * @param duplicateFieldIndexes Fields indexes that will be output as duplicate.
-    * @return a Map that mapping original index to new index for duplicate fields.
-    */
+   * Mapping original duplicate field index to new index in [[LogicalExpand]].
+   *
+   * @param inputType Input row type.
+   * @param duplicateFieldIndexes Fields indexes that will be output as duplicate.
+   * @return a Map that mapping original index to new index for duplicate fields.
+   */
   private def buildDuplicateFieldMap(
       inputType: RelDataType,
       duplicateFieldIndexes: Array[Integer]): Map[Integer, Integer] = {
     // original input fields + expand_id field + duplicate fields
-    duplicateFieldIndexes.zipWithIndex.map {
-      case (duplicateFieldIdx: Integer, idx) =>
+    duplicateFieldIndexes.zipWithIndex
+      .map { case (duplicateFieldIdx: Integer, idx) =>
         require(duplicateFieldIdx < inputType.getFieldCount)
         val duplicateFieldNewIdx: Integer = inputType.getFieldCount + 1 + idx
         (duplicateFieldIdx, duplicateFieldNewIdx)
-    }.toMap[Integer, Integer]
+      }
+      .toMap[Integer, Integer]
   }
 
-
   /**
-    * Build row type for [[LogicalExpand]].
-    *
-    * the order of fields are:
-    * first, the input fields,
-    * second, expand_id field(to distinguish different expanded rows),
-    * last, optional duplicate fields.
-    *
-    * @param typeFactory Type factory.
-    * @param inputType Input row type.
-    * @param duplicateFieldIndexes Fields indexes that will be output as duplicate.
-    * @return Row type for [[LogicalExpand]].
-    */
+   * Build row type for [[LogicalExpand]].
+   *
+   * the order of fields are:
+   * first, the input fields,
+   * second, expand_id field(to distinguish different expanded rows),
+   * last, optional duplicate fields.
+   *
+   * @param typeFactory Type factory.
+   * @param inputType Input row type.
+   * @param duplicateFieldIndexes Fields indexes that will be output as duplicate.
+   * @return Row type for [[LogicalExpand]].
+   */
   def buildExpandRowType(
       typeFactory: RelDataTypeFactory,
       inputType: RelDataType,
@@ -143,25 +144,26 @@ object ExpandUtil {
 
     // 2. add expand_id('$e') field
     typeList += typeFactory.createTypeWithNullability(
-      typeFactory.createSqlType(SqlTypeName.BIGINT), false)
+      typeFactory.createSqlType(SqlTypeName.BIGINT),
+      false)
     var expandIdFieldName = buildUniqueFieldName(allFieldNames, "$e")
     fieldNameList += expandIdFieldName
 
     // 3. add duplicate fields
-    duplicateFieldIndexes.foreach {
-      duplicateFieldIdx =>
-        typeList += inputType.getFieldList.get(duplicateFieldIdx).getType
-        fieldNameList += buildUniqueFieldName(
-          allFieldNames, inputType.getFieldNames.get(duplicateFieldIdx))
+    duplicateFieldIndexes.foreach { duplicateFieldIdx =>
+      typeList += inputType.getFieldList.get(duplicateFieldIdx).getType
+      fieldNameList += buildUniqueFieldName(
+        allFieldNames,
+        inputType.getFieldNames.get(duplicateFieldIdx))
     }
 
     typeFactory.createStructType(typeList, fieldNameList)
   }
 
   /**
-    * Get unique field name based on existed `allFieldNames` collection.
-    * NOTES: the new unique field name will be added to existed `allFieldNames` collection.
-    */
+   * Get unique field name based on existed `allFieldNames` collection.
+   * NOTES: the new unique field name will be added to existed `allFieldNames` collection.
+   */
   private def buildUniqueFieldName(
       allFieldNames: util.Set[String],
       toAddFieldName: String): String = {
@@ -176,17 +178,17 @@ object ExpandUtil {
   }
 
   /**
-    * Create Project list for [[LogicalExpand]].
-    * One input row will expand to multiple output rows, so multi projects will be created.
-    *
-    * @param rexBuilder Rex builder.
-    * @param inputType Input row type.
-    * @param outputType Row type of [[LogicalExpand]].
-    * @param groupSet The original groupSet of a aggregate before expanded.
-    * @param groupSets The original groupSets of a aggregate before expanded.
-    * @param duplicateFieldIndexes Fields indexes that will be output as duplicate.
-    * @return List of expressions of expanded row.
-    */
+   * Create Project list for [[LogicalExpand]].
+   * One input row will expand to multiple output rows, so multi projects will be created.
+   *
+   * @param rexBuilder Rex builder.
+   * @param inputType Input row type.
+   * @param outputType Row type of [[LogicalExpand]].
+   * @param groupSet The original groupSet of a aggregate before expanded.
+   * @param groupSets The original groupSets of a aggregate before expanded.
+   * @param duplicateFieldIndexes Fields indexes that will be output as duplicate.
+   * @return List of expressions of expanded row.
+   */
   def createExpandProjects(
       rexBuilder: RexBuilder,
       inputType: RelDataType,
@@ -225,11 +227,10 @@ object ExpandUtil {
       // TODO only need output duplicate fields for the row against 'regular' aggregates
       // currently, we can't distinguish that
       // an expand row is for 'regular' aggregates or for 'distinct' aggregates
-      duplicateFieldIndexes.foreach {
-        duplicateFieldIdx =>
-          val resultType = inputType.getFieldList.get(duplicateFieldIdx).getType
-          val duplicateField = rexBuilder.makeInputRef(resultType, duplicateFieldIdx)
-          projects.add(duplicateField)
+      duplicateFieldIndexes.foreach { duplicateFieldIdx =>
+        val resultType = inputType.getFieldList.get(duplicateFieldIdx).getType
+        val duplicateField = rexBuilder.makeInputRef(resultType, duplicateFieldIdx)
+        projects.add(duplicateField)
       }
 
       projects
@@ -238,8 +239,8 @@ object ExpandUtil {
   }
 
   /**
-    * generate expand_id('$e' field) value to distinguish different expanded rows.
-    */
+   * generate expand_id('$e' field) value to distinguish different expanded rows.
+   */
   def genExpandId(fullGroupSet: ImmutableBitSet, groupSet: ImmutableBitSet): Long = {
     var v: Long = 0L
     var x: Long = 1L << (fullGroupSet.cardinality - 1)

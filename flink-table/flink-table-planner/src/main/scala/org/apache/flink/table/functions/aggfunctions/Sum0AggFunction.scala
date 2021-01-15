@@ -22,10 +22,10 @@ import java.math.BigDecimal
 import org.apache.flink.api.common.typeinfo.BasicTypeInfo
 
 /**
-  * Base class for built-in Sum0 aggregate function. If all values are null, 0 is returned.
-  *
-  * @tparam T the type for the aggregation result
-  */
+ * Base class for built-in Sum0 aggregate function. If all values are null, 0 is returned.
+ *
+ * @tparam T the type for the aggregation result
+ */
 abstract class Sum0AggFunction[T: Numeric] extends SumAggFunction[T] {
 
   override def getValue(acc: SumAccumulator[T]): T = {
@@ -38,50 +38,50 @@ abstract class Sum0AggFunction[T: Numeric] extends SumAggFunction[T] {
 }
 
 /**
-  * Built-in Byte Sum0 aggregate function
-  */
+ * Built-in Byte Sum0 aggregate function
+ */
 class ByteSum0AggFunction extends Sum0AggFunction[Byte] {
   override def getValueTypeInfo = BasicTypeInfo.BYTE_TYPE_INFO
 }
 
 /**
-  * Built-in Short Sum0 aggregate function
-  */
+ * Built-in Short Sum0 aggregate function
+ */
 class ShortSum0AggFunction extends Sum0AggFunction[Short] {
   override def getValueTypeInfo = BasicTypeInfo.SHORT_TYPE_INFO
 }
 
 /**
-  * Built-in Int Sum0 aggregate function
-  */
+ * Built-in Int Sum0 aggregate function
+ */
 class IntSum0AggFunction extends Sum0AggFunction[Int] {
   override def getValueTypeInfo = BasicTypeInfo.INT_TYPE_INFO
 }
 
 /**
-  * Built-in Long Sum0 aggregate function
-  */
+ * Built-in Long Sum0 aggregate function
+ */
 class LongSum0AggFunction extends Sum0AggFunction[Long] {
   override def getValueTypeInfo = BasicTypeInfo.LONG_TYPE_INFO
 }
 
 /**
-  * Built-in Float Sum0 aggregate function
-  */
+ * Built-in Float Sum0 aggregate function
+ */
 class FloatSum0AggFunction extends Sum0AggFunction[Float] {
   override def getValueTypeInfo = BasicTypeInfo.FLOAT_TYPE_INFO
 }
 
 /**
-  * Built-in Double Sum0 aggregate function
-  */
+ * Built-in Double Sum0 aggregate function
+ */
 class DoubleSum0AggFunction extends Sum0AggFunction[Double] {
   override def getValueTypeInfo = BasicTypeInfo.DOUBLE_TYPE_INFO
 }
 
 /**
-  * Built-in Big Decimal Sum0 aggregate function
-  */
+ * Built-in Big Decimal Sum0 aggregate function
+ */
 class DecimalSum0AggFunction extends DecimalSumAggFunction {
 
   override def getValue(acc: DecimalSumAccumulator): BigDecimal = {

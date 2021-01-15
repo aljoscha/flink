@@ -28,7 +28,6 @@ import org.apache.flink.util.Collector
 import scala.collection.JavaConverters._
 import scala.reflect.ClassTag
 
-
 /**
  * An unfinished coGroup operation that results from [[DataSet.coGroup]] The keys for the left and
  * right side must be specified using first `where` and then `equalTo`. For example:
@@ -44,16 +43,16 @@ import scala.reflect.ClassTag
  */
 @Public
 class UnfinishedCoGroupOperation[L: ClassTag, R: ClassTag](
-                                                            leftInput: DataSet[L],
-                                                            rightInput: DataSet[R])
-  extends UnfinishedKeyPairOperation[L, R, CoGroupDataSet[L, R]](leftInput, rightInput) {
+    leftInput: DataSet[L],
+    rightInput: DataSet[R])
+    extends UnfinishedKeyPairOperation[L, R, CoGroupDataSet[L, R]](leftInput, rightInput) {
 
   private[flink] def finish(leftKey: Keys[L], rightKey: Keys[R]) = {
     val coGrouper = new CoGroupFunction[L, R, (Array[L], Array[R])] {
       def coGroup(
-                   left: java.lang.Iterable[L],
-                   right: java.lang.Iterable[R],
-                   out: Collector[(Array[L], Array[R])]) = {
+          left: java.lang.Iterable[L],
+          right: java.lang.Iterable[R],
+          out: Collector[(Array[L], Array[R])]) = {
         val leftResult = Array[Any](left.asScala.toSeq: _*).asInstanceOf[Array[L]]
         val rightResult = Array[Any](right.asScala.toSeq: _*).asInstanceOf[Array[R]]
 
@@ -64,19 +63,25 @@ class UnfinishedCoGroupOperation[L: ClassTag, R: ClassTag](
     // We have to use this hack, for some reason classOf[Array[T]] does not work.
     // Maybe because ObjectArrayTypeInfo does not accept the Scala Array as an array class.
     val leftArrayType =
-      ObjectArrayTypeInfo.getInfoFor(new Array[L](0).getClass, leftInput.getType)
+      ObjectArrayTypeInfo
+        .getInfoFor(new Array[L](0).getClass, leftInput.getType)
         .asInstanceOf[TypeInformation[Array[L]]]
     val rightArrayType =
-      ObjectArrayTypeInfo.getInfoFor(new Array[R](0).getClass, rightInput.getType)
+      ObjectArrayTypeInfo
+        .getInfoFor(new Array[R](0).getClass, rightInput.getType)
         .asInstanceOf[TypeInformation[Array[R]]]
 
     val returnType = createTuple2TypeInformation[Array[L], Array[R]](leftArrayType, rightArrayType)
     val coGroupOperator = new CoGroupOperator[L, R, (Array[L], Array[R])](
-      leftInput.javaSet, rightInput.javaSet, leftKey, rightKey, coGrouper, returnType,
+      leftInput.javaSet,
+      rightInput.javaSet,
+      leftKey,
+      rightKey,
+      coGrouper,
+      returnType,
       null, // partitioner
       getCallLocationName())
 
     new CoGroupDataSet(coGroupOperator, leftInput, rightInput, leftKey, rightKey)
   }
 }
-

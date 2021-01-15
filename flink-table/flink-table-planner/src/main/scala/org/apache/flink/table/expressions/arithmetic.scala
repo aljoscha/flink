@@ -44,8 +44,9 @@ abstract class BinaryArithmetic extends BinaryExpression {
 
   override private[flink] def validateInput(): ValidationResult = {
     if (!isNumeric(left.resultType) || !isNumeric(right.resultType)) {
-      ValidationFailure(s"The arithmetic '$this' requires both operands to be numeric, but was " +
-        s"'$left' : '${left.resultType}' and '$right' : '${right.resultType}'.")
+      ValidationFailure(
+        s"The arithmetic '$this' requires both operands to be numeric, but was " +
+          s"'$left' : '${left.resultType}' and '$right' : '${right.resultType}'.")
     } else {
       ValidationSuccess
     }
@@ -58,10 +59,10 @@ case class Plus(left: PlannerExpression, right: PlannerExpression) extends Binar
   private[flink] val sqlOperator = SqlStdOperatorTable.PLUS
 
   override private[flink] def toRexNode(implicit relBuilder: RelBuilder): RexNode = {
-    if(isString(left.resultType)) {
+    if (isString(left.resultType)) {
       val castedRight = Cast(right, BasicTypeInfo.STRING_TYPE_INFO)
       relBuilder.call(SqlStdOperatorTable.CONCAT, left.toRexNode, castedRight.toRexNode)
-    } else if(isString(right.resultType)) {
+    } else if (isString(right.resultType)) {
       val castedLeft = Cast(left, BasicTypeInfo.STRING_TYPE_INFO)
       relBuilder.call(SqlStdOperatorTable.CONCAT, castedLeft.toRexNode, right.toRexNode)
     } else if (isTimeInterval(left.resultType) && left.resultType == right.resultType) {
@@ -93,8 +94,8 @@ case class Plus(left: PlannerExpression, right: PlannerExpression) extends Binar
     } else {
       ValidationFailure(
         s"The arithmetic '$this' requires input that is numeric, string, time intervals of the " +
-        s"same type, or a time interval and a time point type, " +
-        s"but was '$left' : '${left.resultType}' and '$right' : '${right.resultType}'.")
+          s"same type, or a time interval and a time point type, " +
+          s"but was '$left' : '${left.resultType}' and '$right' : '${right.resultType}'.")
     }
   }
 }
@@ -114,8 +115,9 @@ case class UnaryMinus(child: PlannerExpression) extends UnaryExpression {
     } else if (isTimeInterval(child.resultType)) {
       ValidationSuccess
     } else {
-      ValidationFailure(s"The arithmetic '$this' requires input that is numeric or a time " +
-        s"interval type, but was '${child.resultType}'.")
+      ValidationFailure(
+        s"The arithmetic '$this' requires input that is numeric or a time " +
+          s"interval type, but was '${child.resultType}'.")
     }
   }
 }
@@ -137,8 +139,8 @@ case class Minus(left: PlannerExpression, right: PlannerExpression) extends Bina
     } else {
       ValidationFailure(
         s"The arithmetic '$this' requires inputs that are numeric, time intervals of the same " +
-        s"type, or a time interval and a time point type, " +
-        s"but was '$left' : '${left.resultType}' and '$right' : '${right.resultType}'.")
+          s"type, or a time interval and a time point type, " +
+          s"but was '$left' : '${left.resultType}' and '$right' : '${right.resultType}'.")
     }
   }
 }

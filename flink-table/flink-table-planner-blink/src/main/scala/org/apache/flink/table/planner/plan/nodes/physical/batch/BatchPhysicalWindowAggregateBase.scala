@@ -45,8 +45,8 @@ abstract class BatchPhysicalWindowAggregateBase(
     enableAssignPane: Boolean = true,
     val isMerge: Boolean,
     val isFinal: Boolean)
-  extends SingleRel(cluster, traitSet, inputRel)
-  with BatchPhysicalRel {
+    extends SingleRel(cluster, traitSet, inputRel)
+    with BatchPhysicalRel {
 
   if (grouping.isEmpty && auxGrouping.nonEmpty) {
     throw new TableException("auxGrouping should be empty if grouping is empty.")
@@ -58,22 +58,29 @@ abstract class BatchPhysicalWindowAggregateBase(
 
   override def explainTerms(pw: RelWriter): RelWriter = {
     val inputRowType = getInput.getRowType
-    super.explainTerms(pw)
+    super
+      .explainTerms(pw)
       .itemIf("groupBy", RelExplainUtil.fieldToString(grouping, inputRowType), grouping.nonEmpty)
-      .itemIf("auxGrouping", RelExplainUtil.fieldToString(auxGrouping, inputRowType),
+      .itemIf(
+        "auxGrouping",
+        RelExplainUtil.fieldToString(auxGrouping, inputRowType),
         auxGrouping.nonEmpty)
       .item("window", window)
-      .itemIf("properties",
-        namedWindowProperties.map(_.name).mkString(", "), namedWindowProperties.nonEmpty)
-      .item("select", RelExplainUtil.windowAggregationToString(
-        inputRowType,
-        grouping,
-        auxGrouping,
-        outputRowType,
-        aggCallToAggFunction,
-        enableAssignPane,
-        isMerge = isMerge,
-        isGlobal = isFinal))
+      .itemIf(
+        "properties",
+        namedWindowProperties.map(_.name).mkString(", "),
+        namedWindowProperties.nonEmpty)
+      .item(
+        "select",
+        RelExplainUtil.windowAggregationToString(
+          inputRowType,
+          grouping,
+          auxGrouping,
+          outputRowType,
+          aggCallToAggFunction,
+          enableAssignPane,
+          isMerge = isMerge,
+          isGlobal = isFinal))
   }
 
 }

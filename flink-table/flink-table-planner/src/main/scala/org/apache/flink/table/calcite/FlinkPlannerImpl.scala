@@ -19,7 +19,16 @@
 package org.apache.flink.table.calcite
 
 import org.apache.flink.sql.parser.ExtendedSqlNode
-import org.apache.flink.sql.parser.dql.{SqlRichDescribeTable, SqlShowCatalogs, SqlShowCurrentCatalog, SqlShowCurrentDatabase, SqlShowDatabases, SqlShowFunctions, SqlShowTables, SqlShowViews}
+import org.apache.flink.sql.parser.dql.{
+  SqlRichDescribeTable,
+  SqlShowCatalogs,
+  SqlShowCurrentCatalog,
+  SqlShowCurrentDatabase,
+  SqlShowDatabases,
+  SqlShowFunctions,
+  SqlShowTables,
+  SqlShowViews
+}
 import org.apache.flink.table.api.{TableException, ValidationException}
 import org.apache.flink.table.catalog.CatalogReader
 
@@ -42,17 +51,17 @@ import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 
 /**
-  * NOTE: this is heavily inspired by Calcite's PlannerImpl.
-  * We need it in order to share the planner between the Table API relational plans
-  * and the SQL relation plans that are created by the Calcite parser.
-  * The main difference is that we do not create a new RelOptPlanner in the ready() method.
-  */
+ * NOTE: this is heavily inspired by Calcite's PlannerImpl.
+ * We need it in order to share the planner between the Table API relational plans
+ * and the SQL relation plans that are created by the Calcite parser.
+ * The main difference is that we do not create a new RelOptPlanner in the ready() method.
+ */
 class FlinkPlannerImpl(
     val config: FrameworkConfig,
     val catalogReaderSupplier: JFunction[JBoolean, CatalogReader],
     planner: RelOptPlanner,
     val typeFactory: FlinkTypeFactory)
-  extends ViewExpander {
+    extends ViewExpander {
 
   val operatorTable: SqlOperatorTable = config.getOperatorTable
   val parser: CalciteParser = new CalciteParser(config.getParserConfig)
@@ -67,23 +76,24 @@ class FlinkPlannerImpl(
       catalogReaderSupplier.apply(true), // ignore cases for lenient completion
       typeFactory,
       SqlValidator.Config.DEFAULT
-          .withSqlConformance(config.getParserConfig.conformance()))
+        .withSqlConformance(config.getParserConfig.conformance()))
     val advisor = new SqlAdvisor(advisorValidator, config.getParserConfig)
     val replaced = Array[String](null)
-    val hints = advisor.getCompletionHints(sql, cursor, replaced)
+    val hints = advisor
+      .getCompletionHints(sql, cursor, replaced)
       .map(item => item.toIdentifier.toString)
     hints.toArray
   }
 
   /**
-    * Get the [[FlinkCalciteSqlValidator]] instance from this planner, create a new instance
-    * if current validator has not been initialized, or returns the validator
-    * instance directly.
-    *
-    * <p>The validator instance creation is not thread safe.
-    *
-    * @return a new validator instance or current existed one
-    */
+   * Get the [[FlinkCalciteSqlValidator]] instance from this planner, create a new instance
+   * if current validator has not been initialized, or returns the validator
+   * instance directly.
+   *
+   * <p>The validator instance creation is not thread safe.
+   *
+   * @return a new validator instance or current existed one
+   */
   def getOrCreateSqlValidator(): FlinkCalciteSqlValidator = {
     if (validator == null) {
       val catalogReader = catalogReaderSupplier.apply(false)
@@ -98,9 +108,9 @@ class FlinkPlannerImpl(
       catalogReader,
       typeFactory,
       SqlValidator.Config.DEFAULT
-          .withIdentifierExpansion(true)
-          // Disable implicit type coercion for now.
-          .withTypeCoercionEnabled(false))
+        .withIdentifierExpansion(true)
+        // Disable implicit type coercion for now.
+        .withTypeCoercionEnabled(false))
     validator
   }
 
@@ -111,8 +121,10 @@ class FlinkPlannerImpl(
 
   private def validateInternal(sqlNode: SqlNode, validator: FlinkCalciteSqlValidator): SqlNode = {
     try {
-      sqlNode.accept(new PreValidateReWriter(
-        validator.getCatalogReader.unwrap(classOf[CatalogReader]), typeFactory))
+      sqlNode.accept(
+        new PreValidateReWriter(
+          validator.getCatalogReader.unwrap(classOf[CatalogReader]),
+          typeFactory))
       // do extended validation.
       sqlNode match {
         case node: ExtendedSqlNode =>
@@ -143,8 +155,7 @@ class FlinkPlannerImpl(
         case _ =>
           validator.validate(sqlNode)
       }
-    }
-    catch {
+    } catch {
       case e: RuntimeException =>
         throw new ValidationException(s"SQL validation failed. ${e.getMessage}", e)
     }
@@ -184,16 +195,14 @@ class FlinkPlannerImpl(
       rowType: RelDataType,
       queryString: String,
       schemaPath: util.List[String],
-      viewPath: util.List[String])
-    : RelRoot = {
+      viewPath: util.List[String]): RelRoot = {
     val parsed = parser.parse(queryString)
     val originalReader = catalogReaderSupplier.apply(false)
     val readerWithPathAdjusted = new CatalogReader(
       originalReader.getRootSchema,
       List(schemaPath, schemaPath.subList(0, 1)).asJava,
       originalReader.getTypeFactory,
-      originalReader.getConfig
-    )
+      originalReader.getConfig)
     val validator = createSqlValidator(readerWithPathAdjusted)
     val validated = validateInternal(parsed, validator)
     rel(validated, validator)

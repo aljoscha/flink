@@ -20,7 +20,11 @@ package org.apache.flink.table.planner.plan.rules.logical
 
 import org.apache.flink.api.scala._
 import org.apache.flink.table.api._
-import org.apache.flink.table.planner.plan.optimize.program.{FlinkBatchProgram, FlinkHepRuleSetProgramBuilder, HEP_RULES_EXECUTION_TYPE}
+import org.apache.flink.table.planner.plan.optimize.program.{
+  FlinkBatchProgram,
+  FlinkHepRuleSetProgramBuilder,
+  HEP_RULES_EXECUTION_TYPE
+}
 import org.apache.flink.table.planner.utils.{TableConfigUtils, TableTestBase}
 
 import org.apache.calcite.plan.hep.HepMatchOrder
@@ -28,10 +32,9 @@ import org.apache.calcite.rel.rules.CoreRules
 import org.apache.calcite.tools.RuleSets
 import org.junit.{Before, Test}
 
-
 /**
-  * Test for [[JoinDependentConditionDerivationRule]].
-  */
+ * Test for [[JoinDependentConditionDerivationRule]].
+ */
 class JoinDependentConditionDerivationRuleTest extends TableTestBase {
 
   private val util = batchTestUtil()
@@ -45,12 +48,12 @@ class JoinDependentConditionDerivationRuleTest extends TableTestBase {
       FlinkHepRuleSetProgramBuilder.newBuilder
         .setHepRulesExecutionType(HEP_RULES_EXECUTION_TYPE.RULE_SEQUENCE)
         .setHepMatchOrder(HepMatchOrder.BOTTOM_UP)
-        .add(RuleSets.ofList(
-          CoreRules.FILTER_INTO_JOIN,
-          CoreRules.JOIN_CONDITION_PUSH,
-          JoinDependentConditionDerivationRule.INSTANCE))
-        .build()
-    )
+        .add(
+          RuleSets.ofList(
+            CoreRules.FILTER_INTO_JOIN,
+            CoreRules.JOIN_CONDITION_PUSH,
+            JoinDependentConditionDerivationRule.INSTANCE))
+        .build())
 
     util.addTableSource[(Int, Long, String)]("MyTable1", 'a, 'b, 'c)
     util.addTableSource[(Int, Long, Int, String, Long)]("MyTable2", 'd, 'e, 'f, 'g, 'h)

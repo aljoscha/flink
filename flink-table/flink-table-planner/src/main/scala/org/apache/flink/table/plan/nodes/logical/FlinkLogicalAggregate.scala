@@ -39,8 +39,8 @@ class FlinkLogicalAggregate(
     groupSet: ImmutableBitSet,
     groupSets: JList[ImmutableBitSet],
     aggCalls: JList[AggregateCall])
-  extends Aggregate(cluster, traitSet, child, groupSet, groupSets, aggCalls)
-  with FlinkLogicalRel {
+    extends Aggregate(cluster, traitSet, child, groupSet, groupSets, aggCalls)
+    with FlinkLogicalRel {
 
   override def copy(
       traitSet: RelTraitSet,
@@ -61,11 +61,11 @@ class FlinkLogicalAggregate(
 }
 
 private class FlinkLogicalAggregateConverter
-  extends ConverterRule(
-    classOf[LogicalAggregate],
-    Convention.NONE,
-    FlinkConventions.LOGICAL,
-    "FlinkLogicalAggregateConverter") {
+    extends ConverterRule(
+      classOf[LogicalAggregate],
+      Convention.NONE,
+      FlinkConventions.LOGICAL,
+      "FlinkLogicalAggregateConverter") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val agg = call.rel(0).asInstanceOf[LogicalAggregate]
@@ -77,7 +77,7 @@ private class FlinkLogicalAggregateConverter
       case SqlKind.AVG => true
       // but none of the other AVG agg functions
       case k if SqlKind.AVG_AGG_FUNCTIONS.contains(k) => false
-      case _ => true
+      case _                                          => true
     }
   }
 

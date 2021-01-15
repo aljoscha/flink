@@ -21,7 +21,12 @@ package org.apache.flink.runtime.akka
 import java.net.{InetAddress, InetSocketAddress}
 import java.util.Collections
 
-import org.apache.flink.configuration.{AkkaOptions, Configuration, IllegalConfigurationException, SecurityOptions}
+import org.apache.flink.configuration.{
+  AkkaOptions,
+  Configuration,
+  IllegalConfigurationException,
+  SecurityOptions
+}
 import org.apache.flink.runtime.clusterframework.BootstrapTools.FixedThreadPoolExecutorConfiguration
 import org.apache.flink.runtime.highavailability.HighAvailabilityServicesUtils.AddressResolution
 import org.apache.flink.runtime.rpc.akka.AkkaRpcServiceUtils
@@ -32,10 +37,7 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
 @RunWith(classOf[JUnitRunner])
-class AkkaUtilsTest
-  extends FunSuite
-  with Matchers
-  with BeforeAndAfterAll {
+class AkkaUtilsTest extends FunSuite with Matchers with BeforeAndAfterAll {
 
   test("getAkkaConfig should validate transport heartbeats") {
     val configuration = new Configuration()
@@ -65,8 +67,9 @@ class AkkaUtilsTest
     result should equal(address)
   }
 
-  test("getHostFromAkkaURL should throw an exception if the InetSocketAddress cannot be " +
-    "retrieved") {
+  test(
+    "getHostFromAkkaURL should throw an exception if the InetSocketAddress cannot be " +
+      "retrieved") {
     val localAkkaURL = AkkaUtils.getLocalAkkaURL("actor")
 
     intercept[Exception] {
@@ -184,17 +187,18 @@ class AkkaUtilsTest
       "localhost",
       1234,
       AkkaUtils.getThreadPoolExecutorConfig(
-        new FixedThreadPoolExecutorConfiguration(minThreads, maxThreads, threadPriority)
-      ))
+        new FixedThreadPoolExecutorConfiguration(minThreads, maxThreads, threadPriority)))
 
     akkaConfig.getString("akka.actor.default-dispatcher.executor") should
       equal("thread-pool-executor")
 
     akkaConfig.getInt("akka.actor.default-dispatcher.thread-priority") should
       equal(threadPriority)
-    akkaConfig.getInt("akka.actor.default-dispatcher.thread-pool-executor.core-pool-size-min")
+    akkaConfig
+      .getInt("akka.actor.default-dispatcher.thread-pool-executor.core-pool-size-min")
       .should(equal(minThreads))
-    akkaConfig.getInt("akka.actor.default-dispatcher.thread-pool-executor.core-pool-size-max")
+    akkaConfig
+      .getInt("akka.actor.default-dispatcher.thread-pool-executor.core-pool-size-max")
       .should(equal(maxThreads))
   }
 

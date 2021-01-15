@@ -31,18 +31,18 @@ import java.io.{PrintWriter, StringWriter}
 import scala.collection.JavaConversions._
 
 /**
-  * Base class for flink relational expression.
-  */
+ * Base class for flink relational expression.
+ */
 trait FlinkRelNode extends RelNode {
 
   /**
-    * Returns a string which describes the detailed information of relational expression
-    * with attributes which contribute to the plan output.
-    *
-    * This method leverages [[RelNode#explain]] with
-    * [[org.apache.calcite.sql.SqlExplainLevel.EXPPLAN_ATTRIBUTES]] explain level to generate
-    * the description.
-    */
+   * Returns a string which describes the detailed information of relational expression
+   * with attributes which contribute to the plan output.
+   *
+   * This method leverages [[RelNode#explain]] with
+   * [[org.apache.calcite.sql.SqlExplainLevel.EXPPLAN_ATTRIBUTES]] explain level to generate
+   * the description.
+   */
   def getRelDetailedDescription: String = {
     val sw = new StringWriter
     val pw = new PrintWriter(sw)
@@ -77,8 +77,9 @@ trait FlinkRelNode extends RelNode {
         l.toString
 
       case l: RexLocalRef if localExprsTable.isEmpty =>
-        throw new IllegalArgumentException("Encountered RexLocalRef without " +
-          "local expression table")
+        throw new IllegalArgumentException(
+          "Encountered RexLocalRef without " +
+            "local expression table")
 
       case l: RexLocalRef =>
         val lExpr = localExprsTable.get(l.getIndex)
@@ -86,8 +87,8 @@ trait FlinkRelNode extends RelNode {
 
       case c: RexCall =>
         val op = c.getOperator.toString
-        val ops = c.getOperands.map(
-          getExpressionString(_, inFields, localExprsTable, expressionFormat))
+        val ops =
+          c.getOperands.map(getExpressionString(_, inFields, localExprsTable, expressionFormat))
         c.getOperator match {
           case _: SqlAsOperator => ops.head
           case _ =>
@@ -96,24 +97,22 @@ trait FlinkRelNode extends RelNode {
               expressionFormat match {
                 case ExpressionFormat.Infix =>
                   c.getKind match {
-                    case IS_FALSE | IS_NOT_FALSE | IS_TRUE | IS_NOT_TRUE | IS_UNKNOWN
-                         | IS_NULL | IS_NOT_NULL => s"$operand $op"
+                    case IS_FALSE | IS_NOT_FALSE | IS_TRUE | IS_NOT_TRUE | IS_UNKNOWN | IS_NULL |
+                        IS_NOT_NULL =>
+                      s"$operand $op"
                     case _ => s"$op($operand)"
                   }
                 case ExpressionFormat.PostFix => s"$operand $op"
-                case ExpressionFormat.Prefix => s"$op($operand)"
+                case ExpressionFormat.Prefix  => s"$op($operand)"
               }
             } else {
               c.getKind match {
-                case TIMES | DIVIDE | PLUS | MINUS
-                     | LESS_THAN | LESS_THAN_OR_EQUAL
-                     | GREATER_THAN | GREATER_THAN_OR_EQUAL
-                     | EQUALS | NOT_EQUALS
-                     | OR | AND =>
+                case TIMES | DIVIDE | PLUS | MINUS | LESS_THAN | LESS_THAN_OR_EQUAL | GREATER_THAN |
+                    GREATER_THAN_OR_EQUAL | EQUALS | NOT_EQUALS | OR | AND =>
                   expressionFormat match {
-                    case ExpressionFormat.Infix => s"(${ops.mkString(s" $op ")})"
+                    case ExpressionFormat.Infix   => s"(${ops.mkString(s" $op ")})"
                     case ExpressionFormat.PostFix => s"(${ops.mkString(", ")})$op"
-                    case ExpressionFormat.Prefix => s"$op(${ops.mkString(", ")})"
+                    case ExpressionFormat.Prefix  => s"$op(${ops.mkString(", ")})"
                   }
                 case _ => s"$op(${ops.mkString(", ")})"
               }
@@ -121,11 +120,8 @@ trait FlinkRelNode extends RelNode {
         }
 
       case fa: RexFieldAccess =>
-        val referenceExpr = getExpressionString(
-          fa.getReferenceExpr,
-          inFields,
-          localExprsTable,
-          expressionFormat)
+        val referenceExpr =
+          getExpressionString(fa.getReferenceExpr, inFields, localExprsTable, expressionFormat)
         val field = fa.getField.getName
         s"$referenceExpr.$field"
       case cv: RexCorrelVariable =>
@@ -137,15 +133,14 @@ trait FlinkRelNode extends RelNode {
 }
 
 /**
-  * Infix, Postfix and Prefix notations are three different but equivalent ways of writing
-  * expressions. It is easiest to demonstrate the differences by looking at examples of operators
-  * that take two operands.
-  * Infix notation: (X + Y)
-  * Postfix notation: (X Y) +
-  * Prefix notation: + (X Y)
-  */
+ * Infix, Postfix and Prefix notations are three different but equivalent ways of writing
+ * expressions. It is easiest to demonstrate the differences by looking at examples of operators
+ * that take two operands.
+ * Infix notation: (X + Y)
+ * Postfix notation: (X Y) +
+ * Prefix notation: + (X Y)
+ */
 object ExpressionFormat extends Enumeration {
   type ExpressionFormat = Value
   val Infix, PostFix, Prefix = Value
 }
-

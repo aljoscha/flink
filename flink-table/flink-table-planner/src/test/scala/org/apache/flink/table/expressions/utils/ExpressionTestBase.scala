@@ -56,8 +56,8 @@ import org.mockito.Mockito._
 import scala.collection.mutable
 
 /**
-  * Base test class for expression tests.
-  */
+ * Base test class for expression tests.
+ */
 abstract class ExpressionTestBase {
 
   @Rule
@@ -82,8 +82,8 @@ abstract class ExpressionTestBase {
     new HepPlanner(builder.build, context._1.getPlanner.getContext)
   }
 
-  private def prepareContext(typeInfo: TypeInformation[Any])
-    : (FlinkRelBuilder, TableEnvImpl, ExecutionEnvironment) = {
+  private def prepareContext(
+      typeInfo: TypeInformation[Any]): (FlinkRelBuilder, TableEnvImpl, ExecutionEnvironment) = {
     // create DataSetTable
     val dataSetMock = mock(classOf[DataSet[Any]])
     val jDataSetMock = mock(classOf[JDataSet[Any]])
@@ -124,10 +124,8 @@ abstract class ExpressionTestBase {
 
     // generate code
     val resultType = new RowTypeInfo(Seq.fill(testExprs.size)(STRING_TYPE_INFO): _*)
-    val genExpr = generator.generateResultExpression(
-      resultType,
-      resultType.getFieldNames,
-      stringTestExprs)
+    val genExpr =
+      generator.generateResultExpression(resultType, resultType.getFieldNames, stringTestExprs)
 
     val bodyCode =
       s"""
@@ -169,15 +167,13 @@ abstract class ExpressionTestBase {
     }
 
     // compare
-    testExprs
-      .zipWithIndex
-      .foreach {
-        case ((originalExpr, optimizedExpr, expected), index) =>
-          val actual = result.getField(index)
-          assertEquals(
-            s"Wrong result for: [$originalExpr] optimized to: [$optimizedExpr]",
-            expected,
-            if (actual == null) "null" else actual)
+    testExprs.zipWithIndex
+      .foreach { case ((originalExpr, optimizedExpr, expected), index) =>
+        val actual = result.getField(index)
+        assertEquals(
+          s"Wrong result for: [$originalExpr] optimized to: [$optimizedExpr]",
+          expected,
+          if (actual == null) "null" else actual)
       }
   }
 
@@ -223,30 +219,18 @@ abstract class ExpressionTestBase {
     addTableApiTestExpr(ExpressionParser.parseExpression(tableApiString), expected)
   }
 
-  def testAllApis(
-      expr: Expression,
-      exprString: String,
-      sqlExpr: String,
-      expected: String)
-    : Unit = {
+  def testAllApis(expr: Expression, exprString: String, sqlExpr: String, expected: String): Unit = {
     addTableApiTestExpr(expr, expected)
     addTableApiTestExpr(exprString, expected)
     addSqlTestExpr(sqlExpr, expected)
   }
 
-  def testTableApi(
-      expr: Expression,
-      exprString: String,
-      expected: String)
-    : Unit = {
+  def testTableApi(expr: Expression, exprString: String, expected: String): Unit = {
     addTableApiTestExpr(expr, expected)
     addTableApiTestExpr(exprString, expected)
   }
 
-  def testSqlApi(
-      sqlExpr: String,
-      expected: String)
-    : Unit = {
+  def testSqlApi(sqlExpr: String, expected: String): Unit = {
     addSqlTestExpr(sqlExpr, expected)
   }
 

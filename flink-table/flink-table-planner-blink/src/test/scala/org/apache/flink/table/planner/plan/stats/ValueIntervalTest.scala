@@ -42,8 +42,7 @@ class ValueIntervalTest {
     // [1, 3] union (-1, 2) = (-1, 3]
     assertEquals(
       ValueInterval(-1, 3, includeLower = false, includeUpper = true),
-      union(interval1, ValueInterval(-1, 2, includeLower = false, includeUpper = true))
-    )
+      union(interval1, ValueInterval(-1, 2, includeLower = false, includeUpper = true)))
     // [1, 3] union [-1, 4] = [-1, 4]
     assertEquals(ValueInterval(-1, 4), union(interval1, ValueInterval(-1, 4)))
     // [1, 3] union [-3, -2) = [-3, 3]
@@ -105,20 +104,14 @@ class ValueIntervalTest {
     // [3, Inf) union (-1, Inf) = (-1, Inf)
     assertEquals(
       ValueInterval(-1, null, includeLower = false),
-      union(interval3, ValueInterval(-1, null, includeLower = false))
-    )
+      union(interval3, ValueInterval(-1, null, includeLower = false)))
   }
 
   @Test
   def testUnionUncompatibility(): Unit = {
     assertEquals(
       toBigDecimalInterval(ValueInterval(1, 2)),
-      toBigDecimalInterval(
-        union(ValueInterval(1L, 2L),
-          ValueInterval(1.2D, 2.0D)
-        )
-      )
-    )
+      toBigDecimalInterval(union(ValueInterval(1L, 2L), ValueInterval(1.2d, 2.0d))))
   }
 
   @Test
@@ -143,16 +136,18 @@ class ValueIntervalTest {
     assertFalse(
       isIntersected(interval1, ValueInterval(-3, -2, includeLower = true, includeUpper = false)))
     // [1, 3] intersect (0, 3)
-    assertTrue(isIntersected(interval1, ValueInterval(0, 3, includeLower = false, includeUpper =
-      false)))
+    assertTrue(
+      isIntersected(interval1, ValueInterval(0, 3, includeLower = false, includeUpper = false)))
     // [1, 3] intersect (0, 4]
     assertTrue(
       isIntersected(interval1, ValueInterval(0, 4, includeLower = false, includeUpper = true)))
     // [1, 3] not intersect [4, 7]
     assertFalse(isIntersected(interval1, ValueInterval(4, 7)))
     // [1, 3) not intersect [3, 3]
-    assertFalse(isIntersected(
-      ValueInterval(1, 3, includeLower = true, includeUpper = false), ValueInterval(3, 3)))
+    assertFalse(
+      isIntersected(
+        ValueInterval(1, 3, includeLower = true, includeUpper = false),
+        ValueInterval(3, 3)))
     // [1, 3] not intersect (-Inf, -2]
     assertFalse(isIntersected(interval1, ValueInterval(null, -2)))
     assertFalse(isIntersected(ValueInterval(null, -2), interval1))
@@ -196,7 +191,7 @@ class ValueIntervalTest {
     // [3, Inf) intersect (-1, Inf)
     assertTrue(isIntersected(ValueInterval(3, null), ValueInterval(-1, null, includeLower = false)))
     // [1, 5] intersect [2.0, 3.0]
-    assertTrue(isIntersected(ValueInterval(1, 5), ValueInterval(2.0D, 3.0D)))
+    assertTrue(isIntersected(ValueInterval(1, 5), ValueInterval(2.0d, 3.0d)))
   }
 
   @Test
@@ -235,7 +230,8 @@ class ValueIntervalTest {
     // [1, 3) intersect [3, 3] = empty
     assertEquals(
       empty,
-      intersect(ValueInterval(1, 3, includeLower = true, includeUpper = false),
+      intersect(
+        ValueInterval(1, 3, includeLower = true, includeUpper = false),
         ValueInterval(3, 3)))
     // [1, 3] intersect (-Inf, -2] = empty
     assertEquals(empty, intersect(interval1, ValueInterval(null, -2)))
@@ -282,9 +278,7 @@ class ValueIntervalTest {
     // (-Inf, 2] intersect (-Inf, 3) = (-Inf, 2]
     assertEquals(interval2, intersect(interval2, ValueInterval(null, 3, includeUpper = false)))
     // [3, Inf) intersect [4, Inf) = [4, Inf)
-    assertEquals(
-      ValueInterval(4, null),
-      intersect(ValueInterval(3, null), ValueInterval(4, null)))
+    assertEquals(ValueInterval(4, null), intersect(ValueInterval(3, null), ValueInterval(4, null)))
     // [3, Inf) intersect (-1, Inf) = [3, Inf)
     assertEquals(
       ValueInterval(3, null),
@@ -453,7 +447,7 @@ class ValueIntervalTest {
       fail()
     } catch {
       case _: IllegalArgumentException =>
-      case _ => fail()
+      case _                           => fail()
     }
   }
 }

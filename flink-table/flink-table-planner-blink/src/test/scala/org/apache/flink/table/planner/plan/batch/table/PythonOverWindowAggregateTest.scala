@@ -29,8 +29,8 @@ class PythonOverWindowAggregateTest extends TableTestBase {
   @Test
   def testPandasRangeOverWindowAggregate(): Unit = {
     val util = batchTestUtil()
-    val sourceTable = util.addTableSource[(Int, Long, Int, Long)](
-      "MyTable", 'a, 'b, 'c, 'rowtime.rowtime)
+    val sourceTable =
+      util.addTableSource[(Int, Long, Int, Long)]("MyTable", 'a, 'b, 'c, 'rowtime.rowtime)
     val func = new PandasAggregateFunction
 
     val resultTable = sourceTable
@@ -48,8 +48,8 @@ class PythonOverWindowAggregateTest extends TableTestBase {
   @Test
   def testPandasRowsOverWindowAggregate(): Unit = {
     val util = batchTestUtil()
-    val sourceTable = util.addTableSource[(Int, Long, Int, Long)](
-      "MyTable", 'a, 'b, 'c, 'rowtime.rowtime)
+    val sourceTable =
+      util.addTableSource[(Int, Long, Int, Long)]("MyTable", 'a, 'b, 'c, 'rowtime.rowtime)
     val func = new PandasAggregateFunction
 
     val resultTable = sourceTable

@@ -23,9 +23,9 @@ import org.apache.flink.table.planner.codegen.{CodeGeneratorContext, GeneratedEx
 import org.apache.flink.table.types.logical.{DoubleType, IntType, LogicalType}
 
 /**
-  * Generates a random function call.
-  * Supports: RAND([seed]) and RAND_INTEGER([seed, ] bound)
-  */
+ * Generates a random function call.
+ * Supports: RAND([seed]) and RAND_INTEGER([seed, ] bound)
+ */
 class RandCallGen(isRandInteger: Boolean, hasSeed: Boolean) extends CallGenerator {
 
   override def generate(

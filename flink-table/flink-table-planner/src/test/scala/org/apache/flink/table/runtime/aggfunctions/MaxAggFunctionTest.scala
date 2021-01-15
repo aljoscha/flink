@@ -25,10 +25,10 @@ import org.apache.flink.table.functions.AggregateFunction
 import org.apache.flink.table.functions.aggfunctions._
 
 /**
-  * Test case for built-in max aggregate function
-  *
-  * @tparam T the type for the aggregation result
-  */
+ * Test case for built-in max aggregate function
+ *
+ * @tparam T the type for the aggregation result
+ */
 abstract class MaxAggFunctionTest[T: Numeric] extends AggFunctionTestBase[T, MaxAccumulator[T]] {
 
   private val numeric: Numeric[T] = implicitly[Numeric[T]]
@@ -49,22 +49,16 @@ abstract class MaxAggFunctionTest[T: Numeric] extends AggFunctionTestBase[T, Max
       minVal,
       numeric.fromInt(-20),
       numeric.fromInt(17),
-      null.asInstanceOf[T]
-    ),
+      null.asInstanceOf[T]),
     Seq(
       null.asInstanceOf[T],
       null.asInstanceOf[T],
       null.asInstanceOf[T],
       null.asInstanceOf[T],
       null.asInstanceOf[T],
-      null.asInstanceOf[T]
-    )
-  )
+      null.asInstanceOf[T]))
 
-  override def expectedResults: Seq[T] = Seq(
-    maxVal,
-    null.asInstanceOf[T]
-  )
+  override def expectedResults: Seq[T] = Seq(maxVal, null.asInstanceOf[T])
 }
 
 class ByteMaxAggFunctionTest extends MaxAggFunctionTest[Byte] {
@@ -130,45 +124,19 @@ class DoubleMaxAggFunctionTest extends MaxAggFunctionTest[Double] {
 class BooleanMaxAggFunctionTest extends AggFunctionTestBase[Boolean, MaxAccumulator[Boolean]] {
 
   override def inputValueSets: Seq[Seq[Boolean]] = Seq(
-    Seq(
-      false,
-      false,
-      false
-    ),
-    Seq(
-      true,
-      true,
-      true
-    ),
-    Seq(
-      true,
-      false,
-      null.asInstanceOf[Boolean],
-      true,
-      false,
-      true,
-      null.asInstanceOf[Boolean]
-    ),
-    Seq(
-      null.asInstanceOf[Boolean],
-      null.asInstanceOf[Boolean],
-      null.asInstanceOf[Boolean]
-    )
-  )
+    Seq(false, false, false),
+    Seq(true, true, true),
+    Seq(true, false, null.asInstanceOf[Boolean], true, false, true, null.asInstanceOf[Boolean]),
+    Seq(null.asInstanceOf[Boolean], null.asInstanceOf[Boolean], null.asInstanceOf[Boolean]))
 
-  override def expectedResults: Seq[Boolean] = Seq(
-    false,
-    true,
-    true,
-    null.asInstanceOf[Boolean]
-  )
+  override def expectedResults: Seq[Boolean] = Seq(false, true, true, null.asInstanceOf[Boolean])
 
   override def aggregator: AggregateFunction[Boolean, MaxAccumulator[Boolean]] =
     new BooleanMaxAggFunction()
 }
 
 class DecimalMaxAggFunctionTest
-  extends AggFunctionTestBase[BigDecimal, MaxAccumulator[BigDecimal]] {
+    extends AggFunctionTestBase[BigDecimal, MaxAccumulator[BigDecimal]] {
 
   override def inputValueSets: Seq[Seq[_]] = Seq(
     Seq(
@@ -180,21 +148,10 @@ class DecimalMaxAggFunctionTest
       new BigDecimal("0"),
       new BigDecimal("-999.999"),
       null,
-      new BigDecimal("999.999")
-    ),
-    Seq(
-      null,
-      null,
-      null,
-      null,
-      null
-    )
-  )
+      new BigDecimal("999.999")),
+    Seq(null, null, null, null, null))
 
-  override def expectedResults: Seq[BigDecimal] = Seq(
-    new BigDecimal("1000.000001"),
-    null
-  )
+  override def expectedResults: Seq[BigDecimal] = Seq(new BigDecimal("1000.000001"), null)
 
   override def aggregator: AggregateFunction[BigDecimal, MaxAccumulator[BigDecimal]] =
     new DecimalMaxAggFunction()
@@ -207,104 +164,56 @@ class StringMaxAggFunctionTest extends AggFunctionTestBase[String, MaxAccumulato
       new String("b"),
       new String("c"),
       null.asInstanceOf[String],
-      new String("d")
-    ),
-    Seq(
-      null.asInstanceOf[String],
-      null.asInstanceOf[String],
-      null.asInstanceOf[String]
-    ),
+      new String("d")),
+    Seq(null.asInstanceOf[String], null.asInstanceOf[String], null.asInstanceOf[String]),
     Seq(
       new String("1House"),
       new String("Household"),
       new String("house"),
-      new String("household")
-    )
-  )
+      new String("household")))
 
-  override def expectedResults: Seq[String] = Seq(
-    new String("d"),
-    null.asInstanceOf[String],
-    new String("household")
-  )
+  override def expectedResults: Seq[String] =
+    Seq(new String("d"), null.asInstanceOf[String], new String("household"))
 
   override def aggregator: AggregateFunction[String, MaxAccumulator[String]] =
     new StringMaxAggFunction()
 }
 
 class TimestampMaxAggFunctionTest
-  extends AggFunctionTestBase[Timestamp, MaxAccumulator[Timestamp]] {
+    extends AggFunctionTestBase[Timestamp, MaxAccumulator[Timestamp]] {
   override def inputValueSets: Seq[Seq[_]] = Seq(
     Seq(
       new Timestamp(0),
       new Timestamp(1000),
       new Timestamp(100),
       null.asInstanceOf[Timestamp],
-      new Timestamp(10)
-    ),
-    Seq(
-      null.asInstanceOf[Timestamp],
-      null.asInstanceOf[Timestamp],
-      null.asInstanceOf[Timestamp]
-    )
-  )
+      new Timestamp(10)),
+    Seq(null.asInstanceOf[Timestamp], null.asInstanceOf[Timestamp], null.asInstanceOf[Timestamp]))
 
-  override def expectedResults: Seq[Timestamp] = Seq(
-    new Timestamp(1000),
-    null.asInstanceOf[Timestamp]
-  )
+  override def expectedResults: Seq[Timestamp] =
+    Seq(new Timestamp(1000), null.asInstanceOf[Timestamp])
 
   override def aggregator: AggregateFunction[Timestamp, MaxAccumulator[Timestamp]] =
     new TimestampMaxAggFunction()
 }
 
-class DateMaxAggFunctionTest
-  extends AggFunctionTestBase[Date, MaxAccumulator[Date]] {
+class DateMaxAggFunctionTest extends AggFunctionTestBase[Date, MaxAccumulator[Date]] {
   override def inputValueSets: Seq[Seq[_]] = Seq(
-    Seq(
-      new Date(0),
-      new Date(1000),
-      new Date(100),
-      null.asInstanceOf[Date],
-      new Date(10)
-    ),
-    Seq(
-      null.asInstanceOf[Date],
-      null.asInstanceOf[Date],
-      null.asInstanceOf[Date]
-    )
-  )
+    Seq(new Date(0), new Date(1000), new Date(100), null.asInstanceOf[Date], new Date(10)),
+    Seq(null.asInstanceOf[Date], null.asInstanceOf[Date], null.asInstanceOf[Date]))
 
-  override def expectedResults: Seq[Date] = Seq(
-    new Date(1000),
-    null.asInstanceOf[Date]
-  )
+  override def expectedResults: Seq[Date] = Seq(new Date(1000), null.asInstanceOf[Date])
 
   override def aggregator: AggregateFunction[Date, MaxAccumulator[Date]] =
     new DateMaxAggFunction()
 }
 
-class TimeMaxAggFunctionTest
-  extends AggFunctionTestBase[Time, MaxAccumulator[Time]] {
+class TimeMaxAggFunctionTest extends AggFunctionTestBase[Time, MaxAccumulator[Time]] {
   override def inputValueSets: Seq[Seq[_]] = Seq(
-    Seq(
-      new Time(0),
-      new Time(1000),
-      new Time(100),
-      null.asInstanceOf[Time],
-      new Time(10)
-    ),
-    Seq(
-      null.asInstanceOf[Time],
-      null.asInstanceOf[Time],
-      null.asInstanceOf[Time]
-    )
-  )
+    Seq(new Time(0), new Time(1000), new Time(100), null.asInstanceOf[Time], new Time(10)),
+    Seq(null.asInstanceOf[Time], null.asInstanceOf[Time], null.asInstanceOf[Time]))
 
-  override def expectedResults: Seq[Time] = Seq(
-    new Time(1000),
-    null.asInstanceOf[Time]
-  )
+  override def expectedResults: Seq[Time] = Seq(new Time(1000), null.asInstanceOf[Time])
 
   override def aggregator: AggregateFunction[Time, MaxAccumulator[Time]] =
     new TimeMaxAggFunction()

@@ -30,10 +30,10 @@ class MapRunner[IN, OUT](
     name: String,
     code: String,
     @transient var returnType: TypeInformation[OUT])
-  extends RichMapFunction[IN, OUT]
-  with ResultTypeQueryable[OUT]
-  with Compiler[MapFunction[IN, OUT]]
-  with Logging {
+    extends RichMapFunction[IN, OUT]
+    with ResultTypeQueryable[OUT]
+    with Compiler[MapFunction[IN, OUT]]
+    with Logging {
 
   private var function: MapFunction[IN, OUT] = _
 

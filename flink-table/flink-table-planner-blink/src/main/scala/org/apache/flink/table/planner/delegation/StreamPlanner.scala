@@ -22,7 +22,12 @@ import org.apache.flink.api.dag.Transformation
 import org.apache.flink.table.api.{ExplainDetail, TableConfig, TableException, TableSchema}
 import org.apache.flink.table.catalog.{CatalogManager, FunctionCatalog, ObjectIdentifier}
 import org.apache.flink.table.delegation.Executor
-import org.apache.flink.table.operations.{CatalogSinkModifyOperation, ModifyOperation, Operation, QueryOperation}
+import org.apache.flink.table.operations.{
+  CatalogSinkModifyOperation,
+  ModifyOperation,
+  Operation,
+  QueryOperation
+}
 import org.apache.flink.table.planner.operations.PlannerQueryOperation
 import org.apache.flink.table.planner.plan.`trait`._
 import org.apache.flink.table.planner.plan.nodes.exec.stream.StreamExecNode
@@ -46,7 +51,7 @@ class StreamPlanner(
     config: TableConfig,
     functionCatalog: FunctionCatalog,
     catalogManager: CatalogManager)
-  extends PlannerBase(executor, config, functionCatalog, catalogManager, isStreamingMode = true) {
+    extends PlannerBase(executor, config, functionCatalog, catalogManager, isStreamingMode = true) {
 
   override protected def getTraitDefs: Array[RelTraitDef[_ <: RelTrait]] = {
     Array(
@@ -66,10 +71,11 @@ class StreamPlanner(
 
     execNodes.map {
       case legacyNode: LegacyStreamExecNode[_] => legacyNode.translateToPlan(planner)
-      case node: StreamExecNode[_] => node.translateToPlan(planner)
+      case node: StreamExecNode[_]             => node.translateToPlan(planner)
       case _ =>
-        throw new TableException("Cannot generate DataStream due to an invalid logical plan. " +
-          "This is a bug and should not happen. Please file an issue.")
+        throw new TableException(
+          "Cannot generate DataStream due to an invalid logical plan. " +
+            "This is a bug and should not happen. Please file an issue.")
     }
   }
 
@@ -90,8 +96,7 @@ class StreamPlanner(
             require(qualifiedName.size() == 3, "the length of qualified name should be 3.")
             val modifyOperation = new CatalogSinkModifyOperation(
               ObjectIdentifier.of(qualifiedName.get(0), qualifiedName.get(1), qualifiedName.get(2)),
-              new PlannerQueryOperation(modify.getInput)
-            )
+              new PlannerQueryOperation(modify.getInput))
             translateToRel(modifyOperation)
           case _ =>
             relNode
@@ -123,10 +128,8 @@ class StreamPlanner(
     }
     val withChangelogTraits = extraDetails.contains(ExplainDetail.CHANGELOG_MODE)
     optimizedRelNodes.foreach { rel =>
-      sb.append(FlinkRelOptUtil.toString(
-        rel,
-        explainLevel,
-        withChangelogTraits = withChangelogTraits))
+      sb.append(
+        FlinkRelOptUtil.toString(rel, explainLevel, withChangelogTraits = withChangelogTraits))
       sb.append(System.lineSeparator)
     }
 

@@ -37,7 +37,7 @@ class SplitPythonConditionFromCorrelateRuleTest extends TableTestBase {
 
     val result = table
       .joinLateral(
-        func('c) as('s, 'l),
+        func('c) as ('s, 'l),
         'l === 'a && 'c === 's && pyFunc('l, 'l) === 2 && 'l + 1 === 'l * 'l)
 
     val expected = unaryNode(
@@ -47,20 +47,17 @@ class SplitPythonConditionFromCorrelateRuleTest extends TableTestBase {
         unaryNode(
           "DataStreamCorrelate",
           streamTableNode(table),
-          term("invocation",
-            s"${func.functionIdentifier}($$2)"),
+          term("invocation", s"${func.functionIdentifier}($$2)"),
           term("correlate", s"table(${func.getClass.getSimpleName}(c))"),
           term("select", "a", "b", "c", "s", "l"),
-          term("rowType",
+          term(
+            "rowType",
             "RecordType(INTEGER a, INTEGER b, VARCHAR(65536) c, VARCHAR(65536) s, INTEGER l)"),
           term("joinType", "INNER"),
-          term("condition", "=(+($1, 1), *($1, $1))")
-        ),
-        term("select", "a", "b", "c", "s", "l", "pyFunc(l, l) AS f0")
-      ),
+          term("condition", "=(+($1, 1), *($1, $1))")),
+        term("select", "a", "b", "c", "s", "l", "pyFunc(l, l) AS f0")),
       term("select", "a", "b", "c", "s", "l"),
-      term("where", "AND(=(f0, 2), AND(=(l, a), =(c, s)))")
-    )
+      term("where", "AND(=(f0, 2), AND(=(l, a), =(c, s)))"))
 
     util.verifyTable(result, expected)
   }

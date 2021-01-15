@@ -26,15 +26,15 @@ import java.util.{Optional, List => JList}
 import scala.collection.JavaConverters._
 
 /**
-  * Utilities for interoperability between Scala and Java classes.
-  */
+ * Utilities for interoperability between Scala and Java classes.
+ */
 object JavaScalaConversionUtil {
 
   // most of these methods are not necessary once we upgraded to Scala 2.12
 
   def toJava[T](option: Option[T]): Optional[T] = option match {
     case Some(v) => Optional.of(v)
-    case None => Optional.empty()
+    case None    => Optional.empty()
   }
 
   def toScala[T](option: Optional[T]): Option[T] = Option(option.orElse(null.asInstanceOf[T]))
@@ -47,7 +47,7 @@ object JavaScalaConversionUtil {
 
   def toJava[K, V](func: (K, V) => Unit): BiConsumer[K, V] = new BiConsumer[K, V] {
     override def accept(k: K, v: V): Unit = {
-      func.apply(k ,v)
+      func.apply(k, v)
     }
   }
 

@@ -34,34 +34,32 @@ class SortTest extends TableTestBase {
   @Test
   def testNonRangeSortOnSingleFieldWithoutForceLimit(): Unit = {
     util.tableEnv.getConfig.getConfiguration.setBoolean(TABLE_EXEC_RANGE_SORT_ENABLED, false)
-    util.tableEnv.getConfig.getConfiguration.setInteger(
-      ExecutionConfigOptions.TABLE_EXEC_SORT_DEFAULT_LIMIT, -1)
+    util.tableEnv.getConfig.getConfiguration
+      .setInteger(ExecutionConfigOptions.TABLE_EXEC_SORT_DEFAULT_LIMIT, -1)
     util.verifyExecPlan("SELECT * FROM MyTable ORDER BY a DESC")
   }
 
   @Test
   def testNonRangeSortOnMultiFieldsWithoutForceLimit(): Unit = {
-    util.tableEnv.getConfig.getConfiguration.setBoolean(
-      TABLE_EXEC_RANGE_SORT_ENABLED, false)
-    util.tableEnv.getConfig.getConfiguration.setInteger(
-      ExecutionConfigOptions.TABLE_EXEC_SORT_DEFAULT_LIMIT, -1)
+    util.tableEnv.getConfig.getConfiguration.setBoolean(TABLE_EXEC_RANGE_SORT_ENABLED, false)
+    util.tableEnv.getConfig.getConfiguration
+      .setInteger(ExecutionConfigOptions.TABLE_EXEC_SORT_DEFAULT_LIMIT, -1)
     util.verifyExecPlan("SELECT * FROM MyTable ORDER BY a DESC, b")
   }
 
   @Test
   def testNonRangeSortWithForceLimit(): Unit = {
-    util.tableEnv.getConfig.getConfiguration.setBoolean(
-      TABLE_EXEC_RANGE_SORT_ENABLED, false)
-    util.tableEnv.getConfig.getConfiguration.setInteger(
-      ExecutionConfigOptions.TABLE_EXEC_SORT_DEFAULT_LIMIT, 200)
+    util.tableEnv.getConfig.getConfiguration.setBoolean(TABLE_EXEC_RANGE_SORT_ENABLED, false)
+    util.tableEnv.getConfig.getConfiguration
+      .setInteger(ExecutionConfigOptions.TABLE_EXEC_SORT_DEFAULT_LIMIT, 200)
     util.verifyExecPlan("SELECT * FROM MyTable ORDER BY a DESC")
   }
 
   @Test
   def testRangeSortWithoutForceLimit(): Unit = {
     util.tableEnv.getConfig.getConfiguration.setBoolean(TABLE_EXEC_RANGE_SORT_ENABLED, true)
-    util.tableEnv.getConfig.getConfiguration.setInteger(
-      ExecutionConfigOptions.TABLE_EXEC_SORT_DEFAULT_LIMIT, -1)
+    util.tableEnv.getConfig.getConfiguration
+      .setInteger(ExecutionConfigOptions.TABLE_EXEC_SORT_DEFAULT_LIMIT, -1)
     // exec node does not support range sort yet, so we verify rel plan here
     util.verifyRelPlan("SELECT * FROM MyTable ORDER BY a DESC")
   }
@@ -69,8 +67,8 @@ class SortTest extends TableTestBase {
   @Test
   def testRangeSortWithForceLimit(): Unit = {
     util.tableEnv.getConfig.getConfiguration.setBoolean(TABLE_EXEC_RANGE_SORT_ENABLED, true)
-    util.tableEnv.getConfig.getConfiguration.setInteger(
-      ExecutionConfigOptions.TABLE_EXEC_SORT_DEFAULT_LIMIT, 200)
+    util.tableEnv.getConfig.getConfiguration
+      .setInteger(ExecutionConfigOptions.TABLE_EXEC_SORT_DEFAULT_LIMIT, 200)
     // exec node does not support range sort yet, so we verify rel plan here
     util.verifyRelPlan("SELECT * FROM MyTable ORDER BY a DESC")
   }

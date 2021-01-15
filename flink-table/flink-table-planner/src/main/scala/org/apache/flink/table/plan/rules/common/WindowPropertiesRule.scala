@@ -33,7 +33,7 @@ import org.apache.flink.table.plan.logical.rel.LogicalWindowAggregate
 import scala.collection.JavaConversions._
 
 abstract class WindowPropertiesBaseRule(rulePredicate: RelOptRuleOperand, ruleName: String)
-  extends RelOptRule(rulePredicate, ruleName) {
+    extends RelOptRule(rulePredicate, ruleName) {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val project = call.rel(0).asInstanceOf[LogicalProject]
@@ -85,8 +85,7 @@ abstract class WindowPropertiesBaseRule(rulePredicate: RelOptRuleOperand, ruleNa
     builder.push(agg.copy(properties))
 
     // forward window properties
-    builder.project(
-      innerProject.getProjects ++ properties.map(np => builder.field(np.name)))
+    builder.project(innerProject.getProjects ++ properties.map(np => builder.field(np.name)))
 
     // replace window auxiliary functions in filter by access to window properties
     filter.foreach { f =>
@@ -96,8 +95,7 @@ abstract class WindowPropertiesBaseRule(rulePredicate: RelOptRuleOperand, ruleNa
     // replace window auxiliary functions in projection by access to window properties
     builder.project(
       project.getProjects.map(expr => replaceGroupAuxiliaries(expr, w, builder)),
-      project.getRowType.getFieldNames
-    )
+      project.getRowType.getFieldNames)
 
     builder.build()
   }
@@ -176,10 +174,9 @@ abstract class WindowPropertiesBaseRule(rulePredicate: RelOptRuleOperand, ruleNa
     node match {
       case n: RexCall if n.getOperator.isGroupAuxiliary =>
         n.getOperator match {
-          case BasicOperatorTable.TUMBLE_START |
-               BasicOperatorTable.HOP_START |
-               BasicOperatorTable.SESSION_START
-          => true
+          case BasicOperatorTable.TUMBLE_START | BasicOperatorTable.HOP_START |
+              BasicOperatorTable.SESSION_START =>
+            true
           case _ => false
         }
       case _ => false
@@ -191,10 +188,9 @@ abstract class WindowPropertiesBaseRule(rulePredicate: RelOptRuleOperand, ruleNa
     node match {
       case n: RexCall if n.getOperator.isGroupAuxiliary =>
         n.getOperator match {
-          case BasicOperatorTable.TUMBLE_END |
-               BasicOperatorTable.HOP_END |
-               BasicOperatorTable.SESSION_END
-          => true
+          case BasicOperatorTable.TUMBLE_END | BasicOperatorTable.HOP_END |
+              BasicOperatorTable.SESSION_END =>
+            true
           case _ => false
         }
       case _ => false
@@ -206,10 +202,9 @@ abstract class WindowPropertiesBaseRule(rulePredicate: RelOptRuleOperand, ruleNa
     node match {
       case n: RexCall if n.getOperator.isGroupAuxiliary =>
         n.getOperator match {
-          case BasicOperatorTable.TUMBLE_ROWTIME |
-               BasicOperatorTable.HOP_ROWTIME |
-               BasicOperatorTable.SESSION_ROWTIME
-            => true
+          case BasicOperatorTable.TUMBLE_ROWTIME | BasicOperatorTable.HOP_ROWTIME |
+              BasicOperatorTable.SESSION_ROWTIME =>
+            true
           case _ => false
         }
       case _ => false
@@ -221,10 +216,9 @@ abstract class WindowPropertiesBaseRule(rulePredicate: RelOptRuleOperand, ruleNa
     node match {
       case n: RexCall if n.getOperator.isGroupAuxiliary =>
         n.getOperator match {
-          case BasicOperatorTable.TUMBLE_PROCTIME |
-               BasicOperatorTable.HOP_PROCTIME |
-               BasicOperatorTable.SESSION_PROCTIME
-            => true
+          case BasicOperatorTable.TUMBLE_PROCTIME | BasicOperatorTable.HOP_PROCTIME |
+              BasicOperatorTable.SESSION_PROCTIME =>
+            true
           case _ => false
         }
       case _ => false
@@ -235,8 +229,10 @@ abstract class WindowPropertiesBaseRule(rulePredicate: RelOptRuleOperand, ruleNa
 object WindowPropertiesRule {
 
   val INSTANCE = new WindowPropertiesBaseRule(
-    RelOptRule.operand(classOf[LogicalProject],
-      RelOptRule.operand(classOf[LogicalProject],
+    RelOptRule.operand(
+      classOf[LogicalProject],
+      RelOptRule.operand(
+        classOf[LogicalProject],
         RelOptRule.operand(classOf[LogicalWindowAggregate], RelOptRule.none()))),
     "WindowPropertiesRule") {
 
@@ -256,9 +252,12 @@ object WindowPropertiesRule {
 object WindowPropertiesHavingRule {
 
   val INSTANCE = new WindowPropertiesBaseRule(
-    RelOptRule.operand(classOf[LogicalProject],
-      RelOptRule.operand(classOf[LogicalFilter],
-        RelOptRule.operand(classOf[LogicalProject],
+    RelOptRule.operand(
+      classOf[LogicalProject],
+      RelOptRule.operand(
+        classOf[LogicalFilter],
+        RelOptRule.operand(
+          classOf[LogicalProject],
           RelOptRule.operand(classOf[LogicalWindowAggregate], RelOptRule.none())))),
     "WindowPropertiesHavingRule") {
 
@@ -275,4 +274,3 @@ object WindowPropertiesHavingRule {
     }
   }
 }
-

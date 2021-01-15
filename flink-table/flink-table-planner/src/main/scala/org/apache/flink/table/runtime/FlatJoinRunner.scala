@@ -31,10 +31,10 @@ class FlatJoinRunner[IN1, IN2, OUT](
     name: String,
     code: String,
     @transient var returnType: TypeInformation[OUT])
-  extends RichFlatJoinFunction[IN1, IN2, OUT]
-  with ResultTypeQueryable[OUT]
-  with Compiler[FlatJoinFunction[IN1, IN2, OUT]]
-  with Logging {
+    extends RichFlatJoinFunction[IN1, IN2, OUT]
+    with ResultTypeQueryable[OUT]
+    with Compiler[FlatJoinFunction[IN1, IN2, OUT]]
+    with Logging {
 
   private var function: FlatJoinFunction[IN1, IN2, OUT] = null
 

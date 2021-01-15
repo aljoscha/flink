@@ -34,8 +34,8 @@ class FlinkLogicalSort(
     collation: RelCollation,
     sortOffset: RexNode,
     sortFetch: RexNode)
-  extends Sort(cluster, traits, child, collation, sortOffset, sortFetch)
-  with FlinkLogicalRel {
+    extends Sort(cluster, traits, child, collation, sortOffset, sortFetch)
+    with FlinkLogicalRel {
 
   private val limitStart: Long = if (offset != null) {
     RexLiteral.intValue(offset)
@@ -76,18 +76,19 @@ class FlinkLogicalSort(
 }
 
 class FlinkLogicalSortConverter
-  extends ConverterRule(
-    classOf[LogicalSort],
-    Convention.NONE,
-    FlinkConventions.LOGICAL,
-    "FlinkLogicalSortConverter") {
+    extends ConverterRule(
+      classOf[LogicalSort],
+      Convention.NONE,
+      FlinkConventions.LOGICAL,
+      "FlinkLogicalSortConverter") {
 
   override def convert(rel: RelNode): RelNode = {
     val sort = rel.asInstanceOf[LogicalSort]
     val traitSet = rel.getTraitSet.replace(FlinkConventions.LOGICAL)
     val newInput = RelOptRule.convert(sort.getInput, FlinkConventions.LOGICAL)
 
-    new FlinkLogicalSort(rel.getCluster,
+    new FlinkLogicalSort(
+      rel.getCluster,
       traitSet,
       newInput,
       sort.getCollation,

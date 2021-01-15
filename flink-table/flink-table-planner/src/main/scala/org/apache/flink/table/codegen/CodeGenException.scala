@@ -19,6 +19,6 @@
 package org.apache.flink.table.codegen
 
 /**
-  * Exception for all errors occurring during code generation.
-  */
+ * Exception for all errors occurring during code generation.
+ */
 class CodeGenException(msg: String) extends RuntimeException(msg)

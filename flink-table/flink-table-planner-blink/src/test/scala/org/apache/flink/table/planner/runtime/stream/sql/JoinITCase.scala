@@ -42,21 +42,15 @@ class JoinITCase(state: StateBackendMode) extends StreamingWithStateTestBase(sta
     (2, 3L, 2, "Hallo Welt wie", 1L),
     (3, 4L, 3, "Hallo Welt wie gehts?", 2L),
     (3, 5L, 4, "ABC", 2L),
-    (3, 6L, 5, "BCD", 3L)
-  )
+    (3, 6L, 5, "BCD", 3L))
 
-  val tuple3Data = List(
-    (1, 1L, "Hi"),
-    (2, 2L, "Hello"),
-    (3, 2L, "Hello world")
-  )
+  val tuple3Data = List((1, 1L, "Hi"), (2, 2L, "Hello"), (3, 2L, "Hello world"))
 
   val dataCannotBeJoin = List(
     (2, 3L, 2, "Hallo Welt wie", 1L),
     (3, 4L, 3, "Hallo Welt wie gehts?", 2L),
     (3, 5L, 4, "ABC", 2L),
-    (3, 6L, 5, "BCD", 3L)
-  )
+    (3, 6L, 5, "BCD", 3L))
 
   override def before(): Unit = {
     super.before()
@@ -68,13 +62,10 @@ class JoinITCase(state: StateBackendMode) extends StreamingWithStateTestBase(sta
     tEnv.registerTable("B", tableB)
   }
 
-
-
   // Tests for inner join.
   override def after(): Unit = {}
 
-
-  /** test non-window inner join **/
+  /** test non-window inner join * */
   @Test
   def testNonWindowInnerJoin(): Unit = {
     val data1 = new mutable.MutableList[(Int, Long, String)]
@@ -274,8 +265,12 @@ class JoinITCase(state: StateBackendMode) extends StreamingWithStateTestBase(sta
     env.execute()
 
     val expected = Seq(
-      "Hi,Hallo", "Hello,Hallo Welt", "Hello world,Hallo Welt wie gehts?", "Hello world,ABC",
-      "I am fine.,HIJ", "I am fine.,IJK")
+      "Hi,Hallo",
+      "Hello,Hallo Welt",
+      "Hello world,Hallo Welt wie gehts?",
+      "Hello world,ABC",
+      "I am fine.,HIJ",
+      "I am fine.,IJK")
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
 
@@ -289,8 +284,8 @@ class JoinITCase(state: StateBackendMode) extends StreamingWithStateTestBase(sta
     tEnv.sqlQuery(sqlQuery).toRetractStream[Row].addSink(sink).setParallelism(1)
     env.execute()
 
-    val expected = Seq("1,Hi", "2,Hello", "1,Hello",
-      "2,Hello world", "2,Hello world", "3,Hello world")
+    val expected =
+      Seq("1,Hi", "2,Hello", "1,Hello", "2,Hello world", "2,Hello world", "3,Hello world")
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
 
@@ -340,29 +335,10 @@ class JoinITCase(state: StateBackendMode) extends StreamingWithStateTestBase(sta
 
   @Test
   def testStreamJoinWithSameRecord(): Unit = {
-    val data1 = List(
-      (1, 1),
-      (1, 1),
-      (2, 2),
-      (2, 2),
-      (3, 3),
-      (3, 3),
-      (4, 4),
-      (4, 4),
-      (5, 5),
-      (5, 5))
+    val data1 = List((1, 1), (1, 1), (2, 2), (2, 2), (3, 3), (3, 3), (4, 4), (4, 4), (5, 5), (5, 5))
 
-    val data2 = List(
-      (1, 1),
-      (2, 2),
-      (3, 3),
-      (4, 4),
-      (5, 5),
-      (6, 6),
-      (7, 7),
-      (8, 8),
-      (9, 9),
-      (10, 10))
+    val data2 =
+      List((1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6), (7, 7), (8, 8), (9, 9), (10, 10))
 
     val table1 = failingDataSource(data1).toTable(tEnv, 'pk, 'a)
     val table2 = failingDataSource(data2).toTable(tEnv, 'pk, 'a)
@@ -383,11 +359,17 @@ class JoinITCase(state: StateBackendMode) extends StreamingWithStateTestBase(sta
     tEnv.sqlQuery(sql).toAppendStream[Row].addSink(sink)
     env.execute()
 
-    val expected = Seq("1,1,1,1", "1,1,1,1",
-      "2,2,2,2", "2,2,2,2",
-      "3,3,3,3", "3,3,3,3",
-      "4,4,4,4", "4,4,4,4",
-      "5,5,5,5", "5,5,5,5")
+    val expected = Seq(
+      "1,1,1,1",
+      "1,1,1,1",
+      "2,2,2,2",
+      "2,2,2,2",
+      "3,3,3,3",
+      "3,3,3,3",
+      "4,4,4,4",
+      "4,4,4,4",
+      "5,5,5,5",
+      "5,5,5,5")
     assertEquals(expected.sorted, sink.getAppendResults.sorted)
   }
 
@@ -399,10 +381,23 @@ class JoinITCase(state: StateBackendMode) extends StreamingWithStateTestBase(sta
     tEnv.sqlQuery(sqlQuery).toRetractStream[Row].addSink(sink).setParallelism(1)
     env.execute()
 
-    val expected = Seq("Hi,Hallo", "Hello,Hallo Welt", "Hello world,Hallo Welt",
-      "null,Hallo Welt wie", "null,Hallo Welt wie gehts?", "null,ABC", "null,BCD",
-      "null,CDE", "null,DEF", "null,EFG", "null,FGH", "null,GHI", "null,HIJ",
-      "null,IJK", "null,JKL", "null,KLM")
+    val expected = Seq(
+      "Hi,Hallo",
+      "Hello,Hallo Welt",
+      "Hello world,Hallo Welt",
+      "null,Hallo Welt wie",
+      "null,Hallo Welt wie gehts?",
+      "null,ABC",
+      "null,BCD",
+      "null,CDE",
+      "null,DEF",
+      "null,EFG",
+      "null,FGH",
+      "null,GHI",
+      "null,HIJ",
+      "null,IJK",
+      "null,JKL",
+      "null,KLM")
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
 
@@ -419,10 +414,23 @@ class JoinITCase(state: StateBackendMode) extends StreamingWithStateTestBase(sta
     tEnv.sqlQuery(sqlQuery).toRetractStream[Row].addSink(sink).setParallelism(1)
     env.execute()
 
-    val expected = Seq("Hi,Hallo", "Hello,Hallo Welt", "Hello world,Hallo Welt",
-      "null,Hallo Welt wie", "null,Hallo Welt wie gehts?", "null,ABC", "null,BCD",
-      "null,CDE", "null,DEF", "null,EFG", "null,FGH", "null,GHI", "null,HIJ",
-      "null,IJK", "null,JKL", "null,KLM")
+    val expected = Seq(
+      "Hi,Hallo",
+      "Hello,Hallo Welt",
+      "Hello world,Hallo Welt",
+      "null,Hallo Welt wie",
+      "null,Hallo Welt wie gehts?",
+      "null,ABC",
+      "null,BCD",
+      "null,CDE",
+      "null,DEF",
+      "null,EFG",
+      "null,FGH",
+      "null,GHI",
+      "null,HIJ",
+      "null,IJK",
+      "null,JKL",
+      "null,KLM")
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
 
@@ -434,10 +442,23 @@ class JoinITCase(state: StateBackendMode) extends StreamingWithStateTestBase(sta
     tEnv.sqlQuery(sqlQuery).toRetractStream[Row].addSink(sink).setParallelism(1)
     env.execute()
 
-    val expected = Seq("Hi,Hallo", "Hello,Hallo Welt", "Hello world,Hallo Welt",
-      "null,Hallo Welt wie", "null,Hallo Welt wie gehts?", "null,ABC", "null,BCD",
-      "null,CDE", "null,DEF", "null,EFG", "null,FGH", "null,GHI", "null,HIJ",
-      "null,IJK", "null,JKL", "null,KLM")
+    val expected = Seq(
+      "Hi,Hallo",
+      "Hello,Hallo Welt",
+      "Hello world,Hallo Welt",
+      "null,Hallo Welt wie",
+      "null,Hallo Welt wie gehts?",
+      "null,ABC",
+      "null,BCD",
+      "null,CDE",
+      "null,DEF",
+      "null,EFG",
+      "null,FGH",
+      "null,GHI",
+      "null,HIJ",
+      "null,IJK",
+      "null,JKL",
+      "null,KLM")
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
 
@@ -583,8 +604,22 @@ class JoinITCase(state: StateBackendMode) extends StreamingWithStateTestBase(sta
     tEnv.sqlQuery(query).toRetractStream[Row].addSink(sink).setParallelism(1)
     env.execute()
 
-    val expected = Seq("null,2", "null,1", "null,3", "null,3", "null,2", "null,5", "null,3",
-      "null,5", "null,4", "null,5", "null,4", "null,5", "null,4", "null,5", "null,4")
+    val expected = Seq(
+      "null,2",
+      "null,1",
+      "null,3",
+      "null,3",
+      "null,2",
+      "null,5",
+      "null,3",
+      "null,5",
+      "null,4",
+      "null,5",
+      "null,4",
+      "null,5",
+      "null,4",
+      "null,5",
+      "null,4")
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
 
@@ -611,8 +646,22 @@ class JoinITCase(state: StateBackendMode) extends StreamingWithStateTestBase(sta
     tEnv.sqlQuery(query).toRetractStream[Row].addSink(sink).setParallelism(1)
     env.execute()
 
-    val expected = Seq("null,2", "null,1", "null,3", "null,2", "null,3", "null,5", "null,5",
-      "null,3", "null,5", "null,5", "null,4", "null,5", "null,4", "null,4", "null,4")
+    val expected = Seq(
+      "null,2",
+      "null,1",
+      "null,3",
+      "null,2",
+      "null,3",
+      "null,5",
+      "null,5",
+      "null,3",
+      "null,5",
+      "null,5",
+      "null,4",
+      "null,5",
+      "null,4",
+      "null,4",
+      "null,4")
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
 
@@ -627,8 +676,8 @@ class JoinITCase(state: StateBackendMode) extends StreamingWithStateTestBase(sta
     tEnv.sqlQuery(query).toRetractStream[Row].addSink(sink).setParallelism(1)
     env.execute()
 
-    val expected = Seq("null,null,3,15", "null,null,4,34", "null,null,2,5", "null,null,5,65",
-      "null,null,1,1")
+    val expected =
+      Seq("null,null,3,15", "null,null,4,34", "null,null,2,5", "null,null,5,65", "null,null,1,1")
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
 
@@ -640,8 +689,22 @@ class JoinITCase(state: StateBackendMode) extends StreamingWithStateTestBase(sta
     tEnv.sqlQuery(query).toRetractStream[Row].addSink(sink).setParallelism(1)
     env.execute()
 
-    val expected = Seq("2,2", "3,3", "3,3", "2,2", "3,3", "null,5", "null,4", "1,1", "null,5",
-      "null,4", "null,5", "null,5", "null,5", "null,4", "null,4")
+    val expected = Seq(
+      "2,2",
+      "3,3",
+      "3,3",
+      "2,2",
+      "3,3",
+      "null,5",
+      "null,4",
+      "1,1",
+      "null,5",
+      "null,4",
+      "null,5",
+      "null,5",
+      "null,5",
+      "null,4",
+      "null,4")
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
 
@@ -668,8 +731,22 @@ class JoinITCase(state: StateBackendMode) extends StreamingWithStateTestBase(sta
     tEnv.sqlQuery(query).toRetractStream[Row].addSink(sink).setParallelism(1)
     env.execute()
 
-    val expected = Seq("null,4", "null,4", "null,4", "null,4", "null,5", "null,5", "null,5",
-      "null,5", "null,5", "1,1", "2,2", "3,3", "3,3", "3,3", "2,2")
+    val expected = Seq(
+      "null,4",
+      "null,4",
+      "null,4",
+      "null,4",
+      "null,5",
+      "null,5",
+      "null,5",
+      "null,5",
+      "null,5",
+      "1,1",
+      "2,2",
+      "3,3",
+      "3,3",
+      "3,3",
+      "2,2")
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
 
@@ -683,8 +760,8 @@ class JoinITCase(state: StateBackendMode) extends StreamingWithStateTestBase(sta
     tEnv.sqlQuery(query).toRetractStream[Row].addSink(sink).setParallelism(1)
     env.execute()
 
-    val expected = Seq("null,null,3,15", "null,null,4,34", "null,null,5,65",
-      "1,1,1,1", "null,null,2,5")
+    val expected =
+      Seq("null,null,3,15", "null,null,4,34", "null,null,5,65", "1,1,1,1", "null,null,2,5")
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
 
@@ -696,9 +773,25 @@ class JoinITCase(state: StateBackendMode) extends StreamingWithStateTestBase(sta
     tEnv.sqlQuery(query).toRetractStream[Row].addSink(sink).setParallelism(1)
     env.execute()
 
-    val expected = Seq("1,null", "3,null", "2,null", "null,3", "null,2", "null,2", "null,3",
-      "null,5", "null,3", "null,5", "null,4", "null,5", "null,4", "null,1", "null,5", "null,4",
-      "null,5", "null,4")
+    val expected = Seq(
+      "1,null",
+      "3,null",
+      "2,null",
+      "null,3",
+      "null,2",
+      "null,2",
+      "null,3",
+      "null,5",
+      "null,3",
+      "null,5",
+      "null,4",
+      "null,5",
+      "null,4",
+      "null,1",
+      "null,5",
+      "null,4",
+      "null,5",
+      "null,4")
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
 
@@ -712,8 +805,16 @@ class JoinITCase(state: StateBackendMode) extends StreamingWithStateTestBase(sta
     tEnv.sqlQuery(query).toRetractStream[Row].addSink(sink).setParallelism(1)
     env.execute()
 
-    val expected = Seq("null,2", "null,5", "null,3", "null,4", "3,null", "1,null", "null,1", "2," +
-      "null")
+    val expected = Seq(
+      "null,2",
+      "null,5",
+      "null,3",
+      "null,4",
+      "3,null",
+      "1,null",
+      "null,1",
+      "2," +
+        "null")
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
 
@@ -726,9 +827,25 @@ class JoinITCase(state: StateBackendMode) extends StreamingWithStateTestBase(sta
     tEnv.sqlQuery(query).toRetractStream[Row].addSink(sink).setParallelism(1)
     env.execute()
 
-    val expected = Seq("null,2", "null,1", "null,2", "null,5", "null,5", "null,5", "null,5",
-      "null,5", "null,3", "null,3", "null,3", "null,4", "null,4", "null,4", "null,4", "3,null",
-      "1,null", "2,null")
+    val expected = Seq(
+      "null,2",
+      "null,1",
+      "null,2",
+      "null,5",
+      "null,5",
+      "null,5",
+      "null,5",
+      "null,5",
+      "null,3",
+      "null,3",
+      "null,3",
+      "null,4",
+      "null,4",
+      "null,4",
+      "null,4",
+      "3,null",
+      "1,null",
+      "2,null")
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
 
@@ -743,8 +860,16 @@ class JoinITCase(state: StateBackendMode) extends StreamingWithStateTestBase(sta
     tEnv.sqlQuery(query).toRetractStream[Row].addSink(sink).setParallelism(1)
     env.execute()
 
-    val expected = Seq("1,1,null,null", "null,null,5,65", "null,null,2,5", "2,2,null,null", "3,2," +
-      "null,null", "null,null,3,15", "null,null,4,34", "null,null,1,1")
+    val expected = Seq(
+      "1,1,null,null",
+      "null,null,5,65",
+      "null,null,2,5",
+      "2,2,null,null",
+      "3,2," +
+        "null,null",
+      "null,null,3,15",
+      "null,null,4,34",
+      "null,null,1,1")
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
 
@@ -756,8 +881,23 @@ class JoinITCase(state: StateBackendMode) extends StreamingWithStateTestBase(sta
     tEnv.sqlQuery(query).toRetractStream[Row].addSink(sink).setParallelism(1)
     env.execute()
 
-    val expected = Seq("1,1", "null,5", "null,5", "null,5", "null,4", "null,5", "null,4", "null," +
-      "5", "null,4", "null,4", "2,2", "2,2", "3,3", "3,3", "3,3")
+    val expected = Seq(
+      "1,1",
+      "null,5",
+      "null,5",
+      "null,5",
+      "null,4",
+      "null,5",
+      "null,4",
+      "null," +
+        "5",
+      "null,4",
+      "null,4",
+      "2,2",
+      "2,2",
+      "3,3",
+      "3,3",
+      "3,3")
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
 
@@ -784,8 +924,22 @@ class JoinITCase(state: StateBackendMode) extends StreamingWithStateTestBase(sta
     tEnv.sqlQuery(query).toRetractStream[Row].addSink(sink).setParallelism(1)
     env.execute()
 
-    val expected = Seq("null,4", "null,4", "null,4", "null,4", "null,5", "null,5", "null,5",
-      "null,5", "null,5", "3,3", "3,3", "3,3", "1,1", "2,2", "2,2")
+    val expected = Seq(
+      "null,4",
+      "null,4",
+      "null,4",
+      "null,4",
+      "null,5",
+      "null,5",
+      "null,5",
+      "null,5",
+      "null,5",
+      "3,3",
+      "3,3",
+      "3,3",
+      "1,1",
+      "2,2",
+      "2,2")
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
 
@@ -799,8 +953,15 @@ class JoinITCase(state: StateBackendMode) extends StreamingWithStateTestBase(sta
     tEnv.sqlQuery(query).toRetractStream[Row].addSink(sink).setParallelism(1)
     env.execute()
 
-    val expected = Seq("null,null,3,15", "null,null,4,34", "null,null,5,65", "3,2,null,null", "2," +
-      "2,null,null", "null,null,2,5", "1,1,1,1")
+    val expected = Seq(
+      "null,null,3,15",
+      "null,null,4,34",
+      "null,null,5,65",
+      "3,2,null,null",
+      "2," +
+        "2,null,null",
+      "null,null,2,5",
+      "1,1,1,1")
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
 
@@ -838,11 +999,7 @@ class JoinITCase(state: StateBackendMode) extends StreamingWithStateTestBase(sta
     tEnv.sqlQuery(sqlQuery).toRetractStream[Row].addSink(sink).setParallelism(1)
     env.execute()
 
-    val expected = mutable.MutableList(
-      "1,1,1,1",
-      "4,2,null,null",
-      "null,8,null,null"
-    )
+    val expected = mutable.MutableList("1,1,1,1", "4,2,null,null", "null,8,null,null")
 
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
@@ -881,11 +1038,7 @@ class JoinITCase(state: StateBackendMode) extends StreamingWithStateTestBase(sta
     tEnv.sqlQuery(sqlQuery).toRetractStream[Row].addSink(sink).setParallelism(1)
     env.execute()
 
-    val expected = mutable.MutableList(
-      "1,1,1,1",
-      "4,2,null,null",
-      "null,8,null,2"
-    )
+    val expected = mutable.MutableList("1,1,1,1", "4,2,null,null", "null,8,null,2")
 
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
@@ -923,11 +1076,7 @@ class JoinITCase(state: StateBackendMode) extends StreamingWithStateTestBase(sta
     tEnv.sqlQuery(sqlQuery).toRetractStream[Row].addSink(sink).setParallelism(1)
     env.execute()
 
-    val expected = mutable.MutableList(
-      "1,1,1,1",
-      "null,null,2,2",
-      "null,null,null,2"
-    )
+    val expected = mutable.MutableList("1,1,1,1", "null,null,2,2", "null,null,null,2")
 
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
@@ -966,11 +1115,7 @@ class JoinITCase(state: StateBackendMode) extends StreamingWithStateTestBase(sta
     tEnv.sqlQuery(sqlQuery).toRetractStream[Row].addSink(sink).setParallelism(1)
     env.execute()
 
-    val expected = mutable.MutableList(
-      "1,1,1,1",
-      "null,null,2,2",
-      "null,8,null,2"
-    )
+    val expected = mutable.MutableList("1,1,1,1", "null,null,2,2", "null,8,null,2")
 
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
@@ -1014,8 +1159,7 @@ class JoinITCase(state: StateBackendMode) extends StreamingWithStateTestBase(sta
       "null,null,2,2",
       "4,2,null,null",
       "null,8,null,null",
-      "null,null,null,2"
-    )
+      "null,null,null,2")
 
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
@@ -1055,12 +1199,7 @@ class JoinITCase(state: StateBackendMode) extends StreamingWithStateTestBase(sta
     tEnv.sqlQuery(sqlQuery).toRetractStream[Row].addSink(sink).setParallelism(1)
     env.execute()
 
-    val expected = mutable.MutableList(
-      "1,1,1,1",
-      "null,null,2,2",
-      "4,2,null,null",
-      "null,8,null,2"
-    )
+    val expected = mutable.MutableList("1,1,1,1", "null,null,2,2", "4,2,null,null", "null,8,null,2")
 
     assertEquals(expected.sorted, sink.getRetractResults.sorted)
   }
@@ -1072,21 +1211,20 @@ class JoinITCase(state: StateBackendMode) extends StreamingWithStateTestBase(sta
     env.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime)
 
     val data1 = new mutable.MutableList[(Int, Long)]
-    data1 .+= ((1, 1L))
-    data1 .+= ((2, 2L))
-    data1 .+= ((3, 3L))
+    data1.+=((1, 1L))
+    data1.+=((2, 2L))
+    data1.+=((3, 3L))
     val data2 = new mutable.MutableList[(Int, Long)]
-    data2 .+= ((1, -1L))
-    data2 .+= ((2, -2L))
-    data2 .+= ((3, -3L))
+    data2.+=((1, -1L))
+    data2.+=((2, -2L))
+    data2.+=((3, -3L))
 
     val t1 = failingDataSource(data1).toTable(tEnv, 'a, 'b)
     tEnv.registerTable("T1", t1)
     val t2 = failingDataSource(data2).toTable(tEnv, 'a, 'c)
     tEnv.registerTable("T2", t2)
 
-    val t3 = tEnv.sqlQuery(
-      "select T1.a, b, c from T1, T2 WHERE T1.a = T2.a")
+    val t3 = tEnv.sqlQuery("select T1.a, b, c from T1, T2 WHERE T1.a = T2.a")
     val sink = new TestingRetractSink
     t3.toRetractStream[Row].addSink(sink).setParallelism(1)
     env.execute()

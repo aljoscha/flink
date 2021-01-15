@@ -35,21 +35,23 @@ import scala.collection.mutable.ListBuffer
 trait CommonTableAggregate extends CommonAggregate {
 
   protected def deriveTableAggRowType(
-    cluster: RelOptCluster,
-    child: RelNode,
-    groupSet: ImmutableBitSet,
-    aggCalls: util.List[AggregateCall]): RelDataType = {
+      cluster: RelOptCluster,
+      child: RelNode,
+      groupSet: ImmutableBitSet,
+      aggCalls: util.List[AggregateCall]): RelDataType = {
 
     val typeFactory = cluster.getTypeFactory.asInstanceOf[FlinkTypeFactory]
     val builder = typeFactory.builder
     val groupNames = new ListBuffer[String]
 
     // group key fields
-    groupSet.asList().foreach(e => {
-      val field = child.getRowType.getFieldList.get(e)
-      groupNames.append(field.getName)
-      builder.add(field)
-    })
+    groupSet
+      .asList()
+      .foreach(e => {
+        val field = child.getRowType.getFieldList.get(e)
+        groupNames.append(field.getName)
+        builder.add(field)
+      })
 
     // agg fields
     val aggCall = aggCalls.get(0)
@@ -60,18 +62,19 @@ trait CommonTableAggregate extends CommonAggregate {
       // A non-structured type does not have a field list, so get field name through
       // TableEnvImpl.getFieldNames.
       val name = FieldInfoUtils
-        .getFieldNames(FlinkTypeFactory.toTypeInfo(aggCall.`type`), groupNames).head
+        .getFieldNames(FlinkTypeFactory.toTypeInfo(aggCall.`type`), groupNames)
+        .head
       builder.add(name, aggCall.`type`)
     }
     builder.build()
   }
 
   override private[flink] def aggregationToString(
-    inputType: RelDataType,
-    grouping: Array[Int],
-    rowType: RelDataType,
-    namedAggregates: Seq[CalcitePair[AggregateCall, String]],
-    namedProperties: Seq[FlinkRelBuilder.NamedWindowProperty]): String = {
+      inputType: RelDataType,
+      grouping: Array[Int],
+      rowType: RelDataType,
+      namedAggregates: Seq[CalcitePair[AggregateCall, String]],
+      namedProperties: Seq[FlinkRelBuilder.NamedWindowProperty]): String = {
 
     val outFields = rowType.getFieldNames
     val aggOutputType = namedAggregates.head.left.getType
@@ -92,11 +95,10 @@ trait CommonTableAggregate extends CommonAggregate {
   }
 
   private[flink] def getNamedAggCalls(
-    aggCalls: util.List[AggregateCall],
-    rowType: RelDataType,
-    indicator: Boolean,
-    groupSet: ImmutableBitSet)
-  : util.List[Pair[AggregateCall, String]] = {
+      aggCalls: util.List[AggregateCall],
+      rowType: RelDataType,
+      indicator: Boolean,
+      groupSet: ImmutableBitSet): util.List[Pair[AggregateCall, String]] = {
 
     def getGroupCount: Int = groupSet.cardinality
     def getIndicatorCount: Int = if (indicator) getGroupCount else 0

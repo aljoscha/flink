@@ -23,7 +23,10 @@ import java.util
 import org.apache.flink.api.common.ExecutionConfig
 import org.apache.flink.api.common.typeinfo.TypeInformation
 import org.apache.flink.api.common.typeutils.{CompositeType, TypeComparator, TypeSerializer}
-import org.apache.flink.api.common.typeutils.CompositeType.{FlatFieldDescriptor, TypeComparatorBuilder}
+import org.apache.flink.api.common.typeutils.CompositeType.{
+  FlatFieldDescriptor,
+  TypeComparatorBuilder
+}
 import org.apache.flink.api.java.typeutils.RowTypeInfo
 import org.apache.flink.types.Row
 
@@ -65,11 +68,8 @@ class CRowTypeInfo(val rowType: RowTypeInfo) extends CompositeType[CRow](classOf
       logicalFieldOffset: Int,
       config: ExecutionConfig): TypeComparator[CRow] = {
 
-    val rowComparator = rowType.createComparator(
-      logicalKeyFields,
-      orders,
-      logicalFieldOffset,
-      config)
+    val rowComparator =
+      rowType.createComparator(logicalKeyFields, orders, logicalFieldOffset, config)
 
     new CRowComparator(rowComparator)
   }
@@ -95,4 +95,3 @@ object CRowTypeInfo {
   }
 
 }
-

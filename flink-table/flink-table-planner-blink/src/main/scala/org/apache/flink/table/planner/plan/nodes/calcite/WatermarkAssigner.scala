@@ -29,15 +29,15 @@ import java.util
 import scala.collection.JavaConversions._
 
 /**
-  * Relational operator that generates [[org.apache.flink.streaming.api.watermark.Watermark]].
-  */
+ * Relational operator that generates [[org.apache.flink.streaming.api.watermark.Watermark]].
+ */
 abstract class WatermarkAssigner(
     cluster: RelOptCluster,
     traits: RelTraitSet,
     inputRel: RelNode,
     val rowtimeFieldIndex: Int,
     val watermarkExpr: RexNode)
-  extends SingleRel(cluster, traits, inputRel) {
+    extends SingleRel(cluster, traits, inputRel) {
 
   override def deriveRowType(): RelDataType = {
     val inputRowType = inputRel.getRowType
@@ -59,7 +59,8 @@ abstract class WatermarkAssigner(
 
   override def explainTerms(pw: RelWriter): RelWriter = {
     val rowtimeFieldName = inputRel.getRowType.getFieldNames.get(rowtimeFieldIndex)
-    super.explainTerms(pw)
+    super
+      .explainTerms(pw)
       .item("rowtime", rowtimeFieldName)
       .item("watermark", watermarkExpr.toString)
   }
@@ -73,8 +74,8 @@ abstract class WatermarkAssigner(
   }
 
   /**
-    * Copies a new WatermarkAssigner.
-    */
+   * Copies a new WatermarkAssigner.
+   */
   def copy(traitSet: RelTraitSet, input: RelNode, rowtime: Int, watermark: RexNode): RelNode
 
 }

@@ -31,16 +31,16 @@ import org.apache.flink.table.util.Logging
 import org.apache.flink.types.Row
 
 /**
-  * Convert [[CRow]] to a [[JTuple2]].
-  */
+ * Convert [[CRow]] to a [[JTuple2]].
+ */
 class CRowToJavaTupleMapRunner(
     name: String,
     code: String,
     @transient var returnType: TypeInformation[JTuple2[JBool, Any]])
-  extends RichMapFunction[CRow, Any]
-  with ResultTypeQueryable[JTuple2[JBool, Any]]
-  with Compiler[MapFunction[Row, Any]]
-  with Logging {
+    extends RichMapFunction[CRow, Any]
+    with ResultTypeQueryable[JTuple2[JBool, Any]]
+    with Compiler[MapFunction[Row, Any]]
+    with Logging {
 
   private var function: MapFunction[Row, Any] = _
   private var tupleWrapper: JTuple2[JBool, Any] = _

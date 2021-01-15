@@ -39,8 +39,8 @@ import org.apache.flink.table.typeutils.TypeCheckUtils.{isLong, isTimePoint}
 import org.apache.flink.types.Row
 
 /**
-  * Flink RelNode which matches along with a LogicalWindowAggregate.
-  */
+ * Flink RelNode which matches along with a LogicalWindowAggregate.
+ */
 class DataSetWindowAggregate(
     window: LogicalWindow,
     namedProperties: Seq[NamedWindowProperty],
@@ -51,7 +51,9 @@ class DataSetWindowAggregate(
     rowRelDataType: RelDataType,
     inputType: RelDataType,
     grouping: Array[Int])
-  extends SingleRel(cluster, traitSet, inputNode) with CommonAggregate with DataSetRel {
+    extends SingleRel(cluster, traitSet, inputNode)
+    with CommonAggregate
+    with DataSetRel {
 
   override def deriveRowType() = rowRelDataType
 
@@ -69,34 +71,22 @@ class DataSetWindowAggregate(
   }
 
   override def toString: String = {
-    s"Aggregate(${
-      if (!grouping.isEmpty) {
-        s"groupBy: (${groupingToString(inputType, grouping)}), "
-      } else {
-        ""
-      }
-    }window: ($window), " +
-      s"select: (${
-        aggregationToString(
-          inputType,
-          grouping,
-          getRowType,
-          namedAggregates,
-          namedProperties)
-      }))"
+    s"Aggregate(${if (!grouping.isEmpty) {
+      s"groupBy: (${groupingToString(inputType, grouping)}), "
+    } else {
+      ""
+    }}window: ($window), " +
+      s"select: (${aggregationToString(inputType, grouping, getRowType, namedAggregates, namedProperties)}))"
   }
 
   override def explainTerms(pw: RelWriter): RelWriter = {
-    super.explainTerms(pw)
+    super
+      .explainTerms(pw)
       .itemIf("groupBy", groupingToString(inputType, grouping), !grouping.isEmpty)
       .item("window", window)
       .item(
-        "select", aggregationToString(
-          inputType,
-          grouping,
-          getRowType,
-          namedAggregates,
-          namedProperties))
+        "select",
+        aggregationToString(inputType, grouping, getRowType, namedAggregates, namedProperties))
   }
 
   override def computeSelfCost(planner: RelOptPlanner, metadata: RelMetadataQuery): RelOptCost = {
@@ -207,7 +197,8 @@ class DataSetWindowAggregate(
       // grouped time window aggregation
       // group by grouping keys and rowtime field (the last field in the row)
       val groupingKeys = grouping.indices ++ Seq(mapReturnType.getArity - 1)
-      mappedInput.asInstanceOf[DataSet[Row]]
+      mappedInput
+        .asInstanceOf[DataSet[Row]]
         .groupBy(groupingKeys: _*)
         .reduceGroup(groupReduceFunction)
         .returns(rowTypeInfo)
@@ -217,7 +208,8 @@ class DataSetWindowAggregate(
       val groupingKeys = grouping.indices.toArray
       if (groupingKeys.length > 0) {
         // grouped aggregation
-        mappedInput.asInstanceOf[DataSet[Row]]
+        mappedInput
+          .asInstanceOf[DataSet[Row]]
           .groupBy(groupingKeys: _*)
           // sort on time field, it's the last element in the row
           .sortGroup(mapReturnType.getArity - 1, Order.ASCENDING)
@@ -270,10 +262,10 @@ class DataSetWindowAggregate(
 
     // do incremental aggregation
     if (doAllSupportPartialMerge(
-      namedAggregates.map(_.getKey),
-      inputType,
-      grouping.length,
-      tableConfig)) {
+        namedAggregates.map(_.getKey),
+        inputType,
+        grouping.length,
+        tableConfig)) {
 
       // gets the window-start and window-end position  in the intermediate result.
       val windowStartPos = rowTimeFieldPos
@@ -349,16 +341,19 @@ class DataSetWindowAggregate(
           tableConfig,
           isInputCombined = true)
 
-        mappedInput.sortPartition(rowTimeFieldPos, Order.ASCENDING)
+        mappedInput
+          .sortPartition(rowTimeFieldPos, Order.ASCENDING)
           .mapPartition(mapPartitionFunction)
-          .sortPartition(windowStartPos, Order.ASCENDING).setParallelism(1)
-          .sortPartition(windowEndPos, Order.ASCENDING).setParallelism(1)
+          .sortPartition(windowStartPos, Order.ASCENDING)
+          .setParallelism(1)
+          .sortPartition(windowEndPos, Order.ASCENDING)
+          .setParallelism(1)
           .reduceGroup(groupReduceFunction)
           .returns(rowTypeInfo)
           .name(aggregateOperatorName)
           .asInstanceOf[DataSet[Row]]
       }
-    // do non-incremental aggregation
+      // do non-incremental aggregation
     } else {
       // grouping window
       if (groupingKeys.length > 0) {
@@ -378,7 +373,8 @@ class DataSetWindowAggregate(
           namedProperties,
           tableConfig)
 
-        mappedInput.groupBy(groupingKeys: _*)
+        mappedInput
+          .groupBy(groupingKeys: _*)
           .sortGroup(rowTimeFieldPos, Order.ASCENDING)
           .reduceGroup(groupReduceFunction)
           .returns(rowTypeInfo)
@@ -399,7 +395,9 @@ class DataSetWindowAggregate(
           namedProperties,
           tableConfig)
 
-        mappedInput.sortPartition(rowTimeFieldPos, Order.ASCENDING).setParallelism(1)
+        mappedInput
+          .sortPartition(rowTimeFieldPos, Order.ASCENDING)
+          .setParallelism(1)
           .reduceGroup(groupReduceFunction)
           .returns(rowTypeInfo)
           .name(aggregateOperatorName)
@@ -418,8 +416,7 @@ class DataSetWindowAggregate(
       size: Long,
       slide: Long,
       isParserCaseSensitive: Boolean,
-      tableConfig: TableConfig)
-    : DataSet[Row] = {
+      tableConfig: TableConfig): DataSet[Row] = {
 
     val input = inputNode.asInstanceOf[DataSetRel]
 
@@ -480,7 +477,8 @@ class DataSetWindowAggregate(
           isParserCaseSensitive,
           tableConfig)
 
-        mappedDataSet.asInstanceOf[DataSet[Row]]
+        mappedDataSet
+          .asInstanceOf[DataSet[Row]]
           .groupBy(groupingKeysAndAlignedRowtime: _*)
           .reduceGroup(prepareReduceFunction) // pre-tumbles and replicates/omits
           .name(prepareOperatorName)
@@ -503,7 +501,7 @@ class DataSetWindowAggregate(
       // count window
 
       throw new UnsupportedOperationException(
-          "Count sliding group windows on event-time are currently not supported.")
+        "Count sliding group windows on event-time are currently not supported.")
     }
 
     val prepareReduceReturnType = preparedDataSet.getType
@@ -537,22 +535,14 @@ class DataSetWindowAggregate(
   }
 
   private def prepareOperatorName: String = {
-    val aggString = aggregationToString(
-      inputType,
-      grouping,
-      getRowType,
-      namedAggregates,
-      namedProperties)
+    val aggString =
+      aggregationToString(inputType, grouping, getRowType, namedAggregates, namedProperties)
     s"prepare select: ($aggString)"
   }
 
   private def aggregateOperatorName: String = {
-    val aggString = aggregationToString(
-      inputType,
-      grouping,
-      getRowType,
-      namedAggregates,
-      namedProperties)
+    val aggString =
+      aggregationToString(inputType, grouping, getRowType, namedAggregates, namedProperties)
     if (grouping.length > 0) {
       s"groupBy: (${groupingToString(inputType, grouping)}), " +
         s"window: ($window), select: ($aggString)"

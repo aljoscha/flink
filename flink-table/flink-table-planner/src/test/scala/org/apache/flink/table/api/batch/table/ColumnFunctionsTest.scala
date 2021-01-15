@@ -27,8 +27,8 @@ import org.apache.flink.table.utils.{BatchTableTestUtil, TableTestBase}
 import org.junit.Test
 
 /**
-  * Tests for column functions.
-  */
+ * Tests for column functions.
+ */
 class ColumnFunctionsTest extends TableTestBase {
 
   val util = new BatchTableTestUtil()
@@ -49,11 +49,7 @@ class ColumnFunctionsTest extends TableTestBase {
       .orderBy("withColumns(1, 2 to 3)")
 
     val expected =
-      unaryNode(
-        "DataSetSort",
-        batchTableNode(t),
-        term("orderBy", "a ASC", "b ASC", "c ASC")
-      )
+      unaryNode("DataSetSort", batchTableNode(t), term("orderBy", "a ASC", "b ASC", "c ASC"))
 
     verifyAll(tab1, tab2, expected)
   }

@@ -34,9 +34,8 @@ import org.apache.flink.table.runtime.types.{CRow, CRowTypeInfo}
 import scala.collection.JavaConverters._
 
 /**
-  * Flink RelNode which matches along with FlatMapOperator.
-  *
-  */
+ * Flink RelNode which matches along with FlatMapOperator.
+ */
 class DataStreamCalc(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -45,24 +44,17 @@ class DataStreamCalc(
     schema: RowSchema,
     calcProgram: RexProgram,
     ruleDescription: String)
-  extends DataStreamCalcBase(
-    cluster,
-    traitSet,
-    input,
-    inputSchema,
-    schema,
-    calcProgram,
-    ruleDescription) {
-
-  override def copy(traitSet: RelTraitSet, child: RelNode, program: RexProgram): Calc = {
-    new DataStreamCalc(
+    extends DataStreamCalcBase(
       cluster,
       traitSet,
-      child,
+      input,
       inputSchema,
       schema,
-      program,
-      ruleDescription)
+      calcProgram,
+      ruleDescription) {
+
+  override def copy(traitSet: RelTraitSet, child: RelNode, program: RexProgram): Calc = {
+    new DataStreamCalc(cluster, traitSet, child, inputSchema, schema, program, ruleDescription)
   }
 
   override def translateToPlan(planner: StreamPlanner): DataStream[CRow] = {
@@ -100,10 +92,8 @@ class DataStreamCalc(
 
     val inputParallelism = inputDataStream.getParallelism
 
-    val processFunc = new CRowProcessRunner(
-      genFunction.name,
-      genFunction.code,
-      CRowTypeInfo(schema.typeInfo))
+    val processFunc =
+      new CRowProcessRunner(genFunction.name, genFunction.code, CRowTypeInfo(schema.typeInfo))
 
     inputDataStream
       .process(processFunc)

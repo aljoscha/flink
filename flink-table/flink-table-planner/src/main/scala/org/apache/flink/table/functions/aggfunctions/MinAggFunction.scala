@@ -32,12 +32,12 @@ import org.apache.flink.table.functions.AggregateFunction
 class MinAccumulator[T] extends JTuple2[T, Boolean]
 
 /**
-  * Base class for built-in Min aggregate function
-  *
-  * @tparam T the type for the aggregation result
-  */
+ * Base class for built-in Min aggregate function
+ *
+ * @tparam T the type for the aggregation result
+ */
 abstract class MinAggFunction[T](implicit ord: Ordering[T])
-  extends AggregateFunction[T, MinAccumulator[T]] {
+    extends AggregateFunction[T, MinAccumulator[T]] {
 
   override def createAccumulator(): MinAccumulator[T] = {
     val acc = new MinAccumulator[T]
@@ -80,10 +80,7 @@ abstract class MinAggFunction[T](implicit ord: Ordering[T])
   }
 
   override def getAccumulatorType: TypeInformation[MinAccumulator[T]] = {
-    new TupleTypeInfo(
-      classOf[MinAccumulator[T]],
-      getValueTypeInfo,
-      BasicTypeInfo.BOOLEAN_TYPE_INFO)
+    new TupleTypeInfo(classOf[MinAccumulator[T]], getValueTypeInfo, BasicTypeInfo.BOOLEAN_TYPE_INFO)
   }
 
   def getInitValue: T
@@ -92,96 +89,96 @@ abstract class MinAggFunction[T](implicit ord: Ordering[T])
 }
 
 /**
-  * Built-in Byte Min aggregate function
-  */
+ * Built-in Byte Min aggregate function
+ */
 class ByteMinAggFunction extends MinAggFunction[Byte] {
   override def getInitValue: Byte = 0.toByte
   override def getValueTypeInfo = BasicTypeInfo.BYTE_TYPE_INFO
 }
 
 /**
-  * Built-in Short Min aggregate function
-  */
+ * Built-in Short Min aggregate function
+ */
 class ShortMinAggFunction extends MinAggFunction[Short] {
   override def getInitValue: Short = 0.toShort
   override def getValueTypeInfo = BasicTypeInfo.SHORT_TYPE_INFO
 }
 
 /**
-  * Built-in Int Min aggregate function
-  */
+ * Built-in Int Min aggregate function
+ */
 class IntMinAggFunction extends MinAggFunction[Int] {
   override def getInitValue: Int = 0
   override def getValueTypeInfo = BasicTypeInfo.INT_TYPE_INFO
 }
 
 /**
-  * Built-in Long Min aggregate function
-  */
+ * Built-in Long Min aggregate function
+ */
 class LongMinAggFunction extends MinAggFunction[Long] {
   override def getInitValue: Long = 0L
   override def getValueTypeInfo = BasicTypeInfo.LONG_TYPE_INFO
 }
 
 /**
-  * Built-in Float Min aggregate function
-  */
+ * Built-in Float Min aggregate function
+ */
 class FloatMinAggFunction extends MinAggFunction[Float] {
   override def getInitValue: Float = 0.0f
   override def getValueTypeInfo = BasicTypeInfo.FLOAT_TYPE_INFO
 }
 
 /**
-  * Built-in Double Min aggregate function
-  */
+ * Built-in Double Min aggregate function
+ */
 class DoubleMinAggFunction extends MinAggFunction[Double] {
   override def getInitValue: Double = 0.0d
   override def getValueTypeInfo = BasicTypeInfo.DOUBLE_TYPE_INFO
 }
 
 /**
-  * Built-in Boolean Min aggregate function
-  */
+ * Built-in Boolean Min aggregate function
+ */
 class BooleanMinAggFunction extends MinAggFunction[Boolean] {
   override def getInitValue: Boolean = false
   override def getValueTypeInfo = BasicTypeInfo.BOOLEAN_TYPE_INFO
 }
 
 /**
-  * Built-in Big Decimal Min aggregate function
-  */
+ * Built-in Big Decimal Min aggregate function
+ */
 class DecimalMinAggFunction extends MinAggFunction[BigDecimal] {
   override def getInitValue: BigDecimal = BigDecimal.ZERO
   override def getValueTypeInfo = BasicTypeInfo.BIG_DEC_TYPE_INFO
 }
 
 /**
-  * Built-in String Min aggregate function
-  */
+ * Built-in String Min aggregate function
+ */
 class StringMinAggFunction extends MinAggFunction[String] {
   override def getInitValue = ""
   override def getValueTypeInfo = BasicTypeInfo.STRING_TYPE_INFO
 }
 
 /**
-  * Built-in Timestamp Min aggregate function
-  */
+ * Built-in Timestamp Min aggregate function
+ */
 class TimestampMinAggFunction extends MinAggFunction[Timestamp] {
   override def getInitValue: Timestamp = new Timestamp(0)
   override def getValueTypeInfo = Types.SQL_TIMESTAMP
 }
 
 /**
-  * Built-in Date Min aggregate function
-  */
+ * Built-in Date Min aggregate function
+ */
 class DateMinAggFunction extends MinAggFunction[Date] {
   override def getInitValue: Date = new Date(0)
   override def getValueTypeInfo = Types.SQL_DATE
 }
 
 /**
-  * Built-in Time Min aggregate function
-  */
+ * Built-in Time Min aggregate function
+ */
 class TimeMinAggFunction extends MinAggFunction[Time] {
   override def getInitValue: Time = new Time(0)
   override def getValueTypeInfo = Types.SQL_TIME

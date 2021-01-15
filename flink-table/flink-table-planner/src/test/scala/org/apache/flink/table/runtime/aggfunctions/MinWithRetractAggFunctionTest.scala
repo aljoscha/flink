@@ -25,12 +25,12 @@ import org.apache.flink.table.functions.AggregateFunction
 import org.apache.flink.table.functions.aggfunctions._
 
 /**
-  * Test case for built-in Min with retraction aggregate function
-  *
-  * @tparam T the type for the aggregation result
-  */
+ * Test case for built-in Min with retraction aggregate function
+ *
+ * @tparam T the type for the aggregation result
+ */
 abstract class MinWithRetractAggFunctionTest[T: Numeric]
-  extends AggFunctionTestBase[T, MinWithRetractAccumulator[T]] {
+    extends AggFunctionTestBase[T, MinWithRetractAccumulator[T]] {
 
   private val numeric: Numeric[T] = implicitly[Numeric[T]]
 
@@ -50,22 +50,16 @@ abstract class MinWithRetractAggFunctionTest[T: Numeric]
       minVal,
       numeric.fromInt(-20),
       numeric.fromInt(17),
-      null.asInstanceOf[T]
-    ),
+      null.asInstanceOf[T]),
     Seq(
       null.asInstanceOf[T],
       null.asInstanceOf[T],
       null.asInstanceOf[T],
       null.asInstanceOf[T],
       null.asInstanceOf[T],
-      null.asInstanceOf[T]
-    )
-  )
+      null.asInstanceOf[T]))
 
-  override def expectedResults: Seq[T] = Seq(
-    minVal,
-    null.asInstanceOf[T]
-  )
+  override def expectedResults: Seq[T] = Seq(minVal, null.asInstanceOf[T])
 
   override def retractFunc = aggregator.getClass.getMethod("retract", accType, classOf[Any])
 }
@@ -131,41 +125,15 @@ class DoubleMinWithRetractAggFunctionTest extends MinWithRetractAggFunctionTest[
 }
 
 class BooleanMinWithRetractAggFunctionTest
-  extends AggFunctionTestBase[Boolean, MinWithRetractAccumulator[Boolean]] {
+    extends AggFunctionTestBase[Boolean, MinWithRetractAccumulator[Boolean]] {
 
   override def inputValueSets: Seq[Seq[Boolean]] = Seq(
-    Seq(
-      false,
-      false,
-      false
-    ),
-    Seq(
-      true,
-      true,
-      true
-    ),
-    Seq(
-      true,
-      false,
-      null.asInstanceOf[Boolean],
-      true,
-      false,
-      true,
-      null.asInstanceOf[Boolean]
-    ),
-    Seq(
-      null.asInstanceOf[Boolean],
-      null.asInstanceOf[Boolean],
-      null.asInstanceOf[Boolean]
-    )
-  )
+    Seq(false, false, false),
+    Seq(true, true, true),
+    Seq(true, false, null.asInstanceOf[Boolean], true, false, true, null.asInstanceOf[Boolean]),
+    Seq(null.asInstanceOf[Boolean], null.asInstanceOf[Boolean], null.asInstanceOf[Boolean]))
 
-  override def expectedResults: Seq[Boolean] = Seq(
-    false,
-    true,
-    false,
-    null.asInstanceOf[Boolean]
-  )
+  override def expectedResults: Seq[Boolean] = Seq(false, true, false, null.asInstanceOf[Boolean])
 
   override def aggregator: AggregateFunction[Boolean, MinWithRetractAccumulator[Boolean]] =
     new BooleanMinWithRetractAggFunction()
@@ -174,7 +142,7 @@ class BooleanMinWithRetractAggFunctionTest
 }
 
 class DecimalMinWithRetractAggFunctionTest
-  extends AggFunctionTestBase[BigDecimal, MinWithRetractAccumulator[BigDecimal]] {
+    extends AggFunctionTestBase[BigDecimal, MinWithRetractAccumulator[BigDecimal]] {
 
   override def inputValueSets: Seq[Seq[_]] = Seq(
     Seq(
@@ -186,21 +154,10 @@ class DecimalMinWithRetractAggFunctionTest
       new BigDecimal("0"),
       new BigDecimal("-999.999"),
       null,
-      new BigDecimal("999.999")
-    ),
-    Seq(
-      null,
-      null,
-      null,
-      null,
-      null
-    )
-  )
+      new BigDecimal("999.999")),
+    Seq(null, null, null, null, null))
 
-  override def expectedResults: Seq[BigDecimal] = Seq(
-    new BigDecimal("-999.999"),
-    null
-  )
+  override def expectedResults: Seq[BigDecimal] = Seq(new BigDecimal("-999.999"), null)
 
   override def aggregator: AggregateFunction[BigDecimal, MinWithRetractAccumulator[BigDecimal]] =
     new DecimalMinWithRetractAggFunction()
@@ -209,34 +166,12 @@ class DecimalMinWithRetractAggFunctionTest
 }
 
 class StringMinWithRetractAggFunctionTest
-  extends AggFunctionTestBase[String, MinWithRetractAccumulator[String]] {
+    extends AggFunctionTestBase[String, MinWithRetractAccumulator[String]] {
 
-  override def inputValueSets: Seq[Seq[_]] = Seq(
-    Seq(
-      "abc",
-      "def",
-      "ghi",
-      null,
-      "jkl",
-      null,
-      "zzz"
-    ),
-    Seq(
-      null,
-      null
-    ),
-    Seq(
-      "x",
-      null,
-      "e"
-    )
-  )
+  override def inputValueSets: Seq[Seq[_]] =
+    Seq(Seq("abc", "def", "ghi", null, "jkl", null, "zzz"), Seq(null, null), Seq("x", null, "e"))
 
-  override def expectedResults: Seq[String] = Seq(
-    "abc",
-    null,
-    "e"
-  )
+  override def expectedResults: Seq[String] = Seq("abc", null, "e")
 
   override def aggregator: AggregateFunction[String, MinWithRetractAccumulator[String]] =
     new StringMinWithRetractAggFunction()
@@ -245,7 +180,7 @@ class StringMinWithRetractAggFunctionTest
 }
 
 class TimestampMinWithRetractAggFunctionTest
-  extends AggFunctionTestBase[Timestamp, MinWithRetractAccumulator[Timestamp]] {
+    extends AggFunctionTestBase[Timestamp, MinWithRetractAccumulator[Timestamp]] {
 
   override def inputValueSets: Seq[Seq[_]] = Seq(
     Seq(
@@ -253,21 +188,10 @@ class TimestampMinWithRetractAggFunctionTest
       new Timestamp(1000),
       new Timestamp(100),
       null.asInstanceOf[Timestamp],
-      new Timestamp(10)
-    ),
-    Seq(
-      null,
-      null,
-      null,
-      null,
-      null
-    )
-  )
+      new Timestamp(10)),
+    Seq(null, null, null, null, null))
 
-  override def expectedResults: Seq[Timestamp] = Seq(
-    new Timestamp(0),
-    null
-  )
+  override def expectedResults: Seq[Timestamp] = Seq(new Timestamp(0), null)
 
   override def aggregator: AggregateFunction[Timestamp, MinWithRetractAccumulator[Timestamp]] =
     new TimestampMinWithRetractAggFunction()
@@ -276,29 +200,13 @@ class TimestampMinWithRetractAggFunctionTest
 }
 
 class DateMinWithRetractAggFunctionTest
-  extends AggFunctionTestBase[Date, MinWithRetractAccumulator[Date]] {
+    extends AggFunctionTestBase[Date, MinWithRetractAccumulator[Date]] {
 
   override def inputValueSets: Seq[Seq[_]] = Seq(
-    Seq(
-      new Date(0),
-      new Date(1000),
-      new Date(100),
-      null.asInstanceOf[Date],
-      new Date(10)
-    ),
-    Seq(
-      null,
-      null,
-      null,
-      null,
-      null
-    )
-  )
+    Seq(new Date(0), new Date(1000), new Date(100), null.asInstanceOf[Date], new Date(10)),
+    Seq(null, null, null, null, null))
 
-  override def expectedResults: Seq[Date] = Seq(
-    new Date(0),
-    null
-  )
+  override def expectedResults: Seq[Date] = Seq(new Date(0), null)
 
   override def aggregator: AggregateFunction[Date, MinWithRetractAccumulator[Date]] =
     new DateMinWithRetractAggFunction()
@@ -307,29 +215,13 @@ class DateMinWithRetractAggFunctionTest
 }
 
 class TimeMinWithRetractAggFunctionTest
-  extends AggFunctionTestBase[Time, MinWithRetractAccumulator[Time]] {
+    extends AggFunctionTestBase[Time, MinWithRetractAccumulator[Time]] {
 
   override def inputValueSets: Seq[Seq[_]] = Seq(
-    Seq(
-      new Time(0),
-      new Time(1000),
-      new Time(100),
-      null.asInstanceOf[Time],
-      new Time(10)
-    ),
-    Seq(
-      null,
-      null,
-      null,
-      null,
-      null
-    )
-  )
+    Seq(new Time(0), new Time(1000), new Time(100), null.asInstanceOf[Time], new Time(10)),
+    Seq(null, null, null, null, null))
 
-  override def expectedResults: Seq[Time] = Seq(
-    new Time(0),
-    null
-  )
+  override def expectedResults: Seq[Time] = Seq(new Time(0), null)
 
   override def aggregator: AggregateFunction[Time, MinWithRetractAccumulator[Time]] =
     new TimeMinWithRetractAggFunction()

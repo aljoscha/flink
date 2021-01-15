@@ -21,8 +21,8 @@ package org.apache.flink.table.plan.cost
 import org.apache.calcite.plan.{RelOptCost, RelOptCostFactory}
 
 /**
-  * This class is based on Apache Calcite's `org.apache.calcite.plan.volcano.VolcanoCost#Factory`.
-  */
+ * This class is based on Apache Calcite's `org.apache.calcite.plan.volcano.VolcanoCost#Factory`.
+ */
 class DataSetCostFactory extends RelOptCostFactory {
 
   override def makeCost(dRows: Double, dCpu: Double, dIo: Double): RelOptCost = {

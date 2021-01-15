@@ -36,8 +36,8 @@ import org.apache.flink.types.Row
 import scala.collection.JavaConverters._
 
 /**
-  * Flink RelNode which matches along with LogicalCalc.
-  */
+ * Flink RelNode which matches along with LogicalCalc.
+ */
 class DataSetCalc(
     cluster: RelOptCluster,
     traitSet: RelTraitSet,
@@ -45,13 +45,13 @@ class DataSetCalc(
     rowRelDataType: RelDataType,
     calcProgram: RexProgram,
     ruleDescription: String)
-  extends DataSetCalcBase(
-    cluster,
-    traitSet,
-    input,
-    rowRelDataType,
-    calcProgram,
-    ruleDescription) {
+    extends DataSetCalcBase(
+      cluster,
+      traitSet,
+      input,
+      rowRelDataType,
+      calcProgram,
+      ruleDescription) {
 
   override def copy(traitSet: RelTraitSet, child: RelNode, program: RexProgram): Calc = {
     new DataSetCalc(cluster, traitSet, child, getRowType, program, ruleDescription)

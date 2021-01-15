@@ -46,23 +46,23 @@ class FlinkLogicalMatch(
     partitionKeys: ImmutableBitSet,
     orderKeys: RelCollation,
     interval: RexNode)
-  extends Match(
-    cluster,
-    traitSet,
-    input,
-    rowType,
-    pattern,
-    strictStart,
-    strictEnd,
-    patternDefinitions,
-    measures,
-    after,
-    subsets,
-    allRows,
-    partitionKeys,
-    orderKeys,
-    interval)
-  with FlinkLogicalRel {
+    extends Match(
+      cluster,
+      traitSet,
+      input,
+      rowType,
+      pattern,
+      strictStart,
+      strictEnd,
+      patternDefinitions,
+      measures,
+      after,
+      subsets,
+      allRows,
+      partitionKeys,
+      orderKeys,
+      interval)
+    with FlinkLogicalRel {
 
   override def copy(traitSet: RelTraitSet, inputs: util.List[RelNode]): RelNode = {
     new FlinkLogicalMatch(
@@ -85,11 +85,11 @@ class FlinkLogicalMatch(
 }
 
 private class FlinkLogicalMatchConverter
-  extends ConverterRule(
-    classOf[LogicalMatch],
-    Convention.NONE,
-    FlinkConventions.LOGICAL,
-    "FlinkLogicalMatchConverter") {
+    extends ConverterRule(
+      classOf[LogicalMatch],
+      Convention.NONE,
+      FlinkConventions.LOGICAL,
+      "FlinkLogicalMatchConverter") {
 
   override def convert(rel: RelNode): RelNode = {
     val logicalMatch = rel.asInstanceOf[LogicalMatch]

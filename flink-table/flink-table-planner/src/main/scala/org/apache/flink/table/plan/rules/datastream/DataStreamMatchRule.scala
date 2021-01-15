@@ -40,11 +40,11 @@ import scala.collection.JavaConversions._
 import scala.collection.mutable
 
 class DataStreamMatchRule
-  extends ConverterRule(
-    classOf[FlinkLogicalMatch],
-    FlinkConventions.LOGICAL,
-    FlinkConventions.DATASTREAM,
-    "DataStreamMatchRule") {
+    extends ConverterRule(
+      classOf[FlinkLogicalMatch],
+      FlinkConventions.LOGICAL,
+      FlinkConventions.DATASTREAM,
+      "DataStreamMatchRule") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val logicalMatch: FlinkLogicalMatch = call.rel(0).asInstanceOf[FlinkLogicalMatch]
@@ -64,12 +64,15 @@ class DataStreamMatchRule
 
     try {
       Class
-        .forName("org.apache.flink.cep.pattern.Pattern",
+        .forName(
+          "org.apache.flink.cep.pattern.Pattern",
           false,
           Thread.currentThread().getContextClassLoader)
     } catch {
-      case ex: ClassNotFoundException => throw new TableException(
-        "MATCH RECOGNIZE clause requires flink-cep dependency to be present on the classpath.", ex)
+      case ex: ClassNotFoundException =>
+        throw new TableException(
+          "MATCH RECOGNIZE clause requires flink-cep dependency to be present on the classpath.",
+          ex)
     }
 
     new DataStreamMatch(
@@ -87,8 +90,7 @@ class DataStreamMatchRule
         logicalMatch.isAllRows,
         logicalMatch.getPartitionKeys,
         logicalMatch.getOrderKeys,
-        logicalMatch.getInterval
-      ),
+        logicalMatch.getInterval),
       new RowSchema(logicalMatch.getRowType),
       new RowSchema(logicalMatch.getInput.getRowType))
   }
@@ -114,15 +116,16 @@ class DataStreamMatchRule
       partitionKeys: ImmutableBitSet,
       measuresNames: mutable.Set[String],
       inputSchema: RelDataType,
-      expectedSchema: RelDataType)
-    : Unit = {
+      expectedSchema: RelDataType): Unit = {
     val actualSize = partitionKeys.toArray.length + measuresNames.size
     val expectedSize = expectedSchema.getFieldCount
     if (actualSize != expectedSize) {
       //try to find ambiguous column
 
-      val ambiguousColumns = partitionKeys.toArray.map(inputSchema.getFieldList.get(_).getName)
-        .filter(measuresNames.contains).mkString("{", ", ", "}")
+      val ambiguousColumns = partitionKeys.toArray
+        .map(inputSchema.getFieldList.get(_).getName)
+        .filter(measuresNames.contains)
+        .mkString("{", ", ", "}")
 
       throw new ValidationException(s"Columns ambiguously defined: $ambiguousColumns")
     }

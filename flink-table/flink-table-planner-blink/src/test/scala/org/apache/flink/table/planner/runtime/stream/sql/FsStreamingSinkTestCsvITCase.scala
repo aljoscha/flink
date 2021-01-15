@@ -23,8 +23,8 @@ import org.apache.flink.table.planner.runtime.stream.FsStreamingSinkITCaseBase
 import scala.collection.Seq
 
 /**
-  * Test checkpoint for file system table factory with testcsv format.
-  */
+ * Test checkpoint for file system table factory with testcsv format.
+ */
 class FsStreamingSinkTestCsvITCase extends FsStreamingSinkITCaseBase {
 
   override def additionalProperties(): Array[String] = {

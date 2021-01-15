@@ -21,22 +21,34 @@ package org.apache.flink.table.factories
 import java.util.{HashMap => JHashMap, Map => JMap}
 
 import org.apache.flink.table.api.NoMatchingTableFactoryException
-import org.apache.flink.table.descriptors.ConnectorDescriptorValidator.{CONNECTOR_PROPERTY_VERSION, CONNECTOR_TYPE}
-import org.apache.flink.table.descriptors.FormatDescriptorValidator.{FORMAT_PROPERTY_VERSION, FORMAT_TYPE}
-import org.apache.flink.table.factories.utils.TestFixedFormatTableFactory.{CONNECTOR_TYPE_VALUE_FIXED, FORMAT_TYPE_VALUE_TEST}
+import org.apache.flink.table.descriptors.ConnectorDescriptorValidator.{
+  CONNECTOR_PROPERTY_VERSION,
+  CONNECTOR_TYPE
+}
+import org.apache.flink.table.descriptors.FormatDescriptorValidator.{
+  FORMAT_PROPERTY_VERSION,
+  FORMAT_TYPE
+}
+import org.apache.flink.table.factories.utils.TestFixedFormatTableFactory.{
+  CONNECTOR_TYPE_VALUE_FIXED,
+  FORMAT_TYPE_VALUE_TEST
+}
 import org.apache.flink.table.factories.utils.TestWildcardFormatTableSourceFactory.CONNECTOR_TYPE_VALUE_WILDCARD
-import org.apache.flink.table.factories.utils.{TestFixedFormatTableFactory, TestWildcardFormatTableSourceFactory}
+import org.apache.flink.table.factories.utils.{
+  TestFixedFormatTableFactory,
+  TestWildcardFormatTableSourceFactory
+}
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
-  * Tests for testing table source discovery using [[TableFactoryService]]. The tests assume the
-  * two table source factories [[TestFixedFormatTableFactory]] and
-  * [[TestWildcardFormatTableSourceFactory]] are registered.
-  *
-  * The first table source has a [[FORMAT_TYPE_VALUE_TEST]] type where as the second source uses
-  * a wildcard to match arbitrary formats.
-  */
+ * Tests for testing table source discovery using [[TableFactoryService]]. The tests assume the
+ * two table source factories [[TestFixedFormatTableFactory]] and
+ * [[TestWildcardFormatTableSourceFactory]] are registered.
+ *
+ * The first table source has a [[FORMAT_TYPE_VALUE_TEST]] type where as the second source uses
+ * a wildcard to match arbitrary formats.
+ */
 class TableSourceFactoryServiceTest {
 
   @Test
@@ -44,8 +56,10 @@ class TableSourceFactoryServiceTest {
     val props = properties()
     props.put(CONNECTOR_TYPE, CONNECTOR_TYPE_VALUE_FIXED)
     props.put(FORMAT_TYPE, FORMAT_TYPE_VALUE_TEST)
-    assertTrue(TableFactoryService.find(classOf[StreamTableSourceFactory[_]], props)
-      .isInstanceOf[TestFixedFormatTableFactory])
+    assertTrue(
+      TableFactoryService
+        .find(classOf[StreamTableSourceFactory[_]], props)
+        .isInstanceOf[TestFixedFormatTableFactory])
   }
 
   @Test(expected = classOf[NoMatchingTableFactoryException])
@@ -63,8 +77,10 @@ class TableSourceFactoryServiceTest {
     props.put(FORMAT_TYPE, FORMAT_TYPE_VALUE_TEST)
     props.put(CONNECTOR_PROPERTY_VERSION, "2")
     // the table source should still be found
-    assertTrue(TableFactoryService.find(classOf[StreamTableSourceFactory[_]], props)
-      .isInstanceOf[TestFixedFormatTableFactory])
+    assertTrue(
+      TableFactoryService
+        .find(classOf[StreamTableSourceFactory[_]], props)
+        .isInstanceOf[TestFixedFormatTableFactory])
   }
 
   @Test(expected = classOf[NoMatchingTableFactoryException])

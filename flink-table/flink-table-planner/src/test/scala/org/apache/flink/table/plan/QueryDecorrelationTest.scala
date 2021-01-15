@@ -30,19 +30,14 @@ class QueryDecorrelationTest extends TableTestBase {
   @Test
   def testCorrelationScalarAggAndFilter(): Unit = {
     val util = batchTestUtil()
-    val table = util.addTable[(Int, String, String, Int, Int)](
-      "emp",
-      'empno,
-      'ename,
-      'job,
-      'salary,
-      'deptno)
+    val table =
+      util.addTable[(Int, String, String, Int, Int)]("emp", 'empno, 'ename, 'job, 'salary, 'deptno)
     val table1 = util.addTable[(Int, String)]("dept", 'deptno, 'name)
 
     val sql = "SELECT e1.empno\n" +
-        "FROM emp e1, dept d1 where e1.deptno = d1.deptno\n" +
-        "and e1.deptno < 10 and d1.deptno < 15\n" +
-        "and e1.salary > (select avg(salary) from emp e2 where e1.empno = e2.empno)"
+      "FROM emp e1, dept d1 where e1.deptno = d1.deptno\n" +
+      "and e1.deptno < 10 and d1.deptno < 15\n" +
+      "and e1.salary > (select avg(salary) from emp e2 where e1.empno = e2.empno)"
 
     val expectedQuery = unaryNode(
       "DataSetCalc",
@@ -56,37 +51,29 @@ class QueryDecorrelationTest extends TableTestBase {
               "DataSetCalc",
               batchTableNode(table),
               term("select", "empno", "salary", "deptno"),
-              term("where", "<(deptno, 10)")
-            ),
+              term("where", "<(deptno, 10)")),
             unaryNode(
               "DataSetCalc",
               batchTableNode(table1),
               term("select", "deptno"),
-              term("where", "<(deptno, 15)")
-            ),
+              term("where", "<(deptno, 15)")),
             term("where", "=(deptno, deptno0)"),
             term("join", "empno", "salary", "deptno", "deptno0"),
-            term("joinType", "InnerJoin")
-          ),
-          term("select", "empno", "salary")
-        ),
+            term("joinType", "InnerJoin")),
+          term("select", "empno", "salary")),
         unaryNode(
           "DataSetAggregate",
           unaryNode(
             "DataSetCalc",
             batchTableNode(table),
             term("select", "empno", "salary"),
-            term("where", "IS NOT NULL(empno)")
-          ),
+            term("where", "IS NOT NULL(empno)")),
           term("groupBy", "empno"),
-          term("select", "empno", "AVG(salary) AS EXPR$0")
-        ),
+          term("select", "empno", "AVG(salary) AS EXPR$0")),
         term("where", "AND(=(empno, empno0), >(salary, EXPR$0))"),
         term("join", "empno", "salary", "empno0", "EXPR$0"),
-        term("joinType", "InnerJoin")
-      ),
-      term("select", "empno")
-    )
+        term("joinType", "InnerJoin")),
+      term("select", "empno"))
 
     util.verifySql(sql, expectedQuery)
   }
@@ -94,20 +81,15 @@ class QueryDecorrelationTest extends TableTestBase {
   @Test
   def testDecorrelateWithMultiAggregate(): Unit = {
     val util = batchTestUtil()
-    val table = util.addTable[(Int, String, String, Int, Int)](
-      "emp",
-      'empno,
-      'ename,
-      'job,
-      'salary,
-      'deptno)
+    val table =
+      util.addTable[(Int, String, String, Int, Int)]("emp", 'empno, 'ename, 'job, 'salary, 'deptno)
     val table1 = util.addTable[(Int, String)]("dept", 'deptno, 'name)
 
     val sql = "select sum(e1.empno) from emp e1, dept d1 " +
-        "where e1.deptno = d1.deptno " +
-        "and e1.salary > (" +
-        "    select avg(e2.salary) from emp e2 where e2.deptno = d1.deptno" +
-        ")"
+      "where e1.deptno = d1.deptno " +
+      "and e1.salary > (" +
+      "    select avg(e2.salary) from emp e2 where e2.deptno = d1.deptno" +
+      ")"
 
     val expectedQuery = unaryNode(
       "DataSetAggregate",
@@ -122,38 +104,26 @@ class QueryDecorrelationTest extends TableTestBase {
               unaryNode(
                 "DataSetCalc",
                 batchTableNode(table),
-                term("select", "empno", "salary", "deptno")
-              ),
-              unaryNode(
-                "DataSetCalc",
-                batchTableNode(table1),
-                term("select", "deptno")
-              ),
+                term("select", "empno", "salary", "deptno")),
+              unaryNode("DataSetCalc", batchTableNode(table1), term("select", "deptno")),
               term("where", "=(deptno, deptno0)"),
               term("join", "empno", "salary", "deptno", "deptno0"),
-              term("joinType", "InnerJoin")
-            ),
-            term("select", "empno", "salary", "deptno0")
-          ),
+              term("joinType", "InnerJoin")),
+            term("select", "empno", "salary", "deptno0")),
           unaryNode(
             "DataSetAggregate",
             unaryNode(
               "DataSetCalc",
               batchTableNode(table),
               term("select", "deptno", "salary"),
-              term("where", "IS NOT NULL(deptno)")
-            ),
+              term("where", "IS NOT NULL(deptno)")),
             term("groupBy", "deptno"),
-            term("select", "deptno", "AVG(salary) AS EXPR$0")
-          ),
+            term("select", "deptno", "AVG(salary) AS EXPR$0")),
           term("where", "AND(=(deptno0, deptno), >(salary, EXPR$0))"),
           term("join", "empno", "salary", "deptno0", "deptno", "EXPR$0"),
-          term("joinType", "InnerJoin")
-        ),
-        term("select", "empno")
-      ),
-      term("select", "SUM(empno) AS EXPR$0")
-    )
+          term("joinType", "InnerJoin")),
+        term("select", "empno")),
+      term("select", "SUM(empno) AS EXPR$0"))
 
     util.verifySql(sql, expectedQuery)
   }

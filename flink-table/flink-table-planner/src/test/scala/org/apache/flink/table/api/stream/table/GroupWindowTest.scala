@@ -20,7 +20,10 @@ package org.apache.flink.table.api.stream.table
 
 import org.apache.flink.api.scala._
 import org.apache.flink.table.api._
-import org.apache.flink.table.runtime.utils.JavaUserDefinedAggFunctions.{WeightedAvg, WeightedAvgWithMerge}
+import org.apache.flink.table.runtime.utils.JavaUserDefinedAggFunctions.{
+  WeightedAvg,
+  WeightedAvgWithMerge
+}
 import org.apache.flink.table.utils.TableTestBase
 import org.apache.flink.table.utils.TableTestUtil._
 
@@ -50,17 +53,13 @@ class GroupWindowTest extends TableTestBase {
           unaryNode(
             "DataStreamCalc",
             streamTableNode(table),
-            term("select", "int", "string", "proctime")
-          ),
+            term("select", "int", "string", "proctime")),
           term("groupBy", "string"),
           term("window", "TumblingGroupWindow('w1, 'proctime, 50.millis)"),
-          term("select", "string", "COUNT(int) AS EXPR$1", "proctime('w1) AS EXPR$0")
-        ),
-        term("select", "EXPR$0 AS proctime", "string")
-      ),
+          term("select", "string", "COUNT(int) AS EXPR$1", "proctime('w1) AS EXPR$0")),
+        term("select", "EXPR$0 AS proctime", "string")),
       term("window", "SlidingGroupWindow('w2, 'proctime, 20.millis, 10.millis)"),
-      term("select", "COUNT(string) AS EXPR$0")
-    )
+      term("select", "COUNT(string) AS EXPR$0"))
     util.verifyTable(windowedTable, expected)
   }
 
@@ -79,12 +78,10 @@ class GroupWindowTest extends TableTestBase {
       unaryNode(
         "DataStreamCalc",
         streamTableNode(table),
-        term("select", "int", "string", "proctime")
-      ),
+        term("select", "int", "string", "proctime")),
       term("groupBy", "string"),
       term("window", "TumblingGroupWindow('w, 'proctime, 50.millis)"),
-      term("select", "string", "COUNT(int) AS EXPR$0")
-    )
+      term("select", "string", "COUNT(int) AS EXPR$0"))
 
     util.verifyTable(windowedTable, expected)
   }
@@ -104,12 +101,10 @@ class GroupWindowTest extends TableTestBase {
       unaryNode(
         "DataStreamCalc",
         streamTableNode(table),
-        term("select", "int", "string", "proctime")
-      ),
+        term("select", "int", "string", "proctime")),
       term("groupBy", "string"),
       term("window", "TumblingGroupWindow('w, 'proctime, 2)"),
-      term("select", "string", "COUNT(int) AS EXPR$0")
-    )
+      term("select", "string", "COUNT(int) AS EXPR$0"))
 
     util.verifyTable(windowedTable, expected)
   }
@@ -129,8 +124,7 @@ class GroupWindowTest extends TableTestBase {
       streamTableNode(table),
       term("groupBy", "string"),
       term("window", "TumblingGroupWindow('w, 'long, 5.millis)"),
-      term("select", "string", "COUNT(int) AS EXPR$0")
-    )
+      term("select", "string", "COUNT(int) AS EXPR$0"))
 
     util.verifyTable(windowedTable, expected)
   }
@@ -152,8 +146,7 @@ class GroupWindowTest extends TableTestBase {
       streamTableNode(table),
       term("groupBy", "string"),
       term("window", "TumblingGroupWindow('w, 'rowtime, 5.millis)"),
-      term("select", "string", "myWeightedAvg(long, int) AS EXPR$0")
-    )
+      term("select", "string", "myWeightedAvg(long, int) AS EXPR$0"))
 
     util.verifyTable(windowedTable, expected)
   }
@@ -173,12 +166,10 @@ class GroupWindowTest extends TableTestBase {
       unaryNode(
         "DataStreamCalc",
         streamTableNode(table),
-        term("select", "int", "string", "proctime")
-      ),
+        term("select", "int", "string", "proctime")),
       term("groupBy", "string"),
       term("window", "SlidingGroupWindow('w, 'proctime, 50.millis, 50.millis)"),
-      term("select", "string", "COUNT(int) AS EXPR$0")
-    )
+      term("select", "string", "COUNT(int) AS EXPR$0"))
 
     util.verifyTable(windowedTable, expected)
   }
@@ -198,12 +189,10 @@ class GroupWindowTest extends TableTestBase {
       unaryNode(
         "DataStreamCalc",
         streamTableNode(table),
-        term("select", "int", "string", "proctime")
-      ),
+        term("select", "int", "string", "proctime")),
       term("groupBy", "string"),
       term("window", "SlidingGroupWindow('w, 'proctime, 2, 1)"),
-      term("select", "string", "COUNT(int) AS EXPR$0")
-    )
+      term("select", "string", "COUNT(int) AS EXPR$0"))
 
     util.verifyTable(windowedTable, expected)
   }
@@ -223,12 +212,10 @@ class GroupWindowTest extends TableTestBase {
       unaryNode(
         "DataStreamCalc",
         streamTableNode(table),
-        term("select", "int", "string", "rowtime")
-      ),
+        term("select", "int", "string", "rowtime")),
       term("groupBy", "string"),
       term("window", "SlidingGroupWindow('w, 'rowtime, 8.millis, 10.millis)"),
-      term("select", "string", "COUNT(int) AS EXPR$0")
-    )
+      term("select", "string", "COUNT(int) AS EXPR$0"))
 
     util.verifyTable(windowedTable, expected)
   }
@@ -249,8 +236,7 @@ class GroupWindowTest extends TableTestBase {
       streamTableNode(table),
       term("groupBy", "string"),
       term("window", "SlidingGroupWindow('w, 'long, 8.millis, 10.millis)"),
-      term("select", "string", "COUNT(int) AS EXPR$0")
-    )
+      term("select", "string", "COUNT(int) AS EXPR$0"))
 
     util.verifyTable(windowedTable, expected)
   }
@@ -272,8 +258,7 @@ class GroupWindowTest extends TableTestBase {
       streamTableNode(table),
       term("groupBy", "string"),
       term("window", "SlidingGroupWindow('w, 'rowtime, 8.millis, 10.millis)"),
-      term("select", "string", "myWeightedAvg(long, int) AS EXPR$0")
-    )
+      term("select", "string", "myWeightedAvg(long, int) AS EXPR$0"))
 
     util.verifyTable(windowedTable, expected)
   }
@@ -293,8 +278,7 @@ class GroupWindowTest extends TableTestBase {
       streamTableNode(table),
       term("groupBy", "string"),
       term("window", "SessionGroupWindow('w, 'long, 7.millis)"),
-      term("select", "string", "COUNT(int) AS EXPR$0")
-    )
+      term("select", "string", "COUNT(int) AS EXPR$0"))
 
     util.verifyTable(windowedTable, expected)
   }
@@ -316,8 +300,7 @@ class GroupWindowTest extends TableTestBase {
       streamTableNode(table),
       term("groupBy", "string"),
       term("window", "SessionGroupWindow('w, 'rowtime, 7.millis)"),
-      term("select", "string", "myWeightedAvg(long, int) AS EXPR$0")
-    )
+      term("select", "string", "myWeightedAvg(long, int) AS EXPR$0"))
 
     util.verifyTable(windowedTable, expected)
   }
@@ -337,12 +320,10 @@ class GroupWindowTest extends TableTestBase {
       unaryNode(
         "DataStreamCalc",
         streamTableNode(table),
-        term("select", "int", "string", "proctime")
-      ),
+        term("select", "int", "string", "proctime")),
       term("groupBy", "string"),
       term("window", "TumblingGroupWindow('w, 'proctime, 50.millis)"),
-      term("select", "string", "COUNT(int) AS EXPR$0")
-    )
+      term("select", "string", "COUNT(int) AS EXPR$0"))
 
     util.verifyTable(windowedTable, expected)
   }
@@ -359,14 +340,9 @@ class GroupWindowTest extends TableTestBase {
 
     val expected = unaryNode(
       "DataStreamGroupWindowAggregate",
-      unaryNode(
-        "DataStreamCalc",
-        streamTableNode(table),
-        term("select", "int", "proctime")
-      ),
+      unaryNode("DataStreamCalc", streamTableNode(table), term("select", "int", "proctime")),
       term("window", "TumblingGroupWindow('w, 'proctime, 2)"),
-      term("select", "COUNT(int) AS EXPR$0")
-    )
+      term("select", "COUNT(int) AS EXPR$0"))
 
     util.verifyTable(windowedTable, expected)
   }
@@ -383,14 +359,9 @@ class GroupWindowTest extends TableTestBase {
 
     val expected = unaryNode(
       "DataStreamGroupWindowAggregate",
-      unaryNode(
-        "DataStreamCalc",
-        streamTableNode(table),
-        term("select", "int", "rowtime")
-      ),
+      unaryNode("DataStreamCalc", streamTableNode(table), term("select", "int", "rowtime")),
       term("window", "TumblingGroupWindow('w, 'rowtime, 5.millis)"),
-      term("select", "COUNT(int) AS EXPR$0")
-    )
+      term("select", "COUNT(int) AS EXPR$0"))
 
     util.verifyTable(windowedTable, expected)
   }
@@ -408,14 +379,9 @@ class GroupWindowTest extends TableTestBase {
 
     val expected = unaryNode(
       "DataStreamGroupWindowAggregate",
-      unaryNode(
-        "DataStreamCalc",
-        streamTableNode(table),
-        term("select", "int", "long")
-      ),
+      unaryNode("DataStreamCalc", streamTableNode(table), term("select", "int", "long")),
       term("window", "TumblingGroupWindow('w, 'long, 5.millis)"),
-      term("select", "COUNT(int) AS EXPR$0")
-    )
+      term("select", "COUNT(int) AS EXPR$0"))
 
     util.verifyTable(windowedTable, expected)
   }
@@ -432,14 +398,9 @@ class GroupWindowTest extends TableTestBase {
 
     val expected = unaryNode(
       "DataStreamGroupWindowAggregate",
-      unaryNode(
-        "DataStreamCalc",
-        streamTableNode(table),
-        term("select", "int", "proctime")
-      ),
+      unaryNode("DataStreamCalc", streamTableNode(table), term("select", "int", "proctime")),
       term("window", "SlidingGroupWindow('w, 'proctime, 50.millis, 50.millis)"),
-      term("select", "COUNT(int) AS EXPR$0")
-    )
+      term("select", "COUNT(int) AS EXPR$0"))
 
     util.verifyTable(windowedTable, expected)
   }
@@ -456,14 +417,9 @@ class GroupWindowTest extends TableTestBase {
 
     val expected = unaryNode(
       "DataStreamGroupWindowAggregate",
-      unaryNode(
-        "DataStreamCalc",
-        streamTableNode(table),
-        term("select", "int", "proctime")
-      ),
+      unaryNode("DataStreamCalc", streamTableNode(table), term("select", "int", "proctime")),
       term("window", "SlidingGroupWindow('w, 'proctime, 2, 1)"),
-      term("select", "COUNT(int) AS EXPR$0")
-    )
+      term("select", "COUNT(int) AS EXPR$0"))
 
     util.verifyTable(windowedTable, expected)
   }
@@ -480,14 +436,9 @@ class GroupWindowTest extends TableTestBase {
 
     val expected = unaryNode(
       "DataStreamGroupWindowAggregate",
-      unaryNode(
-        "DataStreamCalc",
-        streamTableNode(table),
-        term("select", "int", "rowtime")
-      ),
+      unaryNode("DataStreamCalc", streamTableNode(table), term("select", "int", "rowtime")),
       term("window", "SlidingGroupWindow('w, 'rowtime, 8.millis, 10.millis)"),
-      term("select", "COUNT(int) AS EXPR$0")
-    )
+      term("select", "COUNT(int) AS EXPR$0"))
 
     util.verifyTable(windowedTable, expected)
   }
@@ -505,14 +456,9 @@ class GroupWindowTest extends TableTestBase {
 
     val expected = unaryNode(
       "DataStreamGroupWindowAggregate",
-      unaryNode(
-        "DataStreamCalc",
-        streamTableNode(table),
-        term("select", "long", "int")
-      ),
+      unaryNode("DataStreamCalc", streamTableNode(table), term("select", "long", "int")),
       term("window", "SlidingGroupWindow('w, 'long, 8.millis, 10.millis)"),
-      term("select", "COUNT(int) AS EXPR$0")
-    )
+      term("select", "COUNT(int) AS EXPR$0"))
 
     util.verifyTable(windowedTable, expected)
   }
@@ -529,14 +475,9 @@ class GroupWindowTest extends TableTestBase {
 
     val expected = unaryNode(
       "DataStreamGroupWindowAggregate",
-      unaryNode(
-        "DataStreamCalc",
-        streamTableNode(table),
-        term("select", "long", "int")
-      ),
+      unaryNode("DataStreamCalc", streamTableNode(table), term("select", "long", "int")),
       term("window", "SessionGroupWindow('w, 'long, 7.millis)"),
-      term("select", "COUNT(int) AS EXPR$0")
-    )
+      term("select", "COUNT(int) AS EXPR$0"))
 
     util.verifyTable(windowedTable, expected)
   }
@@ -556,16 +497,10 @@ class GroupWindowTest extends TableTestBase {
       unaryNode(
         "DataStreamCalc",
         streamTableNode(table),
-        term("select", "int", "string", "rowtime")
-      ),
+        term("select", "int", "string", "rowtime")),
       term("groupBy", "string"),
       term("window", "TumblingGroupWindow('w, 'rowtime, 5.millis)"),
-      term("select",
-        "string",
-        "COUNT(int) AS EXPR$0",
-        "start('w) AS EXPR$1",
-        "end('w) AS EXPR$2")
-    )
+      term("select", "string", "COUNT(int) AS EXPR$0", "start('w) AS EXPR$1", "end('w) AS EXPR$2"))
 
     util.verifyTable(windowedTable, expected)
   }
@@ -596,15 +531,8 @@ class GroupWindowTest extends TableTestBase {
           streamTableNode(table),
           term("groupBy", "string, int2, int3"),
           term("window", "SlidingGroupWindow('w, 'proctime, 2, 1)"),
-          term(
-            "select",
-            "string",
-            "int2",
-            "int3",
-            "WeightedAvg(long, int) AS EXPR$0")
-        ),
-        term("select","EXPR$0")
-      )
+          term("select", "string", "int2", "int3", "WeightedAvg(long, int) AS EXPR$0")),
+        term("select", "EXPR$0"))
 
     util.verifyTable(windowedTable, expected)
   }
@@ -624,16 +552,10 @@ class GroupWindowTest extends TableTestBase {
       unaryNode(
         "DataStreamCalc",
         streamTableNode(table),
-        term("select", "int", "string", "rowtime")
-      ),
+        term("select", "int", "string", "rowtime")),
       term("groupBy", "string"),
       term("window", "SlidingGroupWindow('w, 'rowtime, 10.millis, 5.millis)"),
-      term("select",
-        "string",
-        "COUNT(int) AS EXPR$0",
-        "start('w) AS EXPR$1",
-        "end('w) AS EXPR$2")
-    )
+      term("select", "string", "COUNT(int) AS EXPR$0", "start('w) AS EXPR$1", "end('w) AS EXPR$2"))
 
     util.verifyTable(windowedTable, expected)
   }
@@ -655,14 +577,13 @@ class GroupWindowTest extends TableTestBase {
         streamTableNode(table),
         term("groupBy", "string"),
         term("window", "SessionGroupWindow('w, 'long, 3.millis)"),
-        term("select",
+        term(
+          "select",
           "string",
           "COUNT(int) AS EXPR$1",
           "end('w) AS EXPR$0",
-          "start('w) AS EXPR$2")
-      ),
-      term("select", "EXPR$0 AS we1", "string", "EXPR$1 AS cnt", "EXPR$2 AS ws", "EXPR$0 AS we2")
-    )
+          "start('w) AS EXPR$2")),
+      term("select", "EXPR$0 AS we1", "string", "EXPR$1 AS cnt", "EXPR$2 AS ws", "EXPR$0 AS we2"))
 
     util.verifyTable(windowedTable, expected)
   }
@@ -675,8 +596,14 @@ class GroupWindowTest extends TableTestBase {
     val windowedTable = table
       .window(Tumble over 5.millis on 'long as 'w)
       .groupBy('w, 'string)
-      .select('string, 'int.sum + 1 as 's1, 'int.sum + 3 as 's2, 'w.start as 'x, 'w.start as 'x2,
-        'w.end as 'x3, 'w.end)
+      .select(
+        'string,
+        'int.sum + 1 as 's1,
+        'int.sum + 3 as 's2,
+        'w.start as 'x,
+        'w.start as 'x2,
+        'w.end as 'x3,
+        'w.end)
 
     val expected = unaryNode(
       "DataStreamCalc",
@@ -685,21 +612,16 @@ class GroupWindowTest extends TableTestBase {
         streamTableNode(table),
         term("groupBy", "string"),
         term("window", "TumblingGroupWindow('w, 'long, 5.millis)"),
-        term("select",
-          "string",
-          "SUM(int) AS EXPR$0",
-          "start('w) AS EXPR$1",
-          "end('w) AS EXPR$2")
-      ),
-      term("select",
+        term("select", "string", "SUM(int) AS EXPR$0", "start('w) AS EXPR$1", "end('w) AS EXPR$2")),
+      term(
+        "select",
         "string",
         "+(EXPR$0, 1) AS s1",
         "+(EXPR$0, 3) AS s2",
         "EXPR$1 AS x",
         "EXPR$1 AS x2",
         "EXPR$2 AS x3",
-        "EXPR$2")
-    )
+        "EXPR$2"))
 
     util.verifyTable(windowedTable, expected)
   }
@@ -722,25 +644,24 @@ class GroupWindowTest extends TableTestBase {
           unaryNode(
             "DataStreamCalc",
             streamTableNode(table),
-            term("select", "rowtime", "c", "*(c, c) AS $f2")
-          ),
+            term("select", "rowtime", "c", "*(c, c) AS $f2")),
           term("window", "TumblingGroupWindow('w, 'rowtime, 900000.millis)"),
-          term("select",
+          term(
+            "select",
             "SUM($f2) AS $f0",
             "SUM(c) AS $f1",
             "COUNT(c) AS $f2",
             "start('w) AS EXPR$4",
-            "end('w) AS EXPR$5")
-        ),
-        term("select",
+            "end('w) AS EXPR$5")),
+        term(
+          "select",
           "/(-($f0, /(*($f1, $f1), $f2)), $f2) AS EXPR$0",
           "/(-($f0, /(*($f1, $f1), $f2)), CASE(=($f2, 1), null:BIGINT, -($f2, 1))) AS EXPR$1",
           "CAST(POWER(/(-($f0, /(*($f1, $f1), $f2)), $f2), 0.5:DECIMAL(2, 1))) AS EXPR$2",
           "CAST(POWER(/(-($f0, /(*($f1, $f1), $f2)), CASE(=($f2, 1), null:BIGINT, " +
             "-($f2, 1))), 0.5:DECIMAL(2, 1))) AS EXPR$3",
           "EXPR$4",
-          "EXPR$5")
-      )
+          "EXPR$5"))
 
     util.verifyTable(windowedTable, expected)
   }

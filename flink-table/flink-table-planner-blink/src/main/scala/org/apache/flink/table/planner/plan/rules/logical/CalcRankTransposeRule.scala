@@ -33,14 +33,13 @@ import org.apache.calcite.util.ImmutableBitSet
 import scala.collection.JavaConversions._
 
 /**
-  * Planner rule that transposes [[FlinkLogicalCalc]] past [[FlinkLogicalRank]]
-  * to reduce rank input fields.
-  */
+ * Planner rule that transposes [[FlinkLogicalCalc]] past [[FlinkLogicalRank]]
+ * to reduce rank input fields.
+ */
 class CalcRankTransposeRule
-  extends RelOptRule(
-    operand(classOf[FlinkLogicalCalc],
-      operand(classOf[FlinkLogicalRank], any())),
-    "CalcRankTransposeRule") {
+    extends RelOptRule(
+      operand(classOf[FlinkLogicalCalc], operand(classOf[FlinkLogicalRank], any())),
+      "CalcRankTransposeRule") {
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val calc: FlinkLogicalCalc = call.rel(0)
@@ -60,10 +59,8 @@ class CalcRankTransposeRule
 
     val rexBuilder = calc.getCluster.getRexBuilder
     // create a new Calc to project columns of Rank's input
-    val innerProgram = createNewInnerCalcProgram(
-      pushableColumns,
-      rank.getInput.getRowType,
-      rexBuilder)
+    val innerProgram =
+      createNewInnerCalcProgram(pushableColumns, rank.getInput.getRowType, rexBuilder)
     val newInnerCalc = calc.copy(calc.getTraitSet, rank.getInput, innerProgram)
 
     // create a new Rank on top of new Calc
@@ -73,17 +70,16 @@ class CalcRankTransposeRule
     // create a new Calc on top of newRank if needed
     if (rank.outputRankNumber) {
       // append RankNumber field mapping
-      val oldRankFunFieldIdx = RankUtil.getRankNumberColumnIndex(rank)
+      val oldRankFunFieldIdx = RankUtil
+        .getRankNumberColumnIndex(rank)
         .getOrElse(throw new TableException("This should not happen"))
-      val newRankFunFieldIdx = RankUtil.getRankNumberColumnIndex(newRank)
+      val newRankFunFieldIdx = RankUtil
+        .getRankNumberColumnIndex(newRank)
         .getOrElse(throw new TableException("This should not happen"))
       fieldMapping += (oldRankFunFieldIdx -> newRankFunFieldIdx)
     }
-    val topProgram = createNewTopCalcProgram(
-      calc.getProgram,
-      fieldMapping,
-      newRank.getRowType,
-      rexBuilder)
+    val topProgram =
+      createNewTopCalcProgram(calc.getProgram, fieldMapping, newRank.getRowType, rexBuilder)
 
     val equiv = if (topProgram.isTrivial) {
       // Ignore newTopCac if it's program is trivial
@@ -124,7 +120,7 @@ class CalcRankTransposeRule
     }
     val rankRangeKey = rank.rankRange match {
       case v: VariableRankRange => Array(v.getRankEndIndex)
-      case _ => Array[Int]()
+      case _                    => Array[Int]()
     }
     // All key including partition key, order key, unique keys, VariableRankRange rankEndIndex
     Set(partitionKey, orderKey, keysInUniqueKeys, rankRangeKey).flatten.toArray
@@ -146,8 +142,8 @@ class CalcRankTransposeRule
       inputRowType: RelDataType,
       rexBuilder: RexBuilder): RexProgram = {
     val oldProjects = oldTopProgram.getProjectList
-    val newProjects = oldProjects.map(oldTopProgram.expandLocalRef).map {
-      p => FlinkRexUtil.adjustInputRef(p, fieldMapping)
+    val newProjects = oldProjects.map(oldTopProgram.expandLocalRef).map { p =>
+      FlinkRexUtil.adjustInputRef(p, fieldMapping)
     }
     val oldCondition = oldTopProgram.getCondition
     val newCondition = if (oldCondition != null) {
@@ -156,12 +152,7 @@ class CalcRankTransposeRule
       null
     }
     val colNames = oldTopProgram.getOutputRowType.getFieldNames
-    RexProgram.create(
-      inputRowType,
-      newProjects,
-      newCondition,
-      colNames,
-      rexBuilder)
+    RexProgram.create(inputRowType, newProjects, newCondition, colNames, rexBuilder)
   }
 
   private def createNewRankOnCalc(
@@ -171,8 +162,8 @@ class CalcRankTransposeRule
     val newPartitionKey = rank.partitionKey.toArray.map(fieldMapping(_))
     val oldOrderKey = rank.orderKey
     val oldFieldCollations = oldOrderKey.getFieldCollations
-    val newFieldCollations = oldFieldCollations.map {
-      fc => fc.copy(fieldMapping(fc.getFieldIndex))
+    val newFieldCollations = oldFieldCollations.map { fc =>
+      fc.copy(fieldMapping(fc.getFieldIndex))
     }
     val newOrderKey = if (newFieldCollations.eq(oldFieldCollations)) {
       oldOrderKey
